@@ -6,6 +6,37 @@ using System;
 using System.IO;
 namespace QTool
 {
+    public interface IKey<KeyType>
+    {
+        KeyType key { get; set; }
+    }
+    public static class ArrayExtend
+    {
+        public static T Get<T, KeyType>(this ICollection<T> array, KeyType key) where T : class, IKey<KeyType>
+        {
+            foreach (var value in array)
+            {
+                if (key.Equals(value.key))
+                {
+                    return value;
+                }
+            }
+            return null;
+        }
+        public static T GetAndCreate<T, KeyType>(this ICollection<T> array, KeyType key) where T : class, IKey<KeyType>, new()
+        {
+            foreach (var value in array)
+            {
+                if (key.Equals(value.key))
+                {
+                    return value;
+                }
+            }
+            var t = new T { key = key };
+            array.Add(t);
+            return t;
+        }
+    }
     public class FileManager
     {
         public static string Serialize<T>(T t, params Type[] extraTypes)
