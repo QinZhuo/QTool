@@ -12,6 +12,17 @@ namespace QTool
     }
     public static class ArrayExtend
     {
+        public static bool ContainsKey<T, KeyType>(this ICollection<T> array, KeyType key) where T : class, IKey<KeyType>
+        {
+            foreach (var value in array)
+            {
+                if (key.Equals(value.key))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
         public static T Get<T, KeyType>(this ICollection<T> array, KeyType key) where T : class, IKey<KeyType>
         {
             foreach (var value in array)
