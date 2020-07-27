@@ -8,7 +8,7 @@ namespace QTool
 {
     public interface IKey<KeyType>
     {
-        KeyType key { get; set; }
+        KeyType Key { get; set; }
     }
     public static class ArrayExtend
     {
@@ -16,7 +16,7 @@ namespace QTool
         {
             foreach (var value in array)
             {
-                if (key.Equals(value.key))
+                if (key.Equals(value.Key))
                 {
                     return true;
                 }
@@ -27,7 +27,7 @@ namespace QTool
         {
             foreach (var value in array)
             {
-                if (key.Equals(value.key))
+                if (key.Equals(value.Key))
                 {
                     return value;
                 }
@@ -38,12 +38,12 @@ namespace QTool
         {
             foreach (var value in array)
             {
-                if (key.Equals(value.key))
+                if (key.Equals(value.Key))
                 {
                     return value;
                 }
             }
-            var t = new T { key = key };
+            var t = new T { Key = key };
             array.Add(t);
             return t;
         }
