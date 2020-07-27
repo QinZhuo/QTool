@@ -10,6 +10,29 @@ namespace QTool
     {
         KeyType Key { get; set; }
     }
+    public class KeyList<KeyType,T>:List<T> where T :class, IKey<KeyType>,new()
+    {
+        private new T this[int index]
+        {
+            get
+            {
+                return default;
+            }
+        }
+        public T this[KeyType key]
+        {
+            get
+            {
+                return this.GetAndCreate<T,KeyType>(key);
+            }
+            set
+            {
+                var old = this.Get(key);
+                Remove(old);
+                Add(value);
+            }
+        }
+    }
     public static class ArrayExtend
     {
         public static bool ContainsKey<T, KeyType>(this ICollection<T> array, KeyType key) where T : class, IKey<KeyType>
