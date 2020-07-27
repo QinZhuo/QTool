@@ -34,6 +34,15 @@ namespace QTool
             }
             return null;
         }
+        public static void Set<T, KeyType>(this ICollection<T> array, KeyType key,T value) where T : class, IKey<KeyType>
+        {
+            var old= array.Get(key);
+            if (old != null)
+            {
+                array.Remove(old);
+            }
+            array.Add(value);
+        }
         public static T GetAndCreate<T, KeyType>(this ICollection<T> array, KeyType key) where T : class, IKey<KeyType>, new()
         {
             foreach (var value in array)
