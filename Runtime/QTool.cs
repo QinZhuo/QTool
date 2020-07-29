@@ -12,13 +12,6 @@ namespace QTool
     }
     public class KeyList<KeyType,T>:List<T> where T :class, IKey<KeyType>,new()
     {
-        private new T this[int index]
-        {
-            get
-            {
-                return default;
-            }
-        }
         public T this[KeyType key]
         {
             get
