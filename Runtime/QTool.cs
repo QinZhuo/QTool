@@ -57,6 +57,7 @@ namespace QTool
             {
                 array.Remove(old);
             }
+            value.Key = key;
             array.Add(value);
         }
         public static T GetAndCreate<T, KeyType>(this ICollection<T> array, KeyType key) where T : class, IKey<KeyType>, new()
