@@ -50,6 +50,20 @@ namespace QTool
             }
             return null;
         }
+        public static T Peek< T>(this IList<T> array) where T : class
+        {
+            return array[array.Count-1];
+        }
+        public static void Push<T>(this IList<T> array,T obj) where T : class
+        {
+            array.Add(obj);
+        }
+        public static T Pop<T>(this IList<T> array) where T : class
+        {
+            var obj = array.Peek();
+            array.RemoveAt(array.Count - 1);
+            return obj;
+        }
         public static void Set<T, KeyType>(this ICollection<T> array, KeyType key,T value) where T : class, IKey<KeyType>
         {
             var old= array.Get(key);
