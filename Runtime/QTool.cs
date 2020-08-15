@@ -90,28 +90,6 @@ namespace QTool
     }
     public class FileManager
     {
-        public static string Serialize<T>(T t, params Type[] extraTypes)
-        {
-            using (StringWriter sw = new StringWriter())
-            {
-                if (t == null)
-                {
-                    Debug.LogError("序列化数据为空" + typeof(T));
-                    return null;
-                }
-                XmlSerializer xz = new XmlSerializer(t.GetType(), extraTypes);
-                xz.Serialize(sw, t);
-                return sw.ToString();
-            }
-        }
-        public static T Deserialize<T>(string s, params Type[] extraTypes)
-        {
-            using (StringReader sr = new StringReader(s))
-            {
-                XmlSerializer xz = new XmlSerializer(typeof(T), extraTypes);
-                return (T)xz.Deserialize(sr);
-            }
-        }
         public static string Load(string path)
         {
             string data = "";
