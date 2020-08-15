@@ -10,13 +10,13 @@ namespace QTool
     {
         KeyType Key { get; set; }
     }
-    public class KeyList<KeyType,T>:List<T> where T :class, IKey<KeyType>,new()
+    public class KeyList<KeyType, T> : List<T> where T : class, IKey<KeyType>, new()
     {
         public T this[KeyType key]
         {
             get
             {
-                return this.GetAndCreate<T,KeyType>(key);
+                return this.GetAndCreate<T, KeyType>(key);
             }
             set
             {
@@ -50,11 +50,11 @@ namespace QTool
             }
             return null;
         }
-        public static T Peek< T>(this IList<T> array) where T : class
+        public static T Peek<T>(this IList<T> array) where T : class
         {
-            return array[array.Count-1];
+            return array[array.Count - 1];
         }
-        public static void Push<T>(this IList<T> array,T obj) where T : class
+        public static void Push<T>(this IList<T> array, T obj) where T : class
         {
             array.Add(obj);
         }
@@ -64,9 +64,9 @@ namespace QTool
             array.RemoveAt(array.Count - 1);
             return obj;
         }
-        public static void Set<T, KeyType>(this ICollection<T> array, KeyType key,T value) where T : class, IKey<KeyType>
+        public static void Set<T, KeyType>(this ICollection<T> array, KeyType key, T value) where T : class, IKey<KeyType>
         {
-            var old= array.Get(key);
+            var old = array.Get(key);
             if (old != null)
             {
                 array.Remove(old);
@@ -90,6 +90,28 @@ namespace QTool
     }
     public class FileManager
     {
+        public static string Serialize<T>(T t, params Type[] extraTypes)
+        {
+            using (StringWriter sw = new StringWriter())
+            {
+                if (t == null)
+                {
+                    Debug.LogError("序列化数据为空" + typeof(T));
+                    return null;
+                }
+                XmlSerializer xz = new XmlSerializer(t.GetType(), extraTypes);
+                xz.Serialize(sw, t);
+                return sw.ToString();
+            }
+        }
+        public static T Deserialize<T>(string s, params Type[] extraTypes)
+        {
+            using (StringReader sr = new StringReader(s))
+            {
+                XmlSerializer xz = new XmlSerializer(typeof(T), extraTypes);
+                return (T)xz.Deserialize(sr);
+            }
+        }
         public static string Load(string path)
         {
             string data = "";
