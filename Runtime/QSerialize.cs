@@ -4,7 +4,7 @@ using System.Reflection;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 using System.Collections;
-
+using UnityEngine;
 namespace QTool
 {
     public class QSValueAttribute : Attribute
@@ -20,6 +20,18 @@ namespace QTool
         public Type type;
         public Action<object, object> set;
         public Func<object, object> get;
+        public QMemeberInfo(FieldInfo info)
+        {
+            type = info.FieldType;
+            set = info.SetValue;
+            get = info.GetValue;
+        }
+        public QMemeberInfo(PropertyInfo info)
+        {
+            type = info.PropertyType;
+            set = info.SetValue;
+            get = info.GetValue;
+        }
     }
     public class QTypeInfo
     {
@@ -46,42 +58,38 @@ namespace QTool
             {
                 ListType= type.GenericTypeArguments[0];
             }
-           
             FieldInfo[] fields = type.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
             foreach (var item in fields)
             {
                 if (IsQSValue(item, item.IsPublic))
                 {
-                    var qMember = new QMemeberInfo
-                    {
-                        type = item.FieldType,
-                        set = item.SetValue,
-                        get = item.GetValue,
-                    };
-                    memberList.Add(qMember);
+                    memberList.Add(new QMemeberInfo(item));
                 }
 
             }
             var infos = type.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
             foreach (var item in infos)
             {
-
                 if (IsQSValue(item, item.Name != "Item" && item.CanRead && item.CanWrite && item.SetMethod.IsPublic && item.GetMethod.IsPublic))
                 {
-                    var qMember = new QMemeberInfo
-                    {
-                        type=item.DeclaringType,
-                        set = item.SetValue,
-                        get = item.GetValue,
-                    };
-                    memberList.Add(qMember);
+                    memberList.Add(new QMemeberInfo(item));
                 }
             }
         }
-      
+        public static Hashtable hashtable=new Hashtable();
         public static QTypeInfo Get(Type type)
         {
-            return new QTypeInfo(type);
+            if (hashtable.ContainsKey(type.FullName))
+            {
+                return (QTypeInfo)hashtable[type.FullName];
+            }
+            else
+            {
+                var info= new QTypeInfo(type);
+                hashtable.Add(type.FullName, info);
+                return info;
+            }
+           
         }
        
     }
@@ -191,7 +199,6 @@ namespace QTool
                                 list.Add(listObj);
                             }
                         }
-                        else
                         {
                             foreach (var item in typeInfo.memberList)
                             {
@@ -273,16 +280,14 @@ namespace QTool
                             var list = value as IList;
                             if (list == null)
                             {
-                                UnityEngine.Debug.LogError(value);
+                                UnityEngine.Debug.LogError(type+":"+ value);
                             }
                             writer.Write(list.Count);
                             foreach (var item in list)
                             {
                                 writer.WriteValue(typeInfo.ListType, item);
-                         //       UnityEngine.Debug.LogError("value:"+ elementType+":" + item);
                             }
                         }
-                        else
                         {
                             foreach (var item in typeInfo.memberList)
                             {

@@ -15,45 +15,51 @@ public class Test : MonoBehaviour
     {
 
     }
+    [System.Serializable]
     public class TestClass
     {
-        public int p1 {  get;  set; }
+        public List<Vector3> list;
         public float p2;
-        public int this[int x]
-        {
-            get
-            {
-                return 0;
-            }
-            set
-            {
-
-            }
-        }
-        public int this[int x,int y]
-        {
-            get
-            {
-                return 0;
-            }
-            set
-            {
-
-            }
-        }
     }
     public Vector3 v3 = new Vector3();
-    public List<int> list = new List<int> { 123,45,56 };
-    public List<int> blist = new List<int> { 123, 45, 56 };
-    public TestClass a = new TestClass { };
+    public List<TestClass> list;
+    public List<TestClass> blist;
+   // public TestClass a = new TestClass { };
     public int[] b;
     public byte[] info;
+    public void TimeCheck(string name, System.Action action)
+    {
+        var last = System.DateTime.Now;
+        action?.Invoke();
+        Debug.LogError("【"+name+"】运行时间:" + (System.DateTime.Now - last).TotalMilliseconds);
+    }
     [ContextMenu("test")]
     public void TestFunc()
     {
-        info = QSerialize.Serialize(list);
-        blist= QSerialize.Deserialize<List<int>>(info);
-     //   Debug.LogError(QSerialize.Deserialize<Vector3>(info));
+
+        TimeCheck("自定义序列化",() =>
+        {
+            for (int i = 0; i < 100; i++)
+            {
+                var info = QSerialize.Serialize(list);
+                blist = QSerialize.Deserialize<List<TestClass>>(info);
+            }
+        });
+
+
+    }
+    [ContextMenu("test2")]
+    public void Test2Func()
+    {
+
+        TimeCheck("Xml序列化", () =>
+        {
+            for (int i = 0; i < 100; i++)
+            {
+                var info = FileManager.Serialize(list);
+                blist = FileManager.Deserialize<List<TestClass>>(info);
+            }
+        });
 
 
     }

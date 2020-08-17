@@ -90,6 +90,20 @@ namespace QTool
     }
     public class FileManager
     {
+        public static Hashtable Hashtable = new Hashtable();
+        public static XmlSerializer GetSerializer(Type type, params Type[] extraTypes)
+        {
+            if (Hashtable.ContainsKey(type.FullName))
+            {
+                return (XmlSerializer)Hashtable[type.FullName];
+            }
+            else
+            {
+                XmlSerializer xz = new XmlSerializer(type, extraTypes);
+                Hashtable.Add(type.FullName, xz);
+                return xz;
+            }
+        }
         public static string Serialize<T>(T t, params Type[] extraTypes)
         {
             using (StringWriter sw = new StringWriter())
@@ -99,8 +113,7 @@ namespace QTool
                     Debug.LogError("序列化数据为空" + typeof(T));
                     return null;
                 }
-                XmlSerializer xz = new XmlSerializer(t.GetType(), extraTypes);
-                xz.Serialize(sw, t);
+                GetSerializer(typeof(T)).Serialize(sw, t);
                 return sw.ToString();
             }
         }
@@ -108,7 +121,7 @@ namespace QTool
         {
             using (StringReader sr = new StringReader(s))
             {
-                XmlSerializer xz = new XmlSerializer(typeof(T), extraTypes);
+                XmlSerializer xz = GetSerializer(typeof(T));
                 return (T)xz.Deserialize(sr);
             }
         }
