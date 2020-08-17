@@ -37,11 +37,16 @@ namespace QTool
         }
         public List<QMemeberInfo> memberList = new List<QMemeberInfo>();
         public bool IsList;
+        public Type ListType;
         private QTypeInfo(Type type)
         {
 
             IsList = (type.GetInterface(typeof(IList<>).FullName, true) != null);
-            if (IsList) return;
+            if (IsList)
+            {
+                ListType= type.GenericTypeArguments[0];
+            }
+           
             FieldInfo[] fields = type.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
             foreach (var item in fields)
             {
@@ -174,14 +179,27 @@ namespace QTool
                     else 
                     {
                         var obj =  CreateInstance(type);
+                        
                         QTypeInfo typeInfo = QTypeInfo.Get(type);
-                        foreach (var item in typeInfo.memberList)
+                        if (typeInfo.IsList)
                         {
-                            item.set?.Invoke(obj, reader.ReadValue(item.type));
+                            var list = obj as IList;
+                            var count = reader.ReadInt32();
+                            for (int i = 0; i < count; i++)
+                            {
+                                var listObj= reader.ReadValue(typeInfo.ListType);
+                                list.Add(listObj);
+                            }
+                        }
+                        else
+                        {
+                            foreach (var item in typeInfo.memberList)
+                            {
+                                item.set?.Invoke(obj, reader.ReadValue(item.type));
+                            }
                         }
                         return obj;
                     }
-                    return null;
                 case TypeCode.SByte:
                     return reader.ReadSByte();
                 case TypeCode.Single:
@@ -252,12 +270,15 @@ namespace QTool
                         QTypeInfo typeInfo = QTypeInfo.Get(type);
                         if (typeInfo.IsList)
                         {
-                            var elementType = type.GenericTypeArguments[0];
                             var list = value as IList;
+                            if (list == null)
+                            {
+                                UnityEngine.Debug.LogError(value);
+                            }
                             writer.Write(list.Count);
                             foreach (var item in list)
                             {
-                                writer.WriteValue(elementType, item);
+                                writer.WriteValue(typeInfo.ListType, item);
                          //       UnityEngine.Debug.LogError("value:"+ elementType+":" + item);
                             }
                         }
@@ -268,6 +289,8 @@ namespace QTool
                                 writer.WriteValue(item.type, item.get(value));
                             }
                         }
+                      
+                          
                        
                     }
                     break;

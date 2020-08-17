@@ -52,8 +52,9 @@ public class Test : MonoBehaviour
     public void TestFunc()
     {
         info = QSerialize.Serialize(list);
+        blist= QSerialize.Deserialize<List<int>>(info);
      //   Debug.LogError(QSerialize.Deserialize<Vector3>(info));
-    
+
 
     }
 }
