@@ -50,9 +50,23 @@ namespace QTool
         public List<QMemeberInfo> memberList = new List<QMemeberInfo>();
         public bool IsList;
         public Type ListType;
+        public Type ArrayType;
+        public Type type;
+        public int ArrayRank;
+        public bool IsArray;
+        public int[] indexArray;
         private QTypeInfo(Type type)
         {
-
+            Debug.LogError(" new Type " + type);
+            this.type = type;
+            IsArray = type.IsArray;
+            if (type.IsArray)
+            {
+                ArrayRank= type.GetArrayRank();
+                ArrayType = type.GetElementType();
+                indexArray = new int[ArrayRank]; 
+            }
+          
             IsList = (type.GetInterface(typeof(IList<>).FullName, true) != null);
             if (IsList)
             {
@@ -76,17 +90,17 @@ namespace QTool
                 }
             }
         }
-        public static Hashtable hashtable=new Hashtable();
+        public static Dictionary<Type, QTypeInfo> table = new Dictionary<Type, QTypeInfo>();
         public static QTypeInfo Get(Type type)
         {
-            if (hashtable.ContainsKey(type.FullName))
+            if (table.ContainsKey(type))
             {
-                return (QTypeInfo)hashtable[type.FullName];
+                return table[type];
             }
             else
             {
                 var info= new QTypeInfo(type);
-                hashtable.Add(type.FullName, info);
+                table.Add(type, info);
                 return info;
             }
            
@@ -101,7 +115,6 @@ namespace QTool
             {
                 using (BinaryWriter writer=new BinaryWriter(memory))
                 {
-                  
                     var type = typeof(T);
                     writer.WriteValue(type,value);
                     return memory.ToArray();
@@ -146,6 +159,45 @@ namespace QTool
             var valueTypeCode= (TypeCode)reader.ReadByte();
             switch (typeCode)
             {
+                case TypeCode.Object:
+                    QTypeInfo typeInfo = QTypeInfo.Get(type);
+                    if (typeInfo.IsArray)
+                    {
+                        var rank = reader.ReadInt32();
+
+                        var count = 1;
+                        for (int i = 0; i < rank; i++)
+                        {
+                            typeInfo.indexArray[i] = reader.ReadInt32();
+                            count *= typeInfo.indexArray[i];
+                        }
+                        var array = (Array)CreateInstance(type, count);
+                        ForeachArray(array, 0, typeInfo.indexArray, (obj) => { array.SetValue(reader.ReadValue(typeInfo.ArrayType), typeInfo.indexArray); });
+                        return array;
+                    }
+                    else
+                    {
+                        var obj = CreateInstance(type);
+
+
+                        if (typeInfo.IsList)
+                        {
+                            var list = obj as IList;
+                            var count = reader.ReadInt32();
+                            for (int i = 0; i < count; i++)
+                            {
+                                var listObj = reader.ReadValue(typeInfo.ListType);
+                                list.Add(listObj);
+                            }
+                        }
+                        {
+                            foreach (var item in typeInfo.memberList)
+                            {
+                                item.set?.Invoke(obj, reader.ReadValue(item.type));
+                            }
+                        }
+                        return obj;
+                    }
                 case TypeCode.Boolean:
                     return reader.ReadBoolean();
                 case TypeCode.Byte:
@@ -168,45 +220,7 @@ namespace QTool
                     return reader.ReadInt32();
                 case TypeCode.Int64:
                     return reader.ReadInt64();
-                case TypeCode.Object:
-                    if (type.IsArray)
-                    {
-                        var elementType = type.GetElementType();
-                        var rank = reader.ReadInt32();
-                        var indexArray = new int[rank];
-                        var count = 1;
-                        for (int i = 0; i < rank; i++)
-                        {
-                            indexArray[i] = reader.ReadInt32();
-                            count *= indexArray[i];
-                        }
-                        var array =(Array)CreateInstance(type, count) ;
-                        ForeachArray(array, 0, indexArray, (obj)=> { array.SetValue( reader.ReadValue(elementType), indexArray ); });
-                        return array;
-                    }
-                    else 
-                    {
-                        var obj =  CreateInstance(type);
-                        
-                        QTypeInfo typeInfo = QTypeInfo.Get(type);
-                        if (typeInfo.IsList)
-                        {
-                            var list = obj as IList;
-                            var count = reader.ReadInt32();
-                            for (int i = 0; i < count; i++)
-                            {
-                                var listObj= reader.ReadValue(typeInfo.ListType);
-                                list.Add(listObj);
-                            }
-                        }
-                        {
-                            foreach (var item in typeInfo.memberList)
-                            {
-                                item.set?.Invoke(obj, reader.ReadValue(item.type));
-                            }
-                        }
-                        return obj;
-                    }
+               
                 case TypeCode.SByte:
                     return reader.ReadSByte();
                 case TypeCode.Single:
@@ -259,29 +273,22 @@ namespace QTool
                     writer.Write((Int64)value);
                     break;
                 case TypeCode.Object:
-                    if (type.IsArray)
+                    QTypeInfo typeInfo = QTypeInfo.Get(type);
+                    if (typeInfo.IsArray)
                     {
                         var array = value as Array;
-                        var elementType = type.GetElementType();
-                        writer.Write(array.Rank);
-                        for (int i = 0; i < array.Rank; i++)
+                        writer.Write(typeInfo.ArrayRank);
+                        for (int i = 0; i < typeInfo.ArrayRank; i++)
                         {
                             writer.Write(array.GetLength(i));
                         }
-                        var indexArray = new int[array.Rank];
-                        ForeachArray(array, 0, indexArray, (obj) => {writer.WriteValue(elementType,obj); });
-     
+                        ForeachArray(array, 0, typeInfo.indexArray, (obj) => {writer.WriteValue(typeInfo.ArrayType, obj); });
                     }
                     else
                     {
-                        QTypeInfo typeInfo = QTypeInfo.Get(type);
                         if (typeInfo.IsList)
                         {
                             var list = value as IList;
-                            if (list == null)
-                            {
-                                UnityEngine.Debug.LogError(type+":"+ value);
-                            }
                             writer.Write(list.Count);
                             foreach (var item in list)
                             {
