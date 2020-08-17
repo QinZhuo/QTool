@@ -150,6 +150,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 95d366b0a182c444894ed30a0337ed81, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  v3: {x: 1, y: 2, z: 3}
+  list: 7b0000002d00000038000000
+  blist: 7b0000002d00000038000000
+  b: 
+  info: 01
 --- !u!4 &728731132
 Transform:
   m_ObjectHideFlags: 0
