@@ -40,23 +40,23 @@ public class NetInput
     public bool NetStay = false;
     public V2 NetVector2;
 }
-[System.Serializable]
-public class IValueBase:IKey<string>
+[Dynamic]
+public interface IValueBase:IKey<string>
 {
-    public string Key { get; set; }
 
-    public NetInput netInput = new NetInput();
-    public void Merger(NetInput other)
-    {
-        netInput.NetStay = netInput.NetStay || other.NetStay;
-        if (other.NetVector2 != Vector2.one)
-        {
-            netInput.NetVector2 = other.NetVector2;
-        }
-    }
+    //public NetInput netInput = new NetInput();
+    //public void Merger(NetInput other)
+    //{
+    //    netInput.NetStay = netInput.NetStay || other.NetStay;
+    //    if (other.NetVector2 != Vector2.one)
+    //    {
+    //        netInput.NetVector2 = other.NetVector2;
+    //    }
+    //}
 }
 public class IntValue : IValueBase
 {
+    public string Key { get; set; }
     public int value;
 }
 [System.Serializable]
@@ -81,8 +81,8 @@ public class Test : MonoBehaviour
     }
 
     public Vector3 v3 = new Vector3();
-    public KeyList<string,IValueBase> list=new KeyList<string,IValueBase>();
-    public KeyList<string,IValueBase> blist=new KeyList<string,IValueBase>();
+    public List<IValueBase> al=new List<IValueBase>();
+    public List<IValueBase> bl=new List<IValueBase>();
     // public TestClass a = new TestClass { };
    // public Dictionary<string, float> aDic = new Dictionary<string, float>();
    // public Dictionary<string, float> bDic = new Dictionary<string, float>();
@@ -104,45 +104,51 @@ public class Test : MonoBehaviour
     {
         // list = new List<IValueBase>();
         //  list.Add(new IntValue { value = 4654 });
-        list.Add(new IValueBase { Key = "a" });
-        list = new KeyList<string, IValueBase>();
-        list["a"].netInput.NetVector2.x = 5;
+
+        al.Add(new IntValue { value = 153 });
         TimeCheck("自定义序列化",() =>
         {
             for (int i = 0; i < 1000; i++)
             {
-                info = QSerialize.Serialize(list);
-                blist = QSerialize.Deserialize <KeyList<string, IValueBase>>(info);
+                info = QSerialize.Serialize(al);
+                bl = QSerialize.Deserialize <List<IValueBase>>(info);
             }
         });
-     //   Debug.LogError(blist["a"].netInput.NetVector2);
+        Debug.LogError((bl[0] as IntValue).value);
+      //  Debug.LogError(al["a"].netInput.NetVector2 .x+ ":" +bl[0].netInput.NetVector2.x);
       
     }
-    [ContextMenu("test2")]
-    public void Test2Func()
-    {
-     //   list = new List<IValueBase>();
-      //  list.Add(new IntValue { value = 431 });
-        TimeCheck("Xml序列化", () =>
-        {
-            for (int i = 0; i < 1000; i++)
-            {
-                info = Encoding.UTF8.GetBytes(FileManager.Serialize(list,typeof(IntValue)));
-                blist = FileManager.Deserialize<KeyList<string,IValueBase>>(Encoding.UTF8.GetString(info));
-            }
-        });
+    //[ContextMenu("test2")]
+    //public void Test2Func()
+    //{
+    //    al = new KeyList<string, IValueBase>();
+    //    al.Add(new IValueBase { Key = "a" });
+    //    al["a"].netInput.NetVector2 = new V2(Vector2.one * 123);
+    //    //   list = new List<IValueBase>();
+    //    //  list.Add(new IntValue { value = 431 });
+    //    TimeCheck("Xml序列化", () =>
+    //    {
+    //        for (int i = 0; i < 1000; i++)
+    //        {
+    //            info = Encoding.UTF8.GetBytes(FileManager.Serialize(al,typeof(IntValue)));
+    //            bl = FileManager.Deserialize<KeyList<string,IValueBase>>(Encoding.UTF8.GetString(info));
+    //        }
+    //    });
 
-    }
-    [ContextMenu("test3")]
-    public void Test3Func()
-    {
-        TimeCheck("Json序列化", () =>
-        {
-            for (int i = 0; i < 1000; i++)
-            {
-                info =Encoding.UTF8.GetBytes( JsonConvert.SerializeObject(list));
-                blist = JsonConvert.DeserializeObject<KeyList<string,IValueBase>>(Encoding.UTF8.GetString( info));
-            }
-        });
-    }
+    //}
+    //[ContextMenu("test3")]
+    //public void Test3Func()
+    //{
+    //    al = new KeyList<string, IValueBase>();
+    //    al.Add(new IValueBase { Key = "a" });
+    //    al["a"].netInput.NetVector2 = new V2(Vector2.one * 123);
+    //    TimeCheck("Json序列化", () =>
+    //    {
+    //        for (int i = 0; i < 1000; i++)
+    //        {
+    //            info =Encoding.UTF8.GetBytes( JsonConvert.SerializeObject(al));
+    //            bl = JsonConvert.DeserializeObject<KeyList<string,IValueBase>>(Encoding.UTF8.GetString( info));
+    //        }
+    //    });
+    //}
 }

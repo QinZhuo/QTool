@@ -78,10 +78,13 @@ namespace QTool
         {
             foreach (var value in array)
             {
-                if (key.Equals(value.Key))
-                {
-                    return value;
-                }
+                if (value == null) continue;
+                    if (key.Equals(value.Key))
+                    {
+                        return value;
+                    }
+             
+              
             }
             var t = new T { Key = key };
             array.Add(t);

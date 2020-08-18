@@ -8,7 +8,11 @@ using QTool.ByteExtends;
 using Newtonsoft.Json;
 namespace QTool
 {
-    
+    [AttributeUsage(AttributeTargets.Class| AttributeTargets.Interface)]
+    public class DynamicAttribute : Attribute
+    {
+
+    }
     public class QSValueAttribute : Attribute
     {
         
@@ -20,20 +24,20 @@ namespace QTool
     public class QMemeberInfo
     {
         public string Name;
-        public TypeCode type;
+        public Type type;
         public Action<object, object> set;
         public Func<object, object> get;
         public QMemeberInfo(FieldInfo info)
         {
             Name = info.Name;
-            type = Type.GetTypeCode(info.FieldType);
+            type = info.FieldType;
             set = info.SetValue;
             get = info.GetValue;
         }
         public QMemeberInfo(PropertyInfo info)
         {
             Name = info.Name;
-            type = Type.GetTypeCode(info.PropertyType);
+            type =info.PropertyType;
             set = info.SetValue;
             get = info.GetValue;
         }
@@ -54,37 +58,31 @@ namespace QTool
         }
         public List<QMemeberInfo> memberList = new List<QMemeberInfo>();
         public bool IsList;
-        public TypeCode ListType;
-        public TypeCode ArrayType;
+        public Type ListType;
+        public Type ArrayType;
         public Type type;
         public int ArrayRank;
         public bool IsArray;
         public int[] indexArray;
+        public bool dynamic = false;
         private QTypeInfo(Type type)
         {
-            Debug.LogError(" new Type " + type);
+           // Debug.LogError(" new Type " + type);
             this.type = type;
+            dynamic = type.GetCustomAttribute<DynamicAttribute>() != null;
             IsArray = type.IsArray;
             if (type.IsArray)
             {
                 ArrayRank= type.GetArrayRank();
-                ArrayType = Type.GetTypeCode( type.GetElementType());
+                ArrayType = type.GetElementType();
                 indexArray = new int[ArrayRank]; 
             }
-          
-            IsList = (type.GetInterface(typeof(IList<>).FullName, true) != null);
+            var listInterFace = type.GetInterface(typeof(IList<>).FullName, true);
+            IsList = (listInterFace != null);
             if (IsList)
             {
-                var baseType = type;
-                while (type.BaseType!=null&& baseType!=null)
-                {
-                    if(baseType==typeof(IList))
-                    {
-                        ListType = Type.GetTypeCode(type.GenericTypeArguments[0]);
-                    }
-                    baseType = baseType.BaseType;
-                }
-               
+                ListType= listInterFace.GenericTypeArguments[0];
+
             }
             FieldInfo[] fields = type.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
             foreach (var item in fields)
@@ -132,7 +130,7 @@ namespace QTool
             typeIndexDic.Clear();
             var type = typeof(T);
             writer.Clear();
-            writer.WriteValue(value,Type.GetTypeCode(type));
+            writer.WriteValue(value,type);
             for (int i = typeStrList.Count-1; i >= 0; i--)
             {
                 var bytes=typeStrList[i].GetBytes();
@@ -152,7 +150,7 @@ namespace QTool
             {
                 typeStrList.Add(reader.ReadString());
             }
-            return (T)reader.ReadValue(Type.GetTypeCode(type));
+            return (T)reader.ReadValue(type);
         }
         static void ForeachArray(Array array,int deep,int[] indexArray,Action<object> Call)
         {
@@ -191,7 +189,6 @@ namespace QTool
                 var index = (byte)typeStrList.Count;
                 typeStrList.Add(typeName);
                 typeIndexDic.Add(typeName,index);
-           //     Debug.LogError("add" + typeName);
                 return index;
             }
            
@@ -221,18 +218,22 @@ namespace QTool
             return null;
 
         }
-        static object CreateInstance(Type type,params object[] args)
+        static object CreateInstance(Type type, params object[] args)
         {
             return Activator.CreateInstance(type, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, args, null);
         }
-        static object ReadValue(this BinaryReader reader, TypeCode typeCode)
+        static object ReadValue(this BinaryReader reader, Type type)
         {
+            TypeCode typeCode = Type.GetTypeCode(type);
             switch (typeCode)
             {
                 case TypeCode.Object:
-                
-                    var type = ParseType(GetTypeStr(reader.ReadByte()));
                     QTypeInfo typeInfo = QTypeInfo.Get(type);
+                    if (typeInfo.dynamic)
+                    {
+                        type = ParseType(GetTypeStr(reader.ReadByte()));
+                        typeInfo = QTypeInfo.Get(type);
+                    }
                     if (typeInfo.IsArray)
                     {
                         var rank = reader.ReadInt32();
@@ -248,7 +249,6 @@ namespace QTool
                     }
                     else
                     {
-                        
                         var obj = CreateInstance(type);
                         if (typeInfo.IsList)
                         {
@@ -307,15 +307,19 @@ namespace QTool
                     return null;
             }
         }
-        static void WriteValue(this BinaryWriter writer ,object value,TypeCode typeCode)
+        static void WriteValue(this BinaryWriter writer ,object value,Type type)
         {
-        
+            TypeCode typeCode = Type.GetTypeCode(type);
             switch (typeCode)
             {
                 case TypeCode.Object:
-                    var type = value == null ? null : value.GetType();
-                    writer.Write(GetTypeIndex(type.FullName));
                     QTypeInfo typeInfo = QTypeInfo.Get(type);
+                    if (typeInfo.dynamic)
+                    {
+                        type = (value == null ? null : value.GetType());
+                        typeInfo = QTypeInfo.Get(type);
+                        writer.Write(GetTypeIndex(type.FullName));
+                    }
                     if (typeInfo.IsArray)
                     {
                         var array = value as Array;
