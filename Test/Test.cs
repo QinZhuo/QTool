@@ -81,11 +81,11 @@ public class Test : MonoBehaviour
     }
 
     public Vector3 v3 = new Vector3();
-    public List<IValueBase> list=new List<IValueBase>();
-    public List<IValueBase> blist=new List<IValueBase>();
+    public KeyList<string,IValueBase> list=new KeyList<string,IValueBase>();
+    public KeyList<string,IValueBase> blist=new KeyList<string,IValueBase>();
     // public TestClass a = new TestClass { };
-    public Dictionary<string, float> aDic = new Dictionary<string, float>();
-    public Dictionary<string, float> bDic = new Dictionary<string, float>();
+   // public Dictionary<string, float> aDic = new Dictionary<string, float>();
+   // public Dictionary<string, float> bDic = new Dictionary<string, float>();
     public int[] b;
     public byte[] info;
     public void TimeCheck(string name, System.Action action)
@@ -104,19 +104,19 @@ public class Test : MonoBehaviour
     {
         // list = new List<IValueBase>();
         //  list.Add(new IntValue { value = 4654 });
-        aDic = new Dictionary<string, float>
-        {
-            {"a",41234.134f},{"asd",4134f}
-        };
+        list.Add(new IValueBase { Key = "a" });
+        list = new KeyList<string, IValueBase>();
+        list["a"].netInput.NetVector2.x = 5;
         TimeCheck("自定义序列化",() =>
         {
             for (int i = 0; i < 1000; i++)
             {
-                info = QSerialize.Serialize(aDic);
-                bDic = QSerialize.Deserialize <Dictionary<string, float>>(info);
+                info = QSerialize.Serialize(list);
+                blist = QSerialize.Deserialize <KeyList<string, IValueBase>>(info);
             }
         });
-           Debug.LogError(bDic["a"]);
+     //   Debug.LogError(blist["a"].netInput.NetVector2);
+      
     }
     [ContextMenu("test2")]
     public void Test2Func()
@@ -128,7 +128,7 @@ public class Test : MonoBehaviour
             for (int i = 0; i < 1000; i++)
             {
                 info = Encoding.UTF8.GetBytes(FileManager.Serialize(list,typeof(IntValue)));
-                blist = FileManager.Deserialize<List<IValueBase>>(Encoding.UTF8.GetString(info));
+                blist = FileManager.Deserialize<KeyList<string,IValueBase>>(Encoding.UTF8.GetString(info));
             }
         });
 
@@ -141,7 +141,7 @@ public class Test : MonoBehaviour
             for (int i = 0; i < 1000; i++)
             {
                 info =Encoding.UTF8.GetBytes( JsonConvert.SerializeObject(list));
-                blist = JsonConvert.DeserializeObject<List<IValueBase>>(Encoding.UTF8.GetString( info));
+                blist = JsonConvert.DeserializeObject<KeyList<string,IValueBase>>(Encoding.UTF8.GetString( info));
             }
         });
     }

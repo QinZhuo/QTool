@@ -5,6 +5,7 @@ using System.Runtime.Serialization;
 using System.Collections;
 using UnityEngine;
 using QTool.ByteExtends;
+using Newtonsoft.Json;
 namespace QTool
 {
     
@@ -74,7 +75,16 @@ namespace QTool
             IsList = (type.GetInterface(typeof(IList<>).FullName, true) != null);
             if (IsList)
             {
-                ListType= Type.GetTypeCode(type.GenericTypeArguments[0]);
+                var baseType = type;
+                while (type.BaseType!=null&& baseType!=null)
+                {
+                    if(baseType==typeof(IList))
+                    {
+                        ListType = Type.GetTypeCode(type.GenericTypeArguments[0]);
+                    }
+                    baseType = baseType.BaseType;
+                }
+               
             }
             FieldInfo[] fields = type.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
             foreach (var item in fields)
