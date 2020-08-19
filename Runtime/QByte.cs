@@ -293,8 +293,11 @@ namespace QTool.ByteExtends
             return BitConverter.ToDouble(value, start);
         }
 
-     
 
+        public static string ComputeScale(this int byteLength)
+        {
+            return ComputeScale(byteLength);
+        }
 
         public static string ComputeScale(this long byteLength)
         {
