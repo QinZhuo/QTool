@@ -116,7 +116,7 @@ namespace QTool
                     Debug.LogError("序列化数据为空" + typeof(T));
                     return null;
                 }
-                GetSerializer(typeof(T)).Serialize(sw, t);
+                GetSerializer(typeof(T), extraTypes).Serialize(sw, t);
                 return sw.ToString();
             }
         }
