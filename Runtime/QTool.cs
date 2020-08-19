@@ -93,17 +93,22 @@ namespace QTool
     }
     public class FileManager
     {
-        public static Hashtable Hashtable = new Hashtable();
+        public static Dictionary<string, XmlSerializer> xmlSerDic =new Dictionary<string, XmlSerializer>()
         public static XmlSerializer GetSerializer(Type type, params Type[] extraTypes)
         {
-            if (Hashtable.ContainsKey(type.FullName))
+            var key = type.FullName;
+            foreach (var item in extraTypes)
             {
-                return (XmlSerializer)Hashtable[type.FullName];
+                key += " " + item.FullName;
+            }
+            if (xmlSerDic.ContainsKey(key))
+            {
+                return xmlSerDic[key];
             }
             else
             {
                 XmlSerializer xz = new XmlSerializer(type, extraTypes);
-                Hashtable.Add(type.FullName, xz);
+                xmlSerDic.Add(key, xz);
                 return xz;
             }
         }
