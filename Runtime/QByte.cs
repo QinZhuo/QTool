@@ -189,7 +189,14 @@ namespace QTool.ByteExtends
             }
             return System.Text.Encoding.Unicode.GetString(value,start,length);
         }
-
+        public static string GetString(this byte[] value)
+        {
+            if (value == null)
+            {
+                return "";
+            }
+            return System.Text.Encoding.Unicode.GetString(value);
+        }
         public static byte[] GetBytes(this Boolean value)
         {
             return BitConverter.GetBytes(value);
