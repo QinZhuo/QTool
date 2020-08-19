@@ -129,7 +129,7 @@ namespace QTool
         {
             using (StringReader sr = new StringReader(s))
             {
-                XmlSerializer xz = GetSerializer(typeof(T));
+                XmlSerializer xz = GetSerializer(typeof(T),extraTypes);
                 return (T)xz.Deserialize(sr);
             }
         }
