@@ -226,6 +226,10 @@ namespace QTool
             switch (typeCode)
             {
                 case TypeCode.Object:
+                    if (reader.ReadBoolean())
+                    {
+                        return null;
+                    }
                     QTypeInfo typeInfo = QTypeInfo.Get(type);
                     if (typeInfo.dynamic)
                     {
@@ -307,10 +311,17 @@ namespace QTool
         }
         static void WriteValue(this BinaryWriter writer ,object value,Type type)
         {
-            TypeCode typeCode = Type.GetTypeCode(type);
+            TypeCode typeCode =Type.GetTypeCode(type);
+         
             switch (typeCode)
             {
                 case TypeCode.Object:
+                    var isNull = value == null;
+                    writer.Write(isNull);
+                    if (isNull)
+                    {
+                        return;
+                    }
                     QTypeInfo typeInfo = QTypeInfo.Get(type);
                     if (typeInfo.dynamic)
                     {
@@ -342,15 +353,10 @@ namespace QTool
                         {
                             foreach (var item in typeInfo.memberList)
                             {
-                                try
-                                {
+                                
                                     var memberObj = item.get(value);
                                     writer.WriteValue(memberObj, item.type);
-                                }
-                                catch (Exception e)
-                                {
-                                    throw new Exception("解析异常" + item.Name+"\n"+e);
-                                }
+                            
                                 
                             }
                         }
