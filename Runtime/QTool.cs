@@ -93,7 +93,7 @@ namespace QTool
     }
     public class FileManager
     {
-        public static Dictionary<string, XmlSerializer> xmlSerDic =new Dictionary<string, XmlSerializer>()
+        public static Dictionary<string, XmlSerializer> xmlSerDic = new Dictionary<string, XmlSerializer>();
         public static XmlSerializer GetSerializer(Type type, params Type[] extraTypes)
         {
             var key = type.FullName;
