@@ -149,7 +149,19 @@ namespace QTool
             }
             return data;
         }
-
+        public static byte[] LoadBytes(string path)
+        {
+            if (!System.IO.File.Exists(path))
+            {
+                Debug.LogError("不存在文件：" + path);
+                return null;
+            }
+            return File.ReadAllBytes(path);
+        }
+        public static void Save(string path, byte[] bytes)
+        {
+            File.WriteAllBytes(path, bytes);
+        }
         public static void SavePng(Texture2D tex, string path)
         {
             var bytes = tex.EncodeToPNG();
@@ -165,6 +177,7 @@ namespace QTool
             tex.LoadImage(bytes);
             return tex;
         }
+     
         public static string Save(string path, string data)
         {
             try
