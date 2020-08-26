@@ -26,13 +26,17 @@ namespace QTool
             }
         }
     }
+    public class StringKeyList<T> : KeyList<string, T> where T: class,IKey<string>,new()
+    {
+    }
+    
     public static class ArrayExtend
     {
         public static bool ContainsKey<T, KeyType>(this ICollection<T> array, KeyType key) where T : class, IKey<KeyType>
         {
             foreach (var value in array)
             {
-                if (key.Equals(value.Key))
+                if (value.Key.Equals(key))
                 {
                     return true;
                 }
@@ -43,7 +47,7 @@ namespace QTool
         {
             foreach (var value in array)
             {
-                if (key.Equals(value.Key))
+                if (value.Key.Equals(key))
                 {
                     return value;
                 }
