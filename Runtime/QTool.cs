@@ -40,7 +40,7 @@ namespace QTool
         {
             foreach (var value in array)
             {
-                if (value.Key.Equals(key))
+                if (key.Equals(value.Key))
                 {
                     return true;
                 }
@@ -51,7 +51,7 @@ namespace QTool
         {
             foreach (var value in array)
             {
-                if (value.Key.Equals(key))
+                if (key.Equals(value.Key))
                 {
                     return value;
                 }
