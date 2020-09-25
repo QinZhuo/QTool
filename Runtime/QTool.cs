@@ -22,6 +22,10 @@ namespace QTool
             {
                 var old = this.Get(key);
                 Remove(old);
+                if (key.Equals(value.Key))
+                {
+                    value.Key = key;
+                }
                 Add(value);
             }
         }
