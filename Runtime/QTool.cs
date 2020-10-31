@@ -12,16 +12,30 @@ namespace QTool
     }
     public class KeyList<KeyType, T> : List<T> where T : class, IKey<KeyType>, new()
     {
+        Dictionary<KeyType, T> dic = new Dictionary<KeyType, T>();
         public T this[KeyType key]
         {
             get
             {
-                return this.GetAndCreate<T, KeyType>(key);
+                if (dic.ContainsKey(key))
+                {
+                    return dic[key];
+                }
+                else
+                {
+                    var value = this.GetAndCreate<T, KeyType>(key); ;
+                    dic.Add(key, value);
+                    return value;
+                }
             }
             set
             {
-                var old = this.Get(key);
+                var old = this[key];
                 Remove(old);
+                if (dic.ContainsKey(key))
+                {
+                    dic[key] = value;
+                }
                 if (!key.Equals(value.Key))
                 {
                     value.Key = key;
