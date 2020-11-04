@@ -57,7 +57,7 @@ namespace QTool
         public string Key { get; set; }
         public List<T> AllPool = new List<T>();
         public List<string> stackTrace = new List<string>();
-        Stack<T> CanUsePool = new Stack<T>();
+        List<T> CanUsePool = new List<T>();
         public bool debugStack = false;
         T CheckGet(T obj)
         {
@@ -114,7 +114,18 @@ namespace QTool
                 return CheckGet(obj);
             }
         }
-
+        public virtual T Get(T obj)
+        {
+            if (CanUsePool.Contains(obj))
+            {
+                CanUsePool.Remove(obj);
+                return CheckGet(obj);
+            }
+            else
+            {
+                return Get();
+            }
+        }
         public virtual T Push(T obj)
         {
             if (AllPool.Contains(obj))
