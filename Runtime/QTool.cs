@@ -80,6 +80,16 @@ namespace QTool
         {
             array.Add(obj);
         }
+        public static void AddCheckExist<T>(this IList<T> array,params T[] objs) where T : class
+        {
+            foreach (var obj in objs)
+            {
+                if (!array.Contains(obj))
+                {
+                    array.Add(obj);
+                }
+            }
+        }
         public static T Pop<T>(this IList<T> array) where T : class
         {
             var obj = array.Peek();
