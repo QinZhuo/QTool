@@ -34,6 +34,10 @@ public class StringEvent : UnityEvent<string>
 public class SpriteEvent : UnityEvent<Sprite>
 {
 }
+[System.Serializable]
+public class ObjectEvent : UnityEvent<Object>
+{
+}
 
 [System.Serializable]
 public class FloatEventTrigger : EventTriggerBase<FloatEvent>
@@ -56,6 +60,10 @@ public class StringEventTrigger :EventTriggerBase<StringEvent>
 public class SpriteEventTrigger : EventTriggerBase<SpriteEvent>
 {
 }
+[System.Serializable]
+public class ObjectEventTrigger : EventTriggerBase<ObjectEvent>
+{
+}
 
 public class ValueEventTrigger : MonoBehaviour
 {
@@ -65,7 +73,8 @@ public class ValueEventTrigger : MonoBehaviour
     public List<BoolEventTrigger> boolEventList;
     public List<FloatEventTrigger> floatEventList;
     public List<ValueEventTrigger> childTrigger;
-    public void Set<T>(string eventName, T value) where T:class
+    public List<ObjectEventTrigger> objectTrigger;
+    public void Set<T>(string eventName, T value) where T:Object
     {
         var type = typeof(T);
         if (type == typeof(string))
@@ -75,6 +84,10 @@ public class ValueEventTrigger : MonoBehaviour
         else if(type == typeof(Sprite))
         {
             spriteEventList.Get(eventName)?.eventAction?.Invoke(value as Sprite);
+        }
+        else
+        {
+            objectTrigger.Get(eventName)?.eventAction?.Invoke(value);
         }
         foreach (var trigger in childTrigger)
         {
@@ -112,7 +125,7 @@ public static class ValueEventTriggerExtends
     {
         obj.GetTrigger()?.Action(eventName.Trim());
     }
-    public static void InvokeEvent<T>(this GameObject obj, string eventName,T value=null) where T:class
+    public static void InvokeEvent<T>(this GameObject obj, string eventName,T value=null) where T:Object
     {
         obj.GetTrigger()?.Set(eventName.Trim(), value);
     }
