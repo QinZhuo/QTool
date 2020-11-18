@@ -35,7 +35,7 @@ public class SpriteEvent : UnityEvent<Sprite>
 {
 }
 [System.Serializable]
-public class ObjectEvent : UnityEvent<Object>
+public class ObjectEvent : UnityEvent<object>
 {
 }
 
@@ -74,7 +74,7 @@ public class ValueEventTrigger : MonoBehaviour
     public List<FloatEventTrigger> floatEventList;
     public List<ValueEventTrigger> childTrigger;
     public List<ObjectEventTrigger> objectTrigger;
-    public void Set<T>(string eventName, T value) where T:Object
+    public void Set<T>(string eventName, T value) where T: class
     {
         var type = typeof(T);
         if (type == typeof(string))
@@ -125,7 +125,7 @@ public static class ValueEventTriggerExtends
     {
         obj.GetTrigger()?.Action(eventName.Trim());
     }
-    public static void InvokeEvent<T>(this GameObject obj, string eventName,T value=null) where T:Object
+    public static void InvokeEvent<T>(this GameObject obj, string eventName,T value=null) where T:class
     {
         obj.GetTrigger()?.Set(eventName.Trim(), value);
     }
