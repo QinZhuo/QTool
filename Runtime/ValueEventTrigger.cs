@@ -64,7 +64,7 @@ public class SpriteEventTrigger : EventTriggerBase<SpriteEvent>
 public class ObjectEventTrigger : EventTriggerBase<ObjectEvent>
 {
 }
-
+[System.Serializable]
 public enum InvokeNext
 {
     不传递=0,
@@ -150,51 +150,53 @@ public class ValueEventTrigger : MonoBehaviour
 public static class ValueEventTriggerExtends
 {
 
-    public static ValueEventTrigger GetTrigger(this GameObject obj, InvokeNext invokeNext = InvokeNext.不传递)
+    public static ValueEventTrigger GetTrigger(this GameObject obj)
     {
         var tigger= obj.GetComponentInChildren<ValueEventTrigger>();
-        tigger.nextInoke = invokeNext;
         return tigger;
     }
 
-    public static ValueEventTrigger GetParentTrigger(this GameObject obj, InvokeNext invokeNext = InvokeNext.不传递)
+    public static ValueEventTrigger GetParentTrigger(this GameObject obj)
     {
-        var tigger = obj.GetComponentInParent<ValueEventTrigger>();
-        tigger.nextInoke = invokeNext;
+        if (obj.transform.parent == null)
+        {
+            return null;
+        }
+        var tigger = obj.transform.parent.GetComponentInParent<ValueEventTrigger>();
         return tigger;
     }
 
-    public static void InvokeEvent(this GameObject obj, string eventName,InvokeNext invokeNext= InvokeNext.不传递) 
+    public static void InvokeEvent(this GameObject obj, string eventName) 
     {
-        obj.GetTrigger(invokeNext)?.Invoke(eventName.Trim());
+        obj.GetTrigger()?.Invoke(eventName.Trim());
     }
-    public static void InvokeEvent<T>(this GameObject obj, string eventName,T value, InvokeNext invokeNext = InvokeNext.不传递) where T:class
+    public static void InvokeEvent<T>(this GameObject obj, string eventName,T value) where T:class
     {
-        obj.GetTrigger(invokeNext)?.Invoke(eventName.Trim(), value);
+        obj.GetTrigger()?.Invoke(eventName.Trim(), value);
     }
-    public static void InvokeEvent(this GameObject obj, string eventName, bool value, InvokeNext invokeNext = InvokeNext.不传递) 
+    public static void InvokeEvent(this GameObject obj, string eventName, bool value) 
     {
-        obj.GetTrigger(invokeNext)?.Invoke(eventName.Trim(), value);
+        obj.GetTrigger()?.Invoke(eventName.Trim(), value);
     }
-    public static void InvokeEvent(this GameObject obj, string eventName, float value, InvokeNext invokeNext = InvokeNext.不传递)
+    public static void InvokeEvent(this GameObject obj, string eventName, float value)
     {
-        obj.GetTrigger(invokeNext)?.Invoke(eventName.Trim(), value);
+        obj.GetTrigger()?.Invoke(eventName.Trim(), value);
     }
   
-    public static void InvokeParentEvent(this GameObject obj, string eventName, InvokeNext invokeNext = InvokeNext.不传递)
+    public static void InvokeParentEvent(this GameObject obj, string eventName)
     {
-        obj.GetParentTrigger(invokeNext)?.Invoke(eventName.Trim());
+        obj.GetParentTrigger()?.Invoke(eventName.Trim());
     }
-    public static void InvokeParentEvent<T>(this GameObject obj, string eventName, T value, InvokeNext invokeNext = InvokeNext.不传递) where T : class
+    public static void InvokeParentEvent<T>(this GameObject obj, string eventName, T value) where T : class
     {
-        obj.GetParentTrigger(invokeNext)?.Invoke(eventName.Trim(), value);
+        obj.GetParentTrigger()?.Invoke(eventName.Trim(), value);
     }
-    public static void InvokeParentEvent(this GameObject obj, string eventName, bool value, InvokeNext invokeNext = InvokeNext.不传递)
+    public static void InvokeParentEvent(this GameObject obj, string eventName, bool value)
     {
-        obj.GetParentTrigger(invokeNext)?.Invoke(eventName.Trim(), value);
+        obj.GetParentTrigger()?.Invoke(eventName.Trim(), value);
     }
-    public static void InvokeParentEvent(this GameObject obj, string eventName, float value, InvokeNext invokeNext = InvokeNext.不传递)
+    public static void InvokeParentEvent(this GameObject obj, string eventName, float value)
     {
-        obj.GetParentTrigger(invokeNext)?.Invoke(eventName.Trim(), value);
+        obj.GetParentTrigger()?.Invoke(eventName.Trim(), value);
     }
 }
