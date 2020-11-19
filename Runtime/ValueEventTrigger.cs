@@ -65,6 +65,12 @@ public class ObjectEventTrigger : EventTriggerBase<ObjectEvent>
 {
 }
 
+public enum InvokeNext
+{
+    不传递=0,
+    传递子物体=1,
+    传递父物体=2,
+}
 public class ValueEventTrigger : MonoBehaviour
 {
     public List<ActionEventTrigger> actionEventList=new List<ActionEventTrigger>();
@@ -72,9 +78,42 @@ public class ValueEventTrigger : MonoBehaviour
     public List<SpriteEventTrigger> spriteEventList=new List<SpriteEventTrigger>();
     public List<BoolEventTrigger> boolEventList=new List<BoolEventTrigger>();
     public List<FloatEventTrigger> floatEventList=new List<FloatEventTrigger>();
-    public List<ValueEventTrigger> childTrigger=new List<ValueEventTrigger>();
     public List<ObjectEventTrigger> objectTrigger=new List<ObjectEventTrigger>();
-    public void Set<T>(string eventName, T value) where T: class
+    ValueEventTrigger _childTigger;
+    ValueEventTrigger _parentTigger;
+    public ValueEventTrigger ChildTrigger
+    {
+        get
+        {
+            return _childTigger ?? (_childTigger = GetComponentInChildren<ValueEventTrigger>());
+        }
+    }
+    public ValueEventTrigger ParentTrigger
+    {
+        get
+        {
+            return _parentTigger ?? (_parentTigger = GetComponentInParent<ValueEventTrigger>());
+        }
+    }
+    public InvokeNext nextInoke = InvokeNext.不传递;
+    ValueEventTrigger NextTigger
+    {
+        get
+        {
+            switch (nextInoke)
+            {
+                case InvokeNext.传递子物体:
+                    return ChildTrigger;
+                case InvokeNext.传递父物体:
+                    return ParentTrigger;
+                default:
+                    return null;
+            }
+        }
+    }
+    
+  
+    public void Invoke<T>(string eventName, T value) where T: class
     {
         var type = typeof(T);
         if (type == typeof(string))
@@ -89,76 +128,73 @@ public class ValueEventTrigger : MonoBehaviour
         {
             objectTrigger.Get(eventName)?.eventAction?.Invoke(value);
         }
-        foreach (var trigger in childTrigger)
-        {
-            trigger.Set(eventName, value);
-        }
+
+        NextTigger?.Invoke(eventName, value);
     }
-    public void Action(string eventName)
+    public void Invoke(string eventName)
     {
         actionEventList.Get(eventName)?.eventAction.Invoke();
-        foreach (var trigger in childTrigger)
-        {
-            trigger.Action(eventName);
-        }
+        NextTigger?.Invoke(eventName);
     }
-    public void Set(string eventName, bool value)
+    public void Invoke(string eventName, bool value)
     {
         boolEventList.Get(eventName)?.eventAction?.Invoke((bool)value);
-        foreach (var trigger in childTrigger)
-        {
-            trigger.Set(eventName, value);
-        }
+        NextTigger?.Invoke(eventName, value);
     }
-    public void Set(string eventName, float value)
+    public new void Invoke(string eventName, float value)
     {
         floatEventList.Get(eventName)?.eventAction?.Invoke(value);
-        foreach (var trigger in childTrigger)
-        {
-            trigger.Set(eventName, value);
-        }
+        NextTigger?.Invoke(eventName, value);
     }
 }
 public static class ValueEventTriggerExtends
 {
-    public static void InvokeEvent(this GameObject obj, string eventName) 
+
+    public static ValueEventTrigger GetTrigger(this GameObject obj, InvokeNext invokeNext = InvokeNext.不传递)
     {
-        obj.GetTrigger()?.Action(eventName.Trim());
+        var tigger= obj.GetComponentInChildren<ValueEventTrigger>();
+        tigger.nextInoke = invokeNext;
+        return tigger;
     }
-    public static void InvokeEvent<T>(this GameObject obj, string eventName,T value=null) where T:class
+
+    public static ValueEventTrigger GetParentTrigger(this GameObject obj, InvokeNext invokeNext = InvokeNext.不传递)
     {
-        obj.GetTrigger()?.Set(eventName.Trim(), value);
+        var tigger = obj.GetComponentInParent<ValueEventTrigger>();
+        tigger.nextInoke = invokeNext;
+        return tigger;
     }
-    public static void InvokeEvent(this GameObject obj, string eventName, bool value) 
+
+    public static void InvokeEvent(this GameObject obj, string eventName,InvokeNext invokeNext= InvokeNext.不传递) 
     {
-        obj.GetTrigger()?.Set(eventName.Trim(), value);
+        obj.GetTrigger(invokeNext)?.Invoke(eventName.Trim());
     }
-    public static void InvokeEvent(this GameObject obj, string eventName, float value)
+    public static void InvokeEvent<T>(this GameObject obj, string eventName,T value, InvokeNext invokeNext = InvokeNext.不传递) where T:class
     {
-        obj.GetTrigger()?.Set(eventName.Trim(), value);
+        obj.GetTrigger(invokeNext)?.Invoke(eventName.Trim(), value);
     }
-    public static ValueEventTrigger GetTrigger(this GameObject obj)
+    public static void InvokeEvent(this GameObject obj, string eventName, bool value, InvokeNext invokeNext = InvokeNext.不传递) 
     {
-        return obj.GetComponentInChildren<ValueEventTrigger>();
+        obj.GetTrigger(invokeNext)?.Invoke(eventName.Trim(), value);
     }
-    public static ValueEventTrigger GetParentTrigger(this GameObject obj)
+    public static void InvokeEvent(this GameObject obj, string eventName, float value, InvokeNext invokeNext = InvokeNext.不传递)
     {
-        return obj.GetComponentInParent<ValueEventTrigger>();
+        obj.GetTrigger(invokeNext)?.Invoke(eventName.Trim(), value);
     }
-    public static void InvokeParentEvent(this GameObject obj, string eventName)
+  
+    public static void InvokeParentEvent(this GameObject obj, string eventName, InvokeNext invokeNext = InvokeNext.不传递)
     {
-        obj.GetParentTrigger()?.Action(eventName.Trim());
+        obj.GetParentTrigger(invokeNext)?.Invoke(eventName.Trim());
     }
-    public static void InvokeParentEvent<T>(this GameObject obj, string eventName, T value = null) where T : class
+    public static void InvokeParentEvent<T>(this GameObject obj, string eventName, T value, InvokeNext invokeNext = InvokeNext.不传递) where T : class
     {
-        obj.GetParentTrigger()?.Set(eventName.Trim(), value);
+        obj.GetParentTrigger(invokeNext)?.Invoke(eventName.Trim(), value);
     }
-    public static void InvokeParentEvent(this GameObject obj, string eventName, bool value)
+    public static void InvokeParentEvent(this GameObject obj, string eventName, bool value, InvokeNext invokeNext = InvokeNext.不传递)
     {
-        obj.GetParentTrigger()?.Set(eventName.Trim(), value);
+        obj.GetParentTrigger(invokeNext)?.Invoke(eventName.Trim(), value);
     }
-    public static void InvokeParentEvent(this GameObject obj, string eventName, float value)
+    public static void InvokeParentEvent(this GameObject obj, string eventName, float value, InvokeNext invokeNext = InvokeNext.不传递)
     {
-        obj.GetParentTrigger()?.Set(eventName.Trim(), value);
+        obj.GetParentTrigger(invokeNext)?.Invoke(eventName.Trim(), value);
     }
 }
