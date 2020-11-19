@@ -8,7 +8,7 @@ public class EventTriggerBase<T>: IKey<string> where T: UnityEventBase
 {
     public string EventName;
     public string Key { get => EventName; set => EventName = value; }
-    public T eventAction;
+    public T eventAction=default;
 }
 [System.Serializable]
 public class ActionEvent :UnityEvent
@@ -67,13 +67,13 @@ public class ObjectEventTrigger : EventTriggerBase<ObjectEvent>
 
 public class ValueEventTrigger : MonoBehaviour
 {
-    public List<ActionEventTrigger> actionEventList;
-    public List<StringEventTrigger> stringEventList;
-    public List<SpriteEventTrigger> spriteEventList;
-    public List<BoolEventTrigger> boolEventList;
-    public List<FloatEventTrigger> floatEventList;
-    public List<ValueEventTrigger> childTrigger;
-    public List<ObjectEventTrigger> objectTrigger;
+    public List<ActionEventTrigger> actionEventList=new List<ActionEventTrigger>();
+    public List<StringEventTrigger> stringEventList=new List<StringEventTrigger>();
+    public List<SpriteEventTrigger> spriteEventList=new List<SpriteEventTrigger>();
+    public List<BoolEventTrigger> boolEventList=new List<BoolEventTrigger>();
+    public List<FloatEventTrigger> floatEventList=new List<FloatEventTrigger>();
+    public List<ValueEventTrigger> childTrigger=new List<ValueEventTrigger>();
+    public List<ObjectEventTrigger> objectTrigger=new List<ObjectEventTrigger>();
     public void Set<T>(string eventName, T value) where T: class
     {
         var type = typeof(T);
