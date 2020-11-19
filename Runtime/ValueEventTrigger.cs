@@ -141,4 +141,24 @@ public static class ValueEventTriggerExtends
     {
         return obj.GetComponentInChildren<ValueEventTrigger>();
     }
+    public static ValueEventTrigger GetParentTrigger(this GameObject obj)
+    {
+        return obj.GetComponentInParent<ValueEventTrigger>();
+    }
+    public static void InvokeParentEvent(this GameObject obj, string eventName)
+    {
+        obj.GetParentTrigger()?.Action(eventName.Trim());
+    }
+    public static void InvokeParentEvent<T>(this GameObject obj, string eventName, T value = null) where T : class
+    {
+        obj.GetParentTrigger()?.Set(eventName.Trim(), value);
+    }
+    public static void InvokeParentEvent(this GameObject obj, string eventName, bool value)
+    {
+        obj.GetParentTrigger()?.Set(eventName.Trim(), value);
+    }
+    public static void InvokeParentEvent(this GameObject obj, string eventName, float value)
+    {
+        obj.GetParentTrigger()?.Set(eventName.Trim(), value);
+    }
 }

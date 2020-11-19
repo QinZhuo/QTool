@@ -14,4 +14,12 @@ public class ValueEventTriggerInvoke : MonoBehaviour
     {
         gameObject.InvokeEvent(key, value);
     }
+    public void InokeParentEvent(string value)
+    {
+        gameObject.InvokeParentEvent(key, value);
+    }
+    public void InokeParentEvent(float value)
+    {
+        gameObject.InvokeParentEvent(key, value);
+    }
 }
