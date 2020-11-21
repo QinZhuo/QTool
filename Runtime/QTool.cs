@@ -23,7 +23,7 @@ namespace QTool
                 }
                 else
                 {
-                    var value = this.GetAndCreate<T, KeyType>(key); ;
+                    var value = this.GetAndCreate<T, KeyType>(key, creatCallback); ;
                     dic.Add(key, value);
                     return value;
                 }
@@ -43,6 +43,7 @@ namespace QTool
                 Add(value);
             }
         }
+        public event System.Action<T> creatCallback;
     }
     public class StringKeyList<T> : KeyList<string, T> where T: class,IKey<string>,new()
     {
@@ -106,19 +107,19 @@ namespace QTool
             value.Key = key;
             array.Add(value);
         }
-        public static T GetAndCreate<T, KeyType>(this ICollection<T> array, KeyType key) where T : class, IKey<KeyType>, new()
+        public static T GetAndCreate<T, KeyType>(this ICollection<T> array, KeyType key,System.Action<T> creatCallback=null) where T : class, IKey<KeyType>, new()
         {
             foreach (var value in array)
             {
                 if (value == null) continue;
-                    if (key.Equals(value.Key))
-                    {
-                        return value;
-                    }
-             
-              
+                if (key.Equals(value.Key))
+                {
+                    return value;
+                }
+
             }
             var t = new T { Key = key };
+            creatCallback?.Invoke(t);
             array.Add(t);
             return t;
         }
