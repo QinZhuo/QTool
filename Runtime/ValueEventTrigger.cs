@@ -156,7 +156,7 @@ public static class ValueEventTriggerExtends
         {
             return null;
         }
-        var tigger= obj.GetComponentInChildren<ValueEventTrigger>();
+        var tigger= obj.GetComponentInChildren<ValueEventTrigger>(true);
         return tigger;
     }
 
