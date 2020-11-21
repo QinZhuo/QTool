@@ -152,13 +152,17 @@ public static class ValueEventTriggerExtends
 
     public static ValueEventTrigger GetTrigger(this GameObject obj)
     {
+        if (obj == null)
+        {
+            return null;
+        }
         var tigger= obj.GetComponentInChildren<ValueEventTrigger>();
         return tigger;
     }
 
     public static ValueEventTrigger GetParentTrigger(this GameObject obj)
     {
-        if (obj.transform.parent == null)
+        if (obj.transform.parent == null||obj==null)
         {
             return null;
         }
