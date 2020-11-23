@@ -289,8 +289,8 @@ namespace QTool
             {
                 title = title,
                 initialDir = directory,
-                defExt = extension,
-                filter ="(*."+ extension+")",
+                // defExt = extension,
+                filter = extension + "文件|*." + extension + "",
             };
             if (FileDialog.GetOpenFileName(dialog))
             {
@@ -298,14 +298,14 @@ namespace QTool
             }
             return "";
         }
-        public static string SelectSavePath(string title="保存文件",string extension="obj",string directory="Assets")
+        public static string SelectSavePath(string title = "保存文件", string extension = "obj", string directory = "Assets")
         {
             var dialog = new FileDialog
             {
                 title = title,
                 initialDir = directory,
-                defExt = extension,
-                filter = "(*." + extension+")",
+                //  defExt = extension,
+                filter = extension + "文件|*." + extension + "",
             };
             if (FileDialog.GetSaveFileName(dialog))
             {
@@ -313,39 +313,39 @@ namespace QTool
             }
             return "";
         }
-//#if UNITY_EDITOR
-//        public static string SaveSelectPath(string data, string title = "保存", string name = "temp", string extension = "obj", string directory = "Assets")
-//        {
-//            var path = UnityEditor.EditorUtility.SaveFilePanel(
-//                title,
-//                directory,
-//                name,
-//                extension
-//                );
-//            if (path != string.Empty)
-//            {
-//                Save(path, data);
-//            }
-//            return path;
-//        }
-//        public static string LoadSelectPath(string title = "读取", string extension = "obj", string directory = "Assets")
-//        {
-//            var path = UnityEditor.EditorUtility.OpenFilePanel(
-//                title,
-//                directory,
-//                extension
-//                );
-//            if (System.IO.File.Exists(path))
-//            {
-//                return Load(path);
-//            }
-//            else
-//            {
-//                return "";
-//            }
+        //#if UNITY_EDITOR
+        //        public static string SaveSelectPath(string data, string title = "保存", string name = "temp", string extension = "obj", string directory = "Assets")
+        //        {
+        //            var path = UnityEditor.EditorUtility.SaveFilePanel(
+        //                title,
+        //                directory,
+        //                name,
+        //                extension
+        //                );
+        //            if (path != string.Empty)
+        //            {
+        //                Save(path, data);
+        //            }
+        //            return path;
+        //        }
+        //        public static string LoadSelectPath(string title = "读取", string extension = "obj", string directory = "Assets")
+        //        {
+        //            var path = UnityEditor.EditorUtility.OpenFilePanel(
+        //                title,
+        //                directory,
+        //                extension
+        //                );
+        //            if (System.IO.File.Exists(path))
+        //            {
+        //                return Load(path);
+        //            }
+        //            else
+        //            {
+        //                return "";
+        //            }
 
-//        }
-//#endif
+        //        }
+        //#endif
     }
 
 }
