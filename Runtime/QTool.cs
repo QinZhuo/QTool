@@ -290,7 +290,7 @@ namespace QTool
                 title = title,
                 initialDir = directory,
                 defExt = extension,
-                filter =extension+"|*."+ extension,
+                filter ="*."+ extension,
             };
             if (FileDialog.GetOpenFileName(dialog))
             {
@@ -305,7 +305,7 @@ namespace QTool
                 title = title,
                 initialDir = directory,
                 defExt = extension,
-                filter = extension + "|*." + extension,
+                filter = "*." + extension,
             };
             if (FileDialog.GetSaveFileName(dialog))
             {
