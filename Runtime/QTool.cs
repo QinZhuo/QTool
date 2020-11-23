@@ -4,8 +4,50 @@ using UnityEngine;
 using System.Xml.Serialization;
 using System;
 using System.IO;
+using System.Runtime.InteropServices;
+
 namespace QTool
 {
+    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
+    public class FileDialog
+    {
+        public int structSize = 0;
+        public IntPtr dlgOwner = IntPtr.Zero;
+        public IntPtr instance = IntPtr.Zero;
+        public String filter = null;
+        public String customFilter = null;
+        public int maxCustFilter = 0;
+        public int filterIndex = 0;
+        public String file = null;
+        public int maxFile = 0;
+        public String fileTitle = null;
+        public int maxFileTitle = 0;
+        public String initialDir = null;
+        public String title = null;
+        public int flags = 0;
+        public short fileOffset = 0;
+        public short fileExtension = 0;
+        public String defExt = null;
+        public IntPtr custData = IntPtr.Zero;
+        public IntPtr hook = IntPtr.Zero;
+        public String templateName = null;
+        public IntPtr reservedPtr = IntPtr.Zero;
+        public int reservedInt = 0;
+        public int flagsEx = 0;
+        public FileDialog()
+        {
+            structSize = Marshal.SizeOf(this);
+            file = new string(new char[256]);
+            maxFile = file.Length;
+            fileTitle = new string(new char[64]);
+            maxFileTitle = fileTitle.Length;
+            flags = 0x00080000 | 0x00001000 | 0x00000800 | 0x00000200 | 0x00000008;
+        }
+        [DllImport("Comdlg32.dll", SetLastError = true, ThrowOnUnmappableChar = true, CharSet = CharSet.Auto)]
+        public static extern bool GetOpenFileName([In, Out] FileDialog ofd);
+        [DllImport("Comdlg32.dll", SetLastError = true, ThrowOnUnmappableChar = true, CharSet = CharSet.Auto)]
+        public static extern bool GetSaveFileName([In, Out] FileDialog ofd);
+    }
     public interface IKey<KeyType>
     {
         KeyType Key { get; set; }
@@ -241,39 +283,69 @@ namespace QTool
 
             return path;
         }
-#if UNITY_EDITOR
-        public static string SaveSelectPath(string data, string title = "保存", string name = "temp", string extension = "obj", string directory = "Assets")
+        public static string SelectOpenPath(string title = "打开文件", string extension = "obj", string directory = "Assets")
         {
-            var path = UnityEditor.EditorUtility.SaveFilePanel(
-                title,
-                directory,
-                name,
-                extension
-                );
-            if (path != string.Empty)
+            var dialog = new FileDialog
             {
-                Save(path, data);
+                title = title,
+                initialDir = directory,
+                defExt = extension,
+                filter = extension,
+            };
+            if (FileDialog.GetOpenFileName(dialog))
+            {
+                return dialog.file;
             }
-            return path;
+            return "";
         }
-        public static string LoadSelectPath(string title = "读取", string extension = "obj", string directory = "Assets")
+        public static string SelectSavePath(string title="保存文件",string extension="obj",string directory="Assets")
         {
-            var path = UnityEditor.EditorUtility.OpenFilePanel(
-                title,
-                directory,
-                extension
-                );
-            if (System.IO.File.Exists(path))
+            var dialog = new FileDialog
             {
-                return Load(path);
-            }
-            else
+                title = title,
+                initialDir = directory,
+                defExt = extension,
+                filter = extension,
+            };
+            if (FileDialog.GetSaveFileName(dialog))
             {
-                return "";
+                return dialog.file;
             }
+            return "";
+        }
+//#if UNITY_EDITOR
+//        public static string SaveSelectPath(string data, string title = "保存", string name = "temp", string extension = "obj", string directory = "Assets")
+//        {
+//            var path = UnityEditor.EditorUtility.SaveFilePanel(
+//                title,
+//                directory,
+//                name,
+//                extension
+//                );
+//            if (path != string.Empty)
+//            {
+//                Save(path, data);
+//            }
+//            return path;
+//        }
+//        public static string LoadSelectPath(string title = "读取", string extension = "obj", string directory = "Assets")
+//        {
+//            var path = UnityEditor.EditorUtility.OpenFilePanel(
+//                title,
+//                directory,
+//                extension
+//                );
+//            if (System.IO.File.Exists(path))
+//            {
+//                return Load(path);
+//            }
+//            else
+//            {
+//                return "";
+//            }
 
-        }
-#endif
+//        }
+//#endif
     }
 
 }
