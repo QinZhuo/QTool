@@ -3,9 +3,22 @@ using System.Collections.Generic;
 using UnityEngine;
 namespace QTool
 {
-    public class PoolManager
+    public static class PoolManager
     {
-
+        public static Dictionary<string, Transform> parentList = new Dictionary<string, Transform>();
+        public static Transform GetPoolParent(string name)
+        {
+            if (parentList.ContainsKey(name))
+            {
+                return parentList[name];
+            }
+            else
+            {
+                var parent = new GameObject(name).transform;
+                parentList.Add(name, parent);
+                return parent;
+            }
+        }
         static Dictionary<string, PoolBase> poolDic = new Dictionary<string, PoolBase>();
         public static T Push<T>(string poolName, T obj) where T : class
         {
@@ -69,13 +82,18 @@ namespace QTool
                     AllPool.Remove(obj);
                     obj = Get();
                 }
+                GameObject gameObj = null;
                 if (isGameObject)
                 {
-                    (obj as GameObject).SetActive(true);
+                    gameObj = (obj as GameObject);
                 }
                 else if (isMonobehaviour)
                 {
-                    (obj as MonoBehaviour).gameObject.SetActive(true);
+                    gameObj = (obj as MonoBehaviour).gameObject;
+                }
+                if (gameObj != null)
+                {
+                    gameObj.SetActive(true);
                 }
             }
             if (isPoolObj) (obj as IPoolObj).PoolReset();
@@ -84,14 +102,19 @@ namespace QTool
         T CheckPush(T obj)
         {
             if (isPoolObj) (obj as IPoolObj).PoolRecover();
-
+            GameObject gameObj=null;
             if (isGameObject)
             {
-                (obj as GameObject).SetActive(false);
+                gameObj=(obj as GameObject);
             }
             else if (isMonobehaviour)
             {
-                (obj as MonoBehaviour).gameObject.SetActive(false);
+                gameObj=(obj as MonoBehaviour).gameObject;
+            }
+            if (gameObj != null)
+            {
+                gameObj.SetActive(false);
+                gameObj.transform.SetParent(PoolManager.GetPoolParent(Key));
             }
             return obj;
         }
