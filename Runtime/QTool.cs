@@ -85,6 +85,16 @@ namespace QTool
                 Add(value);
             }
         }
+        public new void Remove(T obj)
+        {
+            base.Remove(obj);
+            dic.Remove(obj.Key);
+        }
+        public new void Clear()
+        {
+            base.Clear();
+            dic.Clear();
+        }
         public event System.Action<T> creatCallback;
     }
     public class StringKeyList<T> : KeyList<string, T> where T: class,IKey<string>,new()
