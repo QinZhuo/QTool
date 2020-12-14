@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-namespace QTool.ByteExtends
+namespace QTool.BinaryStream
 {
     public class BinaryReader
     {

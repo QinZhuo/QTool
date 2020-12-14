@@ -3,8 +3,8 @@ using System.Reflection;
 using System.Collections.Generic;
 using System.Collections;
 using UnityEngine;
-using QTool.ByteExtends;
-namespace QTool
+using QTool.BinaryStream;
+namespace QTool.Serialize
 {
     [AttributeUsage(AttributeTargets.Class| AttributeTargets.Interface)]
     public class DynamicAttribute : Attribute
@@ -122,7 +122,7 @@ namespace QTool
 
         public static BinaryReader reader=new BinaryReader();
         public static BinaryWriter writer=new BinaryWriter();
-        public static Byte[] Serialize<T>(T value)
+        public static System.Byte[] Serialize<T>(T value)
         {
             typeStrList.Clear();
             typeIndexDic.Clear();
