@@ -141,55 +141,67 @@ namespace QTool.BinaryStream
         {
             return byteList.ToArray();
         }
-        public void Write(byte value)
+        public BinaryWriter Write(byte value)
         {
             byteList.Add(value);
+            return this;
         }
-        public void Write(Int16 value)
+        public BinaryWriter Write(Int16 value)
         {
             byteList.AddRange(value.GetBytes());
+            return this;
         }
-        public void Write(Int32 value)
+        public BinaryWriter Write(Int32 value)
         {
             byteList.AddRange(value.GetBytes());
+            return this;
         }
-        public void Write(Int64 value)
+        public BinaryWriter Write(Int64 value)
         {
             byteList.AddRange(value.GetBytes());
+            return this;
         }
-        public void Write(UInt16 value)
+        public BinaryWriter Write(UInt16 value)
         {
             byteList.AddRange(value.GetBytes());
+            return this;
         }
-        public void Write(UInt32 value)
+        public BinaryWriter Write(UInt32 value)
         {
             byteList.AddRange(value.GetBytes());
+            return this;
         }
-        public void Write(UInt64 value)
+        public BinaryWriter Write(UInt64 value)
         {
             byteList.AddRange(value.GetBytes());
+            return this;
         }
 
-        public void Write(bool value)
+        public BinaryWriter Write(bool value)
         {
             byteList.AddRange(value.GetBytes());
+            return this;
         }
-        public void Write(char value)
+        public BinaryWriter Write(char value)
         {
             byteList.AddRange(value.GetBytes());
+            return this;
         }
-        public void Write(double value)
+        public BinaryWriter Write(double value)
         {
             byteList.AddRange(value.GetBytes());
+            return this;
         }
 
-        public void Write(sbyte value)
+        public BinaryWriter Write(sbyte value)
         {
             byteList.Add(((byte)value));
+            return this;
         }
-        public void Write(float value)
+        public BinaryWriter Write(float value)
         {
             byteList.AddRange(value.GetBytes());
+            return this;
         }
         protected void WriteLengh(int length, LengthType lengthType= LengthType.Int32)
         {
@@ -220,18 +232,20 @@ namespace QTool.BinaryStream
                     break;
             }
         }
-        public void Write(byte[] bytes, LengthType lengthType = LengthType.Int32)
+        public BinaryWriter Write(byte[] bytes, LengthType lengthType = LengthType.Int32)
         {
             var length = bytes.Length;
             WriteLengh(length, lengthType);
             byteList.AddRange(bytes);
+            return this;
         }
-        public void Write(string value, LengthType lengthType = LengthType.Int32)
+        public BinaryWriter Write(string value, LengthType lengthType = LengthType.Int32)
         {
             var bytes = value.GetBytes();
             var length = bytes.Length;
             WriteLengh(length, lengthType);
             byteList.AddRange(bytes);
+            return this;
         }
     }
     public static class QBinaryExtends
