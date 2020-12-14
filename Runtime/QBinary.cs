@@ -8,8 +8,10 @@ public enum LengthType
     Int16,
     Int32,
 }
-namespace QTool.BinaryStream
+namespace QTool.Binary
 {
+
+ 
     public class BinaryReader
     {
         public void Reset(byte[] bytes)
@@ -77,6 +79,19 @@ namespace QTool.BinaryStream
             index += 4;
             return value;
         }
+        public Vector3 ReadVector3()
+        {
+            var value = bytes.GetVector3(index);
+            index += 3*8;
+            return value;
+        }
+        public Quaternion ReadQuaternion()
+        {
+            var value = bytes.GetQuaternion(index);
+            index += 4 * 8;
+            return value;
+        }
+
 
         public UInt16 ReadUInt16()
         {
@@ -199,6 +214,17 @@ namespace QTool.BinaryStream
             return this;
         }
         public BinaryWriter Write(float value)
+        {
+            byteList.AddRange(value.GetBytes());
+            return this;
+        }
+     
+        public BinaryWriter Write(Vector3 value)
+        {
+            byteList.AddRange(value.GetBytes());
+            return this;
+        }
+        public BinaryWriter Write(Quaternion value)
         {
             byteList.AddRange(value.GetBytes());
             return this;
@@ -358,6 +384,34 @@ namespace QTool.BinaryStream
         public static float GetSingle(this byte[] value, int start = 0)
         {
             return BitConverter.ToSingle(value, start);
+        }
+
+
+        public static byte[] GetBytes(this Vector3 value)
+        {
+            var bytes = new byte[8 * 3];
+            Array.Copy(value.x.GetBytes(), 0, bytes, 0, 8);
+            Array.Copy(value.y.GetBytes(), 0, bytes, 8, 8);
+            Array.Copy(value.z.GetBytes(), 0, bytes, 16, 8);
+            return bytes;
+        }
+        public static Vector3 GetVector3(this byte[] value, int start = 0)
+        {
+            return new Vector3(value.GetSingle(0), value.GetSingle(8), value.GetSingle(16));
+        }
+
+        public static byte[] GetBytes(this Quaternion value)
+        {
+            var bytes = new byte[8 * 4];
+            Array.Copy(value.x.GetBytes(), 0, bytes, 0, 8);
+            Array.Copy(value.y.GetBytes(), 0, bytes, 8, 8);
+            Array.Copy(value.z.GetBytes(), 0, bytes, 16, 8);
+            Array.Copy(value.w.GetBytes(), 0, bytes, 24, 8);
+            return bytes;
+        }
+        public static Quaternion GetQuaternion(this byte[] value, int start = 0)
+        {
+            return new Quaternion(value.GetSingle(0), value.GetSingle(8), value.GetSingle(16), value.GetSingle(24));
         }
 
 

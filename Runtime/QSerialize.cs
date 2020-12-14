@@ -3,7 +3,7 @@ using System.Reflection;
 using System.Collections.Generic;
 using System.Collections;
 using UnityEngine;
-using QTool.BinaryStream;
+using QTool.Binary;
 namespace QTool.Serialize
 {
     [AttributeUsage(AttributeTargets.Class| AttributeTargets.Interface)]
