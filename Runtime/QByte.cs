@@ -2,6 +2,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+public enum LengthType
+{
+    Byte,
+    Int16,
+    Int32,
+}
 namespace QTool.BinaryStream
 {
     public class BinaryReader
@@ -11,8 +17,8 @@ namespace QTool.BinaryStream
             this.bytes = bytes;
             index = 0;
         }
-        public byte[] bytes;
-        public int index;
+        public byte[] bytes { protected set; get; }
+        public int index { protected set; get; }
         public byte ReadByte()
         {
             var value = bytes[index];
@@ -92,9 +98,33 @@ namespace QTool.BinaryStream
             index += 5;
             return value;
         }
-        public string ReadString()
+        protected int ReadLength(LengthType lengthType)
         {
-            var length = ReadInt32();
+            switch (lengthType)
+            {
+                case LengthType.Byte:
+                    return ReadByte();
+                case LengthType.Int16:
+                    return ReadInt16();
+                case LengthType.Int32:
+                    return ReadInt32();
+                default:
+                    return 0;
+            }
+        }
+        public byte[] ReadBytes(LengthType lengthType = LengthType.Int32)
+        {
+            var length = ReadLength(lengthType);
+            var bytes = new byte[length];
+            for (int i = 0; i < length; i++)
+            {
+                bytes[i] = ReadByte();
+            }
+            return bytes;
+        }
+        public string ReadString(LengthType lengthType= LengthType.Int32)
+        {
+            var length = ReadLength(lengthType);
             var value = bytes.GetString(index, length);
             index +=  length;
             return value;
@@ -102,7 +132,7 @@ namespace QTool.BinaryStream
     }
     public class BinaryWriter
     {
-        public List<byte> byteList = new List<byte>();
+        public List<byte> byteList { protected set; get; } = new List<byte>();
         public void Clear()
         {
             byteList.Clear();
@@ -157,21 +187,54 @@ namespace QTool.BinaryStream
         {
             byteList.Add(((byte)value));
         }
-
-
         public void Write(float value)
         {
             byteList.AddRange(value.GetBytes());
         }
-        public void Write(string value)
+        protected void WriteLengh(int length, LengthType lengthType= LengthType.Int32)
+        {
+            switch (lengthType)
+            {
+                case LengthType.Byte:
+                    if (length > byte.MaxValue)
+                    {
+                        Debug.LogError("长度[" + length + "]大于" + byte.MaxValue);
+                    }
+                    Write((byte)length);
+                    break;
+                case LengthType.Int16:
+                    if (length > Int16.MaxValue)
+                    {
+                        Debug.LogError("长度[" + length + "]大于" + Int16.MaxValue);
+                    }
+                    Write((Int16)length);
+                    break;
+                case LengthType.Int32:
+                    if (length > Int32.MaxValue)
+                    {
+                        Debug.LogError("长度[" + length + "]大于" + Int32.MaxValue);
+                    }
+                    Write((Int32)length);
+                    break;
+                default:
+                    break;
+            }
+        }
+        public void Write(byte[] bytes, LengthType lengthType = LengthType.Int32)
+        {
+            var length = bytes.Length;
+            WriteLengh(length, lengthType);
+            byteList.AddRange(bytes);
+        }
+        public void Write(string value, LengthType lengthType = LengthType.Int32)
         {
             var bytes = value.GetBytes();
             var length = bytes.Length;
-            Write(length);
+            WriteLengh(length, lengthType);
             byteList.AddRange(bytes);
         }
     }
-    public static class QByte
+    public static class QBinaryExtends
     {
         public static byte[] GetBytes(this string value)
         {
