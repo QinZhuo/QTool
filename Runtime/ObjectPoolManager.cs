@@ -5,6 +5,17 @@ namespace QTool
 {
     public static class PoolManager
     {
+        public static bool ShowLog
+        {
+            get
+            {
+                return PlayerPrefs.GetInt("PoolManager日志", 0) == 1;
+            }
+            set
+            {
+                PlayerPrefs.SetInt("PoolManager日志", value ? 1 : 0);
+            }
+        }
         public static Dictionary<string, Transform> parentList = new Dictionary<string, Transform>();
         public static Transform GetPoolParent(string name)
         {
@@ -133,7 +144,10 @@ namespace QTool
                 var obj = newFunc();
                 AllPool.Add(obj);
                 stackTrace.Add(getStackTrace);
-                UnityEngine.Debug.Log("【" + Key + "】对象池当前池大小：" + AllCount);
+                if (PoolManager.ShowLog)
+                {
+                    UnityEngine.Debug.Log("【" + Key + "】对象池当前池大小：" + AllCount);
+                }
                 return CheckGet(obj);
             }
         }

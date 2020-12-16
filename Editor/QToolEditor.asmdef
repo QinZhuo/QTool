@@ -1,0 +1,17 @@
+{
+    "name": "QToolEditor",
+    "references": [
+        "GUID:8c4295a259d9a934784fb95a11fa9e58"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
