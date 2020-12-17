@@ -95,7 +95,7 @@ namespace QTool
             dic.Clear();
         }
     }
-    public class AutoKeyList<KeyType, T> : DicList<KeyType,T> where T : class, IKey<KeyType>, new()
+    public class AutoDicList<KeyType, T> : DicList<KeyType,T> where T : class, IKey<KeyType>, new()
     {
         public override T Get(KeyType key)
         {
@@ -103,10 +103,6 @@ namespace QTool
         }
         public event System.Action<T> creatCallback;
     }
-    public class StringKeyList<T> : AutoKeyList<string, T> where T : class, IKey<string>, new()
-    {
-    }
-
     public static class ArrayExtend
     {
         public static bool ContainsKey<T, KeyType>(this ICollection<T> array, KeyType key) where T : class, IKey<KeyType>
