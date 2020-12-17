@@ -50,15 +50,15 @@ namespace QTool
     }
     public interface IKey<KeyType>
     {
-        KeyType Key { get;}
+        KeyType Key { get; set; }
     }
-    public interface ISetKey<KeyType>:IKey<KeyType>
-    {
-        void SetKey(KeyType key);
-    }
-    public class KeyList<KeyType, T> : List<T> where T : class, ISetKey<KeyType>, new()
+    public class DicList<KeyType,T>:List<T> where T : class, IKey<KeyType>
     {
         Dictionary<KeyType, T> dic = new Dictionary<KeyType, T>();
+        public virtual T Get(KeyType key)
+        {
+            return this.Get<T, KeyType>(key); 
+        }
         public T this[KeyType key]
         {
             get
@@ -69,24 +69,19 @@ namespace QTool
                 }
                 else
                 {
-                    var value = this.GetAndCreate<T, KeyType>(key, creatCallback); ;
+                    var value = Get(key);
                     dic.Add(key, value);
                     return value;
                 }
             }
             set
             {
-                var old = this[key];
-                Remove(old);
+                this.RemoveKey(key);
                 if (dic.ContainsKey(key))
                 {
                     dic[key] = value;
                 }
-                if (!key.Equals(value.Key))
-                {
-                    value.SetKey(key);
-                }
-                Add(value);
+                this.Set(key, value);
             }
         }
         public new void Remove(T obj)
@@ -99,12 +94,19 @@ namespace QTool
             base.Clear();
             dic.Clear();
         }
+    }
+    public class AutoKeyList<KeyType, T> : DicList<KeyType,T> where T : class, IKey<KeyType>, new()
+    {
+        public override T Get(KeyType key)
+        {
+            return this.GetAndCreate<T, KeyType>(key, creatCallback);
+        }
         public event System.Action<T> creatCallback;
     }
-    public class StringKeyList<T> : KeyList<string, T> where T: class,ISetKey<string>,new()
+    public class StringKeyList<T> : AutoKeyList<string, T> where T : class, IKey<string>, new()
     {
     }
-    
+
     public static class ArrayExtend
     {
         public static bool ContainsKey<T, KeyType>(this ICollection<T> array, KeyType key) where T : class, IKey<KeyType>
@@ -137,7 +139,7 @@ namespace QTool
         {
             array.Add(obj);
         }
-        public static void AddCheckExist<T>(this IList<T> array,params T[] objs) where T : class
+        public static void AddCheckExist<T>(this IList<T> array, params T[] objs) where T : class
         {
             foreach (var obj in objs)
             {
@@ -153,17 +155,22 @@ namespace QTool
             array.RemoveAt(array.Count - 1);
             return obj;
         }
-        public static void Set<T, KeyType>(this ICollection<T> array, KeyType key, T value) where T : class,ISetKey<KeyType>
+        public static void RemoveKey<T, KeyType>(this ICollection<T> array, KeyType key) where T : class, IKey<KeyType>
         {
             var old = array.Get(key);
             if (old != null)
             {
                 array.Remove(old);
             }
-            value.SetKey(key);
+        }
+        public static void Set<T, KeyType>(this ICollection<T> array, KeyType key, T value) where T : class, IKey<KeyType>
+        {
+            array.RemoveKey(key);
+            value.Key = key;
             array.Add(value);
         }
-        public static T GetAndCreate<T, KeyType>(this ICollection<T> array, KeyType key,System.Action<T> creatCallback=null) where T : class, ISetKey<KeyType>, new()
+
+        public static T GetAndCreate<T, KeyType>(this ICollection<T> array, KeyType key, System.Action<T> creatCallback = null) where T : class, IKey<KeyType>, new()
         {
             foreach (var value in array)
             {
@@ -174,8 +181,7 @@ namespace QTool
                 }
 
             }
-            var t = new T {};
-            t.SetKey(key);
+            var t = new T { Key = key };
             creatCallback?.Invoke(t);
             array.Add(t);
             return t;
@@ -219,7 +225,7 @@ namespace QTool
         {
             using (StringReader sr = new StringReader(s))
             {
-                XmlSerializer xz = GetSerializer(typeof(T),extraTypes);
+                XmlSerializer xz = GetSerializer(typeof(T), extraTypes);
                 return (T)xz.Deserialize(sr);
             }
         }
@@ -277,7 +283,7 @@ namespace QTool
             tex.LoadImage(bytes);
             return tex;
         }
-     
+
         public static string Save(string path, string data)
         {
             try
