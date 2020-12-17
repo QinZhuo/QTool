@@ -52,11 +52,11 @@ namespace QTool
     {
         KeyType Key { get;}
     }
-    public interface ISetKey<KeyType>
+    public interface ISetKey<KeyType>:IKey<KeyType>
     {
         void SetKey(KeyType key);
     }
-    public class KeyList<KeyType, T> : List<T> where T : class, IKey<KeyType>,ISetKey<KeyType>, new()
+    public class KeyList<KeyType, T> : List<T> where T : class, ISetKey<KeyType>, new()
     {
         Dictionary<KeyType, T> dic = new Dictionary<KeyType, T>();
         public T this[KeyType key]
@@ -101,7 +101,7 @@ namespace QTool
         }
         public event System.Action<T> creatCallback;
     }
-    public class StringKeyList<T> : KeyList<string, T> where T: class,IKey<string>,ISetKey<string>,new()
+    public class StringKeyList<T> : KeyList<string, T> where T: class,ISetKey<string>,new()
     {
     }
     
@@ -153,7 +153,7 @@ namespace QTool
             array.RemoveAt(array.Count - 1);
             return obj;
         }
-        public static void Set<T, KeyType>(this ICollection<T> array, KeyType key, T value) where T : class, IKey<KeyType>,ISetKey<KeyType>
+        public static void Set<T, KeyType>(this ICollection<T> array, KeyType key, T value) where T : class,ISetKey<KeyType>
         {
             var old = array.Get(key);
             if (old != null)
@@ -163,7 +163,7 @@ namespace QTool
             value.SetKey(key);
             array.Add(value);
         }
-        public static T GetAndCreate<T, KeyType>(this ICollection<T> array, KeyType key,System.Action<T> creatCallback=null) where T : class, IKey<KeyType>,ISetKey<KeyType>, new()
+        public static T GetAndCreate<T, KeyType>(this ICollection<T> array, KeyType key,System.Action<T> creatCallback=null) where T : class, ISetKey<KeyType>, new()
         {
             foreach (var value in array)
             {
