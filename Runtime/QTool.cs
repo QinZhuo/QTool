@@ -127,6 +127,18 @@ namespace QTool
             }
             return null;
         }
+        public static List<T> GetList<T,KeyType>(this ICollection<T> array, KeyType key, List<T> tempList=null) where T : class, IKey<KeyType>
+        {
+            var list = tempList==null?new List<T>():tempList;
+            foreach (var value in array)
+            {
+                if (key.Equals(value.Key))
+                {
+                    list.Add(value);
+                }
+            }
+            return list;
+        }
         public static T Peek<T>(this IList<T> array) where T : class
         {
             return array[array.Count - 1];
