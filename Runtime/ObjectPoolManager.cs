@@ -97,6 +97,7 @@ namespace QTool
                 if (isGameObject)
                 {
                     gameObj = (obj as GameObject);
+                   
                 }
                 else if (isMonobehaviour)
                 {
@@ -105,14 +106,18 @@ namespace QTool
                 if (gameObj != null)
                 {
                     gameObj.SetActive(true);
+                    foreach (var poolObj in gameObj.GetComponents<IPoolObj>())
+                    {
+                        poolObj.PoolReset();
+                    }
                 }
             }
-            if (isPoolObj) (obj as IPoolObj).PoolReset();
+            else if (isPoolObj) (obj as IPoolObj).PoolReset();
             return obj;
         }
         T CheckPush(T obj)
         {
-            if (isPoolObj) (obj as IPoolObj).PoolRecover();
+          
             GameObject gameObj=null;
             if (isGameObject)
             {
@@ -124,8 +129,25 @@ namespace QTool
             }
             if (gameObj != null)
             {
+             
+            }
+            if (isPoolObj)
+            {
+               
+            }
+            if (gameObj != null)
+            {
                 gameObj.SetActive(false);
                 gameObj.transform.SetParent(PoolManager.GetPoolParent(Key));
+                foreach (var poolObj in gameObj.GetComponents<IPoolObj>())
+                {
+                    poolObj.PoolRecover();
+                }
+            }
+            else if (isPoolObj)
+            {
+                (obj as IPoolObj).PoolRecover();
+
             }
             return obj;
         }
