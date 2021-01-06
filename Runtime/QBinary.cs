@@ -389,10 +389,10 @@ namespace QTool.Binary
 
         public static byte[] GetBytes(this Vector3 value)
         {
-            var bytes = new byte[8 * 3];
-            Array.Copy(value.x.GetBytes(), 0, bytes, 0, 8);
-            Array.Copy(value.y.GetBytes(), 0, bytes, 8, 8);
-            Array.Copy(value.z.GetBytes(), 0, bytes, 16, 8);
+            var bytes = new byte[4 * 3];
+            Array.Copy(value.x.GetBytes(), 0, bytes, 0, 4);
+            Array.Copy(value.y.GetBytes(), 0, bytes, 4*1, 4);
+            Array.Copy(value.z.GetBytes(), 0, bytes, 4*2, 4);
             return bytes;
         }
         public static Vector3 GetVector3(this byte[] value, int start = 0)
@@ -402,11 +402,11 @@ namespace QTool.Binary
 
         public static byte[] GetBytes(this Quaternion value)
         {
-            var bytes = new byte[8 * 4];
-            Array.Copy(value.x.GetBytes(), 0, bytes, 0, 8);
-            Array.Copy(value.y.GetBytes(), 0, bytes, 8, 8);
-            Array.Copy(value.z.GetBytes(), 0, bytes, 16, 8);
-            Array.Copy(value.w.GetBytes(), 0, bytes, 24, 8);
+            var bytes = new byte[4 * 4];
+            Array.Copy(value.x.GetBytes(), 0, bytes, 0, 4);
+            Array.Copy(value.y.GetBytes(), 0, bytes, 4*1, 4);
+            Array.Copy(value.z.GetBytes(), 0, bytes, 4*2, 4);
+            Array.Copy(value.w.GetBytes(), 0, bytes, 4*3, 4);
             return bytes;
         }
         public static Quaternion GetQuaternion(this byte[] value, int start = 0)
