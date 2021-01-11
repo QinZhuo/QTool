@@ -14,10 +14,11 @@ namespace QTool.Binary
  
     public class BinaryReader
     {
-        public void Reset(byte[] bytes)
+        public BinaryReader Reset(byte[] bytes)
         {
             this.bytes = bytes;
             index = 0;
+            return this;
         }
         public byte[] bytes { protected set; get; }
         public int index { protected set; get; }
@@ -82,13 +83,13 @@ namespace QTool.Binary
         public Vector3 ReadVector3()
         {
             var value = bytes.GetVector3(index);
-            index += 3*8;
+            index += 3*4;
             return value;
         }
         public Quaternion ReadQuaternion()
         {
             var value = bytes.GetQuaternion(index);
-            index += 4 * 8;
+            index += 4 * 4;
             return value;
         }
 
