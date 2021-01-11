@@ -398,7 +398,7 @@ namespace QTool.Binary
         }
         public static Vector3 GetVector3(this byte[] value, int start = 0)
         {
-            return new Vector3(value.GetSingle(0), value.GetSingle(4*1), value.GetSingle(4*2));
+            return new Vector3(value.GetSingle(start+0), value.GetSingle(start+4 * 1), value.GetSingle(start+4 * 2));
         }
 
         public static byte[] GetBytes(this Quaternion value)
@@ -412,7 +412,7 @@ namespace QTool.Binary
         }
         public static Quaternion GetQuaternion(this byte[] value, int start = 0)
         {
-            return new Quaternion(value.GetSingle(0), value.GetSingle(4*1), value.GetSingle(4*2), value.GetSingle(4*3));
+            return new Quaternion(value.GetSingle(start+0), value.GetSingle(start+4 * 1), value.GetSingle(start+4 * 2), value.GetSingle(start+4 * 3));
         }
 
 
