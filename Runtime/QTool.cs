@@ -103,6 +103,45 @@ namespace QTool
         }
         public event System.Action<T> creatCallback;
     }
+    public class WaitTime
+    {
+        public float Time { get; protected set; }
+        public float CurTime { get; protected set; }
+
+        public void Clear()
+        {
+            CurTime = 0;
+        }
+        public void Over()
+        {
+            CurTime = Time;
+        }
+        public void Reset(float time,bool startOver=false)
+        {
+            this.Time = time;
+            CurTime = 0;
+            if (startOver) Over();
+        }
+        public WaitTime(float time, bool startOver = false)
+        {
+            Reset(time, startOver);
+        }
+
+        public bool Check(float deltaTime, bool autoClear = true)
+        {
+            CurTime += deltaTime;
+            var subTime = CurTime - Time;
+            if (subTime >= 0)
+            {
+                if (autoClear) { CurTime = subTime; }
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+    }
     public static class ArrayExtend
     {
         public static bool ContainsKey<T, KeyType>(this ICollection<T> array, KeyType key) where T : class, IKey<KeyType>
