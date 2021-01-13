@@ -12,7 +12,7 @@ namespace QTool.Binary
 {
 
  
-    public class BinaryReader
+    public class BinaryReader:IPoolObj
     {
         public BinaryReader Reset(byte[] bytes)
         {
@@ -145,8 +145,17 @@ namespace QTool.Binary
             index +=  length;
             return value;
         }
+        public virtual void PoolReset()
+        {
+        }
+
+        public virtual void PoolRecover()
+        {
+            index = 0;
+        }
+
     }
-    public class BinaryWriter
+    public class BinaryWriter : IPoolObj
     {
         public List<byte> byteList { protected set; get; } = new List<byte>();
         public void Clear()
@@ -273,6 +282,15 @@ namespace QTool.Binary
             WriteLengh(length, lengthType);
             byteList.AddRange(bytes);
             return this;
+        }
+
+        public void PoolReset()
+        {
+
+        }
+        public void PoolRecover()
+        {
+            byteList.Clear();
         }
     }
     public static class QBinaryExtends
