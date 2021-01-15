@@ -19,15 +19,14 @@ namespace QTool
      
         static Dictionary<string, PoolBase> poolDic = new Dictionary<string, PoolBase>();
 
-        public static GameObject Get(GameObject prefab, string poolKey = "")
+        public static GameObject Get(string poolKey ,GameObject prefab)
         {
-            return GetPool(prefab, poolKey).Get() ;
+            return GetPool(poolKey,prefab).Get() ;
         }
-        public static ObjectPool<GameObject> GetPool(GameObject prefab, string poolKey = "")
+        public static ObjectPool<GameObject> GetPool(string poolKey,GameObject prefab)
         {
-            return GetPool("".Equals(poolKey) ? prefab.name : poolKey, () => GameObject.Instantiate(prefab));
+            return GetPool(poolKey, () => GameObject.Instantiate(prefab));
         }
-
         public static T Get<T>(string poolName, System.Func<T> newFunc = null) where T : class
         {
             return GetPool<T>(poolName, newFunc).Get();
