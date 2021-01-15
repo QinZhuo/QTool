@@ -16,33 +16,21 @@ namespace QTool
                 PlayerPrefs.SetInt("PoolManager日志", value ? 1 : 0);
             }
         }
-        public static Dictionary<string, Transform> parentList = new Dictionary<string, Transform>();
-        public static Transform GetPoolParent(string name)
-        {
-            if (parentList.ContainsKey(name))
-            {
-                return parentList[name];
-            }
-            else
-            {
-                var parent = new GameObject(name).transform;
-                parentList.Add(name, parent);
-                return parent;
-            }
-        }
+     
         static Dictionary<string, PoolBase> poolDic = new Dictionary<string, PoolBase>();
-        public static T Push<T>(string poolName, T obj) where T : class
+
+        public static GameObject Get(GameObject prefab, string poolKey = "")
         {
-            var pool = GetPool<T>(poolName);
-            if (pool != null)
-            {
-                return pool.Push(obj);
-            }
-            return obj;
+            return GetPool(prefab, poolKey).Get() ;
         }
-        public static ObjectPool<GameObject> GetPool(GameObject prefab)
+        public static ObjectPool<GameObject> GetPool(GameObject prefab, string poolKey = "")
         {
-            return GetPool(prefab.name, () => GameObject.Instantiate(prefab));
+            return GetPool("".Equals(poolKey) ? prefab.name : poolKey, () => GameObject.Instantiate(prefab));
+        }
+
+        public static T Get<T>(string poolName, System.Func<T> newFunc = null) where T : class
+        {
+            return GetPool<T>(poolName, newFunc).Get();
         }
         public static ObjectPool<T> GetPool<T>(string poolName, System.Func<T> newFunc = null) where T : class
         {
@@ -65,6 +53,16 @@ namespace QTool
                 poolDic.Add(key, pool);
                 return pool;
             }
+        }
+
+        public static T Push<T>(string poolName, T obj) where T : class
+        {
+            var pool = GetPool<T>(poolName);
+            if (pool != null)
+            {
+                return pool.Push(obj);
+            }
+            return obj;
         }
     }
     public interface IPoolObj
@@ -115,6 +113,20 @@ namespace QTool
             else if (isPoolObj) (obj as IPoolObj).PoolReset();
             return obj;
         }
+        private static Dictionary<string, Transform> parentList = new Dictionary<string, Transform>();
+        private static Transform GetPoolParent(string name)
+        {
+            if (parentList.ContainsKey(name))
+            {
+                return parentList[name];
+            }
+            else
+            {
+                var parent = new GameObject(name).transform;
+                parentList.Add(name, parent);
+                return parent;
+            }
+        }
         T CheckPush(T obj)
         {
           
@@ -138,7 +150,7 @@ namespace QTool
             if (gameObj != null)
             {
                 gameObj.SetActive(false);
-                gameObj.transform.SetParent(PoolManager.GetPoolParent(Key));
+                gameObj.transform.SetParent(GetPoolParent(Key));
                 foreach (var poolObj in gameObj.GetComponents<IPoolObj>())
                 {
                     poolObj.PoolRecover();
