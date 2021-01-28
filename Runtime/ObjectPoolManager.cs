@@ -140,14 +140,6 @@ namespace QTool
             }
             if (gameObj != null)
             {
-             
-            }
-            if (isPoolObj)
-            {
-               
-            }
-            if (gameObj != null)
-            {
                 gameObj.SetActive(false);
                 gameObj.transform.SetParent(GetPoolParent(Key));
                 foreach (var poolObj in gameObj.GetComponents<IPoolObj>())
