@@ -19,7 +19,26 @@ namespace QTool
         {
             PlayerPrefs.DeleteAll();
         }
-        [MenuItem("QTool/QTool/打包测试当前场景 %R")]
+        public static string BasePath
+        {
+            get
+            {
+                return Application.dataPath.Substring(0, Application.dataPath.IndexOf("Assets")) ;
+            }
+        }
+        public static string WindowsLocalPath
+        {
+            get
+            {
+                return "Builds/Windows/test.exe";
+            }
+        }
+        [MenuItem("QTool/QTool/运行测试包 %T")]
+        public static void RunTest()
+        {
+            System.Diagnostics.Process.Start(BasePath + WindowsLocalPath);
+        }
+        [MenuItem("QTool/QTool/打包测试当前场景 %#T")]
         public static void TestBuild()
         {
             if (!BuildPipeline.isBuildingPlayer)
@@ -27,16 +46,15 @@ namespace QTool
                 var buildOption = new BuildPlayerOptions
                 {
                     scenes = new string[] { SceneManager.GetActiveScene().path },
-                    locationPathName = "Builds/Windows/test.exe",
+                    locationPathName = WindowsLocalPath,
                     target = BuildTarget.StandaloneWindows,
                     options = BuildOptions.None,
                 };
                 var buildInfo = BuildPipeline.BuildPlayer(buildOption);
                 if (buildInfo.summary.result == BuildResult.Succeeded)
                 {
-                    var path = buildInfo.summary.outputPath;
-                    Debug.Log("打包成功" + path);
-                    System.Diagnostics.Process.Start(path, "server");
+                    Debug.Log("打包成功" + BasePath+WindowsLocalPath);
+                    System.Diagnostics.Process.Start(BasePath + WindowsLocalPath);
                 }
                 else
                 {
@@ -44,6 +62,7 @@ namespace QTool
                 }
             }
         }
+       
     }
 }
 
