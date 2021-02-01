@@ -57,6 +57,14 @@ namespace QTool
             var addCustomSize = getGroup.ReturnType.GetMethod("AddCustomSize"); // or group.GetType().
             var gvsType = typeof(Editor).Assembly.GetType("UnityEditor.GameViewSize");
             var ctor = gvsType.GetConstructor(new Type[] { typeof(int), typeof(int), typeof(int), typeof(string) });
+            foreach (var c in gvsType.GetConstructors())
+            {
+                if (ctor == null && c.GetParameters().Length == 4)
+                {
+                    ctor = c;
+                    break;
+                }
+            }
             var newSize = ctor.Invoke(new object[] { (int)viewSizeType, width, height, text });
             addCustomSize.Invoke(group, new object[] { newSize });
         }
@@ -104,7 +112,7 @@ namespace QTool
             int index = FindSize(GetCurrentGroupType(), width, height);
             if (index == -1)
             {
-                AddCustomSize(GameViewSizeType.FixedResolution, GetCurrentGroupType(), width, height, "");
+                AddCustomSize(GameViewSizeType.FixedResolution, GetCurrentGroupType(), width, height, width+"x"+height);
                 index = FindSize(GetCurrentGroupType(), width, height);
             }
             if (index != -1)
