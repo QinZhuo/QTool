@@ -141,7 +141,7 @@ namespace QTool
                 return false;
             }
         }
-    }
+    }                                    
     public static class ArrayExtend
     {
         public static bool ContainsKey<T, KeyType>(this ICollection<T> array, KeyType key) where T : class, IKey<KeyType>
@@ -159,6 +159,7 @@ namespace QTool
         {
             foreach (var value in array)
             {
+                if (value == null) continue;
                 if (key.Equals(value.Key))
                 {
                     return value;
@@ -219,19 +220,18 @@ namespace QTool
 
         public static T GetAndCreate<T, KeyType>(this ICollection<T> array, KeyType key, System.Action<T> creatCallback = null) where T : class, IKey<KeyType>, new()
         {
-            foreach (var value in array)
+           var value= array.Get(key);
+            if (value != null)
             {
-                if (value == null) continue;
-                if (key.Equals(value.Key))
-                {
-                    return value;
-                }
-
+                return value;
             }
-            var t = new T { Key = key };
-            creatCallback?.Invoke(t);
-            array.Add(t);
-            return t;
+            else
+            {
+                var t = new T { Key = key };
+                creatCallback?.Invoke(t);
+                array.Add(t);
+                return t;
+            }
         }
     }
     public class FileManager
