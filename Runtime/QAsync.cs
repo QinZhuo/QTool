@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System;
-using UnityEngine.AddressableAssets;
 #if Addressables
+using UnityEngine.AddressableAssets;
 namespace QTool.Async
 {
     public abstract class AsyncList<ObjT>where ObjT:UnityEngine.Object
