@@ -88,9 +88,9 @@ namespace QTool.Async
                 Set(result.name, result);
             }).Completed+=(results)=> {
                 Debug.LogError("[" + Label + "]加载完成总数" + objDic.Count);
+                LabelLoadOver = true;
                 OnLabelLoadOver?.Invoke();
                 OnLabelLoadOver = null;
-                LabelLoadOver = true;
             };
             while (!LabelLoadOver)
             {
@@ -124,7 +124,7 @@ namespace QTool.Async
         public static GameObject GetInstance(string key,Transform parent = null)
         {
             var obj = GetPool(key)?.Get();
-            if (obj = null)
+            if (obj == null)
             {
                 return null;
             }
