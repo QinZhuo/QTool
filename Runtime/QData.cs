@@ -190,7 +190,7 @@ namespace QTool.Data
             }
             catch (Exception)
             {
-                Debug.LogError(TableName + "加载出错");
+                Debug.LogError(TableName + "加载出错"+path);
                 throw;
             }
           
@@ -216,7 +216,7 @@ namespace QTool.Data
             Addressables.LoadAssetAsync<TextAsset>(path).Completed += (result) =>
             {
                 Set(key, FileManager.Deserialize<DicList<string, T>>(result.Result.text));
-                Debug.LogError(TableName + "加载数据：" + list.Count);
+                Debug.Log(TableName + "加载数据：" + list.Count);
             };
 
         }
