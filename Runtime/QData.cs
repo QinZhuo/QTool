@@ -15,7 +15,7 @@ namespace QTool.Data
     //{
     //    public string string 
     //}
-    public class QData<T> where T : QData<T>, IKey<string>, new()
+    public class QData<T>: IKey<string> where T :QData<T>, new()
     {
         #region 基础属性
 
