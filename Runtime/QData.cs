@@ -188,10 +188,9 @@ namespace QTool.Data
                     Debug.Log(TableName + "加载数据：" + loadList.Count + " 大小：" + (data.Length * 8).ComputeScale());
                 }
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                Debug.LogError(TableName + "加载出错"+path);
-                throw;
+                Debug.LogError(TableName + "加载出错"+path+"  异常信息："+e);
             }
           
         }
