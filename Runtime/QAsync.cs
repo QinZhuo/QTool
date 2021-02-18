@@ -107,10 +107,10 @@ namespace QTool.Async
             var poolkey = key + "_ObjPool";
             if (!PoolDic.ContainsKey(poolkey))
             {
-                var prefab = Get(poolkey) as GameObject;
+                var prefab = Get(key) as GameObject;
                 if (prefab == null)
                 {
-                    Debug.LogError(Label + "找不到预制体资源" + poolkey);
+                    new Exception(Label + "找不到预制体资源" + key);
                     PoolDic.Add(poolkey, null);
                 }
                 else
