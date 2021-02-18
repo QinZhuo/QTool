@@ -7,14 +7,14 @@ using UnityEngine.AddressableAssets;
 namespace QTool.Async
 {
   
-    public abstract class AsyncList<ObjT>where ObjT:UnityEngine.Object
+    public abstract class AsyncList<ClassT,ObjT> where ObjT:UnityEngine.Object where ClassT:AsyncList<ClassT,ObjT>
     {
         public static Dictionary<string, ObjT> objDic = new Dictionary<string, ObjT>();
         public static string Label
         {
             get
             {
-                return typeof(ObjT).ToString();
+                return typeof(ClassT).ToString();
             }
         }
         public static bool LabelLoadOver = false;
@@ -99,7 +99,7 @@ namespace QTool.Async
         }
    
     }
-    public abstract class PrefabAsyncList: AsyncList<GameObject> 
+    public abstract class PrefabAsyncList<ClassT>: AsyncList<ClassT,GameObject> where ClassT:PrefabAsyncList<ClassT>
     {
         static Dictionary<string, ObjectPool<GameObject>> PoolDic = new Dictionary<string, ObjectPool<GameObject>>();
         static ObjectPool<GameObject> GetPool(string key)
