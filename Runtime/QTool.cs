@@ -330,11 +330,16 @@ namespace QTool
             tex.LoadImage(bytes);
             return tex;
         }
-
+        public static void CreatFolder(string path)
+        {
+            string s = path.Substring(0, path.LastIndexOf('/'));
+            System.IO.Directory.CreateDirectory(s);
+        }
         public static string Save(string path, string data)
         {
             try
             {
+                CreatFolder(path);
                 using (var file = System.IO.File.Create(path))
                 {
                     using (var sw = new System.IO.StreamWriter(file))

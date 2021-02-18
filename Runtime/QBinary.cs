@@ -456,24 +456,15 @@ namespace QTool.Binary
             return ComputeScale((long)byteLength);
         }
 
-        public static string ComputeScale(this long byteLength)
+        public static string ComputeScale(this long longLength)
         {
-            if (byteLength < 1024)
-            {
-                return byteLength + " byte ";
-            }
-            else if (byteLength < 1048576)
-            {
-                return byteLength / 1024f + " Kb ";
-            }
-            else if (byteLength < 1048576 * 1024)
-            {
-                return byteLength / 1048576f + " Mb ";
-            }
-            else
-            {
-                return byteLength / (1048576f * 1024) + " Gb ";
-            }
+            string[] Suffix = { "Byte", "KB", "MB", "GB", "TB" };
+            int i = 0;
+            double dblSByte = longLength;
+            if (longLength > 1024)
+                for (i = 0; (longLength / 1024) > 0; i++, longLength /= 1024)
+                    dblSByte = longLength / 1024.0;
+            return String.Format("{0:0.##}{1}", dblSByte, Suffix[i]);
         }
     }
 }

@@ -34,6 +34,10 @@ namespace QTool.Async
         {
             return objDic.ContainsKey(key);
         }
+        public static bool Contains(string key)
+        {
+            return ContainsKey(key);
+        }
         public static ObjT Get(string key)
         {
             if (ContainsKey(key))
@@ -45,7 +49,7 @@ namespace QTool.Async
                 return null;
             }
         }
-        public static void GetAsync(string key,Action<ObjT> loadOver)
+        public static void AsyncGet(string key,Action<ObjT> loadOver)
         {
             var obj = Get(key);
             if (obj!=null)
@@ -80,7 +84,7 @@ namespace QTool.Async
                 objDic[key] = obj;
             }
         }
-        public static IEnumerator LoadLabelAsync()
+        public static IEnumerator AsyncLoadLabel()
         {
             if (LabelLoadOver) yield break;
             Addressables.LoadAssetsAsync<ObjT>(Label, (result) =>
@@ -99,7 +103,7 @@ namespace QTool.Async
         }
    
     }
-    public abstract class PrefabAsyncList<ClassT>: AsyncList<ClassT,GameObject> where ClassT:PrefabAsyncList<ClassT>
+    public abstract class AsyncPrefabList<ClassT>: AsyncList<ClassT,GameObject> where ClassT:AsyncPrefabList<ClassT>
     {
         static Dictionary<string, ObjectPool<GameObject>> PoolDic = new Dictionary<string, ObjectPool<GameObject>>();
         static ObjectPool<GameObject> GetPool(string key)
