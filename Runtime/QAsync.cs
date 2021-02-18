@@ -91,7 +91,7 @@ namespace QTool.Async
             {
                 Set(result.name, result);
             }).Completed+=(results)=> {
-                Debug.LogError("[" + Label + "]加载完成总数" + objDic.Count);
+                Debug.Log("[" + Label + "]加载完成总数" + objDic.Count);
                 LabelLoadOver = true;
                 OnLabelLoadOver?.Invoke();
                 OnLabelLoadOver = null;
