@@ -145,11 +145,13 @@ namespace QTool.Data
         {
             LoadPath(GetPlayerDataPath(key), key);
         }
-        public static void SaveDefaultStaticTable(string key="")
+        public static void SaveDefaultStaticTable(T DefaultData=null,string key="")
         {
-            list.Add(new T());
+            DicList<string, T> list = new DicList<string, T>();
+            list.Add(DefaultData==null?new T():DefaultData);
             var path = GetStaticTablePath(key);
-            FileManager.Save(path, key);
+            var xmlStr = FileManager.Serialize(list);
+            FileManager.Save(path, xmlStr);
             Debug.LogError(TableName + "保存示例静态表成功：" + path);
         }
         public static void SavePlayerData(string key = "")
