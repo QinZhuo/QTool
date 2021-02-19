@@ -158,7 +158,7 @@ namespace QTool.Data
         {
             var saveList = new List<T>();
             saveList.AddRange(list);
-            if (string.IsNullOrEmpty(key))
+            if (!string.IsNullOrEmpty(key))
             {
                 saveList.RemoveAll((obj) =>
                 {
