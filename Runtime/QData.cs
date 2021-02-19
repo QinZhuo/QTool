@@ -32,7 +32,7 @@ namespace QTool.Data
         {
             get
             {
-                return typeof(T).ToString();
+                return typeof(T).Name;
             }
         }
         public static string TableName
