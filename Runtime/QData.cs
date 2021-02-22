@@ -64,6 +64,7 @@ namespace QTool.Data
 
         public static void ClearTable()
         {
+            loadOverFile.Clear();
             list.Clear();
         }
         public static void Set(T newData)
