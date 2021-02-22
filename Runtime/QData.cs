@@ -15,7 +15,7 @@ namespace QTool.Data
     //{
     //    public string string 
     //}
-    public class QData<T>: IKey<string> where T :QData<T>, new()
+    public class QData<T>: IKey<string>  where T :QData<T>, new()
     {
         #region 基础属性
 
@@ -25,7 +25,7 @@ namespace QTool.Data
         #endregion
 
         #region 数据表相关
-
+        
        
         public static DicList<string, T> list = new DicList<string, T>();
         public static string TableType
@@ -102,6 +102,11 @@ namespace QTool.Data
                 new Exception(TableName + "未包含[" + key + "]");
             }
             return obj;
+        }
+        public static T GetNew(string key)
+        {
+            var data = Get(key);
+            return FileManager.Deserialize<T>(FileManager.Serialize(key));
         }
         public static T Get(string prefix, string key)
         {
