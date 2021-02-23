@@ -65,11 +65,11 @@ public class ObjectEventTrigger : EventTriggerBase<ObjectEvent>
 {
 }
 [System.Serializable]
-public class TransformKeyValue : IKey<string>
+public class GameObjectKeyValue : IKey<string>
 {
     public string name;
     public string Key { get => name; set => name = value; }
-    public Transform transform;
+    public GameObject gameObject;
 }
 [System.Serializable]
 public class ValueEventTrigger : MonoBehaviour
@@ -80,10 +80,14 @@ public class ValueEventTrigger : MonoBehaviour
     public List<BoolEventTrigger> boolEventList=new List<BoolEventTrigger>();
     public List<FloatEventTrigger> floatEventList=new List<FloatEventTrigger>();
     public List<ObjectEventTrigger> objectEventList=new List<ObjectEventTrigger>();
-    public List<TransformKeyValue> transformList = new List<TransformKeyValue>();
+    public List<GameObjectKeyValue> objectList = new List<GameObjectKeyValue>();
   
     
-  
+    public GameObject GetObject(string name)
+    {
+        var kv = objectList.Get(name);
+        return kv == null ? null : kv.gameObject;
+    }
     public void Invoke<T>(string eventName, T value) where T: class
     {
         var type = typeof(T);
