@@ -65,6 +65,13 @@ public class ObjectEventTrigger : EventTriggerBase<ObjectEvent>
 {
 }
 [System.Serializable]
+public class TransformKeyValue : IKey<string>
+{
+    public string name;
+    public string Key { get => name; set => name = value; }
+    public Transform transform;
+}
+[System.Serializable]
 public class ValueEventTrigger : MonoBehaviour
 {
     public List<ActionEventTrigger> actionEventList=new List<ActionEventTrigger>();
@@ -73,22 +80,7 @@ public class ValueEventTrigger : MonoBehaviour
     public List<BoolEventTrigger> boolEventList=new List<BoolEventTrigger>();
     public List<FloatEventTrigger> floatEventList=new List<FloatEventTrigger>();
     public List<ObjectEventTrigger> objectEventList=new List<ObjectEventTrigger>();
-    //ValueEventTrigger _childTigger;
-    //ValueEventTrigger _parentTigger;
-    //public ValueEventTrigger ChildTrigger
-    //{
-    //    get
-    //    {
-    //        return _childTigger ?? (_childTigger = GetComponentInChildren<ValueEventTrigger>());
-    //    }
-    //}
-    //public ValueEventTrigger ParentTrigger
-    //{
-    //    get
-    //    {
-    //        return _parentTigger ?? (_parentTigger = GetComponentInParent<ValueEventTrigger>());
-    //    }
-    //}
+    public List<TransformKeyValue> transformList = new List<TransformKeyValue>();
   
     
   
