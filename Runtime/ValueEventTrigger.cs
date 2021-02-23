@@ -30,10 +30,10 @@ public class FloatEvent : UnityEvent<float>
 public class StringEvent : UnityEvent<string>
 {
 }
-//[System.Serializable]
-//public class SpriteEvent : UnityEvent<Sprite>
-//{
-//}
+[System.Serializable]
+public class SpriteEvent : UnityEvent<Sprite>
+{
+}
 [System.Serializable]
 public class ObjectEvent : UnityEvent<object>
 {
