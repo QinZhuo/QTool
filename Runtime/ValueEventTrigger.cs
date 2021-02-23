@@ -140,7 +140,17 @@ public static class ValueEventTriggerExtends
         var tigger = obj.transform.parent.GetComponentInParent<ValueEventTrigger>();
         return tigger;
     }
-
+    public static GameObject GetObject(this GameObject obj, string objName) {
+        var trigger = obj.GetTrigger();
+        if (trigger == null)
+        {
+            return null;
+        }
+        else
+        {
+            return trigger.GetObject(objName);
+        }
+    }
     public static void InvokeEvent(this GameObject obj, string eventName) 
     {
         obj.GetTrigger()?.Invoke(eventName.Trim());
