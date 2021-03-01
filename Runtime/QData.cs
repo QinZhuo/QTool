@@ -25,8 +25,6 @@ namespace QTool.Data
         #endregion
 
         #region 数据表相关
-        
-       
         public static DicList<string, T> list = new DicList<string, T>();
         public static string TableType
         {
@@ -77,6 +75,8 @@ namespace QTool.Data
         }
         public static void Set(string prefix,T newData)
         {
+            Set(newData);
+            newData = GetNew(newData.Key);
             if (!string.IsNullOrWhiteSpace(prefix))
             {
                 if (!newData.Key.StartsWith(prefix + "."))
