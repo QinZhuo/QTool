@@ -19,6 +19,11 @@ namespace QTool
         {
             PlayerPrefs.DeleteAll();
         }
+        [MenuItem("QTool/QTool/清空QSerialize序列化配置文档")]
+        public static void ClearQSerializeFile()
+        {
+            System.IO.Directory.Delete(QTool.Serialize.QTypeFile.BasePath,true);
+        }
         public static string BasePath
         {
             get

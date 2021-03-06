@@ -1,15 +1,26 @@
-﻿using System;
-using System.Reflection;
-using System.Collections.Generic;
+﻿using QTool.Binary;
+using System;
 using System.Collections;
+using System.Collections.Generic;
+using System.Reflection;
 using UnityEngine;
-using QTool.Binary;
 namespace QTool.Serialize
 {
-    [AttributeUsage(AttributeTargets.Class| AttributeTargets.Interface)]
-    public class DynamicAttribute : Attribute
-    {
+    //[AttributeUsage(AttributeTargets.Class| AttributeTargets.Interface)]
+    //public class DynamicAttribute : Attribute
+    //{
 
+    //}
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Interface)]
+    public class QTypeAttribute : Attribute
+    {
+        public string name="";
+        public bool dynamic=false;
+        public QTypeAttribute(string name,bool dynamic=false)
+        {
+            this.name = name;
+            this.dynamic = dynamic;
+        }
     }
     public class QSValueAttribute : Attribute
     {
@@ -19,8 +30,55 @@ namespace QTool.Serialize
     {
 
     }
-    public class QMemeberInfo
+    public class QMemeberFile:IKey<string>
     {
+        public string Key { get; set; }
+        public QMemeberFile()
+        {
+
+        }
+        public QMemeberFile(FieldInfo info)
+        {
+            Key = info.Name;
+        }
+        public QMemeberFile(PropertyInfo info)
+        {
+            Key = info.Name;
+        }
+    }
+    public class QTypeFile : IKey<string>
+    {
+        public static string BasePath { get { return Application.streamingAssetsPath + "/QSerialize/"; } }
+        public static List<QTypeFile> fileList = new List<QTypeFile>();
+        public static QTypeFile Get(string name,Func<QTypeFile> createFunc)
+        {
+            if (fileList.ContainsKey(name))
+            {
+                return fileList.Get(name);
+            }
+            var path = BasePath + name;
+            if (FileManager.ExistsFile(path))
+            {
+                var qtype = FileManager.Deserialize<QTypeFile>(FileManager.Load(path));
+                fileList.Add(qtype);
+                return qtype;
+            }
+            else
+            {
+                var qtype = createFunc?.Invoke();
+                fileList.Add(qtype);
+                FileManager.Save(path, FileManager.Serialize(qtype));
+                return qtype;
+            }
+        }
+        public string Key { get; set; }
+        public List<QMemeberFile> Members = new List<QMemeberFile>()
+        {
+        };
+    }
+    public class QMemeberInfo:IKey<string>
+    {
+        public string Key { get => Name; set => value = Name; }
         public string Name;
         public Type type;
         public Action<object, object> set;
@@ -63,11 +121,40 @@ namespace QTool.Serialize
         public bool IsArray;
         public int[] indexArray;
         public bool dynamic = false;
+        public QTypeFile qTypeFile;
         private QTypeInfo(Type type)
         {
            // Debug.LogError(" new Type " + type);
             this.type = type;
-            dynamic = type.GetCustomAttribute<DynamicAttribute>() != null;
+            var qType = type.GetCustomAttribute<QTypeAttribute>();
+            var fileName = type.Name;
+            if (qType != null)
+            {
+                dynamic = qType.dynamic;
+                fileName=qType.name;
+            }
+            qTypeFile = QTypeFile.Get(fileName, ()=> {
+                qTypeFile = new QTypeFile();
+                qTypeFile.Key = fileName;
+                FieldInfo[] fields = type.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+                foreach (var item in fields)
+                {
+                    if (IsQSValue(item, item.IsPublic))
+                    {
+                        qTypeFile.Members.Add(new QMemeberFile(item));
+                    }
+                }
+                var infos = type.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+                foreach (var item in infos)
+                {
+                    if (IsQSValue(item, item.Name != "Item" && item.CanRead && item.CanWrite && item.SetMethod.IsPublic && item.GetMethod.IsPublic))
+                    {
+                        qTypeFile.Members.Add(new QMemeberFile(item));
+                    }
+                }
+                Debug.LogError("新类型 " + fileName);
+                return qTypeFile;
+            });
             IsArray = type.IsArray;
             if (type.IsArray)
             {
@@ -82,22 +169,20 @@ namespace QTool.Serialize
                 ListType= listInterFace.GenericTypeArguments[0];
 
             }
-            FieldInfo[] fields = type.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-            foreach (var item in fields)
+            foreach (var member in qTypeFile.Members)
             {
-                if (IsQSValue(item, item.IsPublic))
+                var fieldInfo= type.GetField(member.Key, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+                if (fieldInfo != null)
                 {
-                    memberList.Add(new QMemeberInfo(item));
+                    memberList.Add(new QMemeberInfo(fieldInfo));
+                }
+                var propertyInfo = type.GetProperty(member.Key, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+                if (propertyInfo != null)
+                {
+                    memberList.Add(new QMemeberInfo(propertyInfo));
                 }
             }
-            var infos = type.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-            foreach (var item in infos)
-            {
-                if (IsQSValue(item, item.Name != "Item" && item.CanRead && item.CanWrite && item.SetMethod.IsPublic && item.GetMethod.IsPublic))
-                {
-                    memberList.Add(new QMemeberInfo(item));
-                }
-            }
+         
         }
         public static Dictionary<Type, QTypeInfo> table = new Dictionary<Type, QTypeInfo>();
         public static QTypeInfo Get(Type type)
@@ -124,31 +209,39 @@ namespace QTool.Serialize
         public static BinaryWriter writer=new BinaryWriter();
         public static System.Byte[] Serialize<T>(T value)
         {
-            typeStrList.Clear();
-            typeIndexDic.Clear();
+            //typeStrList.Clear();
+            //typeIndexDic.Clear();
             var type = typeof(T);
             writer.Clear();
             writer.WriteValue(value,type);
-            for (int i = typeStrList.Count-1; i >= 0; i--)
-            {
-                var bytes=typeStrList[i].GetBytes();
-                writer.byteList.InsertRange(0, bytes);
-                writer.byteList.InsertRange(0, bytes.Length.GetBytes());
-            }
-            writer.byteList.InsertRange(0, typeStrList.Count.GetBytes());
+            //for (int i = typeStrList.Count-1; i >= 0; i--)
+            //{
+            //    var bytes=typeStrList[i].GetBytes();
+            //    writer.byteList.InsertRange(0, bytes);
+            //    writer.byteList.InsertRange(0, bytes.Length.GetBytes());
+            //}
+            //writer.byteList.InsertRange(0, typeStrList.Count.GetBytes());
             return writer.ToArray();
         }
         public static T Deserialize<T>(byte[] bytes)
         {
-            var type = typeof(T);
-            reader.Reset(bytes);
-            typeStrList.Clear();
-            var count = reader.ReadInt32();
-            for (int i = 0; i < count; i++)
+            try
             {
-                typeStrList.Add(reader.ReadString());
+                var type = typeof(T);
+                reader.Reset(bytes);
+               // typeStrList.Clear();
+                //var count = reader.ReadInt32();
+                //for (int i = 0; i < count; i++)
+                //{
+                //    typeStrList.Add(reader.ReadString());
+                //}
+                return (T)reader.ReadValue(type);
             }
-            return (T)reader.ReadValue(type);
+            catch (Exception e)
+            {
+                throw new Exception("反序列化类型[" + typeof(T) + "]失败 error:[" + e + "]");
+            }
+           
         }
         static void ForeachArray(Array array,int deep,int[] indexArray,Action<object> Call)
         {
@@ -238,7 +331,7 @@ namespace QTool.Serialize
                     }
                     if (typeInfo.IsArray)
                     {
-                        var rank = reader.ReadInt32();
+                        var rank = reader.ReadByte();
                         var count = 1;
                         for (int i = 0; i < rank; i++)
                         {
@@ -332,7 +425,7 @@ namespace QTool.Serialize
                     if (typeInfo.IsArray)
                     {
                         var array = value as Array;
-                        writer.Write(typeInfo.ArrayRank);
+                        writer.Write((byte)typeInfo.ArrayRank);
                         for (int i = 0; i < typeInfo.ArrayRank; i++)
                         {
                             writer.Write(array.GetLength(i));

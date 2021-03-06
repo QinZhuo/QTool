@@ -141,7 +141,7 @@ namespace QTool
                 return false;
             }
         }
-    }                                    
+    }
     public static class ArrayExtend
     {
         public static bool ContainsKey<T, KeyType>(this ICollection<T> array, KeyType key) where T : class, IKey<KeyType>
@@ -167,9 +167,9 @@ namespace QTool
             }
             return null;
         }
-        public static List<T> GetList<T,KeyType>(this ICollection<T> array, KeyType key, List<T> tempList=null) where T : class, IKey<KeyType>
+        public static List<T> GetList<T, KeyType>(this ICollection<T> array, KeyType key, List<T> tempList = null) where T : class, IKey<KeyType>
         {
-            var list = tempList==null?new List<T>():tempList;
+            var list = tempList == null ? new List<T>() : tempList;
             foreach (var value in array)
             {
                 if (key.Equals(value.Key))
@@ -179,13 +179,49 @@ namespace QTool
             }
             return list;
         }
-        public static T Peek<T>(this IList<T> array) where T : class
+        public static T StackPeek<T>(this IList<T> array) where T : class
         {
+            if (array == null || array.Count == 0)
+            {
+                return null;
+            }
             return array[array.Count - 1];
+        }
+        public static T QueuePeek<T>(this IList<T> array) where T : class
+        {
+            if (array == null || array.Count == 0)
+            {
+                return null;
+            }
+            return array[0];
+        }
+        public static void Enqueue<T>(this IList<T> array, T obj) where T : class
+        {
+            array.Add(obj);
         }
         public static void Push<T>(this IList<T> array, T obj) where T : class
         {
             array.Add(obj);
+        }
+        public static T Pop<T>(this IList<T> array) where T : class
+        {
+            if (array == null || array.Count == 0)
+            {
+                return null;
+            }
+            var obj = array.StackPeek();
+            array.RemoveAt(array.Count - 1);
+            return obj;
+        }
+        public static T Dequeue<T>(this IList<T> array) where T : class
+        {
+            if (array == null || array.Count == 0)
+            {
+                return null;
+            }
+            var obj = array.QueuePeek();
+            array.RemoveAt(0);
+            return obj;
         }
         public static void AddCheckExist<T>(this IList<T> array, params T[] objs) where T : class
         {
@@ -197,12 +233,7 @@ namespace QTool
                 }
             }
         }
-        public static T Pop<T>(this IList<T> array) where T : class
-        {
-            var obj = array.Peek();
-            array.RemoveAt(array.Count - 1);
-            return obj;
-        }
+      
         public static void RemoveKey<T, KeyType>(this ICollection<T> array, KeyType key) where T : class, IKey<KeyType>
         {
             var old = array.Get(key);
@@ -276,10 +307,14 @@ namespace QTool
                 return (T)xz.Deserialize(sr);
             }
         }
+        public static bool ExistsFile(string path)
+        {
+            return File.Exists(path);
+        }
         public static string Load(string path)
         {
             string data = "";
-            if (!System.IO.File.Exists(path))
+            if (!ExistsFile(path))
             {
                 Debug.LogError("不存在文件：" + path);
                 return data;
@@ -308,6 +343,7 @@ namespace QTool
         }
         public static void Save(string path, byte[] bytes)
         {
+            CheckFolder(path);
             var directoryPath = Path.GetDirectoryName(path);
             if (!System.IO.Directory.Exists(directoryPath))
             {
@@ -330,16 +366,19 @@ namespace QTool
             tex.LoadImage(bytes);
             return tex;
         }
-        public static void CreatFolder(string path)
+        public static void CheckFolder(string path)
         {
-            string s = path.Substring(0, path.LastIndexOf('/'));
-            System.IO.Directory.CreateDirectory(s);
+            var directoryPath = Path.GetDirectoryName(path);
+            if (!System.IO.Directory.Exists(directoryPath))
+            {
+                Directory.CreateDirectory(directoryPath);
+            }
         }
         public static string Save(string path, string data)
         {
             try
             {
-                CreatFolder(path);
+                CheckFolder(path);
                 using (var file = System.IO.File.Create(path))
                 {
                     using (var sw = new System.IO.StreamWriter(file))
