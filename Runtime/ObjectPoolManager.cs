@@ -159,7 +159,7 @@ namespace QTool
             var getStackTrace = debugStack ? new System.Diagnostics.StackTrace().ToString() : "";
             if (CanUsePool.Count > 0)
             {
-                var index = AllPool.IndexOf(CanUsePool.Peek());
+                var index = AllPool.IndexOf(CanUsePool.StackPeek());
                 stackTrace[index] = getStackTrace;
                 var obj = CanUsePool.Pop();
                 return CheckGet(obj);
