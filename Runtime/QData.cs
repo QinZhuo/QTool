@@ -224,13 +224,26 @@ namespace QTool.Data
             {
                 Set(key, FileManager.Deserialize<DicList<string, T>>(result.Result.text));
                 Debug.Log(TableName + "加载数据：" + list.Count);
+                OnAsyncLoadOver[LoadOverKey(key)]?.Invoke();
+                OnAsyncLoadOver[LoadOverKey(key)] = null;
             };
-
         }
-        public static event System.Action OnAsyncLoadOver;
-        public static void AsyncCheckRun(System.Action action)
+        public static Dictionary<string,System.Action> OnAsyncLoadOver=new Dictionary<string, Action>();
+        static string LoadOverKey(string key)
         {
-            OnAsyncLoadOver += action;
+            return string.IsNullOrWhiteSpace(key) ? "基础表" : key;
+        }
+        public static void AsyncCheckRun(System.Action action,string key="")
+        {
+             key = LoadOverKey(key);
+            if (OnAsyncLoadOver.ContainsKey(key))
+            {
+                OnAsyncLoadOver[key] += action;
+            }
+            else
+            {
+                OnAsyncLoadOver.Add(key, action);
+            }
         }
         public static IEnumerator AsyncLoadList(params string[] keys)
         {
@@ -245,8 +258,7 @@ namespace QTool.Data
                     yield return AsyncLoad(key);
                 }
             }
-            OnAsyncLoadOver?.Invoke();
-            OnAsyncLoadOver = null;
+         
         }
 #endif
         #endregion
