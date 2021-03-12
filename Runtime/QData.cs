@@ -224,8 +224,12 @@ namespace QTool.Data
             {
                 Set(key, FileManager.Deserialize<DicList<string, T>>(result.Result.text));
                 Debug.Log(TableName + "加载数据：" + list.Count);
-                OnAsyncLoadOver[LoadOverKey(key)]?.Invoke();
-                OnAsyncLoadOver[LoadOverKey(key)] = null;
+                var loadKey = LoadOverKey(key);
+                if (OnAsyncLoadOver.ContainsKey(loadKey))
+                {
+                    OnAsyncLoadOver[loadKey]?.Invoke();
+                    OnAsyncLoadOver[loadKey] = null;
+                }
             };
         }
         public static Dictionary<string,System.Action> OnAsyncLoadOver=new Dictionary<string, Action>();
