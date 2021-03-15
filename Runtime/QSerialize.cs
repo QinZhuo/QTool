@@ -15,11 +15,9 @@ namespace QTool.Serialize
     public class QTypeAttribute : Attribute
     {
         public string name="";
-        public bool dynamic=false;
-        public QTypeAttribute(string name,bool dynamic=false)
+        public QTypeAttribute(string name)
         {
             this.name = name;
-            this.dynamic = dynamic;
         }
     }
     public class QSValueAttribute : Attribute
@@ -50,7 +48,8 @@ namespace QTool.Serialize
     {
         public static string BasePath { get { return Application.streamingAssetsPath + "/QSerialize/"; } }
         public static List<QTypeFile> fileList = new List<QTypeFile>();
-        public static QTypeFile Get(string name,Func<QTypeFile> createFunc)
+        
+        public static QTypeFile Get(string name,bool autoCreate=false,Func<QTypeFile> createFunc=null)
         {
             if (fileList.ContainsKey(name))
             {
@@ -63,18 +62,45 @@ namespace QTool.Serialize
                 fileList.Add(qtype);
                 return qtype;
             }
-            else
+            else if(autoCreate)
             {
                 var qtype = createFunc?.Invoke();
+                qtype.Key = name;
                 fileList.Add(qtype);
                 FileManager.Save(path, FileManager.Serialize(qtype));
                 return qtype;
+            }
+            else
+            {
+                return null;
             }
         }
         public string Key { get; set; }
         public List<QMemeberFile> Members = new List<QMemeberFile>()
         {
         };
+        //public List<string> typeList = new List<string>();
+        //public string GetTypeStr(byte index)
+        //{
+        //    if (index >= typeList.Count)
+        //    {
+        //        Debug.LogError("错误：" + index + "/" + typeList.Count);
+        //    }
+        //    return typeList[index];
+        //}
+        //public byte GetTypeIndex(string typeName)
+        //{
+        //    if (typeList.Contains(typeName))
+        //    {
+        //        return (byte)typeList.IndexOf(typeName);
+        //    }
+        //    else
+        //    {
+        //        var index = (byte)typeList.Count;
+        //        typeList.Add(typeName);
+        //        return index;
+        //    }
+        //}
     }
     public class QMemeberInfo:IKey<string>
     {
@@ -120,20 +146,23 @@ namespace QTool.Serialize
         public int ArrayRank;
         public bool IsArray;
         public int[] indexArray;
-        public bool dynamic = false;
         public QTypeFile qTypeFile;
-        private QTypeInfo(Type type)
+   
+        private QTypeInfo Init(Type type,bool autoCreate)
         {
+            if (type.IsInterface)
+            {
+                throw new Exception("不能序列化接口[" + type + "]");
+            }
            // Debug.LogError(" new Type " + type);
             this.type = type;
             var qType = type.GetCustomAttribute<QTypeAttribute>();
             var fileName = type.Name;
             if (qType != null)
             {
-                dynamic = qType.dynamic;
                 fileName=qType.name;
             }
-            qTypeFile = QTypeFile.Get(fileName, ()=> {
+            qTypeFile = QTypeFile.Get(fileName, autoCreate,()=> {
                 qTypeFile = new QTypeFile();
                 qTypeFile.Key = fileName;
                 FieldInfo[] fields = type.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
@@ -155,6 +184,10 @@ namespace QTool.Serialize
                 Debug.LogError("新类型 " + fileName);
                 return qTypeFile;
             });
+            if (qTypeFile == null)
+            {
+                return null;
+            }
             IsArray = type.IsArray;
             if (type.IsArray)
             {
@@ -182,10 +215,10 @@ namespace QTool.Serialize
                     memberList.Add(new QMemeberInfo(propertyInfo));
                 }
             }
-         
+            return this;
         }
         public static Dictionary<Type, QTypeInfo> table = new Dictionary<Type, QTypeInfo>();
-        public static QTypeInfo Get(Type type)
+        public static QTypeInfo Get(Type type,bool write=false)
         {
             if (table.ContainsKey(type))
             {
@@ -193,9 +226,18 @@ namespace QTool.Serialize
             }
             else
             {
-                var info= new QTypeInfo(type);
-                table.Add(type, info);
-                return info;
+                var info= new QTypeInfo().Init(type, write);
+                if (info != null)
+                {
+                    table.Add(type, info);
+                    return info;
+                }
+                else
+                {
+                    Debug.LogError("不存在类型[" + type.Name + "]的QSerialise序列化配置文件");
+                    return null;
+                }
+              
             }
            
         }
@@ -259,31 +301,7 @@ namespace QTool.Serialize
               
             }
         }
-        static List<string> typeStrList = new List<string>();
-        static Dictionary<string,byte> typeIndexDic =new Dictionary<string, byte>();
-        static string GetTypeStr(byte index)
-        {
-            if(index>= typeStrList.Count)
-            {
-                Debug.LogError("错误：" + index + "/" + typeStrList.Count);
-            }
-            return typeStrList[index];
-        }
-        static byte GetTypeIndex(string typeName)
-        {
-            if (typeIndexDic.ContainsKey(typeName))
-            {
-                return typeIndexDic[typeName];
-            }
-            else
-            {
-                var index = (byte)typeStrList.Count;
-                typeStrList.Add(typeName);
-                typeIndexDic.Add(typeName,index);
-                return index;
-            }
-           
-        }
+      
         static Dictionary<string, Type> typeDic = new Dictionary<string, Type>();
         static Type ParseType(string typeString)
         {
@@ -324,11 +342,11 @@ namespace QTool.Serialize
                         return null;
                     }
                     QTypeInfo typeInfo = QTypeInfo.Get(type);
-                    if (typeInfo.dynamic)
-                    {
-                        type = ParseType(GetTypeStr(reader.ReadByte()));
-                        typeInfo = QTypeInfo.Get(type);
-                    }
+                    //if (typeInfo.dynamic)
+                    //{
+                    //    type = ParseType(typeInfo.qTypeFile.GetTypeStr(reader.ReadByte()));
+                    //    typeInfo = QTypeInfo.Get(type);
+                    //}
                     if (typeInfo.IsArray)
                     {
                         var rank = reader.ReadByte();
@@ -415,13 +433,13 @@ namespace QTool.Serialize
                     {
                         return;
                     }
-                    QTypeInfo typeInfo = QTypeInfo.Get(type);
-                    if (typeInfo.dynamic)
-                    {
-                        type = (value == null ? null : value.GetType());
-                        typeInfo = QTypeInfo.Get(type);
-                        writer.Write(GetTypeIndex(type.FullName));
-                    }
+                    QTypeInfo typeInfo = QTypeInfo.Get(type,true);
+                    //if (typeInfo.dynamic)
+                    //{
+                    //    type = (value == null ? null : value.GetType());
+                    //    typeInfo = QTypeInfo.Get(type,true);
+                    //    writer.Write(typeInfo.qTypeFile.GetTypeIndex(type.FullName));
+                    //}
                     if (typeInfo.IsArray)
                     {
                         var array = value as Array;
