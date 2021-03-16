@@ -258,30 +258,17 @@ namespace QTool.Serialize
 
        // public static BinaryReader reader=new BinaryReader();
       // public static BinaryWriter writer=new BinaryWriter();
-        public static ObjectPool<BinaryWriter> WriterPool
-        {
-            get
-            {
-                return PoolManager.GetPool<BinaryWriter>("QSerialize.BinaryWriter", () => new BinaryWriter());
-            }
-        }
-        public static ObjectPool<BinaryReader> ReaderPool
-        {
-            get
-            {
-                return PoolManager.GetPool<BinaryReader>("QSerialize.BinaryReader", () => new BinaryReader());
-            }
-        }
+      
         public static System.Byte[] Serialize<T>(T value)
         {
             //typeStrList.Clear();
             //typeIndexDic.Clear();
             var type = typeof(T);
-            var writer = WriterPool.Get();
+            var writer = BinaryWriter.Get();
             writer.Clear();
             writer.WriteValue(value,type);
             var bytes= writer.ToArray();
-            WriterPool.Push(writer);
+            BinaryWriter.Push(writer);
             //for (int i = typeStrList.Count-1; i >= 0; i--)
             //{
             //    var bytes=typeStrList[i].GetBytes();
@@ -296,10 +283,10 @@ namespace QTool.Serialize
             try
             {
                 var type = typeof(T);
-                var reader = ReaderPool.Get();
+                var reader = BinaryReader.Get();
                 reader.Reset(bytes);
                 var obj= (T)reader.ReadValue(type,targetObj);
-                ReaderPool.Push(reader);
+                BinaryReader.Push(reader);
                 // typeStrList.Clear();
                 //var count = reader.ReadInt32();
                 //for (int i = 0; i < count; i++)

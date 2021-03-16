@@ -64,6 +64,26 @@ namespace QTool
             return obj;
         }
     }
+    public abstract class PoolObj<T>:IPoolObj where T : PoolObj<T>,new()
+    {
+        public static ObjectPool<T> Pool
+        {
+            get
+            {
+                return PoolManager.GetPool(typeof(T).FullName, () => new T());
+            }
+        }
+        public static T Get()
+        {
+            return Pool.Get();
+        }
+        public static T Push(T obj)
+        {
+            return Pool.Push(obj);
+        }
+        public abstract void PoolRecover();
+        public abstract void PoolReset();
+    }
     public interface IPoolObj
     {
         void PoolReset();

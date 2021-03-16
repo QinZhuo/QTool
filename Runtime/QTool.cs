@@ -146,9 +146,13 @@ namespace QTool
     {
         public static bool ContainsKey<T, KeyType>(this ICollection<T> array, KeyType key) where T : class, IKey<KeyType>
         {
+            return array.ContainsKey(key, (item) =>item.Key);
+        }
+        public static bool ContainsKey<T, KeyType>(this ICollection<T> array, KeyType key, Func<T, KeyType> keyGetter) where T : class
+        {
             foreach (var value in array)
             {
-                if (key.Equals(value.Key))
+                if (key.Equals(keyGetter(value)))
                 {
                     return true;
                 }
@@ -157,10 +161,14 @@ namespace QTool
         }
         public static T Get<T, KeyType>(this ICollection<T> array, KeyType key) where T : class, IKey<KeyType>
         {
+            return array.Get(key,(item)=>item.Key);
+        }
+        public static T Get<T, KeyType>(this ICollection<T> array, KeyType key,Func<T,KeyType> keyGetter) where T:class
+        {
             foreach (var value in array)
             {
                 if (value == null) continue;
-                if (key.Equals(value.Key))
+                if (key.Equals(keyGetter(value)))
                 {
                     return value;
                 }
