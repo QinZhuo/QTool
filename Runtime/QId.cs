@@ -6,19 +6,44 @@ namespace QTool.Serialize
 {
     public static class SaveExtends
     {
-        public static string GetInstanceId(this MonoBehaviour mono)
+        public static void Save<T>(BinaryWriter writer,IList<T> objList) where T:MonoBehaviour,IQSerialize
+        {
+            foreach (var obj in objList)
+            {
+                if (obj as MonoBehaviour == null) continue;
+                var qId = obj.GetQId();
+                if (string.IsNullOrWhiteSpace(qId.InstanceId))
+                {
+                    Debug.LogError("保存信息ID不能为空【" + typeof(T) + "】");
+                }
+                else
+                {
+                    writer.Write(qId.InstanceId, LengthType.Byte);
+                    writer.Write(qId.PrefabId, LengthType.Byte);
+                    writer.WriteObject(obj);
+                }
+            }
+        }
+      
+        public static QId GetQId(this MonoBehaviour mono)
         {
             if (mono == null)
             {
-                return "";
+                return null;
             }
-            var qId = mono.GetComponent<QId>();
-            if (qId == null) return "";
-            return qId.InstanceId;
+            return mono.gameObject.GetQId();
+        }
+        public static QId GetQId(this GameObject obj)
+        {
+            if (obj == null)
+            {
+                return null;
+            }
+            return obj.GetComponent<QId>();
         }
     }
     [DisallowMultipleComponent]
-    public class QId : MonoBehaviour
+    public class QId : MonoBehaviour,IQSerialize
     {
 #if UNITY_EDITOR
         private void OnValidate()
@@ -92,6 +117,18 @@ namespace QTool.Serialize
             {
                 InstanceId = GetNewId();
             }
+        }
+
+        public virtual void Write(BinaryWriter write)
+        {
+            write.Write(PrefabId, LengthType.Byte);
+            write.Write(InstanceId, LengthType.Byte);
+        }
+
+        public virtual void Read(BinaryReader read)
+        {
+            PrefabId = read.ReadString(LengthType.Byte);
+            InstanceId = read.ReadString(LengthType.Byte);
         }
     }
 }

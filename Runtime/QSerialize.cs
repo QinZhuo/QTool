@@ -13,7 +13,7 @@ namespace QTool.Serialize
     //}
     public interface IQSerialize
     {
-        BinaryWriter Write(BinaryWriter write);
+        void Write(BinaryWriter write);
         void Read(BinaryReader read);
     }
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Interface)]
