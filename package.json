@@ -1,7 +1,7 @@
 {
   "name": "com.qtool.qtool",
 
-  "version": "1.0.9",
+  "version": "1.0.10",
   "displayName": "QTool",
   "description": "QTool",
   "unity": "2019.1",
@@ -10,7 +10,7 @@
     "tool"
   ],
   "author": {
-    "name": "qinzhuo ",
+    "name": "QinZhuo",
     "url": "https://space.bilibili.com/3981300"
   }
 }

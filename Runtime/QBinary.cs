@@ -136,6 +136,7 @@ namespace QTool.Binary
             {
                 bytes[i] = ReadByte();
             }
+         
             return bytes;
         }
         public string ReadString(LengthType lengthType= LengthType.Int32)
@@ -144,6 +145,10 @@ namespace QTool.Binary
             var value = bytes.GetString(index, length);
             index +=  length;
             return value;
+        }
+        public T ReadObject<T>(T targetObj=default)
+        {
+            return Serialize.QSerialize.Deserialize<T>(ReadBytes(),default);
         }
         public virtual void PoolReset()
         {
@@ -281,6 +286,11 @@ namespace QTool.Binary
             var length = bytes.Length;
             WriteLengh(length, lengthType);
             byteList.AddRange(bytes);
+            return this;
+        }
+        public BinaryWriter WriteObject<T>(T value)
+        {
+            Write(Serialize.QSerialize.Serialize(value));
             return this;
         }
 

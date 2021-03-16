@@ -11,6 +11,11 @@ namespace QTool.Serialize
     //{
 
     //}
+    public interface IQSerialize
+    {
+        BinaryWriter Write(BinaryWriter write);
+        void Read(BinaryReader read);
+    }
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Interface)]
     public class QTypeAttribute : Attribute
     {
@@ -147,15 +152,19 @@ namespace QTool.Serialize
         public bool IsArray;
         public int[] indexArray;
         public QTypeFile qTypeFile;
-   
+        public bool IsISerialize=false;
         private QTypeInfo Init(Type type,bool autoCreate)
         {
             if (type.IsInterface)
             {
                 throw new Exception("不能序列化接口[" + type + "]");
             }
-           // Debug.LogError(" new Type " + type);
+            IsISerialize = typeof(IQSerialize).IsAssignableFrom(type);
             this.type = type;
+            if (IsISerialize)
+            {
+                return this;
+            }
             var qType = type.GetCustomAttribute<QTypeAttribute>();
             var fileName = type.Name;
             if (qType != null)
@@ -247,15 +256,32 @@ namespace QTool.Serialize
     public static class QSerialize
     {
 
-        public static BinaryReader reader=new BinaryReader();
-        public static BinaryWriter writer=new BinaryWriter();
+       // public static BinaryReader reader=new BinaryReader();
+      // public static BinaryWriter writer=new BinaryWriter();
+        public static ObjectPool<BinaryWriter> WriterPool
+        {
+            get
+            {
+                return PoolManager.GetPool<BinaryWriter>("QSerialize.BinaryWriter", () => new BinaryWriter());
+            }
+        }
+        public static ObjectPool<BinaryReader> ReaderPool
+        {
+            get
+            {
+                return PoolManager.GetPool<BinaryReader>("QSerialize.BinaryReader", () => new BinaryReader());
+            }
+        }
         public static System.Byte[] Serialize<T>(T value)
         {
             //typeStrList.Clear();
             //typeIndexDic.Clear();
             var type = typeof(T);
+            var writer = WriterPool.Get();
             writer.Clear();
             writer.WriteValue(value,type);
+            var bytes= writer.ToArray();
+            WriterPool.Push(writer);
             //for (int i = typeStrList.Count-1; i >= 0; i--)
             //{
             //    var bytes=typeStrList[i].GetBytes();
@@ -263,21 +289,24 @@ namespace QTool.Serialize
             //    writer.byteList.InsertRange(0, bytes.Length.GetBytes());
             //}
             //writer.byteList.InsertRange(0, typeStrList.Count.GetBytes());
-            return writer.ToArray();
+            return bytes;
         }
-        public static T Deserialize<T>(byte[] bytes)
+        public static T Deserialize<T>(byte[] bytes,T targetObj=default)
         {
             try
             {
                 var type = typeof(T);
+                var reader = ReaderPool.Get();
                 reader.Reset(bytes);
-               // typeStrList.Clear();
+                var obj= (T)reader.ReadValue(type,targetObj);
+                ReaderPool.Push(reader);
+                // typeStrList.Clear();
                 //var count = reader.ReadInt32();
                 //for (int i = 0; i < count; i++)
                 //{
                 //    typeStrList.Add(reader.ReadString());
                 //}
-                return (T)reader.ReadValue(type);
+                return obj;
             }
             catch (Exception e)
             {
@@ -331,7 +360,7 @@ namespace QTool.Serialize
         {
             return Activator.CreateInstance(type, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, args, null);
         }
-        static object ReadValue(this BinaryReader reader, Type type)
+        static object ReadValue(this BinaryReader reader, Type type,object target=null)
         {
             TypeCode typeCode = Type.GetTypeCode(type);
             switch (typeCode)
@@ -347,39 +376,49 @@ namespace QTool.Serialize
                     //    type = ParseType(typeInfo.qTypeFile.GetTypeStr(reader.ReadByte()));
                     //    typeInfo = QTypeInfo.Get(type);
                     //}
-                    if (typeInfo.IsArray)
+                    if (typeInfo.IsISerialize)
                     {
-                        var rank = reader.ReadByte();
-                        var count = 1;
-                        for (int i = 0; i < rank; i++)
-                        {
-                            typeInfo.indexArray[i] = reader.ReadInt32();
-                            count *= typeInfo.indexArray[i];
-                        }
-                        var array = (Array)CreateInstance(type, count);
-                        ForeachArray(array, 0, typeInfo.indexArray, (obj) => { array.SetValue(reader.ReadValue(typeInfo.ArrayType), typeInfo.indexArray); });
-                        return array;
+                        var serObj = CreateInstance(type) as IQSerialize;
+                        serObj.Read(reader);
+                        return serObj;
                     }
                     else
                     {
-                        var obj = CreateInstance(type);
-                        if (typeInfo.IsList)
+                        if (typeInfo.IsArray)
                         {
-                            var list = obj as IList;
-                            var count = reader.ReadInt32();
-                            for (int i = 0; i < count; i++)
+                            var rank = reader.ReadByte();
+                            var count = 1;
+                            for (int i = 0; i < rank; i++)
                             {
-                                var listObj = reader.ReadValue(typeInfo.ListType);
-                                list.Add(listObj);
+                                typeInfo.indexArray[i] = reader.ReadInt32();
+                                count *= typeInfo.indexArray[i];
                             }
+                            var array = (Array)CreateInstance(type, count);
+                            ForeachArray(array, 0, typeInfo.indexArray, (obj) => { array.SetValue(reader.ReadValue(typeInfo.ArrayType), typeInfo.indexArray); });
+                            return array;
                         }
+                        else
                         {
-                            foreach (var item in typeInfo.memberList)
+                            var obj = target==null? CreateInstance(type):target;
+
+                            if (typeInfo.IsList)
                             {
-                                item.set?.Invoke(obj, reader.ReadValue(item.type));
+                                var list = obj as IList;
+                                var count = reader.ReadInt32();
+                                for (int i = 0; i < count; i++)
+                                {
+                                    var listObj = reader.ReadValue(typeInfo.ListType);
+                                    list.Add(listObj);
+                                }
                             }
+                            {
+                                foreach (var item in typeInfo.memberList)
+                                {
+                                    item.set?.Invoke(obj, reader.ReadValue(item.type));
+                                }
+                            }
+                            return obj;
                         }
-                        return obj;
                     }
                 case TypeCode.Boolean:
                     return reader.ReadBoolean();
@@ -440,35 +479,42 @@ namespace QTool.Serialize
                     //    typeInfo = QTypeInfo.Get(type,true);
                     //    writer.Write(typeInfo.qTypeFile.GetTypeIndex(type.FullName));
                     //}
-                    if (typeInfo.IsArray)
+                    if (typeInfo.IsISerialize)
                     {
-                        var array = value as Array;
-                        writer.Write((byte)typeInfo.ArrayRank);
-                        for (int i = 0; i < typeInfo.ArrayRank; i++)
-                        {
-                            writer.Write(array.GetLength(i));
-                        }
-                        ForeachArray(array, 0, typeInfo.indexArray, (obj) => { writer.WriteValue(obj,typeInfo.ArrayType); });
+                        (value as IQSerialize).Write(writer);
                     }
                     else
                     {
-                        if (typeInfo.IsList)
+                        if (typeInfo.IsArray)
                         {
-                            var list = value as IList;
-                            writer.Write(list.Count);
-                            foreach (var item in list)
+                            var array = value as Array;
+                            writer.Write((byte)typeInfo.ArrayRank);
+                            for (int i = 0; i < typeInfo.ArrayRank; i++)
                             {
-                                writer.WriteValue(item,typeInfo.ListType);
+                                writer.Write(array.GetLength(i));
                             }
+                            ForeachArray(array, 0, typeInfo.indexArray, (obj) => { writer.WriteValue(obj, typeInfo.ArrayType); });
                         }
+                        else
                         {
-                            foreach (var item in typeInfo.memberList)
+                            if (typeInfo.IsList)
                             {
-                                
+                                var list = value as IList;
+                                writer.Write(list.Count);
+                                foreach (var item in list)
+                                {
+                                    writer.WriteValue(item, typeInfo.ListType);
+                                }
+                            }
+                            {
+                                foreach (var item in typeInfo.memberList)
+                                {
+
                                     var memberObj = item.get(value);
                                     writer.WriteValue(memberObj, item.type);
-                            
-                                
+
+
+                                }
                             }
                         }
                     }
