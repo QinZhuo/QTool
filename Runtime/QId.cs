@@ -67,7 +67,7 @@ namespace QTool.Serialize
             }
             return writer;
         }
-        public static BinaryReader Load<T>(this BinaryReader reader, IList<T> objList, System.Func<T, string> GetKey, System.Func<string,T> createFunc)
+        public static BinaryReader Load<T>(this BinaryReader reader, IList<T> objList, System.Func<T, string> GetKey, System.Func<string,T> createFunc,System.Action<T> loadOver=null)
         {
             var desoryList = new List<T>(objList);
             var count = reader.ReadInt32();
@@ -79,6 +79,7 @@ namespace QTool.Serialize
                     var obj = objList.Get(id,GetKey);
                     reader.ReadObject(obj);
                     desoryList.Remove(obj);
+                    loadOver?.Invoke(obj);
                 }
                 else
                 {
@@ -88,7 +89,9 @@ namespace QTool.Serialize
                     {
                         (newObj as IGameSave).LoadCreate();
                     }
+                    loadOver?.Invoke(newObj);
                 }
+              
             }
             foreach (var item in desoryList)
             {
@@ -99,7 +102,7 @@ namespace QTool.Serialize
             }
             return reader;
         }
-        public static BinaryReader Load(this BinaryReader reader, IList<QId> objList,System.Func<string,QId> createFunc)
+        public static BinaryReader Load(this BinaryReader reader, IList<QId> objList,System.Func<string,QId> createFunc, System.Action<QId> loadOver = null)
         {
        
             var desoryList = new List<QId>(objList);
@@ -114,6 +117,7 @@ namespace QTool.Serialize
                     var obj = objList.Get(instanceId);
                     reader.ReadObject(obj.GetComponents<IQSerialize>());
                     desoryList.Remove(obj);
+                    loadOver?.Invoke(obj);
                 }
                 else
                 {
@@ -124,6 +128,7 @@ namespace QTool.Serialize
                     {
                         iLoad.LoadCreate();
                     }
+                    loadOver?.Invoke(newQid);
                 }
             }
             foreach (var item in desoryList)
