@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using QTool.Serialize;
 #if Addressables
 using UnityEngine.AddressableAssets;
 namespace QTool.Async
@@ -90,6 +91,14 @@ namespace QTool.Async
             Addressables.LoadAssetsAsync<ObjT>(Label, (result) =>
             {
                 Set(result.name, result);
+                if(result is MonoBehaviour)
+                {
+                    var qid= (result as MonoBehaviour).GetQId();
+                    if (qid != null)
+                    {
+                        Set(qid.PrefabId, result);
+                    }
+                }
             }).Completed+=(results)=> {
                 Debug.Log("[" + Label + "]加载完成总数" + objDic.Count);
                 LabelLoadOver = true;
