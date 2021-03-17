@@ -9,7 +9,7 @@ namespace QTool.Serialize
         void LoadCreate();
         void LoadDestory();
     }
-    public static class QIdManager
+    public static class QSaveManager
     {
         public static List<QId> qIdList = new List<QId>();
         public static void Add(QId id)
@@ -23,6 +23,14 @@ namespace QTool.Serialize
         public static void Clear()
         {
             qIdList.Clear();
+        }
+        public static byte[] Save()
+        {
+            return BinaryWriter.Get().Save(qIdList).Recover();
+        }
+        public static void Load(byte[] bytes, System.Func<string, QId> createFunc)
+        {
+            BinaryReader.Get().Reset(bytes).Load(qIdList, createFunc);
         }
         public static BinaryWriter Save(this BinaryWriter writer,IList<QId> objList) 
         {
@@ -184,6 +192,18 @@ namespace QTool.Serialize
             {
                 InstanceId = GetNewId();
             }
+        }
+        public void Create()
+        {
+            QSaveManager.Add(this);
+        }
+        public void Destory()
+        {
+            QSaveManager.Remove(this);
+        }
+        private void OnDestroy()
+        {
+            Destory();
         }
         public void Init(string prefabId,string instanceId)
         {
