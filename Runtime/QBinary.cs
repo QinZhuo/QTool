@@ -1,4 +1,5 @@
-﻿using System;
+﻿using QTool.Serialize;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -18,8 +19,10 @@ namespace QTool.Binary
         {
             this.bytes = bytes;
             index = 0;
+            TagIndex = 0;
             return this;
         }
+        public int TagIndex { protected set; get; }
         public byte[] bytes { protected set; get; }
         public int index { protected set; get; }
         public byte ReadByte()
@@ -148,12 +151,16 @@ namespace QTool.Binary
         }
         public T ReadObject<T>(T targetObj=default)
         {
-            return Serialize.QSerialize.Deserialize<T>(ReadBytes(),default);
+         
+            return this.Deserialize<T>(targetObj);
         }
         public override void PoolReset()
         {
         }
-
+        public void Recover()
+        {
+            Push(this);
+        }
         public override void PoolRecover()
         {
             index = 0;
@@ -166,6 +173,12 @@ namespace QTool.Binary
         public void Clear()
         {
             byteList.Clear();
+        }
+        public byte[] Recover()
+        {
+            var array= ToArray();
+            Push(this);
+            return array;
         }
         public byte[] ToArray()
         {
@@ -290,8 +303,7 @@ namespace QTool.Binary
         }
         public BinaryWriter WriteObject<T>(T value)
         {
-            Write(Serialize.QSerialize.Serialize(value));
-            return this;
+            return this.Serialize(value); 
         }
 
         public override void PoolReset()

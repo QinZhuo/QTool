@@ -4,27 +4,87 @@ using System.Collections.Generic;
 using UnityEngine;
 namespace QTool.Serialize
 {
-    public static class SaveExtends
+    public interface IGameLoad:IQSerialize
     {
-        public static void Save<T>(BinaryWriter writer,IList<T> objList) where T:MonoBehaviour,IQSerialize
+        void LoadCreate();
+        void LoadDestory();
+    }
+    public static class QIdManager
+    {
+        public static List<QId> qIdList = new List<QId>();
+        public static void Add(QId id)
         {
+            qIdList.AddCheckExist(id);
+        }
+        public static void Remove(QId id)
+        {
+            qIdList.Remove(id);
+        }
+        public static void Clear()
+        {
+            qIdList.Clear();
+        }
+        public static BinaryWriter Save(this BinaryWriter writer,IList<QId> objList) 
+        {
+            writer.Write(objList.Count);
+          
             foreach (var obj in objList)
             {
                 if (obj as MonoBehaviour == null) continue;
                 var qId = obj.GetQId();
                 if (string.IsNullOrWhiteSpace(qId.InstanceId))
                 {
-                    Debug.LogError("保存信息ID不能为空【" + typeof(T) + "】");
+                    Debug.LogError("保存信息ID不能为空【" + qId.PrefabId + "】");
+                }
+                Debug.LogError("保存" + qId.InstanceId);
+                writer.Write(obj.InstanceId, LengthType.Byte);
+                writer.Write(obj.PrefabId, LengthType.Byte);
+                writer.WriteObject(obj.GetComponents<IQSerialize>());
+            }
+            return writer;
+        }
+        public static BinaryReader Load(this BinaryReader reader, IList<QId> objList,System.Func<string,QId> createFunc)
+        {
+            var createList = new List<QId>();
+            var desoryList = new List<QId>(objList);
+
+            var count = reader.ReadInt32();
+            for (int i = 0; i < count; i++)
+            {
+                var instanceId = reader.ReadString(LengthType.Byte);
+                var prefabId = reader.ReadString(LengthType.Byte);
+                if (objList.ContainsKey(instanceId))
+                {
+                    var obj = objList.Get(instanceId);
+                    reader.ReadObject(obj.GetComponents<IQSerialize>());
+                    desoryList.Remove(obj);
                 }
                 else
                 {
-                    writer.Write(qId.InstanceId, LengthType.Byte);
-                    writer.Write(qId.PrefabId, LengthType.Byte);
-                    writer.WriteObject(obj);
+                    var newQid = createFunc(prefabId);
+                    newQid.InstanceId= instanceId;
+                    reader.ReadObject(newQid.GetComponents<IQSerialize>());
+                    foreach (var iLoad in newQid.GetComponents<IGameLoad>())
+                    {
+                        iLoad.LoadCreate();
+                    }
+                    createList.Add(newQid);
                 }
             }
+            foreach (var item in createList)
+            {
+                objList.Add(item);
+            }
+            foreach (var item in desoryList)
+            {
+                foreach (var iLoad in item.GetComponents<IGameLoad>())
+                {
+                    iLoad.LoadDestory();
+                }
+            }
+            return reader;
         }
-      
+
         public static QId GetQId(this MonoBehaviour mono)
         {
             if (mono == null)
@@ -43,7 +103,7 @@ namespace QTool.Serialize
         }
     }
     [DisallowMultipleComponent]
-    public class QId : MonoBehaviour,IQSerialize
+    public class QId : MonoBehaviour,IKey<string>
     {
 #if UNITY_EDITOR
         private void OnValidate()
@@ -68,15 +128,13 @@ namespace QTool.Serialize
             {
                 if (IsPrefabAssets)
                 {
-                    return UnityEditor.AssetDatabase.AssetPathToGUID(UnityEditor.AssetDatabase.GetAssetPath(gameObject));
+                    var id= UnityEditor.AssetDatabase.AssetPathToGUID(UnityEditor.AssetDatabase.GetAssetPath(gameObject)); ;
+                 //   Debug.LogError("是预制体"+id);
+                    return id;
                 }
-                else if (!UnityEditor.PrefabUtility.IsPartOfNonAssetPrefabInstance(gameObject))
+                else if (IsPrefabInstance)
                 {
-                    Debug.LogError(gameObject + " 不是一个预制体物体");
-                    return null;
-                }
-                else
-                {
+                
                     var prefab = UnityEditor.PrefabUtility.GetCorrespondingObjectFromSource(gameObject);
                     if (prefab == null)
                     {
@@ -85,8 +143,15 @@ namespace QTool.Serialize
                     }
                     else
                     {
-                        return UnityEditor.AssetDatabase.AssetPathToGUID(UnityEditor.AssetDatabase.GetAssetPath(prefab));
+                        var id= UnityEditor.AssetDatabase.AssetPathToGUID(UnityEditor.AssetDatabase.GetAssetPath(prefab));
+                     //   Debug.LogError("是预制体实例"+ id);
+                        return id;
                     }
+                }
+                else
+                {
+                    Debug.LogError(gameObject + " 不是一个预制体物体");
+                    return null;
                 }
             }
         }
@@ -104,10 +169,12 @@ namespace QTool.Serialize
                 return UnityEditor.PrefabUtility.IsPartOfPrefabAsset(gameObject);
             }
         }
+
+        public string Key { get =>InstanceId; set{ }}
 #endif
         public static string GetNewId(string key = "")
         {
-            return string.IsNullOrWhiteSpace(key) ? System.Guid.NewGuid().ToString() : System.Guid.Parse(key).ToString();
+            return string.IsNullOrWhiteSpace(key) ? System.Guid.NewGuid().ToString("N") : System.Guid.Parse(key).ToString("N");
         }
         public string PrefabId;
         public string InstanceId;
@@ -118,17 +185,22 @@ namespace QTool.Serialize
                 InstanceId = GetNewId();
             }
         }
-
-        public virtual void Write(BinaryWriter write)
+        public void Init(string prefabId,string instanceId)
         {
-            write.Write(PrefabId, LengthType.Byte);
-            write.Write(InstanceId, LengthType.Byte);
+            PrefabId = prefabId;
+            InstanceId = instanceId;
         }
 
-        public virtual void Read(BinaryReader read)
-        {
-            PrefabId = read.ReadString(LengthType.Byte);
-            InstanceId = read.ReadString(LengthType.Byte);
-        }
+        //public virtual void Write(BinaryWriter write)
+        //{
+        //    write.Write(InstanceId, LengthType.Byte);
+        //    write.Write(PrefabId, LengthType.Byte);
+        //}
+
+        //public virtual void Read(BinaryReader read)
+        //{
+        //    InstanceId = read.ReadString(LengthType.Byte);
+        //    PrefabId = read.ReadString(LengthType.Byte);
+        //}
     }
 }

@@ -144,6 +144,15 @@ namespace QTool
     }
     public static class ArrayExtend
     {
+        public static string ToOneString<T>(this ICollection<T> array,string splitChar="\n")
+        {
+            var str = "";
+            foreach (var item in array)
+            {
+                str += item + splitChar;
+            }
+            return str;
+        }
         public static bool ContainsKey<T, KeyType>(this ICollection<T> array, KeyType key) where T : class, IKey<KeyType>
         {
             return array.ContainsKey(key, (item) =>item.Key);
