@@ -157,7 +157,7 @@ namespace QTool
         {
             return array.ContainsKey(key, (item) =>item.Key);
         }
-        public static bool ContainsKey<T, KeyType>(this ICollection<T> array, KeyType key, Func<T, KeyType> keyGetter) where T : class
+        public static bool ContainsKey<T, KeyType>(this ICollection<T> array, KeyType key, Func<T, KeyType> keyGetter) 
         {
             foreach (var value in array)
             {
@@ -172,7 +172,7 @@ namespace QTool
         {
             return array.Get(key,(item)=>item.Key);
         }
-        public static T Get<T, KeyType>(this ICollection<T> array, KeyType key,Func<T,KeyType> keyGetter) where T:class
+        public static T Get<T, KeyType>(this ICollection<T> array, KeyType key,Func<T,KeyType> keyGetter) 
         {
             foreach (var value in array)
             {
@@ -182,7 +182,7 @@ namespace QTool
                     return value;
                 }
             }
-            return null;
+            return default;
         }
         public static List<T> GetList<T, KeyType>(this ICollection<T> array, KeyType key, List<T> tempList = null) where T : class, IKey<KeyType>
         {
