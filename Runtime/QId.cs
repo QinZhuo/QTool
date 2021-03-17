@@ -67,7 +67,7 @@ namespace QTool.Serialize
             }
             return writer;
         }
-        public static BinaryReader Load<T>(this BinaryReader reader, IList<T> objList, System.Func<T, string> GetKey, System.Func<T> createFunc)
+        public static BinaryReader Load<T>(this BinaryReader reader, IList<T> objList, System.Func<T, string> GetKey, System.Func<string,T> createFunc)
         {
             var desoryList = new List<T>(objList);
             var count = reader.ReadInt32();
@@ -82,7 +82,7 @@ namespace QTool.Serialize
                 }
                 else
                 {
-                    var newObj = createFunc();
+                    var newObj = createFunc(id);
                     reader.ReadObject(newObj);
                     if(newObj is IGameSave)
                     {
