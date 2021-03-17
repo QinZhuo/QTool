@@ -4,142 +4,73 @@ using System.Collections.Generic;
 using UnityEngine;
 namespace QTool.Serialize
 {
-    public interface IGameSave:IQSerialize
+    public interface IGameSave : IQSerialize
     {
-        void LoadCreate();
-        void LoadDestory();
+        string InstanceId { get; }
+        string PrefabId { get; }
     }
     public static class QSaveManager
     {
-        public static List<QId> qIdList = new List<QId>();
-        public static void Add(QId id)
+        public static BinaryWriter SaveGameObject<T>(this BinaryWriter writer, ICollection<T> objList) where T : MonoBehaviour, IQSerialize
         {
-            qIdList.AddCheckExist(id);
+            return writer.Save(objList, (a) => a.GetQId().InstanceId, (a) => a.GetQId().PrefabId);
         }
-        public static void Remove(QId id)
+        public static BinaryWriter SaveObject<T>(this BinaryWriter writer, ICollection<T> objList) where T :class, IGameSave
         {
-            qIdList.Remove(id);
+            return writer.Save(objList, (a) => a.InstanceId, (a) => a.PrefabId);
         }
-        public static void Clear()
-        {
-            qIdList.Clear();
-        }
-        public static byte[] Save()
-        {
-            return BinaryWriter.Get().Save(qIdList).Recover();
-        }
-        public static void Load(byte[] bytes, System.Func<string, QId> createFunc)
-        {
-            BinaryReader.Get().Reset(bytes).Load(qIdList, createFunc);
-        }
- 
-
-        public static BinaryWriter Save(this BinaryWriter writer,IList<QId> objList) 
-        {
-            writer.Write(objList.Count);
-          
-            foreach (var obj in objList)
-            {
-                if (obj as MonoBehaviour == null) continue;
-                var qId = obj.GetQId();
-                if (string.IsNullOrWhiteSpace(qId.InstanceId))
-                {
-                    Debug.LogError("保存信息ID不能为空【" + qId.PrefabId + "】");
-                }
-                writer.Write(obj.InstanceId, LengthType.Byte);
-                writer.Write(obj.PrefabId, LengthType.Byte);
-                writer.WriteObject(obj.GetComponents<IQSerialize>());
-            }
-            return writer;
-        }
-        public static BinaryWriter Save<T>(this BinaryWriter writer, IList<T> objList, System.Func<T, string> GetKey) where T : IQSerialize
+        public static BinaryWriter Save<T>(this BinaryWriter writer, ICollection<T> objList, System.Func<T, string> GetInstanceKey,System.Func<T,string> GetPrefabKey) where T :IQSerialize
         {
             writer.Write(objList.Count);
             foreach (var obj in objList)
             {
-                var id = GetKey(obj);
+                var id = GetInstanceKey(obj);
                 if (string.IsNullOrWhiteSpace(id))
                 {
-                    Debug.LogError("保存信息ID不能为空【" + id + "】");
+                    Debug.LogError("保存信息实例ID不能为空【" + id + "】");
                 }
                 writer.Write(id, LengthType.Byte);
+                writer.Write(GetPrefabKey(obj), LengthType.Byte);
                 writer.WriteObject(obj);
             }
             return writer;
         }
-        public static BinaryReader Load<T>(this BinaryReader reader, IList<T> objList, System.Func<T, string> GetKey, System.Func<string,T> createFunc,System.Action<T> loadOver=null)
+        public static BinaryReader LoadObject<T>(this BinaryReader reader, ICollection<T> objList, System.Func<string, string, T> createFunc, System.Action<T> destoryFunc = null) where T : class, IGameSave
+        {
+            return reader.Load(objList, (a) => a.InstanceId, (a) => a.PrefabId, createFunc, destoryFunc);
+        }
+        public static BinaryReader LoadGameObject<T>(this BinaryReader reader,ICollection<T> objList ,System.Func<string, string, T> createFunc, System.Action<T> destoryFunc = null) where T : MonoBehaviour, IQSerialize
+        {
+            return reader.Load(objList, (a) => a.GetQId().InstanceId, (a) => a.GetQId().PrefabId, createFunc, destoryFunc);
+        }
+        public static BinaryReader Load<T>(this BinaryReader reader, ICollection<T> objList, System.Func<T, string> GetKey,System.Func<T,string> GetPrefabKey, System.Func<string,string,T> createFunc,System.Action<T> destoryFunc=null)
         {
             var desoryList = new List<T>(objList);
             var count = reader.ReadInt32();
             for (int i = 0; i < count; i++)
             {
-                var id = reader.ReadString(LengthType.Byte);
-                if (objList.ContainsKey(id,GetKey))
+                var instanceId = reader.ReadString(LengthType.Byte);
+                var prefabId = reader.ReadString(LengthType.Byte);
+                if (objList.ContainsKey(instanceId,GetKey))
                 {
-                    var obj = objList.Get(id,GetKey);
+                    var obj = objList.Get(instanceId,GetKey);
                     reader.ReadObject(obj);
                     desoryList.Remove(obj);
-                    loadOver?.Invoke(obj);
                 }
                 else
                 {
-                    var newObj = createFunc(id);
+                    var newObj = createFunc(instanceId,prefabId);
                     reader.ReadObject(newObj);
-                    if(newObj is IGameSave)
-                    {
-                        (newObj as IGameSave).LoadCreate();
-                    }
-                    loadOver?.Invoke(newObj);
                 }
               
             }
             foreach (var item in desoryList)
             {
-                if (item is IGameSave)
-                {
-                    (item as IGameSave).LoadDestory();
-                }
+                destoryFunc?.Invoke(item);
             }
             return reader;
         }
-        public static BinaryReader Load(this BinaryReader reader, IList<QId> objList,System.Func<string,QId> createFunc, System.Action<QId> loadOver = null)
-        {
-       
-            var desoryList = new List<QId>(objList);
 
-            var count = reader.ReadInt32();
-            for (int i = 0; i < count; i++)
-            {
-                var instanceId = reader.ReadString(LengthType.Byte);
-                var prefabId = reader.ReadString(LengthType.Byte);
-                if (objList.ContainsKey(instanceId))
-                {
-                    var obj = objList.Get(instanceId);
-                    reader.ReadObject(obj.GetComponents<IQSerialize>());
-                    desoryList.Remove(obj);
-                    loadOver?.Invoke(obj);
-                }
-                else
-                {
-                    var newQid = createFunc(prefabId);
-                    newQid.InstanceId= instanceId;
-                    reader.ReadObject(newQid.GetComponents<IQSerialize>());
-                    foreach (var iLoad in newQid.GetComponents<IGameSave>())
-                    {
-                        iLoad.LoadCreate();
-                    }
-                    loadOver?.Invoke(newQid);
-                }
-            }
-            foreach (var item in desoryList)
-            {
-                foreach (var iLoad in item.GetComponents<IGameSave>())
-                {
-                    iLoad.LoadDestory();
-                }
-            }
-            return reader;
-        }
 
         public static QId GetQId(this MonoBehaviour mono)
         {
@@ -240,18 +171,6 @@ namespace QTool.Serialize
             {
                 InstanceId = GetNewId();
             }
-        }
-        public void Create()
-        {
-            QSaveManager.Add(this);
-        }
-        public void Destory()
-        {
-            QSaveManager.Remove(this);
-        }
-        private void OnDestroy()
-        {
-            Destory();
         }
         public void Init(string prefabId,string instanceId)
         {
