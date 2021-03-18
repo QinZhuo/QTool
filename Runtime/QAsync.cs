@@ -94,7 +94,7 @@ namespace QTool.Async
                 Set(result.name, result);
                 if(result is GameObject)
                 {
-                    var qid= (result as GameObject).GetQId();
+                    var qid= (result as GameObject).GetComponentInChildren<QId>();
                     if (qid != null)
                     {
                         Set(qid.PrefabId, result);
