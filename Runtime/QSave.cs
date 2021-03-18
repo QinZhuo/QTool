@@ -16,7 +16,7 @@ namespace QTool
     }
     public static class QSave
     {
-        public static List<ObjT> ToOneList<KeyT, ObjT>(this Dictionary<KeyT,ObjT> objList)
+        public static List<ObjT> ToList<KeyT, ObjT>(this Dictionary<KeyT,ObjT> objList)
         {
             var list = new List<ObjT>();
             foreach (var kv in objList)
