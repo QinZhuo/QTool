@@ -7,8 +7,8 @@ namespace QTool
     public interface IQSave<T>
     {
         string InstanceId { get; set; }
-        T Save(T newData);
-        void Load(T data);
+        T Save(T save);
+        void Load(T save);
     }
     public class QSaveBase:IKey<string>
     {
