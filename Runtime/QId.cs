@@ -3,85 +3,85 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
-namespace QTool.Serialize
+namespace QTool
 {
-    public interface IGameSave : IQSerialize
+    //public interface IGameSave : IQSerialize
+    //{
+    //    string InstanceId { get; }
+    //    string PrefabId { get; }
+    //}
+    public static class QIdExtends
     {
-        string InstanceId { get; }
-        string PrefabId { get; }
-    }
-    public static class QSaveManager
-    {
-        public static BinaryWriter SaveGameObject<T>(this BinaryWriter writer, ICollection<T> objList) where T : MonoBehaviour, IQSerialize
-        {
-            return writer.Save(objList, (a) => { return  a.GetQId().idInfo ; });
-        }
+        //public static BinaryWriter SaveGameObject<T>(this BinaryWriter writer, ICollection<T> objList) where T : MonoBehaviour, IQSerialize
+        //{
+        //    return writer.Save(objList, (a) => { return  a.GetQId().idInfo ; });
+        //}
 
-        public static BinaryWriter SaveObject<T>(this BinaryWriter writer, ICollection<T> objList) where T : class, IGameSave
-        {
-            return writer.Save(objList, (a) => { return new QIdInfo(a) ; });
-        }
+        //public static BinaryWriter SaveObject<T>(this BinaryWriter writer, ICollection<T> objList) where T : class, IGameSave
+        //{
+        //    return writer.Save(objList, (a) => { return new QIdInfo(a) ; });
+        //}
 
-        public static BinaryWriter SaveGameObject<T,InitT>(this BinaryWriter writer, ICollection<T> objList,System.Func<T, InitT> InitInfoGet) where T : MonoBehaviour, IQSerialize where InitT:QIdInfo, new ()
-        {
-            return writer.Save(objList, InitInfoGet);
-        }
-        public static BinaryWriter SaveObject<T, InitT>(this BinaryWriter writer, ICollection<T> objList, System.Func<T, InitT> InitInfoGet ) where T :class, IGameSave where InitT : QIdInfo, new()
-        {
-            return writer.Save(objList, InitInfoGet);
-        }
+        //public static BinaryWriter SaveGameObject<T,InitT>(this BinaryWriter writer, ICollection<T> objList,System.Func<T, InitT> InitInfoGet) where T : MonoBehaviour, IQSerialize where InitT:QIdInfo, new ()
+        //{
+        //    return writer.Save(objList, InitInfoGet);
+        //}
+        //public static BinaryWriter SaveObject<T, InitT>(this BinaryWriter writer, ICollection<T> objList, System.Func<T, InitT> InitInfoGet ) where T :class, IGameSave where InitT : QIdInfo, new()
+        //{
+        //    return writer.Save(objList, InitInfoGet);
+        //}
 
-        private static BinaryWriter Save<T,InitT>(this BinaryWriter writer, ICollection<T> objList, System.Func<T,InitT> InitInfoGet) where T : IQSerialize where InitT:QIdInfo, new()
-        {
-            writer.Write(objList.Count);
-            foreach (var obj in objList)
-            {
-                writer.WriteObject(InitInfoGet(obj));
-                writer.WriteObject(obj);
-            }
-            return writer;
-        }
-        public static BinaryReader LoadObject<T>(this BinaryReader reader, ICollection<T> objList, Func<QIdInfo, T> createFunc, Action<T> destoryFunc = null) where T : class, IGameSave
-        {
-            return reader.Load(objList, (a)=> new QIdInfo(a), createFunc, destoryFunc);
-        }
-        public static BinaryReader LoadObject<T,InitT>(this BinaryReader reader, ICollection<T> objList, Func<T, InitT> InitInfoGet, Func<InitT, T> createFunc, Action<T> destoryFunc ) where T : class, IGameSave where InitT : QIdInfo,new()
-        {
-            return reader.Load(objList, InitInfoGet, createFunc, destoryFunc);
-        }
-        public static BinaryReader LoadGameObject<T>(this BinaryReader reader, ICollection<T> objList, Func<QIdInfo, T> createFunc, Action<T> destoryFunc = null) where T : MonoBehaviour, IQSerialize
-        {
-            return reader.Load(objList, (a)=> a.GetQId().idInfo, createFunc, destoryFunc);
-        }
-        public static BinaryReader LoadGameObject<T,InitT>(this BinaryReader reader,ICollection<T> objList, Func<T, InitT> InitInfoGet ,Func<InitT, T> createFunc,Action<T> destoryFunc) where T : MonoBehaviour, IQSerialize where InitT : QIdInfo, new()
-        {
-            return reader.Load(objList, InitInfoGet, createFunc, destoryFunc);
-        }
-        private static BinaryReader Load<T,InitT>(this BinaryReader reader, ICollection<T> objList, Func<T, InitT> InitInfoGet, Func<InitT,T> createFunc,Action<T> destoryFunc) where InitT : QIdInfo, new()
-        {
-            var desoryList = new List<T>(objList);
-            var count = reader.ReadInt32();
-            for (int i = 0; i < count; i++)
-            {
-                var initInfo = reader.ReadObject<InitT>();
-                if (objList.ContainsKey(initInfo.InstanceId,(a)=> InitInfoGet(a).InstanceId))
-                {
-                    var obj = objList.Get(initInfo.InstanceId, (a) => InitInfoGet(a).InstanceId);
-                    reader.ReadObject(obj);
-                    desoryList.Remove(obj);
-                }
-                else
-                {
-                    var newObj = createFunc(initInfo);
-                    reader.ReadObject(newObj);
-                }
-            }
-            foreach (var item in desoryList)
-            {
-                destoryFunc?.Invoke(item);
-            }
-            return reader;
-        }
+        //private static BinaryWriter Save<T,InitT>(this BinaryWriter writer, ICollection<T> objList, System.Func<T,InitT> InitInfoGet) where T : IQSerialize where InitT:QIdInfo, new()
+        //{
+        //    writer.Write(objList.Count);
+        //    foreach (var obj in objList)
+        //    {
+        //        writer.WriteObject(InitInfoGet(obj));
+        //        writer.WriteObject(obj);
+        //    }
+        //    return writer;
+        //}
+        //public static BinaryReader LoadObject<T>(this BinaryReader reader, ICollection<T> objList, Func<QIdInfo, T> createFunc, Action<T> destoryFunc = null) where T : class, IGameSave
+        //{
+        //    return reader.Load(objList, (a)=> new QIdInfo(a), createFunc, destoryFunc);
+        //}
+        //public static BinaryReader LoadObject<T,InitT>(this BinaryReader reader, ICollection<T> objList, Func<T, InitT> InitInfoGet, Func<InitT, T> createFunc, Action<T> destoryFunc ) where T : class, IGameSave where InitT : QIdInfo,new()
+        //{
+        //    return reader.Load(objList, InitInfoGet, createFunc, destoryFunc);
+        //}
+        //public static BinaryReader LoadGameObject<T>(this BinaryReader reader, ICollection<T> objList, Func<QIdInfo, T> createFunc, Action<T> destoryFunc = null) where T : MonoBehaviour, IQSerialize
+        //{
+        //    return reader.Load(objList, (a)=> a.GetQId().idInfo, createFunc, destoryFunc);
+        //}
+        //public static BinaryReader LoadGameObject<T,InitT>(this BinaryReader reader,ICollection<T> objList, Func<T, InitT> InitInfoGet ,Func<InitT, T> createFunc,Action<T> destoryFunc) where T : MonoBehaviour, IQSerialize where InitT : QIdInfo, new()
+        //{
+        //    return reader.Load(objList, InitInfoGet, createFunc, destoryFunc);
+        //}
+        //private static BinaryReader Load<T,InitT>(this BinaryReader reader, ICollection<T> objList, Func<T, InitT> InitInfoGet, Func<InitT,T> createFunc,Action<T> destoryFunc) where InitT : QIdInfo, new()
+        //{
+        //    var desoryList = new List<T>(objList);
+        //    var count = reader.ReadInt32();
+        //    for (int i = 0; i < count; i++)
+        //    {
+        //        var initInfo = reader.ReadObject<InitT>();
+        //        if (objList.ContainsKey(initInfo.InstanceId,(a)=> InitInfoGet(a).InstanceId))
+        //        {
+        //            var obj = objList.Get(initInfo.InstanceId, (a) => InitInfoGet(a).InstanceId);
+        //            reader.ReadObject(obj);
+        //            desoryList.Remove(obj);
+        //        }
+        //        else
+        //        {
+        //            var newObj = createFunc(initInfo);
+        //            reader.ReadObject(newObj);
+        //        }
+        //    }
+        //    foreach (var item in desoryList)
+        //    {
+        //        destoryFunc?.Invoke(item);
+        //    }
+        //    return reader;
+        //}
 
 
         public static QId GetQId(this MonoBehaviour mono)
@@ -102,21 +102,21 @@ namespace QTool.Serialize
             return obj.GetComponent<QId>();
         }
     }
-    [System.Serializable]
-    public class QIdInfo
-    {
-        public string PrefabId;
-        public string InstanceId;
-        public QIdInfo()
-        {
+    //[System.Serializable]
+    //public class QIdInfo
+    //{
+    //    public string PrefabId;
+    //    public string InstanceId;
+    //    public QIdInfo()
+    //    {
 
-        }
-        public QIdInfo(IGameSave gameSave)
-        {
-            PrefabId = gameSave.PrefabId;
-            InstanceId = gameSave.InstanceId;
-        }
-    }
+    //    }
+    //    public QIdInfo(IGameSave gameSave)
+    //    {
+    //        PrefabId = gameSave.PrefabId;
+    //        InstanceId = gameSave.InstanceId;
+    //    }
+    //}
     [DisallowMultipleComponent]
     public class QId : MonoBehaviour,IKey<string>
     {
@@ -192,9 +192,8 @@ namespace QTool.Serialize
         {
             return string.IsNullOrWhiteSpace(key) ? System.Guid.NewGuid().ToString("N") : System.Guid.Parse(key).ToString("N");
         }
-        public QIdInfo idInfo = new QIdInfo();
-        public string PrefabId { get=>idInfo.PrefabId; set=>idInfo.PrefabId=value; }
-        public string InstanceId { get=>idInfo.InstanceId; set=>idInfo.InstanceId=value; }
+        public string PrefabId;
+        public string InstanceId;
         private void Awake()
         {
             if (string.IsNullOrWhiteSpace(InstanceId))
