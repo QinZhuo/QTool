@@ -25,7 +25,7 @@ namespace QTool
             }
             return list;
         }
-        public static List<ObjT> ToOneList<KeyT, ObjT>(this Dictionary<KeyT, ICollection<ObjT>> objList)
+        public static List<ObjT> ToOneList<KeyT, ObjT>(this Dictionary<KeyT, List<ObjT>> objList)
         {
             var list = new List<ObjT>();
             foreach (var kv in objList)
