@@ -92,9 +92,9 @@ namespace QTool.Async
             Addressables.LoadAssetsAsync<ObjT>(Label, (result) =>
             {
                 Set(result.name, result);
-                if(result is MonoBehaviour)
+                if(result is GameObject)
                 {
-                    var qid= (result as MonoBehaviour).GetQId();
+                    var qid= (result as GameObject).GetQId();
                     if (qid != null)
                     {
                         Set(qid.PrefabId, result);
