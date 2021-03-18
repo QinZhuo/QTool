@@ -108,6 +108,7 @@ namespace QTool.Serialize
             {
                 InstanceId = "";
             }
+            UnityEditor.EditorUtility.SetDirty(this);
         }
         private string PrefabUID
         {
@@ -172,22 +173,6 @@ namespace QTool.Serialize
                 InstanceId = GetNewId();
             }
         }
-        public void Init(string prefabId,string instanceId)
-        {
-            PrefabId = prefabId;
-            InstanceId = instanceId;
-        }
-
-        //public virtual void Write(BinaryWriter write)
-        //{
-        //    write.Write(InstanceId, LengthType.Byte);
-        //    write.Write(PrefabId, LengthType.Byte);
-        //}
-
-        //public virtual void Read(BinaryReader read)
-        //{
-        //    InstanceId = read.ReadString(LengthType.Byte);
-        //    PrefabId = read.ReadString(LengthType.Byte);
-        //}
+  
     }
 }

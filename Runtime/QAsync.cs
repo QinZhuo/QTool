@@ -47,6 +47,7 @@ namespace QTool.Async
             }
             else
             {
+                Debug.LogError(Label + "找不到预制体[" + key + "]");
                 return null;
             }
         }
