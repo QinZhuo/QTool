@@ -45,7 +45,7 @@ namespace QTool.Serialize
         {
             return reader.Load(objList, (a)=> new QIdInfo(a), createFunc, destoryFunc);
         }
-        public static BinaryReader LoadObject<T,InitT>(this BinaryReader reader, ICollection<T> objList, Func<T, InitT> InitInfoGet, Func<InitT, T> createFunc, Action<T> destoryFunc = null) where T : class, IGameSave where InitT : QIdInfo
+        public static BinaryReader LoadObject<T,InitT>(this BinaryReader reader, ICollection<T> objList, Func<T, InitT> InitInfoGet, Func<InitT, T> createFunc, Action<T> destoryFunc ) where T : class, IGameSave where InitT : QIdInfo
         {
             return reader.Load(objList, InitInfoGet, createFunc, destoryFunc);
         }
@@ -53,11 +53,11 @@ namespace QTool.Serialize
         {
             return reader.Load(objList, (a)=> a.GetQId().idInfo, createFunc, destoryFunc);
         }
-        public static BinaryReader LoadGameObject<T,InitT>(this BinaryReader reader,ICollection<T> objList, Func<T, InitT> InitInfoGet ,Func<InitT, T> createFunc,Action<T> destoryFunc = null) where T : MonoBehaviour, IQSerialize where InitT:QIdInfo
+        public static BinaryReader LoadGameObject<T,InitT>(this BinaryReader reader,ICollection<T> objList, Func<T, InitT> InitInfoGet ,Func<InitT, T> createFunc,Action<T> destoryFunc) where T : MonoBehaviour, IQSerialize where InitT:QIdInfo
         {
             return reader.Load(objList, InitInfoGet, createFunc, destoryFunc);
         }
-        private static BinaryReader Load<T,InitT>(this BinaryReader reader, ICollection<T> objList, Func<T, InitT> InitInfoGet, Func<InitT,T> createFunc,Action<T> destoryFunc=null) where InitT:QIdInfo
+        private static BinaryReader Load<T,InitT>(this BinaryReader reader, ICollection<T> objList, Func<T, InitT> InitInfoGet, Func<InitT,T> createFunc,Action<T> destoryFunc) where InitT:QIdInfo
         {
             var desoryList = new List<T>(objList);
             var count = reader.ReadInt32();
