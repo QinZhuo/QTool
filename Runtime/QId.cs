@@ -186,12 +186,13 @@ namespace QTool
             }
         }
 
-        public string Key { get =>InstanceId; set{ }}
+        
 #endif
         public static string GetNewId(string key = "")
         {
             return string.IsNullOrWhiteSpace(key) ? System.Guid.NewGuid().ToString("N") : System.Guid.Parse(key).ToString("N");
         }
+        public string Key { get => InstanceId; set { } }
         public string PrefabId;
         public string InstanceId;
         private void Awake()
