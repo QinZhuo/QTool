@@ -268,42 +268,47 @@ namespace QTool.Serialize
         
         public static System.Byte[] Serialize<T>(T value)
         {
-            //typeStrList.Clear();
-            //typeIndexDic.Clear();
+            return Serialize(typeof(T),value);
+        }
+        public static System.Byte[] Serialize(Type type,object value)
+        {
             var writer = BinaryWriter.Get();
             writer.Clear();
             writer.Serialize(value);
             var bytes = writer.ToArray();
             BinaryWriter.Push(writer);
-            //for (int i = typeStrList.Count-1; i >= 0; i--)
-            //{
-            //    var bytes=typeStrList[i].GetBytes();
-            //    writer.byteList.InsertRange(0, bytes);
-            //    writer.byteList.InsertRange(0, bytes.Length.GetBytes());
-            //}
-            //writer.byteList.InsertRange(0, typeStrList.Count.GetBytes());
             return bytes;
         }
-        public static BinaryWriter Serialize<T>(this BinaryWriter writer,  T value)
+        public static BinaryWriter Serialize(this BinaryWriter writer,Type type,object value)
         {
-            var type = typeof(T);
             writer.WriteValue(value, type);
             return writer;
         }
-        public static T Deserialize<T>(byte[] bytes, T targetObj = default)
+        public static BinaryWriter Serialize<T>(this BinaryWriter writer,  T value)
+        {
+            return writer.Serialize(typeof(T), value);
+        }
+        public static object Deserialize(byte[] bytes,Type type, object targetObj = default)
         {
             var reader = BinaryReader.Get();
             reader.Reset(bytes);
-            var obj = reader.Deserialize(targetObj);
+            var obj = reader.Deserialize(type,targetObj);
             BinaryReader.Push(reader);
             return obj;
+        }
+        public static T Deserialize<T>(byte[] bytes, T targetObj = default)
+        {
+            return (T)Deserialize(bytes, typeof(T), targetObj);
+        }
+        public static object Deserialize(this BinaryReader reader,Type type, object targetObj = default)
+        {
+            return reader.ReadValue(type, targetObj);
         }
         public static T Deserialize<T>(this BinaryReader reader, T targetObj = default)
         {
             try
             {
-                var type = typeof(T);
-                var obj = (T)reader.ReadValue(type, targetObj);
+                var obj = (T)reader.Deserialize(typeof(T), targetObj);
                 return obj;
             }
             catch (Exception e)
