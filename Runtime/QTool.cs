@@ -147,7 +147,15 @@ namespace QTool
         public static void RunTimeCheck(string name, System.Action action, Func<int> getLength = null)
         {
             var last = System.DateTime.Now;
-            action.Invoke();
+            try
+            {
+                action.Invoke();
+            }
+            catch (Exception e)
+            {
+                Debug.LogError("【" + name + "】运行出错:"+e);
+                return;
+            }
             Debug.LogError("【" + name + "】运行时间:" + (System.DateTime.Now - last).TotalMilliseconds + (getLength == null ? "" : " 长度" + getLength().ComputeScale()));
         }
     }

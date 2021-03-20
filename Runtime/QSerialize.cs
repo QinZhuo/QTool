@@ -14,11 +14,7 @@ namespace QTool.Serialize
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Interface)]
     public class QTypeAttribute : Attribute
     {
-        public string name = "";
-        public QTypeAttribute(string name)
-        {
-            this.name = name;
-        }
+        public bool dynamic = false;
     }
     public class QSValueAttribute : Attribute
     {
@@ -52,6 +48,14 @@ namespace QTool.Serialize
             get = info.GetValue;
         }
     }
+    public enum QTypeState
+    {
+        Normal,
+        List,
+        Array,
+        Dynamic,
+        ISerialize,
+    }
     public class QTypeInfo
     {
         static bool IsQSValue(MemberInfo info, bool isPublic = true)
@@ -71,53 +75,52 @@ namespace QTool.Serialize
         public Type ListType;
         public Type ArrayType;
         public Type type;
+        public QTypeState state= QTypeState.Normal;
         public int ArrayRank;
-        public bool IsArray;
         public int[] indexArray;
-        public bool IsISerialize = false;
         private QTypeInfo(Type type)
         {
-            IsISerialize = typeof(IQSerialize).IsAssignableFrom(type);
             this.type = type;
-            if (!IsISerialize && !type.IsInterface)
+            if (type.IsArray)
             {
-                var qType = type.GetCustomAttribute<QTypeAttribute>();
-                var fileName = type.Name;
-                if (qType != null)
-                {
-                    fileName = qType.name;
-                }
-                IsArray = type.IsArray;
-                if (type.IsArray)
-                {
-                    ArrayRank = type.GetArrayRank();
-                    ArrayType = type.GetElementType();
-                    indexArray = new int[ArrayRank];
-                }
-                else
-                {
-                    var listInterFace = type.GetInterface(typeof(IList<>).FullName, true);
-                    IsList = (listInterFace != null);
-                    if (IsList)
-                    {
-                        ListType = listInterFace.GenericTypeArguments[0];
-
-                    }
-                    type.ForeachMemeber((item) =>
-                    {
-                        if (IsQSValue(item, item.IsPublic))
-                        {
-                            memberList.Add(new QMemeberInfo(item));
-                        }
-                    },
-                    (item) => {
-                        if (IsQSValue(item, item.Name != "Item" && item.CanRead && item.CanWrite && item.SetMethod.IsPublic && item.GetMethod.IsPublic))
-                        {
-                            memberList.Add(new QMemeberInfo(item));
-                        }
-                    });
-                }
+                state = QTypeState.Array;
+                ArrayRank = type.GetArrayRank();
+                ArrayType = type.GetElementType();
+                indexArray = new int[ArrayRank];
+                return;
             }
+            if (typeof(IQSerialize).IsAssignableFrom(type))
+            {
+                state = QTypeState.ISerialize;
+                return;
+            }
+            var listInterFace = type.GetInterface(typeof(IList<>).FullName, true);
+            if (listInterFace != null)
+            {
+                ListType = listInterFace.GenericTypeArguments[0];
+                state = QTypeState.List;
+                return;
+            }
+
+            var qType = type.GetCustomAttribute<QTypeAttribute>();
+            if ((qType != null&& qType.dynamic) || type.IsInterface)
+            {
+                state = QTypeState.Dynamic;
+            }
+            type.ForeachMemeber((item) =>
+            {
+                if (IsQSValue(item, item.IsPublic))
+                {
+                    memberList.Add(new QMemeberInfo(item));
+                }
+            },
+            (item) =>
+            {
+                if (IsQSValue(item, item.Name != "Item" && item.CanRead && item.CanWrite && item.SetMethod.IsPublic && item.GetMethod.IsPublic))
+                {
+                    memberList.Add(new QMemeberInfo(item));
+                }
+            });
         }
         public static Dictionary<Type, QTypeInfo> table = new Dictionary<Type, QTypeInfo>();
         public static QTypeInfo Get(Type type)
@@ -125,6 +128,7 @@ namespace QTool.Serialize
             if (!table.ContainsKey(type))
             {
                 var info = new QTypeInfo(type);
+                Debug.LogError("类型[" + type + "][" + info.state + "]");
                 table.Add(type, info);
 
             }
@@ -132,7 +136,7 @@ namespace QTool.Serialize
         }
 
     }
-
+  
     #endregion
     public static class QSerialize
     {
@@ -224,72 +228,62 @@ namespace QTool.Serialize
             }
             return Activator.CreateInstance(type, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, args, null);
         }
-        public enum ObjectState:byte
-        {
-            Null=0,
-            Normal=1,
-            Dynamic=2,
-        }
+       
       
         public static BinaryWriter WriteObjectType(this BinaryWriter writer, object value, Type type)
         {
             TypeCode typeCode = Type.GetTypeCode(type);
-
             switch (typeCode)
             {
                 case TypeCode.Object:
-                    if (object.Equals(value, null))
                     {
-                        writer.Write((byte)ObjectState.Null);
-                        return writer;
-                    }
-                    var trueType = value.GetType();
-                    if (trueType != type)
-                    {
-                        writer.Write((byte)ObjectState.Dynamic);
-                        writer.Write(trueType.FullName);
-                        type = trueType;
-                    }
-                    else
-                    {
-                        writer.Write((byte)ObjectState.Normal);
-                    }
-                    QTypeInfo typeInfo = QTypeInfo.Get(type);
-                    if (typeInfo.IsISerialize)
-                    {
-                        (value as IQSerialize).Write(writer);
-                    }
-                    else
-                    {
-                        if (typeInfo.IsArray)
+                        var IsNull = object.Equals(value, null);
+                        if (IsNull)
                         {
-                            var array = value as Array;
-                            writer.Write((byte)typeInfo.ArrayRank);
-                            for (int i = 0; i < typeInfo.ArrayRank; i++)
-                            {
-                                writer.Write(array.GetLength(i));
-                            }
-                            ForeachArray(array, 0, typeInfo.indexArray, (indexArray) => { writer.WriteObjectType(array.GetValue(indexArray), typeInfo.ArrayType); });
+                            return writer;
                         }
-                        else
+                        QTypeInfo typeInfo = QTypeInfo.Get(type);
+                        switch (typeInfo.state)
                         {
-                            if (typeInfo.IsList)
-                            {
+                            case QTypeState.ISerialize:
+                                (value as IQSerialize).Write(writer);
+                                break;
+                            case QTypeState.List:
                                 var list = value as IList;
                                 writer.Write(list.Count);
                                 foreach (var item in list)
                                 {
                                     writer.WriteObjectType(item, typeInfo.ListType);
                                 }
-                            }
-                            writer.Write((byte)typeInfo.memberList.Count);
-                            foreach (var item in typeInfo.memberList)
-                            {
-                                writer.Write(item.Name, LengthType.Byte);
-                                var memberObj = item.get(value);
-                                writer.Write(SerializeType(memberObj, item.type), LengthType.Byte);
-                            }
+                                break;
+                            case QTypeState.Array:
+                                var array = value as Array;
+                                writer.Write((byte)typeInfo.ArrayRank);
+                                for (int i = 0; i < typeInfo.ArrayRank; i++)
+                                {
+                                    writer.Write(array.GetLength(i));
+                                }
+                                ForeachArray(array, 0, typeInfo.indexArray, (indexArray) => { writer.WriteObjectType(array.GetValue(indexArray), typeInfo.ArrayType); });
+                                break;
+                            case QTypeState.Dynamic:
+                            case QTypeState.Normal:
+                                if(typeInfo.state== QTypeState.Dynamic)
+                                {
+                                    writer.Write(type.FullName);
+                                }
+                                writer.Write((byte)typeInfo.memberList.Count);
+                                foreach (var item in typeInfo.memberList)
+                                {
+                                    writer.Write(item.Name, LengthType.Byte);
+                                    var memberObj = item.get(value);
+                                    writer.Write(SerializeType(memberObj, item.type), LengthType.Byte);
+                                }
+                                break;
+                            default:
+                                throw new Exception("序列化类型[" + type + "]出错");
                         }
+                      
+                     
                     }
                     break;
                 #region 基础类型
@@ -357,52 +351,17 @@ namespace QTool.Serialize
 
                 case TypeCode.Object:
                     QTypeInfo typeInfo = null;
-                    switch ((ObjectState)reader.ReadByte())
+                    if (reader.IsEnd)
                     {
-                        case ObjectState.Null:
-                            return null;
-                        case ObjectState.Normal:
-                            typeInfo = QTypeInfo.Get(type);
-                            break;
-                        case ObjectState.Dynamic:
-                            type = ParseType(reader.ReadString(LengthType.Byte));
-                            typeInfo = QTypeInfo.Get(type);
-                            break;
-                        default:
-                            break;
+                        return null;
                     }
-                    if (typeInfo.IsISerialize)
+                    typeInfo = QTypeInfo.Get(type);
+                    switch (typeInfo.state)
                     {
-                        var serObj = CreateInstance(type, target) as IQSerialize;
-                        serObj.Read(reader);
-                        return serObj;
-                    }
-                    else
-                    {
-                        if (typeInfo.IsArray)
-                        {
-                            var rank = reader.ReadByte();
-                            var count = 1;
-                            for (int i = 0; i < rank; i++)
+                       
+                        case QTypeState.List:
                             {
-                                typeInfo.indexArray[i] = reader.ReadInt32();
-                                count *= typeInfo.indexArray[i];
-                            }
-                            var array = (Array)CreateInstance(type, target, count);
-                            ForeachArray(array, 0, typeInfo.indexArray, (indexArray) => {
-                                var obj = array.GetValue(indexArray); if (obj == null)
-                                {
-                                    Debug.LogError(indexArray.ToOneString() + " 数据为空[" + target + "]");
-                                }
-                                array.SetValue(reader.ReadObjectType(typeInfo.ArrayType, array.GetValue(indexArray)), indexArray);
-                            });
-                            return array;
-                        }
-                        else
-                        {
-                            var obj = CreateInstance(type, target);
-                            if (typeInfo.IsList)
-                            {
+                                var obj = CreateInstance(type, target);
                                 var list = obj as IList;
                                 var count = reader.ReadInt32();
                                 for (int i = 0; i < count; i++)
@@ -417,9 +376,42 @@ namespace QTool.Serialize
                                     }
 
                                 }
+                                return list;
                             }
-                            else
+                        case QTypeState.Array:
                             {
+                                var rank = reader.ReadByte();
+                                var count = 1;
+                                for (int i = 0; i < rank; i++)
+                                {
+                                    typeInfo.indexArray[i] = reader.ReadInt32();
+                                    count *= typeInfo.indexArray[i];
+                                }
+                                var array = (Array)CreateInstance(type, target, count);
+                                ForeachArray(array, 0, typeInfo.indexArray, (indexArray) =>
+                                {
+                                    var obj = array.GetValue(indexArray); if (obj == null)
+                                    {
+                                        Debug.LogError(indexArray.ToOneString() + " 数据为空[" + target + "]");
+                                    }
+                                    array.SetValue(reader.ReadObjectType(typeInfo.ArrayType, array.GetValue(indexArray)), indexArray);
+                                });
+                                return array;
+                            }
+                        case QTypeState.ISerialize:
+                            {
+                                var serObj = CreateInstance(type, target) as IQSerialize;
+                                serObj.Read(reader);
+                                return serObj;
+                            }
+                        case QTypeState.Dynamic:
+                        case QTypeState.Normal:
+                            {
+                                if (typeInfo.state == QTypeState.Dynamic)
+                                {
+                                    var typeName = reader.ReadString(LengthType.Byte);
+                                }
+                                var obj = CreateInstance(type, target);
                                 var memberCount = reader.ReadByte();
                                 for (int i = 0; i < memberCount; i++)
                                 {
@@ -431,9 +423,11 @@ namespace QTool.Serialize
                                         memeberInfo.set.Invoke(obj, DeserializeType(bytes, memeberInfo.type, target != null ? memeberInfo.get?.Invoke(target) : null));
                                     }
                                 }
+                                return obj;
                             }
-                            return obj;
-                        }
+                        default:
+                            Debug.LogError("反序列化类型[" + type + "]出错");
+                            return null;
                     }
                 #region 基础类型
 

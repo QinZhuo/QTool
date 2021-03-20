@@ -25,6 +25,13 @@ namespace QTool.Binary
         public int TagIndex { protected set; get; }
         public byte[] bytes { protected set; get; }
         public int index { protected set; get; }
+        public bool IsEnd
+        {
+            get
+            {
+                return index >= bytes.Length;
+            }
+        }
         public byte ReadByte()
         {
             var value = bytes[index];
