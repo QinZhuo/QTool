@@ -28,7 +28,8 @@ namespace QTool.Serialize
     {
 
     }
-   
+    #region 类型数据
+
     public class QMemeberInfo : IKey<string>
     {
         public string Key { get => Name; set => value = Name; }
@@ -132,6 +133,7 @@ namespace QTool.Serialize
 
     }
 
+    #endregion
     public static class QSerialize
     {
         public static void ForeachMemeber(this Type type, Action<FieldInfo> fieldInfo, Action<PropertyInfo> propertyInfo = null)
@@ -154,7 +156,6 @@ namespace QTool.Serialize
         public static System.Byte[] SerializeType(object value,Type type)
         {
             var writer = BinaryWriter.Get();
-            writer.Clear();
             writer.WriteObjectType(value,type);
             var bytes = writer.ToArray();
             BinaryWriter.Push(writer);
@@ -237,8 +238,7 @@ namespace QTool.Serialize
             switch (typeCode)
             {
                 case TypeCode.Object:
-                    var isNull = value == null;
-                    if (isNull)
+                    if (object.Equals(value, null))
                     {
                         writer.Write((byte)ObjectState.Null);
                         return writer;
@@ -248,9 +248,7 @@ namespace QTool.Serialize
                     {
                         writer.Write((byte)ObjectState.Dynamic);
                         writer.Write(trueType.FullName);
-                      
                         type = trueType;
-                       
                     }
                     else
                     {
@@ -403,7 +401,6 @@ namespace QTool.Serialize
                         else
                         {
                             var obj = CreateInstance(type, target);
-
                             if (typeInfo.IsList)
                             {
                                 var list = obj as IList;
@@ -421,15 +418,18 @@ namespace QTool.Serialize
 
                                 }
                             }
-                            var memberCount = reader.ReadByte();
-                            for (int i = 0; i < memberCount; i++)
+                            else
                             {
-                                var name = reader.ReadString(LengthType.Byte);
-                                var bytes = reader.ReadBytes(LengthType.Byte);
-                                if (typeInfo.memberList.ContainsKey(name))
+                                var memberCount = reader.ReadByte();
+                                for (int i = 0; i < memberCount; i++)
                                 {
-                                    var memeberInfo = typeInfo.memberList[name];
-                                    memeberInfo.set.Invoke(obj, DeserializeType(bytes, memeberInfo.type, target != null ? memeberInfo.get?.Invoke(target) : null));
+                                    var name = reader.ReadString(LengthType.Byte);
+                                    var bytes = reader.ReadBytes(LengthType.Byte);
+                                    if (typeInfo.memberList.ContainsKey(name))
+                                    {
+                                        var memeberInfo = typeInfo.memberList[name];
+                                        memeberInfo.set.Invoke(obj, DeserializeType(bytes, memeberInfo.type, target != null ? memeberInfo.get?.Invoke(target) : null));
+                                    }
                                 }
                             }
                             return obj;

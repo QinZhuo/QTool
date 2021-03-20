@@ -83,18 +83,7 @@ namespace QTool.Binary
             index += 4;
             return value;
         }
-        public Vector3 ReadVector3()
-        {
-            var value = bytes.GetVector3(index);
-            index += 3*4;
-            return value;
-        }
-        public Quaternion ReadQuaternion()
-        {
-            var value = bytes.GetQuaternion(index);
-            index += 4 * 4;
-            return value;
-        }
+    
 
 
         public UInt16 ReadUInt16()
@@ -246,16 +235,6 @@ namespace QTool.Binary
             return this;
         }
      
-        public BinaryWriter Write(Vector3 value)
-        {
-            byteList.AddRange(value.GetBytes());
-            return this;
-        }
-        public BinaryWriter Write(Quaternion value)
-        {
-            byteList.AddRange(value.GetBytes());
-            return this;
-        }
         protected void WriteLengh(int length, LengthType lengthType= LengthType.Int32)
         {
             switch (lengthType)
@@ -463,29 +442,6 @@ namespace QTool.Binary
         {
             return BitConverter.ToDouble(value, start);
         }
-        public static string ComputeScale(this string array)
-        {
-            return array.Length.ComputeScale();
-        }
-        public static string ComputeScale(this IList array)
-        {
-            return array.Count.ComputeScale();
-        }
-
-        public static string ComputeScale(this int byteLength)
-        {
-            return ComputeScale((long)byteLength);
-        }
-
-        public static string ComputeScale(this long longLength)
-        {
-            string[] Suffix = { "Byte", "KB", "MB", "GB", "TB" };
-            int i = 0;
-            double dblSByte = longLength;
-            if (longLength > 1024)
-                for (i = 0; (longLength / 1024) > 0; i++, longLength /= 1024)
-                    dblSByte = longLength / 1024.0;
-            return String.Format("{0:0.##}{1}", dblSByte, Suffix[i]);
-        }
+    
     }
 }

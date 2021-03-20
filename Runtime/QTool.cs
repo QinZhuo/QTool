@@ -142,8 +142,41 @@ namespace QTool
             }
         }
     }
+    public static class Tool
+    {
+        public static void RunTimeCheck(string name, System.Action action, Func<int> getLength = null)
+        {
+            var last = System.DateTime.Now;
+            action.Invoke();
+            Debug.LogError("【" + name + "】运行时间:" + (System.DateTime.Now - last).TotalMilliseconds + (getLength == null ? "" : " 长度" + getLength().ComputeScale()));
+        }
+    }
     public static class ArrayExtend
     {
+        public static string ComputeScale(this string array)
+        {
+            return array.Length.ComputeScale();
+        }
+        public static string ComputeScale(this IList array)
+        {
+            return array.Count.ComputeScale();
+        }
+
+        public static string ComputeScale(this int byteLength)
+        {
+            return ComputeScale((long)byteLength);
+        }
+
+        public static string ComputeScale(this long longLength)
+        {
+            string[] Suffix = { "Byte", "KB", "MB", "GB", "TB" };
+            int i = 0;
+            double dblSByte = longLength;
+            if (longLength > 1024)
+                for (i = 0; (longLength / 1024) > 0; i++, longLength /= 1024)
+                    dblSByte = longLength / 1024.0;
+            return String.Format("{0:0.##}{1}", dblSByte, Suffix[i]);
+        }
         public static string ToOneString<T>(this ICollection<T> array,string splitChar="\n")
         {
             var str = "";
