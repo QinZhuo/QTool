@@ -151,8 +151,7 @@ namespace QTool.Binary
         }
         public T ReadObject<T>(T targetObj=default)
         {
-         
-            return this.Deserialize<T>(targetObj);
+            return (T)this.ReadObjectType(typeof(T),targetObj);
         }
         public override void PoolReset()
         {
@@ -303,7 +302,7 @@ namespace QTool.Binary
         }
         public BinaryWriter WriteObject<T>(T value)
         {
-            return this.Serialize(value); 
+            return this.WriteObjectType(value,typeof(T)); 
         }
 
         public override void PoolReset()
