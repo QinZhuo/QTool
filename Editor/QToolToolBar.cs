@@ -9,12 +9,12 @@ namespace QTool
 {
     public static class QToolToolBar
     {
-        [MenuItem("QTool/QTool/显示日志")]
+        [MenuItem("QTool/Tool/显示日志")]
         public static void SwitchLog()
         {
             UnityEngine.Debug.Log(PoolManager.ShowLog ? "显示PoolManager日志" : "隐藏PoolManager日志");
         }
-        [MenuItem("QTool/QTool/清空PlayerPrefs存档")]
+        [MenuItem("QTool/Tool/清空PlayerPrefs存档")]
         public static void ClearPlayerPrefs()
         {
             PlayerPrefs.DeleteAll();
@@ -33,12 +33,12 @@ namespace QTool
                 return "Builds/Windows/test.exe";
             }
         }
-        [MenuItem("QTool/QTool/运行测试包 %T")]
+        [MenuItem("QTool/Tool/运行测试包 %T")]
         public static void RunTest()
         {
             System.Diagnostics.Process.Start(BasePath + WindowsLocalPath);
         }
-        [MenuItem("QTool/QTool/打包测试当前场景 %#T")]
+        [MenuItem("QTool/Tool/打包测试当前场景 %#T")]
         public static void TestBuild()
         {
             if (!BuildPipeline.isBuildingPlayer)
