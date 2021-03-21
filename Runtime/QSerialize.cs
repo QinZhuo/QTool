@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
+using QTool.Reflection;
 namespace QTool.Serialize
 {
     public interface IQSerialize
@@ -140,19 +141,7 @@ namespace QTool.Serialize
     #endregion
     public static class QSerialize
     {
-        public static void ForeachMemeber(this Type type, Action<FieldInfo> fieldInfo, Action<PropertyInfo> propertyInfo = null)
-        {
-            FieldInfo[] fields = type.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-            foreach (var item in fields)
-            {
-                fieldInfo?.Invoke(item);
-            }
-            var infos = type.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-            foreach (var item in infos)
-            {
-                propertyInfo?.Invoke(item);
-            }
-        }
+      
         public static System.Byte[] Serialize<T>(this T value)
         {
             return SerializeType(value, typeof(T));
