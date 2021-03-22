@@ -188,6 +188,10 @@ namespace QTool
         public static string ToOneString<T>(this ICollection<T> array,string splitChar="\n")
         {
             var str = "";
+            if (array == null)
+            {
+                return str;
+            }
             foreach (var item in array)
             {
                 str += item + splitChar;
