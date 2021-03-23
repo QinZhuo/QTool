@@ -129,7 +129,6 @@ namespace QTool.Serialize
             if (!table.ContainsKey(type))
             {
                 var info = new QTypeInfo(type);
-                Debug.LogError("类型[" + type + "][" + info.state + "]");
                 table.Add(type, info);
 
             }

@@ -124,7 +124,7 @@ namespace QTool
         private void OnValidate()
         {
             if (Application.IsPlaying(gameObject)) return;
-            PrefabId = GetNewId(PrefabUID);
+            var newId = GetNewId(PrefabUID);
             if (!IsPrefabAssets)
             {
                 if (string.IsNullOrWhiteSpace(InstanceId))
@@ -136,7 +136,12 @@ namespace QTool
             {
                 InstanceId = "";
             }
-            UnityEditor.EditorUtility.SetDirty(this);
+            if (newId != PrefabId)
+            {
+                PrefabId = newId;
+                UnityEditor.EditorUtility.SetDirty(this);
+            }
+            
         }
         private string PrefabUID
         {
