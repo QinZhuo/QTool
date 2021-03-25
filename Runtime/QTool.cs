@@ -192,9 +192,11 @@ namespace QTool
             {
                 return str;
             }
+            int i=0;
             foreach (var item in array)
             {
-                str += item + splitChar;
+                str += item +(i!=array.Count-1? splitChar:"");
+                i++;
             }
             return str;
         }

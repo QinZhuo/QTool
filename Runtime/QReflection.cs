@@ -35,21 +35,33 @@ namespace QTool.Reflection
         }
         public override string ToString()
         {
-            return "ÊôÐÔ " + Name + "(" + Type + ")";
+            return   "var " + Name+" \t\t("+ Type+")"  ;
         }
     }
-    public class QFunctionBase : IKey<string>
+    public class QFunctionInfo : IKey<string>
     {
-        public string Key { get => Name; set => value = Name; }
+        public string Key { get => Name; set => Name = value; }
         public string Name { get; private set; }
         public List<Attribute> Attributes { get; private set; } = new List<Attribute>();
         public List<Type> ParamType { get; private set; } = new List<Type>();
-        public MethodBase MethodInfo { get; private set; }
-        public QFunctionBase(MethodBase info)
+        public Type ReturnType {
+            get
+            {
+                return MethodInfo.ReturnType;
+            }
+        }
+        public MethodInfo MethodInfo { get; private set; }
+        public Func<object, object[], object> Function { get; private set; }
+        public object Invoke(object target,params object[] param)
+        {
+            return Function?.Invoke(target,param);
+        }
+        public QFunctionInfo(MethodInfo info)
         {
             this.MethodInfo = info;
             Key = info.Name;
             var paramArray = info.GetParameters();
+            Function = info.Invoke;
             foreach (var param in paramArray)
             {
                 ParamType.Add(param.ParameterType);
@@ -57,20 +69,12 @@ namespace QTool.Reflection
         }
         public override string ToString()
         {
-            return "º¯Êý " + Name + "(" + ParamType.ToOneString(",") + ")";
+            return  "function " + Name + "(" + ParamType.ToOneString(",") + ") \t\t("+ ReturnType+")" ;
         }
-    }
-    public class QFunctionInfo :QFunctionBase
-    {
-        public QFunctionInfo(MethodInfo info) :base(info)
-        {
-            Function = info.Invoke;
-        }
-        public Func<object, object[], object> Function { get; private set; }
     }
     public class QTypeInfo<T>where T:QTypeInfo<T> ,new()
     {
-      
+        public string Name { get; private set; }
         public DicList<string, QMemeberInfo> Members = new DicList<string, QMemeberInfo>();
         public DicList<string, QFunctionInfo> Functions = new DicList<string, QFunctionInfo>();
         public bool IsList;
@@ -113,6 +117,7 @@ namespace QTool.Reflection
         }
         protected virtual void Init(Type type)
         {
+            Name = type.Name;
             Type = type;
             Code = Type.GetTypeCode(type);
             if (TypeCode.Object.Equals(Code))
@@ -127,27 +132,24 @@ namespace QTool.Reflection
                     ElementType = type.GetInterface(typeof(IList<>).FullName, true).GenericTypeArguments[0];
                     IsList = true;
                 }
-                else
+                if (Members != null)
                 {
-                    if (Members != null)
+                    type.ForeachMemeber((info) =>
                     {
-                        type.ForeachMemeber((info) =>
-                        {
-                            Members.Add(new QMemeberInfo(info));
-                        },
-                                          (info) =>
-                                          {
-                                              Members.Add(new QMemeberInfo(info));
-                                          }, MemberFlags);
-                    }
+                        Members.Add(new QMemeberInfo(info));
+                    },
+                    (info) =>
+                     {
+                         Members.Add(new QMemeberInfo(info));
+                     }, MemberFlags);
+                }
 
-                    if (Functions != null)
+                if (Functions != null)
+                {
+                    type.ForeachFunction((info) =>
                     {
-                        type.ForeachFunction((info) =>
-                        {
-                            Functions.Add(new QFunctionInfo(info));
-                        }, FunctionFlags);
-                    }
+                        Functions.Add(new QFunctionInfo(info));
+                    }, FunctionFlags);
                 }
             }
         }
@@ -162,6 +164,10 @@ namespace QTool.Reflection
                 table.Add(type, info);
             }
             return table[type];
+        }
+        public override string ToString()
+        {
+            return "Type " + Name + " \n{\n\t" + Members.ToOneString("\n\t") + "\n\t" + Functions.ToOneString("\n\t") + "}";
         }
     }
 
