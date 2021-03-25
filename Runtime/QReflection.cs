@@ -30,8 +30,14 @@ namespace QTool.Reflection
             MemeberInfo = info;
             Name = info.Name;
             Type = info.PropertyType;
-            Set = info.SetValue;
-            Get = info.GetValue;
+            if (info.SetMethod != null)
+            {
+                Set = info.SetValue;
+            }
+            if (info.GetMethod != null)
+            {
+                Get = info.GetValue;
+            }
         }
         public override string ToString()
         {
