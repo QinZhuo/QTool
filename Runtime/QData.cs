@@ -106,7 +106,7 @@ namespace QTool.Data
         public static T GetNew(string key)
         {
             var data = Get(key);
-            return FileManager.Deserialize<T>(FileManager.Serialize(data));
+            return FileManager.Copy(data);
         }
         public static T Get(string prefix, string key)
         {

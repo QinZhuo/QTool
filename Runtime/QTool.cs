@@ -329,6 +329,10 @@ namespace QTool
     }
     public class FileManager
     {
+        public static T Copy<T>(T target)
+        {
+            return Deserialize<T>(Serialize(target));
+        }
         public static Dictionary<string, XmlSerializer> xmlSerDic = new Dictionary<string, XmlSerializer>();
         public static XmlSerializer GetSerializer(Type type, params Type[] extraTypes)
         {

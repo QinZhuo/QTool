@@ -17,38 +17,19 @@ namespace QTool.Serialize
     {
         public bool dynamic = false;
     }
+    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property|AttributeTargets.Interface)]
     public class QSValueAttribute : Attribute
     {
 
     }
+    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property | AttributeTargets.Interface)]
     public class QSIgnoreAttribute : Attribute
     {
 
     }
     #region 类型数据
 
-    public class QMemeberInfo : IKey<string>
-    {
-        public string Key { get => Name; set => value = Name; }
-        public string Name;
-        public Type type;
-        public Action<object, object> set;
-        public Func<object, object> get;
-        public QMemeberInfo(FieldInfo info)
-        {
-            Name = info.Name;
-            type = info.FieldType;
-            set = info.SetValue;
-            get = info.GetValue;
-        }
-        public QMemeberInfo(PropertyInfo info)
-        {
-            Name = info.Name;
-            type = info.PropertyType;
-            set = info.SetValue;
-            get = info.GetValue;
-        }
-    }
+  
     public enum QTypeState
     {
         Normal,
@@ -57,82 +38,53 @@ namespace QTool.Serialize
         Dynamic,
         ISerialize,
     }
-    public class QTypeInfo
+    public class QSerializeType:QTypeInfo<QSerializeType>
     {
-        static bool IsQSValue(MemberInfo info, bool isPublic = true)
+        static bool IsQSValue(MemberInfo info)
         {
-            if (!isPublic && info.GetCustomAttribute<QSValueAttribute>() == null)
-            {
-                return false;
-            }
             if (info.GetCustomAttribute<QSIgnoreAttribute>() != null)
             {
                 return false;
             }
+            if (info.GetCustomAttribute<QSValueAttribute>() != null)
+            {
+                return true;
+            }
             return true;
         }
-        public DicList<string,QMemeberInfo> memberList = new DicList<string,QMemeberInfo>();
-        public bool IsList;
-        public Type ListType;
-        public Type ArrayType;
-        public Type type;
         public QTypeState state= QTypeState.Normal;
-        public int ArrayRank;
-        public int[] indexArray;
-        private QTypeInfo(Type type)
+        protected override void Init(Type type)
         {
-            this.type = type;
-            if (type.IsArray)
+            Functions = null;
+            base.Init(type);
+            if (Code == TypeCode.Object)
             {
-                state = QTypeState.Array;
-                ArrayRank = type.GetArrayRank();
-                ArrayType = type.GetElementType();
-                indexArray = new int[ArrayRank];
-                return;
-            }
-            if (typeof(IQSerialize).IsAssignableFrom(type))
-            {
-                state = QTypeState.ISerialize;
-                return;
-            }
-            var listInterFace = type.GetInterface(typeof(IList<>).FullName, true);
-            if (listInterFace != null)
-            {
-                ListType = listInterFace.GenericTypeArguments[0];
-                state = QTypeState.List;
-                return;
-            }
-
-            var qType = type.GetCustomAttribute<QTypeAttribute>();
-            if ((qType != null&& qType.dynamic) || type.IsInterface)
-            {
-                state = QTypeState.Dynamic;
-            }
-            type.ForeachMemeber((item) =>
-            {
-                if (IsQSValue(item, item.IsPublic))
+                if (typeof(IQSerialize).IsAssignableFrom(type))
                 {
-                    memberList.Add(new QMemeberInfo(item));
+                    state = QTypeState.ISerialize;
+                    return;
                 }
-            },
-            (item) =>
-            {
-                if (IsQSValue(item, item.Name != "Item" && item.CanRead && item.CanWrite && item.SetMethod.IsPublic && item.GetMethod.IsPublic))
+                else if (IsArray)
                 {
-                    memberList.Add(new QMemeberInfo(item));
+                    state = QTypeState.Array;
                 }
-            });
-        }
-        public static Dictionary<Type, QTypeInfo> table = new Dictionary<Type, QTypeInfo>();
-        public static QTypeInfo Get(Type type)
-        {
-            if (!table.ContainsKey(type))
-            {
-                var info = new QTypeInfo(type);
-                table.Add(type, info);
-
+                else if (IsList)
+                {
+                    state = QTypeState.List;
+                }
+                else
+                {
+                    var qType = Type.GetCustomAttribute<QTypeAttribute>();
+                    if ((qType != null && qType.dynamic) || type.IsInterface)
+                    {
+                        state = QTypeState.Dynamic;
+                    }
+                    Members.RemoveAll((info) =>
+                    {
+                        return !IsQSValue(info.MemeberInfo);
+                    });
+                }
             }
-            return table[type];
         }
 
     }
@@ -183,38 +135,14 @@ namespace QTool.Serialize
             }
         }
 
-        static Dictionary<string, Type> typeDic = new Dictionary<string, Type>();
-        public static Type ParseType(string typeString)
-        {
-            if (typeDic.ContainsKey(typeString))
-            {
-                return typeDic[typeString];
-            }
-            else
-            {
-                Type type = null;
-                Assembly[] assemblyArray = AppDomain.CurrentDomain.GetAssemblies();
-                int assemblyArrayLength = assemblyArray.Length;
-                for (int i = 0; i < assemblyArrayLength; ++i)
-                {
-                    type = assemblyArray[i].GetType(typeString);
-                    if (type != null)
-                    {
-                        typeDic.Add(typeString, type);
-                        return type;
-                    }
-                }
-            }
-            return null;
-
-        }
+       
         static object CreateInstance(Type type, object targetObj, params object[] args)
         {
             if (targetObj != null)
             {
                 return targetObj;
             }
-            return Activator.CreateInstance(type, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, args, null);
+            return Activator.CreateInstance(type, args);
         }
        
       
@@ -230,7 +158,7 @@ namespace QTool.Serialize
                         {
                             return writer;
                         }
-                        QTypeInfo typeInfo = QTypeInfo.Get(type);
+                        QSerializeType typeInfo = QSerializeType.Get(type);
                         switch (typeInfo.state)
                         {
                             case QTypeState.ISerialize:
@@ -241,7 +169,7 @@ namespace QTool.Serialize
                                 writer.Write(list.Count);
                                 foreach (var item in list)
                                 {
-                                    writer.WriteObjectType(item, typeInfo.ListType);
+                                    writer.WriteObjectType(item, typeInfo.ElementType);
                                 }
                                 break;
                             case QTypeState.Array:
@@ -251,7 +179,7 @@ namespace QTool.Serialize
                                 {
                                     writer.Write(array.GetLength(i));
                                 }
-                                ForeachArray(array, 0, typeInfo.indexArray, (indexArray) => { writer.WriteObjectType(array.GetValue(indexArray), typeInfo.ArrayType); });
+                                ForeachArray(array, 0, typeInfo.IndexArray, (indexArray) => { writer.WriteObjectType(array.GetValue(indexArray), typeInfo.ElementType); });
                                 break;
                             case QTypeState.Dynamic:
                             case QTypeState.Normal:
@@ -259,12 +187,12 @@ namespace QTool.Serialize
                                 {
                                     writer.Write(type.FullName);
                                 }
-                                writer.Write((byte)typeInfo.memberList.Count);
-                                foreach (var item in typeInfo.memberList)
+                                writer.Write((byte)typeInfo.Members.Count);
+                                foreach (var item in typeInfo.Members)
                                 {
                                     writer.Write(item.Name, LengthType.Byte);
-                                    var memberObj = item.get(value);
-                                    writer.Write(SerializeType(memberObj, item.type), LengthType.Byte);
+                                    var memberObj = item.Get(value);
+                                    writer.Write(SerializeType(memberObj, item.Type), LengthType.Byte);
                                 }
                                 break;
                             default:
@@ -338,12 +266,12 @@ namespace QTool.Serialize
             {
 
                 case TypeCode.Object:
-                    QTypeInfo typeInfo = null;
+                    QSerializeType typeInfo = null;
                     if (reader.IsEnd)
                     {
                         return null;
                     }
-                    typeInfo = QTypeInfo.Get(type);
+                    typeInfo = QSerializeType.Get(type);
                     switch (typeInfo.state)
                     {
                        
@@ -356,11 +284,11 @@ namespace QTool.Serialize
                                 {
                                     if (list.Count > i)
                                     {
-                                        list[i] = reader.ReadObjectType(typeInfo.ListType, list[i]);
+                                        list[i] = reader.ReadObjectType(typeInfo.ElementType, list[i]);
                                     }
                                     else
                                     {
-                                        list.Add(reader.ReadObjectType(typeInfo.ListType));
+                                        list.Add(reader.ReadObjectType(typeInfo.ElementType));
                                     }
 
                                 }
@@ -372,17 +300,17 @@ namespace QTool.Serialize
                                 var count = 1;
                                 for (int i = 0; i < rank; i++)
                                 {
-                                    typeInfo.indexArray[i] = reader.ReadInt32();
-                                    count *= typeInfo.indexArray[i];
+                                    typeInfo.IndexArray[i] = reader.ReadInt32();
+                                    count *= typeInfo.IndexArray[i];
                                 }
                                 var array = (Array)CreateInstance(type, target, count);
-                                ForeachArray(array, 0, typeInfo.indexArray, (indexArray) =>
+                                ForeachArray(array, 0, typeInfo.IndexArray, (indexArray) =>
                                 {
                                     var obj = array.GetValue(indexArray); if (obj == null)
                                     {
                                         Debug.LogError(indexArray.ToOneString() + " 数据为空[" + target + "]");
                                     }
-                                    array.SetValue(reader.ReadObjectType(typeInfo.ArrayType, array.GetValue(indexArray)), indexArray);
+                                    array.SetValue(reader.ReadObjectType(typeInfo.ElementType, array.GetValue(indexArray)), indexArray);
                                 });
                                 return array;
                             }
@@ -405,10 +333,10 @@ namespace QTool.Serialize
                                 {
                                     var name = reader.ReadString(LengthType.Byte);
                                     var bytes = reader.ReadBytes(LengthType.Byte);
-                                    if (typeInfo.memberList.ContainsKey(name))
+                                    if (typeInfo.Members.ContainsKey(name))
                                     {
-                                        var memeberInfo = typeInfo.memberList[name];
-                                        memeberInfo.set.Invoke(obj, DeserializeType(bytes, memeberInfo.type, target != null ? memeberInfo.get?.Invoke(target) : null));
+                                        var memeberInfo = typeInfo.Members[name];
+                                        memeberInfo.Set.Invoke(obj, DeserializeType(bytes, memeberInfo.Type, target != null ? memeberInfo.Get?.Invoke(target) : null));
                                     }
                                 }
                                 return obj;
