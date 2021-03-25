@@ -117,7 +117,7 @@ namespace QTool.Reflection
                 }
             }
         }
-        protected virtual void Init(Type type)
+        protected void Init(Type type,Func<QMemeberInfo,bool> memeberCheck,Func<QFunctionInfo,bool> functionCheck)
         {
             Name = type.Name;
             Type = type;
@@ -136,24 +136,41 @@ namespace QTool.Reflection
                 }
                 if (Members != null)
                 {
+                    QMemeberInfo memeber=null;
                     type.ForeachMemeber((info) =>
                     {
-                        Members.Add(new QMemeberInfo(info));
+                        memeber = new QMemeberInfo(info);
+                        if (memeberCheck == null || memeberCheck(memeber))
+                        {
+                            Members.Add(memeber);
+                        }
                     },
                     (info) =>
-                     {
-                         Members.Add(new QMemeberInfo(info));
-                     }, MemberFlags);
+                    {
+                        memeber = new QMemeberInfo(info);
+                        if (memeberCheck==null||memeberCheck(memeber))
+                        {
+                            Members.Add(memeber);
+                        }
+                    }, MemberFlags);
                 }
 
                 if (Functions != null)
                 {
                     type.ForeachFunction((info) =>
                     {
-                        Functions.Add(new QFunctionInfo(info));
+                        var function = new QFunctionInfo(info);
+                        if (functionCheck==null| functionCheck(function))
+                        {
+                            Functions.Add(function);
+                        }
                     }, FunctionFlags);
                 }
             }
+        }
+        protected virtual void Init(Type type)
+        {
+            Init(type,null,null);
         }
         static Type[] defaultCreatePrams = new Type[0];
         public static Dictionary<Type, T> table = new Dictionary<Type, T>();
