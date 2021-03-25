@@ -47,7 +47,7 @@ namespace QTool.Reflection
     public class QFunctionInfo : IKey<string>
     {
         public string Key { get => Name; set => Name = value; }
-        public string Name { get;  set; }
+        public string Name { get; private set; }
         public ParameterInfo[] ParamType { get; private set; }
         public Type ReturnType {
             get
@@ -57,7 +57,7 @@ namespace QTool.Reflection
         }
         public MethodInfo MethodInfo { get; private set; }
         public Func<object, object[], object> Function { get; private set; }
-        public Attribute Attribute { get; private set; }
+        public Attribute Attribute { get;  set; }
         public object Invoke(object target,params object[] param)
         {
             return Function?.Invoke(target,param);
