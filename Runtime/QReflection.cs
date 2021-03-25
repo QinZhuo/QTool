@@ -15,7 +15,7 @@ namespace QTool.Reflection
         public Type Type { get; private set; }
         public Action<object, object> Set { get; private set; }
         public Func<object, object> Get { get; private set; }
-        public Attribute Attribute { get; private set; }
+        public Attribute Attribute { get; set; }
         public MemberInfo MemeberInfo { get; private set; }
         public QMemeberInfo(FieldInfo info)
         {
@@ -47,7 +47,7 @@ namespace QTool.Reflection
     public class QFunctionInfo : IKey<string>
     {
         public string Key { get => Name; set => Name = value; }
-        public string Name { get; private set; }
+        public string Name { get;  set; }
         public ParameterInfo[] ParamType { get; private set; }
         public Type ReturnType {
             get
