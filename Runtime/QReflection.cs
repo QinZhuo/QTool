@@ -43,7 +43,7 @@ namespace QTool.Reflection
         public string Key { get => Name; set => Name = value; }
         public string Name { get; private set; }
         public List<Attribute> Attributes { get; private set; } = new List<Attribute>();
-        public List<Type> ParamType { get; private set; } = new List<Type>();
+        public ParameterInfo[] ParamType { get; private set; }
         public Type ReturnType {
             get
             {
@@ -60,12 +60,8 @@ namespace QTool.Reflection
         {
             this.MethodInfo = info;
             Key = info.Name;
-            var paramArray = info.GetParameters();
+            ParamType = info.GetParameters();
             Function = info.Invoke;
-            foreach (var param in paramArray)
-            {
-                ParamType.Add(param.ParameterType);
-            }
         }
         public override string ToString()
         {
