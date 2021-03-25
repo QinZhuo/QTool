@@ -15,7 +15,7 @@ namespace QTool.Reflection
         public Type Type { get; private set; }
         public Action<object, object> Set { get; private set; }
         public Func<object, object> Get { get; private set; }
-        public List<Attribute> Attributes { get; private set; } = new List<Attribute>();
+        public Attribute Attribute { get; private set; }
         public MemberInfo MemeberInfo { get; private set; }
         public QMemeberInfo(FieldInfo info)
         {
@@ -48,7 +48,6 @@ namespace QTool.Reflection
     {
         public string Key { get => Name; set => Name = value; }
         public string Name { get; private set; }
-        public List<Attribute> Attributes { get; private set; } = new List<Attribute>();
         public ParameterInfo[] ParamType { get; private set; }
         public Type ReturnType {
             get
@@ -58,6 +57,7 @@ namespace QTool.Reflection
         }
         public MethodInfo MethodInfo { get; private set; }
         public Func<object, object[], object> Function { get; private set; }
+        public Attribute Attribute { get; private set; }
         public object Invoke(object target,params object[] param)
         {
             return Function?.Invoke(target,param);
@@ -117,7 +117,7 @@ namespace QTool.Reflection
                 }
             }
         }
-        protected void Init(Type type,Func<QMemeberInfo,bool> memeberCheck,Func<QFunctionInfo,bool> functionCheck)
+        protected void CheckInit(Type type,Func<QMemeberInfo,bool> memeberCheck,Func<QFunctionInfo,bool> functionCheck)
         {
             Name = type.Name;
             Type = type;
@@ -170,7 +170,7 @@ namespace QTool.Reflection
         }
         protected virtual void Init(Type type)
         {
-            Init(type,null,null);
+            CheckInit(type,null,null);
         }
         static Type[] defaultCreatePrams = new Type[0];
         public static Dictionary<Type, T> table = new Dictionary<Type, T>();
