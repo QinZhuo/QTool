@@ -81,7 +81,7 @@ namespace QTool.Serialize
                     }
                     Members.RemoveAll((info) =>
                     {
-                        return !IsQSValue(info.MemeberInfo);
+                        return !IsQSValue(info.MemeberInfo)||info.Set==null||info.Get==null;
                     });
                 }
             }
