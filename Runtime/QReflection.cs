@@ -160,7 +160,7 @@ namespace QTool.Reflection
                     type.ForeachFunction((info) =>
                     {
                         var function = new QFunctionInfo(info);
-                        if (functionCheck==null| functionCheck(function))
+                        if (functionCheck==null|| functionCheck(function))
                         {
                             Functions.Add(function);
                         }
