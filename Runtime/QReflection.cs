@@ -10,7 +10,7 @@ namespace QTool.Reflection
 
     public class QMemeberInfo : IKey<string>
     {
-        public string Key { get => Name; set => value = Name; }
+        public string Key { get => Name; set => Name=value; }
         public string Name { get; private set; }
         public Type Type { get; private set; }
         public Action<object, object> Set { get; private set; }
