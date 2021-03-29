@@ -149,14 +149,14 @@ namespace QTool.Binary
         {
             return (T)this.ReadObjectType(typeof(T),targetObj);
         }
-        public override void PoolReset()
+        public override void OnPoolReset()
         {
         }
         public void Recover()
         {
             Push(this);
         }
-        public override void PoolRecover()
+        public override void OnPoolRecover()
         {
             index = 0;
         }
@@ -291,11 +291,11 @@ namespace QTool.Binary
             return this.WriteObjectType(value,typeof(T)); 
         }
 
-        public override void PoolReset()
+        public override void OnPoolReset()
         {
 
         }
-        public override void PoolRecover()
+        public override void OnPoolRecover()
         {
             byteList.Clear();
         }

@@ -81,13 +81,17 @@ namespace QTool
         {
             return Pool.Push(obj);
         }
-        public abstract void PoolRecover();
-        public abstract void PoolReset();
+        public void Recover()
+        {
+            Pool.Push(this as T);
+        }
+        public abstract void OnPoolRecover();
+        public abstract void OnPoolReset();
     }
     public interface IPoolObj
     {
-        void PoolReset();
-        void PoolRecover();
+        void OnPoolReset();
+        void OnPoolRecover();
     }
     public abstract class PoolBase
     {
@@ -125,11 +129,11 @@ namespace QTool
                     gameObj.SetActive(true);
                     foreach (var poolObj in gameObj.GetComponents<IPoolObj>())
                     {
-                        poolObj.PoolReset();
+                        poolObj.OnPoolReset();
                     }
                 }
             }
-            else if (isPoolObj) (obj as IPoolObj).PoolReset();
+            else if (isPoolObj) (obj as IPoolObj).OnPoolReset();
             return obj;
         }
         private static Dictionary<string, Transform> parentList = new Dictionary<string, Transform>();
@@ -164,12 +168,12 @@ namespace QTool
                 gameObj.transform.SetParent(GetPoolParent(Key));
                 foreach (var poolObj in gameObj.GetComponents<IPoolObj>())
                 {
-                    poolObj.PoolRecover();
+                    poolObj.OnPoolRecover();
                 }
             }
             else if (isPoolObj)
             {
-                (obj as IPoolObj).PoolRecover();
+                (obj as IPoolObj).OnPoolRecover();
 
             }
             return obj;
@@ -212,7 +216,7 @@ namespace QTool
         {
             if (AllPool.Contains(obj))
             {
-                if (isPoolObj) (obj as IPoolObj).PoolRecover();
+                if (isPoolObj) (obj as IPoolObj).OnPoolRecover();
                 CanUsePool.Push(CheckPush(obj));
                 return null;
             }
