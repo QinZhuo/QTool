@@ -5,83 +5,10 @@ using UnityEngine;
 using System;
 namespace QTool
 {
-    //public interface IGameSave : IQSerialize
-    //{
-    //    string InstanceId { get; }
-    //    string PrefabId { get; }
-    //}
+   
     public static class QIdExtends
     {
-        //public static BinaryWriter SaveGameObject<T>(this BinaryWriter writer, ICollection<T> objList) where T : MonoBehaviour, IQSerialize
-        //{
-        //    return writer.Save(objList, (a) => { return  a.GetQId().idInfo ; });
-        //}
-
-        //public static BinaryWriter SaveObject<T>(this BinaryWriter writer, ICollection<T> objList) where T : class, IGameSave
-        //{
-        //    return writer.Save(objList, (a) => { return new QIdInfo(a) ; });
-        //}
-
-        //public static BinaryWriter SaveGameObject<T,InitT>(this BinaryWriter writer, ICollection<T> objList,System.Func<T, InitT> InitInfoGet) where T : MonoBehaviour, IQSerialize where InitT:QIdInfo, new ()
-        //{
-        //    return writer.Save(objList, InitInfoGet);
-        //}
-        //public static BinaryWriter SaveObject<T, InitT>(this BinaryWriter writer, ICollection<T> objList, System.Func<T, InitT> InitInfoGet ) where T :class, IGameSave where InitT : QIdInfo, new()
-        //{
-        //    return writer.Save(objList, InitInfoGet);
-        //}
-
-        //private static BinaryWriter Save<T,InitT>(this BinaryWriter writer, ICollection<T> objList, System.Func<T,InitT> InitInfoGet) where T : IQSerialize where InitT:QIdInfo, new()
-        //{
-        //    writer.Write(objList.Count);
-        //    foreach (var obj in objList)
-        //    {
-        //        writer.WriteObject(InitInfoGet(obj));
-        //        writer.WriteObject(obj);
-        //    }
-        //    return writer;
-        //}
-        //public static BinaryReader LoadObject<T>(this BinaryReader reader, ICollection<T> objList, Func<QIdInfo, T> createFunc, Action<T> destoryFunc = null) where T : class, IGameSave
-        //{
-        //    return reader.Load(objList, (a)=> new QIdInfo(a), createFunc, destoryFunc);
-        //}
-        //public static BinaryReader LoadObject<T,InitT>(this BinaryReader reader, ICollection<T> objList, Func<T, InitT> InitInfoGet, Func<InitT, T> createFunc, Action<T> destoryFunc ) where T : class, IGameSave where InitT : QIdInfo,new()
-        //{
-        //    return reader.Load(objList, InitInfoGet, createFunc, destoryFunc);
-        //}
-        //public static BinaryReader LoadGameObject<T>(this BinaryReader reader, ICollection<T> objList, Func<QIdInfo, T> createFunc, Action<T> destoryFunc = null) where T : MonoBehaviour, IQSerialize
-        //{
-        //    return reader.Load(objList, (a)=> a.GetQId().idInfo, createFunc, destoryFunc);
-        //}
-        //public static BinaryReader LoadGameObject<T,InitT>(this BinaryReader reader,ICollection<T> objList, Func<T, InitT> InitInfoGet ,Func<InitT, T> createFunc,Action<T> destoryFunc) where T : MonoBehaviour, IQSerialize where InitT : QIdInfo, new()
-        //{
-        //    return reader.Load(objList, InitInfoGet, createFunc, destoryFunc);
-        //}
-        //private static BinaryReader Load<T,InitT>(this BinaryReader reader, ICollection<T> objList, Func<T, InitT> InitInfoGet, Func<InitT,T> createFunc,Action<T> destoryFunc) where InitT : QIdInfo, new()
-        //{
-        //    var desoryList = new List<T>(objList);
-        //    var count = reader.ReadInt32();
-        //    for (int i = 0; i < count; i++)
-        //    {
-        //        var initInfo = reader.ReadObject<InitT>();
-        //        if (objList.ContainsKey(initInfo.InstanceId,(a)=> InitInfoGet(a).InstanceId))
-        //        {
-        //            var obj = objList.Get(initInfo.InstanceId, (a) => InitInfoGet(a).InstanceId);
-        //            reader.ReadObject(obj);
-        //            desoryList.Remove(obj);
-        //        }
-        //        else
-        //        {
-        //            var newObj = createFunc(initInfo);
-        //            reader.ReadObject(newObj);
-        //        }
-        //    }
-        //    foreach (var item in desoryList)
-        //    {
-        //        destoryFunc?.Invoke(item);
-        //    }
-        //    return reader;
-        //}
+      
 
 
         public static QId GetQId(this MonoBehaviour mono)
@@ -102,21 +29,6 @@ namespace QTool
             return obj.GetComponent<QId>();
         }
     }
-    //[System.Serializable]
-    //public class QIdInfo
-    //{
-    //    public string PrefabId;
-    //    public string InstanceId;
-    //    public QIdInfo()
-    //    {
-
-    //    }
-    //    public QIdInfo(IGameSave gameSave)
-    //    {
-    //        PrefabId = gameSave.PrefabId;
-    //        InstanceId = gameSave.InstanceId;
-    //    }
-    //}
     [DisallowMultipleComponent]
     public class QId : MonoBehaviour,IKey<string>
     {
@@ -124,63 +36,59 @@ namespace QTool
         private void OnValidate()
         {
             if (Application.IsPlaying(gameObject)) return;
-            var newId = GetNewId(PrefabUID);
-            if (!IsPrefabAssets)
+
+            InitId();
+        }
+        private void SetPrefabId(string id)
+        {
+            if (id != PrefabId)
+            {
+                PrefabId = id;
+                UnityEditor.EditorUtility.SetDirty(this);
+            }
+        }
+        private void SetInstanceId(string id)
+        {
+            if (id != InstanceId)
+            {
+                InstanceId = id;
+                UnityEditor.EditorUtility.SetDirty(this);
+            }
+        }
+        private void InitId()
+        {
+            if (IsPrefabAssets)
+            {
+                SetPrefabId(UnityEditor.AssetDatabase.AssetPathToGUID(UnityEditor.AssetDatabase.GetAssetPath(gameObject)));
+                SetInstanceId("");
+            }
+            else if (IsPrefabInstance)
             {
                 if (string.IsNullOrWhiteSpace(InstanceId))
                 {
-                    InstanceId = GetNewId();
+                    SetInstanceId(GetNewId());
+                }
+                var prefab = UnityEditor.PrefabUtility.GetCorrespondingObjectFromSource(gameObject);
+                if (prefab == null)
+                {
+                    Debug.LogError(gameObject + " 找不到预制体引用");
+                }
+                else
+                {
+                    SetPrefabId( UnityEditor.AssetDatabase.AssetPathToGUID(UnityEditor.AssetDatabase.GetAssetPath(prefab)));
                 }
             }
             else
             {
-                InstanceId = "";
-            }
-            if (newId != PrefabId)
-            {
-                PrefabId = newId;
-                UnityEditor.EditorUtility.SetDirty(this);
-            }
-            
-        }
-        private string PrefabUID
-        {
-            get
-            {
-                if (IsPrefabAssets)
-                {
-                    var id= UnityEditor.AssetDatabase.AssetPathToGUID(UnityEditor.AssetDatabase.GetAssetPath(gameObject)); ;
-                 //   Debug.LogError("是预制体"+id);
-                    return id;
-                }
-                else if (IsPrefabInstance)
-                {
-                
-                    var prefab = UnityEditor.PrefabUtility.GetCorrespondingObjectFromSource(gameObject);
-                    if (prefab == null)
-                    {
-                        Debug.LogError(gameObject + " 找不到预制体引用");
-                        return null;
-                    }
-                    else
-                    {
-                        var id= UnityEditor.AssetDatabase.AssetPathToGUID(UnityEditor.AssetDatabase.GetAssetPath(prefab));
-                     //   Debug.LogError("是预制体实例"+ id);
-                        return id;
-                    }
-                }
-                else
-                {
-                    Debug.LogError(gameObject + " 不是一个预制体物体");
-                    return null;
-                }
+                SetPrefabId("");
+                SetInstanceId("");
             }
         }
         private bool IsPrefabInstance
         {
             get
             {
-                return UnityEditor.PrefabUtility.IsPartOfPrefabInstance(gameObject);
+                return UnityEditor.PrefabUtility.IsPartOfPrefabInstance(gameObject) || UnityEditor.PrefabUtility.IsPartOfVariantPrefab(gameObject);
             }
         }
         private bool IsPrefabAssets
