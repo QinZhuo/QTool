@@ -3,19 +3,46 @@ using System.Collections.Generic;
 using UnityEngine;
 namespace QTool
 {
-    public static class PoolManager
+    public class ToolDebug : DebugBase<ToolDebug>
     {
+
+    }
+    public class DebugBase<T> where T:DebugBase<T>
+    {
+        static bool Init = false;
+        static bool _show=false;
         public static bool ShowLog
         {
             get
             {
-                return PlayerPrefs.GetInt("PoolManager日志", 0) == 1;
+                if (!Init)
+                {
+                    Init = true;
+                    _show = PlayerPrefs.GetInt("PoolManager日志", 0) == 1;
+                }
+                return _show;
             }
             set
             {
+                if (!Init)
+                {
+                    Init = true;
+                }
+                _show = value;
                 PlayerPrefs.SetInt("PoolManager日志", value ? 1 : 0);
             }
         }
+        public static void Log(object log)
+        {
+            if (ShowLog)
+            {
+                Debug.Log(log);
+            }
+        }
+    }
+    public static class PoolManager
+    {
+      
      
         static Dictionary<string, PoolBase> poolDic = new Dictionary<string, PoolBase>();
 
@@ -103,7 +130,6 @@ namespace QTool
         public List<T> AllPool = new List<T>();
         public List<string> stackTrace = new List<string>();
         List<T> CanUsePool = new List<T>();
-        public bool debugStack = false;
         T CheckGet(T obj)
         {
 
@@ -178,29 +204,25 @@ namespace QTool
             }
             return obj;
         }
-        public virtual T Get()
+        public  T Get()
         {
-            var getStackTrace = debugStack ? new System.Diagnostics.StackTrace().ToString() : "";
             if (CanUsePool.Count > 0)
             {
                 var index = AllPool.IndexOf(CanUsePool.StackPeek());
-                stackTrace[index] = getStackTrace;
                 var obj = CanUsePool.Pop();
                 return CheckGet(obj);
             }
             else
             {
+        
                 var obj = newFunc();
                 AllPool.Add(obj);
-                stackTrace.Add(getStackTrace);
-                if (PoolManager.ShowLog)
-                {
-                    UnityEngine.Debug.Log("【" + Key + "】对象池当前池大小：" + AllCount);
-                }
+                UnityEngine.Debug.Log("输出" + CanUsePool.Count+"/"+AllCount);
+                ToolDebug.Log("【" + Key + "】对象池当前池大小：" + AllCount);
                 return CheckGet(obj);
             }
         }
-        public virtual T Get(T obj)
+        public  T Get(T obj)
         {
             if (CanUsePool.Contains(obj))
             {
@@ -212,7 +234,7 @@ namespace QTool
                 return Get();
             }
         }
-        public virtual T Push(T obj)
+        public  T Push(T obj)
         {
             if (AllPool.Contains(obj))
             {
