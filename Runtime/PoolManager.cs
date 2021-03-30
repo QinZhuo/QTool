@@ -64,7 +64,7 @@ namespace QTool
             return obj;
         }
     }
-    public abstract class PoolObject<T>:IPoolObj where T : PoolObject<T>,new()
+    public abstract class PoolObject<T>:IPoolObject where T : PoolObject<T>,new()
     {
         public static ObjectPool<T> Pool
         {
@@ -88,7 +88,7 @@ namespace QTool
         public abstract void OnPoolRecover();
         public abstract void OnPoolReset();
     }
-    public interface IPoolObj
+    public interface IPoolObject
     {
         void OnPoolReset();
         void OnPoolRecover();
@@ -127,13 +127,13 @@ namespace QTool
                 if (gameObj != null)
                 {
                     gameObj.SetActive(true);
-                    foreach (var poolObj in gameObj.GetComponents<IPoolObj>())
+                    foreach (var poolObj in gameObj.GetComponents<IPoolObject>())
                     {
                         poolObj.OnPoolReset();
                     }
                 }
             }
-            else if (isPoolObj) (obj as IPoolObj).OnPoolReset();
+            else if (isPoolObj) (obj as IPoolObject).OnPoolReset();
             return obj;
         }
         private static Dictionary<string, Transform> parentList = new Dictionary<string, Transform>();
@@ -166,14 +166,14 @@ namespace QTool
             {
                 gameObj.SetActive(false);
                 gameObj.transform.SetParent(GetPoolParent(Key));
-                foreach (var poolObj in gameObj.GetComponents<IPoolObj>())
+                foreach (var poolObj in gameObj.GetComponents<IPoolObject>())
                 {
                     poolObj.OnPoolRecover();
                 }
             }
             else if (isPoolObj)
             {
-                (obj as IPoolObj).OnPoolRecover();
+                (obj as IPoolObject).OnPoolRecover();
 
             }
             return obj;
@@ -216,7 +216,7 @@ namespace QTool
         {
             if (AllPool.Contains(obj))
             {
-                if (isPoolObj) (obj as IPoolObj).OnPoolRecover();
+                if (isPoolObj) (obj as IPoolObject).OnPoolRecover();
                 CanUsePool.Push(CheckPush(obj));
                 return null;
             }
