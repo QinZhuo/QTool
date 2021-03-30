@@ -64,7 +64,7 @@ namespace QTool
             return obj;
         }
     }
-    public abstract class PoolObj<T>:IPoolObj where T : PoolObj<T>,new()
+    public abstract class PoolObject<T>:IPoolObj where T : PoolObject<T>,new()
     {
         public static ObjectPool<T> Pool
         {

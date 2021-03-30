@@ -13,7 +13,7 @@ namespace QTool.Binary
 {
 
  
-    public class BinaryReader:PoolObj<BinaryReader>
+    public class BinaryReader:PoolObject<BinaryReader>
     {
         public BinaryReader Reset(byte[] bytes)
         {
@@ -162,7 +162,7 @@ namespace QTool.Binary
         }
 
     }
-    public class BinaryWriter : PoolObj<BinaryWriter>
+    public class BinaryWriter : PoolObject<BinaryWriter>
     {
         public List<byte> byteList { protected set; get; } = new List<byte>();
         public void Clear()
