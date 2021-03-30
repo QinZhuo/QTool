@@ -216,7 +216,6 @@ namespace QTool
         
                 var obj = newFunc();
                 AllPool.Add(obj);
-                UnityEngine.Debug.Log("输出" + CanUsePool.Count+"/"+AllCount);
                 ToolDebug.Log("【" + Key + "】对象池当前池大小：" + AllCount);
                 return CheckGet(obj);
             }
