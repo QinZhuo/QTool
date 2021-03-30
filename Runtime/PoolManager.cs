@@ -128,7 +128,6 @@ namespace QTool
     {
         public string Key { get; set; }
         public List<T> AllPool = new List<T>();
-        public List<string> stackTrace = new List<string>();
         List<T> CanUsePool = new List<T>();
         T CheckGet(T obj)
         {
