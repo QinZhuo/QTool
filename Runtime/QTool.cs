@@ -52,14 +52,39 @@ namespace QTool
     {
         KeyType Key { get; set; }
     }
-    public class DicList<KeyType,T>:List<T> where T : class, IKey<KeyType>
+    [System.Serializable]
+    public class QKeyValue<TKey, T> : IKey<TKey>
     {
-        Dictionary<KeyType, T> dic = new Dictionary<KeyType, T>();
-        public virtual T Get(KeyType key)
+        public TKey Key { get;set; }
+        public T Value { get;set; }
+        public override string ToString()
         {
-            return this.Get<T, KeyType>(key); 
+            return "{" + Key + ":" + Value + "}";
         }
-        public T this[KeyType key]
+    }
+    public class QDcitionary<TKey, T> : QAutoList<TKey, QKeyValue<TKey, T>>
+    {
+        public new T this[TKey key]
+        {
+            get
+            {
+                var keyValue= base[key];
+                return keyValue.Value;
+            }
+            set
+            {
+                base[key].Value=value;
+            }
+        }
+    }
+    public class QList<TKey,T>:List<T> where T : IKey<TKey>
+    {
+        Dictionary<TKey, T> dic = new Dictionary<TKey, T>();
+        public virtual T Get(TKey key)
+        {
+            return this.Get<T, TKey>(key); 
+        }
+        public T this[TKey key]
         {
             get
             {
@@ -95,7 +120,7 @@ namespace QTool
             dic.Clear();
         }
     }
-    public class AutoDicList<KeyType, T> : DicList<KeyType,T> where T : class, IKey<KeyType>, new()
+    public class QAutoList<KeyType, T> : QList<KeyType,T> where T :IKey<KeyType>, new()
     {
         public override T Get(KeyType key)
         {
@@ -200,12 +225,16 @@ namespace QTool
             }
             return str;
         }
-        public static bool ContainsKey<T, KeyType>(this ICollection<T> array, KeyType key) where T : class, IKey<KeyType>
+        public static bool ContainsKey<T, KeyType>(this ICollection<T> array, KeyType key) where T :  IKey<KeyType>
         {
             return array.ContainsKey(key, (item) =>item.Key);
         }
         public static bool ContainsKey<T, KeyType>(this ICollection<T> array, KeyType key, Func<T, KeyType> keyGetter) 
         {
+            if (key==null)
+            {
+                return false;
+            }
             foreach (var value in array)
             {
                 if (key.Equals(keyGetter(value)))
@@ -215,12 +244,16 @@ namespace QTool
             }
             return false;
         }
-        public static T Get<T, KeyType>(this ICollection<T> array, KeyType key) where T : class, IKey<KeyType>
+        public static T Get<T, KeyType>(this ICollection<T> array, KeyType key) where T : IKey<KeyType>
         {
             return array.Get(key,(item)=>item.Key);
         }
         public static T Get<T, KeyType>(this ICollection<T> array, KeyType key,Func<T,KeyType> keyGetter) 
         {
+            if (key == null)
+            {
+                return default;
+            }
             foreach (var value in array)
             {
                 if (value == null) continue;
@@ -231,7 +264,7 @@ namespace QTool
             }
             return default;
         }
-        public static List<T> GetList<T, KeyType>(this ICollection<T> array, KeyType key, List<T> tempList = null) where T : class, IKey<KeyType>
+        public static List<T> GetList<T, KeyType>(this ICollection<T> array, KeyType key, List<T> tempList = null) where T :IKey<KeyType>
         {
             var list = tempList == null ? new List<T>() : tempList;
             foreach (var value in array)
@@ -243,51 +276,51 @@ namespace QTool
             }
             return list;
         }
-        public static T StackPeek<T>(this IList<T> array) where T : class
+        public static T StackPeek<T>(this IList<T> array) 
         {
             if (array == null || array.Count == 0)
             {
-                return null;
+                return default;
             }
             return array[array.Count - 1];
         }
-        public static T QueuePeek<T>(this IList<T> array) where T : class
+        public static T QueuePeek<T>(this IList<T> array) 
         {
             if (array == null || array.Count == 0)
             {
-                return null;
+                return default;
             }
             return array[0];
         }
-        public static void Enqueue<T>(this IList<T> array, T obj) where T : class
+        public static void Enqueue<T>(this IList<T> array, T obj) 
         {
             array.Add(obj);
         }
-        public static void Push<T>(this IList<T> array, T obj) where T : class
+        public static void Push<T>(this IList<T> array, T obj) 
         {
             array.Add(obj);
         }
-        public static T Pop<T>(this IList<T> array) where T : class
+        public static T Pop<T>(this IList<T> array)
         {
             if (array == null || array.Count == 0)
             {
-                return null;
+                return default;
             }
             var obj = array.StackPeek();
             array.RemoveAt(array.Count - 1);
             return obj;
         }
-        public static T Dequeue<T>(this IList<T> array) where T : class
+        public static T Dequeue<T>(this IList<T> array)
         {
             if (array == null || array.Count == 0)
             {
-                return null;
+                return default;
             }
             var obj = array.QueuePeek();
             array.RemoveAt(0);
             return obj;
         }
-        public static void AddCheckExist<T>(this IList<T> array, params T[] objs) where T : class
+        public static void AddCheckExist<T>(this IList<T> array, params T[] objs)
         {
             foreach (var obj in objs)
             {
@@ -298,7 +331,7 @@ namespace QTool
             }
         }
       
-        public static void RemoveKey<T, KeyType>(this ICollection<T> array, KeyType key) where T : class, IKey<KeyType>
+        public static void RemoveKey<T, KeyType>(this ICollection<T> array, KeyType key) where T : IKey<KeyType>
         {
             var old = array.Get(key);
             if (old != null)
@@ -306,14 +339,14 @@ namespace QTool
                 array.Remove(old);
             }
         }
-        public static void Set<T, KeyType>(this ICollection<T> array, KeyType key, T value) where T : class, IKey<KeyType>
+        public static void Set<T, KeyType>(this ICollection<T> array, KeyType key, T value) where T : IKey<KeyType>
         {
             array.RemoveKey(key);
             value.Key = key;
             array.Add(value);
         }
 
-        public static T GetAndCreate<T, KeyType>(this ICollection<T> array, KeyType key, System.Action<T> creatCallback = null) where T : class, IKey<KeyType>, new()
+        public static T GetAndCreate<T, KeyType>(this ICollection<T> array, KeyType key, System.Action<T> creatCallback = null) where T :IKey<KeyType>, new()
         {
            var value= array.Get(key);
             if (value != null)

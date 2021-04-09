@@ -20,12 +20,12 @@ namespace QTool.Data
         #region 基础属性
 
         [XmlElement("关键名")]
-        public virtual string Key { get; set; }
+        public string Key { get; set; }
 
         #endregion
 
         #region 数据表相关
-        public static DicList<string, T> list = new DicList<string, T>();
+        public static QList<string, T> list = new QList<string, T>();
         public static string TableType
         {
             get
@@ -62,7 +62,7 @@ namespace QTool.Data
 
         public static void ClearTable()
         {
-            loadOverFile.Clear();
+            _loadOverFile.Clear();
             list.Clear();
         }
         public static void Set(T newData)
@@ -135,7 +135,6 @@ namespace QTool.Data
         {
             return Application.dataPath + "/" + GetSubPath(key);
         }
-        static List<string> loadOverFile = new List<string>();
 
         public static void DeletePlayerData(string key="")
         {
@@ -153,7 +152,7 @@ namespace QTool.Data
         }
         public static void SaveDefaultStaticTable(T DefaultData=null,string key="")
         {
-            DicList<string, T> list = new DicList<string, T>();
+            QList<string, T> list = new QList<string, T>();
             list.Add(DefaultData==null?new T():DefaultData);
             var path = GetStaticTablePath(key);
             var xmlStr = FileManager.Serialize(list);
@@ -178,17 +177,17 @@ namespace QTool.Data
         }
         static void LoadPath(string path,string key)
         {
-            if (loadOverFile.Contains(path))
+            if (LoadOver(path,true))
             {
+                InvokeLoadOver(path);
                 return;
             }
-            loadOverFile.Add(path);
             try
             {
                 var data = FileManager.Load(path);
                 if (data != null)
                 {
-                    var loadList = FileManager.Deserialize<DicList<string, T>>(data);
+                    var loadList = FileManager.Deserialize<QList<string, T>>(data);
                     foreach (var item in loadList)
                     {
                         Set(key, item);
@@ -212,34 +211,48 @@ namespace QTool.Data
         static IEnumerator AsyncLoad(string key="")
         {
             var path = AsyncloadPath(key);
-            if (loadOverFile.Contains(path))
+            if (LoadOver(path,true))
             {
+                InvokeLoadOver(key);
                 yield break;
-            }
-            else
-            {
-                loadOverFile.Add(path);
             }
             Addressables.LoadAssetAsync<TextAsset>(path).Completed += (result) =>
             {
-                Set(key, FileManager.Deserialize<DicList<string, T>>(result.Result.text));
-                Debug.Log(TableName + "加载数据：" + list.Count);
-                var loadKey = LoadOverKey(key);
-                if (OnAsyncLoadOver.ContainsKey(loadKey))
-                {
-                    OnAsyncLoadOver[loadKey]?.Invoke();
-                    OnAsyncLoadOver[loadKey] = null;
-                }
+                var newList = FileManager.Deserialize<QList<string, T>>(result.Result.text);
+                Set(key, newList);
+                Debug.Log(TableName + "加载数据：" + newList.ToOneString());
+                InvokeLoadOver(key);
             };
         }
-        public static Dictionary<string,System.Action> OnAsyncLoadOver=new Dictionary<string, Action>();
-        static string LoadOverKey(string key)
+        static void InvokeLoadOver(string key)
+        {
+            var loadKey = GetLoadOverKey(key);
+            if (OnAsyncLoadOver.ContainsKey(loadKey))
+            {
+                OnAsyncLoadOver[loadKey]?.Invoke();
+                OnAsyncLoadOver[loadKey] = null;
+            }
+        }
+        static List<string> _loadOverFile = new List<string>();
+        static string GetLoadOverKey(string key)
         {
             return string.IsNullOrWhiteSpace(key) ? "基础表" : key;
         }
+        public static bool LoadOver(string key,bool writeOver=false)
+        {
+            var loadOverKey = GetLoadOverKey(key);
+            var loadOver= _loadOverFile.Contains(loadOverKey);
+            if (writeOver && !loadOver)
+            {
+                _loadOverFile.Add(loadOverKey);
+            }
+            return loadOver;
+        }
+        public static Dictionary<string,System.Action> OnAsyncLoadOver=new Dictionary<string, Action>();
+    
         public static void AsyncCheckRun(System.Action action,string key="")
         {
-             key = LoadOverKey(key);
+             key = GetLoadOverKey(key);
             if (OnAsyncLoadOver.ContainsKey(key))
             {
                 OnAsyncLoadOver[key] += action;

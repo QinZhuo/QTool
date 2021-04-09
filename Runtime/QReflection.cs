@@ -77,8 +77,8 @@ namespace QTool.Reflection
     public class QTypeInfo<T>where T:QTypeInfo<T> ,new()
     {
         public string Name { get; private set; }
-        public DicList<string, QMemeberInfo> Members = new DicList<string, QMemeberInfo>();
-        public DicList<string, QFunctionInfo> Functions = new DicList<string, QFunctionInfo>();
+        public QList<string, QMemeberInfo> Members = new QList<string, QMemeberInfo>();
+        public QList<string, QFunctionInfo> Functions = new QList<string, QFunctionInfo>();
         public bool IsList;
         public Type ElementType { get; private set; }
         public Type Type { get; private set; }
