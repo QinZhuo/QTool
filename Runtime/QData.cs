@@ -201,28 +201,20 @@ namespace QTool.Data
             }
           
         }
-       
-
-#if Addressables
-        public static string AsyncloadPath(string key="")
+        static List<string> _loadOverFile = new List<string>();
+        static string GetLoadOverKey(string key)
         {
-            return "Assets/" + GetSubPath(key);
+            return string.IsNullOrWhiteSpace(key) ? "基础表" : key;
         }
-        static IEnumerator AsyncLoad(string key="")
+        public static bool LoadOver(string key, bool writeOver = false)
         {
-            var path = AsyncloadPath(key);
-            if (LoadOver(path,true))
+            var loadOverKey = GetLoadOverKey(key);
+            var loadOver = _loadOverFile.Contains(loadOverKey);
+            if (writeOver && !loadOver)
             {
-                InvokeLoadOver(key);
-                yield break;
+                _loadOverFile.Add(loadOverKey);
             }
-            Addressables.LoadAssetAsync<TextAsset>(path).Completed += (result) =>
-            {
-                var newList = FileManager.Deserialize<QList<string, T>>(result.Result.text);
-                Set(key, newList);
-                Debug.Log(TableName + "加载数据：" + newList.ToOneString());
-                InvokeLoadOver(key);
-            };
+            return loadOver;
         }
         static void InvokeLoadOver(string key)
         {
@@ -233,35 +225,51 @@ namespace QTool.Data
                 OnAsyncLoadOver[loadKey] = null;
             }
         }
-        static List<string> _loadOverFile = new List<string>();
-        static string GetLoadOverKey(string key)
+        public static void LoadOverRun(System.Action action, string key = "")
         {
-            return string.IsNullOrWhiteSpace(key) ? "基础表" : key;
-        }
-        public static bool LoadOver(string key,bool writeOver=false)
-        {
-            var loadOverKey = GetLoadOverKey(key);
-            var loadOver= _loadOverFile.Contains(loadOverKey);
-            if (writeOver && !loadOver)
+            key = GetLoadOverKey(key);
+            if (LoadOver(key))
             {
-                _loadOverFile.Add(loadOverKey);
-            }
-            return loadOver;
-        }
-        public static Dictionary<string,System.Action> OnAsyncLoadOver=new Dictionary<string, Action>();
-    
-        public static void AsyncCheckRun(System.Action action,string key="")
-        {
-             key = GetLoadOverKey(key);
-            if (OnAsyncLoadOver.ContainsKey(key))
-            {
-                OnAsyncLoadOver[key] += action;
+                action?.Invoke();
             }
             else
             {
-                OnAsyncLoadOver.Add(key, action);
+                if (OnAsyncLoadOver.ContainsKey(key))
+                {
+                    OnAsyncLoadOver[key] += action;
+                }
+                else
+                {
+                    OnAsyncLoadOver.Add(key, action);
+                }
             }
+           
         }
+#if Addressables
+        public static string AsyncloadPath(string key="")
+        {
+            return "Assets/" + GetSubPath(key);
+        }
+        static IEnumerator AsyncLoad(string key="")
+        {
+            var path = AsyncloadPath(key);
+            if (LoadOver(path,true))
+            {
+                yield break;
+            }
+            Addressables.LoadAssetAsync<TextAsset>(path).Completed += (result) =>
+            {
+                var newList = FileManager.Deserialize<QList<string, T>>(result.Result.text);
+                Set(key, newList);
+                Debug.Log(TableName + "加载数据：" + newList.ToOneString());
+                InvokeLoadOver(key);
+            };
+        }
+      
+  
+        public static Dictionary<string,System.Action> OnAsyncLoadOver=new Dictionary<string, Action>();
+    
+     
         public static IEnumerator AsyncLoadList(params string[] keys)
         {
             if (keys.Length == 0)
