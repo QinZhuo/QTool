@@ -57,6 +57,15 @@ namespace QTool
     {
         public TKey Key { get;set; }
         public T Value { get;set; }
+        public QKeyValue()
+        {
+           
+        }
+        public QKeyValue(TKey key,T value)
+        {
+            Key = key;
+            Value = value;
+        }
         public override string ToString()
         {
             return "{" + Key + ":" + Value + "}";
