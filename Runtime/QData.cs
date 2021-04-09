@@ -177,7 +177,7 @@ namespace QTool.Data
         }
         static void LoadPath(string path,string key)
         {
-            if (LoadOver(path,true))
+            if (LoadOver(key, true))
             {
                 InvokeLoadOver(path);
                 return;
@@ -254,7 +254,7 @@ namespace QTool.Data
         static IEnumerator AsyncLoad(string key="")
         {
             var path = AsyncloadPath(key);
-            if (LoadOver(path,true))
+            if (LoadOver(key, true))
             {
                 yield break;
             }
