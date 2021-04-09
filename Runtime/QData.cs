@@ -216,13 +216,14 @@ namespace QTool.Data
             }
             return loadOver;
         }
+        static Dictionary<string, System.Action> LoadOverCallBack = new Dictionary<string, Action>();
         static void InvokeLoadOver(string key)
         {
             var loadKey = GetLoadOverKey(key);
-            if (OnAsyncLoadOver.ContainsKey(loadKey))
+            if (LoadOverCallBack.ContainsKey(loadKey))
             {
-                OnAsyncLoadOver[loadKey]?.Invoke();
-                OnAsyncLoadOver[loadKey] = null;
+                LoadOverCallBack[loadKey]?.Invoke();
+                LoadOverCallBack[loadKey] = null;
             }
         }
         public static void LoadOverRun(System.Action action, string key = "")
@@ -234,13 +235,13 @@ namespace QTool.Data
             }
             else
             {
-                if (OnAsyncLoadOver.ContainsKey(key))
+                if (LoadOverCallBack.ContainsKey(key))
                 {
-                    OnAsyncLoadOver[key] += action;
+                    LoadOverCallBack[key] += action;
                 }
                 else
                 {
-                    OnAsyncLoadOver.Add(key, action);
+                    LoadOverCallBack.Add(key, action);
                 }
             }
            
@@ -265,10 +266,6 @@ namespace QTool.Data
                 InvokeLoadOver(key);
             };
         }
-      
-  
-        public static Dictionary<string,System.Action> OnAsyncLoadOver=new Dictionary<string, Action>();
-    
      
         public static IEnumerator AsyncLoadList(params string[] keys)
         {
