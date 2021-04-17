@@ -269,7 +269,7 @@ namespace QTool
         public ObjectPool(Func<T> newFunc, string poolName)
         {
             var type = typeof(T);
-            isPoolObj = type.IsAssignableFrom(typeof(IPoolObject));
+            isPoolObj = typeof(IPoolObject).IsAssignableFrom(type);
             isMonobehaviour = type.IsSubclassOf(typeof(MonoBehaviour));
             isGameObject = type == typeof(GameObject);
             this.newFunc = newFunc;
