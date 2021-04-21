@@ -280,9 +280,10 @@ namespace QTool
         public bool isGameObject = false;
         public ObjectPool(Func<T> newFunc, string poolName)
         {
-            isPoolObj = typeof(T).GetInterface("IPoolObj") != null;
-            isMonobehaviour = typeof(T).IsSubclassOf(typeof(MonoBehaviour));
-            isGameObject = typeof(T) == typeof(GameObject);
+            var type = typeof(T);
+            isPoolObj = typeof(IPoolObject).IsAssignableFrom(type);
+            isMonobehaviour = type.IsSubclassOf(typeof(MonoBehaviour));
+            isGameObject = type == typeof(GameObject);
             this.newFunc = newFunc;
             this.Key = poolName;
         }
