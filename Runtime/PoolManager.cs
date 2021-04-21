@@ -43,8 +43,8 @@ namespace QTool
     public static class PoolManager
     {
       
-     
-        static Dictionary<string, PoolBase> poolDic = new Dictionary<string, PoolBase>();
+        
+        static QDcitionary<string, PoolBase> poolDic = new QDcitionary<string, PoolBase>();
 
         public static GameObject Get(string poolKey ,GameObject prefab)
         {
@@ -67,16 +67,24 @@ namespace QTool
             }
             if (poolDic.ContainsKey(key))
             {
-                return poolDic[key] as ObjectPool<T>;
+                if(poolDic[key] is ObjectPool<T>)
+                {
+                    return poolDic[key] as ObjectPool<T>;
+                }
+                else
+                {
+                    throw new Exception("已存在重名不同类型对象池" + poolDic[key]);
+                }
+                    
             }
             else if (newFunc == null)
             {
-                return null;
+                throw new Exception("不能以空的创建函数初始化对象池[" + poolName+"]");
             }
             else
             {
                 var pool = new ObjectPool<T>(newFunc, key);
-                poolDic.Add(key, pool);
+                poolDic[key]= pool;
                 return pool;
             }
         }
@@ -122,11 +130,15 @@ namespace QTool
     }
     public abstract class PoolBase
     {
-
+        public string Key { get; set; }
+        public override string ToString()
+        {
+            var type = GetType();
+            return "对象池["+ Key + "](" + type.Name + (type.IsGenericType ? "<" + type.GenericTypeArguments[0] + ">":"")+")";
+        }
     }
     public class ObjectPool<T> : PoolBase where T : class
     {
-        public string Key { get; set; }
         public List<T> AllPool = new List<T>();
         List<T> CanUsePool = new List<T>();
         T CheckGet(T obj)
