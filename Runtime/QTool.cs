@@ -123,6 +123,10 @@ namespace QTool
             base.Remove(obj);
             dic.Remove(obj.Key);
         }
+        public void RemoveKey(TKey key)
+        {
+            Remove(this[key]);
+        }
         public new void Clear()
         {
             base.Clear();
