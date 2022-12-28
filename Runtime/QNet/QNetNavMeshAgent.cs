@@ -32,11 +32,14 @@ namespace QTool.Net
 				foreach (var other in AllAgents)
 				{
 					if (other == this || other.radius == 0) continue;
+					var minDis = radius + other.radius;
 					var dir = transform.position-other.transform.position ;
-					var minDis = (radius + other.radius) * (radius + other.radius);
-					if (dir.sqrMagnitude < minDis)
+					if (Mathf.Abs(dir.x) < minDis || Mathf.Abs(dir.y) < minDis)
 					{
-						transform.position += dir.normalized * (radius + other.radius - dir.magnitude);
+						if (dir.sqrMagnitude < minDis * minDis)
+						{
+							transform.position += dir.normalized * (radius + other.radius - dir.magnitude);
+						}
 					}
 				}
 			}
