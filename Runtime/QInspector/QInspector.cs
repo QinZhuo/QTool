@@ -42,6 +42,7 @@ namespace QTool
 		public string funcKey;
 		public QEnumAttribute(string GetKeyListFunc = "")
 		{
+			order = 1;
 			this.funcKey = GetKeyListFunc;
 		}
 	}

@@ -16,7 +16,10 @@ namespace QTool.Inspector
 	{
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
-			label.text = property.QName();
+			if (label.text == property.displayName)
+			{
+				label.text = property.QName();
+			}
 			property.Draw(position, label);
 		}
 		public override float GetPropertyHeight(SerializedProperty property, GUIContent label)

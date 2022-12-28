@@ -994,7 +994,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1342849157534090733, guid: e3b8399edb6b7064e8f550458a54bdd3, type: 3}
       propertyPath: toggleTest
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e3b8399edb6b7064e8f550458a54bdd3, type: 3}
