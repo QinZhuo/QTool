@@ -1,0 +1,15 @@
+
+#pragma kernel CSMain
+static const int ThreadsCount = 8;
+
+RWStructuredBuffer<float> floatBuffer;
+int	Size;
+int	GetIndex(uint3 id) {
+	return id.x + id.y * Size + id.z * Size * Size;
+}
+
+[numthreads(ThreadsCount, ThreadsCount, ThreadsCount)]
+void CSMain(uint3 id : SV_DispatchThreadID) 
+{
+	floatBuffer[GetIndex(id)] =0;
+}

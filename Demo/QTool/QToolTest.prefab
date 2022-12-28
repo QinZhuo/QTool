@@ -1,0 +1,110 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &1342849157534090732
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1342849157534090730}
+  - component: {fileID: 1342849157534090733}
+  - component: {fileID: 1342849157534090728}
+  m_Layer: 0
+  m_Name: QToolTest
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1342849157534090730
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1342849157534090732}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1342849157534090733
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1342849157534090732}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 95d366b0a182c444894ed30a0337ed81, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  index: 0
+  test1:
+    rect:
+      serializedVersion: 2
+      x: 123
+      y: 3
+      width: 4
+      height: 5
+    testEnume: 6
+    list:
+    - 4747
+    - 159
+    - 56
+    asdl: 797
+    p2: 234
+    array: 7b27
+    child:
+      list:
+      - 456345
+      - 345
+      - 45645
+      asdl: 456
+  test2:
+    rect:
+      serializedVersion: 2
+      x: 123
+      y: 3
+      width: 4
+      height: 5
+    testEnume: 6
+    list:
+    - 4747
+    - 159
+    - 56
+    asdl: 797
+    p2: 234
+    array: 7b27
+    child:
+      list: []
+      asdl: 
+  testTimes: 100
+  commandStr: "\u9519\u8BEF\u65E5\u5FD7 123"
+  QDataStr: "1\t2\t3\nalsk\t\t\t\tjd\nas\tkjk\t\"asdj\nwe\""
+--- !u!114 &1342849157534090728
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1342849157534090732}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e2e87a97a41a41b4aad68048e7e1df1a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  graphAsset: {fileID: -6006106194802908165, guid: a0d9f6ede066d8f4daf44e5324cf9b1d, type: 3}
+  graph:
+    SerializeString: '{"QTool.FlowGraph.QFlowGraph":{"Name":"","NodeList":[],"Values":[]}}'
+  test1111:
+    testGraph:
+      SerializeString: '{"QTool.FlowGraph.QFlowGraph":{"Name":"","NodeList":[],"Values":[]}}'
+    qFlows:
+    - SerializeString: '{"QTool.FlowGraph.QFlowGraph":{"Name":"","NodeList":[],"Values":[]}}'
+    - SerializeString: '{"QTool.FlowGraph.QFlowGraph":{"Name":"","NodeList":[],"Values":[]}}'

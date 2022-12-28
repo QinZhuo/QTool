@@ -1,0 +1,25 @@
+{
+    "name": "QToolEditor",
+    "rootNamespace": "",
+    "references": [
+        "GUID:8c4295a259d9a934784fb95a11fa9e58",
+        "GUID:69448af7b92c7f342b298e06a37122aa"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [
+        {
+            "name": "com.unity.addressables",
+            "expression": "",
+            "define": "Addressable"
+        }
+    ],
+    "noEngineReferences": false
+}
