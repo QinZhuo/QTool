@@ -384,6 +384,7 @@ namespace QTool.Reflection
 		}
 		public static bool OperaterEqual(this object a, object b)
 		{
+			
 			return Equals(a, b)|| a.ToComputeFloat() == b.ToComputeFloat();
 		}
 		public static T GetAttribute<T>(this ICustomAttributeProvider info) where T :Attribute

@@ -255,13 +255,15 @@ namespace QTool
 					return sum;
 				}
 			}
-			if (value.GetType().IsValueType)
+			switch (Convert.GetTypeCode(value))
 			{
-				return Convert.ToSingle(value);
-			}
-			else
-			{
-				return value.GetHashCode();
+				case TypeCode.DBNull:
+				case TypeCode.Empty:
+					return 0;
+				case TypeCode.Object:
+					return value.GetHashCode();
+				default:
+					return Convert.ToSingle(value);
 			}
 		}
 		public static async void RunTimeCheck(string name, System.Action action, Func<int> getLength = null, Func<string> getInfo = null)
