@@ -38,21 +38,22 @@ namespace QTool.Net
 	public enum DefaultNetAction
 	{
 		PlayerConnected,
+		SyncCheck,
 	}
 	public sealed class QNetManager : InstanceBehaviour<QNetManager>
 	{
 		[QEnum,QName("传输方式")]
 		public QNetTransport transport;
-		[QName("同步频率")]
+		[QName("网络帧率"),SerializeField]
 		[Range(15,60)]
-		public int syncFps = 10;
+		private int netFps = 30;
 		public System.Random Random { get; private set; } = null;
 		protected override void Awake()
 		{
 			base.Awake();
 			Application.runInBackground = true;
 			Physics.autoSimulation = false;
-			Time.fixedDeltaTime = 1f / syncFps;
+			Time.fixedDeltaTime = 1f / netFps;
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
 			QToolManager.Instance.OnGUIEvent += GUI;
 #endif
@@ -150,6 +151,19 @@ namespace QTool.Net
 								var player = eventData.Value?.ToString();
 								ServerPlayers[id] = player;
 								QDebug.Log("["+ServerIndex + "] 添加玩家[" + id + "][" + player+"]");
+							}
+							break;
+						case nameof(DefaultNetAction.SyncCheck):
+							{
+								var flag =(int)eventData.Value;
+								if (flag == SyncCheckFlag)
+								{
+									QDebug.Log("["+id + "]同步验证通过["+flag+"]");
+								}
+								else
+								{
+									Debug.LogError("[" + id + "]同步验证失败[" + flag + "]:[" + SyncCheckFlag + "]");
+								}
 							}
 							break;
 						default:
@@ -286,6 +300,7 @@ namespace QTool.Net
 									}
 								}
 								break;
+							case nameof(DefaultNetAction.SyncCheck):break;
 							case nameof(ServerSeed):
 								{
 									Random = new System.Random((int)eventData.Value);
@@ -302,6 +317,12 @@ namespace QTool.Net
 				Physics.Simulate(Time.fixedDeltaTime);
 				ClientIndex++;
 				NetTime += NetDeltaTime;
+				if (ClientIndex%1000==0)
+				{
+					SyncCheckFlag = 0;
+					OnSyncCheck?.Invoke();
+					PlayerAction(transport.ClientPlayerId, nameof(DefaultNetAction.SyncCheck), SyncCheckFlag);
+				}
 			}
 			if (ClientGameData.ContainsKey(ClientIndex + 1))
 			{
@@ -313,7 +334,9 @@ namespace QTool.Net
 			}
 
 		}
-		public event Action OnNetUpdate=null;
+		internal event Action OnNetUpdate=null;
+		public int SyncCheckFlag = 0;
+		public event Action OnSyncCheck = null;
 		#endregion
 
 		private void FixedUpdate()

@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 41579844808977863}
   - component: {fileID: 41579844808977860}
   - component: {fileID: 41579844808977912}
-  - component: {fileID: 6954046408471459501}
+  - component: {fileID: 6685567726894317027}
   m_Layer: 0
   m_Name: QNetTestPlayer
   m_TagString: Untagged
@@ -61,7 +61,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   bulletPrefab: {fileID: 5305219301813369725, guid: d2d439b036af7f54f861fd13e68a2b58, type: 3}
   Score: 0
---- !u!114 &6954046408471459501
+  controller: {fileID: 0}
+--- !u!114 &6685567726894317027
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

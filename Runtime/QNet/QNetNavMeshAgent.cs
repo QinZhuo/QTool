@@ -9,6 +9,12 @@ namespace QTool.Net
 		[Min(0)]
 		public float radius =0.5f;
 		private static List<QNetNavMeshAgent> AllAgents = new List<QNetNavMeshAgent>();
+		public override void OnSyncCheck()
+		{
+			QNetManager.Instance.SyncCheckFlag ^= (int)transform.position.x;
+			QNetManager.Instance.SyncCheckFlag ^= (int)transform.position.y;
+			QNetManager.Instance.SyncCheckFlag ^= (int)transform.position.z;
+		}
 		private void OnEnable()
 		{
 			AllAgents.Add(this);
@@ -44,6 +50,7 @@ namespace QTool.Net
 				}
 			}
 		}
+
 	}
 }
 
