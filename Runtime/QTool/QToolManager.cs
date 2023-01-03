@@ -27,9 +27,11 @@ namespace QTool
 		public int FPS => (int)Fps.SecondeSum;
 		QAverageValue Fps = new QAverageValue();
 		bool UsingCommmond = false;
+		int CommondTypeIndex = 0;
 		int CommondIndex = 0;
-		List<string> Commonds = new List<string>();
-		object[] CommondObjs = null;
+		List<string> Types = new List<string>();
+		QDictionary<string, List<string>> Commonds = new QDictionary<string, List<string>>((key)=>new List<string>());
+		object[] CommondObjs = new object[0];
 		public void InitCommond()
 		{
 			if (Commonds.Count == 0)
@@ -38,7 +40,16 @@ namespace QTool
 				{
 					if (kv.Value.IsStringCommond)
 					{
-						Commonds.Add(kv.Key);
+						if(kv.Value.name.SplitTowString("/",out var start,out var end))
+						{
+							Types.AddCheckExist(start);
+							Commonds[start].AddCheckExist(kv.Key);
+						}
+						//else if(kv.Value.fullName.SplitTowString("/", out start, out end))
+						//{
+						//	Types.AddCheckExist(start);
+						//	Commonds[start].Add(end);
+						//}
 					}
 				}
 			}
@@ -59,45 +70,54 @@ namespace QTool
 				{
 					GUI.Box(new Rect(0, 0, Screen.width, Screen.height), "");
 					GUI.Box(new Rect(0, 0, Screen.width, Screen.height), "");
+					GUILayout.BeginArea(new Rect(0, 0, Screen.width, Screen.height));
 					InitCommond();
-					var newIndex = GUILayout.SelectionGrid(CommondIndex, Commonds.ToArray(), 10);
-					if (newIndex != CommondIndex)
+					CommondTypeIndex = GUILayout.Toolbar(CommondTypeIndex, Types.ToArray());
+					if(CommondIndex>= Commonds[Types[CommondTypeIndex]].Count)
 					{
-						CommondIndex = newIndex;
-						CommondObjs = new object[QCommand.NameDictionary[Commonds[CommondIndex]].paramInfos.Length];
+						CommondIndex = 0;
+					}
+					CommondIndex = GUILayout.SelectionGrid(CommondIndex, Commonds[Types[CommondTypeIndex]].ToArray(), 10);
+					var name = Commonds[Types[CommondTypeIndex]][CommondIndex];
+					if (QCommand.NameDictionary[name].paramInfos!=null&&CommondObjs.Length!= QCommand.NameDictionary[name].paramInfos.Length)
+					{
+						CommondObjs = new object[QCommand.NameDictionary[name].paramInfos.Length];
 					}
 					GUILayout.FlexibleSpace();
 					using (new GUILayout.HorizontalScope())
 					{
-						GUILayout.Label(Commonds[CommondIndex]);
-						for (int i = 0; i < QCommand.NameDictionary[Commonds[CommondIndex]].paramInfos.Length; i++)
+						GUILayout.Label(name);
+						if (QCommand.NameDictionary[name].paramInfos != null)
 						{
-							var p = QCommand.NameDictionary[Commonds[CommondIndex]].paramInfos[i];
-							if (CommondObjs[i] == null)
+							for (int i = 0; i < CommondObjs.Length && i < QCommand.NameDictionary[name].paramInfos.Length; i++)
 							{
-								CommondObjs[i] = p.DefaultValue;
-							}
-
-							if (p.ParameterType == typeof(int) || p.ParameterType == typeof(float))
-							{
-								var newText = GUILayout.TextField(CommondObjs[i]?.ToString(),20);
-								if (float.TryParse(newText, out var value))
+								var p = QCommand.NameDictionary[name].paramInfos[i];
+								if (CommondObjs[i] == null)
 								{
-									CommondObjs[i] = value;
+									CommondObjs[i] = p.DefaultValue;
+								}
+
+								if (p.ParameterType == typeof(int) || p.ParameterType == typeof(float))
+								{
+									var newText = GUILayout.TextField(CommondObjs[i]?.ToString(), 20);
+									if (float.TryParse(newText, out var value))
+									{
+										CommondObjs[i] = value;
+									}
+									else
+									{
+										CommondObjs[i] = 0;
+									}
+								}
+								else if (p.ParameterType == typeof(string) || p.ParameterType == typeof(object))
+								{
+									var newText = GUILayout.TextField(CommondObjs[i]?.ToString(), 20);
+									CommondObjs[i] = newText;
 								}
 								else
 								{
-									CommondObjs[i] = 0;
+									GUILayout.Label(CommondObjs[i]?.ToString());
 								}
-							}
-							else if (p.ParameterType == typeof(string) || p.ParameterType == typeof(object))
-							{
-								var newText = GUILayout.TextField(CommondObjs[i]?.ToString(), 20);
-								CommondObjs[i] = newText;
-							}
-							else
-							{
-								GUILayout.Label(CommondObjs[i]?.ToString());
 							}
 						}
 					}
@@ -105,8 +125,9 @@ namespace QTool
 					{
 						QTime.RevertScale(nameof(QCommand));
 						UsingCommmond = false;
-						QCommand.NameDictionary[Commonds[CommondIndex]].Invoke(CommondObjs);
+						QCommand.NameDictionary[name].Invoke(CommondObjs);
 					}
+					GUILayout.EndArea();
 				}
 				else if (QDemo.Ctrl && QDemo.Enter)
 				{
@@ -115,7 +136,10 @@ namespace QTool
 				}
 #endif
 			}
-			catch { }
+			catch (Exception e)
+			{
+				Debug.LogError("GUI绘制出错：" + e.ToShortString(1000));
+			}
 		}
 	}
     public abstract class QToolManagerBase<T>:MonoBehaviour where T : QToolManagerBase<T>
