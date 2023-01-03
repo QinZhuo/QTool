@@ -79,20 +79,24 @@ namespace QTool
 					}
 					CommondIndex = GUILayout.SelectionGrid(CommondIndex, Commonds[Types[CommondTypeIndex]].ToArray(), 10);
 					var name = Commonds[Types[CommondTypeIndex]][CommondIndex];
-					GUILayout.FlexibleSpace();
-					using (new GUILayout.HorizontalScope())
+					if (QCommand.NameDictionary[name].paramInfos != null&&CommondParams.Count!= QCommand.NameDictionary[name].paramInfos.Length)
 					{
-						GUILayout.Label(name);
-						if (QCommand.NameDictionary[name].paramInfos != null)
+						CommondParams.Clear();
+					}
+					GUILayout.FlexibleSpace();
+					GUILayout.Label(name);
+					if (QCommand.NameDictionary[name].paramInfos != null)
+					{
+						for (int i = 0; i < QCommand.NameDictionary[name].paramInfos.Length; i++)
 						{
-							for (int i = 0;i < QCommand.NameDictionary[name].paramInfos.Length; i++)
+							var p = QCommand.NameDictionary[name].paramInfos[i];
+							if (CommondParams[i].IsNullOrEmpty())
 							{
-								var p = QCommand.NameDictionary[name].paramInfos[i];
-								if (CommondParams[i].IsNullOrEmpty())
-								{
-									CommondParams[i] = p.DefaultValue.ToQDataType(p.ParameterType);
-								}
-								GUILayout.Label(QCommand.NameDictionary[name].paramViewNames[i] + ":");
+								CommondParams[i] = p.DefaultValue.ToQDataType(p.ParameterType);
+							}
+							using (new GUILayout.HorizontalScope())
+							{
+								GUILayout.Label("    " + QCommand.NameDictionary[name].paramViewNames[i] + ":");
 								CommondParams[i] = GUILayout.TextField(CommondParams[i], 20);
 							}
 						}
