@@ -60,7 +60,6 @@ namespace QTool
 					GUI.Box(new Rect(0, 0, Screen.width, Screen.height), "");
 					GUI.Box(new Rect(0, 0, Screen.width, Screen.height), "");
 					InitCommond();
-					GUILayout.BeginArea(new Rect(0, 0, Screen.width, Screen.height));
 					var newIndex = GUILayout.SelectionGrid(CommondIndex, Commonds.ToArray(), 10);
 					if (newIndex != CommondIndex)
 					{
@@ -108,7 +107,6 @@ namespace QTool
 						UsingCommmond = false;
 						QCommand.NameDictionary[Commonds[CommondIndex]].Invoke(CommondObjs);
 					}
-					GUILayout.EndArea();
 				}
 				else if (QDemo.Ctrl && QDemo.Enter)
 				{
