@@ -231,11 +231,11 @@ namespace QTool
 		{
 			try
 			{
-				if (LanguageFont[key] != null)
+				if (LanguageFont[Language] != null)
 				{
 					foreach (var text in GetComponentsInChildren<Text>())
 					{
-						text.font = LanguageFont[key];
+						text.font = LanguageFont[Language];
 					}
 				}
 			}
