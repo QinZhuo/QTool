@@ -15,7 +15,6 @@ namespace QTool
 	}
 	public class QTranslate : MonoBehaviour
 	{
-
 		public static QList<string, QTranslateKey> TranslateKeys = new QList<string, QTranslateKey>
 		{
 			new QTranslateKey
@@ -173,18 +172,22 @@ namespace QTool
         public StringEvent OnTranslateChange;
         private void Awake()
         {
+			QEventManager.Register<string>(nameof(QTranslate) + "_语言", FreshFont);
 			QEventManager.Register<string>(nameof(QTranslate) + "_语言", CheckFresh);
-        }
+		}
         private void Start()
-        {
-            CheckFresh();
+		{
+			FreshFont();
+			CheckFresh();
         }
         private void OnDestroy()
         {
+			QEventManager.UnRegister<string>(nameof(QTranslate) + "_语言", FreshFont);
 			QEventManager.UnRegister<string>(nameof(QTranslate) + "_语言", CheckFresh);
         }
 
-        public static string Translate(string value,string language="")
+		public static QDictionary<string, Font> LanguageFont = new QDictionary<string, Font>();
+		public static string Translate(string value,string language="")
         {
 			if (string.IsNullOrEmpty(value)) { return value; }
 			if (language.IsNullOrEmpty()) language = GlobalLanguage;
@@ -224,7 +227,23 @@ namespace QTool
 		{
 			CheckFresh();
 		}
-
+		private void FreshFont(string key=default)
+		{
+			try
+			{
+				if (LanguageFont[key] != null)
+				{
+					foreach (var text in GetComponentsInChildren<Text>())
+					{
+						text.font = LanguageFont[key];
+					}
+				}
+			}
+			catch (System.Exception e)
+			{
+				Debug.LogError("字体更改出错"+e.ToShortString());
+			}
+		}
         private void CheckFresh(string key=null)
         {
             if (curValue != value)

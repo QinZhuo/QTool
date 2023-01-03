@@ -53,6 +53,7 @@ namespace QTool.Net
 			base.Awake();
 			Application.runInBackground = true;
 			Physics.autoSimulation = false;
+			Physics.autoSyncTransforms = false;
 			Time.fixedDeltaTime = 1f / netFps;
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
 			QToolManager.Instance.OnGUIEvent += GUI;
@@ -315,6 +316,7 @@ namespace QTool.Net
 				}
 				OnNetUpdate?.Invoke();
 				Physics.Simulate(Time.fixedDeltaTime);
+				Physics.SyncTransforms();
 				ClientIndex++;
 				NetTime += NetDeltaTime;
 				if (ClientIndex%1000==0)

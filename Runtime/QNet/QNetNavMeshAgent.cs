@@ -15,18 +15,14 @@ namespace QTool.Net
 			QNetManager.Instance.SyncCheckFlag ^= (int)transform.position.y;
 			QNetManager.Instance.SyncCheckFlag ^= (int)transform.position.z;
 		}
-		private void OnEnable()
-		{
-			AllAgents.Add(this);
-		}
-		private void OnDisable()
+		public override void OnNetDestroy()
 		{
 			AllAgents.Remove(this);
 		}
 		public override void OnNetStart()
 		{
+			AllAgents.Add(this);
 		}
-
 		public override void OnNetUpdate()
 		{
 			if (NavMesh.SamplePosition(transform.position, out var hitInfo, 2, NavMesh.AllAreas))
@@ -39,16 +35,17 @@ namespace QTool.Net
 				{
 					if (other == this || other.radius == 0) continue;
 					var minDis = radius + other.radius;
-					var dir = transform.position-other.transform.position ;
-					if (Mathf.Abs(dir.x) < minDis || Mathf.Abs(dir.y) < minDis)
+					var dir = (transform.position-other.transform.position) ;
+					if (Mathf.Abs(dir.x) < minDis || Mathf.Abs(dir.y) < minDis)  
 					{
-						if (dir.sqrMagnitude < minDis * minDis)
+						if (dir.sqrMagnitude< (minDis * minDis))
 						{
-							transform.position += dir.normalized * (radius + other.radius - dir.magnitude);
+							transform.position += (dir.normalized * (radius + other.radius - dir.magnitude));
 						}
 					}
 				}
 			}
+			transform.position = transform.position.QNetFix();
 		}
 
 	}

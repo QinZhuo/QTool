@@ -47,10 +47,39 @@ namespace QTool.Net
 			OnNetStart();
 			QNetManager.Instance.OnNetUpdate -= NetStart;
 		}
-		public abstract void OnNetStart();
+		public virtual void OnNetStart() { }
+		public virtual void OnNetDestroy() { }
 		public abstract void OnNetUpdate();
 		public virtual void OnSyncCheck()
 		{
+
+		}
+		public new static void Destroy(UnityEngine.Object obj)
+		{
+			var gameObj = obj.GetGameObject();
+			if (gameObj != null)
+			{
+				var nets= gameObj.GetComponentsInChildren<QNetBehaviour>();
+				foreach (var net in nets)
+				{
+					net.OnNetDestroy();
+				}
+			}
+			GameObject.Destroy(obj);
+		}
+	}
+	public static partial class QTool
+	{
+		public static float QNetFix(this float value)
+		{
+			return Mathf.RoundToInt(value * 1000) / 1000f;
+		}
+		public static Vector3 QNetFix(this Vector3 value)
+		{
+			value.x = value.x.QNetFix();
+			value.y = value.y.QNetFix();
+			value.z = value.z.QNetFix();
+			return value;
 		}
 	}
 }
