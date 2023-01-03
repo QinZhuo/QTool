@@ -92,6 +92,7 @@ namespace QTool
 								{
 									CommondParams[i] = p.DefaultValue.ToQDataType(p.ParameterType);
 								}
+								GUILayout.Label(QCommand.NameDictionary[name].paramViewNames[i] + ":");
 								CommondParams[i] = GUILayout.TextField(CommondParams[i], 20);
 							}
 						}
