@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
 using QTool.FlowGraph;
+using System.Threading.Tasks;
 
 namespace QTool
 {
@@ -139,6 +140,7 @@ namespace QTool
         public ParameterInfo[] paramInfos;
         public List<string> paramNames = new List<string>();
         public List<string> paramViewNames = new List<string>();
+		public bool IsStringCommond { get; private set; } = false;
         public QCommandInfo(MethodInfo method)
         {
             Key = method.DeclaringType.Name + "/" + method.Name;
@@ -146,12 +148,23 @@ namespace QTool
             fullName = method.DeclaringType.QName() + '/' + name;
             this.method = method;
             paramInfos = method.GetParameters();
+			if (method.ReturnType == typeof(void) || method.ReturnType == typeof(Task) || method.ReturnType == typeof(IEnumerator))
+			{
+				IsStringCommond = true;
+			}
             foreach (var paramInfo in paramInfos)
             {
                 paramNames.Add(paramInfo.Name);
                 paramViewNames.Add(paramInfo.QName());
-            }
-        }
+				if (IsStringCommond)
+				{
+					if ((!paramInfo.HasDefaultValue&& paramInfo.ParameterType != typeof(string) && paramInfo.ParameterType != typeof(float) && paramInfo.ParameterType != typeof(int) && paramInfo.ParameterType != typeof(object)) || paramInfo.IsOut)
+					{
+						IsStringCommond = false;
+					}
+				}
+			}
+		}
         public object Invoke(params object[] Params)
         {
             return method.Invoke(null, Params);

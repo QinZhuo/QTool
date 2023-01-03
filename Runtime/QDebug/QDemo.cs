@@ -56,6 +56,43 @@ namespace QTool
 #endif
 			}
 		}
+		public static bool Shift
+		{
+			get
+			{
+				
+#if ENABLE_INPUT_SYSTEM
+				return UnityEngine.InputSystem.Keyboard.current.shiftKey.isPressed;
+#else
+				return Input.GetKey(KeyCode.LeftShift)||Input.GetKey(KeyCode.RightShift);
+#endif
+			}
+		}
+		public static bool Ctrl
+		{
+			get
+			{
+				
+#if ENABLE_INPUT_SYSTEM
+				return UnityEngine.InputSystem.Keyboard.current.ctrlKey.isPressed;
+#else
+				return Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl);
+#endif
+			}
+		}
+		public static bool Enter
+		{
+			get
+			{
+
+			
+#if ENABLE_INPUT_SYSTEM
+				return UnityEngine.InputSystem.Keyboard.current.enterKey.isPressed;
+#else	
+				return Input.GetKey(KeyCode.KeypadEnter);
+#endif
+			}
+		}
 	}
 
 }
