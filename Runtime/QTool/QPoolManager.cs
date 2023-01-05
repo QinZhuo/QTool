@@ -8,21 +8,7 @@ using UnityEditor;
 #endif
 namespace QTool
 {
-	public static partial class Tool
-	{
-		/// <summary>
-		/// 对象池回收
-		/// </summary>
-		/// <param name="poolKey">对象池名</param>
-		public static void PoolRecover(this GameObject poolObj,string poolKey)
-		{
-			QPoolManager.Push(poolKey,poolObj);
-		}
-		public static void PoolRecover(this GameObject poolObj)
-		{
-			QPoolManager.Push(poolObj);
-		}
-	}
+	
     public class QPoolManager: InstanceManager<QPoolManager>
     {
 		public static bool PoolActive => QOnPlayModeAttribute.CurrentrState != PlayModeState.EnteredEditMode;
@@ -140,6 +126,7 @@ namespace QTool
         }
        
     }
+
     public abstract class PoolObject<T>:IPoolObject where T : PoolObject<T>,new()
     {
         internal static ObjectPool<T> _pool;
@@ -367,6 +354,21 @@ namespace QTool
 				obj = PrivateGet();
 			}
 			return base.CheckGet(obj);
+		}
+	}
+	public static partial class Tool
+	{
+		/// <summary>
+		/// 对象池回收
+		/// </summary>
+		/// <param name="poolKey">对象池名</param>
+		public static void PoolRecover(this GameObject poolObj, string poolKey)
+		{
+			QPoolManager.Push(poolKey, poolObj);
+		}
+		public static void PoolRecover(this GameObject poolObj)
+		{
+			QPoolManager.Push(poolObj);
 		}
 	}
 }
