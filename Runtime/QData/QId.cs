@@ -6,146 +6,91 @@ namespace QTool
 {
     
     [DisallowMultipleComponent]
-    public class QId : MonoBehaviour,IKey<string>
+    public class QId : MonoBehaviour
     {
-#if UNITY_EDITOR
-
-        private void OnValidate()
-        {
-            if (!Application.isPlaying)
-            {
-                InitId();
-            }
-        }
-        private void SetPrefabId(string id)
-        {
-            if (id != PrefabId)
-            {
-                PrefabId = id;
-                //this.SetDirty();
-            }
-        }
-   
-        private void InitId()
-        {
-            if (Application.IsPlaying(gameObject)) return;
-            FreshInstanceId();
-            if (gameObject.IsPrefabAsset())
-            {
-                SetPrefabId(UnityEditor.AssetDatabase.GetAssetPath(gameObject));
-           
-            }
-            else if (gameObject.IsPrefabInstance() || Application.IsPlaying(gameObject))
-            {
-                var prefab = UnityEditor.PrefabUtility.GetCorrespondingObjectFromSource(gameObject);
-                if (prefab == null)
-                {
-                    Debug.LogError(gameObject + " 找不到预制体引用");
-                }
-                else
-                {
-                    SetPrefabId(UnityEditor.AssetDatabase.GetAssetPath(prefab));
-                }
-            }
-        }
-      
-
-
-#endif
-     
-     
-        public static QDictionary<string, QId> InstanceIdList = new QDictionary<string, QId>();
-    
-        public static string GetNewId(string key = "")
-        {
-            return string.IsNullOrWhiteSpace(key) ? System.Guid.NewGuid().ToString("N") : System.Guid.Parse(key).ToString("N");
-        }
-        public bool HasPrefabId
-        {
-            get
-            {
-                return !string.IsNullOrWhiteSpace(PrefabId);
-
-            }
-        }
-        public string Key { get => InstanceId; set { } }
-
-        [QReadonly]
-        [QName("实例Id")]
-        public string InstanceId;
-		        [QReadonly]
-        [QName("预制体Id", nameof(HasPrefabId) )]
+		#region 静态数据方法
+		public static QDictionary<string, QId> InstanceIdList = new QDictionary<string, QId>();
+		public static string NewId()
+		{
+			return Guid.NewGuid().ToString("N");
+		}
+		#endregion
+	
+        [QReadonly,QName("Id"),UnityEngine.Serialization.FormerlySerializedAs("InstanceId")]
+        public string Id;
+        [QReadonly,QName("预制体Id", nameof(HasPrefabId) )]
         public string PrefabId;
-        bool IsPlaying
-        {
-            get
-            {
-                return Application.isPlaying;
-            }
-        }
-        public bool IsSceneInstance
-        {
-            get
-            {
-#if UNITY_EDITOR
-                if (this == null)
-                {
-                    return false;
-                }
-                if (UnityEditor.EditorUtility.IsPersistent(gameObject))
-                {
-                    return false;
-                }
-#endif
-                return true;
-            }
-        }
-        private void FreshInstanceId()
-        {
-            if (string.IsNullOrWhiteSpace(InstanceId))
-            {
-                SetInstanceId(GetNewId());
-            }
-            else if (InstanceIdList[InstanceId] == null)
-            {
-                InstanceIdList[InstanceId] = this;
+		public bool HasPrefabId
+		{
+			get
+			{
+				return !PrefabId.IsNullOrEmpty();
 			}
-            else if (InstanceIdList[InstanceId] != this)
+		}
+		private void FreshInstanceId()
+        {
+            if (string.IsNullOrWhiteSpace(Id))
             {
-                SetInstanceId(GetNewId());
+                SetInstanceId(NewId());
+            }
+            else if (InstanceIdList[Id] == null)
+            {
+                InstanceIdList[Id] = this;
+			}
+            else if (InstanceIdList[Id] != this)
+            {
+                SetInstanceId(NewId());
             }
         }
         private void SetInstanceId(string id)
         {
-            if (id != InstanceId)
+            if (id != Id)
             {
-                InstanceId = id;
+                Id = id;
                 InstanceIdList[id] = this;
             }
         }
         [ExecuteInEditMode]
         protected virtual void Awake()
-        {
-          
+		{
+			FreshInstanceId();
+			#region 刷新PrefabId
+
 #if UNITY_EDITOR
-            if (!Application.isPlaying) {
-                InitId();
-            }
+			if (!Application.IsPlaying(this)) {
+				if (gameObject.IsPrefabAsset())
+				{
+					PrefabId = UnityEditor.AssetDatabase.GetAssetPath(gameObject);
+				}
+				else if (gameObject.IsPrefabInstance() || Application.IsPlaying(gameObject))
+				{
+					var prefab = UnityEditor.PrefabUtility.GetCorrespondingObjectFromSource(gameObject);
+					if (prefab == null)
+					{
+						Debug.LogError(gameObject + " 找不到预制体引用");
+					}
+					else
+					{
+						PrefabId = UnityEditor.AssetDatabase.GetAssetPath(prefab);
+					}
+				}
+			}
 #endif
-            FreshInstanceId();
-        }
-        protected virtual void OnDestroy()
+
+			#endregion
+		}
+		protected virtual void OnDestroy()
         {
-            if (InstanceIdList.ContainsKey(InstanceId)){
-                if (InstanceIdList[InstanceId] == this)
+            if (InstanceIdList.ContainsKey(Id)){
+                if (InstanceIdList[Id] == this)
                 {
-                    InstanceIdList.Remove(InstanceId);
+                    InstanceIdList.Remove(Id);
                 }
             }
         }
         public override string ToString()
         {
-            return name + "(" + InstanceId +")";
+            return name + "(" + Id +")";
         }
     }
 

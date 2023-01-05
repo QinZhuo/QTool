@@ -455,6 +455,10 @@ namespace QTool
 		}
 		public static GameObject GetGameObject(this UnityEngine.Object obj)
 		{
+			if (obj == null)
+			{
+				return null;
+			}
 			if (obj is Component com)
 			{
 				return com.gameObject;

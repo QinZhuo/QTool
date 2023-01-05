@@ -106,7 +106,7 @@ namespace QTool
 						{
 							QSceneObjectManager.Instance.qIdInitList.AddCheckExist(qId);
 						}
-						return qId.InstanceId;
+						return qId.Id;
 					}
 				}
 			}

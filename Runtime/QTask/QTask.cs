@@ -76,10 +76,10 @@ namespace QTool
 			await task.Run();
 			nextAction();
 		}
-		public static int RunningFlag { get; private set; } = QId.GetNewId().GetHashCode();
+		public static int RunningFlag { get; private set; } = QId.NewId().GetHashCode();
 		public static void StopAllWait()
 		{
-			RunningFlag = QId.GetNewId().GetHashCode();
+			RunningFlag = QId.NewId().GetHashCode();
 		}
 		public static async Task WaitAllOver(this IList<Task> tasks)
 		{

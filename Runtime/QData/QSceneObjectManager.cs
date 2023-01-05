@@ -14,7 +14,7 @@ namespace QTool
 			qIdInitList.RemoveAll((obj) => obj == null);
             foreach (var id in qIdInitList)
             {
-                QId.InstanceIdList[id.InstanceId] = id;
+                QId.InstanceIdList[id.Id] = id;
             }
         }
     }
