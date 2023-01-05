@@ -183,7 +183,7 @@ namespace QTool.Net
 		internal int IdIndex { get; set; } = 0;
 
 		private QNetSyncFlag SyncCheckFlag = new QNetSyncFlag();
-		internal static QDictionary<string, List<IQNetSyncCheck>> QNetSyncCheckList { get; private set; } = new QDictionary<string, List<IQNetSyncCheck>>((key)=>new List<IQNetSyncCheck>());
+		internal static Dictionary<string, List<IQNetSyncCheck>> QNetSyncCheckList { get; private set; } = new Dictionary<string, List<IQNetSyncCheck>>();
 		public QList<string, QNetActionData> ClientActionData = new QList<string, QNetActionData>(()=>new QNetActionData());
 		[QName("启动客户端", "!" + nameof(NetActive))]
 		public void StartClient(string ip="127.0.0.1")

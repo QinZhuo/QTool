@@ -33,6 +33,16 @@ namespace QTool.Net
 		{
 			QNetManager.Instance.OnNetUpdate += NetStart;
 			QNetManager.Instance.OnNetUpdate += OnNetUpdate;
+			if (this is IQNetSyncCheck sync)
+			{
+				QNetManager.Instance.OnSyncCheck += sync.OnSyncCheck;
+				var qid = GetComponent<QId>().Id;
+				if (!QNetManager.QNetSyncCheckList.ContainsKey(qid))
+				{
+					QNetManager.QNetSyncCheckList.Add(qid, new List<IQNetSyncCheck>());
+				}
+				QNetManager.QNetSyncCheckList[qid].AddCheckExist(sync);
+			}
 		}
 		
 		public virtual void OnDestroy()
@@ -47,11 +57,7 @@ namespace QTool.Net
 		{
 			OnNetStart();
 			QNetManager.Instance.OnNetUpdate -= NetStart;
-			if (this is IQNetSyncCheck sync)
-			{
-				QNetManager.Instance.OnSyncCheck += sync.OnSyncCheck;
-				QNetManager.QNetSyncCheckList[GetComponent<QId>().Id].AddCheckExist(sync);
-			}
+		
 		}
 		public virtual void OnNetStart() { }
 		private void NetDestroy()
@@ -61,10 +67,13 @@ namespace QTool.Net
 			{
 				QNetManager.Instance.OnSyncCheck -= sync.OnSyncCheck;
 				var qid = GetComponent<QId>().Id;
-				QNetManager.QNetSyncCheckList[qid].Remove(sync);
-				if (QNetManager.QNetSyncCheckList[qid].Count == 0)
+				if (QNetManager.QNetSyncCheckList.ContainsKey(qid))
 				{
-					QNetManager.QNetSyncCheckList.Remove(qid);
+					QNetManager.QNetSyncCheckList[qid].Remove(sync);
+					if (QNetManager.QNetSyncCheckList[qid].Count == 0)
+					{
+						QNetManager.QNetSyncCheckList.Remove(qid);
+					}
 				}
 			}
 		}
