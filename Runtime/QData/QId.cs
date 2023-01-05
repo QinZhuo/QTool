@@ -12,7 +12,7 @@ namespace QTool
 		public static QDictionary<string, QId> InstanceIdList = new QDictionary<string, QId>();
 		public static string NewId(UnityEngine.Object obj=null)
 		{
-			if (Application.IsPlaying(obj) && Net.QNetManager.Instance != null)
+			if (obj!=null&&Application.IsPlaying(obj) && Net.QNetManager.Instance != null)
 			{
 				return Net.QNetManager.Instance.IdIndex++ +"_"+ Net.QNetManager.Instance.ClientIndex;
 			}

@@ -181,6 +181,9 @@ namespace QTool.Net
 		public QDictionary<int, QList<string, QNetActionData>> ClientGameData = new QDictionary<int, QList<string, QNetActionData>>();
 		public int ClientIndex { get; private set; } =0;
 		internal int IdIndex { get; set; } = 0;
+
+		private QNetSyncFlag SyncCheckFlag = new QNetSyncFlag();
+		internal static QDictionary<string, List<IQNetSyncCheck>> QNetSyncCheckList { get; private set; } = new QDictionary<string, List<IQNetSyncCheck>>((key)=>new List<IQNetSyncCheck>());
 		public QList<string, QNetActionData> ClientActionData = new QList<string, QNetActionData>(()=>new QNetActionData());
 		[QName("启动客户端", "!" + nameof(NetActive))]
 		public void StartClient(string ip="127.0.0.1")
@@ -273,7 +276,21 @@ namespace QTool.Net
 											{
 												using (var writer = new QBinaryWriter())
 												{
-													OnSyncSave?.Invoke(writer);
+													Debug.LogError("write " + QNetSyncCheckList.Count);
+													writer.Write(QNetSyncCheckList.Count);
+													foreach (var QIdCheck in QNetSyncCheckList)
+													{
+														using (var QIdData=new QBinaryWriter())
+														{
+															QIdData.Write(QIdCheck.Key);
+															QIdData.Write(QIdCheck.Value.Count);
+															for (int i = 0; i < QIdCheck.Value.Count; i++)
+															{
+																QIdCheck.Value[i].OnSyncSave(QIdData);
+															}
+															writer.Write(QIdData.ToArray());
+														}
+													}
 													PlayerAction(transport.ClientPlayerId, nameof(DefaultNetAction.SyncLoad), writer.ToArray());
 												}
 											}
@@ -288,7 +305,23 @@ namespace QTool.Net
 										Debug.LogWarning("["+ClientIndex+"]尝试修复同步");
 										using (var reader = new QBinaryReader(loadData))
 										{
-											OnSyncLoad?.Invoke(reader);
+											var Count = reader.ReadInt32();
+											for (int i = 0; i < Count; i++)
+											{
+												using (var QIdData = new QBinaryReader(reader.ReadBytes()))
+												{
+													var qidKey = QIdData.ReadString();
+													if (QNetSyncCheckList.ContainsKey(qidKey))
+													{
+														var QIdCheck = QNetSyncCheckList[qidKey];
+														var dataCount = QIdData.ReadInt32();
+														for (int j = 0; j < dataCount; j++)
+														{
+															QIdCheck[j].OnSyncLoad(QIdData);
+														}
+													}
+												}
+											}
 										}
 									}
 									else
@@ -333,11 +366,8 @@ namespace QTool.Net
 			}
 
 		}
-		private QNetSyncFlag SyncCheckFlag = new QNetSyncFlag();
 		internal event Action OnNetUpdate=null;
 		internal event Action<QNetSyncFlag> OnSyncCheck = null;
-		internal event Action<QBinaryWriter> OnSyncSave = null;
-		internal event Action<QBinaryReader> OnSyncLoad = null;
 		#endregion
 
 		private void FixedUpdate()

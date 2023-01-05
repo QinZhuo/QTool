@@ -345,7 +345,7 @@ MonoBehaviour:
   Interval: 10
   Timeout: 10000
   FastResend: 2
-  CongestionWindow: 1
+  CongestionWindow: 0
   SendWindowSize: 4096
   ReceiveWindowSize: 4096
   MaxRetransmit: 40

@@ -33,33 +33,41 @@ namespace QTool.Net
 		{
 			QNetManager.Instance.OnNetUpdate += NetStart;
 			QNetManager.Instance.OnNetUpdate += OnNetUpdate;
-			if(this is IQNetSyncCheck sync)
-			{
-				QNetManager.Instance.OnSyncCheck += sync.OnSyncCheck;
-				QNetManager.Instance.OnSyncLoad += sync.OnSyncLoad;
-				QNetManager.Instance.OnSyncSave += sync.OnSyncSave;
-			}
 		}
+		
 		public virtual void OnDestroy()
 		{
 			if (QNetManager.Instance != null)
 			{
 				QNetManager.Instance.OnNetUpdate -= NetStart;
 				QNetManager.Instance.OnNetUpdate -= OnNetUpdate;
-				if (this is IQNetSyncCheck sync)
-				{
-					QNetManager.Instance.OnSyncCheck -= sync.OnSyncCheck;
-					QNetManager.Instance.OnSyncLoad -= sync.OnSyncLoad;
-					QNetManager.Instance.OnSyncSave -= sync.OnSyncSave;
-				}
 			}
 		}
 		private void NetStart()
 		{
 			OnNetStart();
 			QNetManager.Instance.OnNetUpdate -= NetStart;
+			if (this is IQNetSyncCheck sync)
+			{
+				QNetManager.Instance.OnSyncCheck += sync.OnSyncCheck;
+				QNetManager.QNetSyncCheckList[GetComponent<QId>().Id].AddCheckExist(sync);
+			}
 		}
 		public virtual void OnNetStart() { }
+		private void NetDestroy()
+		{
+			OnNetDestroy();
+			if (this is IQNetSyncCheck sync)
+			{
+				QNetManager.Instance.OnSyncCheck -= sync.OnSyncCheck;
+				var qid = GetComponent<QId>().Id;
+				QNetManager.QNetSyncCheckList[qid].Remove(sync);
+				if (QNetManager.QNetSyncCheckList[qid].Count == 0)
+				{
+					QNetManager.QNetSyncCheckList.Remove(qid);
+				}
+			}
+		}
 		public virtual void OnNetDestroy() { }
 		public abstract void OnNetUpdate();
 		
@@ -71,7 +79,7 @@ namespace QTool.Net
 				var nets= gameObj.GetComponentsInChildren<QNetBehaviour>();
 				foreach (var net in nets)
 				{
-					net.OnNetDestroy();
+					net.NetDestroy();
 				}
 			}
 			GameObject.Destroy(obj);
