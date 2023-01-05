@@ -30,9 +30,20 @@ namespace QTool
             if (commands.Count > 0)
             {
                 var name = commands.Dequeue();
+				bool not = false;
+				if (name.StartsWith("!"))
+				{
+					not = true;
+					name =name.Substring(1);
+				}
                 if (NameDictionary.ContainsKey(name))
 				{
-					return NameDictionary[name].Invoke(commands);
+					var result= NameDictionary[name].Invoke(commands);
+					if(not && result is bool boolValue)
+					{
+						result = !boolValue;
+					}
+					return result;
 				}
             }
             return null;
