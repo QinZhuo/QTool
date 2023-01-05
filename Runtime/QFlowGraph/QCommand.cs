@@ -15,14 +15,13 @@ namespace QTool
         {
             FreshCommands(typeof(QCommandType).GetAllTypes());
         }
-        public static bool Invoke(string commandStr) 
+        public static object Invoke(string commandStr) 
         {
-            if (string.IsNullOrWhiteSpace(commandStr)) return false;
+            if (string.IsNullOrWhiteSpace(commandStr)) return null;
 			commandStr =commandStr.ForeachBlockValue('\"', '\"',(value)=> { return value.Replace(" ", "@#&"); });
 			commandStr = commandStr.ForeachBlockValue('“', '”', (value) => { return value.Replace(" ", "@#&"); });
 			List<string> commands = new List<string>();
 			commands.AddRange(commandStr.Split(' '));
-
 			commands.RemoveSpace();
 			for (int i = 0; i < commands.Count; i++)
 			{
@@ -33,17 +32,10 @@ namespace QTool
                 var name = commands.Dequeue();
                 if (NameDictionary.ContainsKey(name))
 				{
-					if (!NameDictionary[name].Invoke(commands))
-                    {
-                        return false;
-                    }
-                }
-                else
-                {
-                    return false;
-                }
+					return NameDictionary[name].Invoke(commands);
+				}
             }
-            return true;
+            return null;
         }
         public static QList<string, QCommandInfo> KeyDictionary = new QList<string, QCommandInfo>();
         public static QDictionary<string, QCommandInfo> NameDictionary = new QDictionary<string, QCommandInfo>();
@@ -169,7 +161,7 @@ namespace QTool
         {
             return method.Invoke(null, Params);
         }
-        public bool Invoke(IList<string> commands)
+        public object Invoke(IList<string> commands)
         {
             var paramObjs = new object[paramInfos.Length];
             for (int i = 0; i < paramInfos.Length; i++)
@@ -193,7 +185,7 @@ namespace QTool
                     {
 
                         Debug.LogError("通过[" + commands.ToOneString(" ") + "]调用命令[" + this + "]出错 " + "参数[" + pInfo + "]解析出错 :\n" + e);
-                        return false;
+                        return null;
                     }
                 }
                 else if (pInfo.HasDefaultValue)
@@ -203,12 +195,10 @@ namespace QTool
                 else
                 {
                     Debug.LogError("通过[" + commands.ToOneString(" ") + "]调用命令[" + this + "]出错 " + "缺少参数[" + pInfo + "]");
-                    return false;
+                    return null;
                 }
             }
-            method.Invoke(null, paramObjs);
-
-            return true; ;
+            return method.Invoke(null, paramObjs);
         }
         public override string ToString()
         {
