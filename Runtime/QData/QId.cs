@@ -25,7 +25,7 @@ namespace QTool
 	
         [QReadonly,QName("Id"),UnityEngine.Serialization.FormerlySerializedAs("InstanceId")]
         public string Id;
-        [QReadonly,QName("预制体Id", nameof(HasPrefab)),UnityEngine.Serialization.FormerlySerializedAs("PrefabId")]
+        [QReadonly,QName("预制体", nameof(HasPrefab)),UnityEngine.Serialization.FormerlySerializedAs("PrefabId")]
         public string Prefab;
 		public bool HasPrefab
 		{
@@ -34,38 +34,43 @@ namespace QTool
 				return !Prefab.IsNullOrEmpty(); 
 			}
 		}
+		protected virtual void Awake()
+		{
+			FreshId();
+		}
+		protected virtual void OnDestroy()
+		{
+			if (InstanceIdList.ContainsKey(Id))
+			{
+				if (InstanceIdList[Id] == this)
+				{
+					InstanceIdList.Remove(Id);
+				}
+			}
+		}
 		private void OnValidate()
 		{
-			FreshInstanceId();
+			FreshId();
 		}
-		private void FreshInstanceId()
-        {
-            if (string.IsNullOrWhiteSpace(Id))
-            {
-                SetNewId();
-            }
-            else if (InstanceIdList[Id] == null)
-            {
-                InstanceIdList[Id] = this;
-			}
-            else if (InstanceIdList[Id] != this)
-            {
-                SetNewId();
-            }
-        }
-        private void SetNewId()
-        {
-			Id = NewId(this);
-			InstanceIdList[Id] = this;
-		}
- 
-        protected virtual void Awake()  
+	
+		private void FreshId()
 		{
-			FreshInstanceId();
-			#region 刷新PrefabId
-
+			if (string.IsNullOrWhiteSpace(Id))
+			{
+				SetNewId();
+			}
+			else if (InstanceIdList[Id] == null)
+			{
+				InstanceIdList[Id] = this;
+			}
+			else if (InstanceIdList[Id] != this)
+			{
+				SetNewId();
+			}
+			#region 刷新Prefab
 #if UNITY_EDITOR
-			if (!Application.IsPlaying(this)) {
+			if (!Application.IsPlaying(this))
+			{
 				if (gameObject.IsPrefabAsset())
 				{
 					Prefab = UnityEditor.AssetDatabase.GetAssetPath(gameObject);
@@ -84,19 +89,15 @@ namespace QTool
 				}
 			}
 #endif
-
 			#endregion
 		}
-		protected virtual void OnDestroy()
-        {
-            if (InstanceIdList.ContainsKey(Id)){
-                if (InstanceIdList[Id] == this)
-                {
-                    InstanceIdList.Remove(Id);
-                }
-            }
-        }
-        public override string ToString()
+		private void SetNewId()
+		{
+			Id = NewId(this);
+			InstanceIdList[Id] = this;
+		}
+
+		public override string ToString()
         {
             return name + "(" + Id +")";
         }
