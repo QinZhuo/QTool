@@ -130,6 +130,7 @@ namespace QTool
             {
                 if (_instance == null)
                 {
+					if (QToolManager.Instance == null) return null;
                     _instance = QToolManager.Instance.transform.GetComponent<T>();
                     if (_instance == null)
                     {
