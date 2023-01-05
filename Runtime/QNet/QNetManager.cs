@@ -180,6 +180,7 @@ namespace QTool.Net
 		#region 客户端数据
 		public QDictionary<int, QList<string, QNetActionData>> ClientGameData = new QDictionary<int, QList<string, QNetActionData>>();
 		public int ClientIndex { get; private set; } =0;
+		internal int IdIndex { get; set; } = 0;
 		public QList<string, QNetActionData> ClientActionData = new QList<string, QNetActionData>(()=>new QNetActionData());
 		[QName("启动客户端", "!" + nameof(NetActive))]
 		public void StartClient(string ip="127.0.0.1")

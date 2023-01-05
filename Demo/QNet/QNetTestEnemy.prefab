@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 41579844808977860}
   - component: {fileID: 1539472545680252240}
   - component: {fileID: 3241145789349601910}
+  - component: {fileID: 7159957425794866180}
   m_Layer: 0
   m_Name: QNetTestEnemy
   m_TagString: Untagged
@@ -59,7 +60,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e5a0c16af9f765c4db12e92e742769ce, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  agent: {fileID: 3241145789349601910}
 --- !u!114 &3241145789349601910
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -73,6 +73,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   radius: 0.5
+--- !u!114 &7159957425794866180
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 41579844808977859}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9a62fe154ceeb184fb003a657ac0cf29, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Id: ad6fd68d7f414ffe8bc0bbb87241aacd
+  Prefab: 
 --- !u!1 &2227655774878594016
 GameObject:
   m_ObjectHideFlags: 0

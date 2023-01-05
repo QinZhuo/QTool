@@ -5,33 +5,44 @@ using System;
 namespace QTool
 {
     
-    [DisallowMultipleComponent]
+    [DisallowMultipleComponent,ExecuteInEditMode]
     public class QId : MonoBehaviour
     {
 		#region 静态数据方法
 		public static QDictionary<string, QId> InstanceIdList = new QDictionary<string, QId>();
-		public static string NewId()
+		public static string NewId(UnityEngine.Object obj=null)
 		{
-			return Guid.NewGuid().ToString("N");
+			if (Application.IsPlaying(obj) && Net.QNetManager.Instance != null)
+			{
+				return Net.QNetManager.Instance.IdIndex++ +"_"+ Net.QNetManager.Instance.ClientIndex;
+			}
+			else
+			{
+				return Guid.NewGuid().ToString("N");
+			}
 		}
 		#endregion
 	
         [QReadonly,QName("Id"),UnityEngine.Serialization.FormerlySerializedAs("InstanceId")]
         public string Id;
-        [QReadonly,QName("预制体Id", nameof(HasPrefabId) )]
-        public string PrefabId;
-		public bool HasPrefabId
+        [QReadonly,QName("预制体Id", nameof(HasPrefab)),UnityEngine.Serialization.FormerlySerializedAs("PrefabId")]
+        public string Prefab;
+		public bool HasPrefab
 		{
 			get
 			{
-				return !PrefabId.IsNullOrEmpty();
+				return !Prefab.IsNullOrEmpty(); 
 			}
+		}
+		private void OnValidate()
+		{
+			FreshInstanceId();
 		}
 		private void FreshInstanceId()
         {
             if (string.IsNullOrWhiteSpace(Id))
             {
-                SetInstanceId(NewId());
+                SetNewId();
             }
             else if (InstanceIdList[Id] == null)
             {
@@ -39,19 +50,16 @@ namespace QTool
 			}
             else if (InstanceIdList[Id] != this)
             {
-                SetInstanceId(NewId());
+                SetNewId();
             }
         }
-        private void SetInstanceId(string id)
+        private void SetNewId()
         {
-            if (id != Id)
-            {
-                Id = id;
-                InstanceIdList[id] = this;
-            }
-        }
-        [ExecuteInEditMode]
-        protected virtual void Awake()
+			Id = NewId(this);
+			InstanceIdList[Id] = this;
+		}
+ 
+        protected virtual void Awake()  
 		{
 			FreshInstanceId();
 			#region 刷新PrefabId
@@ -60,7 +68,7 @@ namespace QTool
 			if (!Application.IsPlaying(this)) {
 				if (gameObject.IsPrefabAsset())
 				{
-					PrefabId = UnityEditor.AssetDatabase.GetAssetPath(gameObject);
+					Prefab = UnityEditor.AssetDatabase.GetAssetPath(gameObject);
 				}
 				else if (gameObject.IsPrefabInstance() || Application.IsPlaying(gameObject))
 				{
@@ -71,7 +79,7 @@ namespace QTool
 					}
 					else
 					{
-						PrefabId = UnityEditor.AssetDatabase.GetAssetPath(prefab);
+						Prefab = UnityEditor.AssetDatabase.GetAssetPath(prefab);
 					}
 				}
 			}

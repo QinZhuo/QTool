@@ -5,6 +5,7 @@ using System.IO;
 using UnityEngine;
 namespace QTool.Net
 {
+	[RequireComponent(typeof(QId))]
 	public abstract class QNetBehaviour : MonoBehaviour
 	{
 		public System.Random Random => QNetManager.Instance.Random;
