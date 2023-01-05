@@ -8,43 +8,11 @@ using UnityEngine;
 namespace QTool.Net
 {
 
-	public class QNetActionData:IKey<string>
-	{
-		public string Key { get; set; }
-		public QDictionary<string, object> Values = new QDictionary<string, object>();
-		public List<QKeyValue<string, object>> Events = new List<QKeyValue<string, object>>();
-		public bool Active => Values.Count + Events.Count > 0;
-		public override string ToString()
-		{
-			return this.ToQData();
-		}
-		public void MergeValues(QNetActionData other)
-		{
-			foreach (var kv in other.Values)
-			{
-				Values[kv.Key] = kv.Value;
-			}
-		}
-		public void TriggerEvent(string key,object value)
-		{
-			Events.Add(new QKeyValue<string, object>(key, value));
-		}
-		public void Clear()
-		{
-			Values.Clear();
-			Events.Clear();
-		}
-	}
-	public enum DefaultNetAction
-	{
-		PlayerConnected,
-		SyncCheck,
-	}
 	public sealed class QNetManager : InstanceBehaviour<QNetManager>
 	{
 		[QEnum,QName("传输方式")]
 		public QNetTransport transport;
-		[QName("网络帧率"),SerializeField]
+		[QName("网络帧率"),SerializeField,Tooltip("每秒进行多少次网络帧同时更改物理帧率 两者保持同步")]
 		[Range(15,60)]
 		private int netFps = 30;
 		public System.Random Random { get; private set; } = null;
@@ -62,7 +30,10 @@ namespace QTool.Net
 		private void OnDestroy()
 		{
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
-			QToolManager.Instance.OnGUIEvent -= GUI;
+			if (QToolManager.Instance != null)
+			{
+				QToolManager.Instance.OnGUIEvent -= GUI;
+			}
 #endif
 			QTime.RevertScale(this);
 			ServerUpdateTimer?.Clear();
@@ -104,7 +75,7 @@ namespace QTool.Net
 		internal QDictionary<string, GameObject> PlayerObjects = new QDictionary<string, GameObject>();
 		QNetActionData LocalAction = new QNetActionData();
 		QNetActionData SendAction = new QNetActionData();
-		public int ServerSeed = 0;
+		private int ServerSeed = 0;
 		public float NetDeltaTime => Time.fixedDeltaTime;
 		public float NetTime { get; private set; }
 		#region 服务器数据
@@ -152,19 +123,6 @@ namespace QTool.Net
 								var player = eventData.Value?.ToString();
 								ServerPlayers[id] = player;
 								QDebug.Log("["+ServerIndex + "] 添加玩家[" + id + "][" + player+"]");
-							}
-							break;
-						case nameof(DefaultNetAction.SyncCheck):
-							{
-								var flag =(int)eventData.Value;
-								if (flag == SyncCheckFlag)
-								{
-									QDebug.Log("["+id + "]同步验证通过["+flag+"]");
-								}
-								else
-								{
-									Debug.LogError("[" + id + "]同步验证失败[" + flag + "]:[" + SyncCheckFlag + "]");
-								}
 							}
 							break;
 						default:
@@ -244,7 +202,7 @@ namespace QTool.Net
 			};
 			transport.OnClientDisconnected += () =>
 			{
-				Debug.LogError("断开链接");
+				QDebug.Log("断开链接");
 			};
 		}
 		private void ReceiveGameData(QBinaryReader reader)
@@ -301,7 +259,43 @@ namespace QTool.Net
 									}
 								}
 								break;
-							case nameof(DefaultNetAction.SyncCheck):break;
+							case nameof(DefaultNetAction.SyncCheck):
+								{
+									var flag = (QNetSyncFlag)eventData.Value;
+									
+									if (flag.Index == SyncCheckFlag.Index)
+									{
+										if (flag.Value != SyncCheckFlag.Value)
+										{
+											Debug.LogWarning("[" + flag.Index + "]同步验证失败[" + flag + "]:[" + SyncCheckFlag + "]");
+											if (transport.ServerActive)
+											{
+												using (var writer = new QBinaryWriter())
+												{
+													OnSyncSave?.Invoke(writer);
+													PlayerAction(transport.ClientPlayerId, nameof(DefaultNetAction.SyncLoad), writer.ToArray());
+												}
+											}
+										}
+									}
+								}
+								break;
+							case nameof(DefaultNetAction.SyncLoad):
+								{
+									if (eventData.Value is byte[] loadData)
+									{
+										Debug.LogWarning("["+ClientIndex+"]尝试修复同步");
+										using (var reader = new QBinaryReader(loadData))
+										{
+											OnSyncLoad?.Invoke(reader);
+										}
+									}
+									else
+									{
+										Debug.LogWarning("同步数据为空");
+									}
+								}
+								break;
 							case nameof(ServerSeed):
 								{
 									Random = new System.Random((int)eventData.Value);
@@ -317,14 +311,16 @@ namespace QTool.Net
 				OnNetUpdate?.Invoke();
 				Physics.Simulate(Time.fixedDeltaTime);
 				Physics.SyncTransforms();
-				ClientIndex++;
-				NetTime += NetDeltaTime;
-				if (ClientIndex%1000==0)
+				if (ClientIndex % (netFps/2) == 0)
 				{
-					SyncCheckFlag = 0;
-					OnSyncCheck?.Invoke();
+					SyncCheckFlag.Index = ClientIndex;
+					SyncCheckFlag.Value = 0;
+					OnSyncCheck?.Invoke(SyncCheckFlag);
 					PlayerAction(transport.ClientPlayerId, nameof(DefaultNetAction.SyncCheck), SyncCheckFlag);
 				}
+				ClientIndex++;
+				NetTime += NetDeltaTime;
+				
 			}
 			if (ClientGameData.ContainsKey(ClientIndex + 1))
 			{
@@ -336,9 +332,11 @@ namespace QTool.Net
 			}
 
 		}
+		private QNetSyncFlag SyncCheckFlag = new QNetSyncFlag();
 		internal event Action OnNetUpdate=null;
-		public int SyncCheckFlag = 0;
-		public event Action OnSyncCheck = null;
+		internal event Action<QNetSyncFlag> OnSyncCheck = null;
+		internal event Action<QBinaryWriter> OnSyncSave = null;
+		internal event Action<QBinaryReader> OnSyncLoad = null;
 		#endregion
 
 		private void FixedUpdate()
@@ -396,6 +394,65 @@ namespace QTool.Net
 		}
 #endif
 
+	}
+
+	public class QNetActionData : IKey<string>
+	{
+		public string Key { get; set; }
+		public QDictionary<string, object> Values = new QDictionary<string, object>();
+		public List<QKeyValue<string, object>> Events = new List<QKeyValue<string, object>>();
+		public bool Active => Values.Count + Events.Count > 0;
+		public override string ToString()
+		{
+			return this.ToQData();
+		}
+		public void MergeValues(QNetActionData other)
+		{
+			foreach (var kv in other.Values)
+			{
+				Values[kv.Key] = kv.Value;
+			}
+		}
+		public void TriggerEvent(string key, object value)
+		{
+			Events.Add(new QKeyValue<string, object>(key, value));
+		}
+		public void Clear()
+		{
+			Values.Clear();
+			Events.Clear();
+		}
+	}
+	public class QNetSyncFlag
+	{
+		[QName("帧索引")]
+		internal int Index { get; set; }
+		[QName("同步检测标志")]
+		internal int Value { get; set; }
+		public void Check(int value)
+		{
+			Value ^= value;
+		}
+		public void Check(float value)
+		{
+			Check((int)(value * 100));
+		}
+		public void Check(Vector3 value)
+		{
+			Check(value.x);
+			Check(value.y);
+			Check(value.z);
+		}
+		public override string ToString()
+		{
+			return "[" + Index + ":" + Value + "]";
+		}
+	}
+	public enum DefaultNetAction
+	{
+		PlayerConnected,
+		SyncCheck,
+		SyncLoad,
 	}
 }
 

@@ -6,7 +6,7 @@ namespace QTool
 {
     
     [DisallowMultipleComponent]
-    public class QId : MonoBehaviour,IKey<string>,IQSerialize
+    public class QId : MonoBehaviour,IKey<string>
     {
 #if UNITY_EDITOR
 
@@ -100,7 +100,6 @@ namespace QTool
                 return true;
             }
         }
-        public List<IQSerialize> qSerializes = new List<IQSerialize>();
         private void FreshInstanceId()
         {
             if (string.IsNullOrWhiteSpace(InstanceId))
@@ -134,9 +133,6 @@ namespace QTool
             }
 #endif
             FreshInstanceId();
-            qSerializes.Clear();
-            qSerializes.AddRange( GetComponents<IQSerialize>());
-            qSerializes.Remove(this);
         }
         protected virtual void OnDestroy()
         {
@@ -147,39 +143,9 @@ namespace QTool
                 }
             }
         }
-        public virtual void Write(QBinaryWriter writer)
-        {
-            writer.WriteObject(transform.position);
-            var byteLength = (byte)qSerializes.Count;
-            writer.Write(byteLength);
-            for (int i = 0; i < byteLength; i++)
-            {
-                writer.WriteObject(qSerializes[i]);
-            }
-        }
-       
         public override string ToString()
         {
-            return name + "(" + InstanceId +")["+ qSerializes.Count+ "]";
-        }
-
-        public virtual void Read(QBinaryReader reader)
-        {
-            transform.position = reader.ReadObject(transform.position);
-            var byteLength = reader.ReadByte();
-            if (qSerializes.Count == byteLength)
-            {
-                for (int i = 0; i < byteLength; i++)
-                {
-                 
-                    reader.ReadObject(qSerializes[i]);
-                }
-            }
-            else
-            {
-                Debug.LogError("读取序列化数据失败脚本数不匹配"+qSerializes.Count+":"+byteLength);
-            }
-           
+            return name + "(" + InstanceId +")";
         }
     }
 

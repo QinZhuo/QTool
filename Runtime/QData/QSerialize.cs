@@ -8,7 +8,7 @@ namespace QTool
 
     public static class QSerialize
     {
-        public static System.Byte[] Serialize<T>(this T value)
+        public static byte[] Serialize<T>(this T value)
         {
             return SerializeType(value, typeof(T));
         }
@@ -164,8 +164,8 @@ namespace QTool
         {
             using (var writer = new QBinaryWriter())
             {
-                return SerializeType(writer, value, type).ToArray();
-            }
+				return SerializeType(writer, value, type).ToArray();
+			}
         }
         public static object DeserializeType(this QBinaryReader reader, Type type, object target = null)
         {
@@ -187,6 +187,10 @@ namespace QTool
 								}
 								var runtimeType = QReflection.ParseType(reader.ReadString());
 								target = reader.ReadObjectType(runtimeType, target);
+								if (target == null)
+								{
+									Debug.LogError("动态数据 " + runtimeType + " 为空");
+								}
 							}break;
 						case QObjectType.UnityObject:
 							{
@@ -199,7 +203,7 @@ namespace QTool
 						case QObjectType.List:
 						case QObjectType.Array:
 							{
-								target = QReflection.CreateInstance(type,target);
+								target = QReflection.CreateInstance(type,target,count);
 								if (count < 0)
 								{
 									return target;
@@ -216,7 +220,8 @@ namespace QTool
 										list.Add(DeserializeType(reader, typeInfo.ElementType));
 									}
 								}
-                            }break;
+							}
+							break;
 						case QObjectType.Dictionary:
 							{
 								var dic= (target = QReflection.CreateInstance(type, target) )as IDictionary;
@@ -361,7 +366,6 @@ namespace QTool
 		public QBinaryReader(ArraySegment<byte> bytes) : base(new MemoryStream(bytes.Array,bytes.Offset,bytes.Count))
 		{
 		}
-		public MemoryStream memory => BaseStream as MemoryStream;
     
         public override byte[] ReadBytes(int count=-1)
         {

@@ -395,7 +395,7 @@ namespace QTool.Reflection
         }
 		public static string QTypeName(this Type type)
 		{
-			if (type.IsGenericType)
+			if (type.IsGenericType||type.IsArray)
 			{
 				return type.FullName;
 			}
@@ -621,57 +621,60 @@ namespace QTool.Reflection
         public static Type ParseType(string typeString)
         {
 			if (typeString.IsNullOrEmpty()) return null;
-            if (TypeBuffer.ContainsKey(typeString))
-            {
-                return TypeBuffer[typeString];
-            }
-            else
-            {
-                Type type = null;
-                Assembly[] assemblyArray = AppDomain.CurrentDomain.GetAssemblies();
-                int assemblyArrayLength = assemblyArray.Length;
-                for (int i = 0; i < assemblyArrayLength; ++i)
-                {
-                    type = assemblyArray[i].GetType(typeString);
-                    if (type != null)
-					{
-						if (!TypeBuffer.ContainsKey(typeString))
-						{
-							TypeBuffer.Add(typeString, type);
-						}
-                        return type; 
-                    }
-                    
-                }
-                for (int i = 0; i < assemblyArrayLength; ++i)
-                {
-                    foreach (var eType in assemblyArray[i].GetTypes())
-                    {
-                        if (eType.Name.Equals(typeString))
-                        {
-                            type = eType;
-                            if (type != null)
-                            {
-								if (!TypeBuffer.ContainsKey(typeString))
-								{
-									TypeBuffer.Add(typeString, type);
-								}
-                                return type;
-                            }
-                        }
-                    }
-                }  
-
-            }
-			if (!TypeBuffer.ContainsKey(typeString))
-			{ 
-				TypeBuffer.Add(typeString, null);
+			if (TypeBuffer.ContainsKey(typeString))
+			{
+				return TypeBuffer[typeString];
 			}
-            if (typeString.Contains("System.Threading.Tasks.Task"))
-            {
-                return null;
-            }
-			return null;
+			else
+			{
+				Type type = Type.GetType(typeString);
+				if (type == null)
+				{
+					Assembly[] assemblyArray = AppDomain.CurrentDomain.GetAssemblies();
+					int assemblyArrayLength = assemblyArray.Length;
+					for (int i = 0; i < assemblyArrayLength; ++i)
+					{
+						type = assemblyArray[i].GetType(typeString);
+						if (type != null)
+						{
+							if (!TypeBuffer.ContainsKey(typeString))
+							{
+								TypeBuffer.Add(typeString, type);
+							}
+							return type;
+						}
+
+					}
+					for (int i = 0; i < assemblyArrayLength; ++i)
+					{
+						foreach (var eType in assemblyArray[i].GetTypes())
+						{
+							if (eType.Name.Equals(typeString))
+							{
+								type = eType;
+								if (type != null)
+								{
+									if (!TypeBuffer.ContainsKey(typeString))
+									{
+										TypeBuffer.Add(typeString, type);
+									}
+									return type;
+								}
+							}
+						}
+					}
+				}
+
+				if(type==null)
+				{
+					Debug.LogWarning("未找到类型[" + typeString + "]");
+				}
+				if (typeString.Contains("System.Threading.Tasks.Task"))
+				{
+					TypeBuffer.Add(typeString, null);
+				}
+				return type;
+			}
         }
         public static void ForeachMemeber(this Type type, Action<FieldInfo> fieldInfo, Action<PropertyInfo> propertyInfo = null, BindingFlags bindingFlags= BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
         {

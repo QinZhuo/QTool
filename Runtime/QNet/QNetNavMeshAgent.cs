@@ -1,27 +1,22 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using UnityEngine.AI;
 namespace QTool.Net
 {
-	public class QNetNavMeshAgent : QNetBehaviour
+	public class QNetNavMeshAgent : QNetBehaviour,IQNetSyncCheck
 	{
 		[Min(0)]
 		public float radius =0.5f;
 		private static List<QNetNavMeshAgent> AllAgents = new List<QNetNavMeshAgent>();
-		public override void OnSyncCheck()
+		public override void OnNetStart()
 		{
-			QNetManager.Instance.SyncCheckFlag ^= (int)transform.position.x;
-			QNetManager.Instance.SyncCheckFlag ^= (int)transform.position.y;
-			QNetManager.Instance.SyncCheckFlag ^= (int)transform.position.z;
+			AllAgents.Add(this);
 		}
 		public override void OnNetDestroy()
 		{
 			AllAgents.Remove(this);
-		}
-		public override void OnNetStart()
-		{
-			AllAgents.Add(this);
 		}
 		public override void OnNetUpdate()
 		{
@@ -45,7 +40,19 @@ namespace QTool.Net
 					}
 				}
 			}
-			transform.position = transform.position.QNetFix();
+		}
+		
+		public void OnSyncCheck(QNetSyncFlag flag)
+		{
+			flag.Check(transform.position);
+		}
+		public void OnSyncSave(QBinaryWriter writer)
+		{
+			writer.WriteObject(transform.position);
+		}
+		public void OnSyncLoad(QBinaryReader reader)
+		{
+			transform.position = reader.ReadObject<Vector3>();
 		}
 
 	}

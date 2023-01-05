@@ -326,7 +326,6 @@ MonoBehaviour:
   transport: {fileID: 311946882}
   netFps: 60
   playerPrefab: {fileID: 41579844808977859, guid: b9d47eb55d5c80a43b6e74975e43e746, type: 3}
-  ServerSeed: 0
   ServerIp: 127.0.0.1
 --- !u!114 &311946882
 MonoBehaviour:

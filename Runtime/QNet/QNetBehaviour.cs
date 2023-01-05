@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 namespace QTool.Net
 {
@@ -31,7 +32,12 @@ namespace QTool.Net
 		{
 			QNetManager.Instance.OnNetUpdate += NetStart;
 			QNetManager.Instance.OnNetUpdate += OnNetUpdate;
-			QNetManager.Instance.OnSyncCheck += OnSyncCheck;
+			if(this is IQNetSyncCheck sync)
+			{
+				QNetManager.Instance.OnSyncCheck += sync.OnSyncCheck;
+				QNetManager.Instance.OnSyncLoad += sync.OnSyncLoad;
+				QNetManager.Instance.OnSyncSave += sync.OnSyncSave;
+			}
 		}
 		public virtual void OnDestroy()
 		{
@@ -39,7 +45,12 @@ namespace QTool.Net
 			{
 				QNetManager.Instance.OnNetUpdate -= NetStart;
 				QNetManager.Instance.OnNetUpdate -= OnNetUpdate;
-				QNetManager.Instance.OnSyncCheck -= OnSyncCheck;
+				if (this is IQNetSyncCheck sync)
+				{
+					QNetManager.Instance.OnSyncCheck -= sync.OnSyncCheck;
+					QNetManager.Instance.OnSyncLoad -= sync.OnSyncLoad;
+					QNetManager.Instance.OnSyncSave -= sync.OnSyncSave;
+				}
 			}
 		}
 		private void NetStart()
@@ -50,10 +61,7 @@ namespace QTool.Net
 		public virtual void OnNetStart() { }
 		public virtual void OnNetDestroy() { }
 		public abstract void OnNetUpdate();
-		public virtual void OnSyncCheck()
-		{
-
-		}
+		
 		public new static void Destroy(UnityEngine.Object obj)
 		{
 			var gameObj = obj.GetGameObject();
@@ -68,18 +76,11 @@ namespace QTool.Net
 			GameObject.Destroy(obj);
 		}
 	}
-	public static partial class QTool
+	public interface IQNetSyncCheck
 	{
-		public static float QNetFix(this float value)
-		{
-			return Mathf.RoundToInt(value * 1000) / 1000f;
-		}
-		public static Vector3 QNetFix(this Vector3 value)
-		{
-			value.x = value.x.QNetFix();
-			value.y = value.y.QNetFix();
-			value.z = value.z.QNetFix();
-			return value;
-		}
+		public void OnSyncCheck(QNetSyncFlag flag);
+		public void OnSyncSave(QBinaryWriter writer);
+		public void OnSyncLoad(QBinaryReader reader);
 	}
+	
 }
