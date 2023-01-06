@@ -8,6 +8,7 @@ public class QNetTestPlayer : QNetBehaviour
 	public static List<QNetTestPlayer> Players = new List<QNetTestPlayer>();
 	public GameObject bulletPrefab;
 	public int Score = 0;
+	public QNetNavMeshAgent agent;
 	QTimer shootTimer = new QTimer(0.4f,true);
 
 	public override void OnNetStart()
@@ -22,7 +23,7 @@ public class QNetTestPlayer : QNetBehaviour
 
 	public override void OnNetUpdate()
 	{
-		transform.position+= PlayerValue("位置", new Vector3( QDemo.MoveDirection.x,0,QDemo.MoveDirection.y))*NetDeltaTime*3;
+		agent.Move(PlayerValue("位置", new Vector3(QDemo.MoveDirection.x, 0, QDemo.MoveDirection.y)) * NetDeltaTime * 3);
 		var pos = PlayerValue("目标", Tool.RayCastPlane(Camera.main.ScreenPointToRay(QDemo.PointerPosition),Vector3.up,Vector3.zero));
 		transform.LookAt(pos);
 		shootTimer.Check(NetDeltaTime, false);

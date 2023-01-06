@@ -60,6 +60,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e5a0c16af9f765c4db12e92e742769ce, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  agent: {fileID: 3241145789349601910}
 --- !u!114 &3241145789349601910
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -85,7 +86,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a62fe154ceeb184fb003a657ac0cf29, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Id: ad6fd68d7f414ffe8bc0bbb87241aacd
+  Id: 
   Prefab: 
 --- !u!1 &2227655774878594016
 GameObject:

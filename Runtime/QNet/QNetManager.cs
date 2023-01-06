@@ -69,7 +69,6 @@ namespace QTool.Net
 				}
 			}
 		}
-		
 		QDictionary<string, Action<object>> NetEvent = new QDictionary<string, Action<object>>();
 		public GameObject playerPrefab;
 		internal QDictionary<string, GameObject> PlayerObjects = new QDictionary<string, GameObject>();
@@ -289,6 +288,11 @@ namespace QTool.Net
 										Debug.LogWarning("同步数据为空");
 									}
 								}break;
+							case nameof(DefaultNetAction.ServerSeed):
+								{
+									Random = new System.Random((int)eventData.Value);
+								}
+								break;
 							default:
 								break;
 						}
@@ -345,7 +349,7 @@ namespace QTool.Net
 															writer.Write(QIdData.ToArray());
 														}
 													}
-													PlayerAction(nameof(QNetManager), nameof(DefaultNetAction.SyncLoad), writer.ToArray());
+													ServerActionData[nameof(QNetManager)].Events.Add(new QKeyValue<string, object>(nameof(DefaultNetAction.SyncLoad), writer.ToArray()));
 												}
 											}
 										}
@@ -353,11 +357,6 @@ namespace QTool.Net
 								}
 								break;
 							case nameof(DefaultNetAction.SyncLoad):break;
-							case nameof(ServerSeed):
-								{
-									Random = new System.Random((int)eventData.Value);
-								}
-								break;
 							default:
 								QEventManager.Trigger(actionData.Key + "_" + eventData.Key, eventData.Value);
 								break;
@@ -505,6 +504,7 @@ namespace QTool.Net
 	public enum DefaultNetAction
 	{
 		PlayerConnected,
+		ServerSeed,
 		SyncCheck,
 		SyncLoad,
 	}

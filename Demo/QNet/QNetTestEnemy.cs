@@ -6,6 +6,7 @@ using QTool;
 using UnityEngine.AI;
 public class QNetTestEnemy : QNetBehaviour
 {
+	public QNetNavMeshAgent agent;
 	private QNetTestPlayer Target;
 	public QNetTestPlayer GetTarget()
 	{
@@ -34,6 +35,6 @@ public class QNetTestEnemy : QNetBehaviour
 		}
 		if (Target == null) return;
 		transform.LookAt(Target.transform);
-		transform.transform.position += transform.forward * NetDeltaTime*1.5f;
+		agent.Move(transform.forward * NetDeltaTime * 1.5f);
 	}
 }
