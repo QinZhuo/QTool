@@ -11,6 +11,10 @@ namespace QTool.Net
 		}
 		public override void OnNetUpdate()
 		{
+			if (UnityEditor.Selection.activeGameObject == gameObject)
+			{
+				Debug.LogError(rigidbody.ToQData());
+			}
 		}
 
 		public void OnSyncCheck(QNetSyncFlag flag)
@@ -24,7 +28,6 @@ namespace QTool.Net
 			rigidbody.velocity = reader.ReadObject<Vector3>();
 			rigidbody.rotation = reader.ReadObject<Quaternion>();
 			rigidbody.angularVelocity = reader.ReadObject<Vector3>();
-			rigidbody.centerOfMass = reader.ReadObject<Vector3>();
 		}
 
 		public void OnSyncSave(QBinaryWriter writer)
@@ -33,7 +36,6 @@ namespace QTool.Net
 			writer.WriteObject(rigidbody.velocity);
 			writer.WriteObject(rigidbody.rotation);
 			writer.WriteObject(rigidbody.angularVelocity);
-			writer.WriteObject(rigidbody.centerOfMass);
 		}
 	}
 }
