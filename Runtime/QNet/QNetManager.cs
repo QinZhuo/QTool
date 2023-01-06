@@ -307,12 +307,20 @@ namespace QTool.Net
 							case nameof(DefaultNetAction.PlayerConnected):
 								if (!PlayerObjects.ContainsKey(actionData.Key))
 								{
-									var obj = GameObject.Instantiate(playerPrefab); ;
-									PlayerObjects[actionData.Key] = obj;
-									foreach (var qNet in obj.GetComponents<QNetBehaviour>())
+									if (playerPrefab != null)
 									{
-										qNet.PlayerId = actionData.Key;
+										var obj = GameObject.Instantiate(playerPrefab); ;
+										PlayerObjects[actionData.Key] = obj;
+										foreach (var qNet in obj.GetComponents<QNetBehaviour>())
+										{
+											qNet.PlayerId = actionData.Key;
+										}
 									}
+									else
+									{
+										Debug.LogWarning(nameof(QNetManager) + " 未设置玩家预制体");
+									}
+								
 								}
 								break;
 							case nameof(DefaultNetAction.SyncCheck):
