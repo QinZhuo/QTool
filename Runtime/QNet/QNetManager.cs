@@ -276,7 +276,6 @@ namespace QTool.Net
 											{
 												using (var writer = new QBinaryWriter())
 												{
-													Debug.LogError("write " + QNetSyncCheckList.Count);
 													writer.Write(QNetSyncCheckList.Count);
 													foreach (var QIdCheck in QNetSyncCheckList)
 													{
@@ -286,7 +285,14 @@ namespace QTool.Net
 															QIdData.Write(QIdCheck.Value.Count);
 															for (int i = 0; i < QIdCheck.Value.Count; i++)
 															{
-																QIdCheck.Value[i].OnSyncSave(QIdData);
+																try
+																{
+																	QIdCheck.Value[i].OnSyncSave(QIdData);
+																}
+																catch (Exception e)
+																{
+																	Debug.LogError("保存[" + QIdCheck.Key + "]" + QIdCheck.Value[i] + "出错 "+e.ToShortString(1000));
+																}
 															}
 															writer.Write(QIdData.ToArray());
 														}
@@ -317,7 +323,14 @@ namespace QTool.Net
 														var dataCount = QIdData.ReadInt32();
 														for (int j = 0; j < dataCount; j++)
 														{
-															QIdCheck[j].OnSyncLoad(QIdData);
+															try
+															{
+																QIdCheck[j].OnSyncLoad(QIdData);
+															}
+															catch (Exception e)
+															{
+																Debug.LogError("读取[" + qidKey + "]" + QIdCheck[j] + "出错 " + e.ToShortString(1000));
+															}
 														}
 													}
 												}

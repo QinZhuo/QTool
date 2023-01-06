@@ -33,16 +33,7 @@ namespace QTool.Net
 		{
 			QNetManager.Instance.OnNetUpdate += NetStart;
 			QNetManager.Instance.OnNetUpdate += OnNetUpdate;
-			if (this is IQNetSyncCheck sync)
-			{
-				QNetManager.Instance.OnSyncCheck += sync.OnSyncCheck;
-				var qid = GetComponent<QId>().Id;
-				if (!QNetManager.QNetSyncCheckList.ContainsKey(qid))
-				{
-					QNetManager.QNetSyncCheckList.Add(qid, new List<IQNetSyncCheck>());
-				}
-				QNetManager.QNetSyncCheckList[qid].AddCheckExist(sync);
-			}
+		
 		}
 		
 		public virtual void OnDestroy()
@@ -55,9 +46,19 @@ namespace QTool.Net
 		}
 		private void NetStart()
 		{
-			OnNetStart();
 			QNetManager.Instance.OnNetUpdate -= NetStart;
-		
+			OnNetStart();
+			if (this is IQNetSyncCheck sync)
+			{
+				QNetManager.Instance.OnSyncCheck += sync.OnSyncCheck;
+				var qid = GetComponent<QId>().Id;
+				if (!QNetManager.QNetSyncCheckList.ContainsKey(qid))
+				{
+					QNetManager.QNetSyncCheckList.Add(qid, new List<IQNetSyncCheck>());
+				}
+				QNetManager.QNetSyncCheckList[qid].AddCheckExist(sync);
+			}
+
 		}
 		public virtual void OnNetStart() { }
 		private void NetDestroy()
