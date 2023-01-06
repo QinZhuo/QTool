@@ -165,7 +165,7 @@ namespace QTool
 		}
 		public static bool IsNullOrEmpty(this string str)
 		{
-			return string.IsNullOrEmpty(str);
+			return string.IsNullOrWhiteSpace(str);
 		}
 		public static string RemveChars(this string str,params char[] exceptchars)
 		{
