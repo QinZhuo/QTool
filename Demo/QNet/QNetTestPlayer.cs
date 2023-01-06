@@ -23,8 +23,15 @@ public class QNetTestPlayer : QNetBehaviour
 
 	public override void OnNetUpdate()
 	{
-		agent.Move(PlayerValue("位置", new Vector3(QDemo.MoveDirection.x, 0, QDemo.MoveDirection.y)) * NetDeltaTime * 3);
-		var pos = PlayerValue("目标", Tool.RayCastPlane(Camera.main.ScreenPointToRay(QDemo.PointerPosition),Vector3.up,Vector3.zero));
+		if (agent != null)
+		{
+			agent.Move(PlayerValue("位置", new Vector3(QDemo.MoveDirection.x, 0, QDemo.MoveDirection.y)) * NetDeltaTime * 3);
+		}
+		else
+		{
+			transform.position += PlayerValue("位置", new Vector3(QDemo.MoveDirection.x, 0, QDemo.MoveDirection.y)) * NetDeltaTime * 3;
+		}
+		var pos = PlayerValue("目标", Tool.RayCastPlane(Camera.main.ScreenPointToRay(QDemo.PointerPosition),Vector3.up,transform.position));
 		transform.LookAt(pos);
 		shootTimer.Check(NetDeltaTime, false);
 		if (PlayerValue("射击",QDemo.Attack)&&shootTimer.Check())
