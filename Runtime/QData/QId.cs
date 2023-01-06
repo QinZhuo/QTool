@@ -38,6 +38,10 @@ namespace QTool
 		{
 			FreshId();
 		}
+		private void OnValidate()
+		{
+			FreshId();
+		}
 		protected virtual void OnDestroy()
 		{
 			if (InstanceIdList.ContainsKey(Id))
@@ -48,53 +52,43 @@ namespace QTool
 				}
 			}
 		}
-		private void OnValidate()
-		{
-			FreshId();
-		}
-	
 		private void FreshId()
 		{
-			if (string.IsNullOrWhiteSpace(Id))
+
+#if UNITY_EDITOR
+			if (this.IsAsset())
 			{
-				SetNewId();
+				if (!Application.IsPlaying(this))
+				{
+					if (gameObject.IsPrefabAsset())
+					{
+						Prefab = UnityEditor.AssetDatabase.GetAssetPath(gameObject);
+					}
+					else if (gameObject.IsPrefabInstance() || Application.IsPlaying(gameObject))
+					{
+						var prefab = UnityEditor.PrefabUtility.GetCorrespondingObjectFromSource(gameObject);
+						if (prefab == null)
+						{
+							Debug.LogError(gameObject + " 找不到预制体引用");
+						}
+						else
+						{
+							Prefab = UnityEditor.AssetDatabase.GetAssetPath(prefab);
+						}
+					}
+				}
+				Id = "";
 			}
-			else if (InstanceIdList[Id] == null)
+			else
+#endif
 			{
+
+				if (Id.IsNullOrEmpty() || InstanceIdList[Id] != this)
+				{
+					Id = NewId(this);
+				}
 				InstanceIdList[Id] = this;
 			}
-			else if (InstanceIdList[Id] != this)
-			{
-				SetNewId();
-			}
-			#region 刷新Prefab
-#if UNITY_EDITOR
-			if (!Application.IsPlaying(this))
-			{
-				if (gameObject.IsPrefabAsset())
-				{
-					Prefab = UnityEditor.AssetDatabase.GetAssetPath(gameObject);
-				}
-				else if (gameObject.IsPrefabInstance() || Application.IsPlaying(gameObject))
-				{
-					var prefab = UnityEditor.PrefabUtility.GetCorrespondingObjectFromSource(gameObject);
-					if (prefab == null)
-					{
-						Debug.LogError(gameObject + " 找不到预制体引用");
-					}
-					else
-					{
-						Prefab = UnityEditor.AssetDatabase.GetAssetPath(prefab);
-					}
-				}
-			}
-#endif
-			#endregion
-		}
-		private void SetNewId()
-		{
-			Id = NewId(this);
-			InstanceIdList[Id] = this;
 		}
 
 		public override string ToString()
