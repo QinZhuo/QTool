@@ -23,15 +23,22 @@ namespace QTool
 		}
 		#endregion
 	
-        [QReadonly,QName("Id","!"+ nameof(HasPrefab)),UnityEngine.Serialization.FormerlySerializedAs("InstanceId")]
+        [QReadonly,QName("Id","!"+ nameof(IsInstance)),UnityEngine.Serialization.FormerlySerializedAs("InstanceId")]
         public string Id;
         [QReadonly,QName("预制体", nameof(HasPrefab)),UnityEngine.Serialization.FormerlySerializedAs("PrefabId")]
         public string Prefab;
-		public bool HasPrefab
+		private bool HasPrefab
 		{
 			get
 			{
 				return !Prefab.IsNullOrEmpty(); 
+			}
+		}
+		private bool IsInstance
+		{
+			get
+			{
+				return !this.IsAsset();
 			}
 		}
 		protected virtual void Awake()
@@ -82,8 +89,7 @@ namespace QTool
 			else
 #endif
 			{
-
-				if (Id.IsNullOrEmpty() || InstanceIdList[Id] != this)
+				if (Id.IsNullOrEmpty() || (InstanceIdList[Id]!=null&& InstanceIdList[Id] != this))
 				{
 					Id = NewId(this);
 				}
