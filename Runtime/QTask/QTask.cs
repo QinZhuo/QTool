@@ -58,12 +58,12 @@ namespace QTool
 				}
 				else
 				{
-					Debug.LogError(exception);
+					Debug.LogError(exception.ToShortString(2000));
 				}
 			}
 			else if(task.Exception!=null)
 			{
-				Debug.LogError(task.Exception);
+				Debug.LogError(task.Exception.ToShortString(2000));
 			}
 		}
 		public static async Task Run(this Task task,Func<Task>  nextAction)
@@ -161,44 +161,6 @@ namespace QTool
 		}
 
 	
-
-
-
-
-		//public struct WaitTimeAwaiter : IAwaiter
-		//{
-		//	readonly float wait;
-		//	Action action;
-		//	public WaitTimeAwaiter(float wait)
-		//	{
-		//		this.wait = wait;
-		//		action = null;
-		//	}
-		//	public async void Start()
-		//	{
-		//		await QTask.Wait(wait);
-		//		IsCompleted = true;
-		//		action?.Invoke();
-		//		action = null;
-		//	}
-
-//	public bool IsCompleted
-//	{
-//		get; set;
-//	}
-
-//	public void GetResult()
-//	{
-//	}
-
-
-//	public void OnCompleted(Action continuation)
-//	{
-//		Debug.LogError(continuation);
-//		action += continuation;
-//	}
-
-//}UnityEditor.PackageManager.Requests
 #if UNITY_EDITOR
 		public static PackageRequestAwaiter GetAwaiter(this UnityEditor.PackageManager.Requests.Request request)
 		{
