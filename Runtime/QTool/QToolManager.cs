@@ -45,11 +45,11 @@ namespace QTool
 							Types.AddCheckExist(start);
 							Commonds[start].AddCheckExist(kv.Key);
 						}
-						//else if(kv.Value.fullName.SplitTowString("/", out start, out end))
-						//{
-						//	Types.AddCheckExist(start);
-						//	Commonds[start].Add(end);
-						//}
+						else if (kv.Value.fullName.SplitTowString("/", out start, out end))
+						{
+							Types.AddCheckExist(start);
+							Commonds[start].AddCheckExist(kv.Key);
+						}
 					}
 				}
 			}
