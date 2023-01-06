@@ -23,7 +23,7 @@ namespace QTool
 		}
 		#endregion
 	
-        [QReadonly,QName("Id","!"+ nameof(IsInstance)),UnityEngine.Serialization.FormerlySerializedAs("InstanceId")]
+        [QReadonly,QName("Id", nameof(IsInstance)),UnityEngine.Serialization.FormerlySerializedAs("InstanceId")]
         public string Id;
         [QReadonly,QName("预制体", nameof(HasPrefab)),UnityEngine.Serialization.FormerlySerializedAs("PrefabId")]
         public string Prefab;

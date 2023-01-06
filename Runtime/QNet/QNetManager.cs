@@ -245,9 +245,57 @@ namespace QTool.Net
 		{
 			if (ClientGameData.ContainsKey(ClientIndex))
 			{
+				if (ClientGameData[ClientIndex].ContainsKey(nameof(QNetManager)))
+				{
+					foreach (var eventData in ClientGameData[ClientIndex][nameof(QNetManager)].Events)
+					{
+						switch (eventData.Key)
+						{
+							case nameof(DefaultNetAction.SyncLoad):
+								{
+									if (eventData.Value is byte[] loadData)
+									{
+										Debug.LogWarning("[" + ClientIndex + "]尝试修复同步");
+										using (var reader = new QBinaryReader(loadData))
+										{
+											var Count = reader.ReadInt32();
+											for (int i = 0; i < Count; i++)
+											{
+												using (var QIdData = new QBinaryReader(reader.ReadBytes()))
+												{
+													var qidKey = QIdData.ReadString();
+													if (QNetSyncCheckList.ContainsKey(qidKey))
+													{
+														var QIdCheck = QNetSyncCheckList[qidKey];
+														var dataCount = QIdData.ReadInt32();
+														for (int j = 0; j < dataCount; j++)
+														{
+															try
+															{
+																QIdCheck[j].OnSyncLoad(QIdData);
+															}
+															catch (Exception e)
+															{
+																Debug.LogError("读取[" + qidKey + "]" + QIdCheck[j] + "出错 " + e.ToShortString(1000));
+															}
+														}
+													}
+												}
+											}
+										}
+									}
+									else
+									{
+										Debug.LogWarning("同步数据为空");
+									}
+								}break;
+							default:
+								break;
+						}
+					}
+				}
 				foreach (var actionData in ClientGameData[ClientIndex])
 				{
-
 					foreach (var eventData in actionData.Events)
 					{
 						switch (eventData.Key)
@@ -297,52 +345,14 @@ namespace QTool.Net
 															writer.Write(QIdData.ToArray());
 														}
 													}
-													PlayerAction(transport.ClientPlayerId, nameof(DefaultNetAction.SyncLoad), writer.ToArray());
+													PlayerAction(nameof(QNetManager), nameof(DefaultNetAction.SyncLoad), writer.ToArray());
 												}
 											}
 										}
 									}
 								}
 								break;
-							case nameof(DefaultNetAction.SyncLoad):
-								{
-									if (eventData.Value is byte[] loadData)
-									{
-										Debug.LogWarning("["+ClientIndex+"]尝试修复同步");
-										using (var reader = new QBinaryReader(loadData))
-										{
-											var Count = reader.ReadInt32();
-											for (int i = 0; i < Count; i++)
-											{
-												using (var QIdData = new QBinaryReader(reader.ReadBytes()))
-												{
-													var qidKey = QIdData.ReadString();
-													if (QNetSyncCheckList.ContainsKey(qidKey))
-													{
-														var QIdCheck = QNetSyncCheckList[qidKey];
-														var dataCount = QIdData.ReadInt32();
-														for (int j = 0; j < dataCount; j++)
-														{
-															try
-															{
-																QIdCheck[j].OnSyncLoad(QIdData);
-															}
-															catch (Exception e)
-															{
-																Debug.LogError("读取[" + qidKey + "]" + QIdCheck[j] + "出错 " + e.ToShortString(1000));
-															}
-														}
-													}
-												}
-											}
-										}
-									}
-									else
-									{
-										Debug.LogWarning("同步数据为空");
-									}
-								}
-								break;
+							case nameof(DefaultNetAction.SyncLoad):break;
 							case nameof(ServerSeed):
 								{
 									Random = new System.Random((int)eventData.Value);
