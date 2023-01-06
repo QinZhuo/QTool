@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 namespace QTool.Net
 {
@@ -24,12 +22,16 @@ namespace QTool.Net
 		{
 			rigidbody.position = reader.ReadObject<Vector3>();
 			rigidbody.velocity = reader.ReadObject<Vector3>();
+			rigidbody.rotation = reader.ReadObject<Quaternion>();
+			rigidbody.angularVelocity = reader.ReadObject<Vector3>();
 		}
 
 		public void OnSyncSave(QBinaryWriter writer)
 		{
 			writer.WriteObject(rigidbody.position);
 			writer.WriteObject(rigidbody.velocity);
+			writer.WriteObject(rigidbody.rotation);
+			writer.WriteObject(rigidbody.angularVelocity);
 		}
 	}
 }
