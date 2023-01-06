@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.AI;
 namespace QTool.Net
 {
+	[DisallowMultipleComponent]
 	public class QNetNavMeshAgent : QNetBehaviour,IQNetSyncCheck
 	{
 		[Min(0)]
