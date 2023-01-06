@@ -50,6 +50,10 @@ namespace QTool
 							Types.AddCheckExist(start);
 							Commonds[start].AddCheckExist(kv.Key);
 						}
+						else
+						{
+							Debug.LogError("命令出错[" + kv.Value.fullName + "]:" + kv.Key);
+						}
 					}
 				}
 			}
