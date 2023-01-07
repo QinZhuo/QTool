@@ -11,10 +11,6 @@ namespace QTool.Net
 		}
 		public override void OnNetUpdate()
 		{
-			if (UnityEditor.Selection.activeGameObject == gameObject)
-			{
-				Debug.LogError(rigidbody.ToQData());
-			}
 		}
 
 		public void OnSyncCheck(QNetSyncFlag flag)
