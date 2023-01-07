@@ -6,11 +6,17 @@ using UnityEngine.AI;
 namespace QTool.Net
 {
 	[DisallowMultipleComponent]
-	public class QNetNavMeshAgent : QNetBehaviour,IQNetSyncCheck
+	public class QNetNavMeshAgent : QNetBehaviour
 	{
+		[QSyncVar(true)]
+		public Vector3 Position
+		{
+			get => transform.position;
+			set => transform.position = value;
+		}
 		[Min(0)]
 		public float radius =0.5f;
-		private static List<QNetNavMeshAgent> AllAgents = new List<QNetNavMeshAgent>();
+
 		public void Move(Vector3 offset)
 		{
 			transform.position += offset;
@@ -46,18 +52,7 @@ namespace QTool.Net
 				transform.position = hitInfo.position;
 			}
 		}
-		public void OnSyncCheck(QNetSyncFlag flag)
-		{
-			flag.Check(transform.position);
-		}
-		public void OnSyncSave(QBinaryWriter writer)
-		{
-			writer.WriteObject(transform.position);
-		}
-		public void OnSyncLoad(QBinaryReader reader)
-		{
-			transform.position = reader.ReadObject<Vector3>();
-		}
+		private static List<QNetNavMeshAgent> AllAgents = new List<QNetNavMeshAgent>();
 
 	}
 }

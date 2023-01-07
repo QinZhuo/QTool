@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Timers;
 using UnityEngine;
+using QTool.Reflection;
 namespace QTool.Net
 {
 
@@ -80,7 +81,7 @@ namespace QTool.Net
 		#region 服务器数据
 
 		const int GameDataArray=-101;
-		const int GameDataArrayLength = 1000;
+		const int GameDataArrayLength = 500;
 		QTimer ServerUpdateTimer;
 		[QName("启动服务器", "!" + nameof(NetActive))]
 		public void StartServer()
@@ -182,7 +183,7 @@ namespace QTool.Net
 		internal int IdIndex { get; set; } = 0;
 
 		private QNetSyncFlag SyncCheckFlag = new QNetSyncFlag();
-		internal static Dictionary<string, List<IQNetSyncCheck>> QNetSyncCheckList { get; private set; } = new Dictionary<string, List<IQNetSyncCheck>>();
+		internal static Dictionary<string, List<QNetBehaviour>> QNetSyncCheckList { get; private set; } = new Dictionary<string, List<QNetBehaviour>>();
 		public QList<string, QNetActionData> ClientActionData = new QList<string, QNetActionData>(()=>new QNetActionData());
 		[QName("启动客户端", "!" + nameof(NetActive))]
 		public void StartClient(string ip="127.0.0.1")
@@ -331,7 +332,7 @@ namespace QTool.Net
 									{
 										if (flag.Value != SyncCheckFlag.Value)
 										{
-											Debug.LogWarning("[" + flag.Index + "]同步验证失败[" + flag + "]:[" + SyncCheckFlag + "]");
+											Debug.LogWarning("[" + flag.Index+"/"+ClientIndex + "]同步验证失败[" + flag + "]:[" + SyncCheckFlag + "]");
 											if (transport.ServerActive)
 											{
 												using (var writer = new QBinaryWriter())
@@ -456,7 +457,7 @@ namespace QTool.Net
 #endif
 
 	}
-
+	
 	public class QNetActionData : IKey<string>
 	{
 		public string Key { get; set; }
@@ -493,16 +494,6 @@ namespace QTool.Net
 		public void Check(int value)
 		{
 			Value ^= value;
-		}
-		public void Check(float value)
-		{
-			Check((int)(value * 100));
-		}
-		public void Check(Vector3 value)
-		{
-			Check(value.x);
-			Check(value.y);
-			Check(value.z);
 		}
 		public override string ToString()
 		{

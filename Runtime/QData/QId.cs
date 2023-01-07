@@ -10,16 +10,9 @@ namespace QTool
     {
 		#region 静态数据方法
 		public static QDictionary<string, QId> InstanceIdList = new QDictionary<string, QId>();
-		public static string NewId(UnityEngine.Object obj=null)
+		public static string NewId()
 		{
-			if (obj!=null&&Application.IsPlaying(obj) && Net.QNetManager.Instance != null)
-			{
-				return Net.QNetManager.Instance.IdIndex++ +"_"+ Net.QNetManager.Instance.ClientIndex;
-			}
-			else
-			{
-				return Guid.NewGuid().ToString("N");
-			}
+			return Guid.NewGuid().ToString("N");
 		}
 		#endregion
 	
@@ -89,9 +82,17 @@ namespace QTool
 			else
 #endif
 			{
+				
 				if (Id.IsNullOrEmpty() || (InstanceIdList[Id]!=null&& InstanceIdList[Id] != this))
 				{
-					Id = NewId(this);
+					if (Net.QNetManager.Instance != null && Application.IsPlaying(this))
+					{
+						Id = Net.QNetManager.Instance.IdIndex++.ToString() + "_" + Net.QNetManager.Instance.ClientIndex;
+					}
+					else 
+					{
+						Id = NewId();
+					}
 				}
 				InstanceIdList[Id] = this;
 			}

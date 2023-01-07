@@ -173,23 +173,23 @@ namespace QTool.Reflection
                 }
             }
         }
-        protected void CheckInit(Type type,Func<QMemeberInfo,bool> memeberCheck,Func<QFunctionInfo,bool> functionCheck)
+        protected virtual void Init(Type type)
         {
-            Key = type.FullName;
-            Type = type;
+			Key = type.FullName;
+			Type = type;
 			ElementType = type;
 			Code = Type.GetTypeCode(type);
-            if (TypeCode.Object.Equals(Code))
-            {
+			if (TypeCode.Object.Equals(Code))
+			{
 				if (type.IsArray)
-                {
-                    ElementType = type.GetElementType();
-                    IndexArray = new int[type.GetArrayRank()];
-                }
-                else if (type.GetInterface(typeof(IList<>).FullName, true) != null)
-                {
-                    ElementType = type.GetInterface(typeof(IList<>).FullName, true).GenericTypeArguments[0];
-                    IsList = true;
+				{
+					ElementType = type.GetElementType();
+					IndexArray = new int[type.GetArrayRank()];
+				}
+				else if (type.GetInterface(typeof(IList<>).FullName, true) != null)
+				{
+					ElementType = type.GetInterface(typeof(IList<>).FullName, true).GenericTypeArguments[0];
+					IsList = true;
 				}
 				else if (type.GetInterface(typeof(IDictionary<,>).FullName, true) != null)
 				{
@@ -200,43 +200,30 @@ namespace QTool.Reflection
 					IsDictionary = true;
 				}
 				if (Members != null)
-                {
-                    QMemeberInfo memeber=null;
-                    type.ForeachMemeber((info) =>
-                    {
-                        memeber = new QMemeberInfo(info);
-                        if (memeberCheck == null || memeberCheck(memeber))
-                        {
-                            Members.Add(memeber);
-                        }
-                    },
-                    (info) =>
-                    {
-                        memeber = new QMemeberInfo(info);
-                        if (memeberCheck==null||memeberCheck(memeber))
-                        {
-                            Members.Add(memeber);
-                        }
-                    }, MemberFlags);
-                }
+				{
+					QMemeberInfo memeber = null;
+					type.ForeachMemeber((info) =>
+					{
+						memeber = new QMemeberInfo(info);
+						Members.Add(memeber);
+					},
+					(info) =>
+					{
+						memeber = new QMemeberInfo(info);
+						Members.Add(memeber);
+					}, MemberFlags);
+				}
 
-                if (Functions != null)
-                {
-                    type.ForeachFunction((info) =>
-                    {
-                        var function = new QFunctionInfo(info);
-                        if (functionCheck==null|| functionCheck(function))
-                        {
-                            Functions.Add(function);
-                        }
-                    }, FunctionFlags);
-                }
-            }
-        }
-        protected virtual void Init(Type type)
-        {
-            CheckInit(type,null,null);
-        }
+				if (Functions != null)
+				{
+					type.ForeachFunction((info) =>
+					{
+						var function = new QFunctionInfo(info);
+						Functions.Add(function);
+					}, FunctionFlags);
+				}
+			}
+		}
         static Type[] defaultCreatePrams = new Type[0];
         public static Dictionary<Type, T> table = new Dictionary<Type, T>();
         public static T Get(Type type)
