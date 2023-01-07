@@ -988,7 +988,17 @@ namespace QTool
 					 nameof(Rect.height),
 					 nameof(Rect.width),
 				 }
-			}
+			},
+			{
+				 typeof(Quaternion),
+				 new List<string>
+				 {
+					 nameof(Quaternion.x),
+					 nameof(Quaternion.y),
+					 nameof(Quaternion.z),
+					 nameof(Quaternion.w),
+				 }
+			},
 		};
 		
 		public QObjectType objType = QObjectType.Object;

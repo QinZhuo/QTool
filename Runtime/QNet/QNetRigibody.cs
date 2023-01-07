@@ -6,11 +6,11 @@ namespace QTool.Net
 	{
 		public new Rigidbody rigidbody;
 		[QSyncVar(true)]
-		public Vector3 Position { get => rigidbody.position; set => rigidbody.position = value; }
+		public Vector3 RigPosition { get => rigidbody.position; set => rigidbody.position = value; }
 		[QSyncVar]
 		public Vector3 Velocity { get => rigidbody.velocity; set => rigidbody.velocity = value; }
 		[QSyncVar]
-		public Quaternion Rotation { get => rigidbody.rotation; set => rigidbody.rotation = value; }
+		public Quaternion RigRotation { get => rigidbody.rotation; set => rigidbody.rotation = value; }
 		[QSyncVar]
 		public Vector3 AngularVelocity { get => rigidbody.angularVelocity; set => rigidbody.angularVelocity = value; }
 		private void Reset()
