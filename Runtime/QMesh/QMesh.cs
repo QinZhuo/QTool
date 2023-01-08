@@ -150,7 +150,7 @@ namespace QTool.Mesh
 				for (int sub = 0; sub < skinedMesh.sharedMesh.subMeshCount; sub++)
 				{
 					CombineInstance combine = new CombineInstance();
-					combine.mesh = GameObject.Instantiate(skinedMesh.sharedMesh);
+					combine.mesh = skinedMesh.sharedMesh;
 					combine.subMeshIndex = sub;
 					combineInfos.Add(combine);
 				}
