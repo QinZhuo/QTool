@@ -6,7 +6,7 @@ using QTool;
 using UnityEngine.AI;
 public class QNetTestEnemy : QNetBehaviour
 {
-	public QNetNavMeshAgent agent;
+	public QNetNavMeshCharacter agent;
 	private QNetTestPlayer Target;
 	public QNetTestPlayer GetTarget()
 	{
