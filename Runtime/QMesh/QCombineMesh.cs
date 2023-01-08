@@ -81,7 +81,7 @@ namespace QTool.Mesh
 							if (child != null)
 							{
 								child.GetComponent<MeshRenderer>(true).sharedMaterials = renderer.sharedMaterials;
-								child.GetComponent<MeshFilter>(true).sharedMesh = meshFilter.sharedMesh;
+								child.GetComponent<MeshFilter>(true).sharedMesh =GameObject.Instantiate( meshFilter.sharedMesh);
 								if (!child.gameObject.activeSelf)
 								{
 									child.gameObject.SetActive(true);
