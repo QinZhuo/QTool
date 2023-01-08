@@ -125,7 +125,7 @@ namespace QTool.Mesh
 			root.sharedMaterials = matList.ToArray();
 			var filter = root.GetComponent<MeshFilter>(true);
 			filter.sharedMesh = new UnityEngine.Mesh();
-			filter.sharedMesh.CombineMeshes(combineInfos.ToArray(), false, true);
+			filter.sharedMesh.CombineMeshes(combineInfos.ToArray(), true, true);
 			Debug.Log(root + " " + nameof(CombineMeshs) + " 顶点数:" + filter.sharedMesh.vertices.Length);
 			if (deleteOld)
 			{
@@ -167,7 +167,7 @@ namespace QTool.Mesh
 			{
 				root.sharedMesh.Clear(false);
 			}
-			root.sharedMesh.CombineMeshes(combineInfos.ToArray(), false, false);
+			root.sharedMesh.CombineMeshes(combineInfos.ToArray(), true, false);
 			root.bones = bones.ToArray();
 			root.materials = matList.ToArray();
 		}
