@@ -16,8 +16,11 @@ namespace QTool.Mesh
 		List<Renderer> Renderers => renderers;
 		[HideInInspector]
 		public Transform rootBone;
-	
 
+		private void Awake()
+		{
+			FreshMesh();
+		}
 		void FreshRenderers()
 		{
 			renderers?.Clear();
