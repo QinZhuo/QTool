@@ -8,7 +8,7 @@ public class QNetTestPlayer : QNetBehaviour
 	public static List<QNetTestPlayer> Players = new List<QNetTestPlayer>();
 	public GameObject bulletPrefab;
 	public int Score = 0;
-	public QNetNavMeshCharacter agent;
+	public QNetNavMeshController agent;
 	QTimer shootTimer = new QTimer(0.4f,true);
 
 	public override void OnNetStart()
