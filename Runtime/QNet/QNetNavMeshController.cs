@@ -47,7 +47,6 @@ namespace QTool.Net
 		}
 		public override void OnNetUpdate()
 		{
-		
 			if (NavMesh.SamplePosition(transform.position, out var hitInfo, 2, NavMesh.AllAreas))
 			{
 				if (useGravity)
@@ -55,7 +54,7 @@ namespace QTool.Net
 					transform.position += NetTime * Physics.gravity;
 				}
 				IsGrounded = transform.position.y <= hitInfo.position.y;
-				transform.position = new Vector3(hitInfo.position.x, IsGrounded ? hitInfo.position.y : transform.position.y, transform.position.z);
+				transform.position = new Vector3(hitInfo.position.x, IsGrounded ? hitInfo.position.y : transform.position.y, hitInfo.position.z);
 			}
 			else
 			{
