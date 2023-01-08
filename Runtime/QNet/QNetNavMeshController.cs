@@ -53,12 +53,12 @@ namespace QTool.Net
 			}
 			if (NavMesh.SamplePosition(transform.position, out var hitInfo, 2, NavMesh.AllAreas))
 			{
-				IsGrounded = hitInfo.position.y <= hitInfo.position.y;
+				IsGrounded = transform.position.y <= hitInfo.position.y;
 				transform.position = new Vector3(hitInfo.position.x, IsGrounded ? hitInfo.position.y : transform.position.y, transform.position.z);
 			}
 			else
 			{
-				IsGrounded = true;
+				IsGrounded = false;
 			}
 		}
 		private static List<QNetNavMeshController> AllAgents = new List<QNetNavMeshController>();
