@@ -56,14 +56,6 @@ namespace QTool.Net
 				IsGrounded = transform.position.y <= hitInfo.position.y;
 				transform.position = new Vector3(hitInfo.position.x, IsGrounded ? hitInfo.position.y : transform.position.y, hitInfo.position.z);
 			}
-			else
-			{
-				if (useGravity)
-				{
-					transform.position += NetTime * Physics.gravity;
-				}
-				IsGrounded = false;
-			}
 		}
 		private static List<QNetNavMeshController> AllAgents = new List<QNetNavMeshController>();
 
