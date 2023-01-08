@@ -16,6 +16,7 @@ namespace QTool.Net
 		public float radius =0.5f;
 		[QName("使用重力")]
 		public bool useGravity = true;
+		public bool IsGrounded { get; private set; }
 		public void Move(Vector3 offset)
 		{
 			transform.position += offset;
@@ -52,7 +53,12 @@ namespace QTool.Net
 			}
 			if (NavMesh.SamplePosition(transform.position, out var hitInfo, 2, NavMesh.AllAreas))
 			{
-				transform.position = new Vector3(hitInfo.position.x, hitInfo.position.y <= hitInfo.position.y ? hitInfo.position.y : transform.position.y, transform.position.z);
+				IsGrounded = hitInfo.position.y <= hitInfo.position.y;
+				transform.position = new Vector3(hitInfo.position.x, IsGrounded ? hitInfo.position.y : transform.position.y, transform.position.z);
+			}
+			else
+			{
+				IsGrounded = true;
 			}
 		}
 		private static List<QNetNavMeshController> AllAgents = new List<QNetNavMeshController>();
