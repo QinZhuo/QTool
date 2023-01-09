@@ -161,7 +161,7 @@ namespace QTool
                 paramViewNames.Add(paramInfo.QName());
 				if (IsStringCommond)
 				{
-					if ((!paramInfo.HasDefaultValue&& !paramInfo.ParameterType.IsValueType && paramInfo.ParameterType != typeof(object)) || paramInfo.IsOut)
+					if ((!paramInfo.HasDefaultValue&& !paramInfo.ParameterType.IsValueType&& paramInfo.ParameterType!=typeof(string) && paramInfo.ParameterType != typeof(object)) || paramInfo.IsOut)
 					{
 						IsStringCommond = false;
 					}
