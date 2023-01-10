@@ -346,9 +346,9 @@ namespace QTool
 				{
 					action(Load(path, defaultValue), path);
 				}
-				else 
+				else
 				{
-					path= path.SplitStartString(".");
+					path = Path.GetFileNameWithoutExtension(path);
 					path.ForeachDirectoryFiles((filePath) =>
 					{
 						action(Load(filePath, defaultValue),filePath);

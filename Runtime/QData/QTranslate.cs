@@ -1,10 +1,6 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using QTool.Inspector;
-using System.Threading.Tasks;
-using System.Xml.Serialization;
 namespace QTool
 {
 	public class QTranslateKey:IKey<string>
@@ -48,9 +44,9 @@ namespace QTool
 			//	WebAPI="ko",
 			//},
 		};
-		static QDataList _languageData;
+		static QDataList _translateData;
 		
-		public static QDataList QTranslateData =>_languageData??=GetQDataList();
+		public static QDataList QTranslateData =>_translateData??=GetQDataList();
 		public static QDataList GetQDataList(string name=null)
 		{
 			if (string.IsNullOrEmpty(name))
