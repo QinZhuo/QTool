@@ -31,16 +31,12 @@ public class AssetTest : MonoBehaviour
 		}
 		else
 		{
-#if QTest
-			obj = await Addressables.LoadAssetAsync<GameObject>(nameof(ResourceTest) + "/" + nameof(ResourceTest) + nameof(GameObject)).Task;
-			sprite = await Addressables.LoadAssetAsync<Sprite>(nameof(ResourceTest) + "/" + nameof(ResourceTest) + nameof(Sprite)).Task;
-#endif
 		}
 
 		sView.sprite = sprite;
 		Instantiate(obj, transform);
 		objList.Clear();
-		await ResourceTest.LoadAllAsync(objList);
+		ResourceTest.LoadAll(objList);
 		Debug.LogError(obj + " : " + sprite+"\n"+objList.ToOneString());
 	}
 	public void ResourceTestUnLoad()
@@ -53,14 +49,9 @@ public class AssetTest : MonoBehaviour
 		}
 		else
 		{
-#if QTest
-			Addressables.Release(sprite);
-			Addressables.Release(obj);
-#endif
 			obj = null;
 			sView.sprite = null;
 			sprite = null;
-			ResourceTest.ReleaseAll();
 			objList.Clear();
 		}
 		
@@ -81,14 +72,14 @@ public class AssetTest : MonoBehaviour
     async void LoadTest1()
     {
         //   Debug.LogError( await ResourceTest.GetAsync("test1"));
-         var obj=await ResourceTest.LoadAsync("Test1");
+         var obj=ResourceTest.Load("Test1");
         text.text = "加载完成:" + obj;
     }
     [ContextMenu("加载全部")]
-    async void LoadAll()
+    void LoadAll()
     {
      //   Debug.LogError( await ResourceTest.GetAsync("test1"));
-        await ResourceTest.LoadAllAsync(objList);
+        ResourceTest.LoadAll(objList);
         //text.text = "加载完成:" + ResourceTest.objDic.Count + ResourceTest.objDic.ToOneString();
     }
 	[ContextMenu("GCLoading")]

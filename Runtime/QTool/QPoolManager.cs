@@ -292,7 +292,6 @@ namespace QTool
 	public class GameObjectPool : ObjectPool<GameObject>
 	{
 		public GameObject prefab { get; internal set; }
-		public event Action OnRelease;
 		public GameObjectPool(string poolName, Func<GameObject> newFunc = null):base(poolName,newFunc)
 		{
 			OnGet += (obj) =>
@@ -329,8 +328,6 @@ namespace QTool
 		{
 			UsingPool.RemoveNull();
 			newFunc = null;
-			OnRelease?.Invoke();
-			OnRelease = null;
 			prefab = null;
 		}
 

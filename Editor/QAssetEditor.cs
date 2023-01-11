@@ -105,15 +105,15 @@ namespace QTool.Asset {
 
 			foreach (var path in AssetDatabase.GetAllAssetPaths())
 			{
-				if (!(path.StartsWith("Assets/")&&(path.EndsWith(".fbx")|| path.EndsWith(".FBX")))) continue;
-				var importer= AssetImporter.GetAtPath(path) as ModelImporter;
+				if (!(path.StartsWith("Assets/") && (path.EndsWith(".fbx") || path.EndsWith(".FBX")))) continue;
+				var importer = AssetImporter.GetAtPath(path) as ModelImporter;
 				FreshEvents(importer);
 			}
 			AssetDatabase.Refresh();
 		}
 		static void FreshEvents(ModelImporter importer)
 		{
-			if (importer&&importer.clipAnimations.Length>0)
+			if (importer && importer.clipAnimations.Length > 0)
 			{
 				bool changed = false;
 				ModelImporterClipAnimation[] animations = importer.clipAnimations;
@@ -282,8 +282,8 @@ namespace QTool.Asset {
 		{
 			foreach (var path in AssetDatabase.GetAllAssetPaths())
 			{
-				if (!path.StartsWith("Assets/") ) continue;
-				if (path.EndsWith(".spriteatlas")||path.EndsWith(".spriteatlasv2"))
+				if (!path.StartsWith("Assets/")) continue;
+				if (path.EndsWith(".spriteatlas") || path.EndsWith(".spriteatlasv2"))
 				{
 					Debug.LogError("删除 " + path);
 					AssetDatabase.DeleteAsset(path);
@@ -298,8 +298,8 @@ namespace QTool.Asset {
 			var paths = AssetDatabase.GetAllAssetPaths();
 			foreach (var path in paths)
 			{
-				if (!path.StartsWith("Assets/") ) continue;
-				if (path.Contains("/Plugins/") ) continue;
+				if (!path.StartsWith("Assets/")) continue;
+				if (path.Contains("/Plugins/")) continue;
 				AssetImporter assetImporter = AssetImporter.GetAtPath(path);
 				if (assetImporter is AudioImporter audioImporter)
 				{
@@ -307,7 +307,7 @@ namespace QTool.Asset {
 				}
 				else if (assetImporter is TextureImporter textureImporter)
 				{
-					if(AssetDatabase.LoadAssetAtPath<Texture>(path) is Texture2D tex2D)
+					if (AssetDatabase.LoadAssetAtPath<Texture>(path) is Texture2D tex2D)
 					{
 						ReImportTexture(tex2D, textureImporter);
 					}
@@ -349,12 +349,12 @@ namespace QTool.Asset {
 				audioImporter.SaveAndReimport();
 			}
 		}
-		public readonly static List<int> TextureSize = new List<int> {1,4,8,16 ,32, 64,128,256,512,1024,2048,4096 };
+		public readonly static List<int> TextureSize = new List<int> { 1, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096 };
 		public static void ReImportTexture(Texture2D texture, TextureImporter textureImporter)
 		{
-			if (texture == null|| textureImporter.textureType == TextureImporterType.Cursor) return;
+			if (texture == null || textureImporter.textureType == TextureImporterType.Cursor) return;
 			var setting = QToolSetting.Instance;
-			if (textureImporter.assetPath.EndsWith(".png") && textureImporter.textureType == TextureImporterType.Sprite&&textureImporter.spriteImportMode== SpriteImportMode.Single&&(texture.width%4!=0||texture.height%4!=0))
+			if (textureImporter.assetPath.EndsWith(".png") && textureImporter.textureType == TextureImporterType.Sprite && textureImporter.spriteImportMode == SpriteImportMode.Single && (texture.width % 4 != 0 || texture.height % 4 != 0))
 			{
 				var last = textureImporter.isReadable;
 				if (!last)
@@ -362,9 +362,9 @@ namespace QTool.Asset {
 					textureImporter.isReadable = true;
 					textureImporter.SaveAndReimport();
 				}
-				var widthOffset= texture.width % 4;
+				var widthOffset = texture.width % 4;
 				var heightOffset = texture.height % 4;
-				var newText= new Texture2D(texture.width+ (widthOffset == 0 ? 0 : 4 - widthOffset),texture.height+ (heightOffset == 0 ? 0 : 4 - heightOffset));
+				var newText = new Texture2D(texture.width + (widthOffset == 0 ? 0 : 4 - widthOffset), texture.height + (heightOffset == 0 ? 0 : 4 - heightOffset));
 				textureImporter.spriteBorder += new Vector4(0, 0, newText.width - texture.width, newText.height - texture.height);
 				for (int x = 0; x < newText.width; x++)
 				{
@@ -376,7 +376,7 @@ namespace QTool.Asset {
 						}
 						else
 						{
-							newText.SetPixel(x, y,Color.clear);
+							newText.SetPixel(x, y, Color.clear);
 						}
 					}
 				}
@@ -392,7 +392,7 @@ namespace QTool.Asset {
 			{
 				Debug.Log("重新导入图片[" + textureImporter.assetPath + "]");
 
-				if(textureImporter.maxTextureSize > texture.width && textureImporter.maxTextureSize > texture.height)
+				if (textureImporter.maxTextureSize > texture.width && textureImporter.maxTextureSize > texture.height)
 				{
 					for (int i = 0; i < TextureSize.Count - 1 && textureImporter.maxTextureSize > TextureSize[i]; i++)
 					{
@@ -426,91 +426,10 @@ namespace QTool.Asset {
 				textureImporter.compressionQuality = setting.compressionQuality;
 				textureImporter.SaveAndReimport();
 			}
-			
+
 		}
 
-		//static void AutoSetAtlasContents(string path, List<string> textures)
-		//{
-		//	path = path + "/"+ Path.GetFileName(path)+ "AutoAtlas.spriteatlas";
-		//	SpriteAtlas atlas = AssetDatabase.LoadAssetAtPath<SpriteAtlas>(path);
-		
-		//	if (atlas == null)
-		//	{
-		//		Debug.LogError("创建图集[" + path + "]");
-		//		atlas = new SpriteAtlas();
-		//		// 设置参数 可根据项目具体情况进行设置
-		//		SpriteAtlasPackingSettings packSetting = new SpriteAtlasPackingSettings()
-		//		{
-		//			blockOffset = 1,
-		//			enableRotation = false,
-		//			enableTightPacking = false,
-		//			padding = 2,
-		//		};
-		//		atlas.SetPackingSettings(packSetting);
-
-		//		SpriteAtlasTextureSettings textureSetting = new SpriteAtlasTextureSettings()
-		//		{
-		//			readable = false,
-		//			generateMipMaps = false,
-		//			sRGB = true,
-		//			filterMode = FilterMode.Bilinear,
-		//		};
-		//		atlas.SetTextureSettings(textureSetting);
-
-		//		TextureImporterPlatformSettings platformSetting = new TextureImporterPlatformSettings()
-		//		{
-		//			maxTextureSize = QToolSetting.Instance.AtlasSize,
-		//			format = TextureImporterFormat.Automatic,
-		//			crunchedCompression = true,
-		//			textureCompression = TextureImporterCompression.Compressed,
-		//			compressionQuality = QToolSetting.Instance.compressionQuality,
-		//		};
-		//		atlas.SetPlatformSettings(platformSetting);
-		//		AssetDatabase.CreateAsset(atlas, path);
-		//		Debug.LogError("创建自动图集 " + path);
-		//	}
-		//	var objs=new List<UnityEngine.Object>( atlas.GetPackables());
-		//	List<Sprite> spriteList = new List<Sprite>(textures.Count);
-		//	foreach (var tex in textures)
-		//	{
-		//		var sprite = AssetDatabase.LoadAssetAtPath<Sprite>(tex);
-		//		if (!objs.Contains(sprite))
-		//		{
-		//			spriteList.Add(sprite);
-		//			Debug.Log("自动图集收集 " + tex);
-		//		}
-		//	}
-		//	if (spriteList.Count > 0)
-		//	{
-		//		atlas.Add(spriteList.ToArray());
-		//	}
-		//}
 		#endregion
-#if Addressable
 
-		public const string AddressableResources = nameof(AddressableResources);
-		[MenuItem("QTool/资源管理/批量处理/生成Addressables资源")]
-		public static void AutoAddressableResources()
-		{
-			var root = "Assets/" + AddressableResources;
-			root.ForeachDirectory((directory) =>
-			{
-				var groupName = directory.SplitEndString(root + "/").SplitStartString("/");
-				var count = directory.DirectoryFileCount();
-				var index = 1f;
-				directory.ForeachDirectoryFiles((path) =>
-				{
-					EditorUtility.DisplayProgressBar("批量添加Addressable资源", "添加资源(" + index + "/" + count + ") : " + path, index / count);
-					var key = path.SplitEndString(root + "/");
-					key = key.Substring(0, key.LastIndexOf('.'));
-					AddressableTool.SetAddresableGroup(path, groupName, key);
-					index++;
-				});
-				EditorUtility.ClearProgressBar();
-			});
-			AssetDatabase.SaveAssets();
-		}
-#endif
-    }
-
+	}
 }
