@@ -24,7 +24,7 @@ namespace QTool
 		[QName("刷新ID")]
 		public void FreshId()
 		{
-			id= UnityEditor.AssetDatabase.GetAssetPath(this);
+			id= UnityEditor.AssetDatabase.GetAssetPath(obj);
 		}
 #endif
 	}
