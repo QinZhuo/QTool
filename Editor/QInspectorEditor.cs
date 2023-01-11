@@ -470,8 +470,9 @@ namespace QTool.Inspector
 		}
 		public override void OnInspectorGUI()
 		{
-			if (this == null)
+			if (target == null)
 			{
+				GUILayout.Label("脚本丢失");
 				return;
 			}
 			base.OnInspectorGUI();
