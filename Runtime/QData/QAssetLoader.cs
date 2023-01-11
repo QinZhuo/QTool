@@ -30,12 +30,6 @@ namespace QTool.Asset
 			return assetList;
 		
 		}
-#if UNITY_EDITOR
-		public static TObj[] GetEditorList()
-		{
-			return Resources.LoadAll<TObj>(DirectoryPath);
-		}
-#endif
 		public static TObj Load(string key)
 		{
 			key = key.Replace('\\', '/');
