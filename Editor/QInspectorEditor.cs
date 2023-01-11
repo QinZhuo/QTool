@@ -470,6 +470,10 @@ namespace QTool.Inspector
 		}
 		public override void OnInspectorGUI()
 		{
+			if (this == null)
+			{
+				return;
+			}
 			base.OnInspectorGUI();
 			DrawButton();
 		}
