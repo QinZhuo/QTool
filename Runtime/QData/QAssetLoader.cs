@@ -29,7 +29,7 @@ namespace QTool.Asset
 	{
 		public static GameObject PoolGet(string key, Transform parent = null)
 		{
-			var pool = QPoolManager.GetPool(key, Load(key));
+			var pool = QPoolManager.GetPool(DirectoryPath + "_" + key, Load(key));
 			if (pool == null)
 			{
 				Debug.LogError("无法实例化预制体[" + key + "]");
