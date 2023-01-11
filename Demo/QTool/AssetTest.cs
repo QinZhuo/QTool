@@ -36,7 +36,7 @@ public class AssetTest : MonoBehaviour
 		sView.sprite = sprite;
 		Instantiate(obj, transform);
 		objList.Clear();
-		ResourceTest.LoadAll(objList);
+		objList.AddRange(ResourceTest.LoadAll());
 		Debug.LogError(obj + " : " + sprite+"\n"+objList.ToOneString());
 	}
 	public void ResourceTestUnLoad()
@@ -78,8 +78,8 @@ public class AssetTest : MonoBehaviour
     [ContextMenu("加载全部")]
     void LoadAll()
     {
-     //   Debug.LogError( await ResourceTest.GetAsync("test1"));
-        ResourceTest.LoadAll(objList);
+		//   Debug.LogError( await ResourceTest.GetAsync("test1"));
+		objList.AddRange( ResourceTest.LoadAll());
         //text.text = "加载完成:" + ResourceTest.objDic.Count + ResourceTest.objDic.ToOneString();
     }
 	[ContextMenu("GCLoading")]

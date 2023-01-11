@@ -15,20 +15,9 @@ namespace QTool.Asset
 				return typeof(TPath).Name;
 			}
 		}
-		public static List<TObj> LoadAll(List<TObj> assetList=null)
+		public static TObj[] LoadAll()
 		{
-			if (assetList == null)
-			{
-				assetList = new List<TObj>();
-			}
-			else
-			{
-				assetList.Clear();
-			}
-			assetList.AddRange(Resources.LoadAll<TObj>(DirectoryPath));
-			QDebug.Log("加载 [" + DirectoryPath + "][" + typeof(TObj) + "] 资源：\n" + assetList.ToOneString());
-			return assetList;
-		
+			return Resources.LoadAll<TObj>(DirectoryPath);
 		}
 		public static TObj Load(string key)
 		{
