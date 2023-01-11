@@ -40,8 +40,9 @@ namespace QTool
 				{
 					try
 					{
-						AssetObjectCache.Add(qidr.id, qidr.obj);
-						AssetIdCache.Add(qidr.obj, qidr.id);
+						var id = UnityEditor.AssetDatabase.GetAssetPath(qidr.obj);
+						AssetObjectCache.Add(id, qidr.obj);
+						AssetIdCache.Add(qidr.obj, id);
 					}
 					catch (System.Exception e)
 					{
@@ -77,7 +78,6 @@ namespace QTool
 							return key;
 						}
 						var qidr = ScriptableObject.CreateInstance<QIdReference>();
-						qidr.id = key;
 						qidr.obj = obj;
 						var path = "Assets/Resources/" + nameof(QIdReference) + "/" + key + ".asset";
 						path = QFileManager.CheckDirectoryPath(path);
