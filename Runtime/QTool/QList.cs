@@ -344,7 +344,11 @@ namespace QTool
 			if (start < 0 || end < 0) return value;
 			while (start >= 0 && end >= 0)
 			{
-				var key = value.Substring(start + 1, end - start - 1);
+				var key = "";
+				if (end > start)
+				{
+					key = value.Substring(start + 1, end - start - 1);
+				}
 				var result = action(key);
 				value = value.Substring(0, start) + result + value.Substring(end + 1);
 				end += result.Length - key.Length - 2;
