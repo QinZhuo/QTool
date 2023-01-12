@@ -9,22 +9,6 @@ namespace QTool
 {
 	public class QToolSetting : InstanceScriptable<QToolSetting>
 	{
-		/// <summary>
-		/// 获取设置文件
-		/// </summary>
-		public static T GetSetting<T>(string name)where T: ScriptableObject
-		{
-			foreach (var setting in Instance.Settings)
-			{
-				if (setting == null) continue;
-				if (setting.name == name)
-				{
-					return setting as T;
-				}
-			}
-			return null;
-		}
-		public List<ScriptableObject> Settings = new List<ScriptableObject>();
 		public QMailAccount QAnalysisMail;
 		public string QAnalysisProject;
 		[QEnum(nameof(GetModList))]
