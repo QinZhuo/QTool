@@ -22,7 +22,6 @@ namespace QTool
 			commandStr = commandStr.ForeachBlockValue('“', '”', (value) => { return value.Replace(" ", "@#&"); });
 			List<string> commands = new List<string>();
 			commands.AddRange(commandStr.Split(' '));
-			commands.RemoveSpace();
 			for (int i = 0; i < commands.Count; i++)
 			{
 				commands[i] = commands[i].Replace("@#&", " ");
