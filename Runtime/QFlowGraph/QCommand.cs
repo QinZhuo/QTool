@@ -27,8 +27,9 @@ namespace QTool
 				commands[i] = commands[i].Replace("@#&", " ");
 			}
             if (commands.Count > 0)
-            {
-                var name = commands.Dequeue();
+			{
+				QDebug.Log("字符命令调用:" + commands.ToOneString());
+				var name = commands.Dequeue();
 				bool not = false;
 				if (name.StartsWith("!"))
 				{
@@ -189,7 +190,6 @@ namespace QTool
 						{
 							paramObjs[i] = commands[i].ParseQDataType(pInfo.ParameterType);
 						}
-
                     }
                     catch (Exception e)
                     {
