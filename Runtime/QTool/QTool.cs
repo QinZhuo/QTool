@@ -137,7 +137,7 @@ namespace QTool
 					}
 					else
 					{
-						throw new Exception(" 找不到 key [" + start + "]" + childPath);
+						return null;
 					}
 				}
 			}
