@@ -144,6 +144,7 @@ namespace QTool
 		}
 		public static void RemoveComponent<T>(this Component com) where T : Component
 		{
+			if (com == null) return;
 			com?.gameObject.RemoveComponent<T>();
 		}
 		public static void RemoveComponent<T>(this GameObject obj) where T : Component
@@ -151,7 +152,7 @@ namespace QTool
 			var com = obj?.GetComponent<T>();
 			if (com != null )
 			{
-				CheckDestory(obj);
+				CheckDestory(com);
 			}
 		}
 		public static T GetComponent<T>(this Component com, bool autoCreate) where T : Component
