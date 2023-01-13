@@ -142,6 +142,18 @@ namespace QTool
 				}
 			}
 		}
+		public static void RemoveComponent<T>(this Component com) where T : Component
+		{
+			com?.gameObject.RemoveComponent<T>();
+		}
+		public static void RemoveComponent<T>(this GameObject obj) where T : Component
+		{
+			var com = obj?.GetComponent<T>();
+			if (com != null )
+			{
+				CheckDestory(obj);
+			}
+		}
 		public static T GetComponent<T>(this Component com, bool autoCreate) where T : Component
 		{
 			return com?.gameObject.GetComponent<T>(autoCreate);
