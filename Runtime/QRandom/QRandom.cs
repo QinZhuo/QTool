@@ -20,6 +20,7 @@ namespace QTool
 		}
 		public static T RandomGet<T>(this IList<T> list, System.Random random=null)
 		{
+			if (list == null || list.Count == 0) return default;
 			return list[random.Range(0, list.Count)];
 		}
 
