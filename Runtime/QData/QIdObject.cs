@@ -136,6 +136,7 @@ namespace QTool
 				if (id.Contains("/" + nameof(Resources) + "/"))
 				{
 					loadPath = id.SplitEndString("/" + nameof(Resources) + "/");
+					loadPath = System.IO.Path.GetFileNameWithoutExtension(loadPath);
 				}
 				else
 				{
