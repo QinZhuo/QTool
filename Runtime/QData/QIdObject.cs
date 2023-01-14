@@ -163,6 +163,7 @@ namespace QTool
 #if UNITY_EDITOR
 				if (id.StartsWith("Assets"))
 				{
+					Debug.LogError("未找到【" + id + "】[" + loadPath + "]");
 					obj = UnityEditor.AssetDatabase.LoadAssetAtPath(id, type);
 					if (obj != null)
 					{
