@@ -81,7 +81,7 @@ namespace QTool.Mesh
 			}
 			filter.sharedMesh = qVoxelData.GenerateMesh();
 #if UNITY_EDITOR
-			if (qVoxelData.MeshData.Mesh.name.IsNullOrEmpty())
+			if (qVoxelData.MeshData.Mesh.name.IsNull())
 			{
 				qVoxelData.MeshData.Mesh.name = nameof(QVoxelMesh) + "_" + qVoxelData.MeshData.Mesh.GetHashCode();
 				var path = "Assets/" + nameof(QVoxelMesh) + "/" + qVoxelData.MeshData.Mesh.name + ".asset";

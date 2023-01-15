@@ -287,7 +287,7 @@ namespace QTool
 		}
 		public void Load(string key=null)
 		{
-			if (key.IsNullOrEmpty())
+			if (key.IsNull())
 			{
 				foreach (var kv in PathIndex)
 				{

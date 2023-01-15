@@ -477,7 +477,7 @@ namespace QTool.Reflection
 		}
 		public static object InvokeFunction(this object obj, string funcName, params object[] param)
 		{
-			if (funcName.IsNullOrEmpty())
+			if (funcName.IsNull())
 			{
 				return null;
 			}
@@ -607,7 +607,7 @@ namespace QTool.Reflection
         static Dictionary<string, Type> TypeBuffer = new Dictionary<string, Type>();
         public static Type ParseType(string typeString)
         {
-			if (typeString.IsNullOrEmpty()) return null;
+			if (typeString.IsNull()) return null;
 			if (TypeBuffer.ContainsKey(typeString))
 			{
 				return TypeBuffer[typeString];

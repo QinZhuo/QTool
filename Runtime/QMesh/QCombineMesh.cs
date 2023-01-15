@@ -60,7 +60,7 @@ namespace QTool.Mesh
 			}
 			foreach (var meshName in skinnedMeshKeys)
 			{
-				if (meshName.IsNullOrEmpty()) continue;
+				if (meshName.IsNull()) continue;
 				var mesh = renderers.Get(meshName, (mesh) => mesh.name);
 				if (mesh == null)
 				{

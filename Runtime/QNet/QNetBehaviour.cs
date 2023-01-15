@@ -15,7 +15,7 @@ namespace QTool.Net
 		public string PlayerId { get; internal set; }
 		public T PlayerValue<T>(string key, T value)
 		{
-			if (PlayerId.IsNullOrEmpty())
+			if (PlayerId.IsNull())
 			{
 				throw new System.Exception(this + " 非玩家对象");
 			}
@@ -23,7 +23,7 @@ namespace QTool.Net
 		}
 		public void PlayerAction<T>(string key, T value, Action<T> action)
 		{
-			if (PlayerId.IsNullOrEmpty())
+			if (PlayerId.IsNull())
 			{
 				throw new System.Exception(this + " 非玩家对象");
 			}

@@ -54,7 +54,7 @@ namespace QTool
 		{
 			UnityWebRequest req = UnityWebRequest.Get(requestUrl);
 			await req.SendWebRequest();
-			if (!req.error.IsNullOrEmpty())
+			if (!req.error.IsNull())
 			{
 				throw new Exception(req.error);
 			}
@@ -170,15 +170,11 @@ namespace QTool
 		}
 		public static bool IsNull(this object obj)
 		{
-			return Equals(obj, null) || (obj is UnityEngine.Object uobj && uobj == null)||(obj is string str&&str.IsNullOrEmpty());
-		}
-		public static bool IsNullOrEmpty(this string str)
-		{
-			return string.IsNullOrWhiteSpace(str);
+			return Equals(obj, null) || (obj is UnityEngine.Object uobj && uobj == null)||(obj is string str&& string.IsNullOrWhiteSpace(str));
 		}
 		public static string RemveChars(this string str,params char[] exceptchars)
 		{
-			if (str.IsNullOrEmpty()|| exceptchars==null) return str;
+			if (str.IsNull()|| exceptchars==null) return str;
 			foreach (var c in exceptchars)
 			{
 				str = str.Replace(c.ToString(), "");

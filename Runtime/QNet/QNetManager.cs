@@ -437,7 +437,7 @@ namespace QTool.Net
 		string LocalIp = "";
 		private void GUI()
 		{
-			if (LocalIp.IsNullOrEmpty())
+			if (LocalIp.IsNull())
 			{
 				LocalIp = Dns.GetHostEntry(Dns.GetHostName()).AddressList.FirstOrDefault(a => a.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork).ToString();
 			}

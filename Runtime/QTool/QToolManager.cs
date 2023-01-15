@@ -94,7 +94,7 @@ namespace QTool
 						for (int i = 0; i < QCommand.NameDictionary[name].paramInfos.Length; i++)
 						{
 							var p = QCommand.NameDictionary[name].paramInfos[i];
-							if (CommondParams[i].IsNullOrEmpty())
+							if (CommondParams[i].IsNull())
 							{
 								CommondParams[i] = p.DefaultValue.ToQDataType(p.ParameterType);
 							}

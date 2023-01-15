@@ -24,7 +24,7 @@ namespace QTool
 		}
 		private void OnRectTransformDimensionsChange()
 		{
-			if (!uiPosSize.IsNullOrEmpty())
+			if (!uiPosSize.IsNull())
 			{
 				Mat.SetVector(uiPosSize,new Vector4( rectTransform.sizeDelta.x,rectTransform.sizeDelta.y,rectTransform.anchoredPosition.x,rectTransform.anchoredPosition.y));
 			}
@@ -34,7 +34,7 @@ namespace QTool
 			(Screen.height - Event.current.mousePosition.y- rectTransform.DownLeft().y) / rectTransform.GetHeight());
 		private void OnGUI()
 		{
-			if (!mousePosButton.IsNullOrEmpty())
+			if (!mousePosButton.IsNull())
 			{
 				if (Event.current != null)
 				{

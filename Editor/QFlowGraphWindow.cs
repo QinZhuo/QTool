@@ -44,7 +44,7 @@ namespace QTool.FlowGraph
 		{
 			if (Graph != null) return;
 			var path = PlayerPrefs.GetString(OpenPathKey);
-			if (path.IsNullOrEmpty())
+			if (path.IsNull())
 			{
 				PlayerPrefs.SetString(OpenPathKey, "");
 				return;

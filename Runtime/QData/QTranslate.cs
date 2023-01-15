@@ -185,8 +185,8 @@ namespace QTool
 		public static QDictionary<string, Font> LanguageFont = new QDictionary<string, Font>();
 		public static string Translate(string value,string language="")
         {
-			if (string.IsNullOrEmpty(value)) { return value; }
-			if (language.IsNullOrEmpty()) language = GlobalLanguage;
+			if (value.IsNull()) { return value; }
+			if (language.IsNull()) language = GlobalLanguage;
 			value = value.Trim();
 			var oldValue = value;
 			value = TranslateKey(value, language);
@@ -207,7 +207,7 @@ namespace QTool
 			else if (QTranslateData.ContainsKey(value)&& QTranslateData[value].HasValue(language))
             {
                 var translate = QTranslateData[value].GetValue<string>(language);
-				if (translate.IsNullOrEmpty()&&!QTranslateData[value].GetValue<string>(DefaultLanguage).IsNullOrEmpty())
+				if (translate.IsNull()&&!QTranslateData[value].GetValue<string>(DefaultLanguage).IsNull())
 				{
 					Debug.LogWarning("缺少翻译[" + value + "]["+language+"]");
 					return value;

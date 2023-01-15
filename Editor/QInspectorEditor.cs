@@ -170,7 +170,7 @@ namespace QTool.Inspector
 		}
 		public void UpdateList(string key)
 		{
-			if (key == "null"|| key.IsNullOrEmpty())
+			if (key == "null"|| key.IsNull())
 			{
 				SelectIndex = 0;
 			}
@@ -215,7 +215,7 @@ namespace QTool.Inspector
 				type = obj?.GetType();
 			}
 			var drawerKey = funcKey;
-			if (drawerKey.IsNullOrEmpty())
+			if (drawerKey.IsNull())
 			{
 				if(obj is SerializedProperty property)
 				{
@@ -231,7 +231,7 @@ namespace QTool.Inspector
 			if (drawer.List.Count <= 0)
 			{
 				drawer.List.AddCheckExist(new GUIContent("null"));
-				if (!funcKey.IsNullOrEmpty())
+				if (!funcKey.IsNull())
 				{
 					object getObj = null;
 					getObj = obj.InvokeFunction(funcKey);
@@ -351,12 +351,12 @@ namespace QTool.Inspector
 					var gameObject = (property.serializedObject.targetObject as MonoBehaviour)?.gameObject;
 					if (gameObject != null) 
 					{
-						if (!value.IsNullOrEmpty())
+						if (!value.IsNull())
 						{
 							GameObject.DestroyImmediate(gameObject.GetComponent(QReflection.ParseType(value)));
 						}
 						value = data.SelectValue;
-						if (!value.IsNullOrEmpty())
+						if (!value.IsNull())
 						{
 							property.objectReferenceValue=gameObject.GetComponent(QReflection.ParseType(value));
 							if(property.objectReferenceValue == null)
@@ -492,7 +492,7 @@ namespace QTool.Inspector
 
 				if (att.Active(target))
 				{
-					var name = att.name.IsNullOrEmpty() ? kv.Key.Name : att.name;
+					var name = att.name.IsNull() ? kv.Key.Name : att.name;
 
 					if (att is QSelectObjectButtonAttribute)
 					{

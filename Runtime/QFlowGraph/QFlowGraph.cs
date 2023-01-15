@@ -36,7 +36,7 @@ namespace QTool.FlowGraph
         public T GetValue<T>(string key="")
         {
             var type = typeof(T);
-			if (key.IsNullOrEmpty())
+			if (key.IsNull())
 			{
 				key = type.Name;
 			}
@@ -609,7 +609,7 @@ namespace QTool.FlowGraph
                 if (NameAttribute != null)
                 {
 					var newName= _value?.ToString();
-					if (!newName.IsNullOrEmpty())
+					if (!newName.IsNull())
 					{
 						Node.Name = newName;
 					}
@@ -939,7 +939,7 @@ namespace QTool.FlowGraph
                 Debug.LogError("不存在命令【" + commandKey + "】");
                 return false; 
             }
-			if (Name.IsNullOrEmpty())
+			if (Name.IsNull())
 			{
 				Name = command.name.SplitEndString("/");
 			}
@@ -1000,7 +1000,7 @@ namespace QTool.FlowGraph
 					if (port.Value != null)
 					{
 						var newName = port.Value?.ToString();
-						if (!newName.IsNullOrEmpty())
+						if (!newName.IsNull())
 						{
 							Name = newName;
 						}

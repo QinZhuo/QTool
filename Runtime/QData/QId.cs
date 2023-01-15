@@ -24,7 +24,7 @@ namespace QTool
 		{
 			get
 			{
-				return !Prefab.IsNullOrEmpty(); 
+				return !Prefab.IsNull(); 
 			}
 		}
 		private bool IsInstance
@@ -83,7 +83,7 @@ namespace QTool
 #endif
 			{
 				
-				if (Id.IsNullOrEmpty() || (InstanceIdList[Id]!=null&& InstanceIdList[Id] != this))
+				if (Id.IsNull() || (InstanceIdList[Id]!=null&& InstanceIdList[Id] != this))
 				{
 					if (Net.QNetManager.Instance != null && Application.IsPlaying(this))
 					{

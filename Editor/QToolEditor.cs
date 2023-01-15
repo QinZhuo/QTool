@@ -95,7 +95,7 @@ namespace QTool
 					text = text.ForeachBlockValue('<', '>', (key) => { var value = key.GetHashCode().ToString(); keyCache[value] ="<" +key+">"; return "["+value+"]"; });
 					var key = QTranslate.QTranslateData.TitleRow[i];
 
-					if (!text.IsNullOrEmpty() && data[i].IsNullOrEmpty() && !QTranslate.QTranslateData.TitleRow[i].IsNullOrEmpty()&&!key.IsNullOrEmpty()&& QTranslate.TranslateKeys.ContainsKey(key))
+					if (!text.IsNull() && data[i].IsNull() && !QTranslate.QTranslateData.TitleRow[i].IsNull()&&!key.IsNull()&& QTranslate.TranslateKeys.ContainsKey(key))
 					{  
 						var language = QTranslate.GetTranslateKey(key);
 						var newLine = newData[data[0]];
@@ -120,7 +120,7 @@ namespace QTool
 		private static void RunBuild()
 		{
 			var path= PlayerPrefs.GetString(nameof(QToolBuild));
-			if (path.IsNullOrEmpty())
+			if (path.IsNull())
 			{
 				Debug.LogError(nameof(QToolBuild) + " 测试包路径为空");
 				return;
