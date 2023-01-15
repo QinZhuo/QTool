@@ -198,6 +198,15 @@ namespace QTool
 			}
 			return str;
 		}
+		public static string QName(this MonoBehaviour behaviour)
+		{
+			return behaviour.GetGameObject().QName();
+		}
+		public static string QName(this GameObject gameObject)
+		{
+			if (gameObject == null) return "";
+			return gameObject.name.SplitStartString("(").TrimEnd();
+		}
 
 		class QKeyParseData : QDataList<QKeyParseData>, IKey<string>
 		{
