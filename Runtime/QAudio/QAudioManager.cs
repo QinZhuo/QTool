@@ -58,6 +58,14 @@ namespace QTool
 				if (audioPrefab == null)
 				{
 					AudioSources[soundKey] = Instance.transform.GetChild(soundKey, true).GetComponent<QAudioSource>(true);
+					if (System.Enum.TryParse<QAudioType>(soundKey, out var type))
+					{
+						AudioSources[soundKey].SetType(type);
+					}
+					else
+					{
+						AudioSources[soundKey].SetType(QAudioType.SE);
+					}
 				}
 				else
 				{
@@ -66,13 +74,6 @@ namespace QTool
 				if (QAudioSetting != null && AudioSources[soundKey].Audio.outputAudioMixerGroup == null)
 				{
 					AudioSources[soundKey].Audio.outputAudioMixerGroup = GetMixer(soundKey);
-				}
-				if(System.Enum.TryParse<QAudioType>(soundKey,out var type)){
-					AudioSources[soundKey].SetType(type);
-				}
-				else
-				{
-					AudioSources[soundKey].SetType(QAudioType.SE);
 				}
 			}
 			return AudioSources[soundKey];
