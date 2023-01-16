@@ -9,6 +9,7 @@ namespace QTool
 	public class QAudioManager : QToolManagerBase<QAudioManager>
 	{
 		static QDictionary<string, QAudioSource> AudioSources = new QDictionary<string, QAudioSource>();
+		static QDictionary<string, AudioMixerGroup> AudioMixerGroups = new QDictionary<string, AudioMixerGroup>();
 		public static AudioMixerGroup QAudioSetting { get;private set; }
 		protected override void Awake()
 		{
@@ -19,11 +20,37 @@ namespace QTool
 				Debug.LogWarning(nameof(Resources) + "找不到设置文件" + nameof(QAudioSetting));
 			}
 		}
-		public static QAudioSource GetAudio(QAudioType audioType= QAudioType.SE)
+		public static void Play(AudioClip clip,QAudioType audioType= QAudioType.SE)
 		{
-			return GetAudio(audioType.ToString());
+			Play(clip,audioType.ToString());
 		}
-		public static QAudioSource GetAudio(string soundKey)
+		public static void Play(AudioClip clip, string soundKey)
+		{
+			GetAudio(soundKey).Play(clip);
+		}
+		public static void Play(QMusicSetting music, QAudioType audioType = QAudioType.SE)
+		{
+			Play(music, audioType.ToString());
+		}
+		public static void Play(QMusicSetting music, string soundKey)
+		{
+			if (soundKey == nameof(QAudioType.BGM))
+			{
+				music.key = nameof(QAudioManager);
+			}
+			GetAudio(soundKey).Play(music);
+		}
+		public static AudioMixerGroup GetMixer(string soundKey)
+		{
+			var group = AudioMixerGroups[soundKey];
+			if (group == null)
+			{
+				group = QAudioSetting.audioMixer.FindMatchingGroups(soundKey).Get(0);
+				AudioMixerGroups[soundKey] = group;
+			}
+			return group;
+		}
+		internal static QAudioSource GetAudio(string soundKey)
 		{
 			if (AudioSources[soundKey] == null)
 			{
@@ -38,7 +65,7 @@ namespace QTool
 				}
 				if (QAudioSetting != null && AudioSources[soundKey].Audio.outputAudioMixerGroup == null)
 				{
-					AudioSources[soundKey].Audio.outputAudioMixerGroup = QAudioSetting.audioMixer.FindMatchingGroups(soundKey).Get(0);
+					AudioSources[soundKey].Audio.outputAudioMixerGroup = GetMixer(soundKey);
 				}
 				if(System.Enum.TryParse<QAudioType>(soundKey,out var type)){
 					AudioSources[soundKey].SetType(type);
@@ -76,16 +103,20 @@ namespace QTool
 	}
 
 	[System.Serializable]
-	public struct QBackgroundMusic
+	public struct QMusicSetting
 	{
 		public string key;
 		[QName("音乐")]
 		public AudioClip music;
 		[QName("前奏")]
 		public AudioClip start;
-		public void Play()
+		internal void Play()
 		{
-			QAudioManager.GetAudio(QAudioType.BGM).Play(this);
+			QAudioManager.GetAudio(nameof(QAudioType.BGM)).Play(this);
+		}
+		public override string ToString()
+		{
+			return key + "[" + music + "][" + start + "]";
 		}
 	}
 }

@@ -10,9 +10,9 @@ namespace QTool
 	public class QSceneMusicSetting : InstanceBehaviour<QSceneMusicSetting>
 	{
 		[QName("背景乐"), SerializeField]
-		private QBackgroundMusic defaultMusic = new QBackgroundMusic() { key = "默认" };
+		private QMusicSetting defaultMusic = new QMusicSetting() { key = "默认" };
 		[QName("事件音乐"),SerializeField]
-		private List<QBackgroundMusic> eventMusic = new List<QBackgroundMusic>();
+		private List<QMusicSetting> eventMusic = new List<QMusicSetting>();
 
 		protected override void Awake()
 		{
@@ -24,7 +24,10 @@ namespace QTool
 					QEventManager.Register(eventMusic.key, eventMusic.Play);
 				}
 			}
-			defaultMusic.Play();
+			if(QAudioManager.GetAudio(nameof(QAudioType.BGM)).CurBGM?.key != nameof(QAudioManager))
+			{
+				defaultMusic.Play();
+			}
 		}
 		private void OnDestroy()
 		{

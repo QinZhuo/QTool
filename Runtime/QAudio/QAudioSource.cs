@@ -45,9 +45,9 @@ namespace QTool
 					break;
 			}
 		}
-		internal QBackgroundMusic? CurBGM { get; private set; } = null;
+		internal QMusicSetting? CurBGM { get; private set; } = null;
 		internal QAudioSource StartAudio { get; private set; }
-		public void Play(QBackgroundMusic bgm)
+		public void Play(QMusicSetting bgm)
 		{
 			switch (AudioType)
 			{
@@ -59,7 +59,7 @@ namespace QTool
 						PlayStart(bgm.start);
 						Audio.clip = bgm.music;
 					}
-					else if(Audio.isPlaying&&CurBGM?.music?.length==bgm.music?.length&&(bgm.music.name.StartsWith(CurBGM?.music.name)||(CurBGM?.music!=null&& CurBGM.Value.music.name.StartsWith(bgm.music.name))))
+					else if(Audio.isPlaying&&CurBGM?.music!=null&&bgm.music!=null&& CurBGM?.music.length==bgm.music.length)
 					{
 						var time = Audio.time;
 						Audio.clip = bgm.music;
@@ -72,7 +72,7 @@ namespace QTool
 					}
 					break;
 				default:
-					throw new System.Exception(AudioType+" 不支持播放 "+bgm);
+					throw new System.Exception(AudioType+" 不支持播放"+nameof(QMusicSetting)+" "+bgm);
 			}
 			CurBGM = bgm;
 		}
