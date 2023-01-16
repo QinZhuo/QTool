@@ -10,11 +10,11 @@ namespace QTool
 	{
 		static QDictionary<string, QAudioSource> AudioSources = new QDictionary<string, QAudioSource>();
 		static QDictionary<string, AudioMixerGroup> AudioMixerGroups = new QDictionary<string, AudioMixerGroup>();
-		public static AudioMixerGroup QAudioSetting { get;private set; }
+		public static AudioMixer QAudioSetting { get;private set; }
 		protected override void Awake()
 		{
 			base.Awake();
-			QAudioSetting = Resources.Load<AudioMixerGroup>(nameof(QAudioSetting));
+			QAudioSetting = Resources.Load<AudioMixer>(nameof(QAudioSetting));
 			if (QAudioSetting == null)
 			{
 				Debug.LogWarning(nameof(Resources) + "找不到设置文件" + nameof(QAudioSetting));
@@ -24,59 +24,63 @@ namespace QTool
 		{
 			Play(clip,audioType.ToString());
 		}
-		public static void Play(AudioClip clip, string soundKey)
+		public static void Play(AudioClip clip, string audioKey)
 		{
-			GetAudio(soundKey).Play(clip);
+			GetAudio(audioKey).Play(clip);
 		}
 		public static void Play(QMusicSetting music, QAudioType audioType = QAudioType.SE)
 		{
 			Play(music, audioType.ToString());
 		}
-		public static void Play(QMusicSetting music, string soundKey)
+		public static void Play(QMusicSetting music, string audioKey)
 		{
-			if (soundKey == nameof(QAudioType.BGM))
+			if (audioKey == nameof(QAudioType.BGM))
 			{
 				music.key = nameof(QAudioManager);
 			}
-			GetAudio(soundKey).Play(music);
+			GetAudio(audioKey).Play(music);
 		}
-		public static AudioMixerGroup GetMixer(string soundKey)
+		public static AudioMixerGroup GetMixer(string audioKey)
 		{
-			var group = AudioMixerGroups[soundKey];
+			var group = AudioMixerGroups[audioKey];
 			if (group == null)
 			{
-				group = QAudioSetting.audioMixer.FindMatchingGroups(soundKey).Get(0);
-				AudioMixerGroups[soundKey] = group;
+				group = QAudioSetting?.FindMatchingGroups(audioKey).Get(0);
+				AudioMixerGroups[audioKey] = group;
 			}
 			return group;
 		}
-		internal static QAudioSource GetAudio(string soundKey)
+		public static void ChangeVolume(string audioKey, float value)
 		{
-			if (AudioSources[soundKey] == null)
+			QAudioSetting?.SetFloat(audioKey, value <= 0 ? -80 : Mathf.Lerp(-20, 0, value));
+		}
+		internal static QAudioSource GetAudio(string audioKey)
+		{
+			if (AudioSources[audioKey] == null)
 			{
-				var audioPrefab = QAudioSourcePrefab.Load(soundKey);
+				var audioPrefab = QAudioSourcePrefab.Load(audioKey);
 				if (audioPrefab == null)
 				{
-					AudioSources[soundKey] = Instance.transform.GetChild(soundKey, true).GetComponent<QAudioSource>(true);
-					if (System.Enum.TryParse<QAudioType>(soundKey, out var type))
+					AudioSources[audioKey] = Instance.transform.GetChild(audioKey, true).GetComponent<QAudioSource>(true);
+					if (System.Enum.TryParse<QAudioType>(audioKey, out var type))
 					{
-						AudioSources[soundKey].SetType(type);
+						AudioSources[audioKey].SetType(type);
 					}
 					else
 					{
-						AudioSources[soundKey].SetType(QAudioType.SE);
+						AudioSources[audioKey].SetType(QAudioType.SE);
 					}
 				}
 				else
 				{
-					AudioSources[soundKey] = Instantiate(audioPrefab, Instance.transform).GetComponent<QAudioSource>(true);
+					AudioSources[audioKey] = Instantiate(audioPrefab, Instance.transform).GetComponent<QAudioSource>(true);
 				}
-				if (QAudioSetting != null && AudioSources[soundKey].Audio.outputAudioMixerGroup == null)
+				if (QAudioSetting != null && AudioSources[audioKey].Audio.outputAudioMixerGroup == null)
 				{
-					AudioSources[soundKey].Audio.outputAudioMixerGroup = GetMixer(soundKey);
+					AudioSources[audioKey].Audio.outputAudioMixerGroup = GetMixer(audioKey);
 				}
 			}
-			return AudioSources[soundKey];
+			return AudioSources[audioKey];
 		}
 		private class QAudioSourcePrefab:Asset.QAssetLoader<QAudioSourcePrefab,GameObject>
 		{
