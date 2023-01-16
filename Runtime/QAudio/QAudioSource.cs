@@ -6,11 +6,10 @@ namespace QTool
 	[RequireComponent(typeof(AudioSource))]
 	public class QAudioSource : MonoBehaviour
 	{
-		public AudioSource Audio { get; private set; }
+		internal AudioSource Audio { get; private set; }
 		[SerializeField]
 		private QAudioType AudioType = QAudioType.BGS;
-		internal QBackgroundMusic? CurBGM { get; private set; }
-		internal QAudioSource StartAudio { get; private set; }
+
 		internal void SetType(QAudioType type)
 		{
 			AudioType = type;
@@ -46,6 +45,8 @@ namespace QTool
 					break;
 			}
 		}
+		internal QBackgroundMusic? CurBGM { get; private set; } = null;
+		internal QAudioSource StartAudio { get; private set; }
 		public void Play(QBackgroundMusic bgm)
 		{
 			switch (AudioType)
@@ -53,11 +54,22 @@ namespace QTool
 				case QAudioType.BGM:
 				case QAudioType.BGS:
 				case QAudioType.ME:
-					if (CurBGM == null || CurBGM.Value.start != bgm.start)
+					if (CurBGM == null || CurBGM?.start != bgm.start)
 					{
 						PlayStart(bgm.start);
+						Audio.clip = bgm.music;
 					}
-					Audio.clip = bgm.music;
+					else if(Audio.isPlaying&&CurBGM?.music?.length==bgm.music?.length&&(CurBGM.Value.music.name.StartsWith(bgm.music.name)|| bgm.music.name.StartsWith(CurBGM.Value.music.name)))
+					{
+						var time = Audio.time;
+						Audio.clip = bgm.music;
+						Audio.time = time;
+						Audio.Play();
+					}
+					else
+					{
+						Audio.clip = bgm.music;
+					}
 					break;
 				default:
 					throw new System.Exception(AudioType+" 不支持播放 "+bgm);
@@ -66,13 +78,13 @@ namespace QTool
 		}
 		private void PlayStart(AudioClip startClip)
 		{
-			if (startClip == null) return;
 			if (StartAudio == null)
 			{
 				StartAudio = transform.GetChild(nameof(StartAudio), true).GetComponent<QAudioSource>(true);
 				StartAudio.Audio.playOnAwake = false;
 				StartAudio.Audio.loop = false;
 			}
+			if (startClip == null) return;
 			StartAudio.Play(startClip);
 		}
 		public void Awake()
@@ -85,7 +97,7 @@ namespace QTool
 		[ExecuteInEditMode]
 		private void Update()
 		{
-			if (StartAudio != null&&!Audio.isPlaying&&Audio.clip!=null)
+			if (StartAudio != null&&!Audio.isPlaying&& CurBGM?.music!=null)
 			{
 				if (!StartAudio.Audio.isPlaying)
 				{
