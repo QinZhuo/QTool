@@ -60,9 +60,10 @@ namespace QTool
 			{
 				if (!Application.IsPlaying(this))
 				{
+					var newPrefab = Prefab;
 					if (gameObject.IsPrefabAsset())
 					{
-						Prefab = UnityEditor.AssetDatabase.GetAssetPath(gameObject);
+						newPrefab = UnityEditor.AssetDatabase.GetAssetPath(gameObject);
 					}
 					else if (gameObject.IsPrefabInstance() || Application.IsPlaying(gameObject))
 					{
@@ -73,8 +74,13 @@ namespace QTool
 						}
 						else
 						{
-							Prefab = UnityEditor.AssetDatabase.GetAssetPath(prefab);
+							newPrefab = UnityEditor.AssetDatabase.GetAssetPath(prefab);
 						}
+					}
+					if (Prefab != newPrefab)
+					{
+						Prefab = newPrefab;
+						this.SetDirty();
 					}
 				}
 				Id = "";
