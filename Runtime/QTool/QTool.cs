@@ -454,7 +454,7 @@ namespace QTool
 			{
 				return false;
 			}
-			if(obj != null && UnityEditor.PrefabUtility.IsPartOfPrefabInstance(obj))
+			if(UnityEditor.PrefabUtility.IsPartOfPrefabInstance(obj))
 			{
 				prefab = UnityEditor.PrefabUtility.GetCorrespondingObjectFromSource(obj.GetGameObject());
 			}
