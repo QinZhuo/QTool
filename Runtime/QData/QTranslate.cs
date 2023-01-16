@@ -193,7 +193,7 @@ namespace QTool
 			value= value.ForeachBlockValue('{', '}',(key)=> TranslateKey(key,language));
 			if (oldValue == value && !QTranslateData.ContainsKey(oldValue))
 			{
-				Debug.LogWarning("缺少翻译[" + value + "][" + language + "]");
+				QDebug.LogWarning("缺少翻译[" + value + "][" + language + "]");
 			}
             return value; 
         }
@@ -209,7 +209,7 @@ namespace QTool
                 var translate = QTranslateData[value].GetValue<string>(language);
 				if (translate.IsNull()&&!QTranslateData[value].GetValue<string>(DefaultLanguage).IsNull())
 				{
-					Debug.LogWarning("缺少翻译[" + value + "]["+language+"]");
+					QDebug.LogWarning("缺少翻译[" + value + "]["+language+"]");
 					return value;
 				}
 				else

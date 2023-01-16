@@ -15,6 +15,11 @@ namespace QTool
 		{
 			Debug.Log("[" + nameof(QDebug) + "]  " + obj);
 		}
+		[System.Diagnostics.Conditional("DEVELOPMENT_BUILD"), System.Diagnostics.Conditional("UNITY_EDITOR")]
+		public static void LogWarning(object obj)
+		{
+			Debug.LogWarning("[" + nameof(QDebug) + "]  " + obj);
+		}
 		public static QDictionary<string, ProfilerMarker> ProfilerMarkerList = new QDictionary<string, ProfilerMarker>((key)=> new ProfilerMarker(key));
 		[System.Diagnostics.Conditional("DEVELOPMENT_BUILD"), System.Diagnostics.Conditional("UNITY_EDITOR")]
 		public static void StartProfiler(string key)

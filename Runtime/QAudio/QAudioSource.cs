@@ -29,7 +29,7 @@ namespace QTool
 					break;
 			}
 		}
-		public void Play(AudioClip clip)
+		public void Play(AudioClip clip,float transition=1)
 		{
 			CurBGM = null;
 			switch (AudioType)
@@ -59,11 +59,10 @@ namespace QTool
 						PlayStart(bgm.start);
 						Audio.clip = bgm.music;
 					}
-					else if(Audio.isPlaying&&CurBGM?.music!=null&&bgm.music!=null&& CurBGM?.music.length==bgm.music.length)
+					else if(Audio.isPlaying&& CurBGM?.music != null && bgm.music != null && CurBGM?.music.length == bgm.music.length)
 					{
 						var time = Audio.time;
 						Audio.clip = bgm.music;
-						Audio.time = time;
 						Audio.Play();
 					}
 					else
