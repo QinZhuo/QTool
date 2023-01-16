@@ -428,15 +428,7 @@ namespace QTool
             }
             return flag;
         }
-		public static bool IsPrefabAsset(this UnityEngine.Object obj)
-		{
-#if UNITY_EDITOR
-			return UnityEditor.PrefabUtility.IsPartOfPrefabAsset(obj);
-#else
-			return false;
-#endif
-		}
-
+		
 		public static bool IsAsset(this UnityEngine.Object obj)
 		{
 #if UNITY_EDITOR
@@ -445,28 +437,36 @@ namespace QTool
             return false;
 #endif
 		}
-		public static bool IsPrefabInstance(this UnityEngine.Object obj)
+		public static bool IsPrefab(this UnityEngine.Object obj)
 		{
 #if UNITY_EDITOR
-			var gameObj = obj.GetGameObject();
-			return gameObj!=null&&UnityEditor.PrefabUtility.IsAnyPrefabInstanceRoot(gameObj) && !obj.IsPrefabAsset();
+			return UnityEditor.PrefabUtility.IsPartOfPrefabAsset(obj);
 #else
-            return false;
+			return false;
 #endif
 		}
-		public static bool IsSceneInstance(this UnityEngine.Object obj)
+
+		public static bool IsPrefabInstance(this UnityEngine.Object obj, out GameObject prefab)
 		{
+			prefab = null;
 #if UNITY_EDITOR
-			if (obj == null)
+			if (obj==null|| obj.IsPrefab())
 			{
 				return false;
 			}
-			if (UnityEditor.EditorUtility.IsPersistent(obj))
+			if(obj != null && UnityEditor.PrefabUtility.IsPartOfPrefabInstance(obj))
 			{
-				return false;
+				prefab = UnityEditor.PrefabUtility.GetCorrespondingObjectFromSource(obj.GetGameObject());
+			}
+			else if(UnityEditor.Experimental.SceneManagement.PrefabStageUtility.GetCurrentPrefabStage()!=null)
+			{
+				if (UnityEditor.Experimental.SceneManagement.PrefabStageUtility.GetPrefabStage(obj.GetGameObject()) != null)
+				{
+					prefab = UnityEditor.AssetDatabase.LoadAssetAtPath<GameObject>(UnityEditor.Experimental.SceneManagement.PrefabStageUtility.GetPrefabStage(obj.GetGameObject()).assetPath);
+				}
 			}
 #endif
-			return true;
+			return false;
 		}
 		public static GameObject GetGameObject(this UnityEngine.Object obj)
 		{
@@ -487,15 +487,7 @@ namespace QTool
 				return null;
 			}
 		}
-		public static GameObject GetPrefab(this UnityEngine.Object obj)
-		{
-#if UNITY_EDITOR
-			var gameObj= obj.GetGameObject();
-			return gameObj == null ? null : UnityEditor.AssetDatabase.LoadAssetAtPath<GameObject>(UnityEditor.PrefabUtility.GetPrefabAssetPathOfNearestInstanceRoot(gameObj));
-#else
-            return null;
-#endif
-		}
+
 		public static T As<T>(this object obj)
 		{
 			try

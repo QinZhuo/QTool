@@ -855,11 +855,11 @@ namespace QTool.FlowGraph
 			leftRect.width /= 2;
 			EditorGUI.LabelField(leftRect, label.text);
 			leftRect.x += leftRect.width;
-			if (property.serializedObject.targetObject.IsPrefabInstance()&&string.IsNullOrWhiteSpace(UnityEditor.SceneManagement.StageUtility.GetCurrentStage().assetPath))
+			if (property.serializedObject.targetObject.IsPrefabInstance(out var prefab))
 			{
 				if (GUI.Button(leftRect, "进入预制体编辑"))
 				{
-					UnityEditor.AssetDatabase.OpenAsset(property.serializedObject.targetObject.GetPrefab());
+					UnityEditor.AssetDatabase.OpenAsset(prefab);
 				}
 			}
 			else
