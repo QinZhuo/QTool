@@ -106,7 +106,7 @@ namespace QTool
 
 		public override string ToString()
         {
-            return name + "(" + Id +")";
+            return name + "(" + Id +")"+(Prefab.IsNull()?"":"["+Prefab+"]");
         }
     }
 
