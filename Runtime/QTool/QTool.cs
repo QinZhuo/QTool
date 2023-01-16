@@ -165,6 +165,7 @@ namespace QTool
 			if (com==null&&autoCreate)
 			{
 				com = obj?.AddComponent<T>();
+				obj?.SetDirty();
 			}
 			return com;
 		}
