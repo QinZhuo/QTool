@@ -80,7 +80,7 @@ namespace QTool
 					if (Prefab != newPrefab)
 					{
 						Prefab = newPrefab;
-						this.SetDirty();
+						gameObject.SetDirty();
 					}
 				}
 				Id = "";
@@ -99,7 +99,7 @@ namespace QTool
 					{
 						Id = NewId();
 					}
-					this.SetDirty();
+					gameObject.SetDirty();
 				}
 				InstanceIdList[Id] = this;
 			}
