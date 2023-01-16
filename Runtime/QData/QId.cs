@@ -99,6 +99,7 @@ namespace QTool
 					{
 						Id = NewId();
 					}
+					this.SetDirty();
 				}
 				InstanceIdList[Id] = this;
 			}
