@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 namespace QTool
 {
-    public class QSceneObjectManager : InstanceManager<QSceneObjectManager>
+    public class QSceneObjectSetting : InstanceManager<QSceneObjectSetting>
     {
 		[QName("初始化列表")]
         public List<QId> qIdInitList = new List<QId>();

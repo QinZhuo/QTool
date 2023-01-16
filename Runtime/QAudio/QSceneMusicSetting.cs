@@ -10,7 +10,7 @@ namespace QTool
 	public class QSceneMusicSetting : InstanceBehaviour<QSceneMusicSetting>
 	{
 		[QName("背景乐"), SerializeField]
-		private QBackgroundMusic defaultMusic = new QBackgroundMusic();
+		private QBackgroundMusic defaultMusic = new QBackgroundMusic() { key = "默认" };
 		[QName("事件音乐"),SerializeField]
 		private List<QBackgroundMusic> eventMusic = new List<QBackgroundMusic>();
 
@@ -24,7 +24,7 @@ namespace QTool
 					QEventManager.Register(eventMusic.key, eventMusic.Play);
 				}
 			}
-			QAudioManager.GetAudio(QAudioType.BGM).Play(defaultMusic.music);
+			defaultMusic.Play();
 		}
 		private void OnDestroy()
 		{

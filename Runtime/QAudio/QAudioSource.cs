@@ -9,6 +9,8 @@ namespace QTool
 		public AudioSource Audio { get; private set; }
 		[SerializeField]
 		private QAudioType AudioType = QAudioType.BGS;
+		internal QBackgroundMusic? CurBGM { get; private set; }
+		internal QAudioSource StartAudio { get; private set; }
 		internal void SetType(QAudioType type)
 		{
 			AudioType = type;
@@ -30,6 +32,7 @@ namespace QTool
 		}
 		public void Play(AudioClip clip)
 		{
+			CurBGM = null;
 			switch (AudioType)
 			{
 				case QAudioType.BGM:
@@ -43,10 +46,34 @@ namespace QTool
 					break;
 			}
 		}
-		public void Play(AudioClip loopClip,bool loop=true)
+		public void Play(QBackgroundMusic bgm)
 		{
-			Audio.loop = loop;
-			Audio.Play();
+			switch (AudioType)
+			{
+				case QAudioType.BGM:
+				case QAudioType.BGS:
+				case QAudioType.ME:
+					if (CurBGM == null || CurBGM.Value.start != bgm.start)
+					{
+						PlayStart(bgm.start);
+					}
+					Audio.clip = bgm.music;
+					break;
+				default:
+					throw new System.Exception(AudioType+" 不支持播放 "+bgm);
+			}
+			CurBGM = bgm;
+		}
+		private void PlayStart(AudioClip startClip)
+		{
+			if (startClip == null) return;
+			if (StartAudio == null)
+			{
+				StartAudio = transform.GetChild(nameof(StartAudio), true).GetComponent<QAudioSource>(true);
+				StartAudio.Audio.playOnAwake = false;
+				StartAudio.Audio.loop = false;
+			}
+			StartAudio.Play(startClip);
 		}
 		public void Awake()
 		{
@@ -55,9 +82,16 @@ namespace QTool
 			Audio.playOnAwake = false;
 			SetType(AudioType);
 		}
+		[ExecuteInEditMode]
 		private void Update()
 		{
-
+			if (StartAudio != null&&!Audio.isPlaying&&Audio.clip!=null)
+			{
+				if (!StartAudio.Audio.isPlaying)
+				{
+					Audio.Play();
+				}
+			}
 		}
 
 		

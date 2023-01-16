@@ -27,7 +27,7 @@ namespace QTool
 		{
 			if (AudioSources[soundKey] == null)
 			{
-				var audioPrefab = Resources.Load<GameObject>(nameof(QAudioType) + "/" + soundKey);
+				var audioPrefab = QAudioSourcePrefab.Load(soundKey);
 				if (audioPrefab == null)
 				{
 					AudioSources[soundKey] = Instance.transform.GetChild(soundKey, true).GetComponent<QAudioSource>(true);
@@ -49,6 +49,10 @@ namespace QTool
 				}
 			}
 			return AudioSources[soundKey];
+		}
+		private class QAudioSourcePrefab:Asset.QAssetLoader<QAudioSourcePrefab,GameObject>
+		{
+			
 		}
 	}
 	public enum QAudioType
@@ -72,16 +76,16 @@ namespace QTool
 	}
 
 	[System.Serializable]
-	public class QBackgroundMusic
+	public struct QBackgroundMusic
 	{
-		public string key = "默认";
+		public string key;
 		[QName("音乐")]
 		public AudioClip music;
 		[QName("前奏")]
 		public AudioClip start;
 		public void Play()
 		{
-
+			QAudioManager.GetAudio(QAudioType.BGM).Play(this);
 		}
 	}
 }
