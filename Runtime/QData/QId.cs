@@ -56,25 +56,28 @@ namespace QTool
 		{
 
 #if UNITY_EDITOR
-			if (gameObject.IsPrefab())
+			if (!Application.IsPlaying(this))
 			{
-				Prefab = UnityEditor.AssetDatabase.GetAssetPath(gameObject);
-				Id = "";
-				gameObject.SetDirty();
-			}
-			else if (gameObject.IsPrefabInstance(out var prefab))
-			{
-				if (prefab == null)
+				if (gameObject.IsPrefab())
 				{
-					Debug.LogError(gameObject + " 找不到预制体引用");
+					Prefab = UnityEditor.AssetDatabase.GetAssetPath(gameObject);
+					Id = "";
+					gameObject.SetDirty();
 				}
-				else
+				else if (gameObject.IsPrefabInstance(out var prefab))
 				{
-					Prefab = UnityEditor.AssetDatabase.GetAssetPath(prefab);
-				}
-				Id = "";
+					if (prefab == null)
+					{
+						Debug.LogError(gameObject + " 找不到预制体引用");
+					}
+					else
+					{
+						Prefab = UnityEditor.AssetDatabase.GetAssetPath(prefab);
+					}
+					Id = "";
 
-				gameObject.SetDirty();
+					gameObject.SetDirty();
+				}
 			}
 #endif
 			if(!this.IsAsset())
