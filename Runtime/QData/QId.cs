@@ -76,8 +76,8 @@ namespace QTool
 
 				gameObject.SetDirty();
 			}
-			else
 #endif
+			if(!this.IsAsset())
 			{
 				
 				if (Id.IsNull() || (InstanceIdList[Id]!=null&& InstanceIdList[Id] != this))
