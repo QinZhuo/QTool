@@ -512,6 +512,10 @@ namespace QTool
 				File.WriteAllText(path, data);
 			}
 		}
+		public static string WithoutExtension(this string path)
+		{
+			return Path.GetDirectoryName(path)+"/"+ Path.GetFileNameWithoutExtension(path);
+		}
 		public static byte[] LoadBytes(string path,byte[] defaultValue=default)
 		{
 			switch (Application.platform)

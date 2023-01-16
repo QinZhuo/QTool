@@ -138,7 +138,7 @@ namespace QTool
 					loadPath = id.SplitEndString("/" + nameof(Resources) + "/");
 					if (loadPath.Contains("."))
 					{
-						loadPath = loadPath.SplitStartString(".");
+						loadPath = loadPath.WithoutExtension();
 					}
 				}
 				else
