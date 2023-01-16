@@ -457,6 +457,7 @@ namespace QTool
 			if(UnityEditor.PrefabUtility.IsPartOfPrefabInstance(obj))
 			{
 				prefab = UnityEditor.PrefabUtility.GetCorrespondingObjectFromSource(obj.GetGameObject());
+				return true;
 			}
 			else if(UnityEditor.Experimental.SceneManagement.PrefabStageUtility.GetCurrentPrefabStage()!=null)
 			{
@@ -464,6 +465,7 @@ namespace QTool
 				{
 					prefab = UnityEditor.AssetDatabase.LoadAssetAtPath<GameObject>(UnityEditor.Experimental.SceneManagement.PrefabStageUtility.GetPrefabStage(obj.GetGameObject()).assetPath);
 				}
+				return true;
 			}
 #endif
 			return false;
