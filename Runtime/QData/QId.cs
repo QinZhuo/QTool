@@ -42,6 +42,10 @@ namespace QTool
 		{
 			FreshId();
 		}
+		private void Reset()
+		{
+			FreshId();
+		}
 		protected virtual void OnDestroy()
 		{
 			if (InstanceIdList.ContainsKey(Id))
