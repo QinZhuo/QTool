@@ -59,7 +59,7 @@ namespace QTool
 						PlayStart(bgm.start);
 						Audio.clip = bgm.music;
 					}
-					else if(Audio.isPlaying&&CurBGM?.music?.length==bgm.music?.length&&(CurBGM.Value.music.name.StartsWith(bgm.music.name)|| bgm.music.name.StartsWith(CurBGM.Value.music.name)))
+					else if(Audio.isPlaying&&CurBGM?.music?.length==bgm.music?.length&&(bgm.music.name.StartsWith(CurBGM?.music.name)||(CurBGM?.music!=null&& CurBGM.Value.music.name.StartsWith(bgm.music.name))))
 					{
 						var time = Audio.time;
 						Audio.clip = bgm.music;
