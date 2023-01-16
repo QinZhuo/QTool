@@ -175,14 +175,7 @@ namespace QTool
 #endif
             return obj ;
         }
-        public static GameObject GetPrefab(this GameObject obj)
-        {
-#if UNITY_EDITOR
-            return PrefabUtility.GetCorrespondingObjectFromSource(obj);
-#else
-            return null;
-#endif
-        }
+      
         public static void CheckDestory(this Object obj)
         {
 #if UNITY_EDITOR
