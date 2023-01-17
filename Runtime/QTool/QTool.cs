@@ -32,6 +32,10 @@ namespace QTool
 			CultureInfo.CurrentCulture = new CultureInfo("en-US");
 			CultureInfo.DefaultThreadCurrentCulture = new CultureInfo("en-US");
 			QTranslate.KeyReplace["版本号"] = Application.version;
+			AppDomain.CurrentDomain.UnhandledException += (e,args) =>
+			{
+				QDebug.LogWarning(args.ExceptionObject);
+			};
 		}
 		public static string Version => Application.version; 
 		public static bool IsTestVersion => Application.version.StartsWith("0.");
