@@ -23,7 +23,7 @@ namespace QTool
 		/// <param name="eventKey">事件名</param>
 		public static void Trigger(string eventKey)
         {
-			Debug.Log("触发事件[" + eventKey+"]");
+			QDebug.Log("触发事件[" + eventKey+"]");
 			try
 			{
 				eventKey = eventKey.Trim();
