@@ -87,7 +87,7 @@ namespace QTool
 			if(!this.IsAsset())
 			{
 				
-				if (Id.IsNull() || (InstanceIdList[Id]!=null&& InstanceIdList[Id] != this))
+				if (Id.IsNull())
 				{
 					if (Net.QNetManager.Instance != null && Application.IsPlaying(this))
 					{
