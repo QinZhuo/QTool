@@ -65,17 +65,19 @@ namespace QTool.Net
 				IsGrounded = transform.position.y<= MeshHit.position.y;
 				if (IsGrounded)
 				{
-					transform.position = MeshHit.position ;
+					transform.position = MeshHit.position;
 				}
-				else 
+				else
 				{
-					var dir= transform.position - MeshHit.position;
+					var dir = transform.position - MeshHit.position;
 					dir.y = 0;
-					if (!(dir.sqrMagnitude > 0.5f&&(!NavMesh.SamplePosition(transform.position + dir.normalized, out var targetMeshHit, 2, NavMesh.AllAreas)
-						||targetMeshHit.position.y+heightOffset<MeshHit.position.y)&&transform.position.y+0.1f>=targetMeshHit.position.y+heightOffset))
+					if (Mathf.Approximately(dir.sqrMagnitude, 0) &&
+						NavMesh.SamplePosition(transform.position + dir.normalized, out var targetMeshHit, 2, NavMesh.AllAreas)&&
+						transform.position.y+0.1f>= targetMeshHit.position.y+heightOffset)
 					{
-						transform.position = new Vector3(MeshHit.position.x, transform.position.y, MeshHit.position.z);
+						return;
 					}
+					transform.position = new Vector3(MeshHit.position.x, transform.position.y, MeshHit.position.z);
 				}
 			}
 			else
