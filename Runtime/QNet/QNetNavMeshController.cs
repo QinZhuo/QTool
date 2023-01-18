@@ -79,6 +79,18 @@ namespace QTool.Net
 		}
 		private static List<QNetNavMeshController> AllAgents = new List<QNetNavMeshController>();
 
+		protected void OnDrawGizmosSelected()
+		{
+			if (Application.IsPlaying(this))
+			{
+				Gizmos.color = Color.green;
+				Gizmos.DrawWireSphere(transform.position, 0.5f);
+				Gizmos.DrawWireSphere(MeshHit.position, 0.5f);
+				Gizmos.DrawLine(transform.position, MeshHit.position);
+			}
+
+		}
+
 	}
 }
 
