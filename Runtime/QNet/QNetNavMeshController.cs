@@ -73,7 +73,7 @@ namespace QTool.Net
 					var dir = transform.position - MeshHit.position;
 					dir.y = 0;
 					if (!Mathf.Approximately(dir.sqrMagnitude, 0) &&
-						NavMesh.SamplePosition(transform.position + dir.normalized, out TargetMeshHit, 2, NavMesh.AllAreas)&&
+						NavMesh.SamplePosition(transform.position + dir*2, out TargetMeshHit, 2, NavMesh.AllAreas)&&
 						transform.position.y> TargetMeshHit.position.y+heightOffset)
 					{
 						return;
