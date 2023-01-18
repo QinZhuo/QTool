@@ -4,7 +4,7 @@ using UnityEngine;
 namespace QTool
 {
 
-	public static class QDemo
+	public static class QDemoInput
 	{
 
 		public static bool Attack
@@ -45,7 +45,7 @@ namespace QTool
 #endif
 			}
 		}
-		public static bool Jump
+		public static bool Space
 		{
 			get
 			{
@@ -90,6 +90,18 @@ namespace QTool
 				return UnityEngine.InputSystem.Keyboard.current.enterKey.isPressed;
 #else	
 				return Input.GetKey(KeyCode.KeypadEnter);
+#endif
+			}
+		}
+		public static bool ESC
+		{
+			get
+			{
+				
+#if ENABLE_INPUT_SYSTEM
+				return UnityEngine.InputSystem.Keyboard.current.escapeKey.isPressed;
+#else
+				return Input.GetKey(KeyCode.Escape);
 #endif
 			}
 		}

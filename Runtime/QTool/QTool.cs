@@ -33,6 +33,14 @@ namespace QTool
 			CultureInfo.DefaultThreadCurrentCulture = new CultureInfo("en-US");
 			QTranslate.KeyReplace["版本号"] = Application.version;
 		}
+		public static void Quit()
+		{
+#if UNITY_EDITOR
+			UnityEditor.EditorApplication.ExitPlaymode();
+#else
+			Application.Quit();
+#endif
+		}
 		public static string Version => Application.version; 
 		public static bool IsTestVersion => Application.version.StartsWith("0.");
         static QDictionary<string, Color> KeyColor = new QDictionary<string, Color>();
@@ -91,10 +99,6 @@ namespace QTool
 			}
         }
 
-		//internal static Task<bool> Wait(float m_Seconds)
-		//{
-		//	throw new NotImplementedException();
-		//}
 		public static string GetPath(this Transform transform)
 		{
 			if (transform.parent == null)

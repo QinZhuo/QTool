@@ -113,7 +113,7 @@ namespace QTool
 					}
 					GUILayout.EndArea();
 				}
-				else if (QDemo.Ctrl && QDemo.Enter)
+				else if (QDemoInput.Ctrl && QDemoInput.Enter)
 				{
 					QTime.ChangeScale(nameof(QCommand), 0);
 					UsingCommmond = true;
