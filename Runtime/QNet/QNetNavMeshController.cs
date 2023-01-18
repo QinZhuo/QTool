@@ -68,6 +68,10 @@ namespace QTool.Net
 				{
 					transform.position = MeshHit.position ;
 				}
+				else 
+				{
+					transform.position = new Vector3(MeshHit.position.x, transform.position.y, MeshHit.position.z);
+				}
 			}
 			else
 			{
