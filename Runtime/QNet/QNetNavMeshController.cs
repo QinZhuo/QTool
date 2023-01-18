@@ -47,7 +47,7 @@ namespace QTool.Net
 		{
 			AllAgents.Remove(this);
 		}
-		NavMeshHit LastMeshHit { get; set; }
+		NavMeshHit MeshHit { get; set; }
 		public override void OnNetUpdate()
 		{
 			if (useGravity)
@@ -55,12 +55,15 @@ namespace QTool.Net
 				transform.position += NetDeltaTime * Physics.gravity;
 				if (NavMesh.SamplePosition(transform.position, out var hitInfo, 2, NavMesh.AllAreas))
 				{
-					IsGrounded = transform.position.y - heightOffset <= hitInfo.position.y;
+					if (MeshHit.position.y >= hitInfo.position.y||transform.position.y>=hitInfo.position.y)
+					{
+						MeshHit = hitInfo;
+					}
+					IsGrounded = transform.position.y - heightOffset <= MeshHit.position.y;
 					if (IsGrounded)
 					{
-						transform.position = new Vector3(hitInfo.position.x, IsGrounded&&LastMeshHit.position.y>=hitInfo.position.y ? hitInfo.position.y + heightOffset : transform.position.y, hitInfo.position.z);
+						transform.position = new Vector3(MeshHit.position.x, IsGrounded&&MeshHit.position.y>= MeshHit.position.y ? MeshHit.position.y + heightOffset : transform.position.y, MeshHit.position.z);
 					}
-					LastMeshHit = hitInfo;
 				}
 				else
 				{
