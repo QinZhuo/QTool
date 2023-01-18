@@ -54,24 +54,24 @@ namespace QTool.Net
 			if (useGravity)
 			{
 				transform.position += NetDeltaTime * Physics.gravity;
-				bool canMove = false;
+				bool newMesh = false;
 				if (NavMesh.SamplePosition(transform.position, out var hitInfo, 2, NavMesh.AllAreas))
 				{
-					if(MeshHit.position.y >= hitInfo.position.y || transform.position.y >= hitInfo.position.y)
+					if(MeshHit.position.y >= hitInfo.position.y || transform.position.y - heightOffset >= hitInfo.position.y)
 					{
-						canMove = true;
+						newMesh = true;
 						MeshHit = hitInfo;
 					}
 				}
 				IsGrounded = transform.position.y - heightOffset <= MeshHit.position.y;
-				if (IsGrounded)
+				if (newMesh&&!IsGrounded)
+				{
+					transform.position = new Vector3(MeshHit.position.x, transform.position.y, MeshHit.position.z);
+				}
+				else
 				{
 					var y = IsGrounded ? MeshHit.position.y + heightOffset : transform.position.y;
 					transform.position = new Vector3(MeshHit.position.x, y, MeshHit.position.z);
-				}
-				else if(canMove)
-				{
-					transform.position = new Vector3(MeshHit.position.x, transform.position.y, MeshHit.position.z);
 				}
 				
 			}
