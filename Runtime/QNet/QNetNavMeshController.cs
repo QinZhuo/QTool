@@ -55,12 +55,12 @@ namespace QTool.Net
 			if (useGravity)
 			{
 				transform.position += NetDeltaTime * Physics.gravity;
-				if (NavMesh.SamplePosition(transform.position, out var hitInfo, 2, NavMesh.AllAreas))
+				if (NavMesh.SamplePosition(transform.position, out TargetMeshHit, 2, NavMesh.AllAreas))
 				{
-					hitInfo.position += Vector3.up * heightOffset;
-					if (MeshHit.position.y+0.1f >= hitInfo.position.y || transform.position.y+0.1f >= hitInfo.position.y)
+					TargetMeshHit.position += Vector3.up * heightOffset;
+					if (MeshHit.position.y+0.1f >= TargetMeshHit.position.y || transform.position.y+0.1f >= TargetMeshHit.position.y)
 					{
-						MeshHit = hitInfo;
+						MeshHit = TargetMeshHit;
 					}
 				}
 				IsGrounded = transform.position.y<= MeshHit.position.y;
@@ -100,8 +100,7 @@ namespace QTool.Net
 				Gizmos.color = IsGrounded? Color.green:Color.red;
 				Gizmos.DrawSphere(MeshHit.position, 0.05f);
 				Gizmos.DrawLine(transform.position, MeshHit.position);
-				Gizmos.color = Color.blue;
-				Gizmos.DrawSphere(TargetMeshHit.position, 0.05f);
+				Gizmos.DrawWireSphere(TargetMeshHit.position, 0.05f);
 			}
 
 		}
