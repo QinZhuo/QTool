@@ -47,7 +47,7 @@ namespace QTool.Net
 		{
 			AllAgents.Remove(this);
 		}
-		NavMeshHit MeshHit { get; set; }
+		NavMeshHit? MeshHit { get; set; } = null;
 		public override void OnNetUpdate()
 		{
 			if (useGravity)
@@ -55,26 +55,26 @@ namespace QTool.Net
 				transform.position += NetDeltaTime * Physics.gravity;
 				if (NavMesh.SamplePosition(transform.position, out var hitInfo, 2, NavMesh.AllAreas))
 				{
-					if (MeshHit.IsNull() || MeshHit.position.y >= hitInfo.position.y || transform.position.y >= MeshHit.position.y)
+					if (MeshHit.IsNull() || MeshHit.Value.position.y >= hitInfo.position.y || transform.position.y >= MeshHit.Value.position.y)
 					{
 						MeshHit = hitInfo;
-						IsGrounded = transform.position.y - heightOffset <= MeshHit.position.y;
+						IsGrounded = transform.position.y - heightOffset <= MeshHit.Value.position.y;
 						if (IsGrounded)
 						{
-							var y = IsGrounded && MeshHit.position.y >= MeshHit.position.y ? MeshHit.position.y + heightOffset : transform.position.y;
-							transform.position = new Vector3(MeshHit.position.x, y, MeshHit.position.z);
+							var y = IsGrounded ? MeshHit.Value.position.y + heightOffset : transform.position.y;
+							transform.position = new Vector3(MeshHit.Value.position.x, y, MeshHit.Value.position.z);
 						}
 					}
 					else
 					{
-						IsGrounded = transform.position.y - heightOffset <= MeshHit.position.y;
+						IsGrounded = transform.position.y - heightOffset <= MeshHit.Value.position.y;
 						if (IsGrounded)
 						{
-							transform.position = MeshHit.position;
+							transform.position = MeshHit.Value.position;
 						}
 						else
 						{
-							transform.position = new Vector3(MeshHit.position.x, transform.position.y, MeshHit.position.z);
+							transform.position = new Vector3(MeshHit.Value.position.x, transform.position.y, MeshHit.Value.position.z);
 						}
 					}
 				
