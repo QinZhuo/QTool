@@ -61,7 +61,6 @@ namespace QTool.Net
 					if (MeshHit.position.y >= hitInfo.position.y || transform.position.y >= hitInfo.position.y)
 					{
 						MeshHit = hitInfo;
-						MeshHit.position += Vector3.up * heightOffset;
 					}
 				}
 				IsGrounded = transform.position.y  <= MeshHit.position.y;
