@@ -72,12 +72,11 @@ namespace QTool.Net
 				{
 					var dir = transform.position - MeshHit.position;
 					dir.y = 0;
-					if (NavMesh.SamplePosition(transform.position + dir*2, out TargetMeshHit, 1, NavMesh.AllAreas)&&
-						MeshHit.position.y>TargetMeshHit.position.y+heightOffset&&transform.position.y+0.1> TargetMeshHit.position.y+heightOffset)
+					var targetPos = transform.position + dir.normalized ;
+					if (!NavMesh.Raycast(targetPos,targetPos+Vector3.down*10, out TargetMeshHit,NavMesh.AllAreas))
 					{
-						return;
+						transform.position = new Vector3(MeshHit.position.x, transform.position.y, MeshHit.position.z);
 					}
-					transform.position = new Vector3(MeshHit.position.x, transform.position.y, MeshHit.position.z);
 				}
 			}
 			else
