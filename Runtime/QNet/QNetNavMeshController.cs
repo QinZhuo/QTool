@@ -49,6 +49,7 @@ namespace QTool.Net
 			AllAgents.Remove(this);
 		}
 		NavMeshHit MeshHit =default;
+		NavMeshHit TargetMeshHit = default;
 		public override void OnNetUpdate()
 		{
 			if (useGravity)
@@ -71,9 +72,9 @@ namespace QTool.Net
 				{
 					var dir = transform.position - MeshHit.position;
 					dir.y = 0;
-					if (Mathf.Approximately(dir.sqrMagnitude, 0) &&
-						NavMesh.SamplePosition(transform.position + dir.normalized, out var targetMeshHit, 2, NavMesh.AllAreas)&&
-						transform.position.y+0.1f>= targetMeshHit.position.y+heightOffset)
+					if (!Mathf.Approximately(dir.sqrMagnitude, 0) &&
+						NavMesh.SamplePosition(transform.position + dir.normalized, out TargetMeshHit, 2, NavMesh.AllAreas)&&
+						transform.position.y+0.1f>= TargetMeshHit.position.y+heightOffset)
 					{
 						return;
 					}
@@ -97,10 +98,10 @@ namespace QTool.Net
 			if (Application.IsPlaying(this))
 			{
 				Gizmos.color = IsGrounded? Color.green:Color.red;
-				Gizmos.DrawWireSphere(transform.position, 0.05f);
 				Gizmos.DrawSphere(MeshHit.position, 0.05f);
 				Gizmos.DrawLine(transform.position, MeshHit.position);
 				Gizmos.color = Color.blue;
+				Gizmos.DrawSphere(TargetMeshHit.position, 0.05f);
 			}
 
 		}
