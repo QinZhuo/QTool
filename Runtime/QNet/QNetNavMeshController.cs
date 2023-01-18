@@ -58,12 +58,12 @@ namespace QTool.Net
 				if (NavMesh.SamplePosition(transform.position, out hitInfo, 2, NavMesh.AllAreas))
 				{
 					hitInfo.position += Vector3.up * heightOffset;
-					if (MeshHit.position.y >= hitInfo.position.y || transform.position.y >= hitInfo.position.y)
+					if (MeshHit.position.y+0.1f >= hitInfo.position.y || transform.position.y+0.1f >= hitInfo.position.y)
 					{
 						MeshHit = hitInfo;
 					}
 				}
-				IsGrounded = transform.position.y  <= MeshHit.position.y;
+				IsGrounded = transform.position.y<= MeshHit.position.y;
 				if (IsGrounded)
 				{
 					transform.position = MeshHit.position ;
