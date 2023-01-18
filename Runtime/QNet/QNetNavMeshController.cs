@@ -73,7 +73,7 @@ namespace QTool.Net
 					var dir = transform.position - MeshHit.position;
 					dir.y = 0;
 					var targetPos = transform.position + dir.normalized ;
-					if (!NavMesh.Raycast(targetPos,targetPos+Vector3.down*10, out TargetMeshHit,NavMesh.AllAreas))
+					if (!NavMesh.Raycast(targetPos,targetPos+Vector3.down*10, out TargetMeshHit,NavMesh.AllAreas)||TargetMeshHit.position.y+heightOffset<transform.position.y)
 					{
 						transform.position = new Vector3(MeshHit.position.x, transform.position.y, MeshHit.position.z);
 					}
