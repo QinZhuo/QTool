@@ -57,7 +57,7 @@ namespace QTool.Net
 				transform.position += NetDeltaTime * Physics.gravity;
 				if (NavMesh.SamplePosition(transform.position, out hitInfo, 2, NavMesh.AllAreas))
 				{
-					hitInfo.position += Vector3.up / heightOffset;
+					hitInfo.position += Vector3.up * heightOffset;
 					if (MeshHit.position.y >= hitInfo.position.y || transform.position.y >= hitInfo.position.y)
 					{
 						MeshHit = hitInfo;
