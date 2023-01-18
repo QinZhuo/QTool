@@ -58,23 +58,13 @@ namespace QTool.Net
 					if(MeshHit == null || MeshHit.Value.position.y <= hitInfo.position.y||transform.position.y>=hitInfo.position.y)
 					{
 						MeshHit = hitInfo;
-						IsGrounded = transform.position.y - heightOffset <= MeshHit.Value.position.y;
-						if (IsGrounded)
-						{
-							var y = IsGrounded ? MeshHit.Value.position.y + heightOffset : transform.position.y;
-							transform.position = new Vector3(MeshHit.Value.position.x, y, MeshHit.Value.position.z);
-						}
 					}
-					else
-					{
-						IsGrounded = false;
-
-					}
-				
 				}
-				else
+				IsGrounded = transform.position.y - heightOffset <= MeshHit.Value.position.y;
+				if (IsGrounded)
 				{
-					IsGrounded = false;
+					var y = IsGrounded ? MeshHit.Value.position.y + heightOffset : transform.position.y;
+					transform.position = new Vector3(MeshHit.Value.position.x, y, MeshHit.Value.position.z);
 				}
 			}
 			else
