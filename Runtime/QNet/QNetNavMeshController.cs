@@ -73,8 +73,7 @@ namespace QTool.Net
 					var dir = transform.position - MeshHit.position;
 					dir.y = 0;
 					var targetPos = transform.position + dir.normalized*(0.5f+radius);
-					NavMesh.Raycast(targetPos, targetPos + Vector3.down*10, out TargetMeshHit, NavMesh.AllAreas);
-					if (transform.position.y>TargetMeshHit.position.y+heightOffset)
+					if (NavMesh.SamplePosition(targetPos, out TargetMeshHit, 10, NavMesh.AllAreas)&&transform.position.y>TargetMeshHit.position.y+heightOffset)
 					{
 						MeshHit = TargetMeshHit;
 						return;
@@ -84,9 +83,9 @@ namespace QTool.Net
 			}
 			else
 			{
-				if (NavMesh.SamplePosition(transform.position, out var hitInfo, 2, NavMesh.AllAreas))
+				if (NavMesh.SamplePosition(transform.position, out TargetMeshHit, 2, NavMesh.AllAreas))
 				{
-					transform.position = hitInfo.position;
+					transform.position = TargetMeshHit.position;
 					IsGrounded = true;
 				}
 			}
