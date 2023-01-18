@@ -52,16 +52,28 @@ namespace QTool.Net
 			if (useGravity)
 			{
 				transform.position += NetDeltaTime * Physics.gravity;
-			}
-			if (NavMesh.SamplePosition(transform.position, out var hitInfo, 2, NavMesh.AllAreas))
-			{
-				IsGrounded = transform.position.y- heightOffset <= hitInfo.position.y;
-				transform.position = new Vector3(hitInfo.position.x, IsGrounded ? hitInfo.position.y+heightOffset : transform.position.y, hitInfo.position.z);
+				if (NavMesh.SamplePosition(transform.position, out var hitInfo, 2, NavMesh.AllAreas))
+				{
+					IsGrounded = transform.position.y - heightOffset <= hitInfo.position.y;
+					if (IsGrounded)
+					{
+						transform.position = new Vector3(hitInfo.position.x, IsGrounded ? hitInfo.position.y + heightOffset : transform.position.y, hitInfo.position.z);
+					}
+				}
+				else
+				{
+					IsGrounded = false;
+				}
 			}
 			else
 			{
-				IsGrounded = false;
+				if (NavMesh.SamplePosition(transform.position, out var hitInfo, 2, NavMesh.AllAreas))
+				{
+					transform.position = hitInfo.position;
+					IsGrounded = true;
+				}
 			}
+		
 		}
 		private static List<QNetNavMeshController> AllAgents = new List<QNetNavMeshController>();
 
