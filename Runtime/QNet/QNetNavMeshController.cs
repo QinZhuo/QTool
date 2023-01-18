@@ -73,7 +73,7 @@ namespace QTool.Net
 					dir.y = 0;
 					if (dir.sqrMagnitude > 0.5f)
 					{
-						if (NavMesh.SamplePosition(transform.position+dir.normalized, out var targetMeshHit, 2, NavMesh.AllAreas))
+						if (NavMesh.SamplePosition(transform.position, out var targetMeshHit, 2, NavMesh.AllAreas))
 						{
 							targetMeshHit.position += Vector3.up * heightOffset;
 							if (targetMeshHit.position.y>MeshHit.position.y)
