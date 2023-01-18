@@ -47,6 +47,7 @@ namespace QTool.Net
 		{
 			AllAgents.Remove(this);
 		}
+		NavMeshHit LastMeshHit { get; set; }
 		public override void OnNetUpdate()
 		{
 			if (useGravity)
@@ -57,8 +58,9 @@ namespace QTool.Net
 					IsGrounded = transform.position.y - heightOffset <= hitInfo.position.y;
 					if (IsGrounded)
 					{
-						transform.position = new Vector3(hitInfo.position.x, IsGrounded ? hitInfo.position.y + heightOffset : transform.position.y, hitInfo.position.z);
+						transform.position = new Vector3(hitInfo.position.x, IsGrounded&&LastMeshHit.position.y>=hitInfo.position.y ? hitInfo.position.y + heightOffset : transform.position.y, hitInfo.position.z);
 					}
+					LastMeshHit = hitInfo;
 				}
 				else
 				{
