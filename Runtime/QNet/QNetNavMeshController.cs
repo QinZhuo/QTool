@@ -55,7 +55,7 @@ namespace QTool.Net
 		}
 		NavMeshHit MeshHit =default;
 		NavMeshHit TargetMeshHit = default;
-		const float CheckOffset = 0.05f;
+		const float CheckOffset = 0.08f;
 	
 		public override void OnNetUpdate()
 		{
@@ -63,7 +63,7 @@ namespace QTool.Net
 			{
 				transform.position += Vector3.up* VelocityY * NetDeltaTime;
 				var checkPoint = transform.position;
-				if(Physics.Raycast(checkPoint+Vector3.up*0.1f,Vector3.down,out var hitInfo)){
+				if(Physics.Raycast(checkPoint+Vector3.up* CheckOffset, Vector3.down,out var hitInfo)){
 					checkPoint = hitInfo.point;
 				}
 				if (NavMesh.SamplePosition(checkPoint, out TargetMeshHit, height, NavMesh.AllAreas))
