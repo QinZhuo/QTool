@@ -88,7 +88,7 @@ namespace QTool.Net
 					if (hit&& transform.position.y>TargetMeshHit.position.y+meshOffset)
 					{
 						TargetMeshHit.position += Vector3.up * meshOffset;
-						MeshHit = TargetMeshHit;
+						MeshHit.position =new Vector3(transform.position.x, TargetMeshHit.position.y,transform.position.z);
 					}
 					else
 					{
