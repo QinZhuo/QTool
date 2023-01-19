@@ -59,7 +59,7 @@ namespace QTool.Net
 			{
 				transform.position += Vector3.up* VelocityY * NetDeltaTime;
 				var checkPoint = transform.position;
-				if(Physics.Raycast(checkPoint,Vector3.down,out var hitInfo)){
+				if(Physics.Raycast(checkPoint+Vector3.up*0.1f,Vector3.down,out var hitInfo)){
 					checkPoint = hitInfo.point;
 				}
 				if (NavMesh.SamplePosition(checkPoint, out TargetMeshHit, height, NavMesh.AllAreas))
