@@ -65,17 +65,14 @@ namespace QTool.Net
 					}
 				}
 				IsGrounded = transform.position.y<= MeshHit.position.y+0.1f;
-				if (IsGrounded)
+				Velocity += Physics.gravity * NetDeltaTime;
+				if (IsGrounded&& Velocity.y<=0)
 				{
-					if (Velocity.y < 0)
-					{
-						Velocity = new Vector3(Velocity.x, 0, Velocity.z);
-					}
+					Velocity = new Vector3(Velocity.x, 0, Velocity.z);
 					transform.position = MeshHit.position;
 				}
 				else
 				{
-					Velocity += Physics.gravity * NetDeltaTime;
 					var dir = transform.position - MeshHit.position;
 					dir.y = 0;
 					var targetPos = transform.position + dir.normalized*(0.5f+radius);
