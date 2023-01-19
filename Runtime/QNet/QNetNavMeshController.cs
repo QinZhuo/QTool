@@ -105,7 +105,8 @@ namespace QTool.Net
 				Gizmos.color =Color.green;
 				Gizmos.DrawSphere(MeshHit.position, 0.05f);
 				Gizmos.DrawLine(MeshHit.position, TargetMeshHit.position);
-				Gizmos.DrawWireSphere(TargetMeshHit.position, 0.05f);
+				Gizmos.color = Color.blue;
+				Gizmos.DrawSphere(TargetMeshHit.position, 0.04f);
 			}
 
 		}
