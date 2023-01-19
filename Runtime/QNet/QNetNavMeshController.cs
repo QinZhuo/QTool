@@ -19,6 +19,7 @@ namespace QTool.Net
 		[QName("高度偏移")]
 		public float heightOffset = -0.08f;
 		public bool IsGrounded { get; private set; }
+		public Vector3 Velocity { get; private set; }
 		public void Move(Vector3 offset)
 		{
 			transform.position += offset;
@@ -54,7 +55,7 @@ namespace QTool.Net
 		{
 			if (useGravity)
 			{
-				transform.position += NetDeltaTime * Physics.gravity;
+				transform.position += Velocity* NetDeltaTime ;
 				if (NavMesh.SamplePosition(transform.position, out TargetMeshHit, 2, NavMesh.AllAreas))
 				{
 					TargetMeshHit.position += Vector3.up * heightOffset;
@@ -67,6 +68,7 @@ namespace QTool.Net
 				if (IsGrounded)
 				{
 					transform.position = MeshHit.position;
+					Velocity = Vector3.zero;
 				}
 				else
 				{
@@ -79,6 +81,7 @@ namespace QTool.Net
 						return;
 					}
 					transform.position = new Vector3(MeshHit.position.x, transform.position.y, MeshHit.position.z);
+					Velocity -= Physics.gravity * NetDeltaTime;
 				}
 			}
 			else
