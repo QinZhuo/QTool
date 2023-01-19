@@ -72,7 +72,7 @@ namespace QTool.Net
 				}
 				else
 				{
-					Velocity -= Physics.gravity * NetDeltaTime;
+					Velocity += Physics.gravity * NetDeltaTime;
 					var dir = transform.position - MeshHit.position;
 					dir.y = 0;
 					var targetPos = transform.position + dir.normalized*(0.5f+radius);
