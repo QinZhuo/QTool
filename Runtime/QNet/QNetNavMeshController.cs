@@ -55,6 +55,8 @@ namespace QTool.Net
 		}
 		NavMeshHit MeshHit =default;
 		NavMeshHit TargetMeshHit = default;
+		const float CheckOffset = 0.01f;
+	
 		public override void OnNetUpdate()
 		{
 			if (useGravity)
@@ -66,12 +68,12 @@ namespace QTool.Net
 				}
 				if (NavMesh.SamplePosition(checkPoint, out TargetMeshHit, height, NavMesh.AllAreas))
 				{
-					if (MeshHit.position.y>= TargetMeshHit.position.y || transform.position.y>= TargetMeshHit.position.y)
+					if (MeshHit.position.y + CheckOffset >= TargetMeshHit.position.y || transform.position.y + CheckOffset >= TargetMeshHit.position.y)
 					{
 						MeshHit = TargetMeshHit;
 					}
 				}
-				IsGrounded = transform.position.y <= MeshHit.position.y;
+				IsGrounded = transform.position.y <= MeshHit.position.y + CheckOffset;
 				VelocityY += Physics.gravity.y * NetDeltaTime;
 				if (IsGrounded&& VelocityY <= 0)
 				{
