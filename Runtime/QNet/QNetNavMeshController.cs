@@ -66,7 +66,7 @@ namespace QTool.Net
 						MeshHit = TargetMeshHit;
 					}
 				}
-				if (transform.position.y > MeshHit.position.y + 0.1f)
+				if (!Mathf.Approximately( (transform.position- MeshHit.position).sqrMagnitude,0))
 				{
 					var dir = transform.position - MeshHit.position;
 					var targetPos = transform.position + dir.normalized * radius * 2;
