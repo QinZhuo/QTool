@@ -61,7 +61,7 @@ namespace QTool.Net
 				if (NavMesh.SamplePosition(transform.position, out TargetMeshHit, height*4, NavMesh.AllAreas))
 				{
 					TargetMeshHit.position += Vector3.up * meshOffset;
-					if (MeshHit.position.y+0.1f >= TargetMeshHit.position.y || transform.position.y+0.1f >= TargetMeshHit.position.y)
+					if (transform.position.y+0.1f >= TargetMeshHit.position.y&& (MeshHit.position-TargetMeshHit.position).sqrMagnitude<=0.5f)
 					{
 						MeshHit = TargetMeshHit;
 					}
