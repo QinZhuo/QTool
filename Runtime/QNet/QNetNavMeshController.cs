@@ -88,10 +88,10 @@ namespace QTool.Net
 						{
 							TargetMeshHit.position += Vector3.up * meshOffset;
 						}
-						if (transform.position.y >= TargetMeshHit.position.y)
-						{
-							MeshHit = TargetMeshHit;
-						}
+					}
+					if (transform.position.y >= TargetMeshHit.position.y)
+					{
+						MeshHit = TargetMeshHit;
 					}
 					else
 					{
@@ -115,7 +115,7 @@ namespace QTool.Net
 		{
 			if (Application.IsPlaying(this))
 			{
-				Gizmos.color =Color.green;
+				Gizmos.color = IsGrounded ? Color.green:Color.red;
 				Gizmos.DrawSphere(MeshHit.position, 0.05f);
 				Gizmos.DrawLine(MeshHit.position, TargetMeshHit.position);
 				Gizmos.color =Color.Lerp(Color.blue,Color.clear,0.8f);
