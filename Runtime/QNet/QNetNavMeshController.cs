@@ -81,7 +81,7 @@ namespace QTool.Net
 				}
 				else
 				{
-					var targetPos = transform.position + LastOffset.normalized*radius*2;
+					var targetPos = transform.position + LastOffset.normalized*radius;
 					if (Physics.Raycast(targetPos + Vector3.up * height, Vector3.down, out hitInfo)&&
 						NavMesh.SamplePosition(hitInfo.point, out TargetMeshHit,radius, NavMesh.AllAreas))
 					{
