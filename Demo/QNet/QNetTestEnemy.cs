@@ -35,6 +35,6 @@ public class QNetTestEnemy : QNetBehaviour
 		}
 		if (Target == null) return;
 		transform.LookAt(Target.transform);
-		agent.Move(transform.forward * NetDeltaTime * 1.5f);
+		agent.Velocity = new Vector3(transform.forward.x * 1.5f, agent.Velocity.y, transform.forward.z);
 	}
 }
