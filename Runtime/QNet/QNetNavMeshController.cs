@@ -12,12 +12,14 @@ namespace QTool.Net
 			get => transform.position;
 			set => transform.position = value;
 		}
-		[QName("半径"),Min(0)]
-		public float radius =0.5f;
+		[QName("网格高度偏移")]
+		public float meshOffset = -0.08f;
 		[QName("使用重力")]
 		public bool useGravity = true;
-		[QName("高度偏移")]
-		public float heightOffset = -0.08f;
+		[QName("半径"),Min(0)]
+		public float radius =0.5f;
+		[QName("高度"), Min(0)]
+		public float height = 2f;
 		public bool IsGrounded { get; private set; }
 		public float VelocityY { get; set; }
 		public void Move(Vector3 offset)
@@ -58,7 +60,7 @@ namespace QTool.Net
 				transform.position += Vector3.up* VelocityY * NetDeltaTime;
 				if (NavMesh.SamplePosition(transform.position, out TargetMeshHit, 2, NavMesh.AllAreas))
 				{
-					TargetMeshHit.position += Vector3.up * heightOffset;
+					TargetMeshHit.position += Vector3.up * meshOffset;
 					if (MeshHit.position.y+0.1f >= TargetMeshHit.position.y || transform.position.y+0.1f >= TargetMeshHit.position.y)
 					{
 						MeshHit = TargetMeshHit;
@@ -78,9 +80,9 @@ namespace QTool.Net
 					var hit = NavMesh.SamplePosition(targetPos, out TargetMeshHit, 5, NavMesh.AllAreas);
 					if (hit)
 					{
-						NavMesh.SamplePosition(targetPos+Vector3.up, out TargetMeshHit, 5, NavMesh.AllAreas);
+						NavMesh.SamplePosition(targetPos+Vector3.up* height, out TargetMeshHit, 5, NavMesh.AllAreas);
 					}
-					if (hit&& transform.position.y>TargetMeshHit.position.y+heightOffset)
+					if (hit&& transform.position.y>TargetMeshHit.position.y+meshOffset)
 					{
 						MeshHit = TargetMeshHit;
 					}
