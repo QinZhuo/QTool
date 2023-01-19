@@ -82,7 +82,12 @@ namespace QTool.Net
 				}
 				else 
 				{
-					NavMesh.SamplePosition(transform.position + MoveOffset.normalized * radius + Vector3.up * height / 2, out TargetMeshHit, height, NavMesh.AllAreas);
+					var TopPoint = transform.position + MoveOffset.normalized * radius + Vector3.up * height;
+					if (Physics.Raycast(TopPoint, Vector3.down, out hitInfo))
+					{
+						TopPoint = hitInfo.point;
+					}
+					NavMesh.SamplePosition(TopPoint, out TargetMeshHit, radius, NavMesh.AllAreas);
 					if (transform.position.y >= TargetMeshHit.position.y)
 					{
 						MeshHit = TargetMeshHit;
