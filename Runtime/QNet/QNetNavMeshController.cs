@@ -81,8 +81,8 @@ namespace QTool.Net
 				}
 				else 
 				{
-					if (MoveOffset.sqrMagnitude>0.1f&& Physics.Raycast(transform.position+MoveOffset + Vector3.up * height, Vector3.down, out hitInfo)&&
-						NavMesh.SamplePosition(hitInfo.point, out TargetMeshHit,radius, NavMesh.AllAreas))
+					if (Physics.Raycast(transform.position+MoveOffset + Vector3.up * height, Vector3.down, out hitInfo)&&
+						NavMesh.SamplePosition(hitInfo.point, out TargetMeshHit,height, NavMesh.AllAreas))
 					{
 						TargetMeshHit.position += Vector3.up * meshOffset;
 					}
