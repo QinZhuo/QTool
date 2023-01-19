@@ -64,7 +64,7 @@ namespace QTool.Net
 						MeshHit = TargetMeshHit;
 					}
 				}
-				IsGrounded = transform.position.y<= MeshHit.position.y;
+				IsGrounded = transform.position.y<= MeshHit.position.y+0.1f;
 				if (IsGrounded)
 				{
 					Velocity = Vector3.zero;
