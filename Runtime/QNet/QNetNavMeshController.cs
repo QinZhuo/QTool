@@ -58,7 +58,11 @@ namespace QTool.Net
 			if (useGravity)
 			{
 				transform.position += Vector3.up* VelocityY * NetDeltaTime;
-				if (NavMesh.SamplePosition(transform.position, out TargetMeshHit, radius, NavMesh.AllAreas))
+				var checkPoint = transform.position;
+				if(Physics.Raycast(checkPoint,Vector3.down,out var hitInfo)){
+					checkPoint = hitInfo.point;
+				}
+				if (NavMesh.SamplePosition(checkPoint, out TargetMeshHit, height, NavMesh.AllAreas))
 				{
 					TargetMeshHit.position += Vector3.up * meshOffset;
 					if (MeshHit.position.y+0.1f >= TargetMeshHit.position.y || transform.position.y+0.1f >= TargetMeshHit.position.y)
@@ -75,32 +79,15 @@ namespace QTool.Net
 				}
 				else
 				{
-					var dir = transform.position - MeshHit.position;
-					var targetPos = transform.position + dir.normalized*radius*2;
-					var hit = NavMesh.SamplePosition(targetPos, out TargetMeshHit, height*4, NavMesh.AllAreas);
-					if (hit)
-					{
-						if(NavMesh.SamplePosition(targetPos+Vector3.up*height, out var heightHit, height/2, NavMesh.AllAreas)&&heightHit.position.y>TargetMeshHit.position.y)
-						{
-							TargetMeshHit = heightHit;
-						}
-					}
-					if (hit&& transform.position.y>TargetMeshHit.position.y+meshOffset)
-					{
-						TargetMeshHit.position += Vector3.up * meshOffset;
-						MeshHit = TargetMeshHit;
-					}
-					else
-					{
-						transform.position = new Vector3(MeshHit.position.x, transform.position.y, MeshHit.position.z);
-					}
+					transform.position = new Vector3(MeshHit.position.x, transform.position.y, MeshHit.position.z);
 				}
+				
 			}
 			else
 			{
-				if (NavMesh.SamplePosition(transform.position, out TargetMeshHit, 2, NavMesh.AllAreas))
+				if (NavMesh.SamplePosition(transform.position, out MeshHit, 2, NavMesh.AllAreas))
 				{
-					transform.position = TargetMeshHit.position;
+					transform.position = MeshHit.position;
 					IsGrounded = true;
 				}
 			}
