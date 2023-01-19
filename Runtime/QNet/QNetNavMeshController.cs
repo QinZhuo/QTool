@@ -19,7 +19,7 @@ namespace QTool.Net
 		[QName("高度偏移")]
 		public float heightOffset = -0.08f;
 		public bool IsGrounded { get; private set; }
-		public Vector3 Velocity { get; private set; }
+		public Vector3 Velocity { get; set; }
 		public void Move(Vector3 offset)
 		{
 			transform.position += offset;
