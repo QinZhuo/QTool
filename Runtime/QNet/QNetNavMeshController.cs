@@ -82,7 +82,7 @@ namespace QTool.Net
 				}
 				else 
 				{
-					if (MoveOffset.sqrMagnitude>0.1f)
+					if (Mathf.Approximately(MoveOffset.sqrMagnitude, 0))
 					{
 						NavMesh.SamplePosition(transform.position + MoveOffset.normalized * radius + Vector3.up * height / 2, out TargetMeshHit, height, NavMesh.AllAreas);
 					}
