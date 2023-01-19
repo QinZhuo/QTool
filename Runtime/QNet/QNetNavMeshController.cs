@@ -20,7 +20,26 @@ namespace QTool.Net
 		public float heightOffset = -0.08f;
 		public bool IsGrounded { get; private set; }
 		public Vector3 Velocity { get; set; }
-		
+		public void Move(Vector3 offset)
+		{
+			transform.position += offset;
+			if (radius >0)
+			{
+				foreach (var other in AllAgents)
+				{
+					if (other == this || other.radius == 0) continue;
+					var minDis = radius + other.radius;
+					var dir = (transform.position - other.transform.position);
+					if (Mathf.Abs(dir.x) < minDis || Mathf.Abs(dir.y) < minDis)
+					{
+						if (dir.sqrMagnitude < (minDis * minDis))
+						{
+							transform.position += (dir.normalized * (radius + other.radius - dir.magnitude));
+						}
+					}
+				}
+			}
+		}
 		public override void OnNetStart()
 		{
 			MeshHit.position = transform.position;
@@ -34,8 +53,6 @@ namespace QTool.Net
 		NavMeshHit TargetMeshHit = default;
 		public override void OnNetUpdate()
 		{
-			var MoveDir = Velocity * NetDeltaTime;
-			MoveDir.y = 0;
 			if (useGravity)
 			{
 				transform.position += Velocity * NetDeltaTime;
@@ -56,7 +73,9 @@ namespace QTool.Net
 				}
 				else
 				{
-					var targetPos = transform.position + MoveDir;
+					var dir = transform.position - MeshHit.position;
+					dir.y = 0;
+					var targetPos = transform.position + dir.normalized*radius;
 					if (NavMesh.SamplePosition(targetPos, out TargetMeshHit, 10, NavMesh.AllAreas)&&transform.position.y>TargetMeshHit.position.y+heightOffset)
 					{
 						MeshHit = TargetMeshHit;
@@ -75,22 +94,7 @@ namespace QTool.Net
 					IsGrounded = true;
 				}
 			}
-			if (radius > 0&&MoveDir.sqrMagnitude>0)
-			{
-				foreach (var other in AllAgents)
-				{
-					if (other == this || other.radius == 0) continue;
-					var minDis = radius + other.radius;
-					var Offset = (transform.position - other.transform.position);
-					if (Mathf.Abs(Offset.x) < minDis || Mathf.Abs(Offset.y) < minDis)
-					{
-						if (Offset.sqrMagnitude < (minDis * minDis))
-						{
-							transform.position += (Offset.normalized * (radius + other.radius - Offset.magnitude));
-						}
-					}
-				}
-			}
+		
 		}
 		private static List<QNetNavMeshController> AllAgents = new List<QNetNavMeshController>();
 

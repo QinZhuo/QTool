@@ -25,8 +25,7 @@ public class QNetTestPlayer : QNetBehaviour
 	{
 		if (agent != null)
 		{
-			var dir = PlayerValue("位置", new Vector3(QDemoInput.MoveDirection.x, 0, QDemoInput.MoveDirection.y)) * NetDeltaTime * 3;
-			agent.Velocity = new Vector3(dir.x, agent.Velocity.y, dir.z);
+			agent.Move(PlayerValue("位置", new Vector3(QDemoInput.MoveDirection.x, 0, QDemoInput.MoveDirection.y)) * NetDeltaTime * 3);
 		}
 		else
 		{
