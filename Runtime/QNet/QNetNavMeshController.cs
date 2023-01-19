@@ -81,7 +81,7 @@ namespace QTool.Net
 				}
 				else
 				{
-					var targetPos = transform.position + LastOffset;
+					var targetPos = transform.position + LastOffset.normalized*radius*2;
 					if (Physics.Raycast(targetPos + Vector3.up * 0.1f, Vector3.down, out hitInfo))
 					{
 						TargetMeshHit.position = hitInfo.point;
