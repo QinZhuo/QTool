@@ -82,13 +82,10 @@ namespace QTool.Net
 				else
 				{
 					var targetPos = transform.position + LastOffset.normalized*radius*2;
-					if (Physics.Raycast(targetPos + Vector3.up * 0.1f, Vector3.down, out hitInfo))
+					if (Physics.Raycast(targetPos + Vector3.up * height, Vector3.down, out hitInfo)&&
+						NavMesh.SamplePosition(hitInfo.point, out TargetMeshHit,radius, NavMesh.AllAreas))
 					{
-						TargetMeshHit.position = hitInfo.point;
-						if (NavMesh.SamplePosition(targetPos + Vector3.up * height, out TargetMeshHit, height / 2, NavMesh.AllAreas))
-						{
-							TargetMeshHit.position += Vector3.up * meshOffset;
-						}
+						TargetMeshHit.position += Vector3.up * meshOffset;
 					}
 					if (transform.position.y >= TargetMeshHit.position.y)
 					{
@@ -121,7 +118,7 @@ namespace QTool.Net
 				Gizmos.DrawLine(MeshHit.position, TargetMeshHit.position);
 				Gizmos.color =Color.Lerp(Color.blue,Color.clear,0.8f);
 				Gizmos.DrawSphere(TargetMeshHit.position, 0.04f);
-				Gizmos.color = Color.black;
+				Gizmos.color=Color.black;
 				Gizmos.DrawSphere(transform.position + LastOffset.normalized * radius * 2, 0.03f);
 			}
 
