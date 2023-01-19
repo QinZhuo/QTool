@@ -121,6 +121,8 @@ namespace QTool.Net
 				Gizmos.DrawLine(MeshHit.position, TargetMeshHit.position);
 				Gizmos.color =Color.Lerp(Color.blue,Color.clear,0.8f);
 				Gizmos.DrawSphere(TargetMeshHit.position, 0.04f);
+				Gizmos.color = Color.black;
+				Gizmos.DrawSphere(transform.position + LastOffset.normalized * radius * 2, 0.03f);
 			}
 
 		}
