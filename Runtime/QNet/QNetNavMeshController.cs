@@ -76,15 +76,11 @@ namespace QTool.Net
 				else
 				{
 					var dir = transform.position - MeshHit.position;
-					var targetPos = transform.position + dir.normalized*radius;
+					var targetPos = transform.position + dir.normalized*radius*2;
 					var hit = NavMesh.SamplePosition(targetPos, out TargetMeshHit, height*2, NavMesh.AllAreas);
 					if (hit)
 					{
-						if(NavMesh.SamplePosition(targetPos+Vector3.up*height/2, out var heightHit, height, NavMesh.AllAreas)&&TargetMeshHit.position.y!=heightHit.position.y)
-						{
-							TargetMeshHit = heightHit;
-						}
-						else if(NavMesh.SamplePosition(targetPos + Vector3.down * height , out heightHit, height, NavMesh.AllAreas))
+						if(NavMesh.SamplePosition(targetPos+Vector3.up*height/2, out var heightHit, height, NavMesh.AllAreas))
 						{
 							TargetMeshHit = heightHit;
 						}
