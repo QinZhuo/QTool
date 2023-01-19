@@ -88,6 +88,7 @@ namespace QTool.Net
 				VelocityY += Physics.gravity.y * NetDeltaTime;
 				if (IsGrounded && VelocityY <= 0)
 				{
+					Debug.LogError(MeshHit.position.y + " " + transform.position.y);
 					VelocityY = 0;
 					transform.position = MeshHit.position;
 				}
