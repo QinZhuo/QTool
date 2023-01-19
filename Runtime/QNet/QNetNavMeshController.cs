@@ -12,8 +12,8 @@ namespace QTool.Net
 			get => transform.position;
 			set => transform.position = value;
 		}
-		[QName("网格高度偏移")]
-		public float meshOffset = -0.08f;
+		//[QName("网格高度偏移")]
+		//public float meshOffset = -0.08f;
 		[QName("使用重力")]
 		public bool useGravity = true;
 		[QName("半径"),Min(0)]
@@ -66,7 +66,6 @@ namespace QTool.Net
 				}
 				if (NavMesh.SamplePosition(checkPoint, out TargetMeshHit, height, NavMesh.AllAreas))
 				{
-					TargetMeshHit.position += Vector3.up * meshOffset;
 					if (MeshHit.position.y+0.1f >= TargetMeshHit.position.y || transform.position.y+0.1f >= TargetMeshHit.position.y)
 					{
 						MeshHit = TargetMeshHit;
@@ -81,9 +80,9 @@ namespace QTool.Net
 				}
 				else 
 				{
-					if (NavMesh.SamplePosition(transform.position + MoveOffset.normalized * radius + Vector3.up * height/2, out TargetMeshHit,height, NavMesh.AllAreas))
+					if (MoveOffset.sqrMagnitude>0.1f)
 					{
-						TargetMeshHit.position += Vector3.up * meshOffset;
+						NavMesh.SamplePosition(transform.position + MoveOffset.normalized * radius + Vector3.up * height / 2, out TargetMeshHit, height, NavMesh.AllAreas);
 					}
 					if (transform.position.y >= TargetMeshHit.position.y)
 					{
