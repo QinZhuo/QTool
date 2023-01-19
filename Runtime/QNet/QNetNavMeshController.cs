@@ -75,7 +75,7 @@ namespace QTool.Net
 				{
 					var dir = transform.position - MeshHit.position;
 					dir.y = 0;
-					var targetPos = transform.position + dir.normalized*radius;
+					var targetPos = transform.position + dir;
 					if (NavMesh.SamplePosition(targetPos, out TargetMeshHit, 10, NavMesh.AllAreas)&&transform.position.y>TargetMeshHit.position.y+heightOffset)
 					{
 						MeshHit = TargetMeshHit;
@@ -103,10 +103,9 @@ namespace QTool.Net
 			if (Application.IsPlaying(this))
 			{
 				Gizmos.color =Color.green;
-				Gizmos.DrawSphere(MeshHit.position, 0.05f);
+				Gizmos.DrawWireSphere(TargetMeshHit.position, 0.05f);
 				Gizmos.DrawLine(transform.position, MeshHit.position);
-				Gizmos.color = Color.blue;
-				Gizmos.DrawSphere(TargetMeshHit.position, 0.05f);
+				Gizmos.DrawSphere(MeshHit.position, 0.05f);
 			}
 
 		}
