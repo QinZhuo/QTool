@@ -94,6 +94,9 @@ namespace QTool.Net
 					if(transform.position.y>= TargetMeshHit.position.y)
 					{
 						MeshHit = TargetMeshHit;
+					}
+					else
+					{
 						transform.position = new Vector3(MeshHit.position.x, transform.position.y, MeshHit.position.z);
 					}
 				}
