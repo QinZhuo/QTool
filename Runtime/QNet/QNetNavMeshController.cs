@@ -91,7 +91,7 @@ namespace QTool.Net
 						TopPoint = hitInfo.point;
 					}
 					NavMesh.SamplePosition(TopPoint, out TargetMeshHit, radius, NavMesh.AllAreas);
-					if (transform.position.y >= TargetMeshHit.position.y)
+					if (transform.position.y+CheckOffset>= TargetMeshHit.position.y)
 					{
 						MeshHit = TargetMeshHit;
 					}
