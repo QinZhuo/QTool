@@ -81,8 +81,7 @@ namespace QTool.Net
 				}
 				else 
 				{
-					var topPoint = transform.position + MoveOffset.normalized * radius + Vector3.up * height;
-					if (Physics.CheckSphere(topPoint, radius)&&NavMesh.SamplePosition(topPoint, out TargetMeshHit,height, NavMesh.AllAreas))
+					if (NavMesh.SamplePosition(transform.position + MoveOffset.normalized * radius + Vector3.up * height/2, out TargetMeshHit,height, NavMesh.AllAreas))
 					{
 						TargetMeshHit.position += Vector3.up * meshOffset;
 					}
