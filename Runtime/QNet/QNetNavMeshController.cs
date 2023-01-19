@@ -79,9 +79,26 @@ namespace QTool.Net
 				}
 				else
 				{
-					transform.position = new Vector3(MeshHit.position.x, transform.position.y, MeshHit.position.z);
+					var dir = transform.position - MeshHit.position;
+					var targetPos = transform.position + dir.normalized*radius*2;
+					var hit = NavMesh.SamplePosition(targetPos, out TargetMeshHit, height*4, NavMesh.AllAreas);
+					if (hit)
+					{
+						if(NavMesh.SamplePosition(targetPos+Vector3.up*height, out var heightHit, height/2, NavMesh.AllAreas)&&heightHit.position.y>TargetMeshHit.position.y)
+						{
+							TargetMeshHit = heightHit;
+						}
+					}
+					if (hit&& transform.position.y>TargetMeshHit.position.y+meshOffset)
+					{
+						TargetMeshHit.position += Vector3.up * meshOffset;
+						MeshHit = TargetMeshHit;
+					}
+					else
+					{
+						transform.position = new Vector3(MeshHit.position.x, transform.position.y, MeshHit.position.z);
+					}
 				}
-				
 			}
 			else
 			{
