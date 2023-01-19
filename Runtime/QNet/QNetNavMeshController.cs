@@ -25,7 +25,10 @@ namespace QTool.Net
 		public Vector3 MoveOffset { get; private set; }
 		public void Move(Vector3 offset)
 		{
-			MoveOffset = offset;
+			if (offset != Vector3.zero)
+			{
+				MoveOffset = offset;
+			}
 			transform.position += offset;
 			if (radius >0)
 			{
@@ -82,7 +85,7 @@ namespace QTool.Net
 				}
 				else 
 				{
-					var TopPoint = transform.position + MoveOffset.normalized * radius + Vector3.up * height;
+					var TopPoint = transform.position + MoveOffset.normalized * radius*2 + Vector3.up * height;
 					if (Physics.Raycast(TopPoint, Vector3.down, out hitInfo))
 					{
 						TopPoint = hitInfo.point;
