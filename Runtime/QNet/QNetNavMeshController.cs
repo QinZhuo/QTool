@@ -72,12 +72,9 @@ namespace QTool.Net
 				}
 				IsGrounded = transform.position.y <= MeshHit.position.y + 0.1f;
 				VelocityY += Physics.gravity.y * NetDeltaTime;
-				if (IsGrounded)
+				if (IsGrounded&& VelocityY <= 0)
 				{
-					if(VelocityY < 0)
-					{
-						VelocityY = 0;
-					}
+					VelocityY = 0;
 					transform.position = MeshHit.position;
 				}
 				else
