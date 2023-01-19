@@ -55,7 +55,7 @@ namespace QTool.Net
 		}
 		NavMeshHit MeshHit =default;
 		NavMeshHit TargetMeshHit = default;
-		const float CheckOffset = 0.01f;
+		const float CheckOffset = 0.05f;
 	
 		public override void OnNetUpdate()
 		{
