@@ -58,10 +58,10 @@ namespace QTool.Net
 			if (useGravity)
 			{
 				transform.position += Vector3.up* VelocityY * NetDeltaTime;
-				if (NavMesh.SamplePosition(transform.position, out TargetMeshHit, height*4, NavMesh.AllAreas))
+				if (NavMesh.SamplePosition(transform.position, out TargetMeshHit, height, NavMesh.AllAreas))
 				{
 					TargetMeshHit.position += Vector3.up * meshOffset;
-					if (transform.position.y+0.1f >= TargetMeshHit.position.y&& (MeshHit.position-TargetMeshHit.position).sqrMagnitude<=0.5f)
+					if (MeshHit.position.y+0.1f >= TargetMeshHit.position.y || transform.position.y+0.1f >= TargetMeshHit.position.y)
 					{
 						MeshHit = TargetMeshHit;
 					}
@@ -88,7 +88,7 @@ namespace QTool.Net
 					if (hit&& transform.position.y>TargetMeshHit.position.y+meshOffset)
 					{
 						TargetMeshHit.position += Vector3.up * meshOffset;
-						MeshHit.position =new Vector3(transform.position.x, TargetMeshHit.position.y,transform.position.z);
+						MeshHit = TargetMeshHit;
 					}
 					else
 					{
