@@ -22,10 +22,10 @@ namespace QTool.Net
 		public float height = 2f;
 		public bool IsGrounded { get; private set; }
 		public float VelocityY { get; set; }
-		public Vector3 LastOffset { get; private set; }
+		public Vector3 MoveOffset { get; private set; }
 		public void Move(Vector3 offset)
 		{
-			LastOffset = offset;
+			MoveOffset = offset;
 			transform.position += offset;
 			if (radius >0)
 			{
@@ -81,7 +81,7 @@ namespace QTool.Net
 				}
 				else
 				{
-					var targetPos = transform.position + LastOffset.normalized*radius;
+					var targetPos = transform.position + MoveOffset;
 					if (Physics.Raycast(targetPos + Vector3.up * height, Vector3.down, out hitInfo)&&
 						NavMesh.SamplePosition(hitInfo.point, out TargetMeshHit,radius, NavMesh.AllAreas))
 					{
@@ -119,7 +119,7 @@ namespace QTool.Net
 				Gizmos.color =Color.Lerp(Color.blue,Color.clear,0.8f);
 				Gizmos.DrawSphere(TargetMeshHit.position, 0.04f);
 				Gizmos.color=Color.black;
-				Gizmos.DrawSphere(transform.position + LastOffset.normalized * radius * 2, 0.03f);
+				Gizmos.DrawSphere(transform.position + MoveOffset.normalized * radius * 2, 0.03f);
 			}
 
 		}
