@@ -116,10 +116,9 @@ namespace QTool.Net
 				Gizmos.color = IsGrounded ? Color.green:Color.red;
 				Gizmos.DrawSphere(MeshHit.position, 0.05f);
 				Gizmos.DrawLine(MeshHit.position, TargetMeshHit.position);
-				Gizmos.color =Color.Lerp(Color.blue,Color.clear,0.8f);
+				Gizmos.color =Color.Lerp(Color.blue,Color.clear,0.5f);
 				Gizmos.DrawSphere(TargetMeshHit.position, 0.04f);
-				Gizmos.color=Color.black;
-				Gizmos.DrawSphere(transform.position + MoveOffset.normalized * radius * 2, 0.03f);
+				Gizmos.DrawLine(transform.position,transform.position+MoveOffset);
 			}
 
 		}
