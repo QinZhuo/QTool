@@ -81,8 +81,11 @@ namespace QTool.Net
 				{
 					var dir = transform.position - MeshHit.position;
 					var targetPos = transform.position + dir.normalized*radius*2;
-					if (NavMesh.SamplePosition(targetPos, out TargetMeshHit, height * 4, NavMesh.AllAreas))
+
+
+					if (Physics.Raycast(checkPoint + Vector3.up * 0.1f, Vector3.down, out hitInfo))
 					{
+						TargetMeshHit.position = hitInfo.point;
 						if (NavMesh.SamplePosition(targetPos + Vector3.up * height, out var heightHit, height / 2, NavMesh.AllAreas) && heightHit.position.y > TargetMeshHit.position.y)
 						{
 							TargetMeshHit = heightHit;
