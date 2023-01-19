@@ -75,7 +75,7 @@ namespace QTool.Net
 				{
 					var dir = transform.position - MeshHit.position;
 					dir.y = 0;
-					var targetPos = transform.position + dir.normalized*(0.5f+radius);
+					var targetPos = transform.position + dir.normalized*radius;
 					if (NavMesh.SamplePosition(targetPos, out TargetMeshHit, 10, NavMesh.AllAreas)&&transform.position.y>TargetMeshHit.position.y+heightOffset)
 					{
 						MeshHit = TargetMeshHit;
