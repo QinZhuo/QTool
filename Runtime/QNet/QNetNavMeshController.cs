@@ -22,8 +22,10 @@ namespace QTool.Net
 		public float height = 2f;
 		public bool IsGrounded { get; private set; }
 		public float VelocityY { get; set; }
+		public Vector3 LastOffset { get; private set; }
 		public void Move(Vector3 offset)
 		{
+			LastOffset = offset;
 			transform.position += offset;
 			if (radius >0)
 			{
@@ -79,9 +81,8 @@ namespace QTool.Net
 				}
 				else
 				{
-					var dir = transform.position - MeshHit.position;
-					var targetPos = transform.position + dir.normalized*radius*2;
-					if (Physics.Raycast(checkPoint + Vector3.up * 0.1f, Vector3.down, out hitInfo))
+					var targetPos = transform.position + LastOffset;
+					if (Physics.Raycast(targetPos + Vector3.up * 0.1f, Vector3.down, out hitInfo))
 					{
 						TargetMeshHit.position = hitInfo.point;
 						if (NavMesh.SamplePosition(targetPos + Vector3.up * height, out TargetMeshHit, height / 2, NavMesh.AllAreas))
