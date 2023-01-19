@@ -79,10 +79,9 @@ namespace QTool.Net
 					VelocityY = 0;
 					transform.position = MeshHit.position;
 				}
-				else
+				else 
 				{
-					var targetPos = transform.position + MoveOffset;
-					if (Physics.Raycast(targetPos + Vector3.up * height, Vector3.down, out hitInfo)&&
+					if (MoveOffset.sqrMagnitude>0.1f&& Physics.Raycast(transform.position+MoveOffset + Vector3.up * height, Vector3.down, out hitInfo)&&
 						NavMesh.SamplePosition(hitInfo.point, out TargetMeshHit,radius, NavMesh.AllAreas))
 					{
 						TargetMeshHit.position += Vector3.up * meshOffset;
@@ -96,6 +95,7 @@ namespace QTool.Net
 						transform.position = new Vector3(MeshHit.position.x, transform.position.y, MeshHit.position.z);
 					}
 				}
+				
 			}
 			else
 			{
