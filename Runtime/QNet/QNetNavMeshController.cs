@@ -66,12 +66,12 @@ namespace QTool.Net
 				}
 				if (NavMesh.SamplePosition(checkPoint, out TargetMeshHit, height, NavMesh.AllAreas))
 				{
-					if (MeshHit.position.y+0.1f >= TargetMeshHit.position.y || transform.position.y+0.1f >= TargetMeshHit.position.y)
+					if (MeshHit.position.y>= TargetMeshHit.position.y || transform.position.y>= TargetMeshHit.position.y)
 					{
 						MeshHit = TargetMeshHit;
 					}
 				}
-				IsGrounded = transform.position.y <= MeshHit.position.y + 0.1f;
+				IsGrounded = transform.position.y <= MeshHit.position.y;
 				VelocityY += Physics.gravity.y * NetDeltaTime;
 				if (IsGrounded&& VelocityY <= 0)
 				{
