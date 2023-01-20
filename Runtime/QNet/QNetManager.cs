@@ -86,11 +86,11 @@ namespace QTool.Net
 		[QName("启动服务器", "!" + nameof(NetActive))]
 		public void StartServer()
 		{
-			transport.ServerStart();
 			ServerSeed = UnityEngine.Random.Range(0,int.MaxValue);
 			ServerActionData[nameof(QNetManager)].Events.Add(new QKeyValue<string, object>(nameof(ServerSeed), ServerSeed));
 			transport.OnServerConnected = (id) =>
 			{
+				QDebug.Log("[" + id + "]连接主机");
 				ServerConnects.Add(id);
 				var max = Mathf.CeilToInt(ServerIndex * 1f / GameDataArrayLength) * GameDataArrayLength;
 				for (int startIndex = 0; startIndex < max; startIndex+=GameDataArrayLength)
@@ -142,7 +142,7 @@ namespace QTool.Net
 				ServerConnects.Remove(id);
 			};
 			ServerUpdateTimer = new QTimer(Time.fixedDeltaTime);
-			
+			transport.ServerStart();
 		}
 		
 		[QName("启动主机", "!" + nameof(NetActive))]
@@ -188,7 +188,6 @@ namespace QTool.Net
 		[QName("启动客户端", "!" + nameof(NetActive))]
 		public void StartClient(string ip="127.0.0.1")
 		{
-			transport.ClientConnect(ip);
 			transport.OnClientConnected += () =>
 			{
 				PlayerAction(transport.ClientPlayerId, nameof(DefaultNetAction.PlayerConnected), transport.ClientPlayerId);
@@ -208,6 +207,7 @@ namespace QTool.Net
 			{
 				QDebug.Log("断开链接");
 			};
+			transport.ClientConnect(ip);
 		}
 		private void ReceiveGameData(QBinaryReader reader)
 		{

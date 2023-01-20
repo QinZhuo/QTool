@@ -16,10 +16,6 @@ namespace QTool.Net
 		public Action OnClientDisconnected;
 		public abstract bool ClientConnected { get; }
 		public abstract void ClientConnect(string address);
-		public virtual void ClientConnect(Uri uri)
-		{
-			ClientConnect(uri.Host);
-		}
 		public abstract void ClientSend(ArraySegment<byte> segment);
 		public virtual void ClientSend(byte[] segment)
 		{
@@ -37,7 +33,6 @@ namespace QTool.Net
 		public Action<int, ArraySegment<byte>> OnServerDataSent;
 		public Action<int, Exception> OnServerError;
 		public Action<int> OnServerDisconnected;
-		public abstract Uri ServerUri { get; }
 		public abstract bool ServerActive { get; }
 		public abstract void ServerStart();
 		

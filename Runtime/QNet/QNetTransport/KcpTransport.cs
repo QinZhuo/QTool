@@ -142,14 +142,6 @@ namespace QTool.Net
         {
             client.Connect(address, Port, NoDelay, Interval, FastResend, CongestionWindow, SendWindowSize, ReceiveWindowSize, Timeout, MaxRetransmit, MaximizeSendReceiveBuffersToOSLimit);
         }
-        public override void ClientConnect(Uri uri)
-        {
-            if (uri.Scheme != Scheme)
-                throw new ArgumentException($"Invalid url {uri}, use {Scheme}://host:port instead", nameof(uri));
-
-            int serverPort = uri.IsDefaultPort ? Port : uri.Port;
-            client.Connect(uri.Host, (ushort)serverPort, NoDelay, Interval, FastResend, CongestionWindow, SendWindowSize, ReceiveWindowSize, Timeout, MaxRetransmit, MaximizeSendReceiveBuffersToOSLimit);
-        }
         public override void ClientSend(ArraySegment<byte> segment)
         {
             client.Send(segment, KcpChannel.Reliable);
@@ -169,19 +161,7 @@ namespace QTool.Net
         // process outgoing in late update
         public override void ClientLateUpdate() => client.TickOutgoing();
 
-        // server
-        public override Uri ServerUri
-        {
-			get
-			{
-				UriBuilder builder = new UriBuilder();
-				builder.Scheme = Scheme;
-				builder.Host = Dns.GetHostName();
-				builder.Port = Port;
-				return builder.Uri;
-			}
-           
-        }
+     
         public override bool ServerActive => server.IsActive();
         public override void ServerStart() => server.Start(Port);
         public override void ServerSend(int connectionId, ArraySegment<byte> segment)
