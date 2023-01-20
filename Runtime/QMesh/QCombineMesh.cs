@@ -108,11 +108,6 @@ namespace QTool.Mesh
 					rootBone.name = bone.name;
 					rootBone.SetAsFirstSibling();
 				}
-				var animator = GetComponent<Animator>();
-				if (animator.avatar == null)
-				{
-					animator.avatar = skineedMeshRenderer.GetComponent<Animator>()?.avatar;
-				}
 			}
 			var meshRnderers = GetComponentsInChildren<MeshRenderer>();
 			for (int i = 0; i < meshRnderers.Length; i++)
