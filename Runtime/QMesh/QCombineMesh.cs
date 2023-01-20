@@ -48,10 +48,7 @@ namespace QTool.Mesh
 		[ContextMenu("刷新模型")]
 		public void FreshMesh()
 		{
-			if (rootBone == null)
-			{
-				FreshRenderers();
-			}
+			FreshRenderers();
 			var combineMeshs = new List<SkinnedMeshRenderer>();
 			var meshRnderers= GetComponentsInChildren<MeshRenderer>();
 			foreach (var r in meshRnderers)
@@ -109,6 +106,7 @@ namespace QTool.Mesh
 					}
 					rootBone = Instantiate(bone, transform);
 					rootBone.name = bone.name;
+					rootBone.SetAsFirstSibling();
 				}
 				var animator = GetComponent<Animator>();
 				if (animator.avatar == null)

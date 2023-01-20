@@ -339,7 +339,7 @@ namespace QTool.Inspector
 			data.UpdateList(value);
 			EditorGUI.LabelField(position.HorizontalRect(0f, 0.3f), property.QName());
 			var newIndex = EditorGUI.Popup(position.HorizontalRect(0.7f, 1), data.SelectIndex, data.List.ToArray());
-			if (newIndex != data.SelectIndex)
+			if (newIndex != data.SelectIndex||value.IsNull())
 			{
 				data.SelectIndex = newIndex;
 				if (property.propertyType== SerializedPropertyType.String)
