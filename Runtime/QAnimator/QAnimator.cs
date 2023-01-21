@@ -77,15 +77,15 @@ namespace QTool
 				return _animator;
 			}
 		}
-		public List<StateGroup> StateGroups;
+		[SerializeField]
+		private List<StateGroup> StateGroupList = new List<StateGroup>();
 		public StateGroup GetCurrentStateGroup()
 		{
 			var stateInfo = Animator.GetCurrentAnimatorStateInfo(0);
 			var nextState = Animator.GetNextAnimatorStateInfo(0);
-			if (StateGroups == null) return null;
-			foreach (var group in StateGroups)
+			foreach (var group in StateGroupList)
 			{
-				if (group.StateNameHash.Contains(stateInfo.shortNameHash) || group.StateNameHash.Contains(stateInfo.shortNameHash))
+				if (group.StateNameHash.Contains(stateInfo.shortNameHash) || group.StateNameHash.Contains(nextState.shortNameHash))
 				{
 					return group;
 				}
@@ -96,32 +96,32 @@ namespace QTool
 		{
 			gameObject.InvokeEvent(eventName);
 		}
-
-	}
-	[System.Serializable]
-	public class StateGroup
-	{
-		public string Key;
-#if UNITY_EDITOR
-		[QEnum(nameof(QAnimator.States))]
-#endif
-		public List<string> StateName = new List<string>();
-		private List<int> _StateNameHash = null;
-		public List<int> StateNameHash
+		[System.Serializable]
+		public class StateGroup
 		{
-			get
+			public string Key;
+#if UNITY_EDITOR
+			[QEnum(nameof(States))]
+#endif
+			public List<string> StateName = new List<string>();
+			private List<int> _StateNameHash = null;
+			public List<int> StateNameHash
 			{
-				if (_StateNameHash == null)
+				get
 				{
-					_StateNameHash = new List<int>();
-					for (int i = 0; i < StateName.Count; i++)
+					if (_StateNameHash == null)
 					{
-						_StateNameHash.Add(Animator.StringToHash(StateName[i]));
+						_StateNameHash = new List<int>();
+						for (int i = 0; i < StateName.Count; i++)
+						{
+							_StateNameHash.Add(Animator.StringToHash(StateName[i]));
+						}
 					}
+					return _StateNameHash;
 				}
-				return _StateNameHash;
 			}
 		}
 	}
+	
 }
 
