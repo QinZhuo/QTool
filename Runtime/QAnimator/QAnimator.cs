@@ -67,36 +67,18 @@ namespace QTool
 		}
 #endif
 		public List<StateGroup> StateGroups = new List<StateGroup>();
-		public StateGroup CurrentStateGroup { get; private set; }
-		public string CurrentState => CurrentStateGroup == null ? "null" : CurrentStateGroup.Key;
-		private void FixedUpdate()
-		{
-			if(Animator.updateMode== AnimatorUpdateMode.Normal)
-			{
-				UpdateStateGroup();
-			}
-		}
-		public void UpdateStateGroup()
+		public StateGroup GetCurrentStateGroup()
 		{
 			var stateInfo = Animator.GetCurrentAnimatorStateInfo(0);
+			var nextState = Animator.GetNextAnimatorStateInfo(0);
 			foreach (var group in StateGroups)
 			{
-				if (group.StateNameHash.Contains(stateInfo.shortNameHash))
+				if (group.StateNameHash.Contains(stateInfo.shortNameHash) || group.StateNameHash.Contains(stateInfo.shortNameHash))
 				{
-					CurrentStateGroup = group;
-					return;
+					return group;
 				}
 			}
-			stateInfo = Animator.GetNextAnimatorStateInfo(0);
-			foreach (var group in StateGroups)
-			{
-				if (group.StateNameHash.Contains(stateInfo.shortNameHash))
-				{
-					CurrentStateGroup = group;
-					return;
-				}
-			}
-			CurrentStateGroup = null;
+			return null;
 		}
 		private void SampleAnimation()
 		{
