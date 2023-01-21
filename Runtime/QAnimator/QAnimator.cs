@@ -39,19 +39,27 @@ namespace QTool
 		}
 #if UNITY_EDITOR
 		public UnityEditor.Animations.AnimatorController AnimatorController => (Animator.runtimeAnimatorController as UnityEditor.Animations.AnimatorController);
-		
-		private string[] _states = null;
-		public string[] States
+
+		private List<string> _states = null;
+		public List<string> States
 		{
 			get
 			{
-				if (_states == null || _states.Length == 0)
-				{
-					var stateInfos = AnimatorController.layers[0].stateMachine.states;
-					_states = new string[stateInfos.Length];
-					for (int i = 0; i < stateInfos.Length; i++)
+				if (_states == null)
+				{ 
+					var stateMachines = new List<UnityEditor.Animations.AnimatorStateMachine>();
+					stateMachines.Add(AnimatorController.layers[0].stateMachine);
+					foreach (var cs in AnimatorController.layers[0].stateMachine.stateMachines)
 					{
-						_states[i] = stateInfos[i].state.name;
+						stateMachines.Add(cs.stateMachine);
+					}
+					_states = new List<string>();
+					foreach (var stateMachine in stateMachines)
+					{
+						foreach (var state in stateMachine.states)
+						{
+							_states.Add(state.state.name);
+						}
 					}
 				}
 				return _states;
