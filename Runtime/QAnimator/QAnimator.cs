@@ -82,6 +82,7 @@ namespace QTool
 		{
 			var stateInfo = Animator.GetCurrentAnimatorStateInfo(0);
 			var nextState = Animator.GetNextAnimatorStateInfo(0);
+			if (StateGroups == null) return null;
 			foreach (var group in StateGroups)
 			{
 				if (group.StateNameHash.Contains(stateInfo.shortNameHash) || group.StateNameHash.Contains(stateInfo.shortNameHash))
@@ -103,7 +104,7 @@ namespace QTool
 			[QEnum(nameof(States))]
 #endif
 			public List<string> StateName = new List<string>();
-			List<int> _StateNameHash = null;
+			private List<int> _StateNameHash = null;
 			public List<int> StateNameHash
 			{
 				get
