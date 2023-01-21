@@ -131,10 +131,11 @@ namespace QTool
     {
 		[QName("注册全局事件")]
 		public bool GlobalEvent = false;
-        public List<ActionEventTrigger> actionEventList = new List<ActionEventTrigger>();
+		public List<ActionEventTrigger> actionEventList = new List<ActionEventTrigger>();
         public List<StringEventTrigger> stringEventList = new List<StringEventTrigger>();
         public List<BoolEventTrigger> boolEventList = new List<BoolEventTrigger>();
         public List<FloatEventTrigger> floatEventList = new List<FloatEventTrigger>();
+		public List<ObjectEventTrigger> objectEventList = new List<ObjectEventTrigger>();
 		public void Awake()
 		{
 			if (GlobalEvent)
@@ -154,6 +155,10 @@ namespace QTool
 				foreach (var eventTrigger in floatEventList)
 				{
 					QEventManager.Register<float>(eventTrigger.Key, eventTrigger.eventAction.Invoke);
+				}
+				foreach (var eventTrigger in objectEventList)
+				{
+					QEventManager.Register<Object>(eventTrigger.Key, eventTrigger.eventAction.Invoke);
 				}
 			}
 		}
@@ -176,6 +181,10 @@ namespace QTool
 				foreach (var eventTrigger in floatEventList)
 				{
 					QEventManager.UnRegister<float>(eventTrigger.Key, eventTrigger.eventAction.Invoke);
+				}
+				foreach (var eventTrigger in objectEventList)
+				{
+					QEventManager.UnRegister<Object>(eventTrigger.Key, eventTrigger.eventAction.Invoke);
 				}
 			}
 		}
@@ -206,6 +215,13 @@ namespace QTool
 			Log(eventName, value);
 #endif
 			floatEventList.Get(eventName)?.eventAction?.Invoke(value);
+		}
+		public void Invoke(string eventName, Object value)
+		{
+#if UNITY_EDITOR
+			Log(eventName, value);
+#endif
+			objectEventList.Get(eventName)?.eventAction?.Invoke(value);
 		}
 #if UNITY_EDITOR
 		void Log(string eventName, object value=null)
@@ -248,24 +264,16 @@ namespace QTool
     public class FloatEvent : UnityEvent<float>
     {
     }
-    [System.Serializable]
-    public class StringEvent : UnityEvent<string>
-    {
-    }
-    [System.Serializable]
-    public class SpriteEvent : UnityEvent<Sprite>
-    {
-    }
-    [System.Serializable]
-    public class ColorEvent : UnityEvent<Color>
-    {
-    }
-    [System.Serializable]
-    public class Vector3Event : UnityEvent<Vector3>
-    {
-    }
-
-    [System.Serializable]
+   
+	[System.Serializable]
+	public class StringEvent : UnityEvent<string>
+	{
+	}
+	[System.Serializable]
+	public class ObjectEvent : UnityEvent<Object>
+	{
+	}
+	[System.Serializable]
     public class FloatEventTrigger : EventTriggerBase<FloatEvent>
     {
     }
@@ -281,9 +289,12 @@ namespace QTool
     public class StringEventTrigger : EventTriggerBase<StringEvent>
     {
     }
+	[System.Serializable]
+	public class ObjectEventTrigger : EventTriggerBase<ObjectEvent>
+	{
+	}
 
-
-    public static class ValueEventTriggerExtends
+	public static class ValueEventTriggerExtends
     {
 
         public static QEventTrigger GetTrigger(this GameObject obj)
@@ -321,7 +332,11 @@ namespace QTool
         {
             obj.GetTrigger()?.Invoke(eventName.Trim(), value);
         }
-        public static void InvokeParentEvent(this GameObject obj, string eventName)
+		public static void InvokeEvent(this GameObject obj, string eventName, Object value)
+		{
+			obj.GetTrigger()?.Invoke(eventName.Trim(), value);
+		}
+		public static void InvokeParentEvent(this GameObject obj, string eventName)
         {
             obj.GetParentTrigger()?.Invoke(eventName.Trim());
         }
@@ -337,5 +352,9 @@ namespace QTool
         {
             obj.GetParentTrigger()?.Invoke(eventName.Trim(), value);
         }
-    }
+		public static void InvokeParentEvent(this GameObject obj, string eventName, Object value)
+		{
+			obj.GetParentTrigger()?.Invoke(eventName.Trim(), value);
+		}
+	}
 }

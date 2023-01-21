@@ -9,19 +9,57 @@ namespace QTool
 	[RequireComponent(typeof(QEventTrigger))]
 	public class QAnimator : MonoBehaviour
 	{
-#if UNITY_EDITOR
+
+
+
+		Animator _animator;
+		public Animator Animator
+		{
+			get
+			{
+				if (_animator == null)
+				{
+					_animator = GetComponent<Animator>();
+				}
+				return _animator;
+			}
+		}
 		[SerializeField]
-		[QToolbar(nameof(Animations), pageSize = 5)]
+		private List<StateGroup> StateGroupList = new List<StateGroup>();
+		public StateGroup GetCurrentStateGroup()
+		{
+			var stateInfo = Animator.GetCurrentAnimatorStateInfo(0);
+			var nextState = Animator.GetNextAnimatorStateInfo(0);
+			foreach (var group in StateGroupList)
+			{
+				if (group.StateNameHash.Contains(stateInfo.shortNameHash) || group.StateNameHash.Contains(nextState.shortNameHash))
+				{
+					return group;
+				}
+			}
+			return null;
+		}
+		public void QEventTrigger(string eventName)
+		{
+			gameObject.InvokeEvent(eventName);
+		}
+
+#if UNITY_EDITOR
+		[QToggle("编辑动画事件")]
+		public bool EditEvent;
+		[SerializeField]
+		[QToolbar(nameof(Animations), pageSize = 5, visibleControl = nameof(EditEvent))]
 		[QOnChange(nameof(SampleAnimation))]
 		private int clipIndex;
 		private AnimationClip[] Animations => Animator.runtimeAnimatorController.animationClips;
 		[SerializeField]
-		[QName("动画进度")]
+		[QName("动画进度", nameof(EditEvent))]
 		[Range(0, 1)]
 		[QOnChange(nameof(SampleAnimation))]
 		private float animationStep;
 		[SerializeField]
 		[QReadonly]
+		[QName("时间", nameof(EditEvent))]
 		private float time;
 		List<string> ActionNames = new List<string>();
 
@@ -63,39 +101,6 @@ namespace QTool
 			}
 		}
 #endif
-
-
-		Animator _animator;
-		public Animator Animator
-		{
-			get
-			{
-				if (_animator == null)
-				{
-					_animator = GetComponent<Animator>();
-				}
-				return _animator;
-			}
-		}
-		[SerializeField]
-		private List<StateGroup> StateGroupList = new List<StateGroup>();
-		public StateGroup GetCurrentStateGroup()
-		{
-			var stateInfo = Animator.GetCurrentAnimatorStateInfo(0);
-			var nextState = Animator.GetNextAnimatorStateInfo(0);
-			foreach (var group in StateGroupList)
-			{
-				if (group.StateNameHash.Contains(stateInfo.shortNameHash) || group.StateNameHash.Contains(nextState.shortNameHash))
-				{
-					return group;
-				}
-			}
-			return null;
-		}
-		public void QEventTrigger(string eventName)
-		{
-			gameObject.InvokeEvent(eventName);
-		}
 		[System.Serializable]
 		public class StateGroup
 		{

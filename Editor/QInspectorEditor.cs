@@ -443,7 +443,8 @@ namespace QTool.Inspector
 		}
 		public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
 		{
-			return property.IsShow() ?((attribute as QToolbarAttribute).pageSize > 0 ? Height+20:Height) : 0;
+			var toolbar = (attribute as QToolbarAttribute);
+			return property.IsShow() ?(toolbar.pageSize > 0&& QEnumListData.Get(property, toolbar.getList).List.Count> toolbar.pageSize ? Height +20:Height) : 0;
 		}
 	}
 	#endregion
