@@ -25,19 +25,16 @@ namespace QTool
 		private float time;
 		List<string> ActionNames = new List<string>();
 
-		Animator _animator;
-		public Animator Animator
+		private void SampleAnimation()
 		{
-			get
+			if (clipIndex < Animations.Length)
 			{
-				if (_animator == null)
-				{
-					_animator = GetComponent<Animator>();
-				}
-				return _animator;
+				var clip = Animations[clipIndex];
+				time = clip.length * animationStep;
+				clip.SampleAnimation(gameObject, time);
 			}
 		}
-#if UNITY_EDITOR
+
 		public UnityEditor.Animations.AnimatorController AnimatorController => (Animator.runtimeAnimatorController as UnityEditor.Animations.AnimatorController);
 
 		private List<string> _states = null;
@@ -46,7 +43,7 @@ namespace QTool
 			get
 			{
 				if (_states == null)
-				{ 
+				{
 					var stateMachines = new List<UnityEditor.Animations.AnimatorStateMachine>();
 					stateMachines.Add(AnimatorController.layers[0].stateMachine);
 					foreach (var cs in AnimatorController.layers[0].stateMachine.stateMachines)
@@ -66,6 +63,20 @@ namespace QTool
 			}
 		}
 #endif
+
+
+		Animator _animator;
+		public Animator Animator
+		{
+			get
+			{
+				if (_animator == null)
+				{
+					_animator = GetComponent<Animator>();
+				}
+				return _animator;
+			}
+		}
 		public List<StateGroup> StateGroups = new List<StateGroup>();
 		public StateGroup GetCurrentStateGroup()
 		{
@@ -80,16 +91,6 @@ namespace QTool
 			}
 			return null;
 		}
-		private void SampleAnimation()
-		{
-			if (clipIndex < Animations.Length)
-			{
-				var clip = Animations[clipIndex];
-				time = clip.length * animationStep;
-				clip.SampleAnimation(gameObject, time);
-			}
-		}
-#endif
 		public void QEventTrigger(string eventName)
 		{
 			gameObject.InvokeEvent(eventName);
