@@ -4,20 +4,20 @@ using UnityEngine;
 using QTool.Inspector;
 namespace QTool
 {
-	
+
 	[RequireComponent(typeof(Animator))]
 	[RequireComponent(typeof(QEventTrigger))]
 	public class QAnimator : MonoBehaviour
 	{
 #if UNITY_EDITOR
 		[SerializeField]
-		[QToolbar(nameof(Animations),pageSize =5)]
+		[QToolbar(nameof(Animations), pageSize = 5)]
 		[QOnChange(nameof(SampleAnimation))]
 		private int clipIndex;
 		private AnimationClip[] Animations => Animator.runtimeAnimatorController.animationClips;
 		[SerializeField]
 		[QName("动画进度")]
-		[Range(0,1)]
+		[Range(0, 1)]
 		[QOnChange(nameof(SampleAnimation))]
 		private float animationStep;
 		[SerializeField]
@@ -77,7 +77,7 @@ namespace QTool
 				return _animator;
 			}
 		}
-		public List<StateGroup> StateGroups = new List<StateGroup>();
+		public List<StateGroup> StateGroups;
 		public StateGroup GetCurrentStateGroup()
 		{
 			var stateInfo = Animator.GetCurrentAnimatorStateInfo(0);
@@ -96,29 +96,30 @@ namespace QTool
 		{
 			gameObject.InvokeEvent(eventName);
 		}
-		[System.Serializable]
-		public class StateGroup
-		{
-			public string Key;
+
+	}
+	[System.Serializable]
+	public class StateGroup
+	{
+		public string Key;
 #if UNITY_EDITOR
-			[QEnum(nameof(States))]
+		[QEnum(nameof(QAnimator.States))]
 #endif
-			public List<string> StateName = new List<string>();
-			private List<int> _StateNameHash = null;
-			public List<int> StateNameHash
+		public List<string> StateName = new List<string>();
+		private List<int> _StateNameHash = null;
+		public List<int> StateNameHash
+		{
+			get
 			{
-				get
+				if (_StateNameHash == null)
 				{
-					if (_StateNameHash == null)
+					_StateNameHash = new List<int>();
+					for (int i = 0; i < StateName.Count; i++)
 					{
-						_StateNameHash = new List<int>();
-						for (int i = 0; i < StateName.Count; i++)
-						{
-							_StateNameHash.Add(Animator.StringToHash(StateName[i]));
-						}
+						_StateNameHash.Add(Animator.StringToHash(StateName[i]));
 					}
-					return _StateNameHash;
 				}
+				return _StateNameHash;
 			}
 		}
 	}
