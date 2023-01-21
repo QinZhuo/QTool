@@ -87,6 +87,15 @@ namespace QTool
 					return;
 				}
 			}
+			stateInfo = Animator.GetNextAnimatorStateInfo(0);
+			foreach (var group in StateGroups)
+			{
+				if (group.StateNameHash.Contains(stateInfo.shortNameHash))
+				{
+					CurrentStateGroup = group;
+					return;
+				}
+			}
 			CurrentStateGroup = null;
 		}
 		private void SampleAnimation()
