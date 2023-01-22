@@ -110,6 +110,22 @@ namespace QTool
 				return transform.parent.GetPath() + "." + transform.name;
 			}
 		}
+		public static Transform FindAll(this Transform transform,string name)
+		{
+			var find= transform.Find(name);
+			if(find == null)
+			{
+				for (int i = 0; i < transform.childCount; i++)
+				{
+					find= transform.GetChild(i).FindAll(name);
+					if (find != null)
+					{
+						return find;
+					}
+				}
+			}
+			return find;
+		}
 		public static Transform GetChild(this Transform transform,string childPath,bool autuCreate=false)
 		{
 			if (childPath.SplitTowString(".", out var start, out var end))
