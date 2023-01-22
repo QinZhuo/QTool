@@ -65,11 +65,14 @@ namespace QTool
 
 		private void SampleAnimation()
 		{
-			if (clipIndex < Animations.Length)
+			if (!Application.isPlaying)
 			{
-				var clip = Animations[clipIndex];
-				time = clip.length * animationStep;
-				clip.SampleAnimation(gameObject, time);
+				if (clipIndex < Animations.Length)
+				{
+					var clip = Animations[clipIndex];
+					time = clip.length * animationStep;
+					clip.SampleAnimation(gameObject, time);
+				}
 			}
 		}
 
