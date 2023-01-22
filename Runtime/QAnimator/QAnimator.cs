@@ -55,14 +55,13 @@ namespace QTool
 		[SerializeField]
 		[QName("动画进度", nameof(PreviewClip))]
 		[Range(0, 1)]
-		[QOnChange(nameof(UpdateAll))]
+		[QOnChange(nameof(UpdateClip))]
 		private float animationStep;
 		[SerializeField]
 		[QReadonly]
 		[QName("时间", nameof(PreviewClip))]
 		private float time;
 		private List<ClipEventData> Events { get; set; }= new List<ClipEventData>();
-		[QOnChange(nameof(SampleEvent))]
 		[QToolbar(nameof(Events),visibleControl = nameof(PreviewClip),dynamic =true,name ="事件")]
 		public int eventIndex;
 		struct ClipEventData
@@ -72,15 +71,6 @@ namespace QTool
 			public override string ToString()
 			{
 				return name + " " + time;
-			}
-		}
-		private void SampleEvent()
-		{
-			if (eventIndex < Events.Count)
-			{
-				var eventData = Events[eventIndex];
-				time = eventData.time;
-				UpdateAll();
 			}
 		}
 		private void UpdateEvent()
@@ -93,7 +83,6 @@ namespace QTool
 				{
 					Events.Add(new ClipEventData { name = eventData.stringParameter, time = eventData.time });
 				}
-				UpdateClip();
 			}
 		}
 		private void UpdateClip()
