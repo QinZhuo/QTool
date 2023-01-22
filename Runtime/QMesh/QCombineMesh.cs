@@ -92,11 +92,6 @@ namespace QTool.Mesh
 			{
 				gameObject.GetComponent<SkinnedMeshRenderer>(true).CombineMeshs(combineMeshs.ToArray());
 			}
-			var animator = GetComponent<Animator>();
-			if (animator != null)
-			{
-				animator.avatar = animator.avatar;
-			}
 		}
 		public void CheckBone(SkinnedMeshRenderer skineedMeshRenderer)
 		{
