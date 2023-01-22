@@ -49,13 +49,13 @@ namespace QTool
 		public bool PreviewClip;
 		[SerializeField]
 		[QToolbar(nameof(Animations), pageSize = 5, visibleControl = nameof(PreviewClip))]
-		[QOnChange(nameof(SampleAnimation))]
+		[QOnChange(nameof(UpdateAll))]
 		private int clipIndex;
 		private AnimationClip[] Animations => Animator.runtimeAnimatorController.animationClips;
 		[SerializeField]
 		[QName("动画进度", nameof(PreviewClip))]
 		[Range(0, 1)]
-		[QOnChange(nameof(SampleAnimation))]
+		[QOnChange(nameof(UpdateAll))]
 		private float animationStep;
 		[SerializeField]
 		[QReadonly]
@@ -74,36 +74,41 @@ namespace QTool
 				return name + " " + time;
 			}
 		}
-		[QName("定位事件", nameof(PreviewClip))]
 		private void SampleEvent()
 		{
 			if (eventIndex < Events.Count)
 			{
 				var eventData = Events[eventIndex];
 				time = eventData.time;
-				SampleAnimation();
+				UpdateAll();
 			}
 		}
-		private void SampleAnimation()
+		private void UpdateEvent()
 		{
-			if (!Application.isPlaying)
+			if (clipIndex < Animations.Length)
 			{
-				if (clipIndex < Animations.Length)
+				var clip = Animations[clipIndex];
+				Events.Clear();
+				foreach (var eventData in clip.events)
 				{
-					var clip = Animations[clipIndex];
-					time = clip.length * animationStep;
-					clip.SampleAnimation(gameObject, time);
-					Events.Clear();
-					foreach (var eventData in clip.events)
-					{
-						Events.Add(new ClipEventData { name = eventData.stringParameter, time = eventData.time });
-					}
+					Events.Add(new ClipEventData { name = eventData.stringParameter, time = eventData.time });
 				}
-				else
-				{
-					Events.Clear();
-				}
+				UpdateClip();
 			}
+		}
+		private void UpdateClip()
+		{
+			if (clipIndex < Animations.Length)
+			{
+				var clip = Animations[clipIndex];
+				time = clip.length * animationStep;
+				clip.SampleAnimation(gameObject, time);
+			}
+		}
+		private void UpdateAll()
+		{
+			UpdateClip();
+			UpdateEvent();
 		}
 
 		public UnityEditor.Animations.AnimatorController AnimatorController => (Animator.runtimeAnimatorController as UnityEditor.Animations.AnimatorController);
