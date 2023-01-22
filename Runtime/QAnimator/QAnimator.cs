@@ -73,18 +73,6 @@ namespace QTool
 				return name + " " + time;
 			}
 		}
-		private void UpdateEvent()
-		{
-			if (clipIndex < Animations.Length)
-			{
-				var clip = Animations[clipIndex];
-				Events.Clear();
-				foreach (var eventData in clip.events)
-				{
-					Events.Add(new ClipEventData { name = eventData.stringParameter, time = eventData.time });
-				}
-			}
-		}
 		private void UpdateClip()
 		{
 			if (clipIndex < Animations.Length)
@@ -97,7 +85,23 @@ namespace QTool
 		private void UpdateAll()
 		{
 			UpdateClip();
-			UpdateEvent();
+			if (clipIndex < Animations.Length)
+			{
+				var clip = Animations[clipIndex];
+				Events.Clear();
+				foreach (var eventData in clip.events)
+				{
+					Events.Add(new ClipEventData { name = eventData.stringParameter, time = eventData.time });
+				}
+			}
+		}
+		[QName("定位动画文件", nameof(PreviewClip))]
+		public void SelectClip()
+		{
+			if (clipIndex < Animations.Length)
+			{
+				UnityEditor.Selection.activeObject = Animations[clipIndex];
+			}
 		}
 
 		public UnityEditor.Animations.AnimatorController AnimatorController => (Animator.runtimeAnimatorController as UnityEditor.Animations.AnimatorController);
