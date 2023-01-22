@@ -336,26 +336,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 311946879}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dfb5948a9e4c41f46b6e0d4179aa287a, type: 3}
+  m_Script: {fileID: 11500000, guid: 8ad2ff6c33f03cb4b940eb24b2d72638, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Port: 7777
-  DualMode: 1
-  NoDelay: 1
-  Interval: 10
-  Timeout: 10000
-  FastResend: 2
-  CongestionWindow: 0
-  SendWindowSize: 4096
-  ReceiveWindowSize: 4096
-  MaxRetransmit: 40
-  NonAlloc: 1
-  MaximizeSendReceiveBuffersToOSLimit: 1
-  ReliableMaxMessageSize: 298449
-  UnreliableMaxMessageSize: 1199
-  debugLog: 0
-  statisticsGUI: 1
-  statisticsLog: 0
 --- !u!1 &419214158
 GameObject:
   m_ObjectHideFlags: 0
