@@ -45,24 +45,45 @@ namespace QTool
 		}
 
 #if UNITY_EDITOR
-		[QToggle("编辑动画事件")]
-		public bool EditEvent;
+		[QToggle("预览动画")]
+		public bool PreviewClip;
 		[SerializeField]
-		[QToolbar(nameof(Animations), pageSize = 5, visibleControl = nameof(EditEvent))]
+		[QToolbar(nameof(Animations), pageSize = 5, visibleControl = nameof(PreviewClip))]
 		[QOnChange(nameof(SampleAnimation))]
 		private int clipIndex;
 		private AnimationClip[] Animations => Animator.runtimeAnimatorController.animationClips;
 		[SerializeField]
-		[QName("动画进度", nameof(EditEvent))]
+		[QName("动画进度", nameof(PreviewClip))]
 		[Range(0, 1)]
 		[QOnChange(nameof(SampleAnimation))]
 		private float animationStep;
 		[SerializeField]
 		[QReadonly]
-		[QName("时间", nameof(EditEvent))]
+		[QName("时间", nameof(PreviewClip))]
 		private float time;
-		List<string> ActionNames = new List<string>();
-
+		private List<ClipEventData> Events { get; set; }= new List<ClipEventData>();
+		[QOnChange(nameof(SampleEvent))]
+		[QToolbar(nameof(Events), pageSize = 5, visibleControl = nameof(PreviewClip),name ="事件")]
+		public int eventIndex;
+		struct ClipEventData
+		{
+			public string name;
+			public float time;
+			public override string ToString()
+			{
+				return name + " " + time;
+			}
+		}
+		[QName("定位事件", nameof(SampleAnimation))]
+		private void SampleEvent()
+		{
+			if (eventIndex < Events.Count)
+			{
+				var eventData = Events[eventIndex];
+				time = eventData.time;
+				SampleAnimation();
+			}
+		}
 		private void SampleAnimation()
 		{
 			if (!Application.isPlaying)
@@ -72,6 +93,15 @@ namespace QTool
 					var clip = Animations[clipIndex];
 					time = clip.length * animationStep;
 					clip.SampleAnimation(gameObject, time);
+					Events.Clear();
+					foreach (var eventData in clip.events)
+					{
+						Events.Add(new ClipEventData { name = eventData.stringParameter, time = eventData.time });
+					}
+				}
+				else
+				{
+					Events.Clear();
 				}
 			}
 		}

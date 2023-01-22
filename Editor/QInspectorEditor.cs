@@ -391,7 +391,7 @@ namespace QTool.Inspector
 			var listData = QEnumListData.Get(property, toolbar.getList);
 			if (listData.List.Count == 0)
 			{
-				GUI.Toolbar(position,0, new string[] { toolbar.name + "为空" });
+				GUI.Toolbar(position,0, new string[] { "无"+toolbar.name }); 
 			}
 			else if (toolbar.pageSize<=0)
 			{
