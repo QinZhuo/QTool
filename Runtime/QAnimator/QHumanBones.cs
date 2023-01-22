@@ -54,10 +54,10 @@ namespace QTool
 		RightUpperArm,
 		RightLowerArm,
 		RightHand,
-		LeftUpLeg,
+		LeftUpperLeg,
 		LeftLowerLeg,
 		LeftFoot,
-		RightUpLeg,
+		RightUpperLeg,
 		RightLowerLeg,
 		RightFoot,
 	}
