@@ -74,7 +74,7 @@ namespace QTool
 				return name + " " + time;
 			}
 		}
-		[QName("定位事件", nameof(SampleAnimation))]
+		[QName("定位事件", nameof(PreviewClip))]
 		private void SampleEvent()
 		{
 			if (eventIndex < Events.Count)
