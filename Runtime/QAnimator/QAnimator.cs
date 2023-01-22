@@ -63,7 +63,7 @@ namespace QTool
 		private float time;
 		private List<ClipEventData> Events { get; set; }= new List<ClipEventData>();
 		[QOnChange(nameof(SampleEvent))]
-		[QToolbar(nameof(Events), pageSize = 5, visibleControl = nameof(PreviewClip),name ="事件")]
+		[QToolbar(nameof(Events),visibleControl = nameof(PreviewClip),dynamic =true,name ="事件")]
 		public int eventIndex;
 		struct ClipEventData
 		{
