@@ -28,6 +28,38 @@ namespace QTool
 		internal QMusicSetting? CurBGM { get; private set; } = null;
 		internal QAudioSource StartAudio { get; private set; }
 		internal QAudioSource TransitionAudio { get; private set; }
+		public float Length
+		{
+			get
+			{
+				var length = 0f;
+				if (StartAudio != null)
+				{
+					length += StartAudio.Length;
+				}
+				if (Audio.clip != null)
+				{
+					length += Audio.clip.length;
+				}
+				return length;
+			}
+		}
+		public float Time
+		{
+			get
+			{
+				var time = 0f;
+				if (StartAudio != null)
+				{
+					time += StartAudio.Time;
+				}
+				if (Audio.clip != null)
+				{
+					time += Audio.time;
+				}
+				return time;
+			}
+		}
 		public bool IsPlaying
 		{
 			get

@@ -122,6 +122,19 @@ namespace QTool
 		public AudioClip music;
 		[QName("前奏")]
 		public AudioClip start;
+		public float GetLength()
+		{
+			float length = 0;
+			if (start != null)
+			{
+				length += start.length;
+			}
+			if (music != null)
+			{
+				length += music.length;
+			}
+			return length;
+		}
 		internal void Play()
 		{
 			QAudioManager.GetAudio(nameof(QAudioType.BGM)).Play(this);
