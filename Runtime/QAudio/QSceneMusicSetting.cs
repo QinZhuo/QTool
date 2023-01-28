@@ -14,7 +14,13 @@ namespace QTool
 		private QMusicSetting defaultMusic = new QMusicSetting() { key = "默认" };
 		[QName("事件音乐"),SerializeField]
 		private List<QMusicSetting> eventMusic = new List<QMusicSetting>();
-
+		public static void ResetSceneMusic()
+		{
+			if (UseSceneMusic&& Instance!=null)
+			{
+				Instance.defaultMusic.Play();
+			}
+		}
 		protected override void Awake()
 		{
 			base.Awake();
@@ -27,10 +33,7 @@ namespace QTool
 			}
 			if(QAudioManager.GetAudio(nameof(QAudioType.BGM)).CurBGM?.key != nameof(QAudioManager))
 			{
-				if (UseSceneMusic)
-				{
-					defaultMusic.Play();
-				}
+				ResetSceneMusic();
 			}
 		}
 		private void OnDestroy()
