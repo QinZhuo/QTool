@@ -6,7 +6,7 @@ namespace QTool
 	[RequireComponent(typeof(AudioSource))]
 	public class QAudioSource : MonoBehaviour
 	{
-		internal AudioSource Audio { get; private set; }
+		public AudioSource Audio { get; private set; }
 		[SerializeField]
 		private QAudioType AudioType = QAudioType.BGS;
 		public void Play(AudioClip clip)
