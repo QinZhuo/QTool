@@ -189,9 +189,10 @@ namespace QTool
 			}
 			return com;
 		}
-		public static bool IsNull(this object obj)
+		public static bool IsNull<T>(this T obj)
 		{
-			return Equals(obj, null) || (obj is UnityEngine.Object uobj && uobj == null)||(obj is string str&& string.IsNullOrWhiteSpace(str));
+			T checkObj = default;
+			return Equals(obj, checkObj) || (obj is UnityEngine.Object uobj && uobj == null)||(obj is string str&& string.IsNullOrWhiteSpace(str));
 		}
 		public static string RemveChars(this string str,params char[] exceptchars)
 		{

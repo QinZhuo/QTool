@@ -9,6 +9,7 @@ namespace QTool
 
 	public class QSceneMusicSetting : InstanceBehaviour<QSceneMusicSetting>
 	{
+		public static bool UseSceneMusic { get; internal set; }
 		[QName("背景乐"), SerializeField]
 		private QMusicSetting defaultMusic = new QMusicSetting() { key = "默认" };
 		[QName("事件音乐"),SerializeField]
@@ -26,7 +27,10 @@ namespace QTool
 			}
 			if(QAudioManager.GetAudio(nameof(QAudioType.BGM)).CurBGM?.key != nameof(QAudioManager))
 			{
-				defaultMusic.Play();
+				if (UseSceneMusic)
+				{
+					defaultMusic.Play();
+				}
 			}
 		}
 		private void OnDestroy()

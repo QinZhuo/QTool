@@ -28,17 +28,22 @@ namespace QTool
 		{
 			GetAudio(audioKey).Play(clip);
 		}
-		public static void Play(QMusicSetting music, QAudioType audioType = QAudioType.SE)
+		public static void Play(QMusicSetting music, QAudioType audioType = QAudioType.BGM,float transition=1)
 		{
-			Play(music, audioType.ToString());
+			Play(music, audioType.ToString(), transition);
 		}
-		public static void Play(QMusicSetting music, string audioKey)
+		public static void Play(QMusicSetting music, string audioKey, float transition = 1)
 		{
 			if (audioKey == nameof(QAudioType.BGM))
 			{
+				QSceneMusicSetting.UseSceneMusic = false;
 				music.key = nameof(QAudioManager);
 			}
-			GetAudio(audioKey).Play(music);
+			GetAudio(audioKey).Play(music,transition);
+		}
+		public static void UseSceneMusic()
+		{
+			QSceneMusicSetting.UseSceneMusic = true;
 		}
 		public static AudioMixerGroup GetMixer(string audioKey)
 		{
