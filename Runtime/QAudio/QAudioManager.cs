@@ -141,7 +141,7 @@ namespace QTool
 		}
 		internal void Play()
 		{
-			QAudioManager.GetAudio(nameof(QAudioType.BGM)).Play(this);
+			QAudioManager.GetAudio(nameof(QAudioType.BGM)).Play(this,0);
 		}
 		public override string ToString()
 		{
