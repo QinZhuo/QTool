@@ -61,9 +61,9 @@ namespace QTool
 		{
 			QAudioSetting?.SetFloat(audioKey, value <= 0 ? -80 : Mathf.Lerp(-20, 0, value));
 		}
-		public static QAudioSource GetAudio(QMusicSetting music)
+		public static QAudioSource GetAudio(QAudioType audioType)
 		{
-			return GetAudio(music.ToString());
+			return GetAudio(audioType.ToString());
 		}
 		public static QAudioSource GetAudio(string audioKey)
 		{
