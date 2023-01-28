@@ -41,8 +41,9 @@ namespace QTool
 			}
 			GetAudio(audioKey).Play(music,transition);
 		}
-		public static void UseSceneMusic()
+		public static void StopBGM(float transition = 1)
 		{
+			GetAudio(nameof(QAudioType.BGM)).Stop(transition);
 			QSceneMusicSetting.UseSceneMusic = true;
 		}
 		public static AudioMixerGroup GetMixer(string audioKey)
