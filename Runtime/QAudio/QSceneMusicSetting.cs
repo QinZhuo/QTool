@@ -9,7 +9,7 @@ namespace QTool
 
 	public class QSceneMusicSetting : InstanceBehaviour<QSceneMusicSetting>
 	{
-		public static bool UseSceneMusic { get; internal set; }
+		public static bool UseSceneMusic { get; internal set; } = true;
 		[QName("背景乐"), SerializeField]
 		private QMusicSetting defaultMusic = new QMusicSetting() { key = "默认" };
 		[QName("事件音乐"),SerializeField]
