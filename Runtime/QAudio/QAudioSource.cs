@@ -51,7 +51,14 @@ namespace QTool
 				var time = 0f;
 				if (StartAudio != null)
 				{
-					time += StartAudio.Time;
+					if (StartAudio.IsPlaying)
+					{
+						time += StartAudio.Time;
+					}
+					else
+					{
+						time += StartAudio.Length;
+					}
 				}
 				if (Audio.clip != null)
 				{
@@ -123,7 +130,7 @@ namespace QTool
 			{
 				SetVolume(Mathf.Lerp(0, 1, startTime / transition));
 				yield return null;
-				startTime += Time.unscaledDeltaTime;
+				startTime +=UnityEngine.Time.unscaledDeltaTime;
 			}
 			SetVolume(1);
 		}
@@ -141,7 +148,7 @@ namespace QTool
 			{
 				TransitionAudio.SetVolume(Mathf.Lerp(1, 0, stopTime / transition));
 				yield return null;
-				stopTime += Time.unscaledDeltaTime;
+				stopTime +=UnityEngine.Time.unscaledDeltaTime;
 			}
 			TransitionAudio.SetVolume(0);
 			TransitionAudio.Stop();
@@ -180,6 +187,16 @@ namespace QTool
 				Audio.Stop();
 				StartAudio?.Audio.Stop();
 			}
+		}
+		public void Pause()
+		{
+			StartAudio?.Pause();
+			Audio.Pause();
+		}
+		public void UnPause()
+		{
+			StartAudio?.UnPause();
+			Audio.UnPause();
 		}
 		public void Awake()
 		{
