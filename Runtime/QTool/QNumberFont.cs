@@ -18,10 +18,8 @@ namespace QTool
 		{
 			if (text != null&&!value.IsNull())
 			{
-				if (value.Contains("x"))
-				{
-					value = value.Replace("x", "");
-				}
+				value = value.Replace("x", "");
+				value = value.Replace(" ", "");
 				if (float.TryParse(value, out var number))
 				{
 					if (text.font != font)
