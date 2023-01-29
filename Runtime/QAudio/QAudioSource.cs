@@ -11,7 +11,6 @@ namespace QTool
 		private QAudioType AudioType = QAudioType.BGS;
 		public void Play(AudioClip clip)
 		{
-			CurBGM = null;
 			switch (AudioType)
 			{
 				case QAudioType.BGM:
@@ -25,7 +24,6 @@ namespace QTool
 					break;
 			}
 		}
-		internal QMusicSetting? CurBGM { get; private set; } = null;
 		internal QAudioSource StartAudio { get; private set; }
 		internal QAudioSource TransitionAudio { get; private set; }
 		public float Length
@@ -78,39 +76,37 @@ namespace QTool
 				return Audio.isPlaying;
 			}
 		}
-		public void Play(QMusicSetting bgm,float transition=1)
+		public void Play(QMusicSetting bgm,float transition=0)
 		{
 			switch (AudioType)
 			{
 				case QAudioType.BGM:
 				case QAudioType.BGS:
 				case QAudioType.ME:
-					if(bgm.start!=null&& CurBGM?.start == bgm.start)
+					if(StartAudio?.Audio.clip == bgm.start)
 					{
-						if (Audio.isPlaying && CurBGM?.music != null && bgm.music != null && CurBGM?.music.length == bgm.music.length)
+						if (StartAudio.IsPlaying)
+						{
+							Audio.clip = bgm.music;
+							break;
+						}
+						else if (Audio.isPlaying &&Audio.clip != null && bgm.music != null && Audio.clip.length == bgm.music.length&&(Audio.clip.name.Contains(bgm.music.name)|| bgm.music.name.Contains(Audio.clip.name)))
 						{
 							var time = Audio.time;
 							Audio.clip = bgm.music;
 							Audio.time = time;
 							Audio.Play();
-						}
-						else
-						{
-							Audio.clip = bgm.music;
+							break;
 						}
 					}
-					else 
-					{
-						Stop(transition);
-						PlayStart(bgm.start);
-						Audio.clip = bgm.music;
-						StartCoroutine(StartVolume(transition));
-					}
+					Stop(transition);
+					PlayStart(bgm.start);
+					Audio.clip = bgm.music;
+					StartCoroutine(StartVolume(transition));
 					break;
 				default:
 					throw new System.Exception(AudioType+" 不支持播放"+nameof(QMusicSetting)+" "+bgm);
 			}
-			CurBGM = bgm;
 		}
 		private void PlayStart(AudioClip startClip)
 		{
@@ -156,7 +152,6 @@ namespace QTool
 		private void Copy(QAudioSource other)
 		{
 			SetType(other.AudioType);
-			CurBGM = other.CurBGM;
 			if (other.StartAudio)
 			{
 				PlayStart(other.StartAudio.Audio.clip);
@@ -207,7 +202,7 @@ namespace QTool
 		}
 		private void Update()
 		{
-			if (StartAudio != null&&!Audio.isPlaying&& CurBGM?.music!=null)
+			if (StartAudio != null&&!Audio.isPlaying&& Audio.clip!=null)
 			{
 				if (!StartAudio.Audio.isPlaying)
 				{

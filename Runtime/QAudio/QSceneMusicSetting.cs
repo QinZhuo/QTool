@@ -31,10 +31,7 @@ namespace QTool
 					QEventManager.Register(eventMusic.key, eventMusic.Play);
 				}
 			}
-			if(QAudioManager.GetAudio(nameof(QAudioType.BGM)).CurBGM?.key != nameof(QAudioManager))
-			{
-				ResetSceneMusic();
-			}
+			ResetSceneMusic();
 		}
 		private void OnDestroy()
 		{

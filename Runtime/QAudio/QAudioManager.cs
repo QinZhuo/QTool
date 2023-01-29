@@ -28,20 +28,19 @@ namespace QTool
 		{
 			GetAudio(audioKey).Play(clip);
 		}
-		public static void Play(QMusicSetting music, QAudioType audioType = QAudioType.BGM,float transition=1)
+		public static void Play(QMusicSetting music, QAudioType audioType = QAudioType.BGM,float transition=0)
 		{
 			Play(music, audioType.ToString(), transition);
 		}
-		public static void Play(QMusicSetting music, string audioKey, float transition = 1)
+		public static void Play(QMusicSetting music, string audioKey, float transition = 0)
 		{
 			if (audioKey == nameof(QAudioType.BGM))
 			{
 				QSceneMusicSetting.UseSceneMusic = false;
-				music.key = nameof(QAudioManager);
 			}
 			GetAudio(audioKey).Play(music,transition);
 		}
-		public static void UseSceneMusic(float transition = 1)
+		public static void UseSceneMusic(float transition =0)
 		{
 			GetAudio(nameof(QAudioType.BGM)).Stop(transition);
 			QSceneMusicSetting.UseSceneMusic = true;
@@ -141,7 +140,7 @@ namespace QTool
 		}
 		internal void Play()
 		{
-			QAudioManager.GetAudio(nameof(QAudioType.BGM)).Play(this,0);
+			QAudioManager.GetAudio(nameof(QAudioType.BGM)).Play(this);
 		}
 		public override string ToString()
 		{
