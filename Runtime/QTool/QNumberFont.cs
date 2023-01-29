@@ -8,7 +8,10 @@ namespace QTool
 	public class QNumberFont : MonoBehaviour
 	{
 		public Text text;
-		public Font font;
+		[QName("数字字体")]
+		[UnityEngine.Serialization.FormerlySerializedAs("font")]
+		public Font numberFont;
+		[QName("默认字体")]
 		public Font defualtFont;
 		public void Reset()
 		{
@@ -18,15 +21,15 @@ namespace QTool
 		{
 			if (text != null&&!value.IsNull())
 			{
-				value = value.Replace("x", "");
 				value = value.Replace(" ", "");
+				value = value.Replace("x", "");
 				if (float.TryParse(value, out var number))
 				{
-					if (text.font != font)
+					if (text.font != numberFont)
 					{
 						defualtFont = text.font;
 					}
-					text.font = font;
+					text.font = numberFont;
 				}
 				else
 				{
