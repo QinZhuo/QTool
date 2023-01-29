@@ -81,7 +81,7 @@ namespace QTool
 	{
         public float Time { get; protected set; }
         public float CurTime { get; protected set; }
-
+		public bool IsOver => CurTime >= Time;
 		public QTimer()
 		{
 
