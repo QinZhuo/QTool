@@ -85,7 +85,7 @@ namespace QTool
 				case QAudioType.ME:
 					if(StartAudio?.Audio.clip == bgm.start)
 					{
-						if (StartAudio.IsPlaying)
+						if (StartAudio?.IsPlaying==true)
 						{
 							Audio.clip = bgm.music;
 							break;
