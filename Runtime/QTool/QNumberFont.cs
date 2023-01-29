@@ -9,7 +9,7 @@ namespace QTool
 	{
 		public Text text;
 		public Font font;
-		private Font lastFont;
+		public Font defualtFont;
 		public void Reset()
 		{
 			text = GetComponent<Text>();
@@ -22,15 +22,15 @@ namespace QTool
 				{
 					if (text.font != font)
 					{
-						lastFont = text.font;
+						defualtFont = text.font;
 					}
 					text.font = font;
 				}
 				else
 				{
-					if (lastFont != null)
+					if (defualtFont != null)
 					{
-						text.font = lastFont;
+						text.font = defualtFont;
 					}
 				}
 			}
