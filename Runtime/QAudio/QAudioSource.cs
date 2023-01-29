@@ -179,6 +179,7 @@ namespace QTool
 			}
 			else
 			{
+				Audio.time = 0;
 				Audio.clip = null;
 				Audio.Stop();
 				StartAudio?.Stop();
