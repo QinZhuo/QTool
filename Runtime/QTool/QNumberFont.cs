@@ -16,8 +16,12 @@ namespace QTool
 		}
 		public void OnChangeText(string value)
 		{
-			if (text != null)
+			if (text != null&&!value.IsNull())
 			{
+				if (value.Contains("x"))
+				{
+					value = value.Replace("x", "");
+				}
 				if (float.TryParse(value, out var number))
 				{
 					if (text.font != font)

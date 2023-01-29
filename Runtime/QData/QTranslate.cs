@@ -229,7 +229,7 @@ namespace QTool
 			{
 				if (LanguageFont[Language] != null)
 				{
-					foreach (var text in GetComponentsInChildren<Text>())
+					foreach (var text in GetComponents<Text>())
 					{
 						text.font = LanguageFont[Language];
 					}
