@@ -467,11 +467,14 @@ namespace QTool
 		}
 		public static string ParseElement(this string value)
 		{
-			if (!string.IsNullOrEmpty(value)&&value.StartsWith("\"") && value.EndsWith("\"") && (value.Contains(",")||value.Contains("\n")||value.Contains("\"\"")))
+			if (value.IsNull()) return value;
+			if(value.StartsWith("\"") && value.EndsWith("\""))
 			{
-				value = value.Substring(1, value.Length - 2); 
-				value = value.Replace("\"\"", "\"");
-				return value;
+				if(value.Contains("\n") || value.Contains("\"\""))
+				{
+					value = value.Substring(1, value.Length - 2);
+					value = value.Replace("\"\"", "\"");
+				}
 			}
 			return value;
 		}
