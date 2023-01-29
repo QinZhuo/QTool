@@ -179,8 +179,9 @@ namespace QTool
 			}
 			else
 			{
+				Audio.clip = null;
 				Audio.Stop();
-				StartAudio?.Audio.Stop();
+				StartAudio?.Stop();
 			}
 		}
 		public void Pause()
