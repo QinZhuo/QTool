@@ -7,14 +7,13 @@ namespace QTool
 	[RequireComponent(typeof(Animator))]
 	public class QHumanBones:MonoBehaviour
 	{
-
-		public List<Transform> bones = new List<Transform>();
-		[QName("刷新人形骨骼")]
+		[SerializeField]
+		private List<Transform> bones = new List<Transform>();
 		private void Reset()
 		{
 			var avatar = GetComponent<Animator>().avatar;
 			if (avatar == null || !avatar.isHuman) return;
-			var boneNames = System.Enum.GetNames(typeof(QHumanBone));
+			var boneNames = System.Enum.GetNames(typeof(QHumanBoneName));
 			bones.Clear();
 			var boneDatas = avatar.humanDescription.human;
 			foreach (var boneName in boneNames)
@@ -37,8 +36,12 @@ namespace QTool
 			}
 
 		}
+		public Transform GetBone(QHumanBoneName name)
+		{
+			return bones[(int)name];
+		}
 	}
-	public enum QHumanBone
+	public enum QHumanBoneName
 	{
 		Hips,
 		Spine,

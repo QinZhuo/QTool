@@ -454,8 +454,7 @@ namespace QTool
 			{
 				value = value.Replace("\t", " ");
 			}
-
-			if (value.Contains("\n"))
+			if (value.Contains("\n")||value.Contains(","))
 			{
 				if (value.Contains("\""))
 				{
@@ -470,7 +469,7 @@ namespace QTool
 			if (value.IsNull()) return value;
 			if(value.StartsWith("\"") && value.EndsWith("\""))
 			{
-				if(value.Contains("\n") || value.Contains("\"\""))
+				if(value.Contains("\n") || value.Contains("\"\"")||value.Contains(","))
 				{
 					value = value.Substring(1, value.Length - 2);
 					value = value.Replace("\"\"", "\"");

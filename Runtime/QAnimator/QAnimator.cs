@@ -43,7 +43,10 @@ namespace QTool
 		{
 			gameObject.InvokeEvent(eventName);
 		}
-
+		public Transform GetBone(QHumanBoneName name)
+		{
+			return this.GetComponent<QHumanBones>(true).GetBone(name);
+		}
 #if UNITY_EDITOR
 		[QToggle("预览动画")]
 		public bool PreviewClip;
@@ -103,7 +106,7 @@ namespace QTool
 				UnityEditor.Selection.activeObject = Animations[clipIndex];
 			}
 		}
-
+		
 		public UnityEditor.Animations.AnimatorController AnimatorController => (Animator.runtimeAnimatorController as UnityEditor.Animations.AnimatorController);
 
 		private List<string> _states = null;
