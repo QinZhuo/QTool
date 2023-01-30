@@ -92,7 +92,29 @@ namespace QTool
         {
             return ExistsDirectory(rootPath) ? Directory.GetFiles(rootPath).Length / 2 : 0;
         }
-        public static void ForeachAllDirectoryWith(this string rootPath, string endsWith, Action<string> action)
+		public static string FileName(this string path,bool withoutExtension=false)
+		{
+			if (withoutExtension)
+			{
+				return Path.GetFileNameWithoutExtension(path);
+			}
+			else
+			{
+				return Path.GetFileName(path);
+			}
+		}
+		public static string FileExtension(this string path)
+		{
+			if (Path.HasExtension(path))
+			{
+				return "."+Path.GetExtension(path);
+			}
+			else
+			{
+				return "";
+			}
+		}
+		public static void ForeachAllDirectoryWith(this string rootPath, string endsWith, Action<string> action)
         {
             rootPath.ForeachDirectory((path) =>
             {
