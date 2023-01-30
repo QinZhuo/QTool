@@ -23,6 +23,7 @@ namespace QTool
 			{
 				value = value.Replace(" ", "");
 				value = value.Replace("x", "");
+				value = value.Replace("X", "");
 				if (float.TryParse(value, out var number))
 				{
 					if (text.font != numberFont)

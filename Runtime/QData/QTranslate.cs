@@ -233,6 +233,10 @@ namespace QTool
 					{
 						text.font = LanguageFont[Language];
 					}
+					foreach (var numberFont in GetComponents<QNumberFont>())
+					{
+						numberFont.defualtFont = LanguageFont[Language];
+					}
 				}
 			}
 			catch (System.Exception e)
