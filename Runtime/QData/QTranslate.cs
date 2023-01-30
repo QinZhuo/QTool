@@ -229,13 +229,13 @@ namespace QTool
 			{
 				if (LanguageFont[Language] != null)
 				{
-					foreach (var text in GetComponents<Text>())
-					{
-						text.font = LanguageFont[Language];
-					}
 					foreach (var numberFont in GetComponents<QNumberFont>())
 					{
 						numberFont.defualtFont = LanguageFont[Language];
+					}
+					foreach (var text in GetComponents<Text>())
+					{
+						text.font = LanguageFont[Language];
 					}
 				}
 			}
