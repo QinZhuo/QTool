@@ -4,7 +4,7 @@ using UnityEngine;
 namespace QTool
 {
 	[ExecuteInEditMode, DisallowMultipleComponent]
-	public class QLigthmapPrefab : MonoBehaviour
+	public class QLightmapPrefab : MonoBehaviour
 	{
 		[SerializeField]
 		private List<QLightmapData> lightmapDatas = new List<QLightmapData>();
@@ -85,7 +85,7 @@ namespace QTool
 				{
 					gameObject.SetActive(true);
 				}
-				foreach (var lightObj in GameObject.FindObjectsOfType<QLigthmapPrefab>())
+				foreach (var lightObj in GameObject.FindObjectsOfType<QLightmapPrefab>())
 				{
 					if (lightObj == this) continue;
 					if (lightObj.gameObject.activeInHierarchy)

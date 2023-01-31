@@ -163,6 +163,10 @@ namespace QTool.Inspector
 			{
 				return ColorUtility.ToHtmlStringRGB(color32);
 			}
+			else if(obj is MemberInfo memberInfo)
+			{
+				return memberInfo.QName();
+			}
 			else
 			{
 				return obj?.ToString();
