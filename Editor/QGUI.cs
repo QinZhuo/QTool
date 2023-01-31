@@ -150,7 +150,7 @@ namespace QTool
 								}
 								if (typeof(QIdObject).IsAssignableFrom(type))
 								{
-									obj = QObjectReferenceDrawer.Draw(name, (QIdObject)obj, layoutOption);
+									obj = QIdObjectReferenceDrawer.Draw(name, (QIdObject)obj, layoutOption);
 								}
 								else
 								{

@@ -37,10 +37,14 @@ namespace QTool.Inspector
 		
 	}
 	[CustomPropertyDrawer(typeof(QIdObject))]
-    public class QObjectReferenceDrawer : PropertyDrawer
+    public class QIdObjectReferenceDrawer : PropertyDrawer
     {
         public static string Draw(string lable, string id,Type type,Rect? rect=null, params GUILayoutOption[] options)
         {
+			if (rect != null)
+			{
+				GUI.BeginGroup(rect.Value);
+			}
             using (new EditorGUILayout.HorizontalScope())
             {
                 var name = lable + "【" + (id == null ? "" : id.Substring(0, Mathf.Min(4, id.Length))) + "~】";
@@ -60,6 +64,10 @@ namespace QTool.Inspector
                    id= QIdObject.GetId(newObj);
                 }
             }
+			if (rect != null)
+			{
+				GUI.EndGroup();
+			}
             return id;
         }
         public static QIdObject Draw(string lable, QIdObject ir, params GUILayoutOption[] options)
