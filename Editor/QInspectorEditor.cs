@@ -146,32 +146,7 @@ namespace QTool.Inspector
 				}
 			}
 		}
-		public static string GetKey(object obj)
-		{
-			if (obj is UnityEngine.Object uObj)
-			{
-				return uObj.name;
-			}
-			else if(obj is IKey<string> ikey)
-			{
-				return ikey.Key;
-			}else if(obj is Color color)
-			{
-				return ColorUtility.ToHtmlStringRGB(color);
-			}
-			else if (obj is Color32 color32)
-			{
-				return ColorUtility.ToHtmlStringRGB(color32);
-			}
-			else if(obj is MemberInfo memberInfo)
-			{
-				return memberInfo.QName();
-			}
-			else
-			{
-				return obj?.ToString();
-			}
-		}
+	
 		public void UpdateList(string key)
 		{
 			if (key == "null"|| key.IsNull())
@@ -194,19 +169,7 @@ namespace QTool.Inspector
 				return Get((object)property, funcKey);
 			}
 		}
-		static QDictionary<Color, Texture> ColorTexture = new QDictionary<Color, Texture>((key) =>
-		   {
-			   var tex = new Texture2D(20, 20);
-			   for (int i = 0; i < tex.width; i++)
-			   {
-				   for (int j = 0; j < tex.height; j++)
-				   {
-					   tex.SetPixel(i, j, key);
-				   }
-			   }
-			   tex.Apply();
-			   return tex;
-		   });
+	
 		public static QEnumListData Get(object obj, string funcKey)
 		{
 			Type type = null;
@@ -231,63 +194,30 @@ namespace QTool.Inspector
 				}
 			}
 			var drawer = DrawerDic[drawerKey];
-
-			if (drawer.List.Count <= 0)
+			if (!funcKey.IsNull())
 			{
-				drawer.List.AddCheckExist(new GUIContent("null"));
-				if (!funcKey.IsNull())
+				if (obj.InvokeFunction(funcKey) is IList itemList)
 				{
-					object getObj = null;
-					getObj = obj.InvokeFunction(funcKey);
-					drawer.List.Clear();
-					if (getObj != null)
+					if (drawer.List.Count != itemList.Count)
 					{
-						if (getObj is IList<Color32> color32List)
+						drawer.List.Clear();
+						foreach (var item in itemList)
 						{
-							foreach (var c in color32List)
-							{
-								drawer.List.Add(new GUIContent(ColorUtility.ToHtmlStringRGB(c), ColorTexture[c]));
-							}
+							drawer.List.Add(new GUIContent(item.ToGUIContent()));
 						}
-						else if (getObj is IList<Color> colorList)
-						{
-							foreach (var c in colorList)
-							{
-								drawer.List.Add(new GUIContent(ColorUtility.ToHtmlStringRGB(c), ColorTexture[c]));
-							}
-						}
-						else if (getObj is IList itemList)
-						{
-							foreach (var item in itemList)
-							{
-								if (item is UnityEngine.Object uObj)
-								{
-									drawer.List.Add(new GUIContent( uObj.name, AssetPreview.GetAssetPreview(uObj)));
-								}
-								else
-								{
-									drawer.List.Add(new GUIContent(GetKey(item)));
-								}
-							}
-						}
-						else
-						{
-							EditorGUILayout.LabelField("错误函数" + funcKey);
-						}
-					}
-					else
-					{
-						EditorGUILayout.LabelField("错误函数" + funcKey);
 					}
 				}
-				else if (type.IsAbstract)
+			}
+			else if (drawer.List.Count == 0)
+			{
+				if (type.IsAbstract)
 				{
 					foreach (var childType in type.GetAllTypes())
 					{
-						drawer.List.Add(new GUIContent( childType.Name));
+						drawer.List.Add(new GUIContent(childType.Name));
 					}
 				}
-				else if(obj is SerializedProperty property)
+				else if (obj is SerializedProperty property)
 				{
 					drawer.List.Clear();
 					switch (property.propertyType)
@@ -298,12 +228,20 @@ namespace QTool.Inspector
 								{
 									drawer.List.Add(new GUIContent(item));
 								}
-							}break;
+							}
+							break;
 						default:
 							break;
 					}
-					
 				}
+				else
+				{
+					EditorGUILayout.LabelField("错误函数" + funcKey);
+				}
+			}
+			if (drawer.List.Count <= 0)
+			{
+				drawer.List.AddCheckExist(new GUIContent("null"));
 			}
 			return drawer;
 		}
@@ -313,7 +251,7 @@ namespace QTool.Inspector
     {
 		public static object Draw(object obj, QEnumAttribute att)
 		{
-			var str = QEnumListData.GetKey(obj);
+			var str = obj.ToGUIContent().text;
 			using (new GUILayout.HorizontalScope())
 			{
 				var data = QEnumListData.Get(obj?.GetType(), att.funcKey);
@@ -438,10 +376,6 @@ namespace QTool.Inspector
 					}
 				}
 
-			}
-			if (toolbar.dynamic)
-			{
-				listData.List.Clear();
 			}
 
 		}

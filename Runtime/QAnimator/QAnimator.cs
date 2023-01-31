@@ -65,7 +65,7 @@ namespace QTool
 		[QName("时间", nameof(PreviewClip))]
 		private float time;
 		private List<ClipEventData> Events { get; set; }= new List<ClipEventData>();
-		[QToolbar(nameof(Events),visibleControl = nameof(PreviewClip),dynamic =true,name ="事件")]
+		[QToolbar(nameof(Events),visibleControl = nameof(PreviewClip),name ="事件")]
 		public int eventIndex;
 		struct ClipEventData
 		{

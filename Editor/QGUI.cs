@@ -324,6 +324,46 @@ namespace QTool
 
 			return obj;
 		}
+		public static GUIContent ToGUIContent(this object obj)
+		{
+			if (obj is UnityEngine.Object uObj)
+			{
+				return new GUIContent(uObj.name, AssetPreview.GetAssetPreview(uObj),uObj.ToString());
+			}
+			else if (obj is Color color)
+			{
+				return new GUIContent(ColorUtility.ToHtmlStringRGB(color), ColorTexture[color]);
+			}
+			else if (obj is Color32 color32)
+			{
+				return new GUIContent(ColorUtility.ToHtmlStringRGB(color32), ColorTexture[color32]);
+			}
+			else if (obj is MemberInfo memberInfo)
+			{
+				return new GUIContent(memberInfo.QName(),memberInfo.Name);
+			}
+			else if (obj is IKey<string> ikey)
+			{
+				return new GUIContent(ikey.Key, obj.ToString());
+			}
+			else
+			{
+				return new GUIContent(obj?.ToString());
+			}
+		}
+		static QDictionary<Color, Texture> ColorTexture = new QDictionary<Color, Texture>((key) =>
+		{
+			var tex = new Texture2D(20, 20);
+			for (int i = 0; i < tex.width; i++)
+			{
+				for (int j = 0; j < tex.height; j++)
+				{
+					tex.SetPixel(i, j, key);
+				}
+			}
+			tex.Apply();
+			return tex;
+		});
 		public static void MouseMenuClick(this Rect rect, System.Action<GenericMenu> action, Action click = null)
 		{
 			if (EventType.MouseUp.Equals(Event.current.type))

@@ -87,7 +87,6 @@ namespace QTool.Inspector
     {
         public string getList;
         public int pageSize= 0;
-		public bool dynamic = false;
         public QToolbarAttribute( string getList="", string showControl = "") : base("", showControl)
         {
             this.getList = getList;

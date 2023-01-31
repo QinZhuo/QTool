@@ -15,7 +15,7 @@ namespace QTool.Mesh
 		public bool editorMode;
 		[QToolbar("", nameof(editorMode))]
 		public QVoxelBrush brush;
-		[QToolbar(nameof(Color32s), nameof(editorMode),dynamic =true)]
+		[QToolbar(nameof(Color32s), nameof(editorMode))]
 		[QOnChange(nameof(OnChangeColorIndex))]
 		public int colorIndex =0;
 		[QName("颜色", nameof(editorMode))]
