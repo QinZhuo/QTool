@@ -41,10 +41,6 @@ namespace QTool.Inspector
     {
 		public static string Draw(string lable, string id, Type type, Rect? rect = null, params GUILayoutOption[] options)
 		{
-			if (rect == null)
-			{
-				GUILayout.BeginHorizontal();
-			}
 			var name = lable + "【" + (id == null ? "" : id.Substring(0, Mathf.Min(4, id.Length))) + "~】";
 			var oldObj = QIdObject.GetObject(id, type);
 			var newObj = oldObj;
@@ -59,10 +55,6 @@ namespace QTool.Inspector
 			if (newObj != oldObj)
 			{
 				id = QIdObject.GetId(newObj);
-			}
-			if (rect == null)
-			{
-				GUILayout.EndHorizontal();
 			}
 			return id;
 		}
