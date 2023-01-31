@@ -39,48 +39,41 @@ namespace QTool.Inspector
 	[CustomPropertyDrawer(typeof(QIdObject))]
     public class QIdObjectReferenceDrawer : PropertyDrawer
     {
-        public static string Draw(string lable, string id,Type type,Rect? rect=null, params GUILayoutOption[] options)
-        {
-			if (rect != null)
+		public static string Draw(string lable, string id, Type type, Rect? rect = null, params GUILayoutOption[] options)
+		{
+			if (rect == null)
 			{
-				GUI.BeginGroup(rect.Value);
+				GUILayout.BeginHorizontal();
 			}
-            using (new EditorGUILayout.HorizontalScope())
-            {
-                var name = lable + "【" + (id == null ? "" : id.Substring(0, Mathf.Min(4, id.Length))) + "~】";
-                var oldObj =QIdObject.GetObject(id,type);
-                var newObj = oldObj;
-
-                if (rect == null)
-                {
-                    newObj = EditorGUILayout.ObjectField(name, oldObj, type, true);
-                }
-                else
-                {
-                    newObj = EditorGUI.ObjectField(rect.Value, name, oldObj, type, true);
-                }
-                if (newObj != oldObj)
-                {
-                   id= QIdObject.GetId(newObj);
-                }
-            }
-			if (rect != null)
+			var name = lable + "【" + (id == null ? "" : id.Substring(0, Mathf.Min(4, id.Length))) + "~】";
+			var oldObj = QIdObject.GetObject(id, type);
+			var newObj = oldObj;
+			if (rect == null)
 			{
-				GUI.EndGroup();
+				newObj = EditorGUILayout.ObjectField(name, oldObj, type, true);
 			}
-            return id;
-        }
+			else
+			{
+				newObj = EditorGUI.ObjectField(rect.Value, name, oldObj, type, true);
+			}
+			if (newObj != oldObj)
+			{
+				id = QIdObject.GetId(newObj);
+			}
+			if (rect == null)
+			{
+				GUILayout.EndHorizontal();
+			}
+			return id;
+		}
         public static QIdObject Draw(string lable, QIdObject ir, params GUILayoutOption[] options)
         {
-            using ( new EditorGUILayout.HorizontalScope())
-            {
-                var newId= Draw(lable, ir.id,typeof(UnityEngine.Object),null, options);
-                if (newId != ir.id)
-                {
-                    ir.id = newId;
-                }
-            }
-            return ir;
+			var newId = Draw(lable, ir.id, typeof(UnityEngine.Object), null, options);
+			if (newId != ir.id)
+			{
+				ir.id = newId;
+			}
+			return ir;
         }
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
