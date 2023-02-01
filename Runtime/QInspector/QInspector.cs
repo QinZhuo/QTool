@@ -57,7 +57,7 @@ namespace QTool.Inspector
 	public class QToggleAttribute : QNameAttribute
 	{
 
-		public QToggleAttribute(string name, float height = 30, string showControl = "") : base(name, showControl)
+		public QToggleAttribute(string name, string showControl = "") : base(name, showControl)
 		{
 			order = 1;
 		}

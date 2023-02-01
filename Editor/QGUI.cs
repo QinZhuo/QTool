@@ -714,7 +714,16 @@ namespace QTool
 				{
 					key = key.TrimStart('!');
 				}
-				var info = target.GetPathObject(key);
+				object info = null;
+				switch (key)
+				{
+					case nameof(Application.isPlaying):
+						info = Application.isPlaying;
+						break;
+					default:
+						info= target.GetPathObject(key);
+						break;
+				}
 				if (info == null)
 				{
 					return !not;
@@ -812,7 +821,7 @@ namespace QTool
 
 		public static bool Active(this QNameAttribute att, object target)
 		{
-			if (string.IsNullOrWhiteSpace(att.visibleControl))
+			if (att.visibleControl.IsNull())
 			{
 				return true;
 			}
