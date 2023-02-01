@@ -189,6 +189,14 @@ namespace QTool
 			}
 			return com;
 		}
+		public static bool Similar(this float value,float other)
+		{
+			return Mathf.Approximately(value, other);
+		}
+		public static bool Similar(this Vector3 value, Vector3 other)
+		{
+			return value.x.Similar(other.x) && value.y.Similar(other.y) && value.z.Similar(other.z);
+		}
 		public static bool IsNull<T>(this T obj)
 		{
 			T checkObj = default;

@@ -12,6 +12,20 @@ namespace QTool
         public float y => position.y;
         public float z => position.z;
     }
+	public static class QGizmos
+	{
+		public static void Draw(GameObject gameObject,Transform transform)
+		{
+			var matrix = Gizmos.matrix;
+			var meshs= gameObject.GetComponentsInChildren<MeshFilter>();
+			foreach (var mesh in meshs)
+			{
+				Gizmos.matrix = transform.localToWorldMatrix ;
+				Gizmos.DrawMesh(mesh.sharedMesh,mesh.transform.position);
+			}
+			Gizmos.matrix = matrix;
+		}
+	}
     public static class QGL
     {
         public static void Start(Material mat, int pass = 0, bool is2D = true)
