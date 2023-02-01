@@ -153,20 +153,5 @@ namespace QTool.Mesh
 		}
 		
 	}
-	public static class QGizmos
-	{
-		static Stack<Matrix4x4> MatrixStack = new Stack<Matrix4x4>();
-		public static void StartMatrix(Transform transform)
-		{
-			MatrixStack.Push(Gizmos.matrix);
-			Gizmos.matrix = transform.localToWorldMatrix;
-		}
-		public static void EndMatrix()
-		{
-			if (MatrixStack.Count > 0)
-			{
-				Gizmos.matrix = MatrixStack.Pop();
-			}
-		}
-	}
+
 }

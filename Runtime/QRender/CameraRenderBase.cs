@@ -11,19 +11,36 @@ namespace QTool
         public float x => position.x;
         public float y => position.y;
         public float z => position.z;
-    }
+	}
 	public static class QGizmos
 	{
-		public static void Draw(GameObject gameObject,Transform transform)
+		static Stack<Matrix4x4> MatrixStack = new Stack<Matrix4x4>();
+		public static void StartMatrix(Transform transform)
 		{
-			var matrix = Gizmos.matrix;
-			var meshs= gameObject.GetComponentsInChildren<MeshFilter>();
+			StartMatrix(transform.localToWorldMatrix);
+		}
+		public static void StartMatrix(Matrix4x4 transform)
+		{
+			MatrixStack.Push(Gizmos.matrix);
+			Gizmos.matrix = transform;
+		}
+		public static void EndMatrix()
+		{
+			if (MatrixStack.Count > 0)
+			{
+				Gizmos.matrix = MatrixStack.Pop();
+			}
+		}
+		public static void Draw(GameObject gameObject, Transform transform)
+		{
+			var meshs = gameObject.GetComponentsInChildren<MeshFilter>(true);
+			StartMatrix(transform);
 			foreach (var mesh in meshs)
 			{
-				Gizmos.matrix = transform.localToWorldMatrix ;
-				Gizmos.DrawMesh(mesh.sharedMesh,mesh.transform.position);
+				Gizmos.color =Color.Lerp(mesh.GetComponent<Renderer>().sharedMaterial.color,Color.clear,0.5f);
+				Gizmos.DrawMesh(mesh.sharedMesh,mesh.transform.position-gameObject.transform.position, mesh.transform.rotation,mesh.transform.lossyScale);
 			}
-			Gizmos.matrix = matrix;
+			EndMatrix();
 		}
 	}
     public static class QGL

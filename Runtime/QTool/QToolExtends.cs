@@ -181,7 +181,17 @@ namespace QTool
 #if UNITY_EDITOR
             if (obj != null)
             {
-                GameObject.DestroyImmediate(obj);
+				try
+				{
+					GameObject.DestroyImmediate(obj);
+				}
+				catch (System.Exception e)
+				{
+					if(obj is GameObject gameObject)
+					{
+						Debug.LogError("删除物体出错 " + gameObject.transform.GetPath() + "  " + e);
+					}
+				}
             }
 #else
               GameObject.Destroy(obj);
