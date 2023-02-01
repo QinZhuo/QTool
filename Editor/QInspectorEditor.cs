@@ -415,7 +415,7 @@ namespace QTool.Inspector
 					if ("m_Script".Equals(iterator.name))
 					{
 						GUI.enabled = false;
-					}	
+					}
 					if (iterator.IsShow())
 					{
 						EditorGUILayout.PropertyField(iterator, new GUIContent(iterator.QName()));
@@ -425,6 +425,7 @@ namespace QTool.Inspector
 						GUI.enabled = true;
 					}
 				} while (iterator.NextVisible(false));
+				serializedObject.ApplyModifiedProperties();
 			}
 			DrawButton();
 		}
