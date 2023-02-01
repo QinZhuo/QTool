@@ -407,7 +407,25 @@ namespace QTool.Inspector
 				GUILayout.Label("脚本丢失");
 				return;
 			}
-			base.OnInspectorGUI();
+			var iterator = serializedObject.GetIterator();
+			if (iterator.NextVisible(true))
+			{
+				do
+				{
+					if ("m_Script".Equals(iterator.name))
+					{
+						GUI.enabled = false;
+					}	
+					if (iterator.IsShow())
+					{
+						EditorGUILayout.PropertyField(iterator, new GUIContent(iterator.QName()));
+					}
+					if ("m_Script".Equals(iterator.name))
+					{
+						GUI.enabled = true;
+					}
+				} while (iterator.NextVisible(false));
+			}
 			DrawButton();
 		}
 		private void OnSceneGUI()

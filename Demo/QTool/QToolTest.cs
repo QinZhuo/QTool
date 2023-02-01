@@ -266,7 +266,7 @@ namespace QTool.Test
 		public string Key { get; set; }
         public Rect rect;
         public TestEnum testEnume = TestEnum.攻击 | TestEnum.死亡;
-
+		[QName("List测试")]
         public List<float> list;
         public List<List<float>> list2Test = new List<List<float>> { new List<float>() { 1, 2, 3 } };
         [QName("名字测试1")]
