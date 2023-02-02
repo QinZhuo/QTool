@@ -169,17 +169,24 @@ namespace QTool
         {
 
 #if UNITY_EDITOR
-            var obj = PrefabUtility.InstantiatePrefab(prefab, parent) as T;
-#else
-            var obj = GameObject.Instantiate(prefab, parent);
+			if (!Application.isPlaying||(parent!=null&&!Application.IsPlaying(parent)))
+			{
+				var obj = PrefabUtility.InstantiatePrefab(prefab, parent) as T;
+				return obj;
+			}
+			else
 #endif
-            return obj ;
+			{
+				var obj = GameObject.Instantiate(prefab, parent);
+				return obj;
+			};
         }
     
         public static void CheckDestory(this Object obj)
-        {
+		{
+			if (obj == null) return;
 #if UNITY_EDITOR
-            if (obj != null)
+			if (!Application.isPlaying||!Application.IsPlaying(obj))
             {
 				try
 				{
@@ -192,10 +199,12 @@ namespace QTool
 						Debug.LogError("删除物体出错 " + gameObject.transform.GetPath() + "  " + e);
 					}
 				}
-            }
-#else
-              GameObject.Destroy(obj);
+			}
+			else
 #endif
+			{
+				GameObject.Destroy(obj);
+			}
         }
 		public static void ClearChild(this Transform transform)
 		{
