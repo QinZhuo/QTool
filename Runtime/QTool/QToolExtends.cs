@@ -175,7 +175,7 @@ namespace QTool
 #endif
             return obj ;
         }
-      
+    
         public static void CheckDestory(this Object obj)
         {
 #if UNITY_EDITOR
@@ -197,7 +197,15 @@ namespace QTool
               GameObject.Destroy(obj);
 #endif
         }
-    }
+		public static void ClearChild(this Transform transform)
+		{
+			for (int i = transform.childCount - 1; i > 0; i--)
+			{
+				var child = transform.GetChild(i).gameObject;
+				child.CheckDestory();
+			}
+		}
+	}
     public static class RectTransformExtend
     {
         public static Vector2 UpRightRectOffset(this RectTransform rectTransform)
