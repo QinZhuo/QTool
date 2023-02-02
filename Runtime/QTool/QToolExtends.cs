@@ -165,7 +165,7 @@ namespace QTool
 #endif
         }
 
-        public static T CheckInstantiate<T>(this T prefab, Transform parent)where T: Object
+        public static T CheckInstantiate<T>(this T prefab, Transform parent=null)where T: Object
         {
 
 #if UNITY_EDITOR
