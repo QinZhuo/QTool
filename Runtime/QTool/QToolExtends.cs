@@ -348,10 +348,9 @@ namespace QTool
 			comp.transform.localPosition = Vector3.zero;
 			return comp;
 		}
-		public static T SetRotationY<T>(this T comp,float y) where T : Component
+		public static T RotationEulerAdd<T>(this T comp,Quaternion otherRotation) where T : Component
 		{
-			var rotation= comp.transform.rotation.eulerAngles;
-			comp.transform.rotation=Quaternion.Euler(rotation.x, y, rotation.z);
+			comp.transform.rotation=Quaternion.Euler(comp.transform.rotation.eulerAngles+otherRotation.eulerAngles);
 			return comp;
 		}
 		public static T Reset<T>(this T comp) where T : Component
