@@ -33,8 +33,8 @@ namespace QTool
 		}
 		public static void Draw(GameObject gameObject, Transform transform)
 		{
-			var meshs = gameObject.GetComponentsInChildren<MeshFilter>(true);
 			StartMatrix(transform);
+			var meshs = gameObject.GetComponentsInChildren<MeshFilter>();
 			foreach (var mesh in meshs)
 			{
 				Gizmos.color =Color.Lerp(mesh.GetComponent<Renderer>().sharedMaterial.color,Color.clear,0.5f);
