@@ -29,7 +29,7 @@ namespace QTool.FlowGraph
 		public static object ObjectFunction(QFlowNode This, object obj, [QName("函数名"), QNodeName] string funcName, [QName("参数")] object[] param)
 		{
 			if (obj == null) return null;
-			var typeInfo = QReflectionTypeInfo.Get(obj.GetType());
+			var typeInfo = QReflectionType.Get(obj.GetType());
 			var funcInfo = typeInfo.Functions[funcName];
 			if (funcInfo == null)
 			{

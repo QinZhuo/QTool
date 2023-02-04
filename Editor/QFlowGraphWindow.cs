@@ -126,7 +126,7 @@ namespace QTool.FlowGraph
 			var value = fromPort.GetValue(fromPortId.index);
 			if (!value.IsNull())
 			{
-				var typeInfo = QReflectionTypeInfo.Get(value.GetType());
+				var typeInfo = QReflectionType.Get(value.GetType());
 				if (typeInfo.Type != typeof(QFlow))
 				{
 					foreach (var funcInfo in typeInfo.Functions)

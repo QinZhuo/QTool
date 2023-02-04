@@ -65,7 +65,7 @@ namespace QTool
 					obj = monoObj.gameObject;
 				}
 #if UNITY_EDITOR
-				if (obj.IsAsset())
+				if (!Application.isPlaying&&obj.IsAsset())
 				{
 					InitCache();
 					if (!AssetIdCache.ContainsKey(obj))
@@ -102,7 +102,7 @@ namespace QTool
 							qId = gameObj.AddComponent<QId>();
 							gameObj.SetDirty();
 						}
-						if (!Application.isPlaying && !gameObj.activeSelf)
+						if (!Application.isPlaying && !gameObj.activeSelf&& QSceneObjectSetting.Instance!=null)
 						{
 							QSceneObjectSetting.Instance.qIdInitList.AddCheckExist(qId);
 						}

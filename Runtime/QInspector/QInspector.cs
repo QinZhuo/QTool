@@ -2,6 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using QTool.Reflection;
+using System.Reflection;
+
 namespace QTool
 {
     /// <summary>
@@ -171,6 +174,44 @@ namespace QTool.Inspector
         {
         }
     }
-   
- 
+
+
+	public class QInspectorType : QTypeInfo<QInspectorType>
+	{
+		public QDictionary<QOnInspectorAttribute, QFunctionInfo> inspectorState = new QDictionary<QOnInspectorAttribute, QFunctionInfo>();
+		public QDictionary<QOnSceneInputAttribute, QFunctionInfo> mouseEventFunc = new QDictionary<QOnSceneInputAttribute, QFunctionInfo>();
+		public QDictionary<QFunctionInfo, QNameAttribute> buttonFunc = new QDictionary<QFunctionInfo, QNameAttribute>();
+		public QDictionary<QOnPlayModeAttribute, QFunctionInfo> playMode = new QDictionary<QOnPlayModeAttribute, QFunctionInfo>();
+		protected override void Init(Type type)
+		{
+			base.Init(type);
+			if (!TypeMembers.ContainsKey(type))
+			{
+				Members.RemoveAll(memebr => (!memebr.IsPublic && memebr.MemeberInfo.GetCustomAttribute<SerializeField>() == null) || !(memebr.MemeberInfo is FieldInfo));
+			}
+			foreach (var funcInfo in Functions)
+			{
+				foreach (var att in funcInfo.MethodInfo.GetCustomAttributes<QOnSceneInputAttribute>())
+				{
+					mouseEventFunc[att] = funcInfo;
+				}
+				foreach (var att in funcInfo.MethodInfo.GetCustomAttributes<QNameAttribute>())
+				{
+					buttonFunc[funcInfo] = att;
+				}
+				foreach (var att in funcInfo.MethodInfo.GetCustomAttributes<ContextMenu>())
+				{
+					buttonFunc[funcInfo] = new QNameAttribute(att.menuItem);
+				}
+				foreach (var att in funcInfo.MethodInfo.GetCustomAttributes<QOnInspectorAttribute>())
+				{
+					inspectorState[att] = funcInfo;
+				}
+				foreach (var att in funcInfo.MethodInfo.GetCustomAttributes<QOnPlayModeAttribute>())
+				{
+					playMode[att] = funcInfo;
+				}
+			}
+		}
+	}
 }

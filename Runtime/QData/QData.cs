@@ -977,38 +977,13 @@ namespace QTool
 	}
 	public class QSerializeType : QTypeInfo<QSerializeType>
 	{
-		public static QDictionary<Type, List<string>> TypeMembers = new QDictionary<Type, List<string>>()
-		{
-			{
-				 typeof(Rect),
-				 new List<string>
-				 { 
-					 nameof(Rect.x),
-					 nameof(Rect.y),
-					 nameof(Rect.height),
-					 nameof(Rect.width),
-				 }
-			},
-			{
-				 typeof(Quaternion),
-				 new List<string>
-				 {
-					 nameof(Quaternion.x),
-					 nameof(Quaternion.y),
-					 nameof(Quaternion.z),
-					 nameof(Quaternion.w),
-				 }
-			},
-		};
-		
+	
 		public QObjectType objType = QObjectType.Object;
 		public bool IsIQSerialize { private set; get; }
 		public bool IsIQData { private set; get; }
 		public bool HasCallback { private set; get; }
-		//public bool IsUnityObject { private set; get; }
 		protected override void Init(Type type)
 		{
-
 			Functions = null;
 			base.Init(type);
 			if (Code == TypeCode.Object)
@@ -1058,26 +1033,13 @@ namespace QTool
 					}
 				}
 			}
-			Members.RemoveAll((member) =>
+			if (!TypeMembers.ContainsKey(type))
 			{
-				if (TypeMembers.ContainsKey(type))
+				Members.RemoveAll((member) =>
 				{
-					if (TypeMembers[type].Contains(member.Key))
-					{
-						if(member.Get != null&& member.Set != null)
-						{
-							return false;
-						}
-						else
-						{
-							Debug.LogError(type + "." + member.Key + " Get" + member.Get+ " Set " + member.Set);
-						}
-					}
-					return true;
-				}
-				return member.MemeberInfo.GetCustomAttribute<QIgnoreAttribute>() != null || (!member.IsPublic&&member.MemeberInfo.GetCustomAttribute<QNameAttribute>()==null) || member.Key == "Item" || member.Set == null || member.Get == null || (member.Type.IsArray && member.Type.GetArrayRank() > 1);
-			});
-
+					return member.MemeberInfo.GetCustomAttribute<QIgnoreAttribute>() != null || (!member.IsPublic && member.MemeberInfo.GetCustomAttribute<QNameAttribute>() == null) || member.Key == "Item" || member.Set == null || member.Get == null || (member.Type.IsArray && member.Type.GetArrayRank() > 1);
+				});
+			}
 		}
 
 	}

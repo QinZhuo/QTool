@@ -106,16 +106,20 @@ namespace QTool.Reflection
 			this.MethodInfo = info;
 			Key = info.Name;
 			ParamInfos = info.GetParameters();
-		//	Function = info.Invoke;
 		}
 		public override string ToString()
 		{
 			return "function " + Name + "(" + ParamInfos.ToOneString(",") + ") \t\t(" + ReturnType + ")";
 		}
 	}
-	public class QReflectionTypeInfo : QTypeInfo<QReflectionTypeInfo>
+	public class QReflectionType : QTypeInfo<QReflectionType>
 	{
-	
+		protected override void Init(Type type)
+		{
+			MemberFlags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static;
+			FunctionFlags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static;
+			base.Init(type);
+		}
 	}
     public class QTypeInfo<T>:IKey<string> where T:QTypeInfo<T> ,new()
 	{
@@ -131,6 +135,39 @@ namespace QTool.Reflection
 		public Type KeyValueType { get; private set; }
         public Type Type { get; private set; }
         public TypeCode Code { get; private set; }
+		public static QDictionary<Type, List<string>> TypeMembers = new QDictionary<Type, List<string>>()
+		{
+			{
+				 typeof(Rect),
+				 new List<string>
+				 {
+					 nameof(Rect.x),
+					 nameof(Rect.y),
+					 nameof(Rect.height),
+					 nameof(Rect.width),
+				 }
+			},
+			{
+				 typeof(Quaternion),
+				 new List<string>
+				 {
+					 nameof(Quaternion.x),
+					 nameof(Quaternion.y),
+					 nameof(Quaternion.z),
+					 nameof(Quaternion.w),
+				 }
+			},
+			{
+				 typeof(Transform),
+				 new List<string>
+				 {
+					 nameof(Transform.localPosition),
+					 nameof(Transform.localRotation),
+					 nameof(Transform.localScale),
+				 }
+			},
+		};
+
 		public QMemeberInfo GetMemberInfo(string keyOrViewName)
 		{
 			var info = Members[keyOrViewName];
@@ -212,6 +249,24 @@ namespace QTool.Reflection
 						memeber = new QMemeberInfo(info);
 						Members.Add(memeber);
 					}, MemberFlags);
+					if (TypeMembers.ContainsKey(type))
+					{
+						Members.RemoveAll((member) =>
+						{
+							if (TypeMembers[type].Contains(member.Key))
+							{
+								if (member.Get != null && member.Set != null)
+								{
+									return false;
+								}
+								else
+								{
+									Debug.LogError(type + "." + member.Key + " Get" + member.Get + " Set " + member.Set);
+								}
+							}
+							return true;
+						});
+					}
 				}
 
 				if (Functions != null)
@@ -222,9 +277,9 @@ namespace QTool.Reflection
 						Functions.Add(function);
 					}, FunctionFlags);
 				}
+
 			}
 		}
-        static Type[] defaultCreatePrams = new Type[0];
         public static Dictionary<Type, T> table = new Dictionary<Type, T>();
         public static T Get(Type type)
         {
@@ -492,7 +547,7 @@ namespace QTool.Reflection
 			{
 				objType = obj as Type;
 			}
-			var typeInfo = QReflectionTypeInfo.Get(objType);
+			var typeInfo = QReflectionType.Get(objType);
 			var method=typeInfo.Functions[funcName]?.MethodInfo;
 			if (method == null)
 			{
@@ -705,7 +760,7 @@ namespace QTool.Reflection
 			}
 			else
 			{
-				var typeInfo = QReflectionTypeInfo.Get(target.GetType());
+				var typeInfo = QReflectionType.Get(target.GetType());
 				var memeberInfo = typeInfo.GetMemberInfo(path);
 				if (memeberInfo!=null)
 				{

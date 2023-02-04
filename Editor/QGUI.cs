@@ -687,7 +687,7 @@ namespace QTool
 			}
 			else
 			{
-				var memebers = QInspectorType.Get(target.GetType()).Members;
+				var memebers = QReflectionType.Get(target.GetType()).Members;
 				if (memebers.ContainsKey(path))
 				{
 					var Get = memebers[path].Get;

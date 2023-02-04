@@ -138,29 +138,33 @@ namespace QTool.Net
 		{
 			Functions = null;
 			base.Init(type);
-			Members.RemoveAll((memberInfo) =>
+			if (!TypeMembers.ContainsKey(type))
 			{
-				if (memberInfo.Get != null || memberInfo.Set != null)
+				Members.RemoveAll((memberInfo) =>
 				{
-					var syncVar = memberInfo.MemeberInfo.GetAttribute<QSyncVarAttribute>();
-					if (syncVar != null)
+					if (memberInfo.Get != null || memberInfo.Set != null)
 					{
-						if (syncVar.SyncCheck)
+						var syncVar = memberInfo.MemeberInfo.GetAttribute<QSyncVarAttribute>();
+						if (syncVar != null)
 						{
-							if (memberInfo.Type.IsValueType)
+							if (syncVar.SyncCheck)
 							{
-								CheckList.Add(memberInfo);
+								if (memberInfo.Type.IsValueType)
+								{
+									CheckList.Add(memberInfo);
+								}
+								else
+								{
+									Debug.LogError("只有值类型才能通过" + nameof(System.Object.GetHashCode) + "()进行同步检测");
+								}
 							}
-							else
-							{
-								Debug.LogError("只有值类型才能通过" + nameof(System.Object.GetHashCode) + "()进行同步检测");
-							}
+							return false;
 						}
-						return false;
 					}
-				}
-				return true;
-			});
+					return true;
+				});
+			}
+			
 		}
 	}
 
