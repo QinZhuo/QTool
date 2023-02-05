@@ -8,18 +8,19 @@ using System;
 
 namespace QTool
 {
-	public class QPrefab:IKey<string>
+	public class QPrefab
 	{
-		public string Key { get; set; }
-		public QList<string, QPrefab> Childs = new QList<string, QPrefab>();
+		public QDictionary<string, string> Members = new QDictionary<string, string>();
+		public QDictionary<int, QPrefab> Childs = new QDictionary<int, QPrefab>();
 		public QList<string, QPrefabComponent> Components = new QList<string, QPrefabComponent>();
-		public QPrefab()
-		{
-			
-		}
+		public bool HasData => Members.Count > 0 || Childs.Count > 0 || Components.Count > 0;
+		public QPrefab() { }
 		public QPrefab(GameObject gameObject,GameObject prefab,params Type[] ignoreComponent)
 		{
-			Key = gameObject.name;
+			if (gameObject.activeSelf != prefab?.activeSelf)
+			{
+				Members[nameof(gameObject.activeSelf)] = gameObject.activeSelf.ToQData();
+			}
 			var start = prefab == null ? gameObject.transform.childCount - 1 : prefab.transform.childCount - 1;
 			for (int i = start; i >= 0; i--)
 			{
@@ -27,9 +28,9 @@ namespace QTool
 				if (child != null)
 				{
 					var childPrefab = new QPrefab(child.gameObject, prefab?.transform?.Find(child.name)?.gameObject);
-					if (childPrefab.Components.Count > 0)
+					if (childPrefab.HasData)
 					{
-						Childs.Add(childPrefab);
+						Childs[i]=childPrefab;
 					}
 				}
 			}
@@ -48,7 +49,7 @@ namespace QTool
 				{
 					prefabComponent = new QPrefabComponent(component, prefab?.GetComponent(component.GetType()));
 				}
-				if (prefabComponent.Members.Count > 0)
+				if (prefabComponent.HasData)
 				{
 					Components.Add(prefabComponent);
 				}
@@ -56,12 +57,23 @@ namespace QTool
 		}	
 		public void Load(GameObject gameObject)
 		{
+			foreach (var member in Members)
+			{
+				switch (member.Key)
+				{
+					case nameof(gameObject.activeSelf):
+						gameObject.SetActive(member.Value.ParseQData<bool>());
+						break;
+					default:
+						break;
+				}
+			}
 			foreach (var childData in Childs)
 			{
 				var child = gameObject.transform.GetChild(childData.Key);
 				if (child != null)
 				{
-					childData.Load(child.gameObject);
+					childData.Value.Load(child.gameObject);
 				}
 			}
 			foreach (var componentData in Components)
@@ -96,9 +108,8 @@ namespace QTool
 	{
 		public string Key { get; set; }
 		public QDictionary<string, string> Members = new QDictionary<string, string>();
-		public QPrefabComponent()
-		{
-		}
+		public bool HasData => Members.Count > 0;
+		public QPrefabComponent() { }
 		public QPrefabComponent(Component component,Component prefab)
 		{
 			var typeInfo = QInspectorType.Get(component.GetType());
