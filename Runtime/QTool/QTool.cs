@@ -566,8 +566,10 @@ namespace QTool
 					
 					QDebug.Log(RunInfo.FileName + " " + RunInfo.Arguments+"\n 运行路径"+ RunInfo.WorkingDirectory);
 					process.Start();
-					var info = process.StandardOutput.ReadToEnd();
-					var error = process.StandardError.ReadToEnd();
+					var infoAsync = process.StandardOutput.ReadToEndAsync();
+					var errorAsync = process.StandardError.ReadToEndAsync();
+					var info= infoAsync.Result;
+					var error = errorAsync.Result;
 #if UNITY_EDITOR
 					if (!Application.isPlaying)
 					{
