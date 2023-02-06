@@ -13,8 +13,9 @@ namespace QTool
 		}
 		public static T RandomPop<T>(this IList<T> list, System.Random random = null)
 		{
+			if (list == null || list.Count == 0) return default;
 			var index = random.Range(0, list.Count);
-			var obj= list[index];
+			var obj = list[index];
 			list.RemoveAt(index);
 			return obj;
 		}
