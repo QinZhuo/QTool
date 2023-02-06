@@ -524,6 +524,7 @@ namespace QTool
 		}
 		public static void Save(string path, string data)
 		{
+			QDebug.Log("保存[" + path + "]:\n" + data);
 			if (path.EndsWith(SecretExtension))
 			{
 				Save(path, data.GetBytes());

@@ -21,6 +21,7 @@ namespace QTool.Asset
 		}
 		public static TObj Load(string key)
 		{
+			if (key.IsNull()) return null;
 			key = key.Replace('\\', '/');
 			return Resources.Load<TObj>(DirectoryPath + "/" + key);
 		}
