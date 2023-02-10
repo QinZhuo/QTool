@@ -8,6 +8,7 @@ using System;
 using System.Threading.Tasks;
 using UnityEngine.U2D;
 using UnityEditor.U2D;
+using UnityEngine.Networking;
 #if Addressable
 using UnityEditor.AddressableAssets.Settings;
 using UnityEditor.AddressableAssets;
@@ -15,6 +16,8 @@ using UnityEditor.AddressableAssets;
 namespace QTool.Asset {
 	public static class AddressableToolEditor
 	{
+
+		#region 资源Id
 		[MenuItem("QTool/资源管理/资源Id/查找当前场景所有Mesh丢失")]
 		static void FindAllMeshNull()
 		{
@@ -27,7 +30,6 @@ namespace QTool.Asset {
 				}
 			}
 		}
-		#region 引用查找
 		[MenuItem("QTool/资源管理/资源Id/复制Id")]
 		static void CopyID()
 		{
@@ -99,73 +101,7 @@ namespace QTool.Asset {
 				Debug.LogError("选中过多");
 			}
 		}
-		[MenuItem("QTool/资源管理/批量处理/转换动画事件格式")]
-		static void FreshAnimationEvent()
-		{
-
-			foreach (var path in AssetDatabase.GetAllAssetPaths())
-			{
-				if (!(path.StartsWith("Assets/") && (path.EndsWith(".fbx") || path.EndsWith(".FBX")))) continue;
-				var importer = AssetImporter.GetAtPath(path) as ModelImporter;
-				FreshEvents(importer);
-			}
-			AssetDatabase.Refresh();
-		}
-		static void FreshEvents(ModelImporter importer)
-		{
-			if (importer && importer.clipAnimations.Length > 0)
-			{
-				bool changed = false;
-				ModelImporterClipAnimation[] animations = importer.clipAnimations;
-				foreach (var animation in animations)
-				{
-					List<AnimationEvent> events = new List<AnimationEvent>();
-					foreach (var eventData in animation.events)
-					{
-						if (eventData.functionName != nameof(QEventTrigger))
-						{
-							changed = true;
-							events.Add(new AnimationEvent
-							{
-								time = eventData.time,
-								stringParameter = eventData.functionName,
-								functionName = nameof(QEventTrigger)
-							});
-						}
-						else
-						{
-							events.Add(new AnimationEvent
-							{
-								time = eventData.time,
-								stringParameter = eventData.stringParameter,
-								functionName = eventData.functionName
-							});
-						}
-					}
-					if (changed)
-					{
-						animation.events = events.ToArray();
-					}
-				}
-				if (changed)
-				{
-					importer.clipAnimations = animations;
-					importer.SaveAndReimport();
-				}
-			}
-		}
-		[MenuItem("QTool/资源管理/批量处理/所有资源格式")]
-		static void FindAllAssetExtension()
-		{
-
-			QDictionary<string, string> list = new QDictionary<string, string>();
-			foreach (var path in AssetDatabase.GetAllAssetPaths())
-			{
-				if (!path.StartsWith("Assets/")) continue;
-				list[Path.GetExtension(path)] = path;
-			}
-			Debug.LogError(list.ToOneString());
-		}
+	
 		[MenuItem("QTool/资源管理/资源Id/查找资源引用 %#&f")]
 		static void FindreAssetFerencesMenu()
 		{
@@ -272,11 +208,97 @@ namespace QTool.Asset {
 			}
 		}
 
-
+		[MenuItem("QTool/资源管理/资源Id/解析URL编码资源名")]
+		public static void ParseURLName()
+		{
+			foreach (var asset in Selection.objects)
+			{
+				var path= AssetDatabase.GetAssetPath(asset);
+				var newName = UnityWebRequest.UnEscapeURL(asset.name);
+				if (asset.name != newName)
+				{
+					QDebug.Log("更改资源名[" + asset.name + "]=>[" + newName + "]");
+					var error= AssetDatabase.RenameAsset(path, newName);
+					if (!error.IsNull())
+					{
+						Debug.LogError("更改资源名出错 "+error);
+						return;
+					}
+				}
+			}
+			AssetDatabase.SaveAssets();
+			AssetDatabase.Refresh();
+		}
 		#endregion
-		#region 资源格式
+		#region 批量处理
 
+		[MenuItem("QTool/资源管理/批量处理/转换动画事件格式")]
+		static void FreshAnimationEvent()
+		{
 
+			foreach (var path in AssetDatabase.GetAllAssetPaths())
+			{
+				if (!(path.StartsWith("Assets/") && (path.EndsWith(".fbx") || path.EndsWith(".FBX")))) continue;
+				var importer = AssetImporter.GetAtPath(path) as ModelImporter;
+				FreshEvents(importer);
+			}
+			AssetDatabase.Refresh();
+		}
+		static void FreshEvents(ModelImporter importer)
+		{
+			if (importer && importer.clipAnimations.Length > 0)
+			{
+				bool changed = false;
+				ModelImporterClipAnimation[] animations = importer.clipAnimations;
+				foreach (var animation in animations)
+				{
+					List<AnimationEvent> events = new List<AnimationEvent>();
+					foreach (var eventData in animation.events)
+					{
+						if (eventData.functionName != nameof(QEventTrigger))
+						{
+							changed = true;
+							events.Add(new AnimationEvent
+							{
+								time = eventData.time,
+								stringParameter = eventData.functionName,
+								functionName = nameof(QEventTrigger)
+							});
+						}
+						else
+						{
+							events.Add(new AnimationEvent
+							{
+								time = eventData.time,
+								stringParameter = eventData.stringParameter,
+								functionName = eventData.functionName
+							});
+						}
+					}
+					if (changed)
+					{
+						animation.events = events.ToArray();
+					}
+				}
+				if (changed)
+				{
+					importer.clipAnimations = animations;
+					importer.SaveAndReimport();
+				}
+			}
+		}
+		[MenuItem("QTool/资源管理/批量处理/所有资源格式")]
+		static void FindAllAssetExtension()
+		{
+
+			QDictionary<string, string> list = new QDictionary<string, string>();
+			foreach (var path in AssetDatabase.GetAllAssetPaths())
+			{
+				if (!path.StartsWith("Assets/")) continue;
+				list[Path.GetExtension(path)] = path;
+			}
+			Debug.LogError(list.ToOneString());
+		}
 		[MenuItem("QTool/资源管理/批量处理/删除图集")]
 		public static void DeleteAllAtlas()
 		{
