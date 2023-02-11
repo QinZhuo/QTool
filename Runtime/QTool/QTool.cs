@@ -377,8 +377,10 @@ namespace QTool
 			Vector3 vec = camera.WorldToViewportPoint(pos);
 			return (vec.x > 0 && vec.x < 1 && vec.y > 0 && vec.y < 1);
 		}
-
-	
+		public static Transform GetHumanBone(this GameObject gameObject, HumanBodyBones name)
+		{
+			return gameObject.GetComponent<Animator>()?.GetBoneTransform(name);
+		}
 
 		public static string ToQTimeString(this DateTime time)
 		{

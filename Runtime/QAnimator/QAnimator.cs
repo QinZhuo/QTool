@@ -43,9 +43,9 @@ namespace QTool
 		{
 			gameObject.InvokeEvent(eventName);
 		}
-		public Transform GetBone(QHumanBoneName name)
+		public Transform GetHumanBone(HumanBodyBones name)
 		{
-			return this.GetComponent<QHumanBones>(true).GetBone(name);
+			return Animator.GetBoneTransform(name);
 		}
 #if UNITY_EDITOR
 		[QToggle("预览动画")]
