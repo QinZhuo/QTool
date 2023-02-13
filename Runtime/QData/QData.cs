@@ -334,6 +334,7 @@ namespace QTool
 					}
 					else
 					{
+						bool isOver = false;
 						foreach (var memeberInfo in typeInfo.Members)
 						{
 							try
@@ -343,7 +344,7 @@ namespace QTool
 								{
 									if (reader.NextIsSplit('}'))
 									{
-										break;
+										isOver = true;
 									}
 								}
 							}
@@ -351,7 +352,14 @@ namespace QTool
 							{
 								throw new Exception("读取"+typeInfo.Type+"."+memeberInfo.QName+"出错",e);
 							}
-							
+						}
+						if (!isOver)
+						{
+							while (!reader.NextIsSplit('}'))
+							{
+								reader.NextIsSplit(',');
+								reader.ReadCheckString();
+							}
 						}
 					}
 
