@@ -345,6 +345,7 @@ namespace QTool
 									if (reader.NextIsSplit('}'))
 									{
 										isOver = true;
+										break;
 									}
 									else
 									{
