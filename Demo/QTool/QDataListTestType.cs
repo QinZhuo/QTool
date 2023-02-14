@@ -13,6 +13,8 @@ namespace QTool.Test
 		public Vector3 v3;
 		public List<int> array;
 		public TestEnum testEnum;
+		[QName("效果"),TextArea(2,4)]
+		public string textArea;
 		public override string ToString()
 		{
 			return Key + ":[" + value + "]";

@@ -497,7 +497,6 @@ namespace QTool
 		}
 		private static bool PrivateDraw(this SerializedProperty property, Rect rect , GUIContent content = null, string parentType = "")
 		{
-			if (UnityAttributeView(property, rect, content, parentType)) return false;
 			var cur = property.Copy();
 			if (cur.hasVisibleChildren && !cur.isArray)
 			{
@@ -513,10 +512,14 @@ namespace QTool
 					{
 						if (SerializedProperty.EqualContents(cur, end)) return expanded;
 						rect = new Rect(new Vector2(rect.x, rect.yMax + 2), new Vector2(rect.width, cur.GetHeight(visable)));
-						cur.PrivateDraw(rect,null, parentType);
+						cur.PrivateDraw(rect, null, parentType);
 					} while (cur.NextVisible(false));
 				}
 				return expanded;
+			}
+			else if (UnityAttributeView(property, rect, content, parentType))
+			{
+				return false;
 			}
 			else
 			{
@@ -524,7 +527,7 @@ namespace QTool
 				{
 					content = new GUIContent(cur.QName(parentType));
 				}
-				return EditorGUI.PropertyField(rect, cur, content,true);
+				return EditorGUI.PropertyField(rect, cur, content, true);
 			}
 		}
 		public static float GetHeight(this SerializedProperty property)
@@ -534,6 +537,21 @@ namespace QTool
 		public static float GetHeight(this SerializedProperty property, bool containsChild)
 		{
 			if (!property.IsShow()) return 0;
+			switch (property.propertyType)
+			{
+				case SerializedPropertyType.String:
+					{
+						var textArea = property.GetAttribute<TextAreaAttribute>();
+						if (textArea != null)
+						{
+							var lineCount = property.stringValue.Split('\n').Length;
+							return EditorGUI.GetPropertyHeight(property,false)* Mathf.Clamp(lineCount, textArea.minLines, textArea.maxLines);
+						}
+					}
+					break;
+				default:
+					break;
+			}
 			return EditorGUI.GetPropertyHeight(property, containsChild && property.isExpanded);
 		}
 		public static bool Toggle(string label, bool value, params GUILayoutOption[] options)

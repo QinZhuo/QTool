@@ -275,7 +275,7 @@ namespace QTool.Test
 		[QName("List测试")]
         public List<float> list;
         public List<List<float>> list2Test = new List<List<float>> { new List<float>() { 1, 2, 3 } };
-        [QName("名字测试1")]
+        [QName("名字测试1"),TextArea(2,4)]
         public string asdl;
         public float p2;
         public byte[] array = new byte[] { 123 };
