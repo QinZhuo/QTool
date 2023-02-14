@@ -372,13 +372,18 @@ namespace QTool
 			}
 			else
 			{
-				if (reader.ReadObjectString() == "null")
+				var objData = reader.ReadObjectString();
+				if (objData == "null")
 				{
 					target = null; 
 				}
-				else
+				else if(objData.IsNull())
 				{
 					target = null;
+				}
+				else
+				{
+					throw new Exception("对象数据出错|" + objData + "|");
 				}
 			}
 			return target;
