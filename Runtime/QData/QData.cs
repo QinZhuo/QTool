@@ -346,8 +346,12 @@ namespace QTool
 									{
 										isOver = true;
 									}
+									else
+									{
+										throw new Exception("读取对象出错缺少,或}而不是" + reader.ReadToEnd());
+									}
 								}
-							}
+							} 
 							catch (Exception e)
 							{
 								throw new Exception("读取"+typeInfo.Type+"."+memeberInfo.QName+"出错",e);
@@ -480,7 +484,7 @@ namespace QTool
 												}
 												else
 												{
-													throw new Exception("数组格式出错 缺少[,]而不是["+ reader.ReadToEnd()+"]"); ;
+													throw new Exception("数组格式出错 缺少,或]而不是|"+ reader.ReadToEnd()+"|"); ;
 												}
 											}
 										}
