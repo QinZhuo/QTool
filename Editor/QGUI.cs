@@ -439,31 +439,38 @@ namespace QTool
 			}
 			return;
 		}
-		private static bool RangeView(this SerializedProperty property,Rect rect, GUIContent content = null, string parentType = "")
+		private static bool UnityAttributeView(this SerializedProperty property,Rect rect, GUIContent content = null, string parentType = "")
 		{
-			var range = property.GetAttribute<RangeAttribute>(parentType);
-			if (range != null)
+			if (content == null)
 			{
-				if (content == null)
-				{
-					content = new GUIContent(property.QName());
-				}
-				switch (property.propertyType)
-				{
-					case SerializedPropertyType.Integer:
+				content = new GUIContent(property.QName(parentType));
+			}
+			switch (property.propertyType)
+			{
+				case SerializedPropertyType.Integer:
+					{
+						var range = property.GetAttribute<RangeAttribute>(parentType);
+						if (range != null)
 						{
 							EditorGUI.IntSlider(rect, property, (int)range.min, (int)range.max, content);
 							return true;
 						}
-					case SerializedPropertyType.Float:
+					}break;
+				case SerializedPropertyType.Float:
+					{
+						var range = property.GetAttribute<RangeAttribute>(parentType);
+						if (range != null)
 						{
 							EditorGUI.Slider(rect, property, range.min, range.max, content);
 							return true;
 						}
-					case SerializedPropertyType.Vector2:
+					}break;
+				case SerializedPropertyType.Vector2:
+					{
+						var range = property.GetAttribute<RangeAttribute>(parentType);
+						if (range != null)
 						{
 							var value = property.vector2Value;
-							
 							EditorGUI.LabelField(rect.HorizontalRect(0, 0.4f), content);
 							value.x = EditorGUI.FloatField(rect.HorizontalRect(0.4f, 0.5f), value.x);
 							EditorGUI.MinMaxSlider(rect.HorizontalRect(0.5f, 0.9f), ref value.x, ref value.y, range.min, range.max);
@@ -471,15 +478,26 @@ namespace QTool
 							property.vector2Value = value;
 							return true;
 						}
-					default:
-						break;
-				}
+					}break;
+				case SerializedPropertyType.String:
+					{
+						var textArea = property.GetAttribute<TextAreaAttribute>(parentType);
+						if (textArea != null)
+						{
+							EditorGUI.LabelField(rect.HorizontalRect(0, 0.4f), content);
+							property.stringValue=EditorGUI.TextArea(rect.HorizontalRect(0.4f, 1f), property.stringValue);
+							return true;
+						}
+					}
+					break;
+				default:
+					break;
 			}
 			return false;
 		}
 		private static bool PrivateDraw(this SerializedProperty property, Rect rect , GUIContent content = null, string parentType = "")
 		{
-			if (RangeView(property, rect, content, parentType)) return false;
+			if (UnityAttributeView(property, rect, content, parentType)) return false;
 			var cur = property.Copy();
 			if (cur.hasVisibleChildren && !cur.isArray)
 			{

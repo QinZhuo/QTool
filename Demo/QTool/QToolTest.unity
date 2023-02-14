@@ -931,8 +931,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a62fe154ceeb184fb003a657ac0cf29, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  InstanceId: 48bf501f3b6d4f849401d053fa32b598
-  PrefabId: 
+  Id: 48bf501f3b6d4f849401d053fa32b598
+  Prefab: 
 --- !u!1001 &1342849156878632982
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -993,6 +993,11 @@ PrefabInstance:
       value: enumTest1
       objectReference: {fileID: 0}
     - target: {fileID: 1342849157534090733, guid: e3b8399edb6b7064e8f550458a54bdd3, type: 3}
+      propertyPath: commandStr
+      value: "\u9519\u8BEF\u65E5\u5FD7 123\n\u9519\u8BEF\u65E5\u5FD7 456\n\u9519\u8BEF\u65E5\u5FD7
+        789"
+      objectReference: {fileID: 0}
+    - target: {fileID: 1342849157534090733, guid: e3b8399edb6b7064e8f550458a54bdd3, type: 3}
       propertyPath: toggleTest
       value: 1
       objectReference: {fileID: 0}
@@ -1015,8 +1020,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a62fe154ceeb184fb003a657ac0cf29, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  InstanceId: 72cd5b9e9b3a49da8c52a23044c9b4f2
-  PrefabId: Assets/QTool/Demo/QTool/QToolTest.prefab
+  Id: 72cd5b9e9b3a49da8c52a23044c9b4f2
+  Prefab: Assets/QTool/Demo/QTool/QToolTest.prefab
 --- !u!114 &1342849156878632985 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 1342849157534090733, guid: e3b8399edb6b7064e8f550458a54bdd3, type: 3}

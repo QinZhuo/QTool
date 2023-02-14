@@ -24,6 +24,20 @@ namespace QTool.Inspector
 		}
 		public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
 		{
+			switch (property.propertyType)
+			{
+				case SerializedPropertyType.String:
+					{
+						var textArea = property.GetAttribute<TextAreaAttribute>();
+						if (textArea != null)
+						{
+							var lineCount = property.stringValue.Split('\n').Length;
+							return property.GetHeight()*Mathf.Max(lineCount,textArea.minLines);
+						}
+					}break;
+				default:
+					break;
+			}
 			return property.GetHeight();
 		}
 	}

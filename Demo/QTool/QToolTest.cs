@@ -34,7 +34,7 @@ namespace QTool.Test
 		public TTestClass test2;
 		[QName("序列化测试次数", nameof(toggleTest))]
 		public int testTimes = 100;
-		[QName("命令", nameof(toggleTest))]
+		[QName("命令", nameof(toggleTest)),TextArea(2,4)]
 		public string commandStr;
 		[QName("QDataList数据", nameof(toggleTest))]
 		[TextArea(5, 10)]

@@ -9,46 +9,67 @@ using System.Threading.Tasks;
 
 namespace QTool
 {
-    public static class QCommand 
-    {
-        static QCommand()
-        {
-            FreshCommands(typeof(QCommandType).GetAllTypes());
-        }
-        public static object Invoke(string commandStr) 
-        {
-            if (string.IsNullOrWhiteSpace(commandStr)) return null;
-			commandStr =commandStr.ForeachBlockValue('\"', '\"',(value)=> { return value.Replace(" ", "@#&"); });
-			commandStr = commandStr.ForeachBlockValue('“', '”', (value) => { return value.Replace(" ", "@#&"); });
-			List<string> commands = new List<string>();
-			commands.AddRange(commandStr.Split(' '));
-			for (int i = 0; i < commands.Count; i++)
+	public static class QCommand
+	{
+		static QCommand()
+		{
+			FreshCommands(typeof(QCommandType).GetAllTypes());
+		}
+		private const string SpaceReplaceKey = nameof(QCommand) + nameof(SpaceReplaceKey);
+		private const string EnterReplaceKey = nameof(QCommand) + nameof(EnterReplaceKey);
+
+		public static object Invoke(string commandStr)
+		{
+			if (string.IsNullOrWhiteSpace(commandStr)) return null;
+			commandStr = commandStr.ForeachBlockValue('\"', '\"', (value) => { return value.Replace(" ", SpaceReplaceKey).Replace("\n", EnterReplaceKey); });
+			commandStr = commandStr.ForeachBlockValue('“', '”', (value) => { return value.Replace(" ", SpaceReplaceKey).Replace("\n", EnterReplaceKey); });
+
+			List<List<string>> commandInfos = new List<List<string>>();
+			var commands = commandStr.Split('\n');
+			foreach (var command in commands)
 			{
-				commands[i] = commands[i].Replace("@#&", " ");
+				if (command.IsNull()) continue;
+				var commandInfo = new List<string>();
+				commandInfo.AddRange(command.Split(' '));
+				for (int i = 0; i < commandInfo.Count; i++)
+				{
+					commandInfo[i] = commandInfo[i].Replace(SpaceReplaceKey, " ").Replace(EnterReplaceKey, "\n");
+				}
+				commandInfos.Add(commandInfo);
 			}
-            if (commands.Count > 0)
+			object result = null;
+			foreach (var commmandInfo in commandInfos)
 			{
-				QDebug.Log("字符命令调用:" + commands.ToOneString());
-				var name = commands.Dequeue();
+				InvokeOneCommand(commmandInfo);
+			}
+			return result;
+		}
+		private static object InvokeOneCommand(IList<string> commandInfo)
+		{
+			if (commandInfo.Count > 0)
+			{
+				QDebug.Log("字符命令调用:" + commandInfo.ToOneString());
+				var name = commandInfo.Dequeue();
 				bool not = false;
 				if (name.StartsWith("!"))
 				{
 					not = true;
-					name =name.Substring(1);
+					name = name.Substring(1);
 				}
-                if (NameDictionary.ContainsKey(name))
+				if (NameDictionary.ContainsKey(name))
 				{
-					var result= NameDictionary[name].Invoke(commands);
-					if(not && result is bool boolValue)
+					var result = NameDictionary[name].Invoke(commandInfo);
+					if (not && result is bool boolValue)
 					{
 						result = !boolValue;
 					}
 					return result;
 				}
-            }
-            return null;
-        }
-        public static QList<string, QCommandInfo> KeyDictionary = new QList<string, QCommandInfo>();
+			}
+			return null;
+		}
+
+		public static QList<string, QCommandInfo> KeyDictionary = new QList<string, QCommandInfo>();
         public static QDictionary<string, QCommandInfo> NameDictionary = new QDictionary<string, QCommandInfo>();
         public static List<Type> TypeList = new List<Type>();
         public static QCommandInfo GetCommand(string key)
