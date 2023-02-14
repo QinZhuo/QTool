@@ -263,7 +263,7 @@ namespace QTool
 				Add(key, value);
 			}
 		}
-		public Func<TKey, T> AutoCreateFunc { protected set; get; }
+		public Func<TKey, T> AutoCreate { protected set; get; }
 		public QDictionary()
 		{
 		}
@@ -277,9 +277,9 @@ namespace QTool
 			if (key == null) return default;
 			if (!ContainsKey(key))
 			{
-				if (AutoCreateFunc != null)
+				if (AutoCreate != null)
 				{
-					Add(key, AutoCreateFunc(key));
+					Add(key, AutoCreate(key));
 				}
 				else
 				{
@@ -288,9 +288,9 @@ namespace QTool
 			}
 			return base[key];
 		}
-		public QDictionary(Func<TKey, T> autoCreateFunc)
+		public QDictionary(Func<TKey, T> AutoCreate)
 		{
-			this.AutoCreateFunc = autoCreateFunc;
+			this.AutoCreate = AutoCreate;
 		}
 	}
 
