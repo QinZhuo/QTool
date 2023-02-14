@@ -340,7 +340,7 @@ namespace QTool
 							try
 							{
 								memeberInfo.Set(target, reader.ReadType(memeberInfo.Type, hasName, memeberInfo.Get(target)));
-								if (!(reader.NextIsSplit(',')))
+								if (!(reader.NextIsSplit(','))) 
 								{
 									if (reader.NextIsSplit('}'))
 									{
