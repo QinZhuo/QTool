@@ -14,6 +14,7 @@ namespace QTool.Reflection
 	{
 		public string Key { get; set; }
 		public string QName { get; set; }
+		public string QOldName { get; set; }
 		public Type Type { get; private set; }
 		public Action<object, object> Set { get; private set; }
 		public Func<object, object> Get { get; private set; }
@@ -24,6 +25,7 @@ namespace QTool.Reflection
 		{
 			MemeberInfo = info;
 			QName = info.QName();
+			QOldName = info.QOldName();
 			Key = info.Name;
 			Type = info.FieldType;
 			Set = info.SetValue;
@@ -34,6 +36,7 @@ namespace QTool.Reflection
 		{
 			MemeberInfo = info;
 			QName = info.QName();
+			QOldName = info.QOldName();
 			Key = info.Name;
 			Type = info.PropertyType;
 			IsPublic = true;
@@ -174,6 +177,10 @@ namespace QTool.Reflection
 			if (info == null)
 			{
 				info= Members.Get(keyOrViewName, (obj) => obj.QName);
+			}
+			if (info == null)
+			{
+				info = Members.Get(keyOrViewName, (obj) => obj.QOldName);
 			}
 			return info;
 			
@@ -457,8 +464,20 @@ namespace QTool.Reflection
             {
                 return type.Name;
             }
-        }
-        public static Type GetTrueType(this Type type)
+		}
+		public static string QOldName(this MemberInfo type)
+		{
+			var att = type.GetCustomAttribute<QOldNameAttribute>();
+			if (att != null && !string.IsNullOrWhiteSpace(att.name))
+			{
+				return att.name;
+			}
+			else
+			{
+				return type.Name;
+			}
+		}
+		public static Type GetTrueType(this Type type)
         {
             if (type.Name.EndsWith("&"))
             {

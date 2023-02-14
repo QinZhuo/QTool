@@ -296,7 +296,7 @@ namespace QTool
 						while (!reader.IsEnd())
 						{
 							var name = reader.ReadCheckString();
-							var memeberInfo = typeInfo.Members[name];
+							var memeberInfo = typeInfo.GetMemberInfo(name);
 
 							object result = null;
 

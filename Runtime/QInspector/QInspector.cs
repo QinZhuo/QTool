@@ -25,10 +25,19 @@ namespace QTool
             this.visibleControl = visibleControl;
         }
     }
-    /// <summary>
-    /// 使数据在inspector视窗不可更改
-    /// </summary>
-    [AttributeUsage(AttributeTargets.Field)]
+	[AttributeUsage(AttributeTargets.Field | AttributeTargets.Class | AttributeTargets.Method | AttributeTargets.Interface | AttributeTargets.Parameter | AttributeTargets.Property)]
+	public class QOldNameAttribute : Attribute
+	{
+		public string name;
+		public QOldNameAttribute(string name)
+		{
+			this.name = name;
+		}
+	}
+	/// <summary>
+	/// 使数据在inspector视窗不可更改
+	/// </summary>
+	[AttributeUsage(AttributeTargets.Field)]
     public class QReadonlyAttribute : PropertyAttribute
 	{
         public QReadonlyAttribute() 
