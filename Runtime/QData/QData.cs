@@ -595,8 +595,11 @@ namespace QTool
 					}
 
 				case TypeCode.Boolean:
-					return bool.Parse(ReadObjectString(reader));
-
+					if(!bool.TryParse(ReadObjectString(reader),out var boolValue))
+					{
+						boolValue = false;
+					}
+					return boolValue;
 				case TypeCode.Char:
 					return char.Parse(ReadObjectString(reader));
 				case TypeCode.DateTime:
