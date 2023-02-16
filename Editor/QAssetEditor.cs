@@ -79,7 +79,7 @@ namespace QTool.Asset {
 								case ".mat":
 								case ".playable":
 									{
-										var text = QFileManager.Load(path);
+										var text = QFileManager.Load(path,"",true);
 										if (text.Contains(oldId))
 										{
 											Debug.LogError("更改[" + path + "]引用资源");

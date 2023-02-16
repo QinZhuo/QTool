@@ -590,11 +590,11 @@ namespace QTool
 
 
 		}
-		public static string Load(string path, string defaultValue = "")
+		public static string Load(string path, string defaultValue = "",bool ignoreResources=false)
 		{
 			try
 			{
-				if (path.StartsWith(ResourcesPathRoot))
+				if (!ignoreResources&&path.StartsWith(ResourcesPathRoot))
 				{
 					var text = Resources.Load<TextAsset>(path.SplitEndString(ResourcesPathRoot + "/").SplitStartString("."));
 					if (text == null)
