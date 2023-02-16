@@ -40,7 +40,7 @@ namespace QTool
 			object result = null;
 			foreach (var commmandInfo in commandInfos)
 			{
-				InvokeOneCommand(commmandInfo);
+				result=InvokeOneCommand(commmandInfo);
 			}
 			return result;
 		}
