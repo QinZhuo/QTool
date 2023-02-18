@@ -8,7 +8,7 @@ namespace QTool
 		public List<QInteractObject> objectList = new List<QInteractObject>();
 		private void Start()
 		{
-			if (QInteractUIList.Instance != null&& QInteractUIList.Instance.Target!=null)
+			if (QInteractUIList.Instance != null&& QInteractUIList.Instance.Target==null)
 			{
 				QInteractUIList.Instance.Target = this;
 			}
