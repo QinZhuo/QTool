@@ -12,6 +12,7 @@ namespace QTool
 			if (interactObject != null)
 			{
 				objectList.AddCheckExist(interactObject);
+				OnInteractAdd?.Invoke(interactObject);
 				FreshCurrent();
 			}
 		}
@@ -21,18 +22,22 @@ namespace QTool
 			if (interactObject != null)
 			{
 				objectList.Remove(interactObject);
+				OnInteractRemove?.Invoke(interactObject);
 				FreshCurrent();
 			}
 		}
-		public System.Action OnInteractFresh;
+		public System.Action<QInteractObject> OnInteractFresh;
+		public System.Action<QInteractObject> OnInteractAdd;
+		public System.Action<QInteractObject> OnInteractRemove;
 		public QInteractObject FreshCurrent()
 		{
 			if (objectList.Count > 0)
 			{
 				objectList.Sort((a, b) => Mathf.FloorToInt((a.transform.position - transform.position).sqrMagnitude - (b.transform.position - transform.position).sqrMagnitude));
 			}
-			OnInteractFresh?.Invoke();
-			return objectList.Get(0);
+			var current = objectList.Get(0);
+			OnInteractFresh?.Invoke(current);
+			return current;
 		}
 		public void Interact()
 		{
