@@ -24,6 +24,10 @@ namespace QTool
 					_Target.OnInteractAdd += Add;
 					_Target.OnInteractRemove += Remove;
 					_Target.OnInteractFresh += Fresh;
+					foreach (var item in _Target.objectList)
+					{
+						Add(item);
+					}
 				}
 			}
 		}
