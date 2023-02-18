@@ -274,6 +274,10 @@ namespace QTool
 	{
 	}
 	[System.Serializable]
+	public class GameObjectEvent : UnityEvent<GameObject>
+	{
+	}
+	[System.Serializable]
     public class FloatEventTrigger : EventTriggerBase<FloatEvent>
     {
     }
