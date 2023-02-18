@@ -51,14 +51,17 @@ namespace QTool
 		QFollowUI LastUI= null;
 		public void Fresh(QInteractObject qInteractObject)
 		{
-			var ui = this[qInteractObject.transform];
+			var ui = qInteractObject==null?null:this[qInteractObject.transform];
 			if (ui != LastUI)
 			{
 				if (LastUI != null)
 				{
 					LastUI.gameObject.InvokeEvent("激活", false);
 				}
-				ui.gameObject.InvokeEvent("激活", true);
+				if (ui != null)
+				{
+					ui.gameObject.InvokeEvent("激活", true);
+				}
 			}
 		}
 	}
