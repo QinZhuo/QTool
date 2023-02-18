@@ -6,6 +6,13 @@ namespace QTool
 	public class QInteractSystem : MonoBehaviour
 	{
 		public List<QInteractObject> objectList = new List<QInteractObject>();
+		private void Start()
+		{
+			if (QInteractUIList.Instance != null&& QInteractUIList.Instance.Target!=null)
+			{
+				QInteractUIList.Instance.Target = this;
+			}
+		}
 		private void OnTriggerEnter(Collider other)
 		{
 			var interactObject = other.GetComponent<QInteractObject>();

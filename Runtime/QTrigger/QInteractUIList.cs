@@ -5,7 +5,7 @@ namespace QTool
 {
 	public class QInteractUIList : QFollowUIList
 	{
-		public QInteractUIList Instance { get; private set; }
+		public static QInteractUIList Instance { get; private set; }
 		private QInteractSystem _Target=null;
 		public QInteractSystem Target
 		{
