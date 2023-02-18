@@ -38,13 +38,13 @@ namespace QTool
 		public void Add(QInteractObject qInteractObject)
 		{
 			var ui= this[qInteractObject.transform];
-			LastUI.gameObject.InvokeEvent("显示", true);
-			LastUI.gameObject.InvokeEvent("交互对象", qInteractObject);
+			ui.gameObject.InvokeEvent("显示", true);
+			ui.gameObject.InvokeEvent("交互对象", qInteractObject);
 		}
 		public async void Remove(QInteractObject qInteractObject)
 		{
 			var ui = this[qInteractObject.transform];
-			LastUI.gameObject.InvokeEvent("显示", false);
+			ui.gameObject.InvokeEvent("显示", false);
 			await QTask.Wait(1, true);
 			Push(ui.gameObject);
 		}
