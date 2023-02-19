@@ -21,7 +21,7 @@ namespace QTool
 					Debug.LogError("follow目标为空");
 					return null;
 				}
-				var obj = ObjectList[gameObject.name+"_"+ gameObject.GetHashCode().ToString()];
+				var obj = ObjectList[target.name+"_"+ target.gameObject.GetHashCode().ToString()];
 				var followUI = obj.GetComponent<QFollowUI>();
 				if (followUI != null)
 				{
