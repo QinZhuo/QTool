@@ -401,7 +401,7 @@ namespace QTool.Net
 		{
 			if (ClientGameData.ContainsKey(ClientIndex + 1))
 			{
-				QTime.ChangeScale(this, 100);
+				QTime.ChangeScale(this, 50);
 			}
 			else
 			{
