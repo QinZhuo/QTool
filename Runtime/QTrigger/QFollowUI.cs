@@ -20,6 +20,7 @@ namespace QTool
 				}
 			}
 		}
+		public QFollowList QFollowList { get; internal set; }
 		public RectTransform rectTransform => transform as RectTransform;
 		private Canvas _Canvas;
 		public Canvas Canvas => _Canvas??=GetComponentInParent<Canvas>();
@@ -37,23 +38,31 @@ namespace QTool
 		}
 		private void LateUpdate()
         {
-            if (_Target != null&&_Target.gameObject.activeInHierarchy)
+            if (_Target != null)
             {
-				var runtimeOffset = offset;
-				if (useBoundsHeight)
+				if (_Target.gameObject.activeInHierarchy)
 				{
-					runtimeOffset += bounds.size.y*Vector3.up;
+					var runtimeOffset = offset;
+					if (useBoundsHeight)
+					{
+						runtimeOffset += bounds.size.y * Vector3.up;
+					}
+					var position = _Target.position + runtimeOffset;
+					if (Canvas != null && Canvas.renderMode == RenderMode.WorldSpace)
+					{
+						rectTransform.position = position;
+					}
+					else
+					{
+						rectTransform.anchoredPosition = Camera.main.WorldToScreenPoint(position);
+					}
 				}
-				var position = _Target.position + runtimeOffset;
-				if(Canvas!=null&&Canvas.renderMode == RenderMode.WorldSpace)
-				{
-					rectTransform.position = position;
-				}
-				else
-				{
-					rectTransform.anchoredPosition= Camera.main.WorldToScreenPoint(position);
-				}
-            }
+			}
+			else if(QFollowList!=null)
+			{
+				QFollowList.Push(gameObject);
+				QFollowList = null;
+			}
         }
     }
 

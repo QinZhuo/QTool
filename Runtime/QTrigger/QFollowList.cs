@@ -4,7 +4,7 @@ using UnityEngine;
 namespace QTool
 {
 	[RequireComponent(typeof(QObjectList))]
-	public class QFollowUIList :MonoBehaviour
+	public class QFollowList :MonoBehaviour
 	{
 		private QObjectList _ObjectList;
 		public QObjectList ObjectList => _ObjectList ??= GetComponent<QObjectList>();
@@ -25,6 +25,7 @@ namespace QTool
 				var followUI = obj.GetComponent<QFollowUI>();
 				if (followUI != null)
 				{
+					followUI.QFollowList = this;
 					followUI.Target = target;
 					return followUI;
 				}
