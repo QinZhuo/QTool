@@ -28,9 +28,7 @@ namespace QTool.Net
 			Physics.autoSimulation = false;
 			Physics.autoSyncTransforms = false;
 			Time.fixedDeltaTime = 1f / netFps;
-			Tool.AddPlayerLoop(typeof(QNetManager), QNetPlayerLoop, "FixedUpdate");
-
-			Debug.LogError(UnityEngine.LowLevel.PlayerLoop.GetCurrentPlayerLoop().subSystemList.ToOneString("\n",TestLoop));
+			Tool.AddPlayerLoop(typeof(QNetManager), QNetPlayerLoop);
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
 			QToolManager.Instance.OnGUIEvent += GUI;
 #endif
@@ -44,7 +42,7 @@ namespace QTool.Net
 			}
 #endif
 			QTime.RevertScale(this);
-			Tool.RemovePlayerLoop(typeof(QNetManager), "FixedUpdate");
+			Tool.RemovePlayerLoop(typeof(QNetManager));
 			ServerUpdateTimer?.Clear();
 		}
 		public bool NetActive => Application.isPlaying&&( transport.ServerActive || transport.ClientConnected);
@@ -405,7 +403,7 @@ namespace QTool.Net
 		}
 		private void QNetPlayerLoop()
 		{
-			if (ClientGameData.ContainsKey(ClientIndex + 1))
+			if (ClientGameData.ContainsKey(ClientIndex + 2))
 			{
 				QTime.ChangeScale(this, 100);
 			}

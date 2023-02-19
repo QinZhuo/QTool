@@ -87,7 +87,7 @@ namespace QTool
 		private static PlayerLoopSystem AddPlayerLoop(this PlayerLoopSystem playerLoop,Type type, Action action)
 		{
 			var loopList = playerLoop.subSystemList.ToList();
-			loopList.Add(new PlayerLoopSystem { type = type, updateDelegate =()=>action() });
+			loopList.Add(new PlayerLoopSystem { type = type, updateDelegate =new PlayerLoopSystem.UpdateFunction(action)});
 			playerLoop.subSystemList = loopList.ToArray();
 			return playerLoop;
 		}
