@@ -111,7 +111,7 @@ namespace QTool
 			{
 				playerLoop = playerLoop.AddPlayerLoop(type, action);
 			}
-			QDebug.Log(playerLoop.subSystemList.ToOneString("\n", (loop) => "----------" + loop + "----------\n" + loop.subSystemList.ToOneString()));
+			QDebug.Log(nameof(PlayerLoop)+"更新\n"+ playerLoop.subSystemList.ToOneString("\n", (loop) => "----------" + loop + "----------\n" + loop.subSystemList.ToOneString()));
 			PlayerLoop.SetPlayerLoop(playerLoop);
 		}
 		public static void RemovePlayerLoop(Type type, string subSystem = "")
