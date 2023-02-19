@@ -84,21 +84,37 @@ namespace QTool
 			Resources.UnloadUnusedAssets();
 			System.GC.Collect();
 		}
-		public static void AddPlayerLoop(Type type, Action action)
+		public static void AddPlayerLoop(this PlayerLoopSystem playerLoop,Type type, Action action)
 		{
-			var playerLoop = PlayerLoop.GetDefaultPlayerLoop();
 			var loopList = playerLoop.subSystemList.ToList();
 			loopList.Add(new PlayerLoopSystem { type = type, updateDelegate = new PlayerLoopSystem.UpdateFunction(action) });
 			playerLoop.subSystemList = loopList.ToArray();
 			PlayerLoop.SetPlayerLoop(playerLoop);
 		}
-		public static void RemovePlayerLoop(Type type)
+		public static void RemovePlayerLoop(this PlayerLoopSystem playerLoop,Type type)
 		{
-			var playerLoop = PlayerLoop.GetDefaultPlayerLoop();
 			var loopList = playerLoop.subSystemList.ToList();
-			loopList.RemoveAll((loop)=>loop.type==type);
+			loopList.RemoveAll((loop) => loop.type == type);
 			playerLoop.subSystemList = loopList.ToArray();
 			PlayerLoop.SetPlayerLoop(playerLoop);
+		}
+		public static void AddPlayerLoop(Type type, Action action, string subSystem = "")
+		{
+			var playerLoop = PlayerLoop.GetDefaultPlayerLoop();
+			if (!subSystem.IsNull())
+			{
+				playerLoop = playerLoop.subSystemList.First((loop) => loop.ToString() == subSystem);
+			}
+			playerLoop.AddPlayerLoop(type, action);
+		}
+		public static void RemovePlayerLoop(Type type, string subSystem = "")
+		{
+			var playerLoop = PlayerLoop.GetDefaultPlayerLoop();
+			if (!subSystem.IsNull())
+			{
+				playerLoop = playerLoop.subSystemList.First((loop) => loop.ToString() == subSystem);
+			}
+			playerLoop.RemovePlayerLoop(type);
 		}
 		public static Color ToColor(this string key, float s = 0.5f, float v = 1f)
         {
