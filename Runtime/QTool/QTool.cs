@@ -12,6 +12,9 @@ using System.Text.RegularExpressions;
 using System.Globalization;
 using UnityEngine.SceneManagement;
 using UnityEngine.Networking;
+using UnityEngine.LowLevel;
+using System.Linq;
+
 namespace QTool
 {
 
@@ -68,6 +71,7 @@ namespace QTool
 			}
 			return req.downloadHandler.text;
 		}
+
 		public static async Task LoadSceneAsync(this string sceneName,float time=2f)
 		{
 			await QTask.Wait(time / 2,true);
@@ -79,6 +83,22 @@ namespace QTool
 		{
 			Resources.UnloadUnusedAssets();
 			System.GC.Collect();
+		}
+		public static void AddPlayerLoop(Type type, Action action)
+		{
+			var playerLoop = PlayerLoop.GetDefaultPlayerLoop();
+			var loopList = playerLoop.subSystemList.ToList();
+			loopList.Add(new PlayerLoopSystem { type = type, updateDelegate = new PlayerLoopSystem.UpdateFunction(action) });
+			playerLoop.subSystemList = loopList.ToArray();
+			PlayerLoop.SetPlayerLoop(playerLoop);
+		}
+		public static void RemovePlayerLoop(Type type)
+		{
+			var playerLoop = PlayerLoop.GetDefaultPlayerLoop();
+			var loopList = playerLoop.subSystemList.ToList();
+			loopList.RemoveAll((loop)=>loop.type==type);
+			playerLoop.subSystemList = loopList.ToArray();
+			PlayerLoop.SetPlayerLoop(playerLoop);
 		}
 		public static Color ToColor(this string key, float s = 0.5f, float v = 1f)
         {

@@ -239,8 +239,6 @@ namespace QTool.Test
 		[QName("QTaskTest")]
 		public async void QTaskTest()
 		{
-			//UnityEngine.LowLevel.PlayerLoop.GetDefaultPlayerLoop();
-			//await Cysharp.Threading.Tasks.UniTask.Yield(Cysharp.Threading.Tasks.PlayerLoopTiming.Update);
 			Debug.LogError(await Resources.LoadAsync<Texture2D>("NodeEditorBackground"));
 			Debug.LogError("开始10秒完成");
 			if (await QTask.Wait(10).IsCancel())

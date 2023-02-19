@@ -12,8 +12,6 @@ namespace QTool.Net
 			get => transform.position;
 			set => transform.position = value;
 		}
-		//[QName("网格高度偏移")]
-		//public float meshOffset = -0.08f;
 		[QName("使用重力")]
 		public bool useGravity = true;
 		[QName("半径"),Min(0)]
