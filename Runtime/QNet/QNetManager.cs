@@ -17,10 +17,6 @@ namespace QTool.Net
 		[Range(15,60)]
 		private int netFps = 30;
 		public System.Random Random { get; private set; } = null;
-		public string TestLoop(UnityEngine.LowLevel.PlayerLoopSystem loop)
-		{
-			return "------------"+loop + "-----------\n" + loop.subSystemList.ToOneString();
-		}
 		protected override void Awake()
 		{
 			base.Awake();
