@@ -7,16 +7,16 @@ namespace QTool
     public class QFollowUI : MonoBehaviour
     {
 		[SerializeField]
-        private Transform target;
+        private Transform _Target;
 		public Transform Target
 		{
-			get => target;
+			get => _Target;
 			set
 			{
-				target = value;
-				if (target!=null&& useBoundsHeight)
+				_Target = value;
+				if (_Target!=null&& useBoundsHeight)
 				{
-					bounds = target.GetBounds();
+					bounds = _Target.GetBounds();
 				}
 			}
 		}
@@ -29,7 +29,7 @@ namespace QTool
 		public Vector3 offset=Vector3.zero;
 		private void Awake()
 		{
-			if(Canvas!=null&&Canvas.renderMode!= RenderMode.WorldSpace)
+			if(Canvas==null||Canvas.renderMode!= RenderMode.WorldSpace)
 			{
 				rectTransform.anchorMin = Vector2.zero;
 				rectTransform.anchorMax = Vector2.zero;
@@ -37,14 +37,14 @@ namespace QTool
 		}
 		private void LateUpdate()
         {
-            if (target != null&&target.gameObject.activeInHierarchy)
+            if (_Target != null&&_Target.gameObject.activeInHierarchy)
             {
 				var runtimeOffset = offset;
 				if (useBoundsHeight)
 				{
 					runtimeOffset += bounds.size.y*Vector3.up;
 				}
-				var position = target.position + runtimeOffset;
+				var position = _Target.position + runtimeOffset;
 				if(Canvas!=null&&Canvas.renderMode == RenderMode.WorldSpace)
 				{
 					rectTransform.position = position;
