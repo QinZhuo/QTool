@@ -84,37 +84,49 @@ namespace QTool
 			Resources.UnloadUnusedAssets();
 			System.GC.Collect();
 		}
-		public static void AddPlayerLoop(this PlayerLoopSystem playerLoop,Type type, Action action)
+		private static PlayerLoopSystem AddPlayerLoop(this PlayerLoopSystem playerLoop,Type type, Action action)
 		{
 			var loopList = playerLoop.subSystemList.ToList();
-			loopList.Add(new PlayerLoopSystem { type = type, updateDelegate = new PlayerLoopSystem.UpdateFunction(action) });
+			loopList.Add(new PlayerLoopSystem { type = type, updateDelegate =()=>action() });
 			playerLoop.subSystemList = loopList.ToArray();
-			PlayerLoop.SetPlayerLoop(playerLoop);
+			return playerLoop;
 		}
-		public static void RemovePlayerLoop(this PlayerLoopSystem playerLoop,Type type)
+		private static PlayerLoopSystem RemovePlayerLoop(this PlayerLoopSystem playerLoop,Type type)
 		{
 			var loopList = playerLoop.subSystemList.ToList();
 			loopList.RemoveAll((loop) => loop.type == type);
 			playerLoop.subSystemList = loopList.ToArray();
-			PlayerLoop.SetPlayerLoop(playerLoop);
+			return playerLoop;
 		}
 		public static void AddPlayerLoop(Type type, Action action, string subSystem = "")
 		{
-			var playerLoop = PlayerLoop.GetDefaultPlayerLoop();
+			var playerLoop = PlayerLoop.GetCurrentPlayerLoop();
 			if (!subSystem.IsNull())
 			{
-				playerLoop = playerLoop.subSystemList.First((loop) => loop.ToString() == subSystem);
+				var subList= playerLoop.subSystemList.ToList();
+				var index = subList.FindIndex((loop) => loop.ToString() == subSystem);
+				playerLoop.subSystemList[index]= playerLoop.subSystemList[index].AddPlayerLoop(type, action);
 			}
-			playerLoop.AddPlayerLoop(type, action);
+			else
+			{
+				playerLoop = playerLoop.AddPlayerLoop(type, action);
+			}
+			PlayerLoop.SetPlayerLoop(playerLoop);
 		}
 		public static void RemovePlayerLoop(Type type, string subSystem = "")
 		{
-			var playerLoop = PlayerLoop.GetDefaultPlayerLoop();
+			var playerLoop = PlayerLoop.GetCurrentPlayerLoop();
 			if (!subSystem.IsNull())
 			{
-				playerLoop = playerLoop.subSystemList.First((loop) => loop.ToString() == subSystem);
+				var subList = playerLoop.subSystemList.ToList();
+				var index = subList.FindIndex((loop) => loop.ToString() == subSystem);
+				playerLoop.subSystemList[index] = playerLoop.subSystemList[index].RemovePlayerLoop(type);
 			}
-			playerLoop.RemovePlayerLoop(type);
+			else
+			{
+			 	playerLoop= playerLoop.RemovePlayerLoop(type);
+			}
+			PlayerLoop.SetPlayerLoop(playerLoop);
 		}
 		public static Color ToColor(this string key, float s = 0.5f, float v = 1f)
         {

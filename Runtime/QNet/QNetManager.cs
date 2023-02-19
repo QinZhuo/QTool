@@ -17,6 +17,10 @@ namespace QTool.Net
 		[Range(15,60)]
 		private int netFps = 30;
 		public System.Random Random { get; private set; } = null;
+		public string TestLoop(UnityEngine.LowLevel.PlayerLoopSystem loop)
+		{
+			return "------------"+loop + "-----------\n" + loop.subSystemList.ToOneString();
+		}
 		protected override void Awake()
 		{
 			base.Awake();
@@ -25,6 +29,8 @@ namespace QTool.Net
 			Physics.autoSyncTransforms = false;
 			Time.fixedDeltaTime = 1f / netFps;
 			Tool.AddPlayerLoop(typeof(QNetManager), QNetFixedUpdate,"FixedUpdate");
+
+			Debug.LogError(UnityEngine.LowLevel.PlayerLoop.GetCurrentPlayerLoop().subSystemList.ToOneString("\n",TestLoop));
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
 			QToolManager.Instance.OnGUIEvent += GUI;
 #endif
