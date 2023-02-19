@@ -17,6 +17,7 @@ namespace QTool
 					_Target.OnInteractAdd -= Add;
 					_Target.OnInteractRemove -= Remove;
 					_Target.OnInteractFresh -= Fresh;
+					transform.ClearChild();
 				}
 				if (value != null)
 				{
@@ -24,7 +25,7 @@ namespace QTool
 					_Target.OnInteractAdd += Add;
 					_Target.OnInteractRemove += Remove;
 					_Target.OnInteractFresh += Fresh;
-					foreach (var item in _Target.objectList)
+					foreach (var item in _Target.InteractList)
 					{
 						Add(item);
 					}
@@ -35,20 +36,20 @@ namespace QTool
 		{
 			Instance = this;
 		}
-		public void Add(QInteractObject qInteractObject)
+		public void Add(QTriggerObject qInteractObject)
 		{
 			var ui= this[qInteractObject.transform];
 			ui.gameObject.InvokeEvent("显示");
 			ui.gameObject.InvokeEvent("交互对象", qInteractObject);
 		}
-		public void Remove(QInteractObject qInteractObject)
+		public void Remove(QTriggerObject qInteractObject)
 		{
 			var ui = this[qInteractObject.transform];
 			ui.gameObject.InvokeEvent("隐藏");
 			Push(ui.gameObject);
 		}
 		QFollowUI LastUI= null;
-		public void Fresh(QInteractObject qInteractObject)
+		public void Fresh(QTriggerObject qInteractObject)
 		{
 			var ui = qInteractObject==null?null:this[qInteractObject.transform];
 			if (ui != LastUI)

@@ -5,7 +5,7 @@ namespace QTool
 {
 	public class QInteractSystem : MonoBehaviour
 	{
-		public List<QInteractObject> objectList = new List<QInteractObject>();
+		public List<QTriggerObject> InteractList { get; private set; } = new List<QTriggerObject>();
 		private void Start()
 		{
 			if (QInteractUIList.Instance != null&& QInteractUIList.Instance.Target==null)
@@ -15,48 +15,58 @@ namespace QTool
 		}
 		private void OnTriggerEnter(Collider other)
 		{
-			var interactObject = other.GetComponent<QInteractObject>();
-			if (interactObject != null)
+			var trigger = other.GetComponent<QTriggerObject>();
+			if (trigger != null)
 			{
-				objectList.AddCheckExist(interactObject);
-				OnInteractAdd?.Invoke(interactObject);
-				FreshCurrent();
+				if (trigger.IsInteract)
+				{
+					InteractList.AddCheckExist(trigger);
+					OnInteractAdd?.Invoke(trigger);
+					FreshInteract();
+				}
+				else
+				{
+					trigger.OnEvent.Invoke(gameObject);
+				}
 			}
 		}
 		private void OnTriggerExit(Collider other)
 		{
-			var interactObject = other.GetComponent<QInteractObject>();
-			if (interactObject != null)
+			var trigger = other.GetComponent<QTriggerObject>();
+			if (trigger != null)
 			{
-				objectList.Remove(interactObject);
-				OnInteractRemove?.Invoke(interactObject);
-				FreshCurrent();
+				if (trigger.IsInteract)
+				{
+					InteractList.Remove(trigger);
+					OnInteractRemove?.Invoke(trigger);
+					FreshInteract();
+				}
 			}
 		}
-		public System.Action<QInteractObject> OnInteractFresh;
-		public System.Action<QInteractObject> OnInteractAdd;
-		public System.Action<QInteractObject> OnInteractRemove;
-		public QInteractObject FreshCurrent()
+		public System.Action<QTriggerObject> OnInteractFresh;
+		public System.Action<QTriggerObject> OnInteractAdd;
+		public System.Action<QTriggerObject> OnInteractRemove;
+		public QTriggerObject FreshInteract()
 		{
-			if (objectList.Count > 0)
+			if (InteractList.Count > 0)
 			{
-				objectList.Sort((a, b) => Mathf.FloorToInt((a.transform.position - transform.position).sqrMagnitude - (b.transform.position - transform.position).sqrMagnitude));
+				InteractList.Sort((a, b) => Mathf.FloorToInt((a.transform.position - transform.position).sqrMagnitude - (b.transform.position - transform.position).sqrMagnitude));
 			}
-			var current = objectList.Get(0);
+			var current = InteractList.Get(0);
 			OnInteractFresh?.Invoke(current);
 			return current;
 		}
 		public void Interact()
 		{
-			if (objectList.Count > 0)
+			if (InteractList.Count > 0)
 			{
-				Interact(objectList.Get(0));
+				Interact(InteractList.Get(0));
 			}
 		}
-		public void Interact(QInteractObject interactObject)
+		public void Interact(QTriggerObject interactObject)
 		{
 			if (interactObject == null) return;
-			interactObject.OnInteract.Invoke(gameObject);
+			interactObject.OnEvent.Invoke(gameObject);
 		}
 	}
 }
