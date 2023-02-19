@@ -28,7 +28,7 @@ namespace QTool.Net
 			Physics.autoSimulation = false;
 			Physics.autoSyncTransforms = false;
 			Time.fixedDeltaTime = 1f / netFps;
-			Tool.AddPlayerLoop(typeof(QNetManager), QNetFixedUpdate,"FixedUpdate");
+			Tool.AddPlayerLoop(typeof(QNetManager), QNetPlayerLoop, "FixedUpdate");
 
 			Debug.LogError(UnityEngine.LowLevel.PlayerLoop.GetCurrentPlayerLoop().subSystemList.ToOneString("\n",TestLoop));
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
@@ -246,167 +246,165 @@ namespace QTool.Net
 					transport.ClientSend(SendAction.Serialize());
 				}
 				SendAction.Clear();
-				ClientNetUpdate();
-			}
-		}
-		private void ClientNetUpdate()
-		{
-			if (ClientGameData.ContainsKey(ClientIndex))
-			{
-				byte[] loadEventData = null;
-				if (ClientGameData[ClientIndex].ContainsKey(nameof(QNetManager)))
+				if (ClientGameData.ContainsKey(ClientIndex))
 				{
-					foreach (var eventData in ClientGameData[ClientIndex][nameof(QNetManager)].Events)
+					byte[] loadEventData = null;
+					if (ClientGameData[ClientIndex].ContainsKey(nameof(QNetManager)))
 					{
-						switch (eventData.Key)
+						foreach (var eventData in ClientGameData[ClientIndex][nameof(QNetManager)].Events)
 						{
-							case nameof(DefaultNetAction.SyncLoad):
-								{
-									if (eventData.Value is byte[] loadData)
-									{
-										loadEventData = loadData;
-									}
-									else
-									{
-										Debug.LogWarning("同步数据为空");
-									}
-									SyncCheckFlag.Index = ClientIndex;
-								}break;
-							case nameof(DefaultNetAction.ServerSeed):
-								{
-									Random = new System.Random((int)eventData.Value);
-								}
-								break;
-							default:
-								break;
-						}
-					}
-				}
-				foreach (var actionData in ClientGameData[ClientIndex])
-				{
-					foreach (var eventData in actionData.Events)
-					{
-						switch (eventData.Key)
-						{
-							case nameof(DefaultNetAction.PlayerConnected):
-								if (!PlayerObjects.ContainsKey(actionData.Key))
-								{
-									if (playerPrefab != null)
-									{
-										var obj = GameObject.Instantiate(playerPrefab); ;
-										PlayerObjects[actionData.Key] = obj;
-										foreach (var qNet in obj.GetComponents<QNetBehaviour>())
-										{
-											qNet.PlayerId = actionData.Key;
-										}
-									}
-									else
-									{
-										Debug.LogWarning(nameof(QNetManager) + " 未设置玩家预制体");
-									}
-								
-								}
-								break;
-							case nameof(DefaultNetAction.SyncCheck):
-								{
-									var flag = (QNetSyncFlag)eventData.Value;
-									
-									if (flag.Index == SyncCheckFlag.Index)
-									{
-										if (flag.Value != SyncCheckFlag.Value)
-										{
-											Debug.LogWarning("[" + flag.Index+"/"+ClientIndex + "]同步验证失败[" + flag + "]:[" + SyncCheckFlag + "]");
-											SyncCheckFlag.Index =-1;
-										}
-									}
-								}
-								break;
-							case nameof(DefaultNetAction.SyncLoad):break;
-							default:
-								QEventManager.Trigger(actionData.Key + "_" + eventData.Key, eventData.Value);
-								break;
-						}
-					}
-					ClientActionData[actionData.Key].MergeValues(actionData);
-				}
-				OnNetUpdate?.Invoke();
-				Physics.Simulate(Time.fixedDeltaTime);
-				Physics.SyncTransforms();
-				if (loadEventData != null)
-				{
-					Debug.LogWarning("[" + ClientIndex + "]尝试修复同步");
-					using (var reader = new QBinaryReader(loadEventData))
-					{
-						var Count = reader.ReadInt32();
-						for (int i = 0; i < Count; i++)
-						{
-							using (var QIdData = new QBinaryReader(reader.ReadBytes()))
+							switch (eventData.Key)
 							{
-								var qidKey = QIdData.ReadString();
-								if (QNetSyncCheckList.ContainsKey(qidKey))
-								{
-									var QIdCheck = QNetSyncCheckList[qidKey];
-									var dataCount = QIdData.ReadInt32();
-									for (int j = 0; j < dataCount; j++)
+								case nameof(DefaultNetAction.SyncLoad):
 									{
-										try
+										if (eventData.Value is byte[] loadData)
 										{
-											QIdCheck[j].OnSyncLoad(QIdData);
+											loadEventData = loadData;
 										}
-										catch (Exception e)
+										else
 										{
-											Debug.LogError("读取[" + qidKey + "]" + QIdCheck[j] + "出错 " + e.ToShortString(1000));
+											Debug.LogWarning("同步数据为空");
+										}
+										SyncCheckFlag.Index = ClientIndex;
+									}
+									break;
+								case nameof(DefaultNetAction.ServerSeed):
+									{
+										Random = new System.Random((int)eventData.Value);
+									}
+									break;
+								default:
+									break;
+							}
+						}
+					}
+					foreach (var actionData in ClientGameData[ClientIndex])
+					{
+						foreach (var eventData in actionData.Events)
+						{
+							switch (eventData.Key)
+							{
+								case nameof(DefaultNetAction.PlayerConnected):
+									if (!PlayerObjects.ContainsKey(actionData.Key))
+									{
+										if (playerPrefab != null)
+										{
+											var obj = GameObject.Instantiate(playerPrefab); ;
+											PlayerObjects[actionData.Key] = obj;
+											foreach (var qNet in obj.GetComponents<QNetBehaviour>())
+											{
+												qNet.PlayerId = actionData.Key;
+											}
+										}
+										else
+										{
+											Debug.LogWarning(nameof(QNetManager) + " 未设置玩家预制体");
+										}
+
+									}
+									break;
+								case nameof(DefaultNetAction.SyncCheck):
+									{
+										var flag = (QNetSyncFlag)eventData.Value;
+
+										if (flag.Index == SyncCheckFlag.Index)
+										{
+											if (flag.Value != SyncCheckFlag.Value)
+											{
+												Debug.LogWarning("[" + flag.Index + "/" + ClientIndex + "]同步验证失败[" + flag + "]:[" + SyncCheckFlag + "]");
+												SyncCheckFlag.Index = -1;
+											}
+										}
+									}
+									break;
+								case nameof(DefaultNetAction.SyncLoad): break;
+								default:
+									QEventManager.Trigger(actionData.Key + "_" + eventData.Key, eventData.Value);
+									break;
+							}
+						}
+						ClientActionData[actionData.Key].MergeValues(actionData);
+					}
+					OnNetUpdate?.Invoke();
+					Physics.Simulate(Time.fixedDeltaTime);
+					Physics.SyncTransforms();
+					if (loadEventData != null)
+					{
+						Debug.LogWarning("[" + ClientIndex + "]尝试修复同步");
+						using (var reader = new QBinaryReader(loadEventData))
+						{
+							var Count = reader.ReadInt32();
+							for (int i = 0; i < Count; i++)
+							{
+								using (var QIdData = new QBinaryReader(reader.ReadBytes()))
+								{
+									var qidKey = QIdData.ReadString();
+									if (QNetSyncCheckList.ContainsKey(qidKey))
+									{
+										var QIdCheck = QNetSyncCheckList[qidKey];
+										var dataCount = QIdData.ReadInt32();
+										for (int j = 0; j < dataCount; j++)
+										{
+											try
+											{
+												QIdCheck[j].OnSyncLoad(QIdData);
+											}
+											catch (Exception e)
+											{
+												Debug.LogError("读取[" + qidKey + "]" + QIdCheck[j] + "出错 " + e.ToShortString(1000));
+											}
 										}
 									}
 								}
 							}
 						}
 					}
-				}
-				if (SyncCheckFlag.Index == -1)
-				{
-					if (transport.ServerActive)
+					if (SyncCheckFlag.Index == -1)
+					{
+						if (transport.ServerActive)
+						{
+							SyncCheckFlag.Index = ClientIndex;
+							using (var writer = new QBinaryWriter())
+							{
+								writer.Write(QNetSyncCheckList.Count);
+								foreach (var QIdCheck in QNetSyncCheckList)
+								{
+									using (var QIdData = new QBinaryWriter())
+									{
+										QIdData.Write(QIdCheck.Key);
+										QIdData.Write(QIdCheck.Value.Count);
+										for (int i = 0; i < QIdCheck.Value.Count; i++)
+										{
+											try
+											{
+												QIdCheck.Value[i].OnSyncSave(QIdData);
+											}
+											catch (Exception e)
+											{
+												Debug.LogError("保存[" + QIdCheck.Key + "]" + QIdCheck.Value[i] + "出错 " + e.ToShortString(1000));
+											}
+										}
+										writer.Write(QIdData.ToArray());
+									}
+								}
+								ServerActionData[nameof(QNetManager)].Events.Add(new QKeyValue<string, object>(nameof(DefaultNetAction.SyncLoad), writer.ToArray()));
+							}
+						}
+					}
+					else if (ClientIndex % (netFps / 2) == 0)
 					{
 						SyncCheckFlag.Index = ClientIndex;
-						using (var writer = new QBinaryWriter())
-						{
-							writer.Write(QNetSyncCheckList.Count);
-							foreach (var QIdCheck in QNetSyncCheckList)
-							{
-								using (var QIdData = new QBinaryWriter())
-								{
-									QIdData.Write(QIdCheck.Key);
-									QIdData.Write(QIdCheck.Value.Count);
-									for (int i = 0; i < QIdCheck.Value.Count; i++)
-									{
-										try
-										{
-											QIdCheck.Value[i].OnSyncSave(QIdData);
-										}
-										catch (Exception e)
-										{
-											Debug.LogError("保存[" + QIdCheck.Key + "]" + QIdCheck.Value[i] + "出错 " + e.ToShortString(1000));
-										}
-									}
-									writer.Write(QIdData.ToArray());
-								}
-							}
-							ServerActionData[nameof(QNetManager)].Events.Add(new QKeyValue<string, object>(nameof(DefaultNetAction.SyncLoad), writer.ToArray()));
-						}
+						SyncCheckFlag.Value = 0;
+						OnSyncCheck?.Invoke(SyncCheckFlag);
+						PlayerAction(transport.ClientPlayerId, nameof(DefaultNetAction.SyncCheck), SyncCheckFlag);
 					}
+					ClientIndex++;
+					NetTime += NetDeltaTime;
 				}
-				else if (ClientIndex % (netFps/2) == 0)
-				{
-					SyncCheckFlag.Index = ClientIndex;
-					SyncCheckFlag.Value = 0;
-					OnSyncCheck?.Invoke(SyncCheckFlag);
-					PlayerAction(transport.ClientPlayerId, nameof(DefaultNetAction.SyncCheck), SyncCheckFlag);
-				}
-				ClientIndex++;
-				NetTime += NetDeltaTime;
-				
 			}
-
+		}
+		private void QNetPlayerLoop()
+		{
 			if (ClientGameData.ContainsKey(ClientIndex + 1))
 			{
 				QTime.ChangeScale(this, 100);
@@ -420,7 +418,7 @@ namespace QTool.Net
 		internal event Action<QNetSyncFlag> OnSyncCheck = null;
 		#endregion
 
-		private void QNetFixedUpdate()
+		private void FixedUpdate()
 		{
 			ClientFixedUpdate();
 			if (transport.ServerActive)
