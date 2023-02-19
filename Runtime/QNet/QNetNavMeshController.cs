@@ -16,8 +16,6 @@ namespace QTool.Net
 		public bool useGravity = true;
 		[QName("半径"),Min(0)]
 		public float radius =0.5f;
-		[QName("高度"), Min(0)]
-		public float height = 2f;
 		public bool IsGrounded { get; private set; }
 		public float VelocityY { get; set; }
 		public Vector3 MoveOffset { get; private set; }
@@ -55,7 +53,6 @@ namespace QTool.Net
 			AllAgents.Remove(this);
 		}
 		NavMeshHit MeshHit =default;
-		NavMeshHit TargetMeshHit = default;
 		const float CheckOffset = 0.08f;
 	
 		public override void OnNetUpdate()
@@ -67,13 +64,7 @@ namespace QTool.Net
 				if(Physics.Raycast(checkPoint+Vector3.up* CheckOffset, Vector3.down,out var hitInfo)){
 					checkPoint = hitInfo.point;
 				}
-				if (NavMesh.SamplePosition(checkPoint, out TargetMeshHit, height, NavMesh.AllAreas))
-				{
-					if (MeshHit.position.y + CheckOffset >= TargetMeshHit.position.y || transform.position.y + CheckOffset >= TargetMeshHit.position.y)
-					{
-						MeshHit = TargetMeshHit;
-					}
-				}
+				NavMesh.SamplePosition(checkPoint, out MeshHit, 2, NavMesh.AllAreas);
 				IsGrounded = transform.position.y <= MeshHit.position.y + CheckOffset;
 				VelocityY += Physics.gravity.y * NetDeltaTime;
 				if (IsGrounded&& VelocityY <= 0)
@@ -81,24 +72,6 @@ namespace QTool.Net
 					VelocityY = 0;
 					transform.position = MeshHit.position;
 				}
-				else 
-				{
-					var TopPoint = transform.position + MoveOffset.normalized * radius*2 + Vector3.up * height;
-					if (Physics.Raycast(TopPoint, Vector3.down, out hitInfo))
-					{
-						TopPoint = hitInfo.point;
-					}
-					NavMesh.SamplePosition(TopPoint, out TargetMeshHit, radius, NavMesh.AllAreas);
-					if (transform.position.y+CheckOffset>= TargetMeshHit.position.y)
-					{
-						MeshHit = TargetMeshHit;
-					}
-					else
-					{
-						transform.position = new Vector3(MeshHit.position.x, transform.position.y, MeshHit.position.z);
-					}
-				}
-				
 			}
 			else
 			{
@@ -118,9 +91,7 @@ namespace QTool.Net
 			{
 				Gizmos.color = IsGrounded ? Color.green:Color.red;
 				Gizmos.DrawSphere(MeshHit.position, 0.05f);
-				Gizmos.DrawLine(MeshHit.position, TargetMeshHit.position);
 				Gizmos.color =Color.Lerp(Color.blue,Color.clear,0.5f);
-				Gizmos.DrawSphere(TargetMeshHit.position, 0.04f);
 				Gizmos.DrawLine(transform.position,transform.position+MoveOffset.normalized * radius);
 			}
 		}
