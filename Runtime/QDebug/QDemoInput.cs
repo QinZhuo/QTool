@@ -56,6 +56,18 @@ namespace QTool
 #endif
 			}
 		}
+		public static bool F
+		{
+			get
+			{
+
+#if ENABLE_INPUT_SYSTEM
+				return UnityEngine.InputSystem.Keyboard.current.fKey.isPressed;
+#else
+				return Input.GetKey(KeyCode.F);
+#endif
+			}
+		}
 		public static bool Shift
 		{
 			get
