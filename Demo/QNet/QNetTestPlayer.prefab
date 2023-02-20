@@ -12,6 +12,8 @@ GameObject:
   - component: {fileID: 41579844808977860}
   - component: {fileID: 41579844808977912}
   - component: {fileID: 6685567726894317027}
+  - component: {fileID: 3186487823667255700}
+  - component: {fileID: 1676794479309287501}
   m_Layer: 0
   m_Name: QNetTestPlayer
   m_TagString: Untagged
@@ -74,8 +76,38 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 53a62143e8d55fb409ebc07189da67b3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  useGravity: 1
-  radius: 0.5
+--- !u!114 &3186487823667255700
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 41579844808977859}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9a62fe154ceeb184fb003a657ac0cf29, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Id: 
+  Prefab: 
+--- !u!143 &1676794479309287501
+CharacterController:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 41579844808977859}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Height: 2
+  m_Radius: 0.5
+  m_SlopeLimit: 45
+  m_StepOffset: 0.3
+  m_SkinWidth: 0.08
+  m_MinMoveDistance: 0.001
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &2227655774878594016
 GameObject:
   m_ObjectHideFlags: 0
