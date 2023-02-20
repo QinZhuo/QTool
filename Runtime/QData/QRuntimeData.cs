@@ -41,6 +41,10 @@ namespace QTool
 		{
 			return value.Value;
 		}
+		public override string ToString()
+		{
+			return Value.ToString();
+		}
 	}
 	public class QRuntimeMaxValue:QRuntimeValue
 	{
@@ -68,7 +72,7 @@ namespace QTool
 			PercentValue = 1;
 		}
 		[QName(nameof(OriginValue))]
-		public float OriginValue { get; private set; } = 0f;
+		public QValue OriginValue { get; private set; } = 0f;
 		public QValue OffsetValue { get; set; } = 0f;
 		public QValue PercentValue { get; set; } = 1;
 		public float Value
