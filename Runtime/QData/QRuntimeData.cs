@@ -54,6 +54,10 @@ namespace QTool
 			CurrentValue = value;
 		}
 		public QValue CurrentValue { get; set; } = 0;
+		public override string ToString()
+		{
+			return CurrentValue + "/" + Value;
+		}
 	}
 	public class QRuntimeValue
 	{
@@ -81,6 +85,10 @@ namespace QTool
 			{
 				return (OriginValue + OffsetValue) * PercentValue;
 			}
+		}
+		public override string ToString()
+		{
+			return Value.ToString();
 		}
 	}
 	public class QRuntimeData
