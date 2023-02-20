@@ -46,15 +46,16 @@ namespace QTool
 			return Value.ToString();
 		}
 	}
-	public class QRuntimeRangeValue:QRuntimeValue
+	public class QRuntimeRangeValue : QRuntimeValue
 	{
 		public QRuntimeRangeValue() { }
-		public QRuntimeRangeValue(float value):base(value)
+		public QRuntimeRangeValue(float value) : base(value)
 		{
 			CurrentValue = value;
 		}
-		public QValue CurrentValue { get; set; } = 0;
-		public QValue MaxValue => Value;
+		private QValue _CurrentValue = 0;
+		public float CurrentValue { get => _CurrentValue; set => _CurrentValue = Mathf.Clamp(value, MinValue, MaxValue); }
+		public float MaxValue => Value;
 		public QValue MinValue { get; set; } = 0;
 		public override string ToString()
 		{
