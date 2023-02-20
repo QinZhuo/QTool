@@ -15,9 +15,9 @@ namespace QTool.Net
 		private CharacterController _Controller;
 		public CharacterController Controller => _Controller ??= GetComponent<CharacterController>();
 		public bool IsGrounded => Controller.isGrounded;
-		public void Move(Vector3 offset)
+		public bool Move(Vector3 speed)
 		{
-			Controller.Move(offset);
+			return Controller.SimpleMove(speed);
 		}
 		public override void OnNetUpdate()
 		{
