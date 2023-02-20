@@ -15,9 +15,9 @@ namespace QTool.Net
 		private CharacterController _Controller;
 		public CharacterController Controller => _Controller ??= GetComponent<CharacterController>();
 		public bool IsGrounded => Controller.isGrounded;
-		public bool Move(Vector3 speed)
+		public CollisionFlags Move(Vector3 speed)
 		{
-			return Controller.SimpleMove(speed);
+			return Controller.Move(speed);
 		}
 		public override void OnNetUpdate()
 		{
@@ -25,7 +25,12 @@ namespace QTool.Net
 			{
 				if (NavMesh.SamplePosition(transform.position, out var MeshHit, 1, NavMesh.AllAreas))
 				{
-					transform.position = MeshHit.position;
+					var meshPosition = MeshHit.position;
+					meshPosition.y = transform.position.y;
+					if (!transform.position.Similar(meshPosition))
+					{
+						transform.position = meshPosition;
+					}
 				}
 			}
 		}
