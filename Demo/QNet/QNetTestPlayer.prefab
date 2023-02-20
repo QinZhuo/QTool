@@ -76,7 +76,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   useGravity: 1
   radius: 0.5
-  height: 2
 --- !u!1 &2227655774878594016
 GameObject:
   m_ObjectHideFlags: 0

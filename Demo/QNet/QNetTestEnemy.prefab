@@ -75,7 +75,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   useGravity: 1
   radius: 0.5
-  height: 2
 --- !u!114 &7159957425794866180
 MonoBehaviour:
   m_ObjectHideFlags: 0

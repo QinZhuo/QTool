@@ -36,20 +36,20 @@ namespace QTool
 		{
 			Instance = this;
 		}
-		public void Add(QTriggerObject qInteractObject)
+		public void Add(QInteractTrigger qInteractObject)
 		{
 			var ui= this[qInteractObject.transform];
 			ui.gameObject.InvokeEvent("显示");
 			ui.gameObject.InvokeEvent("交互对象", qInteractObject);
 		}
-		public void Remove(QTriggerObject qInteractObject)
+		public void Remove(QInteractTrigger qInteractObject)
 		{
 			var ui = this[qInteractObject.transform];
 			ui.gameObject.InvokeEvent("隐藏");
 			Push(ui.gameObject);
 		}
 		QFollowUI LastUI= null;
-		public void Fresh(QTriggerObject qInteractObject)
+		public void Fresh(QInteractTrigger qInteractObject)
 		{
 			var ui = qInteractObject==null?null:this[qInteractObject.transform];
 			if (ui != LastUI)
