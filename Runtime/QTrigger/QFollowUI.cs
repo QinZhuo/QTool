@@ -58,12 +58,19 @@ namespace QTool
 					}
 				}
 			}
-			else if(QFollowList!=null)
+			else
+			{
+				Recover();
+			}
+        }
+		public void Recover()
+		{
+			if (QFollowList != null)
 			{
 				QFollowList.Push(gameObject);
 				QFollowList = null;
 			}
-        }
+		}
     }
 
 }
