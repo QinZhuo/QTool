@@ -42,6 +42,15 @@ namespace QTool
 			return value.Value;
 		}
 	}
+	public class QRuntimeMaxValue:QRuntimeValue
+	{
+		public QRuntimeMaxValue() { }
+		public QRuntimeMaxValue(float value):base(value)
+		{
+			CurrentValue = value;
+		}
+		public QValue CurrentValue { get; set; } = 0;
+	}
 	public class QRuntimeValue
 	{
 		public QRuntimeValue()
