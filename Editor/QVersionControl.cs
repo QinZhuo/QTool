@@ -191,9 +191,9 @@ namespace QTool
 					EditorUtility.DisplayDialog("拉取更新出错", result, "确认");
 					return result;
 				}
-				var mergeErrorFile = result.GetBlockValue(mergerTip, "Please commit your changes or stash them before you merge.");
+				var mergeErrorFile = result.GetBlockValue(mergerTip, "Please commit your changes or stash them before you merge.").Trim();
 				
-				mergeErrorFile+= result.GetBlockValue(untrackedTip, "Please move or remove them before you merge.");
+				mergeErrorFile+="\n"+result.GetBlockValue(untrackedTip, "Please move or remove them before you merge.").Trim();
 		
 				commitList.Clear();
 				foreach (var fileInfo in mergeErrorFile.Trim().Split('\n'))
