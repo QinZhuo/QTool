@@ -256,27 +256,11 @@ namespace QTool
 		{
 			this.Path = Path;
 			this.GetDBPath = GetDBPath;
-			QDictionary<string, List<string>> QDataDBIndex = new QDictionary<string, List<string>>((key) => new List<string>());
-			QDataDBIndex.LoadBytes(Path + "/" + nameof(QDataDBIndex) + ".bin");
-			foreach (var kv in QDataDBIndex)
-			{
-				foreach (var key in kv.Value)
-				{
-					if (!PathIndex.ContainsKey(key))
-					{
-						PathIndex.Add(key, kv.Key);
-					}
-				}
-			}
+			PathIndex.LoadBytes(Path + "/" + nameof(PathIndex) + ".bin");
 		}
 		public void Save() 
 		{
 			PathIndex.SaveBytes(Path + "/" + nameof(PathIndex)+".bin");
-			QDictionary<string, List<string>> QDataDBIndex = new QDictionary<string, List<string>>((key)=>new List<string>());
-			foreach (var kv in PathIndex)
-			{
-				QDataDBIndex[kv.Value].Add(kv.Key);
-			}
 			foreach (var item in Data)
 			{
 				if (item.Value.Changed)
