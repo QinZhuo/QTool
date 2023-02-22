@@ -126,7 +126,7 @@ namespace QTool
 			
 		}
     }
-    [System.Serializable]
+    [System.Serializable,DisallowMultipleComponent]
     public class QEventTrigger : MonoBehaviour
     {
 		[QName("注册全局事件")]
