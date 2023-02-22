@@ -173,6 +173,10 @@ namespace QTool
 		}
 		public static string Pull(string path,bool confim=true)
 		{
+			if (EditorApplication.isPlaying)
+			{
+				EditorApplication.isPlaying = false;
+			}
 			if (!CheckResult(path))
 			{
 				return path;
