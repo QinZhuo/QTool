@@ -627,7 +627,7 @@ namespace QTool
 						UnityEditor.EditorUtility.ClearProgressBar();
 					}
 #endif
-					if (!string.IsNullOrWhiteSpace(error))
+					if (!error.IsNull())
 					{
 
 						if (error.ToLower().Contains("warning"))
