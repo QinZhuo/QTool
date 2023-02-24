@@ -28,14 +28,6 @@ namespace QTool
 		public bool useBoundsHeight=false;
 		Bounds bounds;
 		public Vector3 offset=Vector3.zero;
-		private void Awake()
-		{
-			if(Canvas==null||Canvas.renderMode!= RenderMode.WorldSpace)
-			{
-				rectTransform.anchorMin = Vector2.zero;
-				rectTransform.anchorMax = Vector2.zero;
-			}
-		}
 		private void LateUpdate()
         {
             if (_Target != null)
@@ -48,13 +40,23 @@ namespace QTool
 						runtimeOffset += bounds.size.y * Vector3.up;
 					}
 					var position = _Target.position + runtimeOffset;
-					if (Canvas != null && Canvas.renderMode == RenderMode.WorldSpace)
+					if (Canvas != null)
 					{
-						rectTransform.position = position;
-					}
-					else
-					{
-						rectTransform.anchoredPosition = Camera.main.WorldToScreenPoint(position);
+						switch (Canvas.renderMode)
+						{
+							case RenderMode.ScreenSpaceOverlay:
+								rectTransform.position = Camera.main.WorldToScreenPoint(position);
+								break;
+							case RenderMode.ScreenSpaceCamera:
+								var point = Camera.main.WorldToViewportPoint(position);
+								rectTransform.position =Canvas.transform.position+new Vector3(Screen.width * (point.x - 0.5f) * rectTransform.lossyScale.x, Screen.height*(point.y-0.5f) * rectTransform.lossyScale.y, 0);
+								break;
+							case RenderMode.WorldSpace:
+								rectTransform.position = position;
+								break;
+							default:
+								break;
+						}
 					}
 				}
 			}
