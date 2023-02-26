@@ -238,6 +238,10 @@ namespace QTool
 			}
 			return com;
 		}
+		public static bool Similar(this float value, float other,float scale)
+		{
+			return Mathf.Abs(value - other) < scale;
+		}
 		public static bool Similar(this float value,float other)
 		{
 			return Mathf.Approximately(value, other);
@@ -250,7 +254,7 @@ namespace QTool
 		{
 			value /= size;
 			var ceil = Mathf.CeilToInt(value);
-			return value.Similar(ceil) ? ceil : Mathf.FloorToInt(value);
+			return value.Similar(ceil,0.001f) ? ceil : Mathf.FloorToInt(value);
 		}
 		public static float GridFixed(this float value, float size)
 		{
