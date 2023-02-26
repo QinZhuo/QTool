@@ -246,6 +246,14 @@ namespace QTool
 		{
 			return value.x.Similar(other.x) && value.y.Similar(other.y) && value.z.Similar(other.z);
 		}
+		public static int RoundToInt(this float value,float size=1)
+		{
+			if (size != 1)
+			{
+				value /= 1;
+			}
+			return Mathf.RoundToInt(value);
+		}
 		public static bool IsNull<T>(this T obj)
 		{
 			T checkObj = default;
