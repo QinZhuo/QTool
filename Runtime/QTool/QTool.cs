@@ -246,25 +246,25 @@ namespace QTool
 		{
 			return value.x.Similar(other.x) && value.y.Similar(other.y) && value.z.Similar(other.z);
 		}
-		public static int RoundToGrid(this float value,float size)
+		public static int ToGrid(this float value,float size)
 		{
 			if (size != 0)
 			{
 				value /= size;
 			}
-			return Mathf.RoundToInt(value);
+			return Mathf.RoundToInt(value+0.5f);
 		}
-		public static float RoundFixed(this float value, float size)
+		public static float GridFixed(this float value, float size)
 		{
-			return value.RoundToGrid(size) * size;
+			return value.ToGrid(size) * size;
 		}
-		public static Vector3Int RoundToGrid(this Vector3 value, Vector3 size)
+		public static Vector3Int ToGrid(this Vector3 value, Vector3 size)
 		{
-			return new Vector3Int(value.x.RoundToGrid(size.x), value.y.RoundToGrid(size.y), value.z.RoundToGrid(size.z));
+			return new Vector3Int(value.x.ToGrid(size.x), value.y.ToGrid(size.y), value.z.ToGrid(size.z));
 		}
-		public static Vector3 RoundFixed(this Vector3 value, Vector3 size)
+		public static Vector3 GridFixed(this Vector3 value, Vector3 size)
 		{
-			return new Vector3(value.x.RoundFixed(size.x), value.y.RoundFixed(size.y), value.z.RoundFixed(size.z));
+			return new Vector3(value.x.GridFixed(size.x), value.y.GridFixed(size.y), value.z.GridFixed(size.z));
 		}
 		public static bool IsNull<T>(this T obj)
 		{
