@@ -246,21 +246,17 @@ namespace QTool
 		{
 			return value.x.Similar(other.x) && value.y.Similar(other.y) && value.z.Similar(other.z);
 		}
-		public static int RoundToInt(this float value,float size=1)
+		public static int RoundToInt(this float value,float size=default)
 		{
-			if (size != 1)
+			if (size != default)
 			{
-				value /= 1;
+				value /= size;
 			}
 			return Mathf.RoundToInt(value);
 		}
-		public static Vector3 RoundToInt(this Vector3 value, Vector3 size=default)
+		public static Vector3Int RoundToInt(this Vector3 value, Vector3 size=default)
 		{
-			if (size == default)
-			{
-				size = Vector3.one;
-			}
-			return new Vector3(value.x.RoundToInt(size.x), value.y.RoundToInt(size.y), value.z.RoundToInt(size.z));
+			return new Vector3Int(value.x.RoundToInt(size.x), value.y.RoundToInt(size.y), value.z.RoundToInt(size.z));
 		}
 		public static bool IsNull<T>(this T obj)
 		{
