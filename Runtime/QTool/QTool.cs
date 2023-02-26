@@ -248,7 +248,10 @@ namespace QTool
 		}
 		public static int ToGrid(this float value,float size)
 		{
-			return Mathf.FloorToInt(value/ size);
+			value /= size;
+			var floor = Mathf.FloorToInt(value);
+			var ceil = Mathf.CeilToInt(value);
+			return floor - value < value - ceil ? floor : ceil;
 		}
 		public static float GridFixed(this float value, float size)
 		{
