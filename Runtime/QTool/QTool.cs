@@ -252,7 +252,7 @@ namespace QTool
 			{
 				value /= size;
 			}
-			return Mathf.RoundToInt(value-0.5f);
+			return Mathf.RoundToInt(value-0.25f);
 		}
 		public static float GridFixed(this float value, float size)
 		{
