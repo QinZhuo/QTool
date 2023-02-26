@@ -254,7 +254,7 @@ namespace QTool
 		{
 			value /= size;
 			var ceil = Mathf.CeilToInt(value);
-			return Mathf.FloorToInt(value);
+			return value.Similar(ceil,0.0001f) ? ceil : Mathf.FloorToInt(value);
 		}
 		public static float GridFixed(this float value, float size)
 		{
