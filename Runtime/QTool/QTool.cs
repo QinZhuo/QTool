@@ -248,7 +248,7 @@ namespace QTool
 		}
 		public static int ToGrid(this float value,float size)
 		{
-			return (int)((value + Mathf.Epsilon) / size);
+			return (int)(value/ size);
 		}
 		public static float GridFixed(this float value, float size)
 		{
