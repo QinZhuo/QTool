@@ -253,7 +253,11 @@ namespace QTool.Test
 			}
 		
 		}
-		
+		[QName("int测试")]
+		public void RoundTest()
+		{
+			Debug.LogError("0.1=" + Mathf.FloorToInt(0.1f) + " -0.1=" + Mathf.FloorToInt(-0.1f));
+		}
 	
 	}
     [Flags]
