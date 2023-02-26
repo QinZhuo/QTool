@@ -264,7 +264,7 @@ namespace QTool
 		}
 		public static Vector3 RoundFixed(this Vector3 value, Vector3 size = default)
 		{
-			return value.RoundFixed(size);
+			return new Vector3(value.x.RoundFixed(size.x), value.y.RoundFixed(size.y), value.z.RoundFixed(size.z));
 		}
 		public static bool IsNull<T>(this T obj)
 		{
