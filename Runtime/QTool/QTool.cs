@@ -254,6 +254,14 @@ namespace QTool
 			}
 			return Mathf.RoundToInt(value);
 		}
+		public static Vector3 RoundToInt(this Vector3 value, Vector3 size=default)
+		{
+			if (size == default)
+			{
+				size = Vector3.one;
+			}
+			return new Vector3(value.x.RoundToInt(size.x), value.y.RoundToInt(size.y), value.z.RoundToInt(size.z));
+		}
 		public static bool IsNull<T>(this T obj)
 		{
 			T checkObj = default;
