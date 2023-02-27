@@ -708,17 +708,15 @@ namespace QTool
 			var offset = transform.GetCenter() - transform.position;
 			transform.position = center - offset;
 		}
-		public static Vector3 GridFixed(this Transform transform)
+		public static Vector3 GridFixed(this Transform transform,Vector3 gridSize)
 		{
 			var bounds = transform.GetBounds();
-			var center = bounds.center;
-			center = (center + bounds.size / 2).GridFixed(bounds.size) - bounds.size / 2;
-			transform.SetCenter(center);
+			transform.SetCenter(((bounds.center + bounds.size / 2).GridFixed(bounds.size) - bounds.size / 2).GridFixed(gridSize));
 			return transform.position;
 		}
 		public static Vector3Int ToGrid(this Transform transform,Vector3 gridSize)
 		{
-			return transform.GridFixed().ToGrid(gridSize);
+			return transform.GridFixed(gridSize).ToGrid(gridSize);
 		}
 
 #if UNITY_EDITOR
