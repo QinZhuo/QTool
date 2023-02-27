@@ -7,6 +7,27 @@ namespace QTool.Net
 	
 	public abstract class QNetTransport : MonoBehaviour
 	{
+		#region 服务器
+		public Action<int> OnServerConnected;
+		public Action<int, ArraySegment<byte>> OnServerDataReceived;
+		public Action<int, ArraySegment<byte>> OnServerDataSent;
+		public Action<int, Exception> OnServerError;
+		public Action<int> OnServerDisconnected;
+		public abstract bool ServerActive { get; }
+		public abstract void ServerStart();
+
+		public abstract void ServerSend(int connectionId, ArraySegment<byte> segment);
+		public virtual void ServerSend(int connectionId, byte[] segment)
+		{
+			ServerSend(connectionId, new ArraySegment<byte>(segment));
+		}
+		public abstract void ServerDisconnect(int connectionId);
+		public abstract string ServerGetClientAddress(int connectionId);
+		public abstract void ServerStop();
+		public virtual void ServerReceiveUpdate() { }
+		public virtual void ServerSendUpdate() { }
+		#endregion
+
 		#region 客户端
 		public abstract string ClientPlayerId { get; }
 		public Action OnClientConnected;
@@ -26,28 +47,6 @@ namespace QTool.Net
 		public virtual void ClientReceiveUpdate() { }
 		public virtual void ClientSendUpdate() { }
 		#endregion
-
-		#region 服务器
-		public Action<int> OnServerConnected;
-		public Action<int, ArraySegment<byte>> OnServerDataReceived;
-		public Action<int, ArraySegment<byte>> OnServerDataSent;
-		public Action<int, Exception> OnServerError;
-		public Action<int> OnServerDisconnected;
-		public abstract bool ServerActive { get; }
-		public abstract void ServerStart();
-		
-		public abstract void ServerSend(int connectionId, ArraySegment<byte> segment);
-		public virtual void ServerSend(int connectionId, byte[] segment)
-		{
-			ServerSend(connectionId, new ArraySegment<byte>(segment));
-		}
-		public abstract void ServerDisconnect(int connectionId);
-		public abstract string ServerGetClientAddress(int connectionId);
-		public abstract void ServerStop();
-		public virtual void ServerReceiveUpdate() { }
-		public virtual void ServerSendUpdate() { }
-		#endregion
-
 #pragma warning disable UNT0001
 		public void Update() { }
 		public void LateUpdate() { }

@@ -2,6 +2,9 @@
 #if !(UNITY_STANDALONE_WIN || UNITY_STANDALONE_LINUX || UNITY_STANDALONE_OSX || STEAMWORKS_WIN || STEAMWORKS_LIN_OSX)
 #define DISABLESTEAMWORKS
 #endif
+#if !DISABLESTEAMWORKS
+using Steamworks;
+#endif
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -9,10 +12,6 @@ using System.Threading.Tasks;
 using System;
 using System.Runtime.InteropServices;
 using System.Linq;
-
-#if !DISABLESTEAMWORKS
-using Steamworks;
-#endif
 
 
 namespace QTool
