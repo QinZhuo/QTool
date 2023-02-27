@@ -23,8 +23,8 @@ namespace QTool.Net
 		}
 
 		public abstract void ClientDisconnect();
-		public virtual void ClientEarlyUpdate() { }
-		public virtual void ClientLateUpdate() { }
+		public virtual void ClientReceiveUpdate() { }
+		public virtual void ClientSendUpdate() { }
 		#endregion
 
 		#region 服务器
@@ -44,8 +44,8 @@ namespace QTool.Net
 		public abstract void ServerDisconnect(int connectionId);
 		public abstract string ServerGetClientAddress(int connectionId);
 		public abstract void ServerStop();
-		public virtual void ServerEarlyUpdate() { }
-		public virtual void ServerLateUpdate() { }
+		public virtual void ServerReceiveUpdate() { }
+		public virtual void ServerSendUpdate() { }
 		#endregion
 
 #pragma warning disable UNT0001

@@ -425,10 +425,10 @@ namespace QTool.Net
 		}
 		private void Update()
 		{
-			transport.ClientEarlyUpdate();
-			transport.ClientLateUpdate();
-			transport.ServerEarlyUpdate();
-			transport.ServerLateUpdate();
+			transport.ClientReceiveUpdate();
+			transport.ClientSendUpdate();
+			transport.ServerReceiveUpdate();
+			transport.ServerSendUpdate();
 		}
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
 

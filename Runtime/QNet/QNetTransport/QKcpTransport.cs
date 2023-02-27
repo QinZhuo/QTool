@@ -125,11 +125,11 @@ namespace QTool.Net
             OnClientDataSent?.Invoke(segment);
         }
         public override void ClientDisconnect() => client.Disconnect();
-        public override void ClientEarlyUpdate()
-        {
-            if (enabled) client.TickIncoming();
-        }
-        public override void ClientLateUpdate() => client.TickOutgoing();
+		public override void ClientReceiveUpdate()
+		{
+			client.TickIncoming();
+		}
+        public override void ClientSendUpdate() => client.TickOutgoing();
 
      
         public override bool ServerActive => server.IsActive();
@@ -146,11 +146,11 @@ namespace QTool.Net
             return endPoint != null ? endPoint.Address.ToString() : "";
         }
         public override void ServerStop() => server.Stop();
-        public override void ServerEarlyUpdate()
-        {
-            if (enabled) server.TickIncoming();
-        }
-        public override void ServerLateUpdate() => server.TickOutgoing();
+		public override void ServerReceiveUpdate()
+		{
+			server.TickIncoming();
+		}
+        public override void ServerSendUpdate() => server.TickOutgoing();
         public long GetAverageMaxSendRate() =>
             server.connections.Count > 0
                 ? server.connections.Values.Sum(conn => (long)conn.MaxSendRate) / server.connections.Count
