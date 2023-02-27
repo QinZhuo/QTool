@@ -5,10 +5,6 @@ using System.Threading.Tasks;
 
 namespace QTool
 {
-    public static partial class Tool
-    {
-	
-	}
     public static class QRectTransformTool
     {
         public static Vector2 UpRightRectOffset(this RectTransform rectTransform)
