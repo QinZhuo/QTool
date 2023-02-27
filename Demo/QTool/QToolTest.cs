@@ -258,7 +258,7 @@ namespace QTool.Test
 		[QName("位置测试")]
 		public void RoundTest()
 		{
-			testObject.GridFixed();
+			testObject.GridFixed(Vector3.one);
 		}
 	
 	}
