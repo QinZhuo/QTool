@@ -313,10 +313,16 @@ namespace QTool
 			{
 				case BuildTargetGroup.Standalone:
 					{
-						var tempPath = report.summary.outputPath.SplitStartString(".exe") + "_BackUpThisFolder_ButDontShipItWithYourGame";
+						var path= QFileManager.GetFolderPath(report.summary.outputPath);
+						var tempPath = path+"/"+Application.productName+ "_BackUpThisFolder_ButDontShipItWithYourGame";
 						if (Directory.Exists(tempPath))
 						{
 							Directory.Delete(tempPath, true);
+						}
+						tempPath = path + "/steam_appid.txt";
+						if (File.Exists(tempPath))
+						{
+							File.Delete(tempPath);
 						}
 						var moveToPath = BuildPath;
 						if (!CheckBuildPath(moveToPath))
@@ -325,8 +331,6 @@ namespace QTool
 							Debug.Log("移动打包文件" + DirectoryPath + "到：" + moveToPath);
 							QFileManager.Copy(DirectoryPath, moveToPath);
 						}
-
-						
 					}
 					break;
 				default:
