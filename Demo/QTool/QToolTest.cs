@@ -39,6 +39,8 @@ namespace QTool.Test
 		[QName("QDataList数据", nameof(toggleTest))]
 		[TextArea(5, 10)]
 		public string QDataStr;
+		[QName("位置测试")]
+		public GameObject testObject;
 		[QName("解析类型测试")]
         public void CreateTest()
         {
@@ -253,10 +255,10 @@ namespace QTool.Test
 			}
 		
 		}
-		[QName("int测试")]
+		[QName("位置测试")]
 		public void RoundTest()
 		{
-			Debug.LogError("0.1=" + Mathf.FloorToInt(0.1f) + " -0.1=" + Mathf.FloorToInt(-0.1f));
+			testObject.gameObject.SetCenter(Vector3.zero);
 		}
 	
 	}

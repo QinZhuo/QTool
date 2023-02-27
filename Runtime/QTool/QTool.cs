@@ -14,6 +14,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.Networking;
 using UnityEngine.LowLevel;
 using System.Linq;
+using UnityEngine.Playables;
 
 namespace QTool
 {
@@ -601,6 +602,225 @@ namespace QTool
 				Debug.LogError("强制转换"+ typeof(T) + "["+obj + "]出错");
 			}
 			return default;
+		}
+		/// <summary>
+		/// 设置时间并演出
+		/// </summary>
+		public static void SetTime(this PlayableDirector playableDirector, float value)
+		{
+			playableDirector.time = value;
+			playableDirector.Evaluate();
+		}
+		/// <summary>
+		/// 立即完成当前演出
+		/// </summary>
+		public static void Complete(this PlayableDirector playableDirector)
+		{
+			if (playableDirector.playableAsset != null && playableDirector.state == PlayState.Playing)
+			{
+				SetTime(playableDirector, (float)playableDirector.playableAsset.duration);
+			}
+		}
+		/// <summary>
+		/// 完成上一个演出并播放新的
+		/// </summary>
+		public static void CompleteAndPlay(this PlayableDirector playableDirector, PlayableAsset value)
+		{
+			if (playableDirector.playableAsset != value)
+			{
+				playableDirector.Complete();
+			}
+			playableDirector.Play(value);
+		}
+		public static async void DelayInvoke(this float time, System.Action action, bool ignoreGameTime = true)
+		{
+			if (!await QTask.Wait(time, ignoreGameTime).IsCancel())
+			{
+				action?.Invoke();
+			}
+		}
+		public static Vector3 RayCastPlane(this Ray ray, Vector3 planeNormal, Vector3 planePoint)
+		{
+			float d = Vector3.Dot(planePoint - ray.origin, planeNormal) / Vector3.Dot(ray.direction, planeNormal);
+			return d * ray.direction + ray.origin;
+		}
+		public static Vector3 RayCastPlane(this Ray ray, Vector3 planePoint)
+		{
+			var normal = Vector3.up;
+			var angle = Vector3.Angle(ray.direction, Vector3.right);
+			if (angle < 40 || angle >= 140)
+			{
+				normal = Vector3.right;
+			}
+			angle = Vector3.Angle(ray.direction, Vector3.forward);
+			if (angle < 40 || angle >= 140)
+			{
+				normal = Vector3.forward;
+			}
+			return RayCastPlane(ray, normal, planePoint);
+		}
+		public static Vector3 RayCast(this Ray ray)
+		{
+			if (Physics.Raycast(ray, out var hitInfo))
+			{
+				return hitInfo.point;
+			}
+			return RayCastPlane(ray, Vector3.up, Vector3.zero);
+		}
+		public static Bounds GetBounds(this GameObject obj)
+		{
+			return obj.transform.GetBounds();
+		}
+		public static Bounds GetBounds(this Component com)
+		{
+			var bounds = new Bounds(com.transform.position, Vector3.zero);
+			Renderer[] meshs = com.GetComponentsInChildren<Renderer>();
+			foreach (var mesh in meshs)
+			{
+				if (mesh is MeshRenderer || mesh is SpriteRenderer || mesh is SkinnedMeshRenderer)
+				{
+					if (bounds.extents == Vector3.zero)
+					{
+						bounds = mesh.bounds;
+					}
+					else
+					{
+						bounds.Encapsulate(mesh.bounds);
+					}
+				}
+			}
+			if (float.IsNaN(bounds.size.x))
+			{
+				bounds.center = com.transform.position;
+				bounds.size = Vector3.zero;
+			}
+			return bounds;
+		}
+
+		public static Vector3 GetCenter(this GameObject obj)
+		{
+			return obj.GetBounds().center;
+		}
+		public static void SetCenter(this GameObject obj,Vector3 center)
+		{
+			var offset = obj.GetBounds().center-obj.transform.position;
+			obj.transform.position = center - offset;
+		}
+
+#if UNITY_EDITOR
+		static void StartUpdateEditorTime()
+		{
+			if (!updateEditorTime)
+			{
+				updateEditorTime = true;
+				UnityEditor.EditorApplication.update += () =>
+				{
+					editorDeltaTime = (float)(UnityEditor.EditorApplication.timeSinceStartup - lastTime);
+					lastTime = UnityEditor.EditorApplication.timeSinceStartup;
+				};
+			}
+		}
+
+		static bool updateEditorTime = false;
+		static double lastTime;
+#endif
+		static float editorDeltaTime;
+		public static float EditorDeltaTime
+		{
+			get
+			{
+#if UNITY_EDITOR
+				StartUpdateEditorTime();
+#endif
+				return editorDeltaTime > 1 ? 0 : editorDeltaTime;
+			}
+		}
+		public static void AddAssetObject(this UnityEngine.Object obj, UnityEngine.Object childObj)
+		{
+#if UNITY_EDITOR
+			if (obj != null && !Application.IsPlaying(obj) && obj.IsAsset())
+			{
+				UnityEditor.AssetDatabase.AddObjectToAsset(childObj, obj);
+				SetDirty(obj);
+				UnityEditor.AssetDatabase.SaveAssetIfDirty(obj);
+			}
+#endif
+		}
+		public static void RemoveAssetObject(this UnityEngine.Object obj, UnityEngine.Object childObj)
+		{
+#if UNITY_EDITOR
+			if (obj != null && !Application.IsPlaying(obj) && obj.IsAsset())
+			{
+				UnityEditor.AssetDatabase.RemoveObjectFromAsset(childObj);
+				SetDirty(obj);
+				UnityEditor.AssetDatabase.SaveAssetIfDirty(obj);
+			}
+#endif
+		}
+		public static void SetDirty(this UnityEngine.Object obj)
+		{
+#if UNITY_EDITOR
+			if (obj != null && !Application.IsPlaying(obj))
+			{
+				UnityEditor.EditorUtility.SetDirty(obj);
+			}
+#endif
+		}
+		public static void Record(this UnityEngine.Object obj)
+		{
+#if UNITY_EDITOR
+			UnityEditor.Undo.RecordObject(obj, "RecordObj" + obj.GetHashCode());
+#endif
+		}
+
+		public static T CheckInstantiate<T>(this T prefab, Transform parent = null) where T : UnityEngine.Object
+		{
+
+#if UNITY_EDITOR
+			if (!Application.isPlaying || (parent != null && !Application.IsPlaying(parent)))
+			{
+				var obj = UnityEditor.PrefabUtility.InstantiatePrefab(prefab, parent) as T;
+				return obj;
+			}
+			else
+#endif
+			{
+				var obj = GameObject.Instantiate(prefab, parent);
+				return obj;
+			};
+		}
+
+		public static void CheckDestory(this UnityEngine.Object obj)
+		{
+			if (obj == null) return;
+#if UNITY_EDITOR
+			if (!Application.isPlaying || !Application.IsPlaying(obj))
+			{
+				try
+				{
+					GameObject.DestroyImmediate(obj);
+				}
+				catch (System.Exception e)
+				{
+					if (obj is GameObject gameObject)
+					{
+						Debug.LogError("删除物体出错 " + gameObject.transform.GetPath() + "  " + e);
+					}
+				}
+			}
+			else
+#endif
+			{
+				GameObject.Destroy(obj);
+			}
+		}
+		public static void ClearChild(this Transform transform)
+		{
+			for (int i = transform.childCount - 1; i >= 0; i--)
+			{
+				var child = transform.GetChild(i).gameObject;
+				child.CheckDestory();
+			}
 		}
 
 		static System.Diagnostics.ProcessStartInfo RunInfo = new System.Diagnostics.ProcessStartInfo()
