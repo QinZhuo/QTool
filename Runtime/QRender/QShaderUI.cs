@@ -30,8 +30,8 @@ namespace QTool
 			}
 		}
 		Vector2 MousePosition => new Vector2(
-			(Event.current.mousePosition.x - rectTransform.DownLeft().x) / rectTransform.GetWidth(),
-			(Screen.height - Event.current.mousePosition.y- rectTransform.DownLeft().y) / rectTransform.GetHeight());
+			(Event.current.mousePosition.x - rectTransform.DownLeft().x) / rectTransform.Width(),
+			(Screen.height - Event.current.mousePosition.y- rectTransform.DownLeft().y) / rectTransform.Height());
 		private void OnGUI()
 		{
 			if (!mousePosButton.IsNull())

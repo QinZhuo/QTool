@@ -52,11 +52,6 @@ namespace QTool
         {
             return new Vector2(rectTransform.position.x, rectTransform.position.y) - rectTransform.DownLeftRectOffset();
         }
-
-
-
-
-
 		public static void SetDefaultScale(this RectTransform trans)
 		{
 			trans.localScale = new Vector3(1, 1, 1);
@@ -67,21 +62,6 @@ namespace QTool
 			trans.pivot = aVec;
 			trans.anchorMin = aVec;
 			trans.anchorMax = aVec;
-		}
-
-		public static Vector2 GetSize(this RectTransform trans)
-		{
-			return trans.rect.size;
-		}
-
-		public static float GetWidth(this RectTransform trans)
-		{
-			return trans.rect.width;
-		}
-
-		public static float GetHeight(this RectTransform trans)
-		{
-			return trans.rect.height;
 		}
 
 		public static void SetPositionOfPivot(this RectTransform trans, Vector2 newPos)
