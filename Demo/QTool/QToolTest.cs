@@ -40,7 +40,7 @@ namespace QTool.Test
 		[TextArea(5, 10)]
 		public string QDataStr;
 		[QName("位置测试")]
-		public GameObject testObject;
+		public Transform testObject;
 		[QName("解析类型测试")]
         public void CreateTest()
         {
@@ -258,7 +258,7 @@ namespace QTool.Test
 		[QName("位置测试")]
 		public void RoundTest()
 		{
-			testObject.gameObject.SetCenter(Vector3.zero);
+			testObject.GridFixed();
 		}
 	
 	}

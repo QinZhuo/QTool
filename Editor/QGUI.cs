@@ -834,26 +834,7 @@ namespace QTool
 		}
 
 
-		public static Bounds GetBounds(this GameObject obj)
-		{
-			var bounds = new Bounds(obj.transform.position, Vector3.zero);
-			Renderer[] meshs = obj.GetComponentsInChildren<Renderer>();
-			foreach (var mesh in meshs)
-			{
-				if (mesh)
-				{
-					if (bounds.extents == Vector3.zero)
-					{
-						bounds = mesh.bounds;
-					}
-					else
-					{
-						bounds.Encapsulate(mesh.bounds);
-					}
-				}
-			}
-			return bounds;
-		}
+
 
 		public static bool Active(this QNameAttribute att, object target)
 		{

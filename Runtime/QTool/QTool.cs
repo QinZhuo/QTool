@@ -239,34 +239,7 @@ namespace QTool
 			}
 			return com;
 		}
-		public static bool Similar(this float value, float other,float scale)
-		{
-			return Mathf.Abs(value - other) < scale;
-		}
-		public static bool Similar(this float value,float other)
-		{
-			return Mathf.Approximately(value, other);
-		}
-		public static bool Similar(this Vector3 value, Vector3 other)
-		{
-			return value.x.Similar(other.x) && value.y.Similar(other.y) && value.z.Similar(other.z);
-		}
-		public static int ToGrid(this float value,float size)
-		{
-			return Mathf.RoundToInt(value/size);
-		}
-		public static float GridFixed(this float value, float size)
-		{
-			return value.ToGrid(size) * size;
-		}
-		public static Vector3Int ToGrid(this Vector3 value, Vector3 size)
-		{
-			return new Vector3Int(value.x.ToGrid(size.x), value.y.ToGrid(size.y), value.z.ToGrid(size.z));
-		}
-		public static Vector3 GridFixed(this Vector3 value, Vector3 size)
-		{
-			return new Vector3(value.x.GridFixed(size.x), value.y.GridFixed(size.y), value.z.GridFixed(size.z));
-		}
+		
 		public static bool IsNull<T>(this T obj)
 		{
 			T checkObj = default;
@@ -697,14 +670,50 @@ namespace QTool
 			return bounds;
 		}
 
-		public static Vector3 GetCenter(this GameObject obj)
+	
+		public static bool Similar(this float value, float other, float scale)
 		{
-			return obj.GetBounds().center;
+			return Mathf.Abs(value - other) < scale;
 		}
-		public static void SetCenter(this GameObject obj,Vector3 center)
+		public static bool Similar(this float value, float other)
 		{
-			var offset = obj.GetBounds().center-obj.transform.position;
-			obj.transform.position = center - offset;
+			return Mathf.Approximately(value, other);
+		}
+		public static bool Similar(this Vector3 value, Vector3 other)
+		{
+			return value.x.Similar(other.x) && value.y.Similar(other.y) && value.z.Similar(other.z);
+		}
+		public static int ToGrid(this float value, float size)
+		{
+			return Mathf.RoundToInt(value / size);
+		}
+		public static float GridFixed(this float value, float size)
+		{
+			return value.ToGrid(size) * size;
+		}
+		public static Vector3Int ToGrid(this Vector3 value, Vector3 size)
+		{
+			return new Vector3Int(value.x.ToGrid(size.x), value.y.ToGrid(size.y), value.z.ToGrid(size.z));
+		}
+		public static Vector3 GridFixed(this Vector3 value, Vector3 size)
+		{
+			return new Vector3(value.x.GridFixed(size.x), value.y.GridFixed(size.y), value.z.GridFixed(size.z));
+		}
+		public static Vector3 GetCenter(this Transform transform)
+		{
+			return transform.GetBounds().center;
+		}
+		public static void SetCenter(this Transform transform, Vector3 center)
+		{
+			var offset = transform.GetCenter() - transform.position;
+			transform.position = center - offset;
+		}
+		public static void GridFixed(this Transform transform)
+		{
+			var bounds = transform.GetBounds();
+			var center = bounds.center;
+			center = (center + bounds.size / 2).GridFixed(bounds.size) - bounds.size / 2;
+			transform.SetCenter(center);
 		}
 
 #if UNITY_EDITOR
