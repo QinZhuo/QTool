@@ -32,8 +32,19 @@ namespace QTool
         {
             return rectTransform.rect.size;
         }
-
-        public static RectTransform RectTransform(this Transform transform)
+		public static float ScaleHeight(this RectTransform rectTransform)
+		{
+			return rectTransform.rect.size.y * rectTransform.lossyScale.y;
+		}
+		public static float ScaleWidth(this RectTransform rectTransform)
+		{
+			return rectTransform.rect.size.x * rectTransform.lossyScale.x;
+		}
+		public static Vector2 ScaleSize(this RectTransform rectTransform)
+		{
+			return new Vector2(rectTransform.ScaleWidth(), rectTransform.ScaleHeight());
+		}
+		public static RectTransform RectTransform(this Transform transform)
         {
             return transform as RectTransform;
         }
@@ -151,6 +162,40 @@ namespace QTool
 		{
 			comp.ResetRotation().ResetPosition().ResetScale();
 			return comp;
+		}
+
+
+		public static float Up(this RectTransform rectTransform)
+		{
+			return rectTransform.transform.position.y + rectTransform.UpRightRectOffset().y;
+		}
+		public static float Down(this RectTransform rectTransform)
+		{
+			return rectTransform.transform.position.y - rectTransform.DownLeftRectOffset().y;
+		}
+		public static float Left(this RectTransform rectTransform)
+		{
+			return rectTransform.transform.position.x - rectTransform.DownLeftRectOffset().x;
+		}
+
+		public static float Right(this RectTransform rectTransform)
+		{
+			return rectTransform.transform.position.x + rectTransform.UpRightRectOffset().x;
+		}
+		public static bool ParentHas(this Transform transform, Transform target)
+		{
+			if (transform.parent == null)
+			{
+				return false;
+			}
+			else if (transform.parent == target)
+			{
+				return true;
+			}
+			else
+			{
+				return transform.parent.ParentHas(target);
+			}
 		}
 	}
 }
