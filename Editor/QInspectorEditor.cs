@@ -20,6 +20,10 @@ namespace QTool.Inspector
 			{
 				label.text = property.QName();
 			}
+			if (label.tooltip != property.tooltip)
+			{
+				label.tooltip = property.tooltip;
+			}
 			property.Draw(position, label);
 		}
 		public override float GetPropertyHeight(SerializedProperty property, GUIContent label)

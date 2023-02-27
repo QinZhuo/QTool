@@ -340,7 +340,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Port: 7777
-  DualMode: 1
   NoDelay: 1
   Interval: 10
   Timeout: 10000
