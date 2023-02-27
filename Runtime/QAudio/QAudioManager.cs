@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Audio;
-
+using System.Linq;
 namespace QTool
 {
 
@@ -51,7 +51,7 @@ namespace QTool
 			var group = AudioMixerGroups[audioKey];
 			if (group == null)
 			{
-				group = QAudioSetting?.FindMatchingGroups(audioKey).Get(0);
+				group = QAudioSetting?.FindMatchingGroups(audioKey).Get(audioKey, (obj) => obj.name);
 				AudioMixerGroups[audioKey] = group;
 			}
 			return group;

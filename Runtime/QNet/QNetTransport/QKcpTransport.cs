@@ -7,7 +7,7 @@ using kcp2k;
 namespace QTool.Net
 {
     [DisallowMultipleComponent,QName("Kcp传输")]
-    public class KcpTransport : QNetTransport
+    public class QKcpTransport : QNetTransport
     {
         // scheme used by this transport
         public const string Scheme = "kcp";

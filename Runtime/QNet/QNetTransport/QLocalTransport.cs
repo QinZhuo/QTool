@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 namespace QTool.Net
 {
-	public class LocalTransport : QNetTransport
+	public class QLocalTransport : QNetTransport
 	{
 		public override string ClientPlayerId => SystemInfo.deviceName + (Debug.isDebugBuild ? "_" + System.Diagnostics.Process.GetCurrentProcess().Id : "");
 
