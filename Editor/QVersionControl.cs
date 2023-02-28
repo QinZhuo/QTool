@@ -202,6 +202,7 @@ namespace QTool
 				commitList.Clear();
 				foreach (var fileInfo in mergeErrorFile.Trim().Split('\n'))
 				{
+					if (fileInfo.EndsWith(".DS_Store")) continue;
 					commitList.Add(new QFileState(false,fileInfo));
 				}
 				EditorUtility.ClearProgressBar();
