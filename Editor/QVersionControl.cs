@@ -607,12 +607,11 @@ crashlytics-build.properties
 		public string commitInfo { get; private set; }
 		bool confirm;
 		Vector2 scrollPos = Vector2.zero;
-		private void OnEnable()
-		{
-			Repaint();
-		}
+
+		QTimer timer = new QTimer(10);
 		private void OnGUI()
-		{ 
+		{
+			
 			using (var scroll=new GUILayout.ScrollViewScope(scrollPos,QGUI.BackStyle))
 			{
 				foreach (var file in fileList)
@@ -657,6 +656,10 @@ crashlytics-build.properties
 			{
 				commitInfo = "";
 				Close();
+			}
+			if (timer.Check(1))
+			{
+				Repaint();
 			}
 		}
 	}
