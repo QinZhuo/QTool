@@ -22,7 +22,6 @@ namespace QTool.Net
 			ServerSend(connectionId, new ArraySegment<byte>(segment));
 		}
 		public abstract void ServerDisconnect(int connectionId);
-		public abstract string ServerGetClientAddress(int connectionId);
 		public abstract void ServerStop();
 		public virtual void ServerReceiveUpdate() { }
 		public virtual void ServerSendUpdate() { }

@@ -36,10 +36,6 @@ namespace QTool.Net
 			
 		}
 
-		public override string ServerGetClientAddress(int connectionId)
-		{
-			return "Local";
-		}
 
 		public override void ServerSend(int connectionId, ArraySegment<byte> segment)
 		{

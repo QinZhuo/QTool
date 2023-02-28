@@ -32,10 +32,8 @@ namespace QTool.Net
         public bool NonAlloc = true;
         [QName("自动缓冲区"),Tooltip("启用以自动将客户端和服务器发送/接收缓冲区设置为操作系统限制。避免在重负载下缓冲区太小的问题，从而可能断开连接。如果这仍然太小，请增加操作系统限制。")]
         public bool MaximizeSendReceiveBuffersToOSLimit = true;
-        [QName("最大可靠消息"), QReadonly]
+        [QName("最大消息长度"), QReadonly]
         public int ReliableMaxMessageSize = 0;
-        [QName("最大不可靠消息"), QReadonly]
-		public int UnreliableMaxMessageSize = 0;
         KcpServer server;
         KcpClient client;
 
@@ -111,7 +109,6 @@ namespace QTool.Net
         void OnValidate()
         {
             ReliableMaxMessageSize = KcpConnection.ReliableMaxMessageSize(ReceiveWindowSize);
-            UnreliableMaxMessageSize = KcpConnection.UnreliableMaxMessageSize;
         }
 		public override string ClientPlayerId => SystemInfo.deviceName + (Debug.isDebugBuild ? "_" + System.Diagnostics.Process.GetCurrentProcess().Id : "");
 		public override bool ClientConnected => client.connected;
@@ -140,11 +137,6 @@ namespace QTool.Net
             OnServerDataSent?.Invoke(connectionId, segment);
         }
         public override void ServerDisconnect(int connectionId) =>  server.Disconnect(connectionId);
-        public override string ServerGetClientAddress(int connectionId)
-        {
-            IPEndPoint endPoint = server.GetClientEndPoint(connectionId);
-            return endPoint != null ? endPoint.Address.ToString() : "";
-        }
         public override void ServerStop() => server.Stop();
 		public override void ServerReceiveUpdate()
 		{
