@@ -273,10 +273,10 @@ namespace QTool
 		{
 			var statusInfo =Status(path);
 			if (statusInfo.StartsWith("fatal")) return;
-			var lines = statusInfo.Split('\n');
+			var lines = statusInfo.Trim().Split('\n');
 			foreach (var info in lines)
 			{
-				if (string.IsNullOrWhiteSpace(info)) continue;
+				if (info.IsNull()|| info.EndsWith(".DS_Store")) continue;
 				commitList.Add(new QFileState(true,info));
 			}
 		}
