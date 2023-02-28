@@ -185,7 +185,7 @@ namespace QTool
 			{
 				return "error 取消设置git基础信息";
 			}
-			var result =PathRun(nameof(Pull).ToLower() + " origin", path);
+			var result =PathRun(nameof(Pull).ToLower()+" --ff-only origin", path);
 			var mergerTip = "Your local changes to the following files would be overwritten by merge:";
 			var untrackedTip = "error: The following untracked working tree files would be overwritten by merge:";
 			if (!CheckResult(result)||result.Contains(mergerTip))
