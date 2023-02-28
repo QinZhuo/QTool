@@ -712,6 +712,7 @@ namespace QTool
 		{
 			var bounds = transform.GetBounds();
 			transform.SetCenter(((bounds.center + bounds.size / 2).GridFixed(bounds.size) - bounds.size / 2).GridFixed(gridSize));
+			transform.position = transform.position.GridFixed(gridSize);
 			return transform.position;
 		}
 		public static Vector3Int ToGrid(this Transform transform,Vector3 gridSize)
