@@ -116,10 +116,11 @@ namespace QTool.Net
         {
             client.Connect(address, Port, NoDelay, Interval, FastResend, CongestionWindow, SendWindowSize, ReceiveWindowSize, Timeout, MaxRetransmit, MaximizeSendReceiveBuffersToOSLimit);
         }
-        public override void ClientSend(ArraySegment<byte> segment)
+        public override void ClientSend(byte[] segment)
         {
-            client.Send(segment, KcpChannel.Reliable);
-            OnClientDataSent?.Invoke(segment);
+			var data = new ArraySegment<byte>(segment);
+			client.Send(data, KcpChannel.Reliable);
+            OnClientDataSent?.Invoke(data);
         }
         public override void ClientDisconnect() => client.Disconnect();
 		public override void ClientReceiveUpdate()
@@ -131,10 +132,11 @@ namespace QTool.Net
      
         public override bool ServerActive => server.IsActive();
         public override void ServerStart() => server.Start(Port);
-        public override void ServerSend(int connectionId, ArraySegment<byte> segment)
-        {
-            server.Send(connectionId, segment,KcpChannel.Reliable);
-            OnServerDataSent?.Invoke(connectionId, segment);
+        public override void ServerSend(int connectionId,byte[] segment)
+		{
+			var data = new ArraySegment<byte>(segment);
+			server.Send(connectionId, data, KcpChannel.Reliable);
+            OnServerDataSent?.Invoke(connectionId, data);
         }
         public override void ServerDisconnect(int connectionId) =>  server.Disconnect(connectionId);
         public override void ServerStop() => server.Stop();

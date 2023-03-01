@@ -6,77 +6,101 @@
 using Steamworks;
 #endif
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.InteropServices;
+using System.Threading;
+using System.Threading.Tasks;
 using UnityEngine;
 namespace QTool.Net
 {
 	public class QSteamTransport : QNetTransport
 	{
-		public override bool ServerActive => server != null;
-		NextServer server;
+		public const int MAX_MESSAGES = 256;
+		public override bool ServerActive => Server != null;
+		QSteamServer Server { get; set; }
 		public int maxConnections = 10;
 		public override void ServerStart()
 		{
 			SteamNetworkingUtils.InitRelayNetworkAccess();
 			if (!ServerActive)
 			{
-				server = new NextServer(maxConnections);
-				server.OnConnected += OnServerConnected;
-				server.OnDisconnected += OnServerDisconnected;
-				server.OnReceivedData += OnServerDataReceived;
-				server.OnReceivedError += OnServerError;
+				Server = new QSteamServer(maxConnections);
+				Server.OnConnected += OnServerConnected;
+				Server.OnDisconnected += OnServerDisconnected;
+				Server.OnReceivedData += OnServerDataReceived;
+				Server.OnReceivedError += OnServerError;
 			}
 			else
 			{
 				Debug.LogError("服务器已正在运行");
 			}
 		}
-		public override void ServerStop()
+		public override void ServerSend(int connectionId,byte[] segment)
 		{
 			if (ServerActive)
 			{
-				server.Shutdown();
-				server = null;
-				QDebug.Log(nameof(QSteamTransport) + "服务器已关闭");
+				Server.Send(connectionId, segment);
 			}
 		}
-		public override void ServerSend(int connectionId, ArraySegment<byte> segment)
+		public override void ServerSendUpdate()
 		{
-			if (ServerActive)
-			{
-				server.Send(connectionId, segment.ToArray());
-			}
+			Server?.FlushData();
+		}
+
+		public override void ServerReceiveUpdate()
+		{
+			Server?.ReceiveData();
 		}
 		public override void ServerDisconnect(int connectionId)
 		{
 			if (ServerActive)
 			{
-				server.Disconnect(connectionId);
+				Server.Disconnect(connectionId);
 			}
 		}
-		public override string ClientPlayerId => throw new NotImplementedException();
-		public override bool ClientConnected => throw new NotImplementedException();
+		public override void ServerStop()
+		{
+			if (ServerActive)
+			{
+				Server.Shutdown();
+				Server = null;
+				QDebug.Log(nameof(QSteamTransport) + "服务器已关闭");
+			}
+		}
 
+		public override string ClientPlayerId => "test";
+		public override bool ClientConnected => Client!=null&&Client.Connected;
+		QSteamClient Client { get; set; }
 		public override void ClientConnect(string address)
 		{
-			throw new NotImplementedException();
+			SteamNetworkingUtils.InitRelayNetworkAccess();
+			Client = new QSteamClient();
+			Client.OnConnected += OnClientConnected;
+			Client.OnDisconnected += OnClientDisconnected;
+			Client.OnReceivedData += OnClientDataReceived;
+			Client.Connect(address);
+		}
+		public override void ClientSend(byte[] segment)
+		{
+			Client.Send(segment.ToArray());
+		}
+		public override void ClientSendUpdate()
+		{
+			Client?.FlushData();
+		}
+		public override void ClientReceiveUpdate()
+		{
+			Client?.ReceiveData();
 		}
 		public override void ClientDisconnect()
 		{
-			throw new NotImplementedException();
+			Client?.Disconnect();
+			Client = null;
+			QDebug.Log(nameof(QSteamTransport) + "客户端断开连接");
 		}
-		public override void ClientSend(ArraySegment<byte> segment)
-		{
-			throw new NotImplementedException();
-		}
-
-
 	}
 
-	public class NextServer
+	public class QSteamServer
 	{
 		internal event Action<int> OnConnected;
 		internal event Action<int, ArraySegment<byte>> OnReceivedData;
@@ -90,7 +114,7 @@ namespace QTool.Net
 
 		private Callback<SteamNetConnectionStatusChangedCallback_t> c_onConnectionChange = null;
 
-		internal NextServer(int maxConnections)
+		internal QSteamServer(int maxConnections)
 		{
 			this.maxConnections = maxConnections;
 			c_onConnectionChange = Callback<SteamNetConnectionStatusChangedCallback_t>.Create(OnConnectionStatusChanged);
@@ -173,14 +197,13 @@ namespace QTool.Net
 			}
 		}
 
-		protected const int MAX_MESSAGES = 256;
 		public void ReceiveData()
 		{
 			foreach (HSteamNetConnection conn in ConnectClients.Keys.ToList())
 			{
-				IntPtr[] ptrs = new IntPtr[MAX_MESSAGES];
+				IntPtr[] ptrs = new IntPtr[QSteamTransport.MAX_MESSAGES];
 				int messageCount;
-				if ((messageCount = SteamNetworkingSockets.ReceiveMessagesOnConnection(conn, ptrs, MAX_MESSAGES)) > 0)
+				if ((messageCount = SteamNetworkingSockets.ReceiveMessagesOnConnection(conn, ptrs, QSteamTransport.MAX_MESSAGES)) > 0)
 				{
 					for (int i = 0; i < messageCount; i++)
 					{
@@ -221,6 +244,192 @@ namespace QTool.Net
 				c_onConnectionChange.Dispose();
 				c_onConnectionChange = null;
 			}
+		}
+	}
+	public class QSteamClient
+	{
+		public bool Connected { get; private set; }
+		public bool Error { get; private set; }
+
+
+		internal event Action<ArraySegment<byte>> OnReceivedData;
+		internal event Action OnConnected;
+		internal event Action OnDisconnected;
+		private Callback<SteamNetConnectionStatusChangedCallback_t> c_onConnectionChange = null;
+
+		private CancellationTokenSource cancelToken;
+		private TaskCompletionSource<Task> connectedComplete;
+		private CSteamID hostSteamID = CSteamID.Nil;
+		private HSteamNetConnection HostConnection;
+		private List<Action> BufferedData;
+
+		internal QSteamClient()
+		{
+			BufferedData = new List<Action>();
+		}
+
+		internal async void Connect(string host)
+		{
+			cancelToken = new CancellationTokenSource();
+			c_onConnectionChange = Callback<SteamNetConnectionStatusChangedCallback_t>.Create(OnConnectionStatusChanged);
+
+			try
+			{
+				hostSteamID = new CSteamID(UInt64.Parse(host));
+				connectedComplete = new TaskCompletionSource<Task>();
+				OnConnected += SetConnectedComplete;
+
+				SteamNetworkingIdentity smi = new SteamNetworkingIdentity();
+				smi.SetSteamID(hostSteamID);
+
+				SteamNetworkingConfigValue_t[] options = new SteamNetworkingConfigValue_t[] { };
+				HostConnection = SteamNetworkingSockets.ConnectP2P(ref smi, 0, options.Length, options);
+
+				Task connectedCompleteTask = connectedComplete.Task;
+				Task timeOutTask = Task.Delay(5, cancelToken.Token);
+
+				if (await Task.WhenAny(connectedCompleteTask, timeOutTask) != connectedCompleteTask)
+				{
+					if (cancelToken.IsCancellationRequested)
+					{
+						Debug.LogError($"The connection attempt was cancelled.");
+					}
+					else if (timeOutTask.IsCompleted)
+					{
+						Debug.LogError($"Connection to {host} timed out.");
+					}
+
+					OnConnected -= SetConnectedComplete;
+					OnConnectionFailed();
+				}
+
+				OnConnected -= SetConnectedComplete;
+			}
+			catch (FormatException)
+			{
+				Debug.LogError($"Connection string was not in the right format. Did you enter a SteamId?");
+				Error = true;
+				OnConnectionFailed();
+			}
+			catch (Exception ex)
+			{
+				Debug.LogError(ex.Message);
+				Error = true;
+				OnConnectionFailed();
+			}
+			finally
+			{
+				if (Error)
+				{
+					Debug.LogError("Connection failed.");
+					OnConnectionFailed();
+				}
+			}
+		}
+
+		private void OnConnectionStatusChanged(SteamNetConnectionStatusChangedCallback_t param)
+		{
+			ulong clientSteamID = param.m_info.m_identityRemote.GetSteamID64();
+			if (param.m_info.m_eState == ESteamNetworkingConnectionState.k_ESteamNetworkingConnectionState_Connected)
+			{
+				Connected = true;
+				OnConnected.Invoke();
+				Debug.Log("Connection established.");
+
+				if (BufferedData.Count > 0)
+				{
+					Debug.Log($"{BufferedData.Count} received before connection was established. Processing now.");
+					{
+						foreach (Action a in BufferedData)
+						{
+							a();
+						}
+					}
+				}
+			}
+			else if (param.m_info.m_eState == ESteamNetworkingConnectionState.k_ESteamNetworkingConnectionState_ClosedByPeer || param.m_info.m_eState == ESteamNetworkingConnectionState.k_ESteamNetworkingConnectionState_ProblemDetectedLocally)
+			{
+				Debug.Log($"Connection was closed by peer, {param.m_info.m_szEndDebug}");
+				Disconnect();
+			}
+			else
+			{
+				Debug.Log($"Connection state changed: {param.m_info.m_eState.ToString()} - {param.m_info.m_szEndDebug}");
+			}
+		}
+
+		public void Disconnect()
+		{
+			cancelToken?.Cancel();
+			Dispose();
+
+			if (HostConnection.m_HSteamNetConnection != 0)
+			{
+				Debug.Log("Sending Disconnect message");
+				SteamNetworkingSockets.CloseConnection(HostConnection, 0, "Graceful disconnect", false);
+				HostConnection.m_HSteamNetConnection = 0;
+			}
+		}
+
+		protected void Dispose()
+		{
+			if (c_onConnectionChange != null)
+			{
+				c_onConnectionChange.Dispose();
+				c_onConnectionChange = null;
+			}
+		}
+
+		private void InternalDisconnect()
+		{
+			Connected = false;
+			OnDisconnected.Invoke();
+			Debug.Log("Disconnected.");
+			SteamNetworkingSockets.CloseConnection(HostConnection, 0, "Disconnected", false);
+		}
+
+		public void ReceiveData()
+		{
+			IntPtr[] ptrs = new IntPtr[QSteamTransport.MAX_MESSAGES];
+			int messageCount;
+
+			if ((messageCount = SteamNetworkingSockets.ReceiveMessagesOnConnection(HostConnection, ptrs, QSteamTransport.MAX_MESSAGES)) > 0)
+			{
+				for (int i = 0; i < messageCount; i++)
+				{
+					var data = ptrs[i].ProcessMessage();
+					if (Connected)
+					{
+						OnReceivedData?.Invoke(new ArraySegment<byte>(data));
+					}
+					else
+					{
+						BufferedData.Add(() => OnReceivedData?.Invoke(new ArraySegment<byte>(data)));
+					}
+				}
+			}
+		}
+
+		public void Send(byte[] data)
+		{
+			EResult res = HostConnection.SendSocket(data);
+
+			if (res == EResult.k_EResultNoConnection || res == EResult.k_EResultInvalidParam)
+			{
+				Debug.Log($"Connection to server was lost.");
+				InternalDisconnect();
+			}
+			else if (res != EResult.k_EResultOK)
+			{
+				Debug.LogError($"Could not send: {res.ToString()}");
+			}
+		}
+
+		private void SetConnectedComplete() => connectedComplete.SetResult(connectedComplete.Task);
+		private void OnConnectionFailed() => OnDisconnected.Invoke();
+		public void FlushData()
+		{
+			SteamNetworkingSockets.FlushMessagesOnConnection(HostConnection);
 		}
 	}
 }

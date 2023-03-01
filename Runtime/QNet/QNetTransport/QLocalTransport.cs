@@ -26,9 +26,19 @@ namespace QTool.Net
 			
 		}
 
-		public override void ClientSend(ArraySegment<byte> segment)
+		public override void ClientReceiveUpdate()
 		{
-			OnServerDataReceived?.Invoke(0,segment);
+			
+		}
+
+		public override void ClientSend(byte[] segment)
+		{
+			OnServerDataReceived?.Invoke(0,new ArraySegment<byte>(segment));
+		}
+
+		public override void ClientSendUpdate()
+		{
+			
 		}
 
 		public override void ServerDisconnect(int connectionId)
@@ -36,10 +46,19 @@ namespace QTool.Net
 			
 		}
 
-
-		public override void ServerSend(int connectionId, ArraySegment<byte> segment)
+		public override void ServerReceiveUpdate()
 		{
-			OnClientDataReceived.Invoke(segment);
+			
+		}
+
+		public override void ServerSend(int connectionId,byte[] segment)
+		{
+			OnClientDataReceived?.Invoke(new ArraySegment<byte>(segment));
+		}
+
+		public override void ServerSendUpdate()
+		{
+			
 		}
 
 		public override void ServerStart()

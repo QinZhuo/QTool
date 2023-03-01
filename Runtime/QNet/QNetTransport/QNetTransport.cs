@@ -16,15 +16,12 @@ namespace QTool.Net
 		public abstract bool ServerActive { get; }
 		public abstract void ServerStart();
 
-		public abstract void ServerSend(int connectionId, ArraySegment<byte> segment);
-		public virtual void ServerSend(int connectionId, byte[] segment)
-		{
-			ServerSend(connectionId, new ArraySegment<byte>(segment));
-		}
+		public abstract void ServerSend(int connectionId, byte[] segment);
+		public abstract void ServerSendUpdate();
+		public abstract void ServerReceiveUpdate();
 		public abstract void ServerDisconnect(int connectionId);
 		public abstract void ServerStop();
-		public virtual void ServerReceiveUpdate() { }
-		public virtual void ServerSendUpdate() { }
+	
 		#endregion
 
 		#region 客户端
@@ -36,15 +33,11 @@ namespace QTool.Net
 		public Action OnClientDisconnected;
 		public abstract bool ClientConnected { get; }
 		public abstract void ClientConnect(string address);
-		public abstract void ClientSend(ArraySegment<byte> segment);
-		public virtual void ClientSend(byte[] segment)
-		{
-			ClientSend(new ArraySegment<byte>(segment));
-		}
-
+		public abstract void ClientSend(byte[] segment);
+		public abstract void ClientSendUpdate();
+		public abstract void ClientReceiveUpdate();
 		public abstract void ClientDisconnect();
-		public virtual void ClientReceiveUpdate() { }
-		public virtual void ClientSendUpdate() { }
+
 		#endregion
 #pragma warning disable UNT0001
 		public void Update() { }
