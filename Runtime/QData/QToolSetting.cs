@@ -9,6 +9,9 @@ namespace QTool
 {
 	public class QToolSetting : InstanceScriptable<QToolSetting>
 	{
+#if Steamworks
+		public uint SteamId=480;
+#endif
 		public QMailAccount QAnalysisMail;
 		public string QAnalysisProject;
 		[QEnum(nameof(GetModList))]

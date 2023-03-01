@@ -12,13 +12,48 @@ using System;
 using System.Runtime.InteropServices;
 using System.Linq;
 
-
 namespace QTool
 {
 
 
 	public static class QSteam
     {
+		public static bool Initialized { get; private set; } = false;
+		static QSteam()
+		{
+			if (!Packsize.Test())
+			{
+				Debug.LogError("[Steamworks.NET]包装尺寸测试返回 false，此平台中运行的 Steamworks.NET 版本错误");
+			}
+			if (!DllCheck.Test())
+			{
+				Debug.LogError("[Steamworks.NET] DllCheck 测试返回 false，一个或多个 Steamworks 二进制文件似乎是错误的版本");
+			}
+			try
+			{
+				//如果非Steam启动游戏 会进行下面是否拥有游戏的判断
+				if (SteamAPI.RestartAppIfNecessary(new AppId_t(QToolSetting.Instance.SteamId)))
+				{
+					Application.Quit();
+					return;
+				}
+			}
+			catch (System.DllNotFoundException e)
+			{
+				Debug.LogError("[Steamworks.NET]无法加载[lib]steam_api.dll/so/dylib。它可能不在正确的位置。有关详细信息，请参阅自述文件\n" + e);
+				Application.Quit();
+				return;
+			}
+			Initialized=SteamAPI.Init();
+			SteamClient.SetWarningMessageHook(SteamAPIDebugTextHook);
+			QToolManager.Instance.OnUpdateEvent += SteamAPI.RunCallbacks;
+			QToolManager.Instance.OnDestroyEvent += SteamAPI.Shutdown;
+		}
+		[AOT.MonoPInvokeCallback(typeof(SteamAPIWarningMessageHook_t))]
+		private static void SteamAPIDebugTextHook(int nSeverity, System.Text.StringBuilder pchDebugText)
+		{
+			Debug.LogWarning(pchDebugText);
+		}
 #region 成就
 
 		public static ulong Id =>SteamUser.GetSteamID().m_SteamID;
@@ -90,7 +125,7 @@ namespace QTool
 			return baseValue += changeValue;
 		}
 		#endregion
-		#region 网络通信
+#region 网络通信
 		public static EResult SendSocket(this HSteamNetConnection conn, byte[] data)
 		{
 			GCHandle pinnedArray = GCHandle.Alloc(data, GCHandleType.Pinned);
@@ -379,7 +414,5 @@ namespace QTool
 		#endregion
 	}
 }
-
 #endif
-
 #endif

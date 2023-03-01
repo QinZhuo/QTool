@@ -19,6 +19,13 @@ namespace QTool.Net
 		public override bool ServerActive => Server != null;
 		QSteamServer Server { get; set; }
 		public int maxConnections = 10;
+		private void Awake()
+		{
+			if (!QSteam.Initialized)
+			{
+				Debug.LogError(nameof(QSteamTransport) + "初始化失败");
+			}
+		}
 		public override void ServerStart()
 		{
 			SteamNetworkingUtils.InitRelayNetworkAccess();

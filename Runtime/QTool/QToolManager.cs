@@ -18,11 +18,16 @@ namespace QTool
 			DontDestroyOnLoad(gameObject);
 		}
 		public event Action OnUpdateEvent = null;
+		public event Action OnDestroyEvent = null;
 		public event Action OnGUIEvent = null;
 		private void Update()
 		{
 			OnUpdateEvent?.Invoke();
 			Fps.Push(1);
+		}
+		private void OnDestroy()
+		{
+			OnDestroyEvent?.Invoke();
 		}
 		public int FPS => (int)Fps.SecondeSum;
 		QAverageValue Fps = new QAverageValue();
