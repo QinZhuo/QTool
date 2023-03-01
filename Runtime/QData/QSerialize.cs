@@ -256,7 +256,7 @@ namespace QTool
 									}
 									if (count != typeInfo.Members.Count)  
 									{
-										Debug.LogError(type+" 变量数目不一致 "+typeInfo);
+										Debug.LogError(type+" 变量数目不一致"+count+":"+typeInfo.Members.Count+"\n"+ typeInfo);
 									}
                                     if (hasTarget)
                                     {

@@ -34,8 +34,8 @@ namespace QTool.Net
         public bool MaximizeSendReceiveBuffersToOSLimit = true;
         [QName("最大消息长度"), QReadonly]
         public int ReliableMaxMessageSize = 0;
-        KcpServer server;
-        KcpClient client;
+        KcpServer Server { get; set; }
+        KcpClient Client { get; set; }
 
 		[QName("日志")]
         public bool debugLog;
@@ -43,8 +43,8 @@ namespace QTool.Net
         public bool statisticsGUI;
 		[QName("日志信息", nameof(debugLog))]
 		public bool statisticsLog;
-	
-		void Awake()
+
+		protected override void Awake()
         {
             if (debugLog)
                 Log.Info = Debug.Log;
@@ -58,7 +58,7 @@ namespace QTool.Net
             NonAlloc = false;
 #endif
 
-            client = NonAlloc
+            Client = NonAlloc
                 ? new KcpClientNonAlloc(
                       () => OnClientConnected.Invoke(),
                       (message, channel) => OnClientDataReceived.Invoke(message),
@@ -70,7 +70,7 @@ namespace QTool.Net
                       () => OnClientDisconnected.Invoke(),
                       (error, reason) => OnClientError.Invoke(new Exception(reason)));
 
-            server = NonAlloc
+            Server = NonAlloc
                 ? new KcpServerNonAlloc(
                       (connectionId) => OnServerConnected.Invoke(connectionId),
                       (connectionId, message, channel) => OnServerDataReceived.Invoke(connectionId, message),
@@ -104,63 +104,74 @@ namespace QTool.Net
 
             if (statisticsLog)
                 InvokeRepeating(nameof(OnLogStatistics), 1, 1);
+			base.Awake();
         }
 
         void OnValidate()
         {
             ReliableMaxMessageSize = KcpConnection.ReliableMaxMessageSize(ReceiveWindowSize);
         }
-		public override string ClientPlayerId => SystemInfo.deviceName + (Debug.isDebugBuild ? "_" + System.Diagnostics.Process.GetCurrentProcess().Id : "");
-		public override bool ClientConnected => client.connected;
+		public override string ClientId => SystemInfo.deviceName + (Debug.isDebugBuild ? "_" + System.Diagnostics.Process.GetCurrentProcess().Id : "");
         public override void ClientConnect(string address)
         {
-            client.Connect(address, Port, NoDelay, Interval, FastResend, CongestionWindow, SendWindowSize, ReceiveWindowSize, Timeout, MaxRetransmit, MaximizeSendReceiveBuffersToOSLimit);
-        }
-        public override void ClientSend(byte[] segment)
+            Client.Connect(address, Port, NoDelay, Interval, FastResend, CongestionWindow, SendWindowSize, ReceiveWindowSize, Timeout, MaxRetransmit, MaximizeSendReceiveBuffersToOSLimit);
+		}
+        protected override void ClientSend(byte[] segment)
         {
 			var data = new ArraySegment<byte>(segment);
-			client.Send(data, KcpChannel.Reliable);
+			Client.Send(data, KcpChannel.Reliable);
             OnClientDataSent?.Invoke(data);
         }
-        public override void ClientDisconnect() => client.Disconnect();
+		public override void ClientDisconnect()
+		{
+			Client.Disconnect();
+			base.ClientDisconnect();
+		}
 		public override void ClientReceiveUpdate()
 		{
-			client.TickIncoming();
+			Client.TickIncoming();
 		}
-        public override void ClientSendUpdate() => client.TickOutgoing();
+        public override void ClientSendUpdate() => Client.TickOutgoing();
 
-     
-        public override bool ServerActive => server.IsActive();
-        public override void ServerStart() => server.Start(Port);
-        public override void ServerSend(int connectionId,byte[] segment)
+
+		public override void ServerStart()
+		{
+			Server.Start(Port);
+			base.ServerStart();
+		}
+        protected override void ServerSend(int connectionId,byte[] segment)
 		{
 			var data = new ArraySegment<byte>(segment);
-			server.Send(connectionId, data, KcpChannel.Reliable);
+			Server.Send(connectionId, data, KcpChannel.Reliable);
             OnServerDataSent?.Invoke(connectionId, data);
         }
-        public override void ServerDisconnect(int connectionId) =>  server.Disconnect(connectionId);
-        public override void ServerStop() => server.Stop();
+        public override void ServerDisconnect(int connectionId) =>  Server.Disconnect(connectionId);
+		public override void ServerStop()
+		{
+			Server.Stop();
+			base.ServerStop();
+		}
 		public override void ServerReceiveUpdate()
 		{
-			server.TickIncoming();
+			Server.TickIncoming();
 		}
-        public override void ServerSendUpdate() => server.TickOutgoing();
+        public override void ServerSendUpdate() => Server.TickOutgoing();
         public long GetAverageMaxSendRate() =>
-            server.connections.Count > 0
-                ? server.connections.Values.Sum(conn => (long)conn.MaxSendRate) / server.connections.Count
+            Server.connections.Count > 0
+                ? Server.connections.Values.Sum(conn => (long)conn.MaxSendRate) / Server.connections.Count
                 : 0;
         public long GetAverageMaxReceiveRate() =>
-            server.connections.Count > 0
-                ? server.connections.Values.Sum(conn => (long)conn.MaxReceiveRate) / server.connections.Count
+            Server.connections.Count > 0
+                ? Server.connections.Values.Sum(conn => (long)conn.MaxReceiveRate) / Server.connections.Count
                 : 0;
         long GetTotalSendQueue() =>
-            server.connections.Values.Sum(conn => conn.SendQueueCount);
+            Server.connections.Values.Sum(conn => conn.SendQueueCount);
         long GetTotalReceiveQueue() =>
-            server.connections.Values.Sum(conn => conn.ReceiveQueueCount);
+            Server.connections.Values.Sum(conn => conn.ReceiveQueueCount);
         long GetTotalSendBuffer() =>
-            server.connections.Values.Sum(conn => conn.SendBufferCount);
+            Server.connections.Values.Sum(conn => conn.SendBufferCount);
         long GetTotalReceiveBuffer() =>
-            server.connections.Values.Sum(conn => conn.ReceiveBufferCount);
+            Server.connections.Values.Sum(conn => conn.ReceiveBufferCount);
 
     
         public static string PrettyBytes(long bytes)
@@ -189,7 +200,7 @@ namespace QTool.Net
             {
                 GUILayout.BeginVertical("Box");
                 GUILayout.Label("SERVER");
-                GUILayout.Label($"  connections: {server.connections.Count}");
+                GUILayout.Label($"  connections: {Server.connections.Count}");
                 GUILayout.Label($"  MaxSendRate (avg): {PrettyBytes(GetAverageMaxSendRate())}/s");
                 GUILayout.Label($"  MaxRecvRate (avg): {PrettyBytes(GetAverageMaxReceiveRate())}/s");
                 GUILayout.Label($"  SendQueue: {GetTotalSendQueue()}");
@@ -202,12 +213,12 @@ namespace QTool.Net
             {
                 GUILayout.BeginVertical("Box");
                 GUILayout.Label("CLIENT");
-                GUILayout.Label($"  MaxSendRate: {PrettyBytes(client.connection.MaxSendRate)}/s");
-                GUILayout.Label($"  MaxRecvRate: {PrettyBytes(client.connection.MaxReceiveRate)}/s");
-                GUILayout.Label($"  SendQueue: {client.connection.SendQueueCount}");
-                GUILayout.Label($"  ReceiveQueue: {client.connection.ReceiveQueueCount}");
-                GUILayout.Label($"  SendBuffer: {client.connection.SendBufferCount}");
-                GUILayout.Label($"  ReceiveBuffer: {client.connection.ReceiveBufferCount}");
+                GUILayout.Label($"  MaxSendRate: {PrettyBytes(Client.connection.MaxSendRate)}/s");
+                GUILayout.Label($"  MaxRecvRate: {PrettyBytes(Client.connection.MaxReceiveRate)}/s");
+                GUILayout.Label($"  SendQueue: {Client.connection.SendQueueCount}");
+                GUILayout.Label($"  ReceiveQueue: {Client.connection.ReceiveQueueCount}");
+                GUILayout.Label($"  SendBuffer: {Client.connection.SendBufferCount}");
+                GUILayout.Label($"  ReceiveBuffer: {Client.connection.ReceiveBufferCount}");
                 GUILayout.EndVertical();
             }
         }
@@ -218,7 +229,7 @@ namespace QTool.Net
             if (ServerActive)
             {
                 string log = "kcp SERVER @ time: " + Time.timeAsDouble + "\n";
-                log += $"  connections: {server.connections.Count}\n";
+                log += $"  connections: {Server.connections.Count}\n";
                 log += $"  MaxSendRate (avg): {PrettyBytes(GetAverageMaxSendRate())}/s\n";
                 log += $"  MaxRecvRate (avg): {PrettyBytes(GetAverageMaxReceiveRate())}/s\n";
                 log += $"  SendQueue: {GetTotalSendQueue()}\n";
@@ -231,12 +242,12 @@ namespace QTool.Net
             if (ClientConnected)
             {
                 string log = "kcp CLIENT @ time: " +Time.timeAsDouble+ "\n";
-                log += $"  MaxSendRate: {PrettyBytes(client.connection.MaxSendRate)}/s\n";
-                log += $"  MaxRecvRate: {PrettyBytes(client.connection.MaxReceiveRate)}/s\n";
-                log += $"  SendQueue: {client.connection.SendQueueCount}\n";
-                log += $"  ReceiveQueue: {client.connection.ReceiveQueueCount}\n";
-                log += $"  SendBuffer: {client.connection.SendBufferCount}\n";
-                log += $"  ReceiveBuffer: {client.connection.ReceiveBufferCount}\n\n";
+                log += $"  MaxSendRate: {PrettyBytes(Client.connection.MaxSendRate)}/s\n";
+                log += $"  MaxRecvRate: {PrettyBytes(Client.connection.MaxReceiveRate)}/s\n";
+                log += $"  SendQueue: {Client.connection.SendQueueCount}\n";
+                log += $"  ReceiveQueue: {Client.connection.ReceiveQueueCount}\n";
+                log += $"  SendBuffer: {Client.connection.SendBufferCount}\n";
+                log += $"  ReceiveBuffer: {Client.connection.ReceiveBufferCount}\n\n";
                 Debug.Log(log);
             }
         }

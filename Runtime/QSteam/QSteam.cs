@@ -18,46 +18,61 @@ namespace QTool
 
 	public static class QSteam
     {
-		public static bool Initialized { get; private set; } = false;
+		public static CSteamID Id => SteamUser.GetSteamID();
+		public static string Name => SteamFriends.GetPersonaName();
 		static QSteam()
 		{
 			if (!Packsize.Test())
 			{
-				Debug.LogError("[Steamworks.NET]包装尺寸测试返回 false，此平台中运行的 Steamworks.NET 版本错误");
+				Debug.LogError(nameof(QSteam) + " 包装尺寸测试返回 false，此平台中运行的 Steamworks.NET 版本错误");
 			}
 			if (!DllCheck.Test())
 			{
-				Debug.LogError("[Steamworks.NET] DllCheck 测试返回 false，一个或多个 Steamworks 二进制文件似乎是错误的版本");
+				Debug.LogError(nameof(QSteam) + " DllCheck 测试返回 false，一个或多个 Steamworks 二进制文件似乎是错误的版本");
 			}
 			try
 			{
 				//如果非Steam启动游戏 会进行下面是否拥有游戏的判断
 				if (SteamAPI.RestartAppIfNecessary(new AppId_t(QToolSetting.Instance.SteamId)))
 				{
-					Application.Quit();
+					Debug.LogError(nameof(QSteam) + " 游戏验证未通过");
+					Tool.Quit();
 					return;
 				}
 			}
 			catch (System.DllNotFoundException e)
 			{
-				Debug.LogError("[Steamworks.NET]无法加载[lib]steam_api.dll/so/dylib。它可能不在正确的位置。有关详细信息，请参阅自述文件\n" + e);
-				Application.Quit();
+				Debug.LogError(nameof(QSteam) + " 无法加载[lib]steam_api.dll/so/dylib。它可能不在正确的位置。有关详细信息，请参阅自述文件\n" + e);
+				Tool.Quit();
 				return;
 			}
-			Initialized=SteamAPI.Init();
+			if (!SteamAPI.Init())
+			{
+				Tool.Quit();
+				Debug.LogError(nameof(QSteam) + " 初始化失败");
+				return;
+			}
+			QDebug.Log(nameof(QSteam) + " 初始化成功 [" + Name + "]");
 			SteamClient.SetWarningMessageHook(SteamAPIDebugTextHook);
 			QToolManager.Instance.OnUpdateEvent += SteamAPI.RunCallbacks;
 			QToolManager.Instance.OnDestroyEvent += SteamAPI.Shutdown;
+			SteamUser.GetSteamID();
 		}
 		[AOT.MonoPInvokeCallback(typeof(SteamAPIWarningMessageHook_t))]
 		private static void SteamAPIDebugTextHook(int nSeverity, System.Text.StringBuilder pchDebugText)
 		{
 			Debug.LogWarning(pchDebugText);
 		}
-#region 成就
 
-		public static ulong Id =>SteamUser.GetSteamID().m_SteamID;
-		public static string Name => SteamUser.GetSteamID().GetName();
+		public static CSteamID ToSteamId(this ulong userId)
+		{
+			return (CSteamID)userId;
+		}
+		public static string GetName(this CSteamID userId)
+		{
+			return SteamFriends.GetFriendPersonaName(userId);
+		}
+#region 成就
 		public static bool AchievementState(string key)
 		{
 			if (SteamUserStats.GetAchievement(key, out bool state))
@@ -69,10 +84,18 @@ namespace QTool
 				return false;
 			}
 		}
-		public static void AchievementClear(string key, bool toSteam = true)
+		public static void AchievementClear(string key="", bool toSteam = true)
 		{
-			Debug.Log("QSteam取消成就 [ " + key + " ] ");
-			SteamUserStats.ClearAchievement(key);
+			if (key.IsNull())
+			{
+				QDebug.Log(nameof(QSteam) + "重置所有成就");
+				SteamUserStats.ResetAllStats(true);
+			}
+			else
+			{
+				QDebug.Log(nameof(QSteam) + "取消成就 [ " + key + " ] ");
+				SteamUserStats.ClearAchievement(key);
+			}
 			if (toSteam)
 			{
 				SteamUserStats.StoreStats();
@@ -80,8 +103,7 @@ namespace QTool
 		}
 		public static void AchievementOver(string key,bool toSteam=true)
 		{
-			key = key.Trim();
-			Debug.Log("QSteam完成成就 [ " + key + " ] ");
+			QDebug.Log(nameof(QSteam) + "完成成就 [ " + key + " ] ");
 			SteamUserStats.SetAchievement(key);
 			if (toSteam)
 			{
@@ -90,8 +112,7 @@ namespace QTool
 		}
 		public static void AchievementSetValue(string key, int value, bool toSteam = true)
 		{
-			key = key.Trim();
-			Debug.Log("QSteam成就数值更改 [ " + key + ":" + value + " ] ");
+			QDebug.Log(nameof(QSteam) + "成就数值更改 [ " + key + ":" + value + " ] ");
 			SteamUserStats.SetStat(key, value);
 			if (toSteam)
 			{
@@ -100,8 +121,7 @@ namespace QTool
 		}
 		public static void AchievementSetValue(string key, float value, bool toSteam = true)
 		{
-			key = key.Trim();
-			Debug.Log("QSteam成就数值更改 [ " + key + ":" + value + " ] ");
+			QDebug.Log(nameof(QSteam) + "成就数值更改 [ " + key + ":" + value + " ] ");
 			SteamUserStats.SetStat(key, value);
 			if (toSteam)
 			{
@@ -110,21 +130,17 @@ namespace QTool
 		}
 		public static int AchievementChangeValue(string key,int changeValue, bool toSteam = true)
 		{
-			var baseValue = 0;
-			key = key.Trim();
-			SteamUserStats.GetStat(key, out baseValue);
-			AchievementSetValue(key, baseValue += changeValue, toSteam);
-			return baseValue += changeValue;
+			SteamUserStats.GetStat(key, out int baseValue);
+			AchievementSetValue(key, baseValue + changeValue, toSteam);
+			return baseValue + changeValue;
 		}
 		public static float AchievementChangeValue(string key, float changeValue, bool toSteam = true)
 		{
-			float baseValue = 0f;
-			key = key.Trim();
-			SteamUserStats.GetStat(key, out baseValue);
-			AchievementSetValue(key, baseValue += changeValue, toSteam);
-			return baseValue += changeValue;
+			SteamUserStats.GetStat(key, out float baseValue);
+			AchievementSetValue(key, baseValue + changeValue, toSteam);
+			return baseValue + changeValue;
 		}
-		#endregion
+#endregion
 #region 网络通信
 		public static EResult SendSocket(this HSteamNetConnection conn, byte[] data)
 		{
@@ -177,24 +193,9 @@ namespace QTool
         public static Lobby CurLobby;
  
         private static int chatId = 0;
-        public static CSteamID ToSteamId(this ulong userId)
-        {
-            return (CSteamID)userId;
-        }
-		public static SteamNetworkingIdentity ToNetId(this CSteamID steamID)
-		{
-			var netId = new SteamNetworkingIdentity();
-			netId.SetSteamID(steamID);
-			return netId;
-		}
 		public static void SetLobbyMemberData(string key, string value)
         {
             SteamMatchmaking.SetLobbyMemberData(CurLobby.steamID, key, value);
-        }
-
-        public static string GetName(this CSteamID userId)
-        {
-            return SteamFriends.GetFriendPersonaName(userId);
         }
         public static bool ChatSend(string text)
         {
@@ -228,18 +229,11 @@ namespace QTool
                 }
             }
         }
-        public static event Action<byte[], CSteamID> OnReceiveMessage;
-        public static Callback<LobbyDataUpdate_t> OnUpdateLobby;
-		public static void StartUpdateLobby()
-        {
-        }
-        public const int ReceiveMessageBufferCount = 10;
-        public static IntPtr[] buffers = new IntPtr[ReceiveMessageBufferCount];
- 
+		public static Callback<LobbyDataUpdate_t> OnUpdateLobby = null;
         public static void ExitLobby()
         {
             SteamMatchmaking.LeaveLobby(CurLobby.steamID);
-			Debug.Log("离开房间[" + CurLobby.steamID + "]");
+			QDebug.Log("离开房间[" + CurLobby.steamID + "]");
 			OnUpdateLobby?.Unregister();
             CurLobby = default;
         }
@@ -285,11 +279,11 @@ namespace QTool
             var m_LobbyEnterResponse = (EChatRoomEnterResponse)join.m_EChatRoomEnterResponse;
             if (m_LobbyEnterResponse != EChatRoomEnterResponse.k_EChatRoomEnterResponseSuccess)
             {
-                Debug.Log("加入房间失败 " + id);
+				QDebug.Log("加入房间失败[" + id + "]");
                 return false;
             }
             SetCurRoom(join.m_ulSteamIDLobby);
-            Debug.Log("加入房间 " + join.m_ulSteamIDLobby);
+			QDebug.Log("加入房间[" + join.m_ulSteamIDLobby + "]");
             return true;
         }
         public static async Task CreateLobby(string Game, ELobbyType eLobbyType = ELobbyType.k_ELobbyTypePublic, int maxMembers = -1)
@@ -351,7 +345,7 @@ namespace QTool
         }
         public static async Task<List<Lobby>> FreshLobbys(string key,string value)
         {
-            Debug.Log("刷新房间列表   " + key + ":" + value);
+			QDebug.Log("刷新房间列表[" + key + ":" + value + "]");
             SteamMatchmaking.AddRequestLobbyListStringFilter(key, value, ELobbyComparison.k_ELobbyComparisonEqual);
             return await FreshLobbys();
         }
@@ -369,7 +363,6 @@ namespace QTool
             }
             return lobbyList;
         }
-
 		public struct LobbyMetaData
 		{
 			public string m_Key;

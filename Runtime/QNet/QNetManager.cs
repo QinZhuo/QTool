@@ -46,7 +46,7 @@ namespace QTool.Net
 		{
 			if (transport.ClientConnected)
 			{
-				if (player==transport.ClientPlayerId&&(!LocalAction.Values.ContainsKey(key)|| !LocalAction.Values[key].Equals( localValue)))
+				if (player==transport.ClientId&&(!LocalAction.Values.ContainsKey(key)|| !LocalAction.Values[key].Equals( localValue)))
 				{
 					SendAction.Values[key] = localValue;
 					LocalAction.Values[key] = localValue;
@@ -66,7 +66,7 @@ namespace QTool.Net
 				{
 					QEventManager.RegisterOnce(player + "_" + key, (object obj)=>action?.Invoke((T)obj));
 				}
-				if (player == transport.ClientPlayerId)
+				if (player == transport.ClientId)
 				{
 					SendAction.TriggerEvent(key, value);
 				}
@@ -109,11 +109,11 @@ namespace QTool.Net
 							writer.WriteObject(ServerGameData[i]);
 						}
 						QDebug.Log("服务端发送游戏数据 " + startIndex + "=>" + end + " [" + count + "]"+ writer.BaseStream.Length.ToSizeString());
-						transport.ServerSend(id, writer.ToArray());
+						transport.CheckServerSend(id, writer.ToArray());
 					}
 				}
 			}; 
-			transport.OnServerDataReceived = (id, data) =>
+			transport.OnServerDataReceived = (connectId, data) =>
 			{
 				var netAction= data.Deserialize<QNetActionData>();
 				foreach (var eventData in netAction.Events)
@@ -123,17 +123,18 @@ namespace QTool.Net
 						case nameof(DefaultNetAction.PlayerConnected):
 							{
 								var player = eventData.Value?.ToString();
-								ServerPlayers[id] = player;
-								QDebug.Log("["+ServerIndex + "] 添加玩家[" + id + "][" + player+"]");
+								ServerPlayers[connectId] = player;
+								QDebug.Log("["+ServerIndex + "] 添加玩家[" + connectId + "][" + player+"]");
 							}
 							break;
 						default:
 							break;
 					}
 				}
-				ServerActionData[ServerPlayers[id]].MergeValues(netAction);
-				ServerActionData[ServerPlayers[id]].Events.AddRange(netAction.Events);
-				
+				var playerKey = ServerPlayers[connectId];
+				ServerActionData[playerKey].MergeValues(netAction);
+				ServerActionData[playerKey].Events.AddRange(netAction.Events);
+
 			};
 			transport.OnServerError = (id, e) =>
 			{
@@ -170,7 +171,7 @@ namespace QTool.Net
 					var data = writer.ToArray();
 					foreach (var player in ServerConnects)
 					{
-						transport.ServerSend(player, data);
+						transport.CheckServerSend(player, data);
 					}
 					ServerIndex++;
 				}
@@ -192,7 +193,7 @@ namespace QTool.Net
 		{
 			transport.OnClientConnected += () =>
 			{
-				PlayerAction(transport.ClientPlayerId, nameof(DefaultNetAction.PlayerConnected), transport.ClientPlayerId);
+				PlayerAction(transport.ClientId, nameof(DefaultNetAction.PlayerConnected), transport.ClientId);
 			};
 			transport.OnClientDataReceived += (data) =>
 			{
@@ -209,7 +210,7 @@ namespace QTool.Net
 			{
 				QDebug.Log("断开链接");
 			};
-			transport.ClientConnect(ip);
+			transport.CheckClientConnect(ip);
 		}
 		private void ReceiveGameData(QBinaryReader reader)
 		{
@@ -237,7 +238,7 @@ namespace QTool.Net
 			{
 				if (SendAction.Active)
 				{
-					transport.ClientSend(SendAction.Serialize());
+					transport.CheckClientSend(SendAction.Serialize());
 				}
 				SendAction.Clear();
 				if (ClientGameData.ContainsKey(ClientIndex))
@@ -390,7 +391,7 @@ namespace QTool.Net
 						SyncCheckFlag.Index = ClientIndex;
 						SyncCheckFlag.Value = 0;
 						OnSyncCheck?.Invoke(SyncCheckFlag);
-						PlayerAction(transport.ClientPlayerId, nameof(DefaultNetAction.SyncCheck), SyncCheckFlag);
+						PlayerAction(transport.ClientId, nameof(DefaultNetAction.SyncCheck), SyncCheckFlag);
 					}
 					ClientIndex++;
 					NetTime += NetDeltaTime;
