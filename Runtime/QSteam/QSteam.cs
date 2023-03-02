@@ -32,6 +32,9 @@ namespace QTool
 			}
 			try
 			{
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+				QDebug.Log("测试版不进行Steam游戏验证");
+#else
 				//如果非Steam启动游戏 会进行下面是否拥有游戏的判断
 				if (SteamAPI.RestartAppIfNecessary(new AppId_t(QToolSetting.Instance.SteamId)))
 				{
@@ -39,6 +42,7 @@ namespace QTool
 					Tool.Quit();
 					return;
 				}
+#endif
 			}
 			catch (System.DllNotFoundException e)
 			{
@@ -406,7 +410,7 @@ namespace QTool
 				return name + " [" + members?.Length + "/" + MemberLimit+"]";
 			}
 		}
-		#endregion
+#endregion
 	}
 }
 #endif
