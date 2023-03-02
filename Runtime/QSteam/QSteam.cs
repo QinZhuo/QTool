@@ -59,6 +59,7 @@ namespace QTool
 			QDebug.Log(nameof(QSteam) + " 初始化成功 [" + Name + "]");
 			SteamClient.SetWarningMessageHook(SteamAPIDebugTextHook);
 			QToolManager.Instance.OnUpdateEvent += SteamAPI.RunCallbacks;
+			QToolManager.Instance.OnDestroyEvent +=QSteam.ExitLobby;
 			QToolManager.Instance.OnDestroyEvent += SteamAPI.Shutdown;
 			SteamUser.GetSteamID();
 		}
@@ -238,6 +239,7 @@ namespace QTool
 		public static Callback<LobbyDataUpdate_t> OnUpdateLobby = null;
         public static void ExitLobby()
         {
+			if (CurrentLobby.IsNull()) return;
             SteamMatchmaking.LeaveLobby(_CurrentLobby.steamID);
 			QDebug.Log("离开房间[" + _CurrentLobby.steamID + "]");
 			OnUpdateLobby?.Unregister();
@@ -409,7 +411,7 @@ namespace QTool
 				{
 					name = owner.GetName();
 				}
-				return name + " [" + members?.Length + "/" + MemberLimit+"]";
+				return name + " [" + members?.Length + "/" + MemberLimit+"]["+ steamID.ToShortString(4)+"]";
 			}
 		}
 #endregion

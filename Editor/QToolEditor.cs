@@ -319,17 +319,13 @@ namespace QTool
 						{
 							Directory.Delete(tempPath, true);
 						}
-						tempPath = path + "/steam_appid.txt";
-						if (File.Exists(tempPath))
+						if (!Debug.isDebugBuild)
 						{
-							File.Delete(tempPath);
-						}
-						var moveToPath = BuildPath;
-						if (!CheckBuildPath(moveToPath))
-						{
-							var DirectoryPath = Path.GetDirectoryName(report.summary.outputPath);
-							Debug.Log("移动打包文件" + DirectoryPath + "到：" + moveToPath);
-							QFileManager.Copy(DirectoryPath, moveToPath);
+							tempPath = path + "/steam_appid.txt";
+							if (File.Exists(tempPath))
+							{
+								File.Delete(tempPath);
+							}
 						}
 					}
 					break;

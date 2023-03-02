@@ -172,12 +172,12 @@ namespace QTool.Net
 			var clientSteamID = param.m_info.m_identityRemote.GetSteamID();
 			if (param.m_info.m_eState == ESteamNetworkingConnectionState.k_ESteamNetworkingConnectionState_Connecting)
 			{
-				if (clientSteamID.IsNull())
-				{
-					Debug.Log($"Incoming connection {clientSteamID} would exceed max connection count. Rejecting.");
-					SteamNetworkingSockets.CloseConnection(param.m_hConn, 0, "Max Connection Count", false);
-					return;
-				}
+				//if (clientSteamID.IsNull())
+				//{
+				//	Debug.Log($"Incoming connection {clientSteamID} would exceed max connection count. Rejecting.");
+				//	SteamNetworkingSockets.CloseConnection(param.m_hConn, 0, "Max Connection Count", false);
+				//	return;
+				//}
 
 				EResult res;
 
@@ -195,15 +195,16 @@ namespace QTool.Net
 				var steamId = param.m_info.m_identityRemote.GetSteamID();
 				ConnectClients.Add(param.m_hConn, steamId);
 				OnConnected.Invoke((int)param.m_hConn.m_HSteamNetConnection);
-				Debug.Log(nameof(QSteamServer)+"["+ (int)param.m_hConn.m_HSteamNetConnection+"]["+clientSteamID+"]["+steamId+"]客户端连接成功");
+				QDebug.Log(nameof(QSteamServer)+"["+ (int)param.m_hConn.m_HSteamNetConnection+"]["+clientSteamID+"]["+steamId+"]客户端连接成功");
 			}
 			else if (param.m_info.m_eState == ESteamNetworkingConnectionState.k_ESteamNetworkingConnectionState_ClosedByPeer || param.m_info.m_eState == ESteamNetworkingConnectionState.k_ESteamNetworkingConnectionState_ProblemDetectedLocally)
 			{
+				Debug.LogError("断开连接");
 				InternalDisconnect(param.m_hConn);
 			}
 			else
 			{
-				Debug.Log(nameof(QSteamServer)+" "+clientSteamID.GetName()+ " 连接状态更改 "+param.m_info.m_eState);
+				QDebug.Log(nameof(QSteamServer)+" "+clientSteamID.GetName()+ " 连接状态更改 "+param.m_info.m_eState);
 			}
 		}
 
