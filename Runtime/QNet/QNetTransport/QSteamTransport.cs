@@ -162,13 +162,14 @@ namespace QTool.Net
 		internal QSteamServer()
 		{
 			_ = QSteam.CreateLobby();
-			c_onConnectionChange = Callback<SteamNetConnectionStatusChangedCallback_t>.Create(OnConnectionStatusChanged);
 			SteamNetworkingUtils.InitRelayNetworkAccess();
-			listenSocket = SteamNetworkingSockets.CreateListenSocketP2P(0, 0, new SteamNetworkingConfigValue_t[0]);
+			c_onConnectionChange = Callback<SteamNetConnectionStatusChangedCallback_t>.Create(OnConnectionStatusChanged);
+			listenSocket = SteamNetworkingSockets.CreateListenSocketP2P(150, 0, new SteamNetworkingConfigValue_t[0]);
 		}
 
 		private void OnConnectionStatusChanged(SteamNetConnectionStatusChangedCallback_t param)
 		{
+			Debug.LogError("state " + param.m_info);
 			var clientSteamID = param.m_info.m_identityRemote.GetSteamID();
 			if (param.m_info.m_eState == ESteamNetworkingConnectionState.k_ESteamNetworkingConnectionState_Connecting)
 			{
@@ -312,8 +313,7 @@ namespace QTool.Net
 				await QSteam.JoinLobby(new CSteamID(UInt64.Parse(host)));
 				SteamNetworkingIdentity netId = new SteamNetworkingIdentity();
 				netId.SetSteamID(QSteam.CurrentLobby.owner);
-				SteamNetworkingConfigValue_t[] options = new SteamNetworkingConfigValue_t[] { };
-				HostConnection = SteamNetworkingSockets.ConnectP2P(ref netId, 0, options.Length, options);
+				HostConnection = SteamNetworkingSockets.ConnectP2P(ref netId, 150,0, new SteamNetworkingConfigValue_t[0]);
 				QDebug.Log("尝试连接 " + QSteam.CurrentLobby.owner.GetName());
 				if (!await QTask.Wait(5,true).IsCancel()&&!Connected)
 				{
