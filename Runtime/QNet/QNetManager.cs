@@ -443,13 +443,6 @@ namespace QTool.Net
 				}
 				GUILayout.EndVertical();
 			}
-			else
-			{
-				if (GUILayout.Button("开启主机", GUILayout.Width(150), GUILayout.Height(50)))
-				{
-					StartHost();
-				}
-			}
 			transport.DebugGUI();
 		}
 #endif

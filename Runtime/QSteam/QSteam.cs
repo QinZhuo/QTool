@@ -188,32 +188,34 @@ namespace QTool
             tempCall.Dispose();
             return returnValue;
         }
-        public static int DefaultLobbyMemebersCount = 4;
-        public static List<Lobby> lobbyList = new List<Lobby>();
-		public static Lobby CurLobby = default;
+        public static List<Lobby> LobbyList { get; private set; } = new List<Lobby>();
+
+		private static Lobby _CurrentLobby = default;
+		public static Lobby CurrentLobby => _CurrentLobby;
  
         private static int chatId = 0;
 		public static void SetLobbyMemberData(string key, string value)
         {
-            SteamMatchmaking.SetLobbyMemberData(CurLobby.steamID, key, value);
+			QDebug.Log(Name + "." + key + " = " + value);
+            SteamMatchmaking.SetLobbyMemberData(_CurrentLobby.steamID, key, value);
         }
         public static bool ChatSend(string text)
         {
             byte[] bytes = System.Text.Encoding.UTF8.GetBytes(text);
-            return SteamMatchmaking.SendLobbyChatMsg(CurLobby.steamID, bytes, bytes.Length + 1);
+            return SteamMatchmaking.SendLobbyChatMsg(_CurrentLobby.steamID, bytes, bytes.Length + 1);
         }
         public static event Action<string, CSteamID> OnChatReceive;
         public const int ReceiveBufferSize = 4096;
         public static async Task StartChatReceive()
         {
 
-            var chatLobbyId = CurLobby.steamID;
+            var chatLobbyId = _CurrentLobby.steamID;
             if (chatLobbyId.IsValid()) return;
             var buffer = new byte[ReceiveBufferSize];
-            while (chatLobbyId == CurLobby.steamID && Application.isPlaying)
+            while (chatLobbyId == _CurrentLobby.steamID && Application.isPlaying)
             {
                 await Task.Yield();
-                var length = SteamMatchmaking.GetLobbyChatEntry(CurLobby.steamID, chatId, out var id, buffer, buffer.Length, out var type);
+                var length = SteamMatchmaking.GetLobbyChatEntry(_CurrentLobby.steamID, chatId, out var id, buffer, buffer.Length, out var type);
                 if (length > 0)
                 {
                     chatId++;
@@ -232,42 +234,41 @@ namespace QTool
 		public static Callback<LobbyDataUpdate_t> OnUpdateLobby = null;
         public static void ExitLobby()
         {
-            SteamMatchmaking.LeaveLobby(CurLobby.steamID);
-			QDebug.Log("离开房间[" + CurLobby.steamID + "]");
+            SteamMatchmaking.LeaveLobby(_CurrentLobby.steamID);
+			QDebug.Log("离开房间[" + _CurrentLobby.steamID + "]");
 			OnUpdateLobby?.Unregister();
-            CurLobby = default;
+            _CurrentLobby = default;
         }
         static void SetCurRoom(ulong id)
         {
-            UpdateLobby((CSteamID)id, ref CurLobby);
+            UpdateLobby((CSteamID)id, ref _CurrentLobby);
             OnUpdateLobby = Callback<LobbyDataUpdate_t>.Create((info) =>
             {
-                UpdateLobby((CSteamID)info.m_ulSteamIDLobby, ref CurLobby);
+                UpdateLobby((CSteamID)info.m_ulSteamIDLobby, ref _CurrentLobby);
             });
-            SetLobbyMemberData("加入时间", DateTime.Now.ToString());
+            SetLobbyMemberData("加入时间", DateTime.Now.ToQTimeString());
             _=StartChatReceive();
             chatId = 0;
         }
-        public static async Task<bool> FastStart()
+        public static async Task<bool> FastJoin()
         {
             await FreshLobbys();
-            if (lobbyList.Count > 0)
+            if (LobbyList.Count > 0)
             {
-                for (int i = 0; i < lobbyList.Count; i++)
+                for (int i = 0; i < LobbyList.Count; i++)
                 {
-                    if (await JoinLobby(lobbyList[i].steamID))
+                    if (await JoinLobby(LobbyList[i].steamID))
                     {
 						return true;
 					}
 					else
 					{
-						Debug.LogError("加入房间 " + lobbyList[i].steamID + "失败");
+						Debug.LogError("加入房间 " + LobbyList[i].steamID + "失败");
 						return false;
 					}
                 }
             }
-			await CreateLobby();
-			return true;
+			return false;
 		}
         public static async Task<bool> JoinLobby(CSteamID id)
         {
@@ -282,25 +283,22 @@ namespace QTool
 			QDebug.Log("加入房间[" + join.m_ulSteamIDLobby + "]");
             return true;
         }
-        public static async Task CreateLobby(ELobbyType eLobbyType = ELobbyType.k_ELobbyTypePublic, int maxMembers = -1)
+        public static async Task CreateLobby(int maxMembers = 10,ELobbyType eLobbyType = ELobbyType.k_ELobbyTypePublic)
         {
-            while (!await PrivateCreateLobby(eLobbyType, maxMembers))
+            while (!await PrivateCreateLobby(maxMembers,eLobbyType))
             {
                 await Task.Delay(100);
 			}
-			CurLobby[nameof(Application.productName)] = Application.productName;
-			CurLobby[nameof(Application.version)] = Application.version;
-        }
-        private static async Task<bool> PrivateCreateLobby(ELobbyType eLobbyType = ELobbyType.k_ELobbyTypePublic, int maxMembers = -1)
+			_CurrentLobby[nameof(Name)] = Name;
+			_CurrentLobby[nameof(Application.productName)] = Application.productName;
+			_CurrentLobby[nameof(Application.version)] = Application.version;
+		}
+        private static async Task<bool> PrivateCreateLobby(int maxMembers = 10,ELobbyType eLobbyType = ELobbyType.k_ELobbyTypePublic)
         {
-            if (maxMembers < 0)
-            {
-                maxMembers = DefaultLobbyMemebersCount;
-            }
             var create = await SteamMatchmaking.CreateLobby(eLobbyType, maxMembers).GetResult<LobbyCreated_t>();
             if (create.m_ulSteamIDLobby != 0)
             {
-                Debug.Log("Steam创建房间成功[" + create.m_ulSteamIDLobby + "]");
+                QDebug.Log("Steam创建房间成功[" + create.m_ulSteamIDLobby + "]");
                 SetCurRoom(create.m_ulSteamIDLobby);
                 return true;
             }
@@ -326,7 +324,7 @@ namespace QTool
             for (int t = 0; t < lobby.data.Length; ++t)
             {
                 bool lobbyDataRet = SteamMatchmaking.GetLobbyDataByIndex(id, t, out lobby.data[t].m_Key, Constants.k_nMaxLobbyKeyLength, out lobby.data[t].m_Value, Constants.k_cubChatMetadataMax);
-                if (!lobbyDataRet)
+				if (!lobbyDataRet)
                 {
                     Debug.LogError("SteamMatchmaking.GetLobbyDataByIndex returned false." + t);
                     continue;
@@ -344,16 +342,16 @@ namespace QTool
 			SteamMatchmaking.AddRequestLobbyListStringFilter(nameof(Application.productName), Application.productName, ELobbyComparison.k_ELobbyComparisonEqual);
 			SteamMatchmaking.AddRequestLobbyListStringFilter(nameof(Application.version), Application.version, ELobbyComparison.k_ELobbyComparisonEqual);
 			var matchList = await SteamMatchmaking.RequestLobbyList().GetResult<LobbyMatchList_t>();
-            if (!Application.isPlaying) return null;
-            lobbyList.Clear();
+			if (!Application.isPlaying) return null;
+            LobbyList.Clear();
             for (int i = 0; i < matchList.m_nLobbiesMatching; i++)
             {
                 var id = SteamMatchmaking.GetLobbyByIndex(i);
                 var lobby = new Lobby();
                 UpdateLobby(id, ref lobby);
-                lobbyList.Add(lobby);
+                LobbyList.Add(lobby);
             }
-            return lobbyList;
+            return LobbyList;
         }
 		public struct LobbyMetaData
 		{
@@ -377,23 +375,35 @@ namespace QTool
 			{
 				get
 				{
-					foreach (var kv in data)
+					if (data != null)
 					{
-						if (kv.m_Key == key) return kv.m_Value;
+						foreach (var kv in data)
+						{
+							if (kv.m_Key == key.ToLower()) return kv.m_Value;
+						}
 					}
 					return "";
 				}
 				set
 				{
-					if (!SteamMatchmaking.SetLobbyData(steamID, key, value))
+					if (SteamMatchmaking.SetLobbyData(steamID, key, value))
 					{
-						Debug.LogError("设置大厅数据出错[" + steamID + "]" + key + ":" + value);
+						QDebug.Log("房间." + key + " = " + value);
+					}
+					else
+					{
+						Debug.LogError("设置大厅数据出错[" + steamID + "]" + key.ToLower() + ":" + value);
 					}
 				}
 			}
 			public override string ToString()
 			{
-				return steamID + ": " + members?.Length + "/" + MemberLimit;
+				var name = this[nameof(QSteam.Name)];
+				if (name.IsNull())
+				{
+					name = owner.GetName();
+				}
+				return name + " [" + members?.Length + "/" + MemberLimit+"]";
 			}
 		}
 		#endregion

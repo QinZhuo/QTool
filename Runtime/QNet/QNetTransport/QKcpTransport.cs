@@ -179,6 +179,7 @@ namespace QTool.Net
 		private string ServerIp = "localhost";
 		public override void DebugGUI()
 		{
+			base.DebugGUI();
 			if (ServerActive)
 			{
 				GUILayout.Label(Tool.LocalIp);

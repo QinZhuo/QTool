@@ -20,15 +20,16 @@ namespace QTool.Net
 		public int maxConnections = 10;
 		protected override void Awake()
 		{
+			base.Awake();
 			var id = QSteam.Id;
 			SteamNetworkingUtils.InitRelayNetworkAccess();
-			base.Awake();
+			_= QSteam.FreshLobbys();
 		}
 		public override void ServerStart()
 		{
 			if (!ServerActive)
 			{
-				Server = new QSteamServer(maxConnections);
+				Server = new QSteamServer();
 				Server.OnConnected += OnServerConnected;
 				Server.OnDisconnected += OnServerDisconnected;
 				Server.OnReceivedData += OnServerDataReceived;
@@ -104,23 +105,42 @@ namespace QTool.Net
 			base.ClientDisconnect();
 		}
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
-		private string ServerIp = "localhost";
+		private Vector2 ScrollPosition=Vector2.zero;
 		public override void DebugGUI()
 		{
 			if (ServerActive)
 			{
-				GUILayout.Label(QSteam.Id.ToString());
+				GUILayout.Label(QSteam.CurrentLobby.ToString());
+			}
+			else
+			{
+				if (GUILayout.Button("创建房间", GUILayout.Width(200), GUILayout.Height(30)))
+				{
+					GetComponent<QNetManager>().StartHost();
+				}
 			}
 			if (!ClientConnected)
 			{
-				ServerIp = GUILayout.TextField(ServerIp);
-				if (GUILayout.Button("开启客户端", GUILayout.Width(150), GUILayout.Height(50)))
+				if (QSteam.CurrentLobby.IsNull())
 				{
-					GetComponent<QNetManager>().StartClient(ServerIp);
-				}
-				if (GUILayout.Button("快速开始"))
-				{
-					 _=QSteam.FastStart();
+					if (QSteam.LobbyList.Count > 0)
+					{
+						using (var scroll = new GUILayout.ScrollViewScope(ScrollPosition, true, false, GUILayout.Width(200)))
+						{
+							foreach (var lobby in QSteam.LobbyList)
+							{
+								if (GUILayout.Button(lobby.ToString(), GUILayout.Width(180), GUILayout.Height(20)))
+								{
+									GetComponent<QNetManager>().StartClient(lobby.steamID.ToString());
+								}
+							}
+							ScrollPosition = scroll.scrollPosition;
+						}
+					}
+					if (GUILayout.Button("刷新房间", GUILayout.Width(200), GUILayout.Height(30)))
+					{
+						_ = QSteam.FreshLobbys();
+					}
 				}
 			}
 		}
@@ -141,9 +161,9 @@ namespace QTool.Net
 
 		private Callback<SteamNetConnectionStatusChangedCallback_t> c_onConnectionChange = null;
 
-		internal QSteamServer(int maxConnections)
+		internal QSteamServer()
 		{
-			this.maxConnections = maxConnections;
+			_ = QSteam.CreateLobby();
 			c_onConnectionChange = Callback<SteamNetConnectionStatusChangedCallback_t>.Create(OnConnectionStatusChanged);
 			SteamNetworkingUtils.InitRelayNetworkAccess();
 			listenSocket = SteamNetworkingSockets.CreateListenSocketP2P(0, 0, new SteamNetworkingConfigValue_t[0]);
@@ -283,7 +303,6 @@ namespace QTool.Net
 		internal event Action OnConnected;
 		internal event Action OnDisconnected;
 		private Callback<SteamNetConnectionStatusChangedCallback_t> c_onConnectionChange = null;
-		private CSteamID hostSteamID = CSteamID.Nil;
 		private HSteamNetConnection HostConnection;
 	
 		internal async void Connect(string host)
@@ -291,16 +310,15 @@ namespace QTool.Net
 			c_onConnectionChange = Callback<SteamNetConnectionStatusChangedCallback_t>.Create(OnConnectionStatusChanged);
 			try
 			{
-				hostSteamID = new CSteamID(UInt64.Parse(host));
-				SteamNetworkingIdentity smi = new SteamNetworkingIdentity();
-				smi.SetSteamID(hostSteamID);
-
+				await QSteam.JoinLobby(new CSteamID(UInt64.Parse(host)));
+				SteamNetworkingIdentity netId = new SteamNetworkingIdentity();
+				netId.SetSteamID(QSteam.CurrentLobby.owner);
 				SteamNetworkingConfigValue_t[] options = new SteamNetworkingConfigValue_t[] { };
-				HostConnection = SteamNetworkingSockets.ConnectP2P(ref smi, 0, options.Length, options);
-				QDebug.Log("尝试连接 " + host);
+				HostConnection = SteamNetworkingSockets.ConnectP2P(ref netId, 0, options.Length, options);
+				QDebug.Log("尝试连接 " + QSteam.CurrentLobby.owner.GetName());
 				if (!await QTask.Wait(5,true).IsCancel()&&!Connected)
 				{
-					Debug.LogError(nameof(QSteamClient)+" 连接 "+ host +" 超时");
+					Debug.LogError(nameof(QSteamClient)+" 连接 "+ QSteam.CurrentLobby.owner.GetName() + " 超时");
 					OnConnectionFailed();
 					return;
 				}
@@ -308,7 +326,7 @@ namespace QTool.Net
 			}
 			catch (FormatException)
 			{
-				Debug.LogError(nameof(QSteamClient) + "连接出错 ["+host+"]不是SteamId");
+				Debug.LogError(nameof(QSteamClient) + "连接出错 ["+host+"]不是房间Id");
 				Error = true;
 				OnConnectionFailed();
 			}
