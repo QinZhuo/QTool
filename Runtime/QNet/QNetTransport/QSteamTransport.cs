@@ -153,8 +153,6 @@ namespace QTool.Net
 		internal event Action<int, ArraySegment<byte>> OnReceivedData;
 		internal event Action<int> OnDisconnected;
 		internal event Action<int, Exception> OnReceivedError;
-
-		private int maxConnections;
 		public Dictionary<HSteamNetConnection, CSteamID> ConnectClients = new Dictionary<HSteamNetConnection, CSteamID>();
 
 		private HSteamListenSocket listenSocket;
@@ -171,10 +169,10 @@ namespace QTool.Net
 
 		private void OnConnectionStatusChanged(SteamNetConnectionStatusChangedCallback_t param)
 		{
-			ulong clientSteamID = param.m_info.m_identityRemote.GetSteamID64();
+			var clientSteamID = param.m_info.m_identityRemote.GetSteamID();
 			if (param.m_info.m_eState == ESteamNetworkingConnectionState.k_ESteamNetworkingConnectionState_Connecting)
 			{
-				if (ConnectClients.Count >= maxConnections)
+				if (clientSteamID.IsNull())
 				{
 					Debug.Log($"Incoming connection {clientSteamID} would exceed max connection count. Rejecting.");
 					SteamNetworkingSockets.CloseConnection(param.m_hConn, 0, "Max Connection Count", false);
@@ -185,11 +183,11 @@ namespace QTool.Net
 
 				if ((res = SteamNetworkingSockets.AcceptConnection(param.m_hConn)) == EResult.k_EResultOK)
 				{
-					Debug.Log($"Accepting connection {clientSteamID}");
+					QDebug.Log(nameof(QSteamServer)+ "["+ clientSteamID.GetName() + "]成功连接");
 				}
 				else
 				{
-					Debug.Log($"Connection {clientSteamID} could not be accepted: {res.ToString()}");
+					QDebug.LogWarning(nameof(QSteamServer) + "[" + clientSteamID.GetName() + "]连接失败:"+ res);
 				}
 			}
 			else if (param.m_info.m_eState == ESteamNetworkingConnectionState.k_ESteamNetworkingConnectionState_Connected)
@@ -205,7 +203,7 @@ namespace QTool.Net
 			}
 			else
 			{
-				Debug.Log($"Connection {clientSteamID} state changed: {param.m_info.m_eState.ToString()}");
+				Debug.Log(nameof(QSteamServer)+" "+clientSteamID.GetName()+ " 连接状态更改 "+param.m_info.m_eState);
 			}
 		}
 
@@ -348,21 +346,20 @@ namespace QTool.Net
 
 		private void OnConnectionStatusChanged(SteamNetConnectionStatusChangedCallback_t param)
 		{
-			ulong clientSteamID = param.m_info.m_identityRemote.GetSteamID64();
 			if (param.m_info.m_eState == ESteamNetworkingConnectionState.k_ESteamNetworkingConnectionState_Connected)
 			{
 				OnConnected.Invoke();
-				Debug.Log("Connection established.");
+				Debug.Log(nameof(QSteamClient) +" 连接["+ param.m_info.m_identityRemote.GetSteamID().GetName()+ "]成功");
 				Connected = true;
 			}
 			else if (param.m_info.m_eState == ESteamNetworkingConnectionState.k_ESteamNetworkingConnectionState_ClosedByPeer || param.m_info.m_eState == ESteamNetworkingConnectionState.k_ESteamNetworkingConnectionState_ProblemDetectedLocally)
 			{
-				Debug.Log($"Connection was closed by peer, {param.m_info.m_szEndDebug}");
+				Debug.LogError(nameof(QSteamClient) + " 连接被关闭 "+param.m_info.m_szEndDebug);
 				Disconnect();
 			}
 			else
 			{
-				Debug.Log($"Connection state changed: {param.m_info.m_eState.ToString()} - {param.m_info.m_szEndDebug}");
+				Debug.Log(nameof(QSteamClient) + " 连接状态更改 " + param.m_info.m_eState+" : "+param.m_info.m_szEndDebug);
 			}
 		}
 

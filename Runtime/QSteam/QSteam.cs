@@ -344,7 +344,9 @@ namespace QTool
         public static async Task<List<Lobby>> FreshLobbys()
 		{
 			SteamMatchmaking.AddRequestLobbyListStringFilter(nameof(Application.productName), Application.productName, ELobbyComparison.k_ELobbyComparisonEqual);
+#if !UNITY_EDITOR
 			SteamMatchmaking.AddRequestLobbyListStringFilter(nameof(Application.version), Application.version, ELobbyComparison.k_ELobbyComparisonEqual);
+#endif
 			var matchList = await SteamMatchmaking.RequestLobbyList().GetResult<LobbyMatchList_t>();
 			if (!Application.isPlaying) return null;
             LobbyList.Clear();
