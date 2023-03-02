@@ -176,7 +176,6 @@ namespace QTool.Net
             return $"{(bytes / (1024f * 1024f * 1024f)):F2} GB";
         }
 #if UNITY_EDITOR||DEVELOPMENT_BUILD
-		[HideInInspector, SerializeField]
 		private string ServerIp = "localhost";
 		public override void DebugGUI()
 		{

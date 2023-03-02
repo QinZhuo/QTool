@@ -104,6 +104,7 @@ namespace QTool.Net
 			base.ClientDisconnect();
 		}
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
+		private string ServerIp = "localhost";
 		public override void DebugGUI()
 		{
 			if (ServerActive)
@@ -112,6 +113,11 @@ namespace QTool.Net
 			}
 			if (!ClientConnected)
 			{
+				ServerIp = GUILayout.TextField(ServerIp);
+				if (GUILayout.Button("开启客户端", GUILayout.Width(150), GUILayout.Height(50)))
+				{
+					GetComponent<QNetManager>().StartClient(ServerIp);
+				}
 				if (GUILayout.Button("快速开始"))
 				{
 					 _=QSteam.FastStart();
