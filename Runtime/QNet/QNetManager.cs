@@ -26,7 +26,7 @@ namespace QTool.Net
 			Time.fixedDeltaTime = 1f / netFps;
 			Tool.AddPlayerLoop(typeof(QNetManager), QNetPlayerLoop,"FixedUpdate");
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
-			QToolManager.Instance.OnGUIEvent += GUI;
+			QToolManager.Instance.OnGUIEvent += DebugGUI;
 #endif
 		}
 		private void OnDestroy()
@@ -34,7 +34,7 @@ namespace QTool.Net
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
 			if (QToolManager.Instance != null)
 			{
-				QToolManager.Instance.OnGUIEvent -= GUI;
+				QToolManager.Instance.OnGUIEvent -= DebugGUI;
 			}
 #endif
 			QTime.RevertScale(this);
@@ -85,7 +85,6 @@ namespace QTool.Net
 		const int GameDataArray=-101;
 		const int GameDataArrayLength = 200;
 		QTimer ServerUpdateTimer;
-		[QName("启动服务器", "!" + nameof(NetActive))]
 		public void StartServer()
 		{
 			ServerSeed = UnityEngine.Random.Range(0,int.MaxValue);
@@ -188,7 +187,6 @@ namespace QTool.Net
 		private QNetSyncFlag SyncCheckFlag = new QNetSyncFlag();
 		internal static Dictionary<string, List<QNetBehaviour>> QNetSyncCheckList { get; private set; } = new Dictionary<string, List<QNetBehaviour>>();
 		public QList<string, QNetActionData> ClientActionData = new QList<string, QNetActionData>(()=>new QNetActionData());
-		[QName("启动客户端", "!" + nameof(NetActive))]
 		public void StartClient(string ip="127.0.0.1")
 		{
 			transport.OnClientConnected += () =>
@@ -433,10 +431,8 @@ namespace QTool.Net
 		}
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
 
-		[HideInInspector,SerializeField]
-		private string ServerIp = "127.0.0.1";
 		string LocalIp = "";
-		private void GUI()
+		private void DebugGUI()
 		{
 			if (LocalIp.IsNull())
 			{
@@ -458,13 +454,8 @@ namespace QTool.Net
 				{
 					StartHost();
 				}
-				ServerIp= GUILayout.TextField(ServerIp);
-				if (GUILayout.Button("开启客户端", GUILayout.Width(150), GUILayout.Height(50)))
-				{
-					StartClient(ServerIp);
-				}
 			}
-			
+			transport.DebugGUI();
 		}
 #endif
 

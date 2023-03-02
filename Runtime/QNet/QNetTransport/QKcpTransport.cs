@@ -37,20 +37,10 @@ namespace QTool.Net
         KcpServer Server { get; set; }
         KcpClient Client { get; set; }
 
-		[QName("日志")]
-        public bool debugLog;
-		[QName("日志UI",nameof(debugLog))]
-        public bool statisticsGUI;
-		[QName("日志信息", nameof(debugLog))]
-		public bool statisticsLog;
-
 		protected override void Awake()
         {
-            if (debugLog)
-                Log.Info = Debug.Log;
-            else
-                Log.Info = _ => {};
-            Log.Warning = Debug.LogWarning;
+			Log.Info = Debug.Log;
+			Log.Warning = Debug.LogWarning;
             Log.Error = Debug.LogError;
 
 #if ENABLE_IL2CPP
@@ -101,9 +91,6 @@ namespace QTool.Net
                       Timeout,
                       MaxRetransmit,
                       MaximizeSendReceiveBuffersToOSLimit);
-
-            if (statisticsLog)
-                InvokeRepeating(nameof(OnLogStatistics), 1, 1);
 			base.Awake();
         }
 
@@ -188,69 +175,20 @@ namespace QTool.Net
             // gigabytes
             return $"{(bytes / (1024f * 1024f * 1024f)):F2} GB";
         }
-
-// OnGUI allocates even if it does nothing. avoid in release.
-#if UNITY_EDITOR || DEVELOPMENT_BUILD
-        void OnGUI()
-        {
-            if (!statisticsGUI) return;
-			GUILayout.Space(50);
-
-			if (ServerActive)
-            {
-                GUILayout.BeginVertical("Box");
-                GUILayout.Label("SERVER");
-                GUILayout.Label($"  connections: {Server.connections.Count}");
-                GUILayout.Label($"  MaxSendRate (avg): {PrettyBytes(GetAverageMaxSendRate())}/s");
-                GUILayout.Label($"  MaxRecvRate (avg): {PrettyBytes(GetAverageMaxReceiveRate())}/s");
-                GUILayout.Label($"  SendQueue: {GetTotalSendQueue()}");
-                GUILayout.Label($"  ReceiveQueue: {GetTotalReceiveQueue()}");
-                GUILayout.Label($"  SendBuffer: {GetTotalSendBuffer()}");
-                GUILayout.Label($"  ReceiveBuffer: {GetTotalReceiveBuffer()}");
-                GUILayout.EndVertical();
-            }
-            if (ClientConnected)
-            {
-                GUILayout.BeginVertical("Box");
-                GUILayout.Label("CLIENT");
-                GUILayout.Label($"  MaxSendRate: {PrettyBytes(Client.connection.MaxSendRate)}/s");
-                GUILayout.Label($"  MaxRecvRate: {PrettyBytes(Client.connection.MaxReceiveRate)}/s");
-                GUILayout.Label($"  SendQueue: {Client.connection.SendQueueCount}");
-                GUILayout.Label($"  ReceiveQueue: {Client.connection.ReceiveQueueCount}");
-                GUILayout.Label($"  SendBuffer: {Client.connection.SendBufferCount}");
-                GUILayout.Label($"  ReceiveBuffer: {Client.connection.ReceiveBufferCount}");
-                GUILayout.EndVertical();
-            }
-        }
+#if UNITY_EDITOR||DEVELOPMENT_BUILD
+		[HideInInspector, SerializeField]
+		private string ServerIp = "localhost";
+		public override void DebugGUI()
+		{
+			if (!ClientConnected)
+			{
+				ServerIp = GUILayout.TextField(ServerIp);
+				if (GUILayout.Button("开启客户端", GUILayout.Width(150), GUILayout.Height(50)))
+				{
+					GetComponent<QNetManager>().StartClient(ServerIp);
+				}
+			}
+		}
 #endif
-
-        void OnLogStatistics()
-        {
-            if (ServerActive)
-            {
-                string log = "kcp SERVER @ time: " + Time.timeAsDouble + "\n";
-                log += $"  connections: {Server.connections.Count}\n";
-                log += $"  MaxSendRate (avg): {PrettyBytes(GetAverageMaxSendRate())}/s\n";
-                log += $"  MaxRecvRate (avg): {PrettyBytes(GetAverageMaxReceiveRate())}/s\n";
-                log += $"  SendQueue: {GetTotalSendQueue()}\n";
-                log += $"  ReceiveQueue: {GetTotalReceiveQueue()}\n";
-                log += $"  SendBuffer: {GetTotalSendBuffer()}\n";
-                log += $"  ReceiveBuffer: {GetTotalReceiveBuffer()}\n\n";
-                Debug.Log(log);
-            }
-
-            if (ClientConnected)
-            {
-                string log = "kcp CLIENT @ time: " +Time.timeAsDouble+ "\n";
-                log += $"  MaxSendRate: {PrettyBytes(Client.connection.MaxSendRate)}/s\n";
-                log += $"  MaxRecvRate: {PrettyBytes(Client.connection.MaxReceiveRate)}/s\n";
-                log += $"  SendQueue: {Client.connection.SendQueueCount}\n";
-                log += $"  ReceiveQueue: {Client.connection.ReceiveQueueCount}\n";
-                log += $"  SendBuffer: {Client.connection.SendBufferCount}\n";
-                log += $"  ReceiveBuffer: {Client.connection.ReceiveBufferCount}\n\n";
-                Debug.Log(log);
-            }
-        }
-
-    }
+	}
 }

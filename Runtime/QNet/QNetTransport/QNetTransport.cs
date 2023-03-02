@@ -27,10 +27,7 @@ namespace QTool.Net
 			{
 				OnClientDataReceived(new ArraySegment<byte>(segment));
 			}
-			else
-			{
-				ServerSend(connectionId,segment);
-			}
+			ServerSend(connectionId, segment);
 		}
 		protected abstract void ServerSend(int connectionId, byte[] segment);
 		public virtual void ServerSendUpdate() { }
@@ -96,6 +93,10 @@ namespace QTool.Net
 		public virtual void OnDestroy()
 		{
 			Shutdown();
+		}
+		public virtual void DebugGUI()
+		{
+
 		}
 	}
 }
