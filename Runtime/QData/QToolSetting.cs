@@ -2,20 +2,22 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using QTool.Inspector;
+using QTool.Reflection;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
 namespace QTool
 {
+	[QName("基础设置")]
 	public class QToolSetting : InstanceScriptable<QToolSetting>
 	{
 #if Steamworks
 		public uint SteamId=480;
 #endif
-		public QMailAccount QAnalysisMail;
-		public string QAnalysisProject;
-		[QEnum(nameof(GetModList))]
+		[QName("支持Mod文件夹"),QEnum(nameof(GetModList))]
 		public List<string> modeList = new List<string> { nameof(QTranslate.QTranslateData) };
+		[QName("游戏数据邮箱")]
+		public QMailAccount QAnalysisMail;
 		public static List<string> GetModList()
 		{
 			List<string> pathList = new List<string>();

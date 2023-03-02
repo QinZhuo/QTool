@@ -137,7 +137,7 @@ namespace QTool
 			stopTask = null;
 		}
 		static string _startKey = null;
-		public static string StartKey => _startKey??= nameof(QAnalysis) + "_" + (string.IsNullOrEmpty(QToolSetting.Instance.QAnalysisProject)? Application.productName: QToolSetting.Instance.QAnalysisProject);
+		public static string StartKey => _startKey??= nameof(QAnalysis) + "_" + Application.productName;
 		public static string EventListKey => StartKey + "_" + nameof(EventList);
 	
 		static async Task SendAndClear()

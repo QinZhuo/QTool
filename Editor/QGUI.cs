@@ -9,8 +9,6 @@ using System.Reflection;
 using QTool.FlowGraph;
 namespace QTool
 {
-
-
 	public static class QGUI
 	{
 		static QGUI()
@@ -34,7 +32,48 @@ namespace QTool
 			
 			};
 		}
-	
+
+		[SettingsProvider]
+		public static SettingsProvider QToolSetting()
+		{
+			return new SettingsProvider("Project/" + nameof(QTool)+"设置", SettingsScope.Project)
+			{
+				guiHandler = (searchContext) =>
+				{
+					foreach (var SettingType in typeof(InstanceScriptable<>).GetAllTypes())
+					{
+						using (new GUILayout.VerticalScope(BackStyle))
+						{
+							GUILayout.Label(SettingType.QName(), TitleLable);
+							new SerializedObject(SettingType.InvokeFunction(nameof(QTool.QToolSetting.Instance)) as ScriptableObject).Draw();
+						}
+					}
+				}
+			};
+		}
+		public static void Draw(this SerializedObject serializedObject)
+		{
+			var iterator = serializedObject.GetIterator();
+			if (iterator.NextVisible(true))
+			{
+				do
+				{
+					if ("m_Script".Equals(iterator.name))
+					{
+						GUI.enabled = false;
+					}
+					if (iterator.IsShow())
+					{
+						EditorGUILayout.PropertyField(iterator, new GUIContent(iterator.QName()));
+					}
+					if ("m_Script".Equals(iterator.name))
+					{
+						GUI.enabled = true;
+					}
+				} while (iterator.NextVisible(false));
+				serializedObject.ApplyModifiedProperties();
+			}
+		}
 		public static QDictionary<int, Action> OnChangeDelayCall = new QDictionary<int, Action>();
 		public static QDictionary<string, bool> FoldoutDic = new QDictionary<string, bool>();
 		public static QDictionary<Type, Func<object, string, object>> DrawOverride = new QDictionary<Type, Func<object, string, object>>();
