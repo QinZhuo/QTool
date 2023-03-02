@@ -431,14 +431,9 @@ namespace QTool.Net
 		}
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
 
-		string LocalIp = "";
+
 		private void DebugGUI()
 		{
-			if (LocalIp.IsNull())
-			{
-				LocalIp = Dns.GetHostEntry(Dns.GetHostName()).AddressList.FirstOrDefault(a => a.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork).ToString();
-			}
-			GUILayout.Label(LocalIp);
 			if (NetActive)
 			{
 				GUILayout.BeginVertical("Box");

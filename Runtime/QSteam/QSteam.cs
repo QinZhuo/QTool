@@ -190,7 +190,7 @@ namespace QTool
         }
         public static int DefaultLobbyMemebersCount = 4;
         public static List<Lobby> lobbyList = new List<Lobby>();
-        public static Lobby CurLobby;
+		public static Lobby CurLobby = default;
  
         private static int chatId = 0;
 		public static void SetLobbyMemberData(string key, string value)
@@ -248,9 +248,9 @@ namespace QTool
             _=StartChatReceive();
             chatId = 0;
         }
-        public static async Task<bool> FastJoin(string game,bool autoCreate=true)
+        public static async Task<bool> FastStart()
         {
-            await FreshLobbys(game);
+            await FreshLobbys();
             if (lobbyList.Count > 0)
             {
                 for (int i = 0; i < lobbyList.Count; i++)
@@ -266,13 +266,9 @@ namespace QTool
 					}
                 }
             }
-			if (autoCreate)
-			{
-				await CreateLobby(game);
-				return true;	
-			}
-            return false;
-        }
+			await CreateLobby();
+			return true;
+		}
         public static async Task<bool> JoinLobby(CSteamID id)
         {
             var join = await SteamMatchmaking.JoinLobby(id).GetResult<LobbyEnter_t>();
@@ -286,16 +282,14 @@ namespace QTool
 			QDebug.Log("加入房间[" + join.m_ulSteamIDLobby + "]");
             return true;
         }
-        public static async Task CreateLobby(string Game, ELobbyType eLobbyType = ELobbyType.k_ELobbyTypePublic, int maxMembers = -1)
+        public static async Task CreateLobby(ELobbyType eLobbyType = ELobbyType.k_ELobbyTypePublic, int maxMembers = -1)
         {
             while (!await PrivateCreateLobby(eLobbyType, maxMembers))
             {
                 await Task.Delay(100);
-            }
-            if (!string.IsNullOrWhiteSpace(Game))
-            {
-                CurLobby[nameof(Game)] = Game;
-            }
+			}
+			CurLobby[nameof(Application.productName)] = Application.productName;
+			CurLobby[nameof(Application.version)] = Application.version;
         }
         private static async Task<bool> PrivateCreateLobby(ELobbyType eLobbyType = ELobbyType.k_ELobbyTypePublic, int maxMembers = -1)
         {
@@ -339,22 +333,20 @@ namespace QTool
                 }
             }
         }
-        public static async Task<List<Lobby>> FreshLobbys(string Game)
-        {
-            return await FreshLobbys(nameof(Game), Game);
-        }
         public static async Task<List<Lobby>> FreshLobbys(string key,string value)
         {
 			QDebug.Log("刷新房间列表[" + key + ":" + value + "]");
             SteamMatchmaking.AddRequestLobbyListStringFilter(key, value, ELobbyComparison.k_ELobbyComparisonEqual);
             return await FreshLobbys();
         }
-        private static async Task<List<Lobby>> FreshLobbys()
-        {
-            var mList = await SteamMatchmaking.RequestLobbyList().GetResult<LobbyMatchList_t>();
+        public static async Task<List<Lobby>> FreshLobbys()
+		{
+			SteamMatchmaking.AddRequestLobbyListStringFilter(nameof(Application.productName), Application.productName, ELobbyComparison.k_ELobbyComparisonEqual);
+			SteamMatchmaking.AddRequestLobbyListStringFilter(nameof(Application.version), Application.version, ELobbyComparison.k_ELobbyComparisonEqual);
+			var matchList = await SteamMatchmaking.RequestLobbyList().GetResult<LobbyMatchList_t>();
             if (!Application.isPlaying) return null;
             lobbyList.Clear();
-            for (int i = 0; i < mList.m_nLobbiesMatching; i++)
+            for (int i = 0; i < matchList.m_nLobbiesMatching; i++)
             {
                 var id = SteamMatchmaking.GetLobbyByIndex(i);
                 var lobby = new Lobby();

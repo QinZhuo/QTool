@@ -15,6 +15,7 @@ using UnityEngine.Networking;
 using UnityEngine.LowLevel;
 using System.Linq;
 using UnityEngine.Playables;
+using System.Net;
 
 namespace QTool
 {
@@ -24,6 +25,9 @@ namespace QTool
     {
 		public static bool IsBuilding { set; get; }
 		public static CultureInfo RealyCulture= CultureInfo.CurrentCulture;
+		private static string _LocalIp = null;
+		public static string LocalIp => _LocalIp??= Dns.GetHostEntry(Dns.GetHostName()).AddressList.FirstOrDefault(a => a.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork).ToString();
+
 #if UNITY_EDITOR
 		[UnityEditor.InitializeOnLoadMethod]
 #else

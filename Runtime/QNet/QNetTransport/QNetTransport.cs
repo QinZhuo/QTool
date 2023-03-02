@@ -23,11 +23,14 @@ namespace QTool.Net
 		}
 		public void CheckServerSend(int connectionId, byte[] segment)
 		{
-			if (ClientConnected)
+			if (connectionId==0)
 			{
 				OnClientDataReceived(new ArraySegment<byte>(segment));
 			}
-			ServerSend(connectionId, segment);
+			else
+			{
+				ServerSend(connectionId, segment);
+			}
 		}
 		protected abstract void ServerSend(int connectionId, byte[] segment);
 		public virtual void ServerSendUpdate() { }

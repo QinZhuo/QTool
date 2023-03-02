@@ -103,6 +103,22 @@ namespace QTool.Net
 			QDebug.Log(nameof(QSteamTransport) + "客户端断开连接");
 			base.ClientDisconnect();
 		}
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+		public override void DebugGUI()
+		{
+			if (ServerActive)
+			{
+				GUILayout.Label(QSteam.Id.ToString());
+			}
+			if (!ClientConnected)
+			{
+				if (GUILayout.Button("快速开始"))
+				{
+					 _=QSteam.FastStart();
+				}
+			}
+		}
+#endif
 	}
 
 	public class QSteamServer
@@ -391,6 +407,7 @@ namespace QTool.Net
 		{
 			SteamNetworkingSockets.FlushMessagesOnConnection(HostConnection);
 		}
+
 	}
 }
 #endif
