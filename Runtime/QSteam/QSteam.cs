@@ -335,6 +335,7 @@ namespace QTool
                     continue;
                 }
             }
+			QDebug.Log("房间信息更新:\n" + lobby.ToDetailString());
         }
         public static async Task<List<Lobby>> FreshLobbys(string key,string value)
         {
@@ -388,7 +389,7 @@ namespace QTool
 					{
 						foreach (var kv in data)
 						{
-							if (kv.m_Key == key.ToLower()) return kv.m_Value;
+							if (kv.m_Key == key||kv.m_Key.ToLower()==key.ToLower()) return kv.m_Value;
 						}
 					}
 					return "";
@@ -401,7 +402,7 @@ namespace QTool
 					}
 					else
 					{
-						Debug.LogError("设置大厅数据出错[" + steamID + "]" + key.ToLower() + ":" + value);
+						Debug.LogError("设置大厅数据出错[" + steamID + "]" + key+ ":" + value);
 					}
 				}
 			}
@@ -413,6 +414,15 @@ namespace QTool
 					name = owner.GetName();
 				}
 				return name + " [" + members?.Length + "/" + MemberLimit+"]["+ steamID.ToShortString(4)+"]";
+			}
+			public string ToDetailString()
+			{
+				var dataStr= ToString();
+				foreach (var d in data)
+				{
+					dataStr += "[" + d.m_Key + "]:[" + d.m_Value + "]";
+				}
+				return dataStr;
 			}
 		}
 #endregion
