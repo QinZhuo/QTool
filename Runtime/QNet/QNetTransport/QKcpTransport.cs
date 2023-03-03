@@ -186,8 +186,8 @@ namespace QTool.Net
 			}
 			if (!ClientConnected)
 			{
-				ServerIp = GUILayout.TextField(ServerIp);
-				if (GUILayout.Button("开启客户端", GUILayout.Width(150), GUILayout.Height(50)))
+				ServerIp = GUILayout.TextField(ServerIp, GUILayout.Width(200));
+				if (GUILayout.Button("开启客户端", GUILayout.Width(200), GUILayout.Height(30)))
 				{
 					GetComponent<QNetManager>().StartClient(ServerIp);
 				}

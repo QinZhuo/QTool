@@ -99,9 +99,12 @@ namespace QTool.Net
 		}
 		public virtual void DebugGUI()
 		{
-			if (GUILayout.Button("开启主机", GUILayout.Width(150), GUILayout.Height(50)))
+			if (!ServerActive)
 			{
-				GetComponent<QNetManager>().StartHost();
+				if (GUILayout.Button("开启主机", GUILayout.Width(200), GUILayout.Height(30)))
+				{
+					GetComponent<QNetManager>().StartHost();
+				}
 			}
 		}
 	}

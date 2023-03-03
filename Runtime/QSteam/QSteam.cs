@@ -289,7 +289,11 @@ namespace QTool
         {
             while (!await PrivateCreateLobby(maxMembers,eLobbyType))
             {
-                await Task.Delay(100);
+                if(await QTask.Wait(1,true).IsCancel())
+				{
+					QDebug.Log(nameof(QSteam)+" 取消创建房间");
+					return;
+				}
 			}
 			_CurrentLobby[nameof(Name)] = Name;
 			_CurrentLobby[nameof(Application.productName)] = Application.productName;
@@ -306,7 +310,7 @@ namespace QTool
             }
             else
             {
-                Debug.LogError("Steam创建房间出错");
+                Debug.LogError("Steam创建房间出错"+ create.m_eResult);
                 return false;
             }
         }
