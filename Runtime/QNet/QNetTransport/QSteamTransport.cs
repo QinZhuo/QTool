@@ -153,7 +153,7 @@ namespace QTool.Net
 						{
 							foreach (var lobby in QSteam.LobbyList)
 							{
-								if (GUILayout.Button(lobby.ToString(), GUILayout.Width(180), GUILayout.Height(20)))
+								if (GUILayout.Button(lobby.ToString(), GUILayout.Width(175), GUILayout.Height(40)))
 								{
 									GetComponent<QNetManager>().StartClient(lobby.steamID.ToString());
 								}

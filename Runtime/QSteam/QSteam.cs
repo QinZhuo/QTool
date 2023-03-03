@@ -413,7 +413,7 @@ namespace QTool
 				{
 					name = owner.GetName();
 				}
-				return name + " [" + members?.Length + "/" + MemberLimit+"]["+ steamID+"]";
+				return name + " [" + members?.Length + "/" + MemberLimit+"]\n["+ steamID+"]";
 			}
 			public string ToDetailString()
 			{
