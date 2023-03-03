@@ -237,9 +237,9 @@ namespace QTool.Net
 			if (ConnectClients.ContainsKey(socket))
 			{
 				OnDisconnected.Invoke((int)socket.m_HSteamNetConnection);
-				SteamNetworkingSockets.CloseConnection(socket, 0, "Graceful disconnect", false);
+				SteamNetworkingSockets.CloseConnection(socket, 0, "正常断开连接", false);
+				Debug.Log(nameof(QSteamServer)+" 玩家 ["+new CSteamID(ConnectClients[socket].m_SteamID).GetName()+"] 断开连接.");
 				ConnectClients.Remove(socket);
-				Debug.Log($"Client with ConnectionID {ConnectClients[socket].m_SteamID} disconnected.");
 			}
 		}
 
@@ -308,6 +308,7 @@ namespace QTool.Net
 		}
 		public void Shutdown()
 		{
+			QSteam.LeaveLobby();
 			SteamNetworkingSockets.CloseListenSocket(listenSocket);
 			if (c_onConnectionChange != null)
 			{
@@ -383,8 +384,8 @@ namespace QTool.Net
 
 		public void Disconnect()
 		{
+			QSteam.LeaveLobby();
 			Dispose();
-
 			if (HostConnection.m_HSteamNetConnection != 0)
 			{
 				Debug.Log("Sending Disconnect message");

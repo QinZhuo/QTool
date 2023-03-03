@@ -54,7 +54,6 @@ namespace QTool
 			}
 			SteamClient.SetWarningMessageHook(SteamAPIDebugTextHook);
 			QToolManager.Instance.OnUpdateEvent += SteamAPI.RunCallbacks;
-			QToolManager.Instance.OnDestroyEvent +=QSteam.ExitLobby;
 			QToolManager.Instance.OnDestroyEvent += SteamAPI.Shutdown;
 			QDebug.Log(nameof(QSteam) + " 初始化成功 [" + Name + "]["+Id+"]");
 		}
@@ -232,7 +231,7 @@ namespace QTool
             }
         }
 		public static Callback<LobbyDataUpdate_t> OnUpdateLobby = null;
-        public static void ExitLobby()
+        public static void LeaveLobby()
         {
 			if (CurrentLobby.IsNull()) return;
             SteamMatchmaking.LeaveLobby(_CurrentLobby.steamID);
