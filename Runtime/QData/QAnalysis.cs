@@ -14,7 +14,6 @@ namespace QTool
 			游戏_结束,
 			游戏_暂离,
 			游戏_错误,
-			游戏_帧数,
 			游戏_场景,
 		}
 		public static string PlayerId { private set; get; }
@@ -203,7 +202,6 @@ namespace QTool
 					}
 					var eventData = new QAnalysisEvent(PlayerId,eventKey, value);
 					EventList.Add(eventData);
-					EventList.Add(new QAnalysisEvent(PlayerId,nameof(QAnalysisEventName.游戏_帧数).Replace("_","/"),QToolManager.Instance.FPS));
 					QPlayerPrefs.SetString(EventListKey, EventList.ToQData());
 					QDebug.Log(StartKey + " 触发事件 " + eventData);
 					if (AutoSendCount >= 1 && EventList.Count >= AutoSendCount)
