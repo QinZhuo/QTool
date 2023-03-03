@@ -338,12 +338,6 @@ namespace QTool.Net
 				netId.SetSteamID(QSteam.CurrentLobby.owner);
 				HostConnection = SteamNetworkingSockets.ConnectP2P(ref netId, 0,0, new SteamNetworkingConfigValue_t[0]);
 				QDebug.Log("尝试连接 " + QSteam.CurrentLobby.owner.GetName());
-				if (!await QTask.Wait(5,true).IsCancel()&&!Connected)
-				{
-					Debug.LogError(nameof(QSteamClient)+" 连接 "+ QSteam.CurrentLobby.owner.GetName() + " 超时");
-					OnConnectionFailed();
-					return;
-				}
 
 			}
 			catch (FormatException)
@@ -378,7 +372,7 @@ namespace QTool.Net
 			}
 			else if (param.m_info.m_eState == ESteamNetworkingConnectionState.k_ESteamNetworkingConnectionState_ClosedByPeer || param.m_info.m_eState == ESteamNetworkingConnectionState.k_ESteamNetworkingConnectionState_ProblemDetectedLocally)
 			{
-				Debug.LogError(nameof(QSteamClient) + " 连接被关闭 "+param.m_info.m_szEndDebug);
+				Debug.LogError(nameof(QSteamClient) + " 连接被关闭 ["+ param.m_info.m_identityRemote.GetSteamID().GetName() +"]:"+param.m_info.m_szEndDebug);
 				Disconnect();
 			}
 			else
