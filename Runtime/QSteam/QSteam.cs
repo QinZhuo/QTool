@@ -52,12 +52,11 @@ namespace QTool
 				Debug.LogError(nameof(QSteam) + " 初始化失败");
 				return;
 			}
-			QDebug.Log(nameof(QSteam) + " 初始化成功 [" + Name + "]");
 			SteamClient.SetWarningMessageHook(SteamAPIDebugTextHook);
 			QToolManager.Instance.OnUpdateEvent += SteamAPI.RunCallbacks;
 			QToolManager.Instance.OnDestroyEvent +=QSteam.ExitLobby;
 			QToolManager.Instance.OnDestroyEvent += SteamAPI.Shutdown;
-			SteamUser.GetSteamID();
+			QDebug.Log(nameof(QSteam) + " 初始化成功 [" + Name + "]["+Id+"]");
 		}
 		[AOT.MonoPInvokeCallback(typeof(SteamAPIWarningMessageHook_t))]
 		private static void SteamAPIDebugTextHook(int nSeverity, System.Text.StringBuilder pchDebugText)
@@ -352,13 +351,15 @@ namespace QTool
 			var matchList = await SteamMatchmaking.RequestLobbyList().GetResult<LobbyMatchList_t>();
 			if (!Application.isPlaying) return null;
             LobbyList.Clear();
+			QDebug.Log(nameof(QSteam) + " 刷新房间结束");
             for (int i = 0; i < matchList.m_nLobbiesMatching; i++)
             {
                 var id = SteamMatchmaking.GetLobbyByIndex(i);
                 var lobby = new Lobby();
                 UpdateLobby(id, ref lobby);
                 LobbyList.Add(lobby);
-            }
+				QDebug.Log(nameof(QSteam) + " 房间信息 "+lobby);
+			}
             return LobbyList;
         }
 		public struct LobbyMetaData
