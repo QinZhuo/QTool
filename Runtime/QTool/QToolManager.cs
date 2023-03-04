@@ -19,6 +19,7 @@ namespace QTool
 		}
 		public event Action OnUpdateEvent = null;
 		public event Action OnDestroyEvent = null;
+		public event Action OnLateDestroyEvent = null;
 		public event Action OnGUIEvent = null;
 		private void Update()
 		{
@@ -28,6 +29,7 @@ namespace QTool
 		private void OnDestroy()
 		{
 			OnDestroyEvent?.Invoke();
+			OnLateDestroyEvent?.Invoke();
 		}
 		public int FPS => (int)Fps.SecondeSum;
 		QAverageValue Fps = new QAverageValue();

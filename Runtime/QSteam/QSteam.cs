@@ -54,7 +54,8 @@ namespace QTool
 			}
 			SteamClient.SetWarningMessageHook(SteamAPIDebugTextHook);
 			QToolManager.Instance.OnUpdateEvent += SteamAPI.RunCallbacks;
-			QToolManager.Instance.OnDestroyEvent += SteamAPI.Shutdown;
+			QToolManager.Instance.OnLateDestroyEvent +=LeaveLobby;
+			QToolManager.Instance.OnLateDestroyEvent += SteamAPI.Shutdown;
 			QDebug.Log(nameof(QSteam) + " 初始化成功 [" + Name + "]["+Id+"]");
 		}
 		[AOT.MonoPInvokeCallback(typeof(SteamAPIWarningMessageHook_t))]

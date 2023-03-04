@@ -97,30 +97,6 @@ namespace QTool.Net
 		{
 			Client?.ReceiveData();
 		}
-		[QName]
-		public async void Steamtest()
-		{
-			ClientConnect(QSteam.CurrentLobby.steamID.ToString());
-			//await QSteam.CreateLobby();
-
-			//Callback<SteamNetConnectionStatusChangedCallback_t>.Create((param) =>
-			//{
-			//	var clientSteamID = param.m_info.m_identityRemote.GetSteamID();
-			//	if (param.m_info.m_eState == ESteamNetworkingConnectionState.k_ESteamNetworkingConnectionState_Connecting)
-			//	{
-			//		SteamNetworkingSockets.AcceptConnection(param.m_hConn);
-			//		QDebug.Log("接收 " + clientSteamID.GetName());
-			//	}
-			//	else
-			//	{
-			//		QDebug.Log(nameof(QSteamServer) + " " + clientSteamID.GetName() + " 连接状态更改 " + param.m_info.m_eState);
-			//	}
-			//});
-			//SteamNetworkingSockets.CreateListenSocketP2P(0, 0, new SteamNetworkingConfigValue_t[0]);
-			//var netId = new SteamNetworkingIdentity();
-			//netId.SetSteamID(QSteam.Id);
-			//SteamNetworkingSockets.ConnectP2P(ref netId, 0, 0, new SteamNetworkingConfigValue_t[0]);
-		}
 		public override void ClientDisconnect()
 		{
 			Client?.Disconnect();

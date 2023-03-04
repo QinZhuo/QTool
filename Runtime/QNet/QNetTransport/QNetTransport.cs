@@ -6,6 +6,16 @@ namespace QTool.Net
 {
 	public abstract class QNetTransport : MonoBehaviour
 	{
+		protected virtual void Awake()
+		{
+			OnClientConnected += () => ClientConnected = true;
+			QToolManager.Instance.OnDestroyEvent += Shutdown;
+		}
+		public virtual void Shutdown()
+		{
+			ClientDisconnect();
+			ServerStop();
+		}
 		#region 服务器
 		public Action<int> OnServerConnected;
 		public Action<int, ArraySegment<byte>> OnServerDataReceived;
@@ -13,10 +23,7 @@ namespace QTool.Net
 		public Action<int, Exception> OnServerError;
 		public Action<int> OnServerDisconnected;
 		public bool ServerActive { get; private set; }
-		protected virtual void Awake()
-		{
-			OnClientConnected += () => ClientConnected = true;
-		}
+		
 		public virtual void ServerStart()
 		{
 			ServerActive = true;
@@ -87,16 +94,9 @@ namespace QTool.Net
 #pragma warning disable UNT0001
 		public void Update() { }
 		public void LateUpdate() { }
-#pragma warning restore UNT0001 
-		public virtual void Shutdown()
-		{
-			ClientDisconnect();
-			ServerStop();
-		}
-		public virtual void OnDestroy()
-		{
-			Shutdown();
-		}
+#pragma warning restore UNT0001
+	
+		
 		public virtual void DebugGUI()
 		{
 			if (!ServerActive)
