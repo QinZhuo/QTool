@@ -33,7 +33,7 @@ namespace QTool.Net
 				Server.OnConnected += OnServerConnected;
 				Server.OnDisconnected += OnServerDisconnected;
 				Server.OnReceivedData += OnServerDataReceived;
-				Server.OnReceivedError += OnServerError;
+				Server.OnError += OnServerError;
 			}
 			else
 			{
@@ -152,7 +152,7 @@ namespace QTool.Net
 		internal event Action<int> OnConnected;
 		internal event Action<int, ArraySegment<byte>> OnReceivedData;
 		internal event Action<int> OnDisconnected;
-		internal event Action<int, Exception> OnReceivedError;
+		internal event Action<int, Exception> OnError;
 		public Dictionary<HSteamNetConnection, CSteamID> ConnectClients = new Dictionary<HSteamNetConnection, CSteamID>();
 
 		private HSteamListenSocket listenSocket;
@@ -172,12 +172,18 @@ namespace QTool.Net
 			var clientSteamID = param.m_info.m_identityRemote.GetSteamID();
 			if (param.m_info.m_eState == ESteamNetworkingConnectionState.k_ESteamNetworkingConnectionState_Connecting)
 			{
-				//if (clientSteamID.IsNull())
-				//{
-				//	Debug.Log($"Incoming connection {clientSteamID} would exceed max connection count. Rejecting.");
-				//	SteamNetworkingSockets.CloseConnection(param.m_hConn, 0, "Max Connection Count", false);
-				//	return;
-				//}
+				if (clientSteamID==QSteam.Id)
+				{
+					Debug.LogError(nameof(QSteamServer) + " 主机[" + QSteam.Id.GetName() + "]无法自连接");
+					SteamNetworkingSockets.CloseConnection(param.m_hConn, 0, "主机无法自连接", false);
+					return;
+				}
+				else if(!QSteam.CurrentLobby.members.ContainsKey(clientSteamID))
+				{
+					Debug.LogError(nameof(QSteamServer) + " 非房间内玩家[" + clientSteamID.GetName() + "]无法连接");
+					SteamNetworkingSockets.CloseConnection(param.m_hConn, 0, "非房间内玩家", false);
+					return;
+				}
 				QDebug.Log(nameof(QSteamServer) + "[" + clientSteamID.GetName() + "]尝试连接");
 				EResult res;
 
@@ -214,7 +220,7 @@ namespace QTool.Net
 			{
 				OnDisconnected.Invoke((int)socket.m_HSteamNetConnection);
 				SteamNetworkingSockets.CloseConnection(socket, 0, "正常断开连接", false);
-				Debug.Log(nameof(QSteamServer)+" 玩家 ["+new CSteamID(ConnectClients[socket].m_SteamID).GetName()+"] 断开连接.");
+				QDebug.Log(nameof(QSteamServer)+" 玩家 ["+new CSteamID(ConnectClients[socket].m_SteamID).GetName()+"] 断开连接.");
 				ConnectClients.Remove(socket);
 			}
 		}
@@ -224,14 +230,14 @@ namespace QTool.Net
 			var connection = new HSteamNetConnection((uint)connectionId);
 			if (ConnectClients.ContainsKey(connection))
 			{
-				Debug.Log($"Connection id {connectionId} disconnected.");
-				SteamNetworkingSockets.CloseConnection(connection, 0, "Disconnected by server", false);
+				QDebug.Log(nameof(QSteamServer)+" 断开["+ConnectClients[connection].GetName()+"]连接");
+				SteamNetworkingSockets.CloseConnection(connection, 0, "服务器主动断开连接", false);
 				ConnectClients.Remove(connection);
 				OnDisconnected(connectionId);
 			}
 			else
 			{
-				Debug.LogWarning("Trying to disconnect unknown connection id: " + connectionId);
+				QDebug.LogWarning("尝试断开未知连接[" + connectionId+"]");
 			}
 		}
 
@@ -268,18 +274,18 @@ namespace QTool.Net
 
 				if (res == EResult.k_EResultNoConnection || res == EResult.k_EResultInvalidParam)
 				{
-					Debug.Log($"Connection to {connectionId} was lost.");
+					QDebug.Log(nameof(QSteamServer)+ " 与["+ ConnectClients[connection].GetName()+ "]的连接丢失");
 					InternalDisconnect(connection);
 				}
 				else if (res != EResult.k_EResultOK)
 				{
-					Debug.LogError($"Could not send: {res.ToString()}");
+					Debug.LogError(nameof(QSteamServer)+" 发送消息失败 "+res);
 				}
 			}
 			else
 			{
-				Debug.LogError("Trying to send on unknown connection: " + connectionId);
-				OnReceivedError.Invoke(connectionId, new Exception("ERROR Unknown Connection"));
+				Debug.LogError(nameof(QSteamServer)+" 尝试发送消息给未知连接 " + connectionId);
+				OnError.Invoke(connectionId, new Exception("未知连接"));
 			}
 		}
 		public void Shutdown()
@@ -296,7 +302,6 @@ namespace QTool.Net
 	public class QSteamClient
 	{
 		public bool Connected { get; private set; }
-		public bool Error { get; private set; }
 
 
 		internal event Action<ArraySegment<byte>> OnReceivedData;
@@ -320,22 +325,12 @@ namespace QTool.Net
 			catch (FormatException)
 			{
 				Debug.LogError(nameof(QSteamClient) + "连接出错 ["+host+"]不是房间Id");
-				Error = true;
 				OnConnectionFailed();
 			}
 			catch (Exception ex)
 			{
-				Debug.LogError(ex.Message);
-				Error = true;
+				Debug.LogError(nameof(QSteamClient) + " 连接[" + host + "]失败 "+ ex.Message);
 				OnConnectionFailed();
-			}
-			finally
-			{
-				if (Error)
-				{
-					Debug.LogError("Connection failed.");
-					OnConnectionFailed();
-				}
 			}
 		}
 
@@ -344,7 +339,7 @@ namespace QTool.Net
 			if (param.m_info.m_eState == ESteamNetworkingConnectionState.k_ESteamNetworkingConnectionState_Connected)
 			{
 				OnConnected.Invoke();
-				Debug.Log(nameof(QSteamClient) +" 连接["+ param.m_info.m_identityRemote.GetSteamID().GetName()+ "]成功");
+				QDebug.Log(nameof(QSteamClient) +" 连接["+ param.m_info.m_identityRemote.GetSteamID().GetName()+ "]成功");
 				Connected = true;
 			}
 			else if (param.m_info.m_eState == ESteamNetworkingConnectionState.k_ESteamNetworkingConnectionState_ClosedByPeer || param.m_info.m_eState == ESteamNetworkingConnectionState.k_ESteamNetworkingConnectionState_ProblemDetectedLocally)
@@ -354,7 +349,7 @@ namespace QTool.Net
 			}
 			else
 			{
-				Debug.Log(nameof(QSteamClient) + " 连接状态更改 " + param.m_info.m_eState+" : "+param.m_info.m_szEndDebug);
+				QDebug.Log(nameof(QSteamClient) + " 连接状态更改 " + param.m_info.m_eState+" : "+param.m_info.m_szEndDebug);
 			}
 		}
 
@@ -364,8 +359,8 @@ namespace QTool.Net
 			Dispose();
 			if (HostConnection.m_HSteamNetConnection != 0)
 			{
-				Debug.Log("Sending Disconnect message");
-				SteamNetworkingSockets.CloseConnection(HostConnection, 0, "Graceful disconnect", false);
+				QDebug.Log(nameof(QSteamClient)+" 主动断开连接");
+				SteamNetworkingSockets.CloseConnection(HostConnection, 0, " 客户端主动断开连接 ", false);
 				HostConnection.m_HSteamNetConnection = 0;
 			}
 		}
@@ -383,8 +378,8 @@ namespace QTool.Net
 		{
 			Connected = false;
 			OnDisconnected.Invoke();
-			Debug.Log("Disconnected.");
-			SteamNetworkingSockets.CloseConnection(HostConnection, 0, "Disconnected", false);
+			QDebug.Log(nameof(QSteamClient)+" 断开连接");
+			SteamNetworkingSockets.CloseConnection(HostConnection, 0, "断开连接", false);
 		}
 
 		public void ReceiveData()
@@ -406,12 +401,12 @@ namespace QTool.Net
 
 			if (res == EResult.k_EResultNoConnection || res == EResult.k_EResultInvalidParam)
 			{
-				Debug.Log($"Connection to server was lost.");
+				Debug.LogError(nameof(QSteamClient)+" 服务器连接丢失");
 				InternalDisconnect();
 			}
 			else if (res != EResult.k_EResultOK)
 			{
-				Debug.LogError($"Could not send: {res.ToString()}");
+				Debug.LogError(nameof(QSteamClient)+" 发送消息失败 "+ res);
 			}
 		}
 

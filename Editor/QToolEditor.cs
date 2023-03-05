@@ -103,7 +103,7 @@ namespace QTool
 					    var translateText = "#" + await text.NetworkTranslateAsync(language.WebAPI);
 						translateText = translateText.ForeachBlockValue('[', ']', (key) => keyCache.ContainsKey(key)?keyCache[key]:key );
 						newLine[i] = translateText;
-						Debug.Log("翻译" + language.Key + " " + rowIndex + "/" + QTranslate.QTranslateData.Count + " " + " [" + data[1] + "]=>[" + newLine[i] + "]");
+						QDebug.Log("翻译" + language.Key + " " + rowIndex + "/" + QTranslate.QTranslateData.Count + " " + " [" + data[1] + "]=>[" + newLine[i] + "]");
 					}
 				}
 			}
@@ -293,14 +293,14 @@ namespace QTool
 		//打包前处理
 		public void OnPreprocessBuild(BuildReport report)
 		{
-			Debug.Log("开始打包["+report.summary.platformGroup+"]" + report.summary.outputPath);
+			QDebug.Log("开始打包["+report.summary.platformGroup+"]" + report.summary.outputPath);
 			PlayerPrefs.SetString(nameof(QToolBuild), report.summary.outputPath);
 			var path= Path.GetDirectoryName(report.summary.outputPath);
 			if (!CheckBuildPath(path))
 			{
 				if (Directory.Exists(path))
 				{
-					Debug.Log("删除打包路径下文件 " + path);
+					QDebug.Log("删除打包路径下文件 " + path);
 					Directory.Delete(path, true);
 				}
 				Directory.CreateDirectory(path);
@@ -339,7 +339,7 @@ namespace QTool
 			}
 			PlayerSettings.bundleVersion = versions.ToOneString(".");
 			QEventManager.Trigger("游戏版本", PlayerSettings.bundleVersion);
-			Debug.Log("打包完成 "+ report.summary.outputPath);
+			QDebug.Log("打包完成 "+ report.summary.outputPath);
 		}
 
 	}

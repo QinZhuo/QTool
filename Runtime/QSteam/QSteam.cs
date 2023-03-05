@@ -368,8 +368,9 @@ namespace QTool
 			public string m_Key;
 			public string m_Value;
 		}
-		public struct LobbyMember
+		public struct LobbyMember:IKey<CSteamID>
 		{
+			public CSteamID Key { get => m_SteamID; set => m_SteamID = value; }
 			public CSteamID m_SteamID;
 			public LobbyMetaData[] m_Data;
 			public SteamNetworkingIdentity netId;

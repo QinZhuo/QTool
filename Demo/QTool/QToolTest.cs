@@ -231,12 +231,12 @@ namespace QTool.Test
 
 					if (subSystem.subSystemList != null)
 					{
-						UnityEngine.Debug.LogWarning("More Subsystem:" + subSystem.subSystemList.Length);
+						QDebug.LogWarning("More Subsystem:" + subSystem.subSystemList.Length);
 					}
 				}
 			}
 
-			UnityEngine.Debug.Log(sb.ToString());
+			QDebug.Log(sb.ToString());
 		}
 		[QName("QTaskTest")]
 		public async void QTaskTest()

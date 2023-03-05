@@ -126,7 +126,7 @@ namespace QTool.Mesh
 			var filter = root.GetComponent<MeshFilter>(true);
 			filter.sharedMesh = new UnityEngine.Mesh();
 			filter.sharedMesh.CombineMeshes(combineInfos.ToArray(), true, true);
-			Debug.Log(root + " " + nameof(CombineMeshs) + " 顶点数:" + filter.sharedMesh.vertices.Length);
+			QDebug.Log(root + " " + nameof(CombineMeshs) + " 顶点数:" + filter.sharedMesh.vertices.Length);
 			if (deleteOld)
 			{
 				foreach (var mesh in meshes)

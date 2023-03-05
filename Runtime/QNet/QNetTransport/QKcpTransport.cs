@@ -141,38 +141,6 @@ namespace QTool.Net
 			Server.TickIncoming();
 		}
         public override void ServerSendUpdate() => Server.TickOutgoing();
-        public long GetAverageMaxSendRate() =>
-            Server.connections.Count > 0
-                ? Server.connections.Values.Sum(conn => (long)conn.MaxSendRate) / Server.connections.Count
-                : 0;
-        public long GetAverageMaxReceiveRate() =>
-            Server.connections.Count > 0
-                ? Server.connections.Values.Sum(conn => (long)conn.MaxReceiveRate) / Server.connections.Count
-                : 0;
-        long GetTotalSendQueue() =>
-            Server.connections.Values.Sum(conn => conn.SendQueueCount);
-        long GetTotalReceiveQueue() =>
-            Server.connections.Values.Sum(conn => conn.ReceiveQueueCount);
-        long GetTotalSendBuffer() =>
-            Server.connections.Values.Sum(conn => conn.SendBufferCount);
-        long GetTotalReceiveBuffer() =>
-            Server.connections.Values.Sum(conn => conn.ReceiveBufferCount);
-
-    
-        public static string PrettyBytes(long bytes)
-        {
-            // bytes
-            if (bytes < 1024)
-                return $"{bytes} B";
-            // kilobytes
-            else if (bytes < 1024L * 1024L)
-                return $"{(bytes / 1024f):F2} KB";
-            // megabytes
-            else if (bytes < 1024 * 1024L * 1024L)
-                return $"{(bytes / (1024f * 1024f)):F2} MB";
-            // gigabytes
-            return $"{(bytes / (1024f * 1024f * 1024f)):F2} GB";
-        }
 #if UNITY_EDITOR||DEVELOPMENT_BUILD
 		private string ServerIp = "localhost";
 		public override void DebugGUI()

@@ -363,7 +363,7 @@ namespace QTool.Asset {
 				{
 					audioImporter.forceToMono = true;
 				}
-				Debug.Log("重新导入音频[" + audioImporter.assetPath + "]");
+				QDebug.Log("重新导入音频[" + audioImporter.assetPath + "]");
 				audioImporter.defaultSampleSettings = audioSetting;
 				//audioImporter.SetOverrideSampleSettings("Standalone", audioSetting);
 				//audioImporter.SetOverrideSampleSettings("iPhone", audioSetting);
@@ -412,7 +412,7 @@ namespace QTool.Asset {
 			}
 			if (!textureImporter.crunchedCompression)
 			{
-				Debug.Log("重新导入图片[" + textureImporter.assetPath + "]");
+				QDebug.Log("重新导入图片[" + textureImporter.assetPath + "]");
 
 				if (textureImporter.maxTextureSize > texture.width && textureImporter.maxTextureSize > texture.height)
 				{
