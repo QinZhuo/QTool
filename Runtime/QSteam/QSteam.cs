@@ -61,7 +61,6 @@ namespace QTool
 		{
 			Debug.LogWarning(pchDebugText);
 		}
-
 		public static CSteamID ToSteamId(this ulong userId)
 		{
 			return (CSteamID)userId;
@@ -278,35 +277,22 @@ namespace QTool
 			QDebug.Log("加入房间[" + join.m_ulSteamIDLobby + "]");
             return true;
         }
-        public static async Task CreateLobby(int maxMembers = 10,ELobbyType eLobbyType = ELobbyType.k_ELobbyTypePublic)
+        public static async void CreateLobby(int maxMembers = 10,ELobbyType eLobbyType = ELobbyType.k_ELobbyTypePublic)
         {
-            while (!await PrivateCreateLobby(maxMembers,eLobbyType))
-            {
-                if(await QTask.Wait(1,true).IsCancel())
-				{
-					QDebug.Log(nameof(QSteam)+" 取消创建房间");
-					return;
-				}
+			var create = await SteamMatchmaking.CreateLobby(eLobbyType, maxMembers).GetResult<LobbyCreated_t>();
+			if (create.m_ulSteamIDLobby != 0)
+			{
+				QDebug.Log(nameof(QSteam) + " 创建房间成功[" + create.m_ulSteamIDLobby + "]");
+				SetCurRoom(create.m_ulSteamIDLobby);
+				_CurrentLobby[nameof(Name)] = Name;
+				_CurrentLobby[nameof(Application.productName)] = Application.productName;
+				_CurrentLobby[nameof(Application.version)] = Application.version;
 			}
-			_CurrentLobby[nameof(Name)] = Name;
-			_CurrentLobby[nameof(Application.productName)] = Application.productName;
-			_CurrentLobby[nameof(Application.version)] = Application.version;
+			else
+			{
+				Debug.LogError(nameof(QSteam) + " 创建房间出错" + create.m_eResult);
+			}
 		}
-        private static async Task<bool> PrivateCreateLobby(int maxMembers = 10,ELobbyType eLobbyType = ELobbyType.k_ELobbyTypePublic)
-        {
-            var create = await SteamMatchmaking.CreateLobby(eLobbyType, maxMembers).GetResult<LobbyCreated_t>();
-            if (create.m_ulSteamIDLobby != 0)
-            {
-                QDebug.Log("Steam创建房间成功[" + create.m_ulSteamIDLobby + "]");
-                SetCurRoom(create.m_ulSteamIDLobby);
-                return true;
-            }
-            else
-            {
-                Debug.LogError("Steam创建房间出错"+ create.m_eResult);
-                return false;
-            }
-        }
         public static void UpdateLobby(CSteamID id, ref Lobby lobby)
         {
             lobby.steamID = id;

@@ -45,7 +45,7 @@ namespace QTool.Test
         public void CreateTest()
         {
             var run = Assembly.GetExecutingAssembly();
-            Tool.RunTimeCheck("系统创建", () =>
+            QDebug.DebugRun("系统创建", () =>
             {
                 for (int i = 0; i < 10000; i++)
                 {
@@ -53,7 +53,7 @@ namespace QTool.Test
                 }
             });
             var ar = new object[0];
-            Tool.RunTimeCheck("QInstance创建", () =>
+			QDebug.DebugRun("QInstance创建", () =>
             {
                 for (int i = 0; i < 10000; i++)
                 {
@@ -90,43 +90,43 @@ namespace QTool.Test
         public void TestFunc()
         {
 			Debug.LogError(test1.ToQData().ToIdString());
-            Tool.RunTimeCheck("QData写入", () =>
+            QDebug.DebugRun("QData写入", () =>
             {
                 for (int i = 0; i < testTimes; i++)
                 {
                     testBytes = test1.ToQData().GetBytes();
                 }
-            }, () => testBytes.Length, () => test1.ToQData());
-			Tool.RunTimeCheck("QData读取", () =>
+            });
+			QDebug.DebugRun("QData读取", () =>
 			{
 				for (int i = 0; i < testTimes; i++)
 				{
 					test2 = testBytes.GetString().ParseQData<TTestClass>(null, true);
 				}
 			});
-			Tool.RunTimeCheck("QData读取 有Target", () =>
+			QDebug.DebugRun("QData读取 有Target", () =>
             {
                 for (int i = 0; i < testTimes; i++)
                 {
 					test2 = testBytes.GetString().ParseQData<TTestClass>(test2, true);
                 }
             });
-            Tool.RunTimeCheck("QData写入 无Name", () =>
+			QDebug.DebugRun("QData写入 无Name", () =>
             {
                 for (int i = 0; i < testTimes; i++)
                 {
                     testBytes = test1.ToQData(false).GetBytes();
                 }
-            }, () => testBytes.Length, () => test1.ToQData(false));
+            });
 
-			Tool.RunTimeCheck("QData读取 无Name", () =>
+			QDebug.DebugRun("QData读取 无Name", () =>
 			{
 				for (int i = 0; i < testTimes; i++)
 				{
 					test2 = testBytes.GetString().ParseQData<TTestClass>(null,false);
 				}
 			});
-			Tool.RunTimeCheck("QData读取 无Name 有Target", () =>
+			QDebug.DebugRun("QData读取 无Name 有Target", () =>
             {
                 for (int i = 0; i < testTimes; i++)
                 {

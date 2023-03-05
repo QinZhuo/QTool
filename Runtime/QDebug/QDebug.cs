@@ -5,11 +5,32 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.Profiling;
 using UnityEngine;
+using System.Reflection;
 
 namespace QTool
 {
 	public static class QDebug
 	{
+
+		public static void DebugRun(string key, Action action)
+		{
+			GC.Collect();
+			GC.WaitForPendingFinalizers();
+			var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+			var lastMemery = GC.GetTotalMemory(false);
+			var lastCount = GC.CollectionCount(0);
+			try
+			{
+				action();
+			}
+			catch (Exception e)
+			{
+				Debug.LogError("【" + key + "】运行出错:" + e);
+				return;
+			}
+			Log("【" + key + "】运行时间 " + stopwatch.Elapsed + " 内存使用 " + (GC.GetTotalMemory(false) - lastMemery).ToSizeString() + " 垃圾回收次数 " + (GC.CollectionCount(0) - lastCount));
+			stopwatch.Stop();
+		}
 		[System.Diagnostics.Conditional("DEVELOPMENT_BUILD"), System.Diagnostics.Conditional("UNITY_EDITOR")]
 		public static void Log(object obj)
 		{

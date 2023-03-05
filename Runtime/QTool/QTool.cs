@@ -357,37 +357,6 @@ namespace QTool
 					return Convert.ToSingle(value);
 			}
 		}
-		public static async void RunTimeCheck(string name, System.Action action, Func<int> getLength = null, Func<string> getInfo = null)
-		{
-			await RunTimeCheck(name, () => { action();return 0; },getLength,getInfo);
-		}
-		public static async Task RunTimeCheck(string name, System.Func<object> action, Func<int> getLength = null, Func<string> getInfo = null)
-        {
-            var last = System.DateTime.Now;
-            try
-            {
-                var obj= action.Invoke();
-				if(obj is Task task)
-				{
-					await task.Run();
-				}
-            }
-            catch (Exception e)
-            {
-                Debug.LogError("【" + name + "】运行出错:" + e);
-                return;
-            }
-            var checkInfo = "【" + name + "】运行时间:" + (System.DateTime.Now - last).TotalMilliseconds;
-            if (getLength != null)
-            {
-                checkInfo += " " + " 大小" + getLength().ToSizeString();
-            }
-            if (getInfo != null)
-            {
-                checkInfo += "\n" + getInfo();
-            }
-            Debug.LogError(checkInfo);
-        }
 		public static Material GetInstanceMaterial(this UnityEngine.UI.Graphic graphic)
 		{
 			if (graphic.material == null) return null;

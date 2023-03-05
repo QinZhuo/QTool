@@ -22,7 +22,7 @@ public class AssetTest : MonoBehaviour
 	public static GameObject obj;
 	public static List<Sprite> objList = new List<Sprite>();
 	public bool isresources = false;
-	public async void ResourceTestLoad()
+	public void ResourceTestLoad()
 	{
 		if (isresources)
 		{
@@ -69,7 +69,7 @@ public class AssetTest : MonoBehaviour
 	}
 	// Start is called before the first frame update
 	[ContextMenu("加载Test1")]
-    async void LoadTest1()
+    void LoadTest1()
     {
         //   Debug.LogError( await ResourceTest.GetAsync("test1"));
          var obj=ResourceTest.Load("Test1");

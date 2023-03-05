@@ -14,7 +14,7 @@ public class QComputeShaderTest : MonoBehaviour
 	{
 		var Size = 8*20;
 		floatList = new float[Size * Size * Size];
-		Tool.RunTimeCheck("普通", () =>
+		QDebug.DebugRun("普通", () =>
 		{
 			for (int i = 0; i < Size; i++)
 			{
@@ -28,7 +28,7 @@ public class QComputeShaderTest : MonoBehaviour
 			}
 		});
 		int kernelHandle = computeShader.FindKernel("CSMain");
-		Tool.RunTimeCheck(nameof(computeShader), () =>
+		QDebug.DebugRun(nameof(computeShader), () =>
 		{
 			if (floatBuffer == null)
 			{

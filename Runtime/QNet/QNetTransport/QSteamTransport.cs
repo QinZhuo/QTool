@@ -70,12 +70,13 @@ namespace QTool.Net
 			{
 				Server.Shutdown();
 				Server = null;
-				QDebug.Log(nameof(QSteamTransport) + "服务器已关闭");
+				QDebug.Log(nameof(QSteamTransport) + " 服务器关闭");
 			}
 			base.ServerStop();
 		}
 
 		public override string ClientId => QSteam.Id.ToString();
+		public override float Ping => SteamNetworkingUtils.GetLocalPingLocation(out var pt);
 		QSteamClient Client { get; set; }
 		protected override void ClientConnect(string address)
 		{
@@ -101,7 +102,7 @@ namespace QTool.Net
 		{
 			Client?.Disconnect();
 			Client = null;
-			QDebug.Log(nameof(QSteamTransport) + "客户端断开连接");
+			QDebug.Log(nameof(QSteamTransport) + " 客户端断开连接");
 			base.ClientDisconnect();
 		}
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
@@ -161,7 +162,7 @@ namespace QTool.Net
 
 		internal QSteamServer()
 		{
-			_ = QSteam.CreateLobby();
+			QSteam.CreateLobby();
 			c_onConnectionChange = Callback<SteamNetConnectionStatusChangedCallback_t>.Create(OnConnectionStatusChanged);
 			listenSocket = SteamNetworkingSockets.CreateListenSocketP2P(0, 0, new SteamNetworkingConfigValue_t[0]);
 		}
