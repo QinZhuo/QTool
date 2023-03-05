@@ -98,10 +98,6 @@ namespace QTool.Net
 		/// </summary>
 		public abstract string ClientId { get; }
 		/// <summary>
-		/// 客户端与主机延迟
-		/// </summary>
-		public virtual float Ping => 0;
-		/// <summary>
 		/// 客户端连接成功事件
 		/// </summary>
 		public Action OnClientConnected;

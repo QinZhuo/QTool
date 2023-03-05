@@ -76,7 +76,6 @@ namespace QTool.Net
 		}
 
 		public override string ClientId => QSteam.Id.ToString();
-		public override float Ping => SteamNetworkingUtils.GetLocalPingLocation(out var pt);
 		QSteamClient Client { get; set; }
 		protected override void ClientConnect(string address)
 		{
