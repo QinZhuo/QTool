@@ -205,7 +205,7 @@ namespace QTool.Net
 			}
 			else if (param.m_info.m_eState == ESteamNetworkingConnectionState.k_ESteamNetworkingConnectionState_ClosedByPeer || param.m_info.m_eState == ESteamNetworkingConnectionState.k_ESteamNetworkingConnectionState_ProblemDetectedLocally)
 			{
-				Debug.LogError("断开连接");
+				Debug.LogError(nameof(QSteamServer)+"["+ clientSteamID .GetName()+ "]断开连接");
 				InternalDisconnect(param.m_hConn);
 			}
 			else
@@ -237,7 +237,7 @@ namespace QTool.Net
 			}
 			else
 			{
-				QDebug.LogWarning("尝试断开未知连接[" + connectionId+"]");
+				QDebug.LogWarning(nameof(QSteamServer)+"尝试断开未知连接[" + connectionId+"]");
 			}
 		}
 
@@ -319,12 +319,12 @@ namespace QTool.Net
 				SteamNetworkingIdentity netId = new SteamNetworkingIdentity();
 				netId.SetSteamID(QSteam.CurrentLobby.owner);
 				HostConnection = SteamNetworkingSockets.ConnectP2P(ref netId, 0,0, new SteamNetworkingConfigValue_t[0]);
-				QDebug.Log("尝试连接 " + QSteam.CurrentLobby.owner.GetName());
+				QDebug.Log(nameof(QSteamClient)+" 尝试连接 " + QSteam.CurrentLobby.owner.GetName());
 
 			}
 			catch (FormatException)
 			{
-				Debug.LogError(nameof(QSteamClient) + "连接出错 ["+host+"]不是房间Id");
+				Debug.LogError(nameof(QSteamClient) + " 连接出错 ["+host+"]不是房间Id");
 				OnConnectionFailed();
 			}
 			catch (Exception ex)
