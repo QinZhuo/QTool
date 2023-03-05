@@ -99,7 +99,7 @@ namespace QTool.Net
             ReliableMaxMessageSize = KcpConnection.ReliableMaxMessageSize(ReceiveWindowSize);
         }
 		public override string ClientId => SystemInfo.deviceName + (Debug.isDebugBuild ? "_" + System.Diagnostics.Process.GetCurrentProcess().Id : "");
-        public override void ClientConnect(string address)
+        protected override void ClientConnect(string address)
         {
             Client.Connect(address, Port, NoDelay, Interval, FastResend, CongestionWindow, SendWindowSize, ReceiveWindowSize, Timeout, MaxRetransmit, MaximizeSendReceiveBuffersToOSLimit);
 		}
@@ -107,7 +107,6 @@ namespace QTool.Net
         {
 			var data = new ArraySegment<byte>(segment);
 			Client.Send(data, KcpChannel.Reliable);
-            OnClientDataSent?.Invoke(data);
         }
 		public override void ClientDisconnect()
 		{
@@ -130,7 +129,6 @@ namespace QTool.Net
 		{
 			var data = new ArraySegment<byte>(segment);
 			Server.Send(connectionId, data, KcpChannel.Reliable);
-            OnServerDataSent?.Invoke(connectionId, data);
         }
         public override void ServerDisconnect(int connectionId) =>  Server.Disconnect(connectionId);
 		public override void ServerStop()

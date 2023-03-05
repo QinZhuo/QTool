@@ -77,7 +77,7 @@ namespace QTool.Net
 
 		public override string ClientId => QSteam.Id.ToString();
 		QSteamClient Client { get; set; }
-		public override void ClientConnect(string address)
+		protected override void ClientConnect(string address)
 		{
 			Client = new QSteamClient();
 			Client.OnConnected += OnClientConnected;

@@ -6,8 +6,8 @@ namespace QTool.Net
 {
 	public class QLocalTransport : QNetTransport
 	{
-		public override string ClientId => SystemInfo.deviceName + (Debug.isDebugBuild ? "_" + System.Diagnostics.Process.GetCurrentProcess().Id : "");
-		public override void ClientConnect(string address) { }
+		public override string ClientId => SystemInfo.deviceName;
+		protected override void ClientConnect(string address) { }
 		public override void ClientReceiveUpdate() { }
 		protected override void ClientSend(byte[] segment) { }
 		public override void ServerDisconnect(int connectionId) { }
