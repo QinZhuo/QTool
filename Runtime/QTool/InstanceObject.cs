@@ -103,7 +103,7 @@ namespace QTool
 #if UNITY_EDITOR
 						if (Inspector.QOnPlayModeAttribute.CurrentrState == Inspector.PlayModeState.ExitingPlayMode) return null;
 #endif
-						QDebug.Log("创建单例"+nameof(InstanceManager<T>) +"[" + typeof(T).Name + "]");
+						QDebug.Log("单例实例化 "+nameof(InstanceManager<T>) +"<" + typeof(T).Name + ">");
 						var obj = new GameObject(typeof(T).Name);
 						_instance = obj.AddComponent<T>();
 						_instance.SetDirty();

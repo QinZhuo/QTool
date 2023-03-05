@@ -108,15 +108,15 @@ namespace QTool
 			var playerLoop = PlayerLoop.GetCurrentPlayerLoop();
 			if (!subSystem.IsNull())
 			{
-				var subList= playerLoop.subSystemList.ToList();
+				var subList = playerLoop.subSystemList.ToList();
 				var index = subList.FindIndex((loop) => loop.ToString() == subSystem);
-				playerLoop.subSystemList[index]= playerLoop.subSystemList[index].AddPlayerLoop(type, action);
+				playerLoop.subSystemList[index] = playerLoop.subSystemList[index].AddPlayerLoop(type, action);
 			}
 			else
 			{
 				playerLoop = playerLoop.AddPlayerLoop(type, action);
 			}
-			QDebug.Log(nameof(PlayerLoop)+"更新\n"+ playerLoop.subSystemList.ToOneString("\n", (loop) => "----------" + loop + "----------\n" + loop.subSystemList.ToOneString()));
+			QDebug.Log("更改主循环 "+nameof(PlayerLoop) + (subSystem.IsNull() ? "" : " 在" + subSystem+"中") + " 添加子系统 " + type + "\n主循环信息:\n" + playerLoop.subSystemList.ToOneString("\n", (loop) => "----------" + loop + "----------\n" + loop.subSystemList.ToOneString()));
 			PlayerLoop.SetPlayerLoop(playerLoop);
 		}
 		public static void RemovePlayerLoop(Type type, string subSystem = "")

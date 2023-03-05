@@ -4,13 +4,11 @@
 #endif
 #if !DISABLESTEAMWORKS
 using Steamworks;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using System.Threading.Tasks;
 using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using System.Linq;
+using System.Threading.Tasks;
+using UnityEngine;
 
 namespace QTool
 {
@@ -142,19 +140,19 @@ namespace QTool
 		}
 #endregion
 #region 网络通信
-		public static EResult SendSocket(this HSteamNetConnection conn, byte[] data)
+		public static EResult Send(this HSteamNetConnection conn, byte[] data)
 		{
 			GCHandle pinnedArray = GCHandle.Alloc(data, GCHandleType.Pinned);
 			IntPtr pData = pinnedArray.AddrOfPinnedObject();
 			EResult res = SteamNetworkingSockets.SendMessageToConnection(conn, pData, (uint)data.Length, Constants.k_nSteamNetworkingSend_Reliable, out long _);
 			if (res != EResult.k_EResultOK)
 			{
-				Debug.LogWarning($"Send issue: {res}");
+				Debug.LogWarning(nameof(QSteam)+ " 向[" + conn + "]发送消息失败 "+res);
 			}
 			pinnedArray.Free();
 			return res;
 		}
-		public static byte[] ProcessMessage(this IntPtr ptrs)
+		public static byte[] ToBytes(this IntPtr ptrs)
 		{
 			SteamNetworkingMessage_t data = Marshal.PtrToStructure<SteamNetworkingMessage_t>(ptrs);
 			byte[] managedArray = new byte[data.m_cbSize];
@@ -166,14 +164,14 @@ namespace QTool
         public static async Task<T> GetResult<T>(this SteamAPICall_t steamAPICall_t)
         {
             bool runing = true;
-            CallResult<T> tempCall = CallResult<T>.Create();
+            CallResult<T> CallBack = CallResult<T>.Create();
             T returnValue = default;
-            tempCall.Set(steamAPICall_t, (info, failure) =>
+            CallBack.Set(steamAPICall_t, (info, failure) =>
             {
                 if (failure)
                 {
-                    ESteamAPICallFailure reason = SteamUtils.GetAPICallFailureReason(tempCall.Handle);
-                    Debug.LogError("OnLobbyMatchList encountered an IOFailure due to: " + reason);
+                    ESteamAPICallFailure reason = SteamUtils.GetAPICallFailureReason(CallBack.Handle);
+                    Debug.LogError(nameof(QSteam)+" 获取调用结果["+typeof(T)+"]出错 " + reason);
                 }
                 else
                 {
@@ -181,11 +179,8 @@ namespace QTool
                 }
                 runing = false;
             });
-            while (runing)
-            {
-                await Task.Delay(10);
-            }
-            tempCall.Dispose();
+			await QTask.Wait(() => !runing);
+            CallBack.Dispose();
             return returnValue;
         }
         public static List<Lobby> LobbyList { get; private set; } = new List<Lobby>();
@@ -208,7 +203,6 @@ namespace QTool
         public const int ReceiveBufferSize = 4096;
         public static async Task StartChatReceive()
         {
-
             var chatLobbyId = _CurrentLobby.steamID;
             if (chatLobbyId.IsValid()) return;
             var buffer = new byte[ReceiveBufferSize];
@@ -236,7 +230,7 @@ namespace QTool
         {
 			if (CurrentLobby.IsNull()) return;
             SteamMatchmaking.LeaveLobby(_CurrentLobby.steamID);
-			QDebug.Log("离开房间[" + _CurrentLobby.steamID + "]");
+			QDebug.Log(nameof(QSteam)+" 离开房间[" + _CurrentLobby.steamID + "]");
 			OnUpdateLobby?.Unregister();
             _CurrentLobby = default;
         }
@@ -331,24 +325,25 @@ namespace QTool
                 bool lobbyDataRet = SteamMatchmaking.GetLobbyDataByIndex(id, t, out lobby.data[t].m_Key, Constants.k_nMaxLobbyKeyLength, out lobby.data[t].m_Value, Constants.k_cubChatMetadataMax);
 				if (!lobbyDataRet)
                 {
-                    Debug.LogError("SteamMatchmaking.GetLobbyDataByIndex returned false." + t);
+                    Debug.LogError(nameof(QSteam)+" 获取房间["+id+"]信息出错 " + t);
                     continue;
                 }
             }
-			QDebug.Log("房间信息更新:\n" + lobby.ToDetailString());
+			QDebug.Log(nameof(QSteam)+" 房间信息更新 " + lobby.ToDetailString());
         }
         public static async Task<List<Lobby>> FreshLobbys(string key,string value)
         {
-			QDebug.Log("刷新房间列表[" + key + ":" + value + "]");
+			QDebug.Log(nameof(QSteam)+ " 过滤房间列表[" + key + ":" + value + "]");
             SteamMatchmaking.AddRequestLobbyListStringFilter(key, value, ELobbyComparison.k_ELobbyComparisonEqual);
             return await FreshLobbys();
         }
         public static async Task<List<Lobby>> FreshLobbys()
 		{
 			SteamMatchmaking.AddRequestLobbyListStringFilter(nameof(Application.productName), Application.productName, ELobbyComparison.k_ELobbyComparisonEqual);
-#if !UNITY_EDITOR
-			SteamMatchmaking.AddRequestLobbyListStringFilter(nameof(Application.version), Application.version, ELobbyComparison.k_ELobbyComparisonEqual);
-#endif
+			if (!Application.isEditor)
+			{
+				SteamMatchmaking.AddRequestLobbyListStringFilter(nameof(Application.version), Application.version, ELobbyComparison.k_ELobbyComparisonEqual);
+			}
 			var matchList = await SteamMatchmaking.RequestLobbyList().GetResult<LobbyMatchList_t>();
 			if (!Application.isPlaying) return null;
             LobbyList.Clear();
