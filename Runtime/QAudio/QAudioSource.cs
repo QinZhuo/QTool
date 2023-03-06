@@ -17,10 +17,16 @@ namespace QTool
 				case QAudioType.BGS:
 				case QAudioType.ME:
 					Audio.clip = clip;
-					Audio.Play();
+					if (Audio.clip != null)
+					{
+						Audio.Play();
+					}
 					break;
 				default:
-					Audio.PlayOneShot(clip);
+					if (clip != null)
+					{
+						Audio.PlayOneShot(clip);
+					}
 					break;
 			}
 		}
@@ -116,7 +122,6 @@ namespace QTool
 				StartAudio.Audio.outputAudioMixerGroup = Audio.outputAudioMixerGroup;
 				StartAudio.Audio.loop = false;
 			}
-			if (startClip == null) return;
 			StartAudio.Play(startClip);
 		}
 		private IEnumerator StartVolume(float transition)

@@ -32,7 +32,7 @@ namespace QTool.Net
 		private void OnDestroy()
 		{
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
-			if (QToolManager.Instance != null)
+			if (QToolManager.IsInstanced)
 			{
 				QToolManager.Instance.OnGUIEvent -= DebugGUI;
 			}
