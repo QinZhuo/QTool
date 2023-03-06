@@ -4,7 +4,7 @@ using UnityEngine.AI;
 namespace QTool.Net
 {
 	[DisallowMultipleComponent,RequireComponent(typeof(CharacterController))]
-	public class QNetNavMeshController : QNetBehaviour
+	public class QNetNavMeshAgent : QNetBehaviour
 	{
 		[QSyncVar(true)]
 		public Vector3 Position

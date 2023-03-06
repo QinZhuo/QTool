@@ -11,7 +11,7 @@ namespace QTool
 	{
 
 
-
+		
 		Animator _animator;
 		public Animator Animator
 		{
