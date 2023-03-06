@@ -18,7 +18,7 @@ namespace QTool.TileMap {
 			if (curLevel != QualitySettings.GetQualityLevel())
 			{
 				curLevel = QualitySettings.GetQualityLevel();
-				QDebug.Log("画质级别 " + curLevel);
+				QDebug.Log(nameof(QQualityLevel)+" 画质级别 " + curLevel);
 				OnFresh?.Invoke();
 			}
 		}
