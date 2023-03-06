@@ -607,7 +607,7 @@ namespace QTool
 		}
 		public static Vector3 RayCast(this Ray ray)
 		{
-			if (Physics.Raycast(ray, out var hitInfo))
+			if (Physics.Raycast(ray, out var hitInfo,100,-1, queryTriggerInteraction: QueryTriggerInteraction.Ignore))
 			{
 				return hitInfo.point;
 			}
