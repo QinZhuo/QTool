@@ -118,7 +118,7 @@ namespace QTool
 	}
 
 	[System.Serializable]
-	public struct QMusicSetting
+	public class QMusicSetting
 	{
 		public string key;
 		[QName("音乐")]
