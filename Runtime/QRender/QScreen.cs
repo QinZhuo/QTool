@@ -38,7 +38,7 @@ namespace QTool
 			return texture;
 		}
 		static readonly Color AlphaColor = Color.magenta;
-		const float Range = 1f;
+		const float Range = 0.1f;
 		public static Texture2D SetAlpha(this Texture2D texture,Color alphaColor)
 		{
 			for (int i = 0; i < texture.width; i++)
@@ -50,7 +50,7 @@ namespace QTool
 					var dis =Mathf.Abs(offset.r) + Mathf.Abs(offset.g) + Mathf.Abs(offset.b);
 					if (dis < Range)
 					{
-						texture.SetPixel(i, j, new Color(offset.r, offset.g, offset.b,Mathf.Lerp(0,1,dis)));
+						texture.SetPixel(i, j, new Color(offset.r, offset.g, offset.b,Mathf.Lerp(0,1,dis*2/Range-0.5f)));
 					}
 				}
 			}
