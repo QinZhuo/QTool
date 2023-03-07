@@ -493,6 +493,15 @@ namespace QTool
 #endif
 		}
 
+		public static bool ApplyPrefab(this GameObject gameObject)
+		{
+			if (UnityEditor.PrefabUtility.IsPartOfPrefabInstance(gameObject))
+			{
+				UnityEditor.PrefabUtility.ApplyPrefabInstance(gameObject, UnityEditor.InteractionMode.AutomatedAction);
+				return true;
+			}
+			return false;
+		}
 		public static bool IsPrefabInstance(this UnityEngine.Object obj, out GameObject prefab)
 		{
 			prefab = null;

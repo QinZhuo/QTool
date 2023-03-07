@@ -66,8 +66,8 @@ namespace QTool
 	
 		private bool IsPrefab => gameObject.IsPrefabInstance(out var prefab)&&!Application.isPlaying&&
 					!UnityEditor.Lightmapping.isRunning;
-		[QName("生成光照贴图信息",nameof(IsPrefab))]
-		private void GenerateLightmap()
+		[QName("烘培光照贴图信息",nameof(IsPrefab))]
+		private void BakeLightmap()
 		{
 			if (gameObject.IsPrefabInstance(out var prefab))
 			{
@@ -147,7 +147,7 @@ namespace QTool
 						lightmapOffsetScale = terrain.lightmapScaleOffset,
 					});
 				}
-				UnityEditor.PrefabUtility.ApplyPrefabInstance(gameObject, UnityEditor.InteractionMode.AutomatedAction);
+				gameObject.ApplyPrefab();
 			}
 
 		}

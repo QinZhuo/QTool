@@ -168,6 +168,19 @@ namespace QTool.Test
 		{
 			QScreen.SetResolution(900, 600, value);
 		}
+		public Texture2D CaptureTexture2d;
+		[QName("截图测试")]
+		public  void RenderTest()
+		{
+			CaptureTexture2d=QScreen.Capture();
+			//if (CaptureTexture2d == null || CaptureTexture2d.width != Screen.width || CaptureTexture2d.height != Screen.height)
+			//{
+			//	CaptureTexture2d = new Texture2D(Screen.width, Screen.height, TextureFormat.RGB24, false);
+			//}
+			//Camera.main.Render();
+			//CaptureTexture2d.ReadPixels(new Rect(0, 0,100, 100), 0, 0);
+			//CaptureTexture2d.Apply();
+		}
 		[QName("多值枚举序列化测试")]
 		public void EnumTest()
 		{

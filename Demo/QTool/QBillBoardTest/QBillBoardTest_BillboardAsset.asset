@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!226 &22600000
+BillboardAsset:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: QBillBoardTest_BillboardAsset
+  serializedVersion: 2
+  width: 1
+  bottom: -0.5
+  height: 1
+  imageTexCoords:
+  - {x: 0, y: 0, z: 0.125, w: 1}
+  - {x: 0.125, y: 0, z: 0.125, w: 1}
+  - {x: 0.25, y: 0, z: 0.125, w: 1}
+  - {x: 0.375, y: 0, z: 0.125, w: 1}
+  - {x: 0.5, y: 0, z: 0.125, w: 1}
+  - {x: 0.625, y: 0, z: 0.125, w: 1}
+  - {x: 0.75, y: 0, z: 0.125, w: 1}
+  - {x: 0.875, y: 0, z: 0.125, w: 1}
+  vertices:
+  - {x: 0, y: 1}
+  - {x: 0, y: 0}
+  - {x: 1, y: 1}
+  - {x: 1, y: 0}
+  indices: 000003000100020003000000
+  material: {fileID: 2100000, guid: e32e3e7338c1f4e4a9e183f3cc587ce1, type: 2}
