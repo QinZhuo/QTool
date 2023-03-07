@@ -7,7 +7,19 @@ namespace QTool
 {
     public static class QRectTransformTool
     {
-        public static Vector2 UpRightRectOffset(this RectTransform rectTransform)
+		public static bool ContainsScreenPoint(this RectTransform rectTransform,Vector2 screenPoint)
+		{
+			return RectTransformUtility.RectangleContainsScreenPoint(rectTransform, screenPoint);
+		}
+		public static Vector2 ScreenPointToLocalPoint(this RectTransform rectTransform, Vector2 screenPoint)
+		{
+			if(RectTransformUtility.ScreenPointToLocalPointInRectangle(rectTransform, screenPoint,Camera.main,out var localPoint))
+			{
+				return localPoint;
+			}
+			return Vector2.zero;
+		}
+		public static Vector2 UpRightRectOffset(this RectTransform rectTransform)
         {
             return new Vector2(rectTransform.Width() * (1 - rectTransform.pivot.x), rectTransform.Height() * (1 - rectTransform.pivot.y));
         }
