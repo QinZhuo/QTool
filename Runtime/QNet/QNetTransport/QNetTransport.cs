@@ -97,6 +97,18 @@ namespace QTool.Net
 		/// 客户端Id 每个客户端的Id必须时唯一的 主要用于断线重连
 		/// </summary>
 		public abstract string ClientId { get; }
+		public virtual int Ping => 0;
+		QTimer PingTimer = new QTimer(1);
+		public virtual void FreshPing()
+		{
+		}
+		public void FixedUpdate()
+		{
+			if (PingTimer.Check(Time.deltaTime) &&ClientConnected)
+			{
+				FreshPing();
+			}
+		}
 		/// <summary>
 		/// 客户端连接成功事件
 		/// </summary>
