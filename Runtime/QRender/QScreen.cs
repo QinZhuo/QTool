@@ -25,7 +25,7 @@ namespace QTool
 			{
 				texture = new Texture2D(width, height, TextureFormat.BGRA32, false);
 			}
-			var rt = new RenderTexture(width, height, 16);
+			var rt = new RenderTexture(width, height, 32);
 			rt.autoGenerateMips = false;
 			camera.targetTexture = rt;
 			camera.Render();
@@ -45,14 +45,13 @@ namespace QTool
 			var camera= gameObject.transform.GetChild(nameof(Capture) + nameof(Camera), true).GetComponent<Camera>(true);
 			camera.CopyFrom(Camera.main);
 			camera.orthographic = true;
-			camera.clearFlags = CameraClearFlags.Nothing;
-			
+			camera.clearFlags = CameraClearFlags.Color;
+			camera.backgroundColor = Color.clear;
 			Bounds bounds = gameObject.GetBounds();
 			float maxSize = Mathf.Max(bounds.size.x,bounds.size.y, bounds.size.z)*1.05f;
 			camera.nearClipPlane = 0.0f;
 			camera.farClipPlane = maxSize;
 			camera.orthographicSize = maxSize / 2;
-			
 			if (count == 1)
 			{
 				camera.transform.position = bounds.center + -Camera.main.transform.forward * maxSize / 2;
