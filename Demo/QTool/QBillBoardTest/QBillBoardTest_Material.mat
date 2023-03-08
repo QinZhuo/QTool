@@ -37,8 +37,6 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Floats:
     - BILLBOARDMODE: 1
-    - Boolean_18af5cd10d9744c49cfd2102cee412d7: 0
-    - _BILLBOARDMODE: 0
-    - _Count: 8
+    - _Count: 16
     m_Colors: []
   m_BuildTextureStacks: []

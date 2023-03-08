@@ -9,10 +9,10 @@ namespace QTool
 #if UNITY_EDITOR
 		private bool IsPrefab => gameObject.IsPrefabInstance(out var prefab) && !Application.isPlaying;
 		[QName("单个图像尺寸")]
-		public int size = 256;
+		public int size = 128;
 		[QName("方向"),Range(1,64)]
-		public int count = 8;
-		[QName("烘培"+nameof(BillboardAsset), nameof(IsPrefab))]
+		public int count = 1;
+		[QName("烘培QBillboard资源", nameof(IsPrefab))]
 		void Bake()
 		{
 			if (gameObject.IsPrefabInstance(out var prefab))
