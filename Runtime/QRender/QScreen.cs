@@ -23,64 +23,57 @@ namespace QTool
 		{
 			if (texture == null)
 			{
-				texture = new Texture2D(width, height, TextureFormat.RGBA32, false);
+				texture = new Texture2D(width, height, TextureFormat.BGRA32, false);
 			}
-			texture.alphaIsTransparency = true;
-			var rt = new RenderTexture(width, height, 0);
-			RenderTexture.active = rt;
+			var rt = new RenderTexture(width, height, 16);
+			rt.autoGenerateMips = false;
 			camera.targetTexture = rt;
 			camera.Render();
-			texture.ReadPixels(new Rect(0, 0, width, height), desX, desY);
-			texture.Apply();
 			camera.targetTexture = null;
+			RenderTexture.active = rt;
+			texture.ReadPixels(new Rect(0, 0, width, height), desX, desY);
 			RenderTexture.active = null;
-			rt.Release();
-			return texture;
-		}
-		static readonly Color AlphaColor = Color.magenta;
-		const float Range = 0.1f;
-		public static Texture2D SetAlpha(this Texture2D texture,Color alphaColor)
-		{
-			for (int i = 0; i < texture.width; i++)
-			{
-				for (int j = 0; j < texture.height; j++)
-				{
-					var color = texture.GetPixel(i, j);
-					var offset = (color - alphaColor);
-					var dis =Mathf.Abs(offset.r) + Mathf.Abs(offset.g) + Mathf.Abs(offset.b);
-					if (dis < Range)
-					{
-						texture.SetPixel(i, j, new Color(offset.r, offset.g, offset.b,Mathf.Lerp(0,1,dis*2/Range-0.5f)));
-					}
-				}
-			}
 			texture.Apply();
+			rt.Release();
 			return texture;
 		}
 		public static Texture2D CaptureAround(this GameObject gameObject,int size=512,int count=8)
 		{
-			var texture = new Texture2D(size * count, size, TextureFormat.BGRA32,false);
+			var xCount = count == 1 ? count : Mathf.CeilToInt(Mathf.Sqrt(count));
+			var yCount = count == 1 ? count : Mathf.CeilToInt(Mathf.Sqrt(count));
+			var texture = new Texture2D(size * xCount, size* yCount, TextureFormat.BGRA32,false);
 			var camera= gameObject.transform.GetChild(nameof(Capture) + nameof(Camera), true).GetComponent<Camera>(true);
 			camera.CopyFrom(Camera.main);
 			camera.orthographic = true;
-			camera.clearFlags = CameraClearFlags.SolidColor;
-			camera.backgroundColor = AlphaColor;
+			camera.clearFlags = CameraClearFlags.Nothing;
+			
 			Bounds bounds = gameObject.GetBounds();
-			float maxSize = Mathf.Max(bounds.max.z - bounds.min.z, bounds.max.x - bounds.min.x);
-			camera.transform.position = bounds.center;
-			camera.transform.position = new Vector3(camera.transform.position.x + maxSize / 2, camera.transform.position.y, camera.transform.position.z);
+			float maxSize = Mathf.Max(bounds.size.x,bounds.size.y, bounds.size.z)*1.05f;
 			camera.nearClipPlane = 0.0f;
 			camera.farClipPlane = maxSize;
-			camera.orthographicSize = Mathf.Max(Mathf.Max((bounds.max.y - bounds.min.y) / 2.0f, (bounds.max.x - bounds.min.x) / 2.0f), Mathf.Max((bounds.max.z - bounds.min.z) / 2.0f));
-			camera.transform.LookAt(new Vector3(gameObject.transform.position.x, bounds.center.y, gameObject.transform.position.z));
-			var angle = 360f / count;
-			for (int i = 0; i < count; i++)
+			camera.orthographicSize = maxSize / 2;
+			
+			if (count == 1)
 			{
-				camera.Capture(size, size, texture, size * i);
-				camera.transform.RotateAround(gameObject.transform.position, Vector3.up, -angle);
+				camera.transform.position = bounds.center + -Camera.main.transform.forward * maxSize / 2;
+				camera.transform.LookAt(bounds.center);
+				camera.Capture(size, size, texture);
+			}
+			else
+			{
+				camera.transform.position = bounds.center + Vector3.right * maxSize / 2;
+				camera.transform.LookAt(bounds.center);
+				var angle = 360f / count;
+				for (int i = 0; i < count; i++)
+				{
+					var x = i % xCount;
+					var y = i / xCount;
+					camera.Capture(size, size, texture, size * x,size* y);
+					camera.transform.RotateAround(gameObject.transform.position, Vector3.up, -angle);
+				}
 			}
 			camera.gameObject.CheckDestory();
-			return texture.SetAlpha(AlphaColor);
+			return texture;
 		}
 		static bool IsDrag = false;
 		static void OnGUI()
