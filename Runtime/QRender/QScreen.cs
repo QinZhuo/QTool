@@ -37,10 +37,10 @@ namespace QTool
 			rt.Release();
 			return texture;
 		}
-		public static Texture2D CaptureAround(this GameObject gameObject,int size=512,int count=8)
+		public static Texture2D CaptureAround(this GameObject gameObject,int size=512,int count=8, bool around=false)
 		{
-			var xCount = count == 1 ? count : Mathf.CeilToInt(Mathf.Sqrt(count));
-			var yCount = count == 1 ? count : Mathf.CeilToInt(Mathf.Sqrt(count));
+			var xCount = around ? count : Mathf.CeilToInt(Mathf.Sqrt(count));
+			var yCount = around ? count : xCount;
 			var texture = new Texture2D(size * xCount, size* yCount, TextureFormat.BGRA32,false);
 			var camera= gameObject.transform.GetChild(nameof(Capture) + nameof(Camera), true).GetComponent<Camera>(true);
 			camera.CopyFrom(Camera.main);
@@ -48,19 +48,19 @@ namespace QTool
 			camera.clearFlags = CameraClearFlags.Color;
 			camera.backgroundColor = Color.clear;
 			Bounds bounds = gameObject.GetBounds();
-			float maxSize = Mathf.Max(bounds.size.x,bounds.size.y, bounds.size.z)*1.05f;
+			float cameraSize = bounds.size.magnitude*1.1f;
 			camera.nearClipPlane = 0.0f;
-			camera.farClipPlane = maxSize;
-			camera.orthographicSize = maxSize / 2;
+			camera.farClipPlane = cameraSize;
+			camera.orthographicSize = cameraSize / 2;
 			if (count == 1)
 			{
-				camera.transform.position = bounds.center + -Camera.main.transform.forward * maxSize / 2;
+				camera.transform.position = bounds.center + -Camera.main.transform.forward * cameraSize / 2;
 				camera.transform.LookAt(bounds.center);
 				camera.Capture(size, size, texture);
 			}
-			else
+			else if(!around)
 			{
-				camera.transform.position = bounds.center + Vector3.right * maxSize / 2;
+				camera.transform.position = bounds.center + Vector3.right * cameraSize / 2;
 				camera.transform.LookAt(bounds.center);
 				var angle = 360f / count;
 				for (int i = 0; i < count; i++)
@@ -69,6 +69,21 @@ namespace QTool
 					var y = i / xCount;
 					camera.Capture(size, size, texture, size * x,size* y);
 					camera.transform.RotateAround(gameObject.transform.position, Vector3.up, -angle);
+				}
+			}
+			else
+			{
+				camera.transform.position = bounds.center + Vector3.right * cameraSize / 2;
+				camera.transform.LookAt(bounds.center);
+				var angle = 360f / count;
+				for (int y = 0; y < yCount; y++)
+				{
+					for (int x = 0; x < xCount; x++)
+					{
+						camera.Capture(size, size, texture, size * x, size * y);
+						camera.transform.RotateAround(gameObject.transform.position, Vector3.up, -angle);
+					}
+					camera.transform.RotateAround(gameObject.transform.position, Vector3.forward, -angle);
 				}
 			}
 			camera.gameObject.CheckDestory();

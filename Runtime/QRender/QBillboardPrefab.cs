@@ -12,6 +12,8 @@ namespace QTool
 		public int size = 128;
 		[QName("方向"),Range(1,64)]
 		public int count = 1;
+		[QName("环绕四周")]
+		public bool around=false;
 		[QName("烘培QBillboard资源", nameof(IsPrefab))]
 		void Bake()
 		{
@@ -23,7 +25,7 @@ namespace QTool
 				{
 					QBillboard.gameObject.SetActive(false);
 				}
-				var texture = gameObject.CaptureAround(size, count);
+				var texture = gameObject.CaptureAround(size, count,around);
 				var pngPath = path.Replace(".prefab", "/" + name + "_" + nameof(Texture) + ".png");
 				pngPath.CheckDirectoryPath();
 				QFileManager.SavePNG(texture, pngPath);
@@ -46,16 +48,27 @@ namespace QTool
 				texture= UnityEditor.AssetDatabase.LoadAssetAtPath<Texture2D>(pngPath);
 				QBillboard.sharedMaterial.SetTexture("_MainTex", texture);
 				QBillboard.sharedMaterial.SetInt("_Count", count);
+				QBillboard.sharedMaterial.DisableKeyword("BILLBOARDMODE_Normal");
+				QBillboard.sharedMaterial.DisableKeyword("BILLBOARDMODE_HORIZONTAL");
+				QBillboard.sharedMaterial.DisableKeyword("BILLBOARDMODE_AROUND");
 				if (count == 1)
 				{
 					QBillboard.sharedMaterial.EnableKeyword("BILLBOARDMODE_Normal");
 				}
-				else
+				else if (!around)
 				{
 					QBillboard.sharedMaterial.EnableKeyword("BILLBOARDMODE_HORIZONTAL");
 				}
+				else
+				{
+					QBillboard.sharedMaterial.EnableKeyword("BILLBOARDMODE_AROUND");
+				}
 				gameObject.ApplyPrefab();
-			
+				QDebug.Log(nameof(QBillboardPrefab) + " " + gameObject + "烘培QBillboard资源成功 "+ path);
+			}
+			else
+			{
+				Debug.LogError(nameof(QBillboardPrefab) + " " + gameObject + " 非预制体实例 无法烘培QBillboard资源");
 			}
 		}
 #endif
