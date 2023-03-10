@@ -11,31 +11,19 @@ namespace QTool
     public static class QScreen
     {
 		static Texture2D CaptureTexture2d=null;
-		public static Texture2D Capture(
-#if URP
-			bool postProcessing = true
-#endif
-			)
+		public static Texture2D Capture()
 		{
-			return Capture(null, postProcessing);
+			return Capture(null);
 		}
-		public static Texture2D Capture(this Camera camera
-#if URP
-			, bool postProcessing = true
-#endif
-		)
+		public static Texture2D Capture(this Camera camera)
 		{
 			if (CaptureTexture2d == null || CaptureTexture2d.width != Screen.width || CaptureTexture2d.height != Screen.height)
 			{
 				CaptureTexture2d = new Texture2D(Screen.width, Screen.height, TextureFormat.RGB24, false);
 			}
-			return Camera.main.Capture(Screen.width,Screen.height,CaptureTexture2d,0,0,postProcessing);
+			return Camera.main.Capture(Screen.width,Screen.height,CaptureTexture2d,0,0);
 		}
-		public static Texture2D Capture(this Camera camera,int width, int height, Texture2D texture=null,int desX=0,int desY=0
-#if URP
-			,bool postProcessing = true
-#endif
-			)
+		public static Texture2D Capture(this Camera camera,int width, int height, Texture2D texture=null,int desX=0,int desY=0)
 		{
 			if (texture == null)
 			{
@@ -48,13 +36,6 @@ namespace QTool
 				camera.targetTexture = rt;
 				camera.Render();
 				camera.targetTexture = null;
-#if URP
-				var cameraData = camera?.GetComponent<UnityEngine.Rendering.Universal.UniversalAdditionalCameraData>();
-				if (cameraData != null)
-				{
-					cameraData.renderPostProcessing = postProcessing;
-				}
-#endif
 			}
 			RenderTexture.active = rt;
 			texture.ReadPixels(new Rect(0, 0, width, height), desX, desY);
@@ -63,11 +44,7 @@ namespace QTool
 			rt.Release();
 			return texture;
 		}
-		public static Texture2D CaptureAround(this GameObject gameObject,int size=512,int count=8, bool around=false
-#if URP
-			, bool postProcessing = true
-#endif
-			)
+		public static Texture2D CaptureAround(this GameObject gameObject,int size=512,int count=8, bool around=false)
 		{
 			var xCount = around ? count : Mathf.CeilToInt(Mathf.Sqrt(count));
 			var yCount = around ? count : xCount;
@@ -77,6 +54,24 @@ namespace QTool
 			camera.orthographic = true;
 			camera.clearFlags = CameraClearFlags.Color;
 			camera.backgroundColor = Color.clear;
+#if URP
+			var cameraData = camera?.GetComponent<UnityEngine.Rendering.Universal.UniversalAdditionalCameraData>();
+			var targetData = Camera.main.GetComponent<UnityEngine.Rendering.Universal.UniversalAdditionalCameraData>();
+			if (cameraData != null)
+			{
+				cameraData.renderPostProcessing = targetData.renderPostProcessing;
+				var curRenerer = UnityEngine.Rendering.Universal.UniversalRenderPipeline.asset.GetRenderer(0);
+				for (int curIndex = 0; curRenerer!=null; curIndex++)
+				{
+					curRenerer = UnityEngine.Rendering.Universal.UniversalRenderPipeline.asset.GetRenderer(0);
+					if (curRenerer == targetData.scriptableRenderer)
+					{
+						cameraData.SetRenderer(curIndex);
+						break;
+					}
+				}
+			}
+#endif
 			Bounds bounds = gameObject.GetBounds();
 			float cameraSize = bounds.size.magnitude*1.1f;
 			camera.nearClipPlane = 0.0f;
@@ -86,7 +81,7 @@ namespace QTool
 			{
 				camera.transform.position = bounds.center + -Camera.main.transform.forward * cameraSize / 2;
 				camera.transform.LookAt(bounds.center);
-				camera.Capture(size, size, texture,0,0, postProcessing);
+				camera.Capture(size, size, texture,0,0);
 			}
 			else if(!around)
 			{
@@ -97,7 +92,7 @@ namespace QTool
 				{
 					var x = i % xCount;
 					var y = i / xCount;
-					camera.Capture(size, size, texture, size * x,size* y, postProcessing);
+					camera.Capture(size, size, texture, size * x,size* y);
 					camera.transform.RotateAround(gameObject.transform.position, Vector3.up, -angle);
 				}
 			}
