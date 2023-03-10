@@ -60,17 +60,16 @@ namespace QTool
 			if (targetData != null)
 			{
 				cameraData.renderPostProcessing = targetData.renderPostProcessing;
-				var curRenerer = UnityEngine.Rendering.Universal.UniversalRenderPipeline.asset.GetRenderer(0);
-				for (int curIndex = 0; curRenerer!=null||curIndex>10; curIndex++)
+				var curIndex = 0;
+				for (curIndex = 0; true; curIndex++)
 				{
-					curRenerer = UnityEngine.Rendering.Universal.UniversalRenderPipeline.asset.GetRenderer(0);
+					var curRenerer = UnityEngine.Rendering.Universal.UniversalRenderPipeline.asset.GetRenderer(curIndex);
 					if (curRenerer == targetData.scriptableRenderer)
 					{
-						cameraData.SetRenderer(curIndex);
 						break;
 					}
 				}
-				
+				cameraData.SetRenderer(curIndex);
 			}
 #endif
 			Bounds bounds = gameObject.GetBounds();
