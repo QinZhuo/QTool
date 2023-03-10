@@ -204,8 +204,7 @@ namespace QTool
 				{
 					if (autuCreate)
 					{
-						child.position.Similar();
-						   child = new GameObject(start).transform;
+						child = new GameObject(start).transform;
 						child.position = transform.position;
 						child.SetParent(transform);
 						return child;
