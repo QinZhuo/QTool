@@ -10,7 +10,7 @@ namespace QTool
 		private bool IsPrefab => gameObject.IsPrefabInstance(out var prefab) && !Application.isPlaying;
 		[QName("单位像素尺寸")]
 		public int pixel = 100;
-		[QName("方向"),Range(1,64)]
+		[QName("方向"), Range(1, 64)]
 		public int count = 1;
 		[QName("仅Y轴旋转")]
 		public bool onlyY = true;
@@ -26,13 +26,13 @@ namespace QTool
 					QBillboard.gameObject.SetActive(false);
 				}
 				var bounds = gameObject.GetBounds();
-			
-				var texture = gameObject.CaptureAround(pixel, count,false);
+
+				var texture = gameObject.CaptureAround(pixel, count, false);
 				var pngPath = path.Replace(".prefab", "/" + name + "_" + nameof(Texture) + ".png");
 				pngPath.CheckDirectoryPath();
 				QFileManager.SavePNG(texture, pngPath);
 				UnityEditor.AssetDatabase.Refresh();
-				if (QBillboard== null)
+				if (QBillboard == null)
 				{
 					QBillboard = GameObject.CreatePrimitive(PrimitiveType.Quad).GetComponent<MeshRenderer>();
 					QBillboard.transform.SetParent(transform);
@@ -43,7 +43,7 @@ namespace QTool
 				{
 					QBillboard.gameObject.SetActive(true);
 				}
-			
+
 				QBillboard.transform.position = bounds.center;
 				texture = UnityEditor.AssetDatabase.LoadAssetAtPath<Texture2D>(pngPath);
 				if (QBillboard.sharedMaterial == null)
@@ -60,12 +60,12 @@ namespace QTool
 				QBillboard.sharedMaterial.SetInt("_Count", count);
 				if (count == 1)
 				{
-					QBillboard.transform.localScale = bounds.size.magnitude*Vector3.one;
+					QBillboard.transform.localScale = bounds.size.magnitude * new Vector3(1 / transform.lossyScale.x, 1 / transform.lossyScale.y, 1); ;
 					QBillboard.sharedMaterial.EnableKeyword("BILLBOARDMODE_NORMAL");
 				}
 				else
 				{
-					QBillboard.transform.localScale = new Vector3(new Vector2(bounds.size.x, bounds.size.z).magnitude, bounds.size.y, 1);
+					QBillboard.transform.localScale = new Vector3(new Vector2(bounds.size.x, bounds.size.z).magnitude / transform.lossyScale.x, bounds.size.y / transform.lossyScale.y, 1);
 					QBillboard.sharedMaterial.EnableKeyword("BILLBOARDMODE_HORIZONTAL");
 				}
 				if (onlyY)
@@ -77,7 +77,7 @@ namespace QTool
 					QBillboard.sharedMaterial.DisableKeyword("ONLYY");
 				}
 				gameObject.ApplyPrefab();
-				QDebug.Log(nameof(QBillboardPrefab) + " " + gameObject + "烘培QBillboard资源成功 "+ path);
+				QDebug.Log(nameof(QBillboardPrefab) + " " + gameObject + "烘培QBillboard资源成功 " + path);
 			}
 			else
 			{
