@@ -72,12 +72,14 @@ namespace QTool
 			}
 #endif
 			Bounds bounds = gameObject.GetBounds();
-			var weight = Mathf.CeilToInt(pixel * new Vector2(bounds.size.x, bounds.size.z).magnitude);
-			var height = Mathf.CeilToInt(pixel * bounds.size.y);
+			var sizeX = count == 1 ? bounds.size.magnitude : new Vector2(bounds.size.x, bounds.size.z).magnitude;
+			var sizeY = count == 1 ? bounds.size.magnitude : bounds.size.y;
+			var weight = Mathf.CeilToInt(pixel * sizeX);
+			var height = Mathf.CeilToInt(pixel * sizeY);
 			var texture = new Texture2D(weight * xCount, height * yCount, TextureFormat.BGRA32, false);
 			camera.nearClipPlane = 0.0f;
-			camera.farClipPlane = new Vector2(bounds.size.x, bounds.size.z).magnitude;
-			camera.orthographicSize = Mathf.Max(bounds.size.y, new Vector2(bounds.size.x, bounds.size.z).magnitude) / 2;
+			camera.farClipPlane = sizeX;
+			camera.orthographicSize = Mathf.Max(sizeY, sizeX) / 2;
 			if (count == 1)
 			{
 				camera.transform.position = bounds.center + -Camera.main.transform.forward * camera.orthographicSize;

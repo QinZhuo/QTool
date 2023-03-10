@@ -45,7 +45,6 @@ namespace QTool
 				}
 			
 				QBillboard.transform.position = bounds.center;
-				QBillboard.transform.localScale =new Vector3(new Vector2(bounds.size.x,bounds.size.z).magnitude, bounds.size.y, 1) ;
 				texture = UnityEditor.AssetDatabase.LoadAssetAtPath<Texture2D>(pngPath);
 				if (QBillboard.sharedMaterial == null)
 				{
@@ -61,10 +60,12 @@ namespace QTool
 				QBillboard.sharedMaterial.SetInt("_Count", count);
 				if (count == 1)
 				{
+					QBillboard.transform.localScale = bounds.size.magnitude*Vector3.one;
 					QBillboard.sharedMaterial.EnableKeyword("BILLBOARDMODE_NORMAL");
 				}
 				else
 				{
+					QBillboard.transform.localScale = new Vector3(new Vector2(bounds.size.x, bounds.size.z).magnitude, bounds.size.y, 1);
 					QBillboard.sharedMaterial.EnableKeyword("BILLBOARDMODE_HORIZONTAL");
 				}
 				if (onlyY)
