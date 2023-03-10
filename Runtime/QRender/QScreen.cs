@@ -44,11 +44,10 @@ namespace QTool
 			rt.Release();
 			return texture;
 		}
-		public static Texture2D CaptureAround(this GameObject gameObject,int size=512,int count=8, bool around=false)
+		public static Texture2D CaptureAround(this GameObject gameObject,int pixel=100,int count=8, bool around=false)
 		{
 			var xCount = around ? count : Mathf.CeilToInt(Mathf.Sqrt(count));
 			var yCount = around ? count : xCount;
-			var texture = new Texture2D(size * xCount, size* yCount, TextureFormat.BGRA32,false);
 			var camera= gameObject.transform.GetChild(nameof(Capture) + nameof(Camera), true).GetComponent<Camera>(true);
 			camera.CopyFrom(Camera.main);
 			camera.orthographic = true;
@@ -73,6 +72,8 @@ namespace QTool
 			}
 #endif
 			Bounds bounds = gameObject.GetBounds();
+			var textureSize = Mathf.CeilToInt(pixel * bounds.size.magnitude);
+			var texture = new Texture2D(textureSize * xCount, textureSize * yCount, TextureFormat.BGRA32, false);
 			float cameraSize = bounds.size.magnitude*1.1f;
 			camera.nearClipPlane = 0.0f;
 			camera.farClipPlane = cameraSize;
@@ -81,7 +82,7 @@ namespace QTool
 			{
 				camera.transform.position = bounds.center + -Camera.main.transform.forward * cameraSize / 2;
 				camera.transform.LookAt(bounds.center);
-				camera.Capture(size, size, texture,0,0);
+				camera.Capture(textureSize, textureSize, texture,0,0);
 			}
 			else if(!around)
 			{
@@ -92,7 +93,7 @@ namespace QTool
 				{
 					var x = i % xCount;
 					var y = i / xCount;
-					camera.Capture(size, size, texture, size * x,size* y);
+					camera.Capture(textureSize, textureSize, texture, textureSize * x, textureSize * y);
 					camera.transform.RotateAround(gameObject.transform.position, Vector3.up, -angle);
 				}
 			}
@@ -105,7 +106,7 @@ namespace QTool
 				{
 					for (int x = 0; x < xCount; x++)
 					{
-						camera.Capture(size, size, texture, size * x, size * y);
+						camera.Capture(textureSize, textureSize, texture, textureSize * x, textureSize * y);
 						camera.transform.RotateAround(gameObject.transform.position, Vector3.up, -angle);
 					}
 					camera.transform.RotateAround(gameObject.transform.position, Vector3.forward, -angle);

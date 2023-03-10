@@ -8,8 +8,8 @@ namespace QTool
 	{
 #if UNITY_EDITOR
 		private bool IsPrefab => gameObject.IsPrefabInstance(out var prefab) && !Application.isPlaying;
-		[QName("单个图像尺寸")]
-		public int size = 128;
+		[QName("单位像素尺寸")]
+		public int pixel = 100;
 		[QName("方向"),Range(1,64)]
 		public int count = 1;
 		[QName("烘培QBillboard资源", nameof(IsPrefab))]
@@ -25,7 +25,7 @@ namespace QTool
 				}
 				var bounds = gameObject.GetBounds();
 			
-				var texture = gameObject.CaptureAround(size, count,false);
+				var texture = gameObject.CaptureAround(pixel, count,false);
 				var pngPath = path.Replace(".prefab", "/" + name + "_" + nameof(Texture) + ".png");
 				pngPath.CheckDirectoryPath();
 				QFileManager.SavePNG(texture, pngPath);
