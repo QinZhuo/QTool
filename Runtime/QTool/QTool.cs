@@ -204,7 +204,8 @@ namespace QTool
 				{
 					if (autuCreate)
 					{
-						child = new GameObject(start).transform;
+						child.position.Similar();
+						   child = new GameObject(start).transform;
 						child.position = transform.position;
 						child.SetParent(transform);
 						return child;
@@ -657,13 +658,17 @@ namespace QTool
 		{
 			return Mathf.Abs(value - other) < scale;
 		}
-		public static bool Similar(this float value, float other)
+		public static bool Similar(this float value, float other=default)
 		{
 			return Mathf.Approximately(value, other);
 		}
-		public static bool Similar(this Vector3 value, Vector3 other)
+		public static bool Similar(this Vector3 value, Vector3 other=default)
 		{
 			return value.x.Similar(other.x) && value.y.Similar(other.y) && value.z.Similar(other.z);
+		}
+		public static bool Similar(this Vector2 value, Vector2 other = default)
+		{
+			return value.x.Similar(other.x) && value.y.Similar(other.y);
 		}
 		public static int ToGrid(this float value, float size)
 		{
