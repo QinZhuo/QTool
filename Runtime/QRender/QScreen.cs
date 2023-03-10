@@ -58,7 +58,7 @@ namespace QTool
 			var cameraData = camera.GetComponent<UnityEngine.Rendering.Universal.UniversalAdditionalCameraData>(true);
 			if (targetData != null)
 			{
-				cameraData.renderPostProcessing = targetData.renderPostProcessing;
+				cameraData.renderPostProcessing = false;
 				var curIndex = 0;
 				for (curIndex = 0; true; curIndex++)
 				{
