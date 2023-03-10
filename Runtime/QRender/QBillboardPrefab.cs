@@ -37,7 +37,7 @@ namespace QTool
 					QBillboard = GameObject.CreatePrimitive(PrimitiveType.Quad).GetComponent<MeshRenderer>();
 					QBillboard.transform.SetParent(transform);
 					QBillboard.name = nameof(QBillboard);
-				
+					QBillboard.sharedMaterial = null;
 				}
 				else
 				{
