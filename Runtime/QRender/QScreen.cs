@@ -13,15 +13,15 @@ namespace QTool
 		static Texture2D CaptureTexture2d=null;
 		public static Texture2D Capture(
 #if URP
-			bool renderPostProcessing = true
+			bool postProcessing = true
 #endif
 			)
 		{
-			return Capture(null, renderPostProcessing);
+			return Capture(null, postProcessing);
 		}
 		public static Texture2D Capture(this Camera camera
 #if URP
-			, bool renderPostProcessing = true
+			, bool postProcessing = true
 #endif
 		)
 		{
@@ -29,11 +29,11 @@ namespace QTool
 			{
 				CaptureTexture2d = new Texture2D(Screen.width, Screen.height, TextureFormat.RGB24, false);
 			}
-			return Camera.main.Capture(Screen.width,Screen.height,CaptureTexture2d,0,0,renderPostProcessing);
+			return Camera.main.Capture(Screen.width,Screen.height,CaptureTexture2d,0,0,postProcessing);
 		}
 		public static Texture2D Capture(this Camera camera,int width, int height, Texture2D texture=null,int desX=0,int desY=0
 #if URP
-			,bool renderPostProcessing = true
+			,bool postProcessing = true
 #endif
 			)
 		{
@@ -52,7 +52,7 @@ namespace QTool
 				var cameraData = camera?.GetComponent<UnityEngine.Rendering.Universal.UniversalAdditionalCameraData>();
 				if (cameraData != null)
 				{
-					cameraData.renderPostProcessing = renderPostProcessing;
+					cameraData.renderPostProcessing = postProcessing;
 				}
 #endif
 			}
@@ -63,7 +63,11 @@ namespace QTool
 			rt.Release();
 			return texture;
 		}
-		public static Texture2D CaptureAround(this GameObject gameObject,int size=512,int count=8, bool around=false)
+		public static Texture2D CaptureAround(this GameObject gameObject,int size=512,int count=8, bool around=false
+#if URP
+			, bool postProcessing = true
+#endif
+			)
 		{
 			var xCount = around ? count : Mathf.CeilToInt(Mathf.Sqrt(count));
 			var yCount = around ? count : xCount;
@@ -82,7 +86,7 @@ namespace QTool
 			{
 				camera.transform.position = bounds.center + -Camera.main.transform.forward * cameraSize / 2;
 				camera.transform.LookAt(bounds.center);
-				camera.Capture(size, size, texture);
+				camera.Capture(size, size, texture,0,0, postProcessing);
 			}
 			else if(!around)
 			{
@@ -93,7 +97,7 @@ namespace QTool
 				{
 					var x = i % xCount;
 					var y = i / xCount;
-					camera.Capture(size, size, texture, size * x,size* y,false);
+					camera.Capture(size, size, texture, size * x,size* y, postProcessing);
 					camera.transform.RotateAround(gameObject.transform.position, Vector3.up, -angle);
 				}
 			}

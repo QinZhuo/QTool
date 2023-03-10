@@ -12,6 +12,10 @@ namespace QTool
 		public int size = 128;
 		[QName("方向"),Range(1,64)]
 		public int count = 1;
+#if URP
+		[QName("渲染后处理效果")]
+		public bool postProcessing = false;
+#endif
 		[QName("烘培QBillboard资源", nameof(IsPrefab))]
 		void Bake()
 		{
@@ -25,7 +29,7 @@ namespace QTool
 				}
 				var bounds = gameObject.GetBounds();
 			
-				var texture = gameObject.CaptureAround(size, count);
+				var texture = gameObject.CaptureAround(size, count,false, postProcessing);
 				var pngPath = path.Replace(".prefab", "/" + name + "_" + nameof(Texture) + ".png");
 				pngPath.CheckDirectoryPath();
 				QFileManager.SavePNG(texture, pngPath);
