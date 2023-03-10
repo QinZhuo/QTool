@@ -61,7 +61,7 @@ namespace QTool
 			{
 				cameraData.renderPostProcessing = targetData.renderPostProcessing;
 				var curRenerer = UnityEngine.Rendering.Universal.UniversalRenderPipeline.asset.GetRenderer(0);
-				for (int curIndex = 0; curRenerer!=null; curIndex++)
+				for (int curIndex = 0; curRenerer!=null||curIndex>10; curIndex++)
 				{
 					curRenerer = UnityEngine.Rendering.Universal.UniversalRenderPipeline.asset.GetRenderer(0);
 					if (curRenerer == targetData.scriptableRenderer)
@@ -69,7 +69,6 @@ namespace QTool
 						cameraData.SetRenderer(curIndex);
 						break;
 					}
-					Debug.LogError(curIndex + " " + curRenerer);
 				}
 				
 			}
