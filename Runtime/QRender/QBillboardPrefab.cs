@@ -46,7 +46,7 @@ namespace QTool
 					QBillboard.gameObject.SetActive(true);
 				}
 				QBillboard.transform.position = bounds.center;
-				QBillboard.transform.localScale =Vector3.one* bounds.size.magnitude * 1.1f;
+				QBillboard.transform.localScale =new Vector3(new Vector2(bounds.size.x,bounds.size.z).magnitude, bounds.size.y, 1) ;
 				texture = UnityEditor.AssetDatabase.LoadAssetAtPath<Texture2D>(pngPath);
 				QBillboard.sharedMaterial.SetTexture("_MainTex", texture);
 				QBillboard.sharedMaterial.SetInt("_Count", count);
