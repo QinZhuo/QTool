@@ -55,9 +55,9 @@ namespace QTool
 			camera.clearFlags = CameraClearFlags.Color;
 			camera.backgroundColor = Color.clear;
 #if URP
-			var cameraData = camera?.GetComponent<UnityEngine.Rendering.Universal.UniversalAdditionalCameraData>();
 			var targetData = Camera.main.GetComponent<UnityEngine.Rendering.Universal.UniversalAdditionalCameraData>();
-			if (cameraData != null)
+			var cameraData = camera.GetComponent<UnityEngine.Rendering.Universal.UniversalAdditionalCameraData>(true);
+			if (targetData != null)
 			{
 				cameraData.renderPostProcessing = targetData.renderPostProcessing;
 				var curRenerer = UnityEngine.Rendering.Universal.UniversalRenderPipeline.asset.GetRenderer(0);
@@ -69,7 +69,9 @@ namespace QTool
 						cameraData.SetRenderer(curIndex);
 						break;
 					}
+					Debug.LogError(curIndex + " " + curRenerer);
 				}
+				
 			}
 #endif
 			Bounds bounds = gameObject.GetBounds();
