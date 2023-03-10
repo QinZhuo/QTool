@@ -49,8 +49,11 @@ namespace QTool
 				camera.Render();
 				camera.targetTexture = null;
 #if URP
-				var cameraData = camera.GetComponent<UnityEngine.Rendering.Universal.UniversalAdditionalCameraData>();
-				cameraData.renderPostProcessing = renderPostProcessing;
+				var cameraData = camera?.GetComponent<UnityEngine.Rendering.Universal.UniversalAdditionalCameraData>();
+				if (cameraData != null)
+				{
+					cameraData.renderPostProcessing = renderPostProcessing;
+				}
 #endif
 			}
 			RenderTexture.active = rt;
