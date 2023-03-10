@@ -11,15 +11,31 @@ namespace QTool
     public static class QScreen
     {
 		static Texture2D CaptureTexture2d=null;
-		public static Texture2D Capture()
+		public static Texture2D Capture(
+#if URP
+			bool renderPostProcessing = true
+#endif
+			)
+		{
+			return Capture(null, renderPostProcessing);
+		}
+		public static Texture2D Capture(this Camera camera
+#if URP
+			, bool renderPostProcessing = true
+#endif
+		)
 		{
 			if (CaptureTexture2d == null || CaptureTexture2d.width != Screen.width || CaptureTexture2d.height != Screen.height)
 			{
 				CaptureTexture2d = new Texture2D(Screen.width, Screen.height, TextureFormat.RGB24, false);
 			}
-			return Camera.main.Capture(Screen.width,Screen.height,CaptureTexture2d);
+			return Camera.main.Capture(Screen.width,Screen.height,CaptureTexture2d,0,0,renderPostProcessing);
 		}
-		public static Texture2D Capture(this Camera camera,int width, int height, Texture2D texture=null,int desX=0,int desY=0)
+		public static Texture2D Capture(this Camera camera,int width, int height, Texture2D texture=null,int desX=0,int desY=0
+#if URP
+			,bool renderPostProcessing = true
+#endif
+			)
 		{
 			if (texture == null)
 			{
@@ -27,9 +43,16 @@ namespace QTool
 			}
 			var rt = new RenderTexture(width, height, 32);
 			rt.autoGenerateMips = false;
-			camera.targetTexture = rt;
-			camera.Render();
-			camera.targetTexture = null;
+			if (camera != null)
+			{
+				camera.targetTexture = rt;
+				camera.Render();
+				camera.targetTexture = null;
+#if URP
+				var cameraData = camera.GetComponent<UnityEngine.Rendering.Universal.UniversalAdditionalCameraData>();
+				cameraData.renderPostProcessing = renderPostProcessing;
+#endif
+			}
 			RenderTexture.active = rt;
 			texture.ReadPixels(new Rect(0, 0, width, height), desX, desY);
 			RenderTexture.active = null;
@@ -67,7 +90,7 @@ namespace QTool
 				{
 					var x = i % xCount;
 					var y = i / xCount;
-					camera.Capture(size, size, texture, size * x,size* y);
+					camera.Capture(size, size, texture, size * x,size* y,false);
 					camera.transform.RotateAround(gameObject.transform.position, Vector3.up, -angle);
 				}
 			}
