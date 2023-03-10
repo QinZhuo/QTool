@@ -9,7 +9,7 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: QBillBoardTest_Material
   m_Shader: {fileID: -6465566751694194690, guid: bbdb9bc7815cd794b8c77b6ca1098a44, type: 3}
-  m_ShaderKeywords: BILLBOARDMODE_HORIZONTAL BILLBOARDMODE_Normal
+  m_ShaderKeywords: BILLBOARDMODE_HORIZONTAL
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -37,6 +37,6 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Floats:
     - BILLBOARDMODE: 1
-    - _Count: 16
+    - _Count: 8
     m_Colors: []
   m_BuildTextureStacks: []

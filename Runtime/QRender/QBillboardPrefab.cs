@@ -12,6 +12,8 @@ namespace QTool
 		public int pixel = 100;
 		[QName("方向"),Range(1,64)]
 		public int count = 1;
+		[QName("仅Y轴旋转")]
+		public bool onlyY = true;
 		[QName("烘培QBillboard资源", nameof(IsPrefab))]
 		void Bake()
 		{
@@ -35,30 +37,43 @@ namespace QTool
 					QBillboard = GameObject.CreatePrimitive(PrimitiveType.Quad).GetComponent<MeshRenderer>();
 					QBillboard.transform.SetParent(transform);
 					QBillboard.name = nameof(QBillboard);
+				
+				}
+				else
+				{
+					QBillboard.gameObject.SetActive(true);
+				}
+			
+				QBillboard.transform.position = bounds.center;
+				QBillboard.transform.localScale =new Vector3(new Vector2(bounds.size.x,bounds.size.z).magnitude, bounds.size.y, 1) ;
+				texture = UnityEditor.AssetDatabase.LoadAssetAtPath<Texture2D>(pngPath);
+				if (QBillboard.sharedMaterial == null)
+				{
 					QBillboard.sharedMaterial = new Material(Shader.Find("QShaderGraph/QBillboard"));
 					var matPath = path.Replace(".prefab", "/" + name + "_" + nameof(Material) + ".mat");
 					UnityEditor.AssetDatabase.CreateAsset(QBillboard.sharedMaterial, matPath);
 					UnityEditor.AssetDatabase.Refresh();
 					QBillboard.sharedMaterial = UnityEditor.AssetDatabase.LoadAssetAtPath<Material>(matPath);
 				}
-				else
-				{
-					QBillboard.gameObject.SetActive(true);
-				}
-				QBillboard.transform.position = bounds.center;
-				QBillboard.transform.localScale =new Vector3(new Vector2(bounds.size.x,bounds.size.z).magnitude, bounds.size.y, 1) ;
-				texture = UnityEditor.AssetDatabase.LoadAssetAtPath<Texture2D>(pngPath);
+				QBillboard.sharedMaterial.DisableKeyword("BILLBOARDMODE_NORMAL");
+				QBillboard.sharedMaterial.DisableKeyword("BILLBOARDMODE_HORIZONTAL");
 				QBillboard.sharedMaterial.SetTexture("_MainTex", texture);
 				QBillboard.sharedMaterial.SetInt("_Count", count);
-				QBillboard.sharedMaterial.DisableKeyword("BILLBOARDMODE_Normal");
-				QBillboard.sharedMaterial.DisableKeyword("BILLBOARDMODE_HORIZONTAL");
 				if (count == 1)
 				{
-					QBillboard.sharedMaterial.EnableKeyword("BILLBOARDMODE_Normal");
+					QBillboard.sharedMaterial.EnableKeyword("BILLBOARDMODE_NORMAL");
 				}
 				else
 				{
 					QBillboard.sharedMaterial.EnableKeyword("BILLBOARDMODE_HORIZONTAL");
+				}
+				if (onlyY)
+				{
+					QBillboard.sharedMaterial.EnableKeyword("ONLYY");
+				}
+				else
+				{
+					QBillboard.sharedMaterial.DisableKeyword("ONLYY");
 				}
 				gameObject.ApplyPrefab();
 				QDebug.Log(nameof(QBillboardPrefab) + " " + gameObject + "烘培QBillboard资源成功 "+ path);
