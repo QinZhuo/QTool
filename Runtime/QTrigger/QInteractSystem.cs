@@ -13,7 +13,7 @@ namespace QTool
 				QInteractUIList.Instance.Target = this;
 			}
 		}
-		protected override void TriggerEnter(QInteractTrigger trigger)
+		protected override void TriggerEnter(QInteractTrigger trigger,Collider other)
 		{
 			if (trigger.IsManual)
 			{
@@ -69,7 +69,7 @@ namespace QTool
 			var trigger = other.GetComponent<T>();
 			if (trigger != null)
 			{
-				TriggerEnter(trigger);
+				TriggerEnter(trigger,other);
 			}
 		}
 		protected virtual void OnTriggerExit(Collider other)
@@ -80,7 +80,7 @@ namespace QTool
 				TriggerExit(trigger);
 			}
 		}
-		protected abstract void TriggerEnter(T trigger);
+		protected abstract void TriggerEnter(T trigger,Collider other);
 		protected abstract void TriggerExit(T trigger);
 	}
 }
