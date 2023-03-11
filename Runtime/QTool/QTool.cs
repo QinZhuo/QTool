@@ -492,7 +492,7 @@ namespace QTool
 			return false;
 #endif
 		}
-
+#if UNITY_EDITOR
 		public static bool ApplyPrefab(this GameObject gameObject)
 		{
 			if (UnityEditor.PrefabUtility.IsPartOfPrefabInstance(gameObject))
@@ -502,6 +502,7 @@ namespace QTool
 			}
 			return false;
 		}
+#endif
 		public static bool IsPrefabInstance(this UnityEngine.Object obj, out GameObject prefab)
 		{
 			prefab = null;
