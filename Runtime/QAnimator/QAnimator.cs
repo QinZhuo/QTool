@@ -9,9 +9,6 @@ namespace QTool
 	[RequireComponent(typeof(QEventTrigger))]
 	public class QAnimator : MonoBehaviour
 	{
-
-
-		
 		Animator _animator;
 		public Animator Animator
 		{
@@ -161,6 +158,14 @@ namespace QTool
 			}
 		}
 	}
-
+	public static class QAnimatorTool
+	{
+		public static void SetTrigger(this Animator animator,string name,Vector2 vector2)
+		{
+			animator.SetFloat(name + "X",vector2.x);
+			animator.SetFloat(name + "Y", vector2.x);
+			animator.SetTrigger(name);
+		}
+	}
 }
 
