@@ -58,6 +58,7 @@ namespace QTool
 			{
 				do
 				{
+					var GUIEnabled = GUI.enabled;
 					if ("m_Script".Equals(iterator.name))
 					{
 						GUI.enabled = false;
@@ -68,17 +69,17 @@ namespace QTool
 					}
 					if ("m_Script".Equals(iterator.name))
 					{
-						GUI.enabled = true;
+						GUI.enabled = GUIEnabled;
 					}
 				} while (iterator.NextVisible(false));
 				serializedObject.ApplyModifiedProperties();
 			}
 		}
+
+		public const float BorderSize = 8;
 		public static QDictionary<int, Action> OnChangeDelayCall = new QDictionary<int, Action>();
 		public static QDictionary<string, bool> FoldoutDic = new QDictionary<string, bool>();
 		public static QDictionary<Type, Func<object, string, object>> DrawOverride = new QDictionary<Type, Func<object, string, object>>();
-		static Color BackColor = new Color(0, 0, 0, 0.6f);
-
 		public static List<string> TypeMenuList = new List<string>() { typeof(UnityEngine.Object).FullName.Replace('.', '/') };
 		public static List<Type> TypeList = new List<Type>() { typeof(UnityEngine.Object) };
 		public static object Draw(this object obj, string name, Type type, Action<object> changeValue = null, ICustomAttributeProvider customAttribute = null, Func<int, object, string, Type, object> DrawElement = null, Action<int, int> IndexChange = null, params GUILayoutOption[] layoutOption)
@@ -258,7 +259,7 @@ namespace QTool
 									var color = GUI.backgroundColor;
 									GUI.backgroundColor = BackColor;
 
-									using (new EditorGUILayout.VerticalScope(QGUI.BackStyle, layoutOption))
+									using (new EditorGUILayout.VerticalScope(BackStyle, layoutOption))
 									{
 
 										GUI.backgroundColor = color;
@@ -286,7 +287,7 @@ namespace QTool
 												{
 													for (int i = 0; i < list.Count; i++)
 													{
-														using (new EditorGUILayout.VerticalScope(QGUI.BackStyle))
+														using (new EditorGUILayout.VerticalScope(BackStyle))
 														{
 															var key = name + "[" + i + "]";
 															if (DrawElement == null)
@@ -390,19 +391,41 @@ namespace QTool
 				return new GUIContent(obj?.ToString());
 			}
 		}
-		static QDictionary<Color, Texture> ColorTexture = new QDictionary<Color, Texture>((key) =>
+		public static QDictionary<Color, Texture2D> ColorTexture { get; private set; } = new QDictionary<Color, Texture2D>((key) =>
+		  {
+			  var tex = new Texture2D(1, 1);
+			  for (int i = 0; i < tex.width; i++)
+			  {
+				  for (int j = 0; j < tex.height; j++)
+				  {
+					  tex.SetPixel(i, j, key);
+				  }
+			  }
+			  tex.Apply();
+			  return tex;
+		  });
+		public static Texture2D GetCircleTexture(Color color, int radius=32)
 		{
-			var tex = new Texture2D(20, 20);
+			var tex = new Texture2D(radius*2, radius*2);
 			for (int i = 0; i < tex.width; i++)
 			{
 				for (int j = 0; j < tex.height; j++)
 				{
-					tex.SetPixel(i, j, key);
+					var x = i - radius;
+					var y = j - radius;
+					if (x * x + y * y < radius * radius)
+					{
+						tex.SetPixel(i, j, color);
+					}
+					else
+					{
+						tex.SetPixel(i, j, Color.clear);
+					}
 				}
 			}
 			tex.Apply();
 			return tex;
-		});
+		}
 		public static void MouseMenuClick(this Rect rect, System.Action<GenericMenu> action, Action click = null)
 		{
 			if (EventType.MouseUp.Equals(Event.current.type))
@@ -701,7 +724,7 @@ namespace QTool
 			if (progress > 0)
 			{
 				PushColor(color);
-				GUI.Box(rateRect, "", CellStyle);
+				GUI.Box(rateRect, "", BackStyle);
 				PopColor();
 			}
 			GUI.Label(lastRect, info, CenterLable);
@@ -718,15 +741,22 @@ namespace QTool
 		static GUIStyle _leftLable;
 		public static GUIStyle RightLabel => _rightLabel ??= new GUIStyle(EditorStyles.label) { alignment = TextAnchor.MiddleRight };
 		static GUIStyle _rightLabel;
-		public static Texture2D NodeEditorBackTexture2D => _nodeEditorBackTexture2D ??= Resources.Load<Texture2D>("NodeEditorBackground");
-		static Texture2D _nodeEditorBackTexture2D = null;
-		public static Texture2D DotTexture2D => _dotTextrue2D ??= Resources.Load<Texture2D>("NodeEditorDot");
-		static Texture2D _dotTextrue2D;
-		public static GUIStyle BackStyle => _backStyle ??= new GUIStyle("helpBox") { alignment = TextAnchor.MiddleCenter };
+		public static Color BackColor { get; private set; } = new Color32(32, 32, 32, 255);
+		public static Color LineColor { get; private set; } = new Color32(0, 0, 0, 60);
+		public static Texture2D BackTexture => _nodeEditorBackTexture ??= ColorTexture[BackColor];
+		static Texture2D _nodeEditorBackTexture = null;
+		public static Texture2D DotTexture => _dotTextrue ??= GetCircleTexture(Color.white);
+		static Texture2D _dotTextrue;
+		public static GUIStyle BackStyle => _backStyle ??= new GUIStyle()
+		{
+			alignment = TextAnchor.MiddleCenter,
+			normal = new GUIStyleState
+			{
+				background = GetCircleTexture(LineColor,4),
+			},
+			border = new RectOffset { bottom =4, left = 4, right = 4, top = 4 },
+		};
 		static GUIStyle _backStyle;
-
-		public static GUIStyle CellStyle => _cellStyle ??= new GUIStyle("GroupBox") { alignment = TextAnchor.MiddleCenter };
-		static GUIStyle _cellStyle;
 	}
 	public static class QEditorTool
 	{

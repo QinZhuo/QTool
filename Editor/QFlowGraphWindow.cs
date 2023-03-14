@@ -20,7 +20,6 @@ namespace QTool.FlowGraph
 				return obj;
 			};
 		}
-        const float dotSize = 16;
 		static QFlowGraph Graph = null;
         [OnOpenAsset(0)]
         public static bool OnOpen(int instanceID, int line)
@@ -364,8 +363,8 @@ namespace QTool.FlowGraph
         {
             ViewRange.size = position.size;
             mousePos = Event.current.mousePosition + ViewRange.position;
-            DrawBackground();
-            if (Graph==null)
+			GUI.DrawTexture(new Rect(Vector2.zero, position.size), QGUI.BackTexture);
+			if (Graph==null)
             {
                 if (GUILayout.Button("创建新的QFlowGraph"))
                 {
@@ -630,30 +629,19 @@ namespace QTool.FlowGraph
             }
             return pos;
         }
-        void DrawBackground()
-        {
-            var xTex = position.width / QGUI.NodeEditorBackTexture2D.width;
-            var yTex = position.height / QGUI.NodeEditorBackTexture2D.height;
-            var xStart = Fix(-ViewRange.x,-QGUI.NodeEditorBackTexture2D.width, 0, QGUI.NodeEditorBackTexture2D.width);
-            var yStart = Fix(-ViewRange.y,-QGUI.NodeEditorBackTexture2D.height, 0, QGUI.NodeEditorBackTexture2D.height);
-            for (int x = 0; x <= xTex + 1; x++)
-            {
-                for (int y = 0; y <= yTex + 1; y++)
-                {
-                    GUI.DrawTexture(new Rect(xStart + QGUI.NodeEditorBackTexture2D.width * x, yStart + QGUI.NodeEditorBackTexture2D.height * y, QGUI.NodeEditorBackTexture2D.width, QGUI.NodeEditorBackTexture2D.height), QGUI.NodeEditorBackTexture2D);
-                }
-            }
-        }
         Rect windowRect;
         void DrawNode(int id)
         {
             var node = Graph.NodeList[id];
 			if (node == null) return;
             windowRect = node.rect;
-            EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.Space(dotSize);
+			EditorGUI.DrawRect(new Rect(1, 21, windowRect.width - 2, 2), QGUI.LineColor);
+			EditorGUI.DrawRect(new Rect(1, 21, windowRect.width - 2, windowRect.height - 20), QGUI.LineColor);
+			EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.Space(QGUI.BorderSize*2);
             EditorGUILayout.BeginVertical();
-            if (node.command == null)
+			EditorGUILayout.Space(QGUI.BorderSize);
+			if (node.command == null)
             {
 				GUILayout.Label("丢失【" + node.commandKey + "】 ",GUILayout.MaxWidth(200));
 			}
@@ -662,7 +650,7 @@ namespace QTool.FlowGraph
 				DrawPort(port);
 			}
 			EditorGUILayout.EndVertical();
-            EditorGUILayout.Space(dotSize);
+            EditorGUILayout.Space(QGUI.BorderSize*2);
             EditorGUILayout.EndHorizontal();
             if (Event.current.type== EventType.Repaint)
             {
@@ -692,51 +680,51 @@ namespace QTool.FlowGraph
 			var endOffset= Vector2.Lerp(end + Vector2.left * size, new Vector2(end.x - 100, yMax), t);
 			Handles.DrawBezier(start, end, startOffset, endOffset, color, null, 3f);
 		}
-        public void DrawCurve()
-        {
-            if (connectStartPort!=null)
-            {
-                var connectInfo = Graph.GetConnectInfo(connectStartPort);
+		public void DrawCurve()
+		{
+			if (connectStartPort != null)
+			{
+				var connectInfo = Graph.GetConnectInfo(connectStartPort);
 				var color = GetTypeColor(Graph.GetPort(connectStartPort).ConnectType);
-                DrawCurve(connectInfo.rect.center, mousePos, color, Graph.GetPort(connectStartPort).ConnectType==typeof(QFlow));
-                DrawDot(mousePos - ViewRange.position, dotSize*0.8f, color);
-                if (nearPortId != null)
-                {
-                    DrawDot(Graph.GetConnectInfo(nearPortId).rect.center - ViewRange.position, dotSize * 0.4f, color);
-                }
-            }
-            foreach (var name in Graph.NodeList)
-            {
-                foreach (var port in name.Ports)
-                { 
-                    if (port.IsOutput )
-                    {
-                        var color = GetTypeColor(port.ConnectType);
-                        foreach (var c in port.ConnectInfolist)
-                        {
-                            foreach (var connect in c.ConnectList)
-                            {
-                                var next = Graph.GetConnectInfo(connect);
-                                if (next != null)
-                                {
-                                    DrawCurve(c.rect.center, next.rect.center, color, port.ConnectType==typeof(QFlow));
-                                }
-                            }
-                        }
-                      
-                    }
-                }
-            }
-        }
+				DrawCurve(connectInfo.rect.center, mousePos, color, Graph.GetPort(connectStartPort).ConnectType == typeof(QFlow));
+				DrawDot(mousePos - ViewRange.position,0.8f, color);
+				if (nearPortId != null)
+				{
+					DrawDot(Graph.GetConnectInfo(nearPortId).rect.center - ViewRange.position, 0.8f, color);
+				}
+			}
+			foreach (var name in Graph.NodeList)
+			{
+				foreach (var port in name.Ports)
+				{
+					if (port.IsOutput)
+					{
+						var color = GetTypeColor(port.ConnectType);
+						foreach (var c in port.ConnectInfolist)
+						{
+							foreach (var connect in c.ConnectList)
+							{
+								var next = Graph.GetConnectInfo(connect);
+								if (next != null)
+								{
+									DrawCurve(c.rect.center, next.rect.center, color, port.ConnectType == typeof(QFlow));
+								}
+							}
+						}
+
+					}
+				}
+			}
+		}
   
 
         Rect DrawDot(Vector2 center,float size,Color color)
         {
             var rect = new Rect();
-            rect.size = Vector3.one * size;
+			rect.size = Vector3.one * QGUI.BorderSize * size*1.5f;
             rect.center = center;
 			QGUI.PushColor(color);
-            GUI.DrawTexture(rect, QGUI.DotTexture2D);
+            GUI.DrawTexture(rect, QGUI.DotTexture);
 			QGUI.PopColor();
 			return rect;
         }
@@ -786,32 +774,33 @@ namespace QTool.FlowGraph
             DrawPortDot(GUILayoutUtility.GetLastRect(), curDrawPort[i],curDrawPort.IsOutput, curDrawPort.ConnectType);
 			return value;
 		}
-		public void DrawPortDot(Rect rect,ConnectInfo port,bool isOutput,Type connectType)
-        {
-            var typeColor = GetTypeColor(connectType);
-            Rect dotRect = default;
-            if (isOutput)
-            {
-                var center = new Vector2(rect.xMax, rect.y) + Vector2.one * dotSize / 2;
-                dotRect = DrawDot(center, dotSize, Color.black);
-                DrawDot(center, dotSize * (port.ConnectList.Count==0? 0.9f : 0.7f), typeColor);
-            }
-            else
-            {
-                var center = rect.position + new Vector2(-dotSize, dotSize) / 2;
-                var canConnect = connectStartPort != null &&Graph.GetPort(connectStartPort).CanConnect(connectType);
-                dotRect = DrawDot(center, dotSize * (canConnect ? 1 : 0.8f), typeColor);
-                DrawDot(center, dotSize * (canConnect ? 0.8f : 0.7f), Color.black);
-                if (port.ConnectList.Count > 0)
-                {
-                    DrawDot(center, dotSize * 0.6f, typeColor);
-                }
-            }
-            if (Event.current.type == EventType.Repaint)
-            {
-                port.rect = new Rect(dotRect.position + windowRect.position, dotRect.size);
-            }
-        }
+		public void DrawPortDot(Rect rect, ConnectInfo port, bool isOutput, Type connectType)
+		{
+			var typeColor = GetTypeColor(connectType);
+			Rect dotRect = default;
+			if (isOutput)
+			{
+				var center = new Vector2(rect.xMax, rect.y) + Vector2.one * QGUI.BorderSize;
+				DrawDot(center, 1, typeColor);
+				dotRect = DrawDot(center, 0.8f, Color.black);
+				DrawDot(center, 0.5f, typeColor);
+			}
+			else
+			{
+				var center = rect.position + new Vector2(-QGUI.BorderSize, QGUI.BorderSize);
+				var canConnect = connectStartPort != null && Graph.GetPort(connectStartPort).CanConnect(connectType);
+				dotRect = DrawDot(center, (canConnect ? 1f : 1), typeColor);
+				DrawDot(center,  (canConnect ? 0.8f :0.8f), Color.black);
+				if (port.ConnectList.Count > 0)
+				{
+					DrawDot(center,0.6f, typeColor);
+				}
+			}
+			if (Event.current.type == EventType.Repaint)
+			{
+				port.rect = new Rect(dotRect.position + windowRect.position, dotRect.size);
+			}
+		}
 
         #endregion
 
