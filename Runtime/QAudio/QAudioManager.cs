@@ -40,6 +40,35 @@ namespace QTool
 			}
 			GetAudio(audioKey).Play(music,transition);
 		}
+		public static void Stop(QAudioType audioType = QAudioType.SE, float transition = 0)
+		{
+			Stop(audioType.ToString(), transition);
+		}
+		public static void Stop(string audioKey, float transition = 0)
+		{
+			var audio = GetAudio(audioKey);
+			switch (audio.Type)
+			{
+				case QAudioType.BGM:
+				case QAudioType.ME:
+					audio.Stop(transition);
+					break;
+				default:
+					Debug.LogError(nameof(QAudioManager) + " ["+ audio.Type + "] 类型"+nameof(QAudioSource)+"不能停止音频");
+					break;
+			}
+		}
+		public static void StopAll()
+		{
+			QSceneMusicSetting.UseSceneMusic = true;
+			foreach (var audio in AudioSources)
+			{
+				if (audio.Value.Type== QAudioType.ME)
+				{
+					audio.Value.Stop(0.5f);
+				}
+			}
+		}
 		public static void UseSceneMusic(float transition =0)
 		{
 			GetAudio(nameof(QAudioType.BGM)).Stop(transition);

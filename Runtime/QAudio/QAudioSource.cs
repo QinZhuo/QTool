@@ -9,6 +9,7 @@ namespace QTool
 		public AudioSource Audio { get; private set; }
 		[SerializeField]
 		private QAudioType AudioType = QAudioType.BGS;
+		public QAudioType Type => AudioType;
 		public void Play(AudioClip clip)
 		{
 			switch (AudioType)
