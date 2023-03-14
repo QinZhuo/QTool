@@ -742,7 +742,7 @@ namespace QTool
 		public static GUIStyle RightLabel => _rightLabel ??= new GUIStyle(EditorStyles.label) { alignment = TextAnchor.MiddleRight };
 		static GUIStyle _rightLabel;
 		public static Color BackColor { get; private set; } = new Color32(32, 32, 32, 255);
-		public static Color LineColor { get; private set; } = new Color32(0, 0, 0, 60);
+		public static Color LineColor { get; private set; } = new Color32(0, 0, 0, 40);
 		public static Texture2D BackTexture => _nodeEditorBackTexture ??= ColorTexture[BackColor];
 		static Texture2D _nodeEditorBackTexture = null;
 		public static Texture2D DotTexture => _dotTextrue ??= GetCircleTexture(Color.white);
@@ -752,7 +752,7 @@ namespace QTool
 			alignment = TextAnchor.MiddleCenter,
 			normal = new GUIStyleState
 			{
-				background = GetCircleTexture(LineColor,4),
+				background = GetCircleTexture(LineColor, 4),
 			},
 			border = new RectOffset { bottom =4, left = 4, right = 4, top = 4 },
 		};
