@@ -304,7 +304,7 @@ namespace QTool.FlowGraph
                                 var dis = Vector2.Distance(c.rect.position, mousePos);
                                 if (dis < minDis)
                                 {
-                                    nearPortId = new PortId(port, index);
+									nearPortId = port.GetPortId(index);;
                                     minDis = dis;
                                 }
                                 index++;
@@ -345,7 +345,7 @@ namespace QTool.FlowGraph
                     {
                         if (c.rect.Contains(mousePos))
                         {
-                            curPortId = new PortId(port,index);
+							curPortId = port.GetPortId(index); 
                             break;
                         }
                         index++;
@@ -687,10 +687,10 @@ namespace QTool.FlowGraph
 				var connectInfo = Graph.GetConnectInfo(connectStartPort);
 				var color = GetTypeColor(Graph.GetPort(connectStartPort).ConnectType);
 				DrawCurve(connectInfo.rect.center, mousePos, color, Graph.GetPort(connectStartPort).ConnectType == typeof(QFlow));
-				DrawDot(mousePos - ViewRange.position,0.8f, color);
+				DrawCircle(mousePos - ViewRange.position, color);
 				if (nearPortId != null)
 				{
-					DrawDot(Graph.GetConnectInfo(nearPortId).rect.center - ViewRange.position, 0.8f, color);
+					DrawCurve(connectInfo.rect.center, Graph.GetConnectInfo(nearPortId.Value).rect.center,Color.Lerp( color,Color.clear,0.4f), Graph.GetPort(connectStartPort).ConnectType == typeof(QFlow));
 				}
 			}
 			foreach (var name in Graph.NodeList)
@@ -716,18 +716,40 @@ namespace QTool.FlowGraph
 				}
 			}
 		}
-  
-
-        Rect DrawDot(Vector2 center,float size,Color color)
+		public static Texture2D CircleTexture => _CircleTexture ??= QGUI.GetCircleTexture(Color.white);
+		static Texture2D _CircleTexture = null;
+		public static Texture2D DotTexture => _DotTexture ??= QGUI.GetCircleTexture(Color.white).DrawCircle(Color.black, 20);
+		static Texture2D _DotTexture = null;
+		public static Texture2D DotConnectTexture => _DotConnectTexture??= QGUI.GetCircleTexture(Color.white).DrawCircle(Color.black, 20).DrawCircle(Color.white,15);
+		static Texture2D _DotConnectTexture = null;
+		Rect DrawDot(Vector2 center,float size,Color color,bool isConnect)
         {
             var rect = new Rect();
-			rect.size = Vector3.one * QGUI.BorderSize * size*1.5f;
+			rect.size = Vector3.one * QGUI.BorderSize * size*1.4f;
             rect.center = center;
 			QGUI.PushColor(color);
-            GUI.DrawTexture(rect, QGUI.DotTexture);
+			if (isConnect)
+			{
+				GUI.DrawTexture(rect, DotConnectTexture);
+			}
+			else
+			{
+				GUI.DrawTexture(rect, DotTexture);
+			}
 			QGUI.PopColor();
+			rect.size *= 2;
+			rect.center = center;
 			return rect;
         }
+		void DrawCircle(Vector2 center, Color color)
+		{
+			var rect = new Rect();
+			rect.size = Vector3.one * QGUI.BorderSize*0.8f;
+			rect.center = center;
+			QGUI.PushColor(color);
+			GUI.DrawTexture(rect, CircleTexture);
+			QGUI.PopColor();
+		}
        
         void DrawPort(QFlowPort port)
         {
@@ -757,7 +779,7 @@ namespace QTool.FlowGraph
 				}
 				lastRect = GUILayoutUtility.GetLastRect();
 			}
-			DrawPortDot(lastRect, port[0], port.IsOutput, port.ConnectType);
+			DrawPortDot(lastRect, port.GetPortId(0), port.IsOutput, port.ConnectType);
 		}
         QFlowPort curDrawPort;
         object DrawList(int i, object value,string name,Type type)
@@ -771,34 +793,28 @@ namespace QTool.FlowGraph
 			{
 				EditorGUILayout.LabelField(name, curDrawPort.IsOutput ? QGUI.RightLabel : QGUI.LeftLable);
 			}
-            DrawPortDot(GUILayoutUtility.GetLastRect(), curDrawPort[i],curDrawPort.IsOutput, curDrawPort.ConnectType);
+			DrawPortDot(GUILayoutUtility.GetLastRect(), curDrawPort.GetPortId(i), curDrawPort.IsOutput, curDrawPort.ConnectType);
 			return value;
 		}
-		public void DrawPortDot(Rect rect, ConnectInfo port, bool isOutput, Type connectType)
+		public void DrawPortDot(Rect rect, PortId port, bool isOutput, Type connectType)
 		{
 			var typeColor = GetTypeColor(connectType);
 			Rect dotRect = default;
+			var connectInfo = Graph.GetConnectInfo(port);
 			if (isOutput)
 			{
 				var center = new Vector2(rect.xMax, rect.y) + Vector2.one * QGUI.BorderSize;
-				DrawDot(center, 1, typeColor);
-				dotRect = DrawDot(center, 0.8f, Color.black);
-				DrawDot(center, 0.5f, typeColor);
+				dotRect=DrawDot(center, Equals(connectStartPort, port)?1.2f:1, typeColor, connectInfo.ConnectList.Count > 0 || Equals(connectStartPort, port));
 			}
 			else
 			{
 				var center = rect.position + new Vector2(-QGUI.BorderSize, QGUI.BorderSize);
 				var canConnect = connectStartPort != null && Graph.GetPort(connectStartPort).CanConnect(connectType);
-				dotRect = DrawDot(center, (canConnect ? 1f : 1), typeColor);
-				DrawDot(center,  (canConnect ? 0.8f :0.8f), Color.black);
-				if (port.ConnectList.Count > 0)
-				{
-					DrawDot(center,0.6f, typeColor);
-				}
+				dotRect = DrawDot(center, (canConnect ? 1.2f : 1), typeColor, connectInfo.ConnectList.Count > 0 || Equals(nearPortId, port));
 			}
 			if (Event.current.type == EventType.Repaint)
 			{
-				port.rect = new Rect(dotRect.position + windowRect.position, dotRect.size);
+				connectInfo.rect = new Rect(dotRect.position + windowRect.position, dotRect.size);
 			}
 		}
 
@@ -822,6 +838,7 @@ namespace QTool.FlowGraph
 				CreateMenu(connectStartPort.Value);
             }
             connectStartPort = null;
+			nearPortId = null;
         }
         PortId? connectStartPort;
         QDictionary<string, Color> KeyColor = new QDictionary<string, Color>();

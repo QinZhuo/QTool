@@ -404,22 +404,33 @@ namespace QTool
 			  tex.Apply();
 			  return tex;
 		  });
-		public static Texture2D GetCircleTexture(Color color, int radius=32)
+		public static Texture2D GetTexture(int size = 32)
 		{
-			var tex = new Texture2D(radius*2, radius*2);
+			var tex = new Texture2D(size * 2, size * 2);
 			for (int i = 0; i < tex.width; i++)
 			{
 				for (int j = 0; j < tex.height; j++)
 				{
-					var x = i - radius;
-					var y = j - radius;
+					tex.SetPixel(i, j, Color.clear);
+				}
+			}
+			return tex;
+		}
+		public static Texture2D GetCircleTexture(Color color, int radius=32)
+		{
+			return GetTexture(radius).DrawCircle(color,radius);
+		}
+		public static Texture2D DrawCircle(this Texture2D tex,Color color,int radius=32)
+		{
+			for (int i = 0; i < tex.width; i++)
+			{
+				for (int j = 0; j < tex.height; j++)
+				{
+					var x = i - tex.width/2;
+					var y = j - tex.height/2;
 					if (x * x + y * y < radius * radius)
 					{
 						tex.SetPixel(i, j, color);
-					}
-					else
-					{
-						tex.SetPixel(i, j, Color.clear);
 					}
 				}
 			}
@@ -745,8 +756,7 @@ namespace QTool
 		public static Color LineColor { get; private set; } = new Color32(0, 0, 0, 40);
 		public static Texture2D BackTexture => _nodeEditorBackTexture ??= ColorTexture[BackColor];
 		static Texture2D _nodeEditorBackTexture = null;
-		public static Texture2D DotTexture => _dotTextrue ??= GetCircleTexture(Color.white);
-		static Texture2D _dotTextrue;
+
 		public static GUIStyle BackStyle => _backStyle ??= new GUIStyle()
 		{
 			alignment = TextAnchor.MiddleCenter,
