@@ -4,7 +4,6 @@
 #endif
 #if !DISABLESTEAMWORKS
 using Steamworks;
-#endif
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -429,4 +428,6 @@ namespace QTool.Net
 
 	}
 }
+#endif
+
 #endif
