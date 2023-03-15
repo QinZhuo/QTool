@@ -5,13 +5,17 @@ namespace QTool.Mesh
 {
 	public static class QMarchingCubes
 	{
+		static QMarchingCubes()
+		{
+			UnityEngine.Shader.EnableKeyword(nameof(QMarchingCubes) + nameof(Shader));
+		}
 		public static void GenerateMeshData(this QVoxel voxelData,bool gup=true)
 		{
 			if (voxelData.MeshData.Changing||!voxelData.MeshData.Dirty) return;
 			voxelData.MeshData.Clear();
 			voxelData.MeshData.Changing = true;
-			if (gup)
-			{
+			if (UnityEngine.Shader.GetGlobalFloat("SHADER_TARGET")>=30&&gup)
+			{ 
 				GenerateGPU(voxelData);
 			}
 			else
@@ -22,7 +26,7 @@ namespace QTool.Mesh
 			voxelData.MeshData.FreshMesh();
 		}
 		
-		#region GUP
+#region GUP
 		public static ComputeShader Shader;
 		static void GenerateGPU(QVoxel voxelData)
 		{
@@ -30,6 +34,7 @@ namespace QTool.Mesh
 			{
 				Shader = Resources.Load<ComputeShader>(nameof(QMarchingCubes) + nameof(Shader));
 			}
+			Shader.EnableKeyword(nameof(QMarchingCubes) + nameof(Shader));
 			var size = Mathf.Max(voxelData.Size.x, voxelData.Size.y, voxelData.Size.z)+2 ;
 			Vector4[] Voxels = new Vector4[size* size* size];
 			var index = 0;
@@ -79,9 +84,9 @@ namespace QTool.Mesh
 			public Vector3 c;
 			public float value;
 		};
-		#endregion
+#endregion
 
-		#region CPU
+#region CPU
 		static void GenerateCPU(QVoxel voxelData)
 		{
 			for (int x = voxelData.Min.x - 1; x <= voxelData.Max.x; x++)
@@ -129,7 +134,7 @@ namespace QTool.Mesh
 			return a + t * (b - a);
 		}
 
-		#region 静态索引表
+#region 静态索引表
 		private static readonly Vector3Int[] VertexOffset = new Vector3Int[]
 		{
 			new Vector3Int(0, 0, 0),new Vector3Int(1, 0, 0),new Vector3Int(1, 1, 0),new Vector3Int(0, 1, 0),
@@ -398,7 +403,7 @@ namespace QTool.Mesh
 		private static int[] PointA = { 0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3 };
 
 		private static int[] PointB = { 1, 2, 3, 0, 5, 6, 7, 4, 4, 5, 6, 7 };
-		#endregion
-		#endregion
+#endregion
+#endregion
 	}
 }

@@ -1,4 +1,5 @@
 #pragma kernel CSMain
+# if SHADER_TARGET >= 30
 static const int TriangleTable[256][16] =
 {
 	{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 },
@@ -289,7 +290,7 @@ static const int PointB[12] =
 	6,
 	7
 };
-static const int ThreadsCount = 8;
+
 
 struct Triangle
 {
@@ -312,9 +313,12 @@ float3 GetPoint(float4 v1, float4 v2)
 	float t = (Surface - v1.w) / (v2.w - v1.w);
 	return v1.xyz + t * normalize(v2.xyz - v1.xyz);
 }
+# endif
+static const int ThreadsCount = 8;
 [numthreads(ThreadsCount, ThreadsCount, ThreadsCount)]
 void CSMain(uint3 id : SV_DispatchThreadID)
 {
+# if SHADER_TARGET >= 30
 	if (id.x >= Size-1  || id.y >= Size-1 || id.z >= Size-1 )
 	{
 		return;
@@ -345,6 +349,7 @@ void CSMain(uint3 id : SV_DispatchThreadID)
 		tri.value = value;
 		TrianglesBuffer.Append(tri);
 	}
-	
+#endif
 
 }
+
