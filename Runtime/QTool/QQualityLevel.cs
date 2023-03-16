@@ -7,7 +7,7 @@ namespace QTool.TileMap {
 	public class QQualityLevel : MonoBehaviour
 	{
 		#region 质量检测
-		static int curLevel = -1;
+		public static int CurLevel { get; private set; } = -1;
 		[RuntimeInitializeOnLoadMethod]
 		static void Init()
 		{
@@ -15,10 +15,10 @@ namespace QTool.TileMap {
 		}
 		static void CheckUpdate()
 		{
-			if (curLevel != QualitySettings.GetQualityLevel())
+			if (CurLevel != QualitySettings.GetQualityLevel())
 			{
-				curLevel = QualitySettings.GetQualityLevel();
-				QDebug.Log(nameof(QQualityLevel)+" 画质级别 " + curLevel);
+				CurLevel = QualitySettings.GetQualityLevel();
+				QDebug.Log(nameof(QQualityLevel)+" 画质级别 " + CurLevel);
 				OnFresh?.Invoke();
 			}
 		}
@@ -41,12 +41,12 @@ namespace QTool.TileMap {
 			if(OnLevelChange==null)return;
 			for (int i = 0; i < OnLevelChange.Count; i++)
 			{
-				if (i != curLevel)
+				if (i != CurLevel)
 				{
 					OnLevelChange[i]?.Invoke(false);
 				}
 			}
-			OnLevelChange.Get(curLevel)?.Invoke(true);
+			OnLevelChange.Get(CurLevel)?.Invoke(true);
 		}
 	}
 
