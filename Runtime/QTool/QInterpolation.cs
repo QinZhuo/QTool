@@ -82,7 +82,7 @@ namespace QTool
 	/// </summary>
 	public static class QCatmullRom
 	{
-		public static Vector3 Sample(Vector3 C0, Vector3 P0, Vector3 P1, Vector3 C1, float t)
+		public static Vector3 CatmullRom(Vector3 C0, Vector3 P0, Vector3 P1, Vector3 C1, float t)
 		{
 			const float m00 = 0f, m01 = -0.5f, m02 = 1f, m03 = -0.5f,
 				m10 = 1f, m11 = 0f, m12 = -2.5f, m13 = 1.5f,
