@@ -446,13 +446,13 @@ namespace QTool.Asset {
 				textureImporter.crunchedCompression = true;
 				textureImporter.textureCompression = TextureImporterCompression.Compressed;
 				textureImporter.compressionQuality = setting.compressionQuality;
-				var defualtSetting = textureImporter.GetDefaultPlatformTextureSettings();
-#if UNITY_SWITCH_API
-				var switchSetting = defualtSetting.QDataCopy();
-				switchSetting.name = nameof(RuntimePlatform.Switch);
-				switchSetting.textureCompression = TextureImporterCompression.CompressedLQ;
-				textureImporter.SetPlatformTextureSettings(switchSetting);
-#endif
+//				var defualtSetting = textureImporter.GetDefaultPlatformTextureSettings();
+//#if UNITY_SWITCH_API
+//				var switchSetting = defualtSetting.QDataCopy();
+//				switchSetting.name = nameof(RuntimePlatform.Switch);
+//				switchSetting.textureCompression = TextureImporterCompression.CompressedLQ;
+//				textureImporter.SetPlatformTextureSettings(switchSetting);
+//#endif
 				textureImporter.SaveAndReimport();
 
 			}
