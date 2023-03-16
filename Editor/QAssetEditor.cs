@@ -313,7 +313,6 @@ namespace QTool.Asset {
 			};
 			AssetDatabase.SaveAssets();
 		}
-		//public static QDictionary<string, List<string>> AutoAtlas = new QDictionary<string, List<string>>((key) => new List<string>());
 		[MenuItem("QTool/资源管理/批量处理/设置资源格式")]
 		public static void FreshAllImporter()
 		{
@@ -410,6 +409,7 @@ namespace QTool.Asset {
 					textureImporter.SaveAndReimport();
 				}
 			}
+
 			if (!textureImporter.crunchedCompression)
 			{
 				QDebug.Log("重新导入图片[" + textureImporter.assetPath + "]");
@@ -446,7 +446,15 @@ namespace QTool.Asset {
 				textureImporter.crunchedCompression = true;
 				textureImporter.textureCompression = TextureImporterCompression.Compressed;
 				textureImporter.compressionQuality = setting.compressionQuality;
+				var defualtSetting = textureImporter.GetDefaultPlatformTextureSettings();
+#if UNITY_SWITCH_API
+				var switchSetting = defualtSetting.QDataCopy();
+				switchSetting.name = nameof(RuntimePlatform.Switch);
+				switchSetting.textureCompression = TextureImporterCompression.CompressedLQ;
+				textureImporter.SetPlatformTextureSettings(switchSetting);
+#endif
 				textureImporter.SaveAndReimport();
+
 			}
 
 		}
