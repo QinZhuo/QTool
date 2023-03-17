@@ -14,7 +14,7 @@ namespace QTool.Mesh
 			if (voxelData.MeshData.Changing||!voxelData.MeshData.Dirty) return;
 			voxelData.MeshData.Clear();
 			voxelData.MeshData.Changing = true;
-			if (UnityEngine.Shader.GetGlobalFloat("SHADER_TARGET")>=30&&gup)
+			if (Application.platform!= RuntimePlatform.Switch&&gup)
 			{ 
 				GenerateGPU(voxelData);
 			}
