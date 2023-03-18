@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace QTool.Mesh
+namespace QTool
 {
 	[System.Serializable]
 	public class QVoxelData: QVoxel

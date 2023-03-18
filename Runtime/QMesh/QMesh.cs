@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using QTool.Inspector;
-namespace QTool.Mesh
+namespace QTool
 {
 	
 	public class QMeshData

@@ -345,12 +345,12 @@ namespace QTool
 	}
 
 
-	[CustomPropertyDrawer(typeof(Mesh.QVoxelData))]
+	[CustomPropertyDrawer(typeof(QVoxelData))]
 	public class QVoxelDataDrawer : PropertyDrawer
 	{
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
-			var voxel= property.GetObject() as Mesh.QVoxelData;
+			var voxel= property.GetObject() as QVoxelData;
 			EditorGUI.LabelField(position, label.text, voxel.MeshData?.ToString());
 		}
 		

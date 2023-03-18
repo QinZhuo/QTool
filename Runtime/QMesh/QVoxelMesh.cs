@@ -1,7 +1,7 @@
 using QTool.Inspector;
 using System.Collections.Generic;
 using UnityEngine;
-namespace QTool.Mesh
+namespace QTool
 {
 	public class QVoxelMesh : MonoBehaviour
 	{

@@ -1,7 +1,7 @@
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace QTool.Mesh
+namespace QTool
 {
 	public static class QMarchingCubes
 	{
@@ -14,7 +14,7 @@ namespace QTool.Mesh
 			if (voxelData.MeshData.Changing||!voxelData.MeshData.Dirty) return;
 			voxelData.MeshData.Clear();
 			voxelData.MeshData.Changing = true;
-			if (Application.platform!= RuntimePlatform.Switch&&gup)
+			if (SystemInfo.supportsComputeShaders&& gup)
 			{ 
 				GenerateGPU(voxelData);
 			}

@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-namespace QTool.Mesh
+namespace QTool
 {
 
 	public abstract class QNoiseVoxel:QVoxel
