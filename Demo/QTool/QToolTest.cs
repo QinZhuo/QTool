@@ -41,6 +41,7 @@ namespace QTool.Test
 		public string QDataStr;
 		[QName("位置测试")]
 		public Transform testObject;
+		public Color color;
 		[QName("解析类型测试")]
         public void CreateTest()
         {

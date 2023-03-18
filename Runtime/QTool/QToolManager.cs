@@ -34,28 +34,23 @@ namespace QTool
 		public int FPS => (int)Fps.SecondeSum;
 		QAverageValue Fps = new QAverageValue();
 		bool UsingCommmond = false;
-		int CommondTypeIndex = 0;
-		int CommondIndex = 0;
-		List<string> Types = new List<string>();
-		QDictionary<string, List<string>> Commonds = new QDictionary<string, List<string>>((key)=>new List<string>());
-		QList<string> CommondParams = new QList<string>();
+		private QToolBar<QCommandInfo> toolBar = null;
 		public void InitCommond()
 		{
-			if (Commonds.Count == 0)
+			if (toolBar==null)
 			{
+				toolBar = new QToolBar<QCommandInfo>();
 				foreach (var kv in QCommand.NameDictionary)
 				{
 					if (kv.Value.IsStringCommond)
 					{
-						if(kv.Value.name.SplitTowString("/",out var start,out var end))
+						if (kv.Value.name.SplitTowString("/",out var start,out var end))
 						{
-							Types.AddCheckExist(start);
-							Commonds[start].AddCheckExist(kv.Key);
+							toolBar[start][kv.Key].Obj = kv.Value;
 						}
 						else if (kv.Value.fullName.SplitTowString("/", out start, out end))
 						{
-							Types.AddCheckExist(start);
-							Commonds[start].AddCheckExist(kv.Key);
+							toolBar[start][kv.Key].Obj = kv.Value;
 						}
 						else
 						{
@@ -65,10 +60,12 @@ namespace QTool
 				}
 			}
 		}
+		int index;
 		private void OnGUI()
 		{
 			try
 			{
+				index=QGUI.DropdownButton(index, new string[] { "测试1", "测试2" });
 				OnGUIEvent?.Invoke();
 #if DEVELOPMENT_BUILD || UNITY_EDITOR
 				GUILayout.BeginArea(new Rect(0, 0, Screen.width, Screen.height));
@@ -79,45 +76,45 @@ namespace QTool
 				GUILayout.EndArea();
 				if (UsingCommmond)
 				{
-					GUI.Box(new Rect(0, 0, Screen.width, Screen.height), "");
-					GUI.Box(new Rect(0, 0, Screen.width, Screen.height), "");
+					GUI.Box(new Rect(-1, 0, Screen.width+1, Screen.height+1),"", QGUI.BackStyle);
 					GUILayout.BeginArea(new Rect(0, 0, Screen.width, Screen.height));
 					InitCommond();
-					CommondTypeIndex = GUILayout.Toolbar(CommondTypeIndex, Types.ToArray());
-					if(CommondIndex>= Commonds[Types[CommondTypeIndex]].Count)
-					{
-						CommondIndex = 0;
-					}
-					CommondIndex = GUILayout.SelectionGrid(CommondIndex, Commonds[Types[CommondTypeIndex]].ToArray(), 10);
-					var name = Commonds[Types[CommondTypeIndex]][CommondIndex];
-					if (QCommand.NameDictionary[name].paramInfos != null&&CommondParams.Count!= QCommand.NameDictionary[name].paramInfos.Length)
-					{
-						CommondParams.Clear();
-					}
+					toolBar.Draw();
+					//CommondTypeIndex = QGUI.DropdownButton(CommondTypeIndex, Types.ToArray());
+					//if(CommondIndex>= Commonds[Types[CommondTypeIndex]].Count)
+					//{
+					//	CommondIndex = 0;
+					//}
+					//CommondIndex = QGUI.DropdownButton(CommondIndex, Commonds[Types[CommondTypeIndex]].ToArray());
+					//var name = Commonds[Types[CommondTypeIndex]][CommondIndex];
+					//if (QCommand.NameDictionary[name].paramInfos != null&&CommondParams.Count!= QCommand.NameDictionary[name].paramInfos.Length)
+					//{
+					//	CommondParams.Clear();
+					//}
 					GUILayout.FlexibleSpace();
 					GUILayout.Label(name);
-					if (QCommand.NameDictionary[name].paramInfos != null)
-					{
-						for (int i = 0; i < QCommand.NameDictionary[name].paramInfos.Length; i++)
-						{
-							var p = QCommand.NameDictionary[name].paramInfos[i];
-							if (CommondParams[i].IsNull())
-							{
-								CommondParams[i] = p.DefaultValue.ToQDataType(p.ParameterType);
-							}
-							using (new GUILayout.HorizontalScope())
-							{
-								GUILayout.Label("    " + QCommand.NameDictionary[name].paramViewNames[i] + ":");
-								CommondParams[i] = GUILayout.TextField(CommondParams[i], 20);
-							}
-						}
-					}
-					if (GUILayout.Button("确定"))
-					{
-						QTime.RevertScale(nameof(QCommand));
-						UsingCommmond = false;
-						QCommand.NameDictionary[name].Invoke(CommondParams);
-					}
+					//if (QCommand.NameDictionary[name].paramInfos != null)
+					//{
+					//	for (int i = 0; i < QCommand.NameDictionary[name].paramInfos.Length; i++)
+					//	{
+					//		var p = QCommand.NameDictionary[name].paramInfos[i];
+					//		if (CommondParams[i].IsNull())
+					//		{
+					//			CommondParams[i] = p.DefaultValue.ToQDataType(p.ParameterType);
+					//		}
+					//		using (new GUILayout.HorizontalScope())
+					//		{
+					//			GUILayout.Label("    " + QCommand.NameDictionary[name].paramViewNames[i] + ":");
+					//			CommondParams[i] = GUILayout.TextField(CommondParams[i], 20);
+					//		}
+					//	}
+					//}
+					//if (GUILayout.Button("运行"))
+					//{
+					//	QTime.RevertScale(nameof(QCommand));
+					//	UsingCommmond = false;
+					//	QCommand.NameDictionary[name].Invoke(CommondParams);
+					//}
 					GUILayout.EndArea();
 				}
 				else if (QDemoInput.Ctrl && QDemoInput.Enter)

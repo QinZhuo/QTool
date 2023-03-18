@@ -615,7 +615,7 @@ crashlytics-build.properties
 		}
 		private void OnGUI()
 		{
-			using (var scroll=new GUILayout.ScrollViewScope(scrollPos,QGUI.BackStyle))
+			using (var scroll=new GUILayout.ScrollViewScope(scrollPos,QGUI.AlphaBackStyle))
 			{
 				foreach (var file in fileList)
 				{

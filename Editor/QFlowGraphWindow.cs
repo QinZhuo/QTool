@@ -19,6 +19,24 @@ namespace QTool.FlowGraph
 				EditorGUILayout.LabelField(name);
 				return obj;
 			};
+			QGUI.DrawOverride[typeof(QFlowGraph)] = (obj, name) =>
+			{
+				if (obj == null)
+				{
+					obj = new QFlowGraph { Name = name };
+				}
+				using (new GUILayout.HorizontalScope())
+				{
+					GUILayout.Label(name);
+					if (GUILayout.Button("编辑"))
+					{
+						var graph = obj as QFlowGraph;
+						Open(graph, () => { graph.SetDirty(); });
+					}
+					return obj;
+				}
+
+			};
 		}
 		static QFlowGraph Graph = null;
         [OnOpenAsset(0)]
@@ -635,8 +653,8 @@ namespace QTool.FlowGraph
             var node = Graph.NodeList[id];
 			if (node == null) return;
             windowRect = node.rect;
-			EditorGUI.DrawRect(new Rect(1, 21, windowRect.width - 2, 2), QGUI.LineColor);
-			EditorGUI.DrawRect(new Rect(1, 21, windowRect.width - 2, windowRect.height - 20), QGUI.LineColor);
+			EditorGUI.DrawRect(new Rect(1, 21, windowRect.width - 2, 2), QGUI.AlphaBackColor);
+			EditorGUI.DrawRect(new Rect(1, 21, windowRect.width - 2, windowRect.height - 20), QGUI.AlphaBackColor);
 			EditorGUILayout.BeginHorizontal();
             EditorGUILayout.Space(QGUI.BorderSize*2);
             EditorGUILayout.BeginVertical();

@@ -1,39 +1,200 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEditor;
 using System;
 using QTool.Inspector;
 using QTool.Reflection;
 using System.Reflection;
 using QTool.FlowGraph;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 namespace QTool
 {
+	public class QToolBar<T>
+	{
+		internal List<string> Values=new List<string>();
+		internal List<QToolBar<T>> ChildToolbars = new List<QToolBar<T>>();
+		public QToolBar<T> ChildToolBar => ChildToolbars.Get(Select);
+		public bool Vertical { get; set; } 
+		public int Select { get; internal set; } = -1;
+		public T Obj { get; set; }
+		public QToolBar<T> this[string key]
+		{
+			get
+			{
+				var index= Values.IndexOf(key);
+				if (index<0)
+				{
+					Values.Add(key);
+					var newToolBar = new QToolBar<T>();
+					newToolBar.Vertical = true;
+					ChildToolbars.Add(newToolBar);
+					return newToolBar;
+				}
+				else
+				{
+					return ChildToolbars[index];
+				}
+			}
+		}
+	}
 	public static class QGUI
 	{
-		static QGUI()
+		public static Color BackColor { get; private set; } = new Color32(32, 32, 32, 255);
+		public static Color AlphaBackColor { get; private set; } = new Color32(0, 0, 0, 40);
+		public static Texture2D BackTexture => _BackTexture ??= ColorTexture[BackColor];
+		private static Texture2D _BackTexture = null;
+		private static GUIStyle _btnStyle;
+		public static GUIStyle ButtonStyle => _btnStyle ??= new GUIStyle()
 		{
-			DrawOverride[typeof(QFlowGraph)] = (obj, name) =>
+			alignment = TextAnchor.MiddleCenter,
+			normal = new GUIStyleState
 			{
-				if (obj == null)
+				background = GetBackTexture(new Color32(70, 70, 70, 255), RectRaudius),
+				textColor = new Color32(225, 225, 225, 255),
+			},
+			hover = new GUIStyleState
+			{
+				background = GetBackTexture(new Color32(90, 90, 90, 255), RectRaudius),
+				textColor = new Color32(225, 225, 225, 255),
+			},
+			active = new GUIStyleState
+			{
+				background = GetBackTexture(new Color32(55, 55, 55, 255), RectRaudius),
+				textColor = new Color32(225, 225, 225, 255),
+			},
+			onNormal=new GUIStyleState
+			{
+				background = GetBackTexture(new Color32(80, 80, 80, 255), RectRaudius),
+				textColor = new Color32(225, 225, 225, 255),
+			},
+			border = new RectOffset { bottom = RectRaudius, left = RectRaudius, right = RectRaudius, top = RectRaudius },
+		};
+		public const int RectRaudius = 4;
+		private static GUIStyle _AlphaBackStyle;
+		public static GUIStyle AlphaBackStyle => _AlphaBackStyle ??= new GUIStyle()
+		{
+			alignment = TextAnchor.MiddleCenter,
+			normal = new GUIStyleState
+			{
+				background = GetCircleTexture(AlphaBackColor, RectRaudius),
+			},
+			border = new RectOffset { bottom = RectRaudius, left = RectRaudius, right = RectRaudius, top = RectRaudius },
+		};
+		private static GUIStyle _BackStyle;
+		public static GUIStyle BackStyle => _BackStyle ??= new GUIStyle()
+		{
+			alignment = TextAnchor.MiddleCenter,
+			normal = new GUIStyleState
+			{
+				background = GetCircleTexture(BackColor, 2),
+			},
+			border = new RectOffset { bottom = 2, left = 2, right = 2, top = 2 },
+		};
+	
+		public static int DropdownButton(int select, params string[] values)
+		{
+			var value = values.Get(select);
+			var active = select + " " + value == CurrentDropDownKey;
+			if (Button(active ? "×" : value))
+			{
+				if (!active)
 				{
-					obj = new QFlowGraph { Name = name };
+					CurrentDropDownKey = select + " " + value;
 				}
-				using (new EditorGUILayout.HorizontalScope())
+				else
 				{
-					GUILayout.Label(name);
-					if (GUILayout.Button("编辑"))
-					{
-						var graph = obj as QFlowGraph;
-						QFlowGraphWindow.Open(graph, () => { graph.SetDirty(); });
-					}
-					return obj;
+					CurrentDropDownKey = null;
 				}
+			}
+			if (!CurrentDropDownKey.IsNull())
+			{
 			
-			};
+				if (select + " " + value == CurrentDropDownKey)
+				{
+					using (new GUILayout.HorizontalScope())
+					{
+						GUILayout.Space(20);
+						using (new GUILayout.VerticalScope(BackStyle))
+						{
+							select = GUILayout.SelectionGrid(select, values, 1, ButtonStyle);
+						}
+					}
+				}
+			}
+			return select;
 		}
+		public static void Draw<T>(this QToolBar<T> toolBar)
+		{
+			if (toolBar == null) return;
+			if (toolBar.Vertical)
+			{
+				toolBar.Select = GUILayout.SelectionGrid(toolBar.Select, toolBar.Values.ToArray(), 1, ButtonStyle);
+			}
+			else
+			{
+				toolBar.Select = GUILayout.Toolbar(toolBar.Select, toolBar.Values.ToArray(), ButtonStyle);
+			}
+			toolBar.ChildToolBar.Draw();
+		}
+		public static bool Button(string text)
+		{
+			return GUILayout.Button(text,ButtonStyle);
+		}
+		public static QDictionary<Color, Texture2D> ColorTexture { get; private set; } = new QDictionary<Color, Texture2D>((key) =>
+		{
+			var tex = new Texture2D(1, 1);
+			for (int i = 0; i < tex.width; i++)
+			{
+				for (int j = 0; j < tex.height; j++)
+				{
+					tex.SetPixel(i, j, key);
+				}
+			}
+			tex.Apply();
+			return tex;
+		});
+		public static Texture2D GetTexture(int size = 32)
+		{
+			var tex = new Texture2D(size * 2, size * 2);
+			for (int i = 0; i < tex.width; i++)
+			{
+				for (int j = 0; j < tex.height; j++)
+				{
+					tex.SetPixel(i, j, Color.clear);
+				}
+			}
+			return tex;
+		}
+		public static Texture2D GetCircleTexture(Color color, int radius = 32)
+		{
+			return GetTexture(radius).DrawCircle(color, radius);
+		}
+		public static Texture2D GetBackTexture(Color color, int radius = 32, int line = 1)
+		{
+			return GetTexture(radius).DrawCircle(Color.Lerp(color, Color.black, 0.5f), radius).DrawCircle(color, radius - 1);
+		}
+		public static Texture2D DrawCircle(this Texture2D tex, Color color, int radius = 32)
+		{
+			for (int i = 0; i < tex.width; i++)
+			{
+				for (int j = 0; j < tex.height; j++)
+				{
+					var x = i - tex.width / 2;
+					var y = j - tex.height / 2;
+					if (x * x + y * y < radius * radius)
+					{
+						tex.SetPixel(i, j, color);
+					}
+				}
+			}
+			tex.Apply();
+			return tex;
+		}
+#if UNITY_EDITOR
 
-		[SettingsProvider]
+		[UnityEditor.SettingsProvider]
 		public static SettingsProvider QToolSetting()
 		{
 			return new SettingsProvider("Project/" + nameof(QTool)+"设置", SettingsScope.Project)
@@ -42,7 +203,7 @@ namespace QTool
 				{
 					foreach (var SettingType in typeof(InstanceScriptable<>).GetAllTypes())
 					{
-						using (new GUILayout.VerticalScope(BackStyle))
+						using (new GUILayout.VerticalScope(AlphaBackStyle))
 						{
 							GUILayout.Label(SettingType.QName(), TitleLable);
 							new SerializedObject(SettingType.InvokeFunction(nameof(QTool.QToolSetting.Instance)) as ScriptableObject).Draw();
@@ -196,7 +357,7 @@ namespace QTool
 								{
 
 									PushBackColor(BackColor);
-									using (new EditorGUILayout.VerticalScope(QGUI.BackStyle, layoutOption))
+									using (new EditorGUILayout.VerticalScope(QGUI.AlphaBackStyle, layoutOption))
 									{
 										PopBackColor();
 										if (hasName)
@@ -259,7 +420,7 @@ namespace QTool
 									var color = GUI.backgroundColor;
 									GUI.backgroundColor = BackColor;
 
-									using (new EditorGUILayout.VerticalScope(BackStyle, layoutOption))
+									using (new EditorGUILayout.VerticalScope(AlphaBackStyle, layoutOption))
 									{
 
 										GUI.backgroundColor = color;
@@ -287,7 +448,7 @@ namespace QTool
 												{
 													for (int i = 0; i < list.Count; i++)
 													{
-														using (new EditorGUILayout.VerticalScope(BackStyle))
+														using (new EditorGUILayout.VerticalScope(AlphaBackStyle))
 														{
 															var key = name + "[" + i + "]";
 															if (DrawElement == null)
@@ -391,52 +552,7 @@ namespace QTool
 				return new GUIContent(obj?.ToString());
 			}
 		}
-		public static QDictionary<Color, Texture2D> ColorTexture { get; private set; } = new QDictionary<Color, Texture2D>((key) =>
-		  {
-			  var tex = new Texture2D(1, 1);
-			  for (int i = 0; i < tex.width; i++)
-			  {
-				  for (int j = 0; j < tex.height; j++)
-				  {
-					  tex.SetPixel(i, j, key);
-				  }
-			  }
-			  tex.Apply();
-			  return tex;
-		  });
-		public static Texture2D GetTexture(int size = 32)
-		{
-			var tex = new Texture2D(size * 2, size * 2);
-			for (int i = 0; i < tex.width; i++)
-			{
-				for (int j = 0; j < tex.height; j++)
-				{
-					tex.SetPixel(i, j, Color.clear);
-				}
-			}
-			return tex;
-		}
-		public static Texture2D GetCircleTexture(Color color, int radius=32)
-		{
-			return GetTexture(radius).DrawCircle(color,radius);
-		}
-		public static Texture2D DrawCircle(this Texture2D tex,Color color,int radius=32)
-		{
-			for (int i = 0; i < tex.width; i++)
-			{
-				for (int j = 0; j < tex.height; j++)
-				{
-					var x = i - tex.width/2;
-					var y = j - tex.height/2;
-					if (x * x + y * y < radius * radius)
-					{
-						tex.SetPixel(i, j, color);
-					}
-				}
-			}
-			tex.Apply();
-			return tex;
-		}
+	
 		public static void MouseMenuClick(this Rect rect, System.Action<GenericMenu> action, Action click = null)
 		{
 			if (EventType.MouseUp.Equals(Event.current.type))
@@ -473,6 +589,8 @@ namespace QTool
 
 			}
 		}
+		private static string CurrentDropDownKey = null;
+	
 		public static void Draw(this SerializedProperty property, Rect rect, GUIContent content = null)
 		{
 			if (!property.IsShow()) return;
@@ -630,7 +748,7 @@ namespace QTool
 		public static bool Toggle(string label, bool value, params GUILayoutOption[] options)
 		{
 			PushColor(value ? Color.black : Color.white);
-			value = GUILayout.Toggle(value, label, BackStyle, options);
+			value = GUILayout.Toggle(value, label, AlphaBackStyle, options);
 			PopColor();
 			return value;
 		}
@@ -727,7 +845,7 @@ namespace QTool
 		}
 		public static void ProgressBar(string info, float progress, Color color)
 		{
-			GUILayout.Box("", BackStyle);
+			GUILayout.Box("", AlphaBackStyle);
 			var lastRect = GUILayoutUtility.GetLastRect();
 			var rateRect = lastRect;
 			progress = Mathf.Clamp(progress, 0.01f, 1);
@@ -735,7 +853,7 @@ namespace QTool
 			if (progress > 0)
 			{
 				PushColor(color);
-				GUI.Box(rateRect, "", BackStyle);
+				GUI.Box(rateRect, "", AlphaBackStyle);
 				PopColor();
 			}
 			GUI.Label(lastRect, info, CenterLable);
@@ -752,21 +870,8 @@ namespace QTool
 		static GUIStyle _leftLable;
 		public static GUIStyle RightLabel => _rightLabel ??= new GUIStyle(EditorStyles.label) { alignment = TextAnchor.MiddleRight };
 		static GUIStyle _rightLabel;
-		public static Color BackColor { get; private set; } = new Color32(32, 32, 32, 255);
-		public static Color LineColor { get; private set; } = new Color32(0, 0, 0, 40);
-		public static Texture2D BackTexture => _nodeEditorBackTexture ??= ColorTexture[BackColor];
-		static Texture2D _nodeEditorBackTexture = null;
-
-		public static GUIStyle BackStyle => _backStyle ??= new GUIStyle()
-		{
-			alignment = TextAnchor.MiddleCenter,
-			normal = new GUIStyleState
-			{
-				background = GetCircleTexture(LineColor, 4),
-			},
-			border = new RectOffset { bottom =4, left = 4, right = 4, top = 4 },
-		};
-		static GUIStyle _backStyle;
+	
+	
 	}
 	public static class QEditorTool
 	{
@@ -1013,4 +1118,5 @@ namespace QTool
 			GUILayout.Space(10);
 		}
 	}
+#endif
 }
