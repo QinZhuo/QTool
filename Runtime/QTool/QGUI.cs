@@ -11,15 +11,25 @@ using UnityEditor;
 #endif
 namespace QTool
 {
-	public class QToolBar<T>
+	public class QToolBar
 	{
 		internal List<string> Values=new List<string>();
-		internal List<QToolBar<T>> ChildToolbars = new List<QToolBar<T>>();
-		public QToolBar<T> ChildToolBar => ChildToolbars.Get(Select);
-		public bool Vertical { get; set; } 
+		internal List<QToolBar> ChildToolbars = new List<QToolBar>();
+		public QToolBar ChildToolBar => ChildToolbars.Get(Select);
 		public int Select { get; internal set; } = -1;
-		public T Obj { get; set; }
-		public QToolBar<T> this[string key]
+		public bool Selected => Select >= 0;
+		public bool IsButton => ChildToolbars.Count == 0;
+		public int Width { get; set; } = 100;
+		public object Value { get; set; }
+		public void CancelSelect()
+		{
+			if (Selected)
+			{
+				ChildToolBar.CancelSelect();
+				Select = -1;
+			}
+		}
+		public QToolBar this[string key]
 		{
 			get
 			{
@@ -27,8 +37,7 @@ namespace QTool
 				if (index<0)
 				{
 					Values.Add(key);
-					var newToolBar = new QToolBar<T>();
-					newToolBar.Vertical = true;
+					var newToolBar = new QToolBar();
 					ChildToolbars.Add(newToolBar);
 					return newToolBar;
 				}
@@ -92,51 +101,21 @@ namespace QTool
 			},
 			border = new RectOffset { bottom = 2, left = 2, right = 2, top = 2 },
 		};
-	
-		public static int DropdownButton(int select, params string[] values)
+		public static object Draw(this QToolBar toolBar)
 		{
-			var value = values.Get(select);
-			var active = select + " " + value == CurrentDropDownKey;
-			if (Button(active ? "×" : value))
+			if (toolBar == null) return default;
+			if (!toolBar.IsButton)
 			{
-				if (!active)
+				if (toolBar.Selected)
 				{
-					CurrentDropDownKey = select + " " + value;
+					return toolBar.ChildToolBar.Draw();
 				}
 				else
 				{
-					CurrentDropDownKey = null;
+					toolBar.Select = GUILayout.Toolbar(toolBar.Select, toolBar.Values.ToArray(), ButtonStyle, GUILayout.Width(toolBar.Width * toolBar.Values.Count));
 				}
 			}
-			if (!CurrentDropDownKey.IsNull())
-			{
-			
-				if (select + " " + value == CurrentDropDownKey)
-				{
-					using (new GUILayout.HorizontalScope())
-					{
-						GUILayout.Space(20);
-						using (new GUILayout.VerticalScope(BackStyle))
-						{
-							select = GUILayout.SelectionGrid(select, values, 1, ButtonStyle);
-						}
-					}
-				}
-			}
-			return select;
-		}
-		public static void Draw<T>(this QToolBar<T> toolBar)
-		{
-			if (toolBar == null) return;
-			if (toolBar.Vertical)
-			{
-				toolBar.Select = GUILayout.SelectionGrid(toolBar.Select, toolBar.Values.ToArray(), 1, ButtonStyle);
-			}
-			else
-			{
-				toolBar.Select = GUILayout.Toolbar(toolBar.Select, toolBar.Values.ToArray(), ButtonStyle);
-			}
-			toolBar.ChildToolBar.Draw();
+			return toolBar.Value;
 		}
 		public static bool Button(string text)
 		{
@@ -192,58 +171,13 @@ namespace QTool
 			tex.Apply();
 			return tex;
 		}
-#if UNITY_EDITOR
-
-		[UnityEditor.SettingsProvider]
-		public static SettingsProvider QToolSetting()
-		{
-			return new SettingsProvider("Project/" + nameof(QTool)+"设置", SettingsScope.Project)
-			{
-				guiHandler = (searchContext) =>
-				{
-					foreach (var SettingType in typeof(InstanceScriptable<>).GetAllTypes())
-					{
-						using (new GUILayout.VerticalScope(AlphaBackStyle))
-						{
-							GUILayout.Label(SettingType.QName(), TitleLable);
-							new SerializedObject(SettingType.InvokeFunction(nameof(QTool.QToolSetting.Instance)) as ScriptableObject).Draw();
-						}
-					}
-				}
-			};
-		}
-		public static void Draw(this SerializedObject serializedObject)
-		{
-			var iterator = serializedObject.GetIterator();
-			if (iterator.NextVisible(true))
-			{
-				do
-				{
-					var GUIEnabled = GUI.enabled;
-					if ("m_Script".Equals(iterator.name))
-					{
-						GUI.enabled = false;
-					}
-					if (iterator.IsShow())
-					{
-						EditorGUILayout.PropertyField(iterator, new GUIContent(iterator.QName()));
-					}
-					if ("m_Script".Equals(iterator.name))
-					{
-						GUI.enabled = GUIEnabled;
-					}
-				} while (iterator.NextVisible(false));
-				serializedObject.ApplyModifiedProperties();
-			}
-		}
-
 		public const float BorderSize = 8;
 		public static QDictionary<int, Action> OnChangeDelayCall = new QDictionary<int, Action>();
 		public static QDictionary<string, bool> FoldoutDic = new QDictionary<string, bool>();
 		public static QDictionary<Type, Func<object, string, object>> DrawOverride = new QDictionary<Type, Func<object, string, object>>();
 		public static List<string> TypeMenuList = new List<string>() { typeof(UnityEngine.Object).FullName.Replace('.', '/') };
 		public static List<Type> TypeList = new List<Type>() { typeof(UnityEngine.Object) };
-		public static object Draw(this object obj, string name, Type type, Action<object> changeValue = null, ICustomAttributeProvider customAttribute = null, Func<int, object, string, Type, object> DrawElement = null, Action<int, int> IndexChange = null, params GUILayoutOption[] layoutOption)
+		public static object Draw(this object obj, string name, Type type, ICustomAttributeProvider customAttribute = null, Func<int, object, string, Type, object> DrawElement = null, Action<int, int> IndexChange = null, params GUILayoutOption[] layoutOption)
 		{
 			var hasName = !string.IsNullOrWhiteSpace(name);
 			if (type == null)
@@ -258,7 +192,6 @@ namespace QTool
 			{
 				return DrawOverride[type].Invoke(obj, name);
 			}
-
 			var typeInfo = QSerializeType.Get(type);
 			if (type != typeof(object) && !TypeList.Contains(type) && !type.IsGenericType)
 			{
@@ -385,7 +318,7 @@ namespace QTool
 															}
 															else
 															{
-																member.Set(obj, member.Get(obj).Draw(member.QName, member.Type, (value) => member.Set(obj, value)));
+																member.Set(obj, member.Get(obj).Draw(member.QName, member.Type));
 															}
 														}
 														catch (Exception e)
@@ -453,7 +386,7 @@ namespace QTool
 															var key = name + "[" + i + "]";
 															if (DrawElement == null)
 															{
-																list[i] = list[i].Draw(key, typeInfo.ElementType, null, customAttribute);
+																list[i] = list[i].Draw(key, typeInfo.ElementType, customAttribute);
 															}
 															else
 															{
@@ -506,25 +439,57 @@ namespace QTool
 				case TypeCode.Empty:
 				case TypeCode.DBNull:
 				default:
-					;
 					EditorGUILayout.LabelField(name, obj?.ToString(), layoutOption);
 					break;
 			}
-			if (changeValue != null)
-			{
-				GUILayoutUtility.GetLastRect().MouseMenuClick((menu) =>
-				{
-					menu.AddItem(new GUIContent("复制" + name), false, () => GUIUtility.systemCopyBuffer = obj.ToQDataType(type));
-					if (!string.IsNullOrWhiteSpace(GUIUtility.systemCopyBuffer))
-					{
-						menu.AddItem(new GUIContent("粘贴" + name), false, () => changeValue(GUIUtility.systemCopyBuffer.ParseQDataType(type, true, obj)));
-					}
-
-				});
-			}
-
 			return obj;
 		}
+
+#if UNITY_EDITOR
+
+		[UnityEditor.SettingsProvider]
+		public static SettingsProvider QToolSetting()
+		{
+			return new SettingsProvider("Project/" + nameof(QTool)+"设置", SettingsScope.Project)
+			{
+				guiHandler = (searchContext) =>
+				{
+					foreach (var SettingType in typeof(InstanceScriptable<>).GetAllTypes())
+					{
+						using (new GUILayout.VerticalScope(AlphaBackStyle))
+						{
+							GUILayout.Label(SettingType.QName(), TitleLable);
+							new SerializedObject(SettingType.InvokeFunction(nameof(QTool.QToolSetting.Instance)) as ScriptableObject).Draw();
+						}
+					}
+				}
+			};
+		}
+		public static void Draw(this SerializedObject serializedObject)
+		{
+			var iterator = serializedObject.GetIterator();
+			if (iterator.NextVisible(true))
+			{
+				do
+				{
+					var GUIEnabled = GUI.enabled;
+					if ("m_Script".Equals(iterator.name))
+					{
+						GUI.enabled = false;
+					}
+					if (iterator.IsShow())
+					{
+						EditorGUILayout.PropertyField(iterator, new GUIContent(iterator.QName()));
+					}
+					if ("m_Script".Equals(iterator.name))
+					{
+						GUI.enabled = GUIEnabled;
+					}
+				} while (iterator.NextVisible(false));
+				serializedObject.ApplyModifiedProperties();
+			}
+		}
+
 		public static GUIContent ToGUIContent(this object obj)
 		{
 			if (obj is UnityEngine.Object uObj)

@@ -34,23 +34,23 @@ namespace QTool
 		public int FPS => (int)Fps.SecondeSum;
 		QAverageValue Fps = new QAverageValue();
 		bool UsingCommmond = false;
-		private QToolBar<QCommandInfo> toolBar = null;
+		private QToolBar toolBar = null;
 		public void InitCommond()
 		{
 			if (toolBar==null)
 			{
-				toolBar = new QToolBar<QCommandInfo>();
+				toolBar = new QToolBar();
 				foreach (var kv in QCommand.NameDictionary)
 				{
 					if (kv.Value.IsStringCommond)
 					{
 						if (kv.Value.name.SplitTowString("/",out var start,out var end))
 						{
-							toolBar[start][kv.Key].Obj = kv.Value;
+							toolBar["命令"][start][kv.Key].Value = kv.Value;
 						}
 						else if (kv.Value.fullName.SplitTowString("/", out start, out end))
 						{
-							toolBar[start][kv.Key].Obj = kv.Value;
+							toolBar["命令"][start][kv.Key].Value = kv.Value;
 						}
 						else
 						{
@@ -60,12 +60,11 @@ namespace QTool
 				}
 			}
 		}
-		int index;
+		
 		private void OnGUI()
 		{
 			try
 			{
-				index=QGUI.DropdownButton(index, new string[] { "测试1", "测试2" });
 				OnGUIEvent?.Invoke();
 #if DEVELOPMENT_BUILD || UNITY_EDITOR
 				GUILayout.BeginArea(new Rect(0, 0, Screen.width, Screen.height));
@@ -79,7 +78,10 @@ namespace QTool
 					GUI.Box(new Rect(-1, 0, Screen.width+1, Screen.height+1),"", QGUI.BackStyle);
 					GUILayout.BeginArea(new Rect(0, 0, Screen.width, Screen.height));
 					InitCommond();
-					toolBar.Draw();
+					if( toolBar.Draw() is QCommandInfo qCommand)
+					{
+						"测试".Draw("名字[" + System.Threading.Thread.CurrentThread.ManagedThreadId+"]", typeof(string));
+					}
 					//CommondTypeIndex = QGUI.DropdownButton(CommondTypeIndex, Types.ToArray());
 					//if(CommondIndex>= Commonds[Types[CommondTypeIndex]].Count)
 					//{
@@ -91,8 +93,6 @@ namespace QTool
 					//{
 					//	CommondParams.Clear();
 					//}
-					GUILayout.FlexibleSpace();
-					GUILayout.Label(name);
 					//if (QCommand.NameDictionary[name].paramInfos != null)
 					//{
 					//	for (int i = 0; i < QCommand.NameDictionary[name].paramInfos.Length; i++)

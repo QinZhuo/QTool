@@ -337,7 +337,7 @@ namespace QTool
 			using (var scroll= new GUILayout.ScrollViewScope(scrollPos))
 			{
 				scrollPos = scroll.scrollPosition;
-				value= value.Draw("", type,null,customAttribute);	
+				value= value.Draw("", type,customAttribute);	
 			}
 		}
 	}

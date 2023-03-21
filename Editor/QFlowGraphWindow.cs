@@ -781,14 +781,14 @@ namespace QTool.FlowGraph
 			{
 				if (port.IsList)
 				{
-					port.Value = port.Value.Draw(port.ViewName, port.ValueType, (obj) => { port.Value = obj; }, port.parameterInfo, DrawList, port.IndexChange);
+					port.Value = port.Value.Draw(port.ViewName, port.ValueType,  port.parameterInfo, DrawList, port.IndexChange);
 					return;
 				}
 				else
 				{
 					if (port.IsShowValue())
 					{
-						port.Value = port.Value.Draw(port.ViewName, port.ValueType, (obj) => { port.Value = obj; });
+						port.Value = port.Value.Draw(port.ViewName, port.ValueType);
 					}
 					else
 					{
