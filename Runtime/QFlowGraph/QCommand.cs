@@ -157,6 +157,32 @@ namespace QTool
 	}
 	public class QCommandInfo : IKey<string>
     {
+		static QCommandInfo()
+		{
+			QGUI.DrawOverride[typeof(QCommandInfo)] = (obj, name) =>
+			{
+				if (obj is QCommandInfo commandInfo)
+				{
+					GUILayout.BeginHorizontal();
+					QGUI.LabelField(commandInfo.name);
+					for (int i = 0; i < commandInfo.paramInfos.Length; i++)
+					{
+						var info = commandInfo.paramInfos[i];
+						if (i >= commandInfo.TempValues.Count&& info.HasDefaultValue)
+						{
+							commandInfo.TempValues[i] = info.DefaultValue;
+						}
+						commandInfo.TempValues[i] = commandInfo.TempValues[i].Draw(info.QName(), info.ParameterType);
+					}
+					if (QGUI.Button("运行命令"))
+					{
+						commandInfo.Invoke(commandInfo.TempValues.ToArray());
+					}
+					GUILayout.EndHorizontal();
+				};
+				return obj;
+			};
+		}
         public string Key { set; get; } 
         public string name; 
         public string fullName;
@@ -164,6 +190,7 @@ namespace QTool
         public ParameterInfo[] paramInfos;
         public List<string> paramNames = new List<string>();
         public List<string> paramViewNames = new List<string>();
+		private QList<object> TempValues = new QList<object>();
 		public bool IsStringCommond { get; private set; } = false;
         public QCommandInfo(MethodInfo method)
         {

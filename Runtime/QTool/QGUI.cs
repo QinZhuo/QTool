@@ -13,7 +13,7 @@ namespace QTool
 {
 	public class QToolBar
 	{
-		internal List<string> Values=new List<string>();
+		internal List<string> Values=new List<string>() ;
 		internal List<QToolBar> ChildToolbars = new List<QToolBar>();
 		public QToolBar ChildToolBar => ChildToolbars.Get(Select);
 		public int Select { get; internal set; } = -1;
@@ -29,6 +29,14 @@ namespace QTool
 				Select = -1;
 			}
 		}
+		public QToolBar(bool backButton = false)
+		{
+			if (backButton)
+			{
+				Values.Add("返回");
+				ChildToolbars.Add(new QToolBar(false) { Value = "返回" });
+			}
+		}
 		public QToolBar this[string key]
 		{
 			get
@@ -37,7 +45,7 @@ namespace QTool
 				if (index<0)
 				{
 					Values.Add(key);
-					var newToolBar = new QToolBar();
+					var newToolBar = new QToolBar(true);
 					ChildToolbars.Add(newToolBar);
 					return newToolBar;
 				}
@@ -73,7 +81,7 @@ namespace QTool
 				background = GetBackTexture(new Color32(55, 55, 55, 255), RectRaudius),
 				textColor = new Color32(225, 225, 225, 255),
 			},
-			onNormal=new GUIStyleState
+			onNormal = new GUIStyleState
 			{
 				background = GetBackTexture(new Color32(80, 80, 80, 255), RectRaudius),
 				textColor = new Color32(225, 225, 225, 255),
@@ -112,15 +120,20 @@ namespace QTool
 				}
 				else
 				{
-					toolBar.Select = GUILayout.Toolbar(toolBar.Select, toolBar.Values.ToArray(), ButtonStyle, GUILayout.Width(toolBar.Width * toolBar.Values.Count));
+					toolBar.Select = GUILayout.Toolbar(toolBar.Select, toolBar.Values.ToArray(), ButtonStyle, GUILayout.Width(toolBar.Width * toolBar.Values.Count), Height);
+					
 				}
+			}
+			if ("返回".Equals(toolBar.ChildToolBar?.ChildToolBar?.Value))
+			{
+				Debug.LogError("返回 " + toolBar.Select);
+				toolBar.CancelSelect();
+				Debug.LogError("结果 " + toolBar.Select);
 			}
 			return toolBar.Value;
 		}
-		public static bool Button(string text)
-		{
-			return GUILayout.Button(text,ButtonStyle);
-		}
+
+	
 		public static QDictionary<Color, Texture2D> ColorTexture { get; private set; } = new QDictionary<Color, Texture2D>((key) =>
 		{
 			var tex = new Texture2D(1, 1);
@@ -171,18 +184,332 @@ namespace QTool
 			tex.Apply();
 			return tex;
 		}
+		public static GUILayoutOption Height { get; private set; } = GUILayout.Height(BorderSize * 3);
 		public const float BorderSize = 8;
 		public static QDictionary<int, Action> OnChangeDelayCall = new QDictionary<int, Action>();
-		public static QDictionary<string, bool> FoldoutDic = new QDictionary<string, bool>();
 		public static QDictionary<Type, Func<object, string, object>> DrawOverride = new QDictionary<Type, Func<object, string, object>>();
 		public static List<string> TypeMenuList = new List<string>() { typeof(UnityEngine.Object).FullName.Replace('.', '/') };
 		public static List<Type> TypeList = new List<Type>() { typeof(UnityEngine.Object) };
-		public static object Draw(this object obj, string name, Type type, ICustomAttributeProvider customAttribute = null, Func<int, object, string, Type, object> DrawElement = null, Action<int, int> IndexChange = null, params GUILayoutOption[] layoutOption)
+
+		private static bool IsRuntimeDraw { get; set; }
+		public static void BeginRuntimeGUI()
+		{
+			IsRuntimeDraw = true;
+			if (Application.isEditor)
+			{
+				Application.targetFrameRate = 30;
+			}
+		}
+		public static void EndRuntimeGUI()
+		{
+			IsRuntimeDraw = false;
+		}
+		public static bool Button(string text)
+		{
+			return GUILayout.Button(text, ButtonStyle, Height);
+		}
+		public static void LabelField(string name,string value=null)
+		{
+#if UNITY_EDITOR
+			if (!IsRuntimeDraw)
+			{
+				if (value.IsNull())
+				{
+					EditorGUILayout.LabelField(name);
+				}
+				else
+				{
+					EditorGUILayout.LabelField(name,value);
+				}
+			}
+			else
+#endif
+			{
+				GUILayout.BeginHorizontal();
+				GUILayout.Label(name, Height);
+				GUILayout.Label(value, Height);
+				GUILayout.EndHorizontal();
+			}
+		}
+		public static string TextField(string lable, string text)
+		{
+#if UNITY_EDITOR
+			if (!IsRuntimeDraw)
+			{
+				if (lable.IsNull())
+				{
+					return EditorGUILayout.TextArea(text);
+				}
+				else
+				{
+					return EditorGUILayout.TextField(lable, text);
+				}
+			}
+			else
+#endif
+			{
+				GUILayout.BeginHorizontal();
+				GUILayout.Label(lable, Height);
+				text = GUILayout.TextField(text, Height);
+				GUILayout.EndHorizontal();
+				return text;
+			}
+		}
+		public static int IntField(string lable, int value)
+		{
+#if UNITY_EDITOR
+			if (!IsRuntimeDraw)
+			{
+				if (lable.IsNull())
+				{
+					return EditorGUILayout.IntField(value);
+				}
+				else
+				{
+					return EditorGUILayout.IntField(lable, value);
+				}
+			}
+			else
+#endif
+			{
+				GUILayout.BeginHorizontal();
+				GUILayout.Label(lable, Height);
+				var str = GUILayout.TextField(value.ToString(), Height);
+				GUILayout.EndHorizontal();
+				if(int.TryParse(str,out var newInt))
+				{
+					return newInt;
+				}
+				else
+				{
+					return value;
+				}
+			}
+		}
+		public static Enum EnumField(string lable, Enum value)
+		{
+#if UNITY_EDITOR
+			if (!IsRuntimeDraw)
+			{
+				if (lable.IsNull())
+				{
+					return EditorGUILayout.EnumPopup(value);
+				}
+				else
+				{
+					return EditorGUILayout.EnumPopup(lable, value);
+				}
+			}
+			else
+#endif
+			{
+			 	//var dataList= QEnumListData.Get(value,"");
+				GUILayout.BeginHorizontal();
+				// GUILayout.SelectionGrid(dataList.SelectIndex, dataList.List.ToArray(), 1);
+				GUILayout.Label(lable, Height);
+				GUILayout.Label(value.ToString(), Height);
+				GUILayout.EndHorizontal();
+				return value;
+			}
+		}
+		public static Enum EnumFlagsField(string lable, Enum value)
+		{
+#if UNITY_EDITOR
+			if (!IsRuntimeDraw)
+			{
+				if (lable.IsNull())
+				{
+					return EditorGUILayout.EnumFlagsField(value);
+				}
+				else
+				{
+					return EditorGUILayout.EnumFlagsField(lable, value);
+				}
+			}
+			else
+#endif
+			{
+				//var dataList= QEnumListData.Get(value,"");
+				GUILayout.BeginHorizontal();
+				// GUILayout.SelectionGrid(dataList.SelectIndex, dataList.List.ToArray(), 1);
+				GUILayout.Label(lable, Height);
+				GUILayout.Label(value.ToString(), Height);
+				GUILayout.EndHorizontal();
+				return value;
+			}
+		}
+		public static long LongField(string lable, long value)
+		{
+#if UNITY_EDITOR
+			if (!IsRuntimeDraw)
+			{
+				if (lable.IsNull())
+				{
+					return EditorGUILayout.LongField(value);
+				}
+				else
+				{
+					return EditorGUILayout.LongField(lable, value);
+				}
+			}
+			else
+#endif
+			{
+				GUILayout.BeginHorizontal();
+				GUILayout.Label(lable, Height);
+				var str = GUILayout.TextField(value.ToString(), Height);
+				GUILayout.EndHorizontal();
+				if (long.TryParse(str, out var newInt))
+				{
+					return newInt;
+				}
+				else
+				{
+					return value;
+				}
+			}
+		}
+		public static float FloatField(string lable, float value)
+		{
+#if UNITY_EDITOR
+			if (!IsRuntimeDraw)
+			{
+				if (lable.IsNull())
+				{
+					return EditorGUILayout.FloatField(value);
+				}
+				else
+				{
+					return EditorGUILayout.FloatField(lable, value);
+				}
+			}
+			else
+#endif
+			{
+				GUILayout.BeginHorizontal();
+				GUILayout.Label(lable, Height);
+				var str = GUILayout.TextField(value.ToString(), Height);
+				GUILayout.EndHorizontal();
+				if (float.TryParse(str, out var newInt))
+				{
+					return newInt;
+				}
+				else
+				{
+					return value;
+				}
+			}
+		}
+		public static double DoubleField(string lable, double value)
+		{
+#if UNITY_EDITOR
+			if (!IsRuntimeDraw)
+			{
+				if (lable.IsNull())
+				{
+					return EditorGUILayout.DoubleField(value);
+				}
+				else
+				{
+					return EditorGUILayout.DoubleField(lable, value);
+				}
+			}
+			else
+#endif
+			{
+				GUILayout.BeginHorizontal();
+				GUILayout.Label(lable, Height);
+				var str = GUILayout.TextField(value.ToString(), Height);
+				GUILayout.EndHorizontal();
+				if (double.TryParse(str, out var newInt))
+				{
+					return newInt;
+				}
+				else
+				{
+					return value;
+				}
+			}
+		}
+		public static UnityEngine.Object ObjectField(string lable, UnityEngine.Object value,Type type)
+		{
+#if UNITY_EDITOR
+			if (!IsRuntimeDraw)
+			{
+				if (lable.IsNull())
+				{
+					return EditorGUILayout.ObjectField(value, type, true);
+				}
+				else
+				{
+					return EditorGUILayout.ObjectField(lable, value, type, true);
+				}
+			}
+			else
+#endif
+			{
+				GUILayout.BeginHorizontal();
+				GUILayout.Label(lable, Height);
+				GUILayout.Label(value.ToString(), Height);
+				GUILayout.EndHorizontal();
+				return value;
+			}
+		}
+		public static bool Toggle(string lable, bool value)
+		{
+#if UNITY_EDITOR
+			if (!IsRuntimeDraw)
+			{
+				if (lable.IsNull())
+				{
+					return EditorGUILayout.Toggle(value);
+				}
+				else
+				{
+					return EditorGUILayout.Toggle(lable, value);
+				}
+			}
+			else
+#endif
+			{
+				GUILayout.BeginHorizontal();
+				GUILayout.Label(lable, Height);
+				value = GUILayout.Toggle(value,"√", Height);
+				GUILayout.EndHorizontal();
+				return value;
+			}
+		}
+		private static QDictionary<string, bool> FoldoutCache= new QDictionary<string, bool>();
+		public static bool Foldout(string key)
+		{
+#if UNITY_EDITOR
+			if (!IsRuntimeDraw)
+			{
+				FoldoutCache[key]= EditorGUILayout.Foldout(FoldoutCache[key], key);
+			}
+			else
+#endif
+			{
+				GUILayout.BeginHorizontal();
+				FoldoutCache[key] = GUILayout.Toggle(FoldoutCache[key],key);
+				GUILayout.EndHorizontal();
+			}
+			return FoldoutCache[key];
+		}
+		public static object Draw(this object obj, string name, Type type=null, ICustomAttributeProvider customAttribute = null, Func<int, object, string, Type, object> DrawElement = null, Action<int, int> IndexChange = null)
 		{
 			var hasName = !string.IsNullOrWhiteSpace(name);
 			if (type == null)
 			{
-				EditorGUILayout.LabelField(name, layoutOption);
+				if (obj == null)
+				{
+					LabelField(name);
+					return obj;
+				}
+				else
+				{
+					type = obj.GetType();
+				}
 			}
 			if (obj == null && type.IsValueType)
 			{
@@ -201,7 +528,7 @@ namespace QTool
 			switch (typeInfo.Code)
 			{
 				case TypeCode.Boolean:
-					obj = EditorGUILayout.Toggle(name, (bool)obj, layoutOption); break;
+					obj = Toggle(name, (bool)obj); break;
 				case TypeCode.Char:
 				case TypeCode.SByte:
 				case TypeCode.Byte:
@@ -211,49 +538,45 @@ namespace QTool
 				case TypeCode.UInt32:
 					if (type.IsEnum)
 					{
-						var flagsEnum = type.GetAttribute<System.FlagsAttribute>();
+						var flagsEnum = type.GetAttribute<FlagsAttribute>();
 						if (flagsEnum != null)
 						{
-							obj = EditorGUILayout.EnumFlagsField(name, (Enum)obj, layoutOption);
+							obj = EnumFlagsField(name, (Enum)obj);
 						}
 						else
 						{
-							obj = EditorGUILayout.EnumPopup(name, (Enum)obj, layoutOption);
+							obj = EnumField(name, (Enum)obj);
 						}
 					}
 					else
 					{
-						obj = EditorGUILayout.IntField(name, (int)obj, layoutOption);
+						obj =	IntField(name, (int)obj);
 					}
 					break;
 				case TypeCode.Int64:
 				case TypeCode.UInt64:
-					obj = EditorGUILayout.LongField(name, (long)obj, layoutOption); break;
+					obj = LongField(name, (long)obj); break;
 				case TypeCode.Single:
-					obj = EditorGUILayout.FloatField(name, (float)obj, layoutOption); break;
+					obj = FloatField(name, (float)obj); break;
 				case TypeCode.Decimal:
 				case TypeCode.Double:
-					obj = EditorGUILayout.DoubleField(name, (double)obj, layoutOption); break;
+					obj = DoubleField(name, (double)obj); break;
 				case TypeCode.String:
 					var enumView = customAttribute?.GetAttribute<QEnumAttribute>();
 					if (enumView != null)
 					{
 						obj = QEnumDrawer.Draw(obj, enumView); break;
 					}
-					else if (string.IsNullOrWhiteSpace(name))
-					{
-						obj = EditorGUILayout.TextArea(obj?.ToString(), layoutOption); break;
-					}
 					else
 					{
-						obj = EditorGUILayout.TextField(name, obj?.ToString(), layoutOption); break;
+						obj = TextField(name, obj?.ToString()); break;
 					}
 				case TypeCode.Object:
 					switch (typeInfo.objType)
 					{
 						case QObjectType.DynamicObject:
 							{
-								using (new EditorGUILayout.HorizontalScope(layoutOption))
+								using (new GUILayout.HorizontalScope())
 								{
 									if (obj == null)
 									{
@@ -273,7 +596,7 @@ namespace QTool
 							break;
 						case QObjectType.UnityObject:
 							{
-								obj = EditorGUILayout.ObjectField(name, (UnityEngine.Object)obj, type, true, layoutOption);
+								obj = ObjectField(name, (UnityEngine.Object)obj, type);
 							}
 							break;
 						case QObjectType.Object:
@@ -284,28 +607,29 @@ namespace QTool
 								}
 								if (typeof(QIdObject).IsAssignableFrom(type))
 								{
-									obj = QIdObjectReferenceDrawer.Draw(name, (QIdObject)obj, layoutOption);
+									obj = QIdObjectReferenceDrawer.Draw(name, (QIdObject)obj);
 								}
 								else
 								{
 
 									PushBackColor(BackColor);
-									using (new EditorGUILayout.VerticalScope(QGUI.AlphaBackStyle, layoutOption))
+									using (new GUILayout.VerticalScope(QGUI.AlphaBackStyle))
 									{
 										PopBackColor();
+										var show = false;
 										if (hasName)
 										{
-											FoldoutDic[name] = EditorGUILayout.Foldout(FoldoutDic[name], name);
+											show=Foldout(name);
 										}
-										if (!hasName || FoldoutDic[name])
+										if (!hasName || show)
 										{
-											using (new EditorGUILayout.HorizontalScope(layoutOption))
+											using (new GUILayout.HorizontalScope())
 											{
 												if (hasName)
 												{
-													EditorGUILayout.Space(10);
+													GUILayout.Space(10);
 												}
-												using (new EditorGUILayout.VerticalScope())
+												using (new GUILayout.VerticalScope())
 												{
 
 													foreach (var member in typeInfo.Members)
@@ -353,7 +677,7 @@ namespace QTool
 									var color = GUI.backgroundColor;
 									GUI.backgroundColor = BackColor;
 
-									using (new EditorGUILayout.VerticalScope(AlphaBackStyle, layoutOption))
+									using (new GUILayout.VerticalScope(AlphaBackStyle))
 									{
 
 										GUI.backgroundColor = color;
@@ -362,26 +686,26 @@ namespace QTool
 										{
 											if (canHideChild)
 											{
-												FoldoutDic[name] = EditorGUILayout.Foldout(FoldoutDic[name], name);
+												canHideChild = !Foldout(name);
 											}
 											else
 											{
-												EditorGUILayout.LabelField(name);
+												LabelField(name);
 											}
 										}
-										if (!canHideChild || !hasName || FoldoutDic[name])
+										if (!canHideChild || !hasName )
 										{
-											using (new EditorGUILayout.HorizontalScope())
+											using (new GUILayout.HorizontalScope())
 											{
 												if (hasName)
 												{
-													EditorGUILayout.Space(10);
+													GUILayout.Space(10);
 												}
-												using (new EditorGUILayout.VerticalScope())
+												using (new GUILayout.VerticalScope())
 												{
 													for (int i = 0; i < list.Count; i++)
 													{
-														using (new EditorGUILayout.VerticalScope(AlphaBackStyle))
+														using (new GUILayout.VerticalScope(AlphaBackStyle))
 														{
 															var key = name + "[" + i + "]";
 															if (DrawElement == null)
@@ -392,7 +716,7 @@ namespace QTool
 															{
 																list[i] = DrawElement.Invoke(i, list[i], key, typeInfo.ElementType);
 															}
-															using (new EditorGUILayout.HorizontalScope())
+															using (new GUILayout.HorizontalScope())
 															{
 																GUILayout.FlexibleSpace();
 																QGUI.PushColor(Color.blue.LerpTo(Color.white, 0.5f));
@@ -439,7 +763,7 @@ namespace QTool
 				case TypeCode.Empty:
 				case TypeCode.DBNull:
 				default:
-					EditorGUILayout.LabelField(name, obj?.ToString(), layoutOption);
+					LabelField(name, obj?.ToString());
 					break;
 			}
 			return obj;

@@ -426,6 +426,13 @@ namespace QTool.Inspector
 						drawer.List.Add(new GUIContent(childType.Name));
 					}
 				}
+				else if (type.IsEnum)
+				{
+					foreach (var name in Enum.GetNames(type))
+					{
+						drawer.List.Add(name.ToGUIContent());
+					}
+				}
 				else if (obj is SerializedProperty property)
 				{
 					drawer.List.Clear();
@@ -445,7 +452,7 @@ namespace QTool.Inspector
 				}
 				else
 				{
-					EditorGUILayout.LabelField("错误函数" + funcKey);
+					QGUI.LabelField("错误函数" + funcKey);
 				}
 			}
 			if (drawer.List.Count <= 0)

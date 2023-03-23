@@ -65,7 +65,6 @@ namespace QTool
 		{
 			try
 			{
-				OnGUIEvent?.Invoke();
 #if DEVELOPMENT_BUILD || UNITY_EDITOR
 				GUILayout.BeginArea(new Rect(0, 0, Screen.width, Screen.height));
 				GUILayout.BeginHorizontal();
@@ -75,12 +74,13 @@ namespace QTool
 				GUILayout.EndArea();
 				if (UsingCommmond)
 				{
+					QGUI.BeginRuntimeGUI();
 					GUI.Box(new Rect(-1, 0, Screen.width+1, Screen.height+1),"", QGUI.BackStyle);
 					GUILayout.BeginArea(new Rect(0, 0, Screen.width, Screen.height));
 					InitCommond();
 					if( toolBar.Draw() is QCommandInfo qCommand)
 					{
-						"测试".Draw("名字[" + System.Threading.Thread.CurrentThread.ManagedThreadId+"]", typeof(string));
+						qCommand.Draw("命令");
 					}
 					//CommondTypeIndex = QGUI.DropdownButton(CommondTypeIndex, Types.ToArray());
 					//if(CommondIndex>= Commonds[Types[CommondTypeIndex]].Count)
@@ -116,6 +116,7 @@ namespace QTool
 					//	QCommand.NameDictionary[name].Invoke(CommondParams);
 					//}
 					GUILayout.EndArea();
+					QGUI.EndRuntimeGUI();
 				}
 				else if (QDemoInput.Ctrl && QDemoInput.Enter)
 				{
