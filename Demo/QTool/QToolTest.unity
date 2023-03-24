@@ -651,10 +651,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 06b826aeeb1fe334296806b47c20e0dd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  width: 100
-  height: 100
-  detailScale: 10
-  heightScale: 5
 --- !u!64 &774464684
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -1400,7 +1396,7 @@ Canvas:
   m_Enabled: 1
   serializedVersion: 3
   m_RenderMode: 0
-  m_Camera: {fileID: 0}
+  m_Camera: {fileID: 2065236535}
   m_PlaneDistance: 100
   m_PixelPerfect: 0
   m_ReceivesEvents: 1
@@ -1788,6 +1784,7 @@ GameObject:
   - component: {fileID: 2065236534}
   - component: {fileID: 2065236537}
   - component: {fileID: 2065236538}
+  - component: {fileID: 2065236539}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -1907,6 +1904,20 @@ MonoBehaviour:
   m_RequiresDepthTexture: 0
   m_RequiresColorTexture: 0
   m_Version: 2
+--- !u!114 &2065236539
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2065236533}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4276d03642c52434baa571b947cfddd3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  aspect: 1.7777778
+  blackFill: 1
 --- !u!1001 &780893287985218886
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2038,7 +2049,7 @@ PrefabInstance:
       objectReference: {fileID: 1876963881}
     - target: {fileID: 1342849157534090733, guid: e3b8399edb6b7064e8f550458a54bdd3, type: 3}
       propertyPath: toggleTest
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e3b8399edb6b7064e8f550458a54bdd3, type: 3}
