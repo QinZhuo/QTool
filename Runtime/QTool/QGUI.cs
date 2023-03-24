@@ -18,7 +18,7 @@ namespace QTool
 		public QToolBar ChildToolBar => ChildToolbars.Get(Select);
 		public int Select { get; internal set; } = -1;
 		public bool Selected => Select >= 0;
-		public bool IsButton => ChildToolbars.Count == 0;
+		public bool IsButton => ChildToolbars.Count == 0 ;
 		public int Width { get; set; } = 100;
 		public object Value { get; set; }
 		public void CancelSelect()
@@ -29,13 +29,8 @@ namespace QTool
 				Select = -1;
 			}
 		}
-		public QToolBar(bool backButton = false)
+		public QToolBar()
 		{
-			if (backButton)
-			{
-				Values.Add("返回");
-				ChildToolbars.Add(new QToolBar(false) { Value = "返回" });
-			}
 		}
 		public QToolBar this[string key]
 		{
@@ -45,7 +40,7 @@ namespace QTool
 				if (index<0)
 				{
 					Values.Add(key);
-					var newToolBar = new QToolBar(true);
+					var newToolBar = new QToolBar();
 					ChildToolbars.Add(newToolBar);
 					return newToolBar;
 				}
@@ -116,19 +111,20 @@ namespace QTool
 			{
 				if (toolBar.Selected)
 				{
-					return toolBar.ChildToolBar.Draw();
+					GUILayout.BeginHorizontal();
+					if (!toolBar.ChildToolBar.Selected&& Button("返回",50))
+					{
+						toolBar.CancelSelect();
+					}
+					var result= toolBar.ChildToolBar.Draw();
+					GUILayout.EndHorizontal();
+					return result;
 				}
 				else
 				{
 					toolBar.Select = GUILayout.Toolbar(toolBar.Select, toolBar.Values.ToArray(), ButtonStyle, GUILayout.Width(toolBar.Width * toolBar.Values.Count), Height);
 					
 				}
-			}
-			if ("返回".Equals(toolBar.ChildToolBar?.ChildToolBar?.Value))
-			{
-				Debug.LogError("返回 " + toolBar.Select);
-				toolBar.CancelSelect();
-				Debug.LogError("结果 " + toolBar.Select);
 			}
 			return toolBar.Value;
 		}
@@ -204,10 +200,19 @@ namespace QTool
 		{
 			IsRuntimeDraw = false;
 		}
-		public static bool Button(string text)
+		public static bool Button(string text, float width = -1)
 		{
-			return GUILayout.Button(text, ButtonStyle, Height);
+			if (width > 0)
+			{
+				return GUILayout.Button(text, ButtonStyle, Height,GUILayout.Width(width));
+			}
+			else
+			{
+
+				return GUILayout.Button(text, ButtonStyle, Height);
+			}
 		}
+		
 		public static void LabelField(string name,string value=null)
 		{
 #if UNITY_EDITOR

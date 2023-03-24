@@ -174,10 +174,6 @@ namespace QTool
 						}
 						commandInfo.TempValues[i] = commandInfo.TempValues[i].Draw(info.QName(), info.ParameterType);
 					}
-					if (QGUI.Button("运行命令"))
-					{
-						commandInfo.Invoke(commandInfo.TempValues.ToArray());
-					}
 					GUILayout.EndHorizontal();
 				};
 				return obj;
@@ -190,7 +186,7 @@ namespace QTool
         public ParameterInfo[] paramInfos;
         public List<string> paramNames = new List<string>();
         public List<string> paramViewNames = new List<string>();
-		private QList<object> TempValues = new QList<object>();
+		internal QList<object> TempValues = new QList<object>();
 		public bool IsStringCommond { get; private set; } = false;
         public QCommandInfo(MethodInfo method)
         {
