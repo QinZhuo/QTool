@@ -100,9 +100,10 @@ namespace QTool
 			alignment = TextAnchor.MiddleCenter,
 			normal = new GUIStyleState
 			{
-				background = GetCircleTexture(BackColor, 2),
+				background = GetBackTexture(BackColor, 4),
 			},
-			border = new RectOffset { bottom = 2, left = 2, right = 2, top = 2 },
+			border = new RectOffset(4,4,4,4),
+			overflow =new RectOffset(2,2,2,2),
 		};
 		public static object Draw(this QToolBar toolBar)
 		{
@@ -143,9 +144,9 @@ namespace QTool
 			tex.Apply();
 			return tex;
 		});
-		public static Texture2D GetTexture(int size = 32)
+		public static Texture2D GetTexture(int size = 8)
 		{
-			var tex = new Texture2D(size * 2, size * 2);
+			var tex = new Texture2D(size * 2+1, size * 2+1);
 			for (int i = 0; i < tex.width; i++)
 			{
 				for (int j = 0; j < tex.height; j++)

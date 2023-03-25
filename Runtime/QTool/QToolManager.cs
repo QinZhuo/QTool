@@ -71,7 +71,7 @@ namespace QTool
 			try
 			{
 #if DEVELOPMENT_BUILD || UNITY_EDITOR
-				GUILayout.BeginArea(new Rect(0, 0, Screen.width, Screen.height));
+				GUILayout.BeginArea(QScreen.AspectGUIRect);
 				GUILayout.BeginHorizontal();
 				GUILayout.FlexibleSpace();
 				GUILayout.Label(FPS.ToString());
@@ -80,8 +80,8 @@ namespace QTool
 				if (DebugPanelShow)
 				{
 					QGUI.BeginRuntimeGUI();
-					GUI.Box(new Rect(-1, 0, Screen.width + 1, Screen.height + 1), "", QGUI.BackStyle);
-					GUILayout.BeginArea(new Rect(0, 0, Screen.width, Screen.height));
+					GUI.Box(QScreen.AspectGUIRect, "", QGUI.BackStyle);
+					GUILayout.BeginArea(QScreen.AspectGUIRect);
 					InitCommond();
 					GUILayout.BeginHorizontal();
 					var select = toolBar.Draw();

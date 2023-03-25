@@ -13,9 +13,11 @@ namespace QTool
 		static Texture2D CaptureTexture2d = null;
 		public static int Width => Screen.width;
 		public static int Height => Screen.height;
+		public static Vector2 Size => new Vector2(Width, Height);
 		public static float Aspect => Width * 1f / Height;
 		public static float TargetAspect => QToolSetting.Instance.targetAspect;
 		public static Rect AspectRect = new Rect(0, 0, 1, 1);
+		public static Rect AspectGUIRect => new Rect(AspectRect.position * Size, AspectRect.size * Size);
 		public static Texture2D Capture()
 		{
 			return Capture(null);
