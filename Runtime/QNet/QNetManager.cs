@@ -435,7 +435,7 @@ namespace QTool.Net
 
 		private void DebugGUI()
 		{
-			GUILayout.BeginVertical(QGUI.BackStyle);
+			GUILayout.BeginVertical(QGUI.AlphaBackStyle);
 			if (NetActive)
 			{
 				if (transport.ClientConnected)

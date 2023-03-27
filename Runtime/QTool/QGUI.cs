@@ -89,7 +89,7 @@ namespace QTool
 			alignment = TextAnchor.MiddleCenter,
 			normal = new GUIStyleState
 			{
-				background = GetBackTexture(new Color32(42, 42, 42, 255), RectRaudius),
+				background = GetBackTexture(AlphaBackColor, RectRaudius),
 				textColor = new Color32(225, 225, 225, 255),
 			},
 			border = new RectOffset { bottom = RectRaudius, left = RectRaudius, right = RectRaudius, top = RectRaudius },
@@ -101,9 +101,10 @@ namespace QTool
 			alignment = TextAnchor.MiddleCenter,
 			normal = new GUIStyleState
 			{
-				background = GetCircleTexture(AlphaBackColor, RectRaudius),
+				background = GetBackTexture(AlphaBackColor, RectRaudius),
 			},
 			border = new RectOffset { bottom = RectRaudius, left = RectRaudius, right = RectRaudius, top = RectRaudius },
+			overflow = new RectOffset(2, 2, 2, 2),
 		};
 		private static GUIStyle _BackStyle;
 		public static GUIStyle BackStyle => _BackStyle ??= new GUIStyle()
@@ -111,10 +112,10 @@ namespace QTool
 			alignment = TextAnchor.MiddleCenter,
 			normal = new GUIStyleState
 			{
-				background = GetBackTexture(BackColor, 4),
+				background = GetBackTexture(BackColor, RectRaudius),
 				textColor = new Color32(225, 225, 225, 255),
 			},
-			border = new RectOffset(4, 4, 4, 4),
+			border = new RectOffset(RectRaudius, RectRaudius, RectRaudius, RectRaudius),
 			overflow = new RectOffset(2, 2, 2, 2),
 		};
 		static Stack<Color> colorStack = new Stack<Color>();
