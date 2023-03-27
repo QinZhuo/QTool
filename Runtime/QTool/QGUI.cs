@@ -241,10 +241,6 @@ namespace QTool
 		public static void BeginRuntimeGUI()
 		{
 			IsRuntimeDraw = true;
-			if (Application.isEditor)
-			{
-				Application.targetFrameRate = 30;
-			}
 		}
 		public static void EndRuntimeGUI()
 		{
