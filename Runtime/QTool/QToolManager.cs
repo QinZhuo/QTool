@@ -70,6 +70,7 @@ namespace QTool
 		{
 			try
 			{
+				OnGUIEvent?.Invoke();
 #if DEVELOPMENT_BUILD || UNITY_EDITOR
 				GUILayout.BeginArea(QScreen.AspectGUIRect);
 				GUILayout.BeginHorizontal();
