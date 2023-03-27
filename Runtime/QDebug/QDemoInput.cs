@@ -6,7 +6,7 @@ namespace QTool
 
 	public static class QDemoInput
 	{
-
+		
 		public static bool PointerPress
 		{
 			get
