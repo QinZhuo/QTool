@@ -85,15 +85,19 @@ namespace QTool
 				GUILayout.Label("层级",QGUI.BackStyle, GUILayout.Width(QScreen.Width * 0.2f),GUILayout.Height(QGUI.BorderSize*2));
 				using (var scroll=new GUILayout.ScrollViewScope(ScrollPosition,QGUI.BackStyle,GUILayout.Width(QScreen.Width*0.2f)))
 				{
-					var objects= UnityEngine.SceneManagement.SceneManager.GetActiveScene().GetRootGameObjects();
-					foreach (var obj in objects)
+					for (int i = 0; i < UnityEngine.SceneManagement.SceneManager.sceneCount; i++)
 					{
-						QGUI.PushContentColor(obj.activeInHierarchy ? Color.white : Color.gray);
-						if (QGUI.Button(obj.name))
+						var scene = UnityEngine.SceneManagement.SceneManager.GetSceneAt(i);
+						GUILayout.Label("场景["+scene.name+"]", QGUI.BackStyle, GUILayout.Height(QGUI.BorderSize * 2));
+						foreach (var obj in scene.GetRootGameObjects())
 						{
-							obj.SetActive(!obj.activeInHierarchy);
+							QGUI.PushContentColor(obj.activeInHierarchy ? Color.white : Color.gray);
+							if (QGUI.Button(obj.name))
+							{
+								obj.SetActive(!obj.activeInHierarchy);
+							}
+							QGUI.PopContentColor();
 						}
-						QGUI.PopContentColor();
 					}
 					ScrollPosition =scroll.scrollPosition;
 				}
