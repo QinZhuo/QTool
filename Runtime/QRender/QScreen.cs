@@ -140,14 +140,7 @@ namespace QTool
 #endif
 			}
 		}
-		static QScreen()
-		{
-			var sizesType = typeof(Editor).Assembly.GetType("UnityEditor.GameViewSizes");
-			var singleType = typeof(ScriptableSingleton<>).MakeGenericType(sizesType);
-			var instanceProp = singleType.GetProperty("instance");
-			getGroup = sizesType.GetMethod("GetGroup");
-			gameViewSizesInstance = instanceProp.GetValue(null, null);
-		}
+
 		public static void SetResolution(int width, int height, bool fullScreen)
 		{
 			switch (Application.platform)
@@ -239,7 +232,14 @@ namespace QTool
 		static object gameViewSizesInstance;
 		static MethodInfo getGroup;
 
-
+		static QScreen()
+		{
+			var sizesType = typeof(Editor).Assembly.GetType("UnityEditor.GameViewSizes");
+			var singleType = typeof(ScriptableSingleton<>).MakeGenericType(sizesType);
+			var instanceProp = singleType.GetProperty("instance");
+			getGroup = sizesType.GetMethod("GetGroup");
+			gameViewSizesInstance = instanceProp.GetValue(null, null);
+		}
 		private enum GameViewSizeType
 		{
 			AspectRatio, FixedResolution
