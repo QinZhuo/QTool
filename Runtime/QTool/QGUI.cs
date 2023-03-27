@@ -101,6 +101,7 @@ namespace QTool
 			normal = new GUIStyleState
 			{
 				background = GetBackTexture(BackColor, 4),
+				textColor = new Color32(225, 225, 225, 255),
 			},
 			border = new RectOffset(4, 4, 4, 4),
 			overflow = new RectOffset(2, 2, 2, 2),
@@ -218,8 +219,8 @@ namespace QTool
 			tex.Apply();
 			return tex;
 		}
-		public static GUILayoutOption Height { get; private set; } = GUILayout.Height(BorderSize * 3);
-		public const float BorderSize = 8;
+		public static GUILayoutOption Height { get; private set; } = GUILayout.Height(BorderSize * 3f);
+		public const float BorderSize = 10;
 		public static QDictionary<int, Action> OnChangeDelayCall = new QDictionary<int, Action>();
 		public static QDictionary<Type, Func<object, string, object>> DrawOverride = new QDictionary<Type, Func<object, string, object>>();
 		public static List<string> TypeMenuList = new List<string>() { typeof(UnityEngine.Object).FullName.Replace('.', '/') };
