@@ -259,38 +259,11 @@ namespace QTool.Inspector
 	[CustomPropertyDrawer(typeof(QIdObject))]
 	public class QIdObjectReferenceDrawer : PropertyDrawer
 	{
-		public static string Draw(string lable, string id, Type type, Rect? rect = null, params GUILayoutOption[] options)
-		{
-			var name = lable + "【" + (id == null ? "" : id.Substring(0, Mathf.Min(4, id.Length))) + "~】";
-			var oldObj = QIdObject.GetObject(id, type);
-			var newObj = oldObj;
-			if (rect == null)
-			{
-				newObj = EditorGUILayout.ObjectField(name, oldObj, type, true);
-			}
-			else
-			{
-				newObj = EditorGUI.ObjectField(rect.Value, name, oldObj, type, true);
-			}
-			if (newObj != oldObj)
-			{
-				id = QIdObject.GetId(newObj);
-			}
-			return id;
-		}
-		public static QIdObject Draw(string lable, QIdObject ir, params GUILayoutOption[] options)
-		{
-			var newId = Draw(lable, ir.id, typeof(UnityEngine.Object), null, options);
-			if (newId != ir.id)
-			{
-				ir.id = newId;
-			}
-			return ir;
-		}
+	
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
 			var id = property.FindPropertyRelative(nameof(QIdObject.id));
-			id.stringValue = Draw(label.text, id.stringValue, typeof(UnityEngine.Object), position);
+			id.stringValue =QGUI.DrawQIdObject(label.text, id.stringValue, typeof(UnityEngine.Object), position);
 		}
 		public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
 		{
@@ -331,164 +304,11 @@ namespace QTool.Inspector
 			}
 		}
 	}
-	public class QEnumListData
-	{
-		static QDictionary<string, QEnumListData> DrawerDic = new QDictionary<string, QEnumListData>((key) => new QEnumListData());
 
-		public List<GUIContent> List = new List<GUIContent>();
-		public int SelectIndex = 0;
-		public string SelectValue
-		{
-			get
-			{
-				if (SelectIndex >= 0 && SelectIndex < List.Count)
-				{
-					return List[SelectIndex].text == "null" ? null : List[SelectIndex].text;
-				}
-				else
-				{
-					if (SelectIndex < 0)
-					{
-						SelectIndex = 0;
-					}
-					return default;
-				}
-			}
-		}
-
-		public void UpdateList(string key)
-		{
-			if (key == "null" || key.IsNull())
-			{
-				SelectIndex = 0;
-			}
-			else
-			{
-				SelectIndex = List.FindIndex((obj) => obj.text == key);
-			}
-		}
-		public static QEnumListData Get(SerializedProperty property, string funcKey)
-		{
-			if (property.propertyType == SerializedPropertyType.ObjectReference)
-			{
-				return Get(QReflection.ParseType(property.type.SplitEndString("PPtr<$").TrimEnd('>')), funcKey);
-			}
-			else
-			{
-				return Get((object)property, funcKey);
-			}
-		}
-
-		public static QEnumListData Get(object obj, string funcKey)
-		{
-			Type type = null;
-			if (obj is Type)
-			{
-				type = obj as Type;
-			}
-			else
-			{
-				type = obj?.GetType();
-			}
-			var drawerKey = funcKey;
-			if (drawerKey.IsNull())
-			{
-				if (obj is SerializedProperty property)
-				{
-					drawerKey = property.propertyType + "_" + property.name;
-				}
-				else
-				{
-					drawerKey = type + "";
-				}
-			}
-			var drawer = DrawerDic[drawerKey];
-			if (!funcKey.IsNull())
-			{
-				if (obj.InvokeFunction(funcKey) is IList itemList)
-				{
-					if (drawer.List.Count != itemList.Count)
-					{
-						drawer.List.Clear();
-						foreach (var item in itemList)
-						{
-							drawer.List.Add(new GUIContent(item.ToGUIContent()));
-						}
-					}
-				}
-			}
-			else if (drawer.List.Count == 0)
-			{
-				if (type.IsAbstract)
-				{
-					foreach (var childType in type.GetAllTypes())
-					{
-						drawer.List.Add(new GUIContent(childType.Name));
-					}
-				}
-				else if (type.IsEnum)
-				{
-					foreach (var name in Enum.GetNames(type))
-					{
-						drawer.List.Add(name.ToGUIContent());
-					}
-				}
-				else if (obj is SerializedProperty property)
-				{
-					drawer.List.Clear();
-					switch (property.propertyType)
-					{
-						case SerializedPropertyType.Enum:
-							{
-								foreach (var item in property.enumNames)
-								{
-									drawer.List.Add(new GUIContent(item));
-								}
-							}
-							break;
-						default:
-							break;
-					}
-				}
-				else
-				{
-					QGUI.LabelField("错误函数" + funcKey);
-				}
-			}
-			if (drawer.List.Count <= 0)
-			{
-				drawer.List.AddCheckExist(new GUIContent("null"));
-			}
-			return drawer;
-		}
-	}
 	[CustomPropertyDrawer(typeof(QEnumAttribute))]
 	public class QEnumDrawer : QNameDrawer
 	{
-		public static object Draw(object obj, QEnumAttribute att)
-		{
-			var str = obj.ToGUIContent().text;
-			using (new GUILayout.HorizontalScope())
-			{
-				var data = QEnumListData.Get(obj?.GetType(), att.funcKey);
-				data.UpdateList(str);
-				if (data.SelectIndex < 0)
-				{
-					data.SelectIndex = 0;
-					str = data.SelectValue;
-				}
-				var newIndex = EditorGUILayout.Popup(data.SelectIndex, data.List.ToArray());
-				if (newIndex != data.SelectIndex)
-				{
-					data.SelectIndex = newIndex;
-					if (data.SelectIndex >= 0)
-					{
-						str = data.SelectValue;
-					}
-				}
-			}
-			return str;
-		}
+	
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
 			if (!property.IsShow()) return;
