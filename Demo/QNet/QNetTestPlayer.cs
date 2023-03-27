@@ -34,7 +34,7 @@ public class QNetTestPlayer : QNetBehaviour
 		var pos = PlayerValue("目标", Tool.RayCastPlane(Camera.main.ScreenPointToRay(QDemoInput.PointerPosition),Vector3.up,transform.position));
 		transform.LookAt(pos);
 		shootTimer.Check(NetDeltaTime, false);
-		if (PlayerValue("射击",QDemoInput.Attack)&&shootTimer.Check())
+		if (PlayerValue("射击",QDemoInput.PointerPress)&&shootTimer.Check())
 		{
 			var bullet= Instantiate(bulletPrefab, transform.position, transform.rotation);
 			bullet.GetComponent<QNetTestBullet>().Player = this;

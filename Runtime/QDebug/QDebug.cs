@@ -16,40 +16,8 @@ namespace QTool
 		internal static QAverageValue Fps = new QAverageValue();
 		static bool DebugPanelShow = false;
 		private static QToolBar toolBar = null;
-		[System.Diagnostics.Conditional("DEVELOPMENT_BUILD"), System.Diagnostics.Conditional("UNITY_EDITOR")]
-		private static void Close()
-		{
-			DebugPanelShow = false;
-			toolBar.CancelSelect();
-		}
-		[System.Diagnostics.Conditional("DEVELOPMENT_BUILD"), System.Diagnostics.Conditional("UNITY_EDITOR")]
-		private static void InitCommond()
-		{
-			if (toolBar == null)
-			{
-				toolBar = new QToolBar();
-				toolBar["关闭"].Value = nameof(Close);
-				foreach (var kv in QCommand.NameDictionary)
-				{
-					if (kv.Value.IsStringCommond)
-					{
-						if (kv.Value.name.SplitTowString("/", out var start, out var end))
-						{
-							toolBar["命令"][start][kv.Key].Value = kv.Value;
-						}
-						else if (kv.Value.fullName.SplitTowString("/", out start, out end))
-						{
-							toolBar["命令"][start][kv.Key].Value = kv.Value;
-						}
-						else
-						{
-							Debug.LogError("命令出错[" + kv.Value.fullName + "]:" + kv.Key);
-						}
-					}
-				}
-			}
-		}
-		static Vector2 ScrollPosition=Vector2.zero;
+
+		static Vector2 ScrollPosition = Vector2.zero;
 		[System.Diagnostics.Conditional("DEVELOPMENT_BUILD"), System.Diagnostics.Conditional("UNITY_EDITOR")]
 		public static void QDebugGUI()
 		{
@@ -83,14 +51,14 @@ namespace QTool
 					}
 				}
 				GUILayout.Space(QGUI.BorderSize);
-				GUILayout.Label("层级",QGUI.BackStyle, GUILayout.Width(QScreen.Width * 0.2f),GUILayout.Height(QGUI.BorderSize*2));
-				using (var scroll=new GUILayout.ScrollViewScope(ScrollPosition,QGUI.BackStyle,GUILayout.Width(QScreen.Width*0.2f)))
+				GUILayout.Label("层级", QGUI.BackStyle, GUILayout.Width(QScreen.Width * 0.2f), GUILayout.Height(QGUI.BorderSize * 2));
+				using (var scroll = new GUILayout.ScrollViewScope(ScrollPosition, QGUI.BackStyle, GUILayout.Width(QScreen.Width * 0.2f)))
 				{
 					for (int i = 0; i < SceneManager.sceneCount; i++)
 					{
 						DrawScene(SceneManager.GetSceneAt(i));
 					}
-					ScrollPosition =scroll.scrollPosition;
+					ScrollPosition = scroll.scrollPosition;
 				}
 				GUILayout.EndArea();
 				QGUI.EndRuntimeGUI();
@@ -99,6 +67,69 @@ namespace QTool
 			{
 				QTime.ChangeScale(nameof(QCommand), 0);
 				DebugPanelShow = true;
+			}
+			else if(InputCircle>720)
+			{
+				QTime.ChangeScale(nameof(QCommand), 0);
+				DebugPanelShow = true;
+			}
+		}
+		[System.Diagnostics.Conditional("DEVELOPMENT_BUILD"), System.Diagnostics.Conditional("UNITY_EDITOR")]
+		private static void Close()
+		{
+			DebugPanelShow = false;
+			toolBar.CancelSelect();
+		}
+		[System.Diagnostics.Conditional("DEVELOPMENT_BUILD"), System.Diagnostics.Conditional("UNITY_EDITOR")]
+		private static void InitCommond()
+		{
+			if (toolBar == null)
+			{
+				toolBar = new QToolBar();
+				toolBar["关闭"].Value = nameof(Close);
+				foreach (var kv in QCommand.NameDictionary)
+				{
+					if (kv.Value.IsStringCommond)
+					{
+						if (kv.Value.name.SplitTowString("/", out var start, out var end))
+						{
+							toolBar["命令"][start][kv.Key].Value = kv.Value;
+						}
+						else if (kv.Value.fullName.SplitTowString("/", out start, out end))
+						{
+							toolBar["命令"][start][kv.Key].Value = kv.Value;
+						}
+						else
+						{
+							Debug.LogError("命令出错[" + kv.Value.fullName + "]:" + kv.Key);
+						}
+					}
+				}
+			}
+		}
+		static Vector2 last = default;
+		static float angle = 0;
+		private static float InputCircle
+		{
+			get
+			{
+				if (!QDemoInput.PointerPress || QDemoInput.PointerPosition.IsNull())
+				{
+					last = default;
+					angle = 0;
+					return angle;
+				}
+				var point = QDemoInput.PointerPosition;
+				if (last.IsNull())
+				{
+					last = point - QScreen.Size / 2;
+					angle = 0;
+					return angle;
+				}
+				point -= QScreen.Size / 2;
+				angle += Vector2.Angle(last, point) * (Vector3.Cross(last, point).z > 0 ? -1:1);
+				last = point;
+				return angle;
 			}
 		}
 		private static void DrawScene(Scene scene)
