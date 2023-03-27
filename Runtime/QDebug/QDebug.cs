@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using Unity.Profiling;
 using UnityEngine;
 using System.Reflection;
+using UnityEngine.SceneManagement;
 
 namespace QTool
 {
@@ -85,19 +86,9 @@ namespace QTool
 				GUILayout.Label("层级",QGUI.BackStyle, GUILayout.Width(QScreen.Width * 0.2f),GUILayout.Height(QGUI.BorderSize*2));
 				using (var scroll=new GUILayout.ScrollViewScope(ScrollPosition,QGUI.BackStyle,GUILayout.Width(QScreen.Width*0.2f)))
 				{
-					for (int i = 0; i < UnityEngine.SceneManagement.SceneManager.sceneCount; i++)
+					for (int i = 0; i < SceneManager.sceneCount; i++)
 					{
-						var scene = UnityEngine.SceneManagement.SceneManager.GetSceneAt(i);
-						GUILayout.Label("场景["+scene.name+"]", QGUI.BackStyle, GUILayout.Height(QGUI.BorderSize * 2));
-						foreach (var obj in scene.GetRootGameObjects())
-						{
-							QGUI.PushContentColor(obj.activeInHierarchy ? Color.white : Color.gray);
-							if (QGUI.Button(obj.name))
-							{
-								obj.SetActive(!obj.activeInHierarchy);
-							}
-							QGUI.PopContentColor();
-						}
+						DrawScene(SceneManager.GetSceneAt(i));
 					}
 					ScrollPosition =scroll.scrollPosition;
 				}
@@ -108,6 +99,19 @@ namespace QTool
 			{
 				QTime.ChangeScale(nameof(QCommand), 0);
 				DebugPanelShow = true;
+			}
+		}
+		private static void DrawScene(Scene scene)
+		{
+			GUILayout.Label("场景[" + scene.name + "]", QGUI.BackStyle, GUILayout.Height(QGUI.BorderSize * 2));
+			foreach (var obj in scene.GetRootGameObjects())
+			{
+				QGUI.PushContentColor(obj.activeInHierarchy ? Color.white : Color.gray);
+				if (QGUI.Button(obj.name))
+				{
+					obj.SetActive(!obj.activeInHierarchy);
+				}
+				QGUI.PopContentColor();
 			}
 		}
 		public static void DebugRun(string key, Action action)
