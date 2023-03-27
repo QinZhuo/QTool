@@ -37,8 +37,10 @@ namespace QTool
 		{
 			try
 			{
+				QGUI.BeginRuntimeGUI();
 				OnGUIEvent?.Invoke();
 				QDebug.QDebugGUI();
+				QGUI.EndRuntimeGUI();
 			}
 			catch (Exception e)
 			{

@@ -294,7 +294,7 @@ namespace QTool
 			{
 				GUILayout.BeginHorizontal();
 				GUILayout.Label(lable, Height);
-				text = GUILayout.TextField(text, Height);
+				text = GUILayout.TextField(text, Height,GUILayout.MinWidth(80));
 				GUILayout.EndHorizontal();
 				return text;
 			}

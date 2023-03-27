@@ -158,15 +158,17 @@ namespace QTool.Net
 			base.DebugGUI();
 			if (ServerActive)
 			{
-				GUILayout.Label(Tool.LocalIp);
+				QGUI.LabelField("本地IP",Tool.LocalIp);
 			}
 			if (!ClientConnected)
 			{
-				ServerIp = GUILayout.TextField(ServerIp, GUILayout.Width(200));
-				if (GUILayout.Button("开启客户端", GUILayout.Width(200), GUILayout.Height(30)))
+				GUILayout.BeginHorizontal();
+				ServerIp = QGUI.TextField("主机IP",ServerIp);
+				if (QGUI.Button("客户端"))
 				{
 					GetComponent<QNetManager>().StartClient(ServerIp);
 				}
+				GUILayout.EndHorizontal();
 			}
 		}
 #endif

@@ -435,16 +435,16 @@ namespace QTool.Net
 
 		private void DebugGUI()
 		{
+			GUILayout.BeginVertical(QGUI.BackStyle);
 			if (NetActive)
 			{
-				GUILayout.BeginVertical("Box");
 				if (transport.ClientConnected)
 				{
-					GUILayout.Label("当前帧" + ClientIndex + "/" + ClientGameData.Count+" "+nameof(NetTime)+":"+new TimeSpan((long)( TimeSpan.TicksPerSecond* NetTime)).ToString(@"hh\:mm\:ss")+" 延迟 "+transport.Ping+" ms");
+					QGUI.LabelField("运行信息" , ClientIndex + "/" + ClientGameData.Count+" "+nameof(NetTime)+":"+new TimeSpan((long)( TimeSpan.TicksPerSecond* NetTime)).ToString(@"hh\:mm\:ss")+" 延迟 "+transport.Ping+" ms");
 				}
-				GUILayout.EndVertical();
 			}
 			transport.DebugGUI();
+			GUILayout.EndVertical();
 		}
 #endif
 

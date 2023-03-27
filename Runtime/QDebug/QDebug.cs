@@ -29,7 +29,6 @@ namespace QTool
 			GUILayout.EndArea();
 			if (DebugPanelShow)
 			{
-				QGUI.BeginRuntimeGUI();
 				GUI.Box(QScreen.AspectGUIRect, "", QGUI.BackStyle);
 				GUILayout.BeginArea(QScreen.AspectGUIRect);
 				InitCommond();
@@ -61,7 +60,6 @@ namespace QTool
 					ScrollPosition = scroll.scrollPosition;
 				}
 				GUILayout.EndArea();
-				QGUI.EndRuntimeGUI();
 			}
 			else if (QDemoInput.Ctrl && QDemoInput.Enter)
 			{
