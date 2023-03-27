@@ -83,6 +83,17 @@ namespace QTool
 			},
 			border = new RectOffset { bottom = RectRaudius, left = RectRaudius, right = RectRaudius, top = RectRaudius },
 		};
+		private static GUIStyle _TextStyle;
+		public static GUIStyle TextStyle => _TextStyle ??= new GUIStyle()
+		{
+			alignment = TextAnchor.MiddleCenter,
+			normal = new GUIStyleState
+			{
+				background = GetBackTexture(new Color32(42, 42, 42, 255), RectRaudius),
+				textColor = new Color32(225, 225, 225, 255),
+			},
+			border = new RectOffset { bottom = RectRaudius, left = RectRaudius, right = RectRaudius, top = RectRaudius },
+		};
 		public const int RectRaudius = 4;
 		private static GUIStyle _AlphaBackStyle;
 		public static GUIStyle AlphaBackStyle => _AlphaBackStyle ??= new GUIStyle()
@@ -294,10 +305,14 @@ namespace QTool
 			{
 				GUILayout.BeginHorizontal();
 				GUILayout.Label(lable, Height);
-				text = GUILayout.TextField(text, Height,GUILayout.MinWidth(80));
+				text = TextField(text);
 				GUILayout.EndHorizontal();
 				return text;
 			}
+		}
+		public static string TextField(string text)
+		{
+			return GUILayout.TextField(text,TextStyle ,Height, GUILayout.MinWidth(80));
 		}
 		public static int IntField(string lable, int value)
 		{
@@ -318,7 +333,7 @@ namespace QTool
 			{
 				GUILayout.BeginHorizontal();
 				GUILayout.Label(lable, Height);
-				var str = GUILayout.TextField(value.ToString(), Height);
+				var str = TextField(value.ToString());
 				GUILayout.EndHorizontal();
 				if (int.TryParse(str, out var newInt))
 				{
@@ -433,7 +448,7 @@ namespace QTool
 			{
 				GUILayout.BeginHorizontal();
 				GUILayout.Label(lable, Height);
-				var str = GUILayout.TextField(value.ToString(), Height);
+				var str = TextField(value.ToString());
 				GUILayout.EndHorizontal();
 				if (long.TryParse(str, out var newInt))
 				{
@@ -464,7 +479,7 @@ namespace QTool
 			{
 				GUILayout.BeginHorizontal();
 				GUILayout.Label(lable, Height);
-				var str = GUILayout.TextField(value.ToString(), Height);
+				var str = TextField(value.ToString());
 				GUILayout.EndHorizontal();
 				if (float.TryParse(str, out var newInt))
 				{
@@ -495,7 +510,7 @@ namespace QTool
 			{
 				GUILayout.BeginHorizontal();
 				GUILayout.Label(lable, Height);
-				var str = GUILayout.TextField(value.ToString(), Height);
+				var str = TextField(value.ToString());
 				GUILayout.EndHorizontal();
 				if (double.TryParse(str, out var newInt))
 				{
