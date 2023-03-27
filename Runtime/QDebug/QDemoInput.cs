@@ -12,7 +12,7 @@ namespace QTool
 			get
 			{
 #if ENABLE_INPUT_SYSTEM
-				return UnityEngine.InputSystem.Mouse.current !=null&&UnityEngine.InputSystem.Mouse.current.leftButton.isPressed;
+				return UnityEngine.InputSystem.Pointer.current !=null&&UnityEngine.InputSystem.Pointer.current.press.isPressed;
 #else
 				return Input.GetKey(KeyCode.Mouse0);
 #endif
@@ -23,7 +23,7 @@ namespace QTool
 			get
 			{
 #if ENABLE_INPUT_SYSTEM
-				return UnityEngine.InputSystem.Mouse.current==null?Vector2.zero:UnityEngine.InputSystem.Mouse.current.position.ReadValue();
+				return UnityEngine.InputSystem.Pointer.current==null?Vector2.zero:UnityEngine.InputSystem.Pointer.current.position.ReadValue();
 #else
 				return Input.mousePosition;
 #endif
