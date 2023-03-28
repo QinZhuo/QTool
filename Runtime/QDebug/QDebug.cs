@@ -49,8 +49,8 @@ namespace QTool
 						Close();
 					}
 				}
-				GUILayout.Space(QGUI.BorderSize);
-				GUILayout.Label("层级", QGUI.BackStyle, GUILayout.Width(QScreen.Width * 0.2f), GUILayout.Height(QGUI.BorderSize * 2));
+				GUILayout.Space(QGUI.Size);
+				GUILayout.Label("场景层级", QGUI.BackStyle, GUILayout.Width(QScreen.Width * 0.2f), GUILayout.Height(QGUI.Size * 2));
 				using (var scroll = new GUILayout.ScrollViewScope(ScrollPosition, QGUI.BackStyle, GUILayout.Width(QScreen.Width * 0.2f)))
 				{
 					for (int i = 0; i < SceneManager.sceneCount; i++)
@@ -132,15 +132,50 @@ namespace QTool
 		}
 		private static void DrawScene(Scene scene)
 		{
-			GUILayout.Label("场景[" + scene.name + "]", QGUI.BackStyle, GUILayout.Height(QGUI.BorderSize * 2));
 			foreach (var obj in scene.GetRootGameObjects())
 			{
+				DrawSceneObject(obj);
+			}
+		}
+
+		private static void DrawSceneObject(GameObject obj)
+		{
+			if (obj == null) return;
+			if (obj.transform.childCount > 0)
+			{
+				GUILayout.BeginHorizontal();
+				var showChild = QGUI.Foldout("", obj.GetHashCode());
 				QGUI.PushContentColor(obj.activeInHierarchy ? Color.white : Color.gray);
 				if (QGUI.Button(obj.name))
 				{
 					obj.SetActive(!obj.activeInHierarchy);
 				}
 				QGUI.PopContentColor();
+				GUILayout.EndHorizontal();
+				if (showChild)
+				{
+					using (new GUILayout.HorizontalScope())
+					{
+						GUILayout.Space(QGUI.Height);
+						using (new GUILayout.VerticalScope())
+						{
+							for (int i = 0; i < obj.transform.childCount; i++)
+							{
+								DrawSceneObject(obj.transform.GetChild(i).gameObject);
+							}
+						}
+					}
+				}
+			}
+			else
+			{
+				GUILayout.BeginHorizontal();
+				GUILayout.Space(QGUI.Height-2);
+				if (QGUI.Button(obj.name))
+				{
+					obj.SetActive(!obj.activeInHierarchy);
+				}
+				GUILayout.EndHorizontal();
 			}
 		}
 		public static void DebugRun(string key, Action action)

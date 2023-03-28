@@ -199,6 +199,7 @@ namespace QTool
 				QToolManager.Instance.OnUpdateEvent -= OnUpdate;
 			}
 		}
+	
 		#region 分辨率设置逻辑
 
 #if PLATFORM_STANDALONE_WIN

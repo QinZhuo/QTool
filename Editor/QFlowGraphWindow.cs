@@ -656,9 +656,9 @@ namespace QTool.FlowGraph
 			EditorGUI.DrawRect(new Rect(1, 21, windowRect.width - 2, 2), QGUI.AlphaBackColor);
 			EditorGUI.DrawRect(new Rect(1, 21, windowRect.width - 2, windowRect.height - 20), QGUI.AlphaBackColor);
 			EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.Space(QGUI.BorderSize*2);
+            EditorGUILayout.Space(QGUI.Size*2);
             EditorGUILayout.BeginVertical();
-			EditorGUILayout.Space(QGUI.BorderSize);
+			EditorGUILayout.Space(QGUI.Size);
 			if (node.command == null)
             {
 				GUILayout.Label("丢失【" + node.commandKey + "】 ",GUILayout.MaxWidth(200));
@@ -668,7 +668,7 @@ namespace QTool.FlowGraph
 				DrawPort(port);
 			}
 			EditorGUILayout.EndVertical();
-            EditorGUILayout.Space(QGUI.BorderSize*2);
+            EditorGUILayout.Space(QGUI.Size*2);
             EditorGUILayout.EndHorizontal();
             if (Event.current.type== EventType.Repaint)
             {
@@ -743,7 +743,7 @@ namespace QTool.FlowGraph
 		Rect DrawDot(Vector2 center,float size,Color color,bool isConnect)
         {
             var rect = new Rect();
-			rect.size = Vector3.one * QGUI.BorderSize * size*1.4f;
+			rect.size = Vector3.one * QGUI.Size * size*1.4f;
             rect.center = center;
 			QGUI.PushColor(color);
 			if (isConnect)
@@ -762,7 +762,7 @@ namespace QTool.FlowGraph
 		void DrawCircle(Vector2 center, Color color)
 		{
 			var rect = new Rect();
-			rect.size = Vector3.one * QGUI.BorderSize*0.8f;
+			rect.size = Vector3.one * QGUI.Size*0.8f;
 			rect.center = center;
 			QGUI.PushColor(color);
 			GUI.DrawTexture(rect, CircleTexture);
@@ -821,12 +821,12 @@ namespace QTool.FlowGraph
 			var connectInfo = Graph.GetConnectInfo(port);
 			if (isOutput)
 			{
-				var center = new Vector2(rect.xMax, rect.y) + Vector2.one * QGUI.BorderSize;
+				var center = new Vector2(rect.xMax, rect.y) + Vector2.one * QGUI.Size;
 				dotRect=DrawDot(center, Equals(connectStartPort, port)?1.2f:1, typeColor, connectInfo.ConnectList.Count > 0 || Equals(connectStartPort, port));
 			}
 			else
 			{
-				var center = rect.position + new Vector2(-QGUI.BorderSize, QGUI.BorderSize);
+				var center = rect.position + new Vector2(-QGUI.Size, QGUI.Size);
 				var canConnect = connectStartPort != null && Graph.GetPort(connectStartPort).CanConnect(connectType);
 				dotRect = DrawDot(center, (canConnect ? 1.2f : 1), typeColor, connectInfo.ConnectList.Count > 0 || Equals(nearPortId, port));
 			}

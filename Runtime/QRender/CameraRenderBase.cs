@@ -4,14 +4,7 @@ using UnityEngine;
 using UnityEngine.Rendering;
 namespace QTool
 {
-    public struct VertexInfo
-    {
-        public Vector3 position;
-        public Vector3 uv;
-        public float x => position.x;
-        public float y => position.y;
-        public float z => position.z;
-	}
+ 
 	public static class QGizmos
 	{
 		static Stack<Matrix4x4> MatrixStack = new Stack<Matrix4x4>();
@@ -45,14 +38,18 @@ namespace QTool
 	}
     public static class QGL
     {
-        public static void Start(Material mat, int pass = 0, bool is2D = true)
+		public readonly static Material DefaultMaterial = new Material(Shader.Find("Unlit/Color"));
+        public static void Start(Material mat = null,bool is2D = true)
         {
-            if (!mat)
-            {
-                Debug.LogError("Please Assign a material on the inspector");
-                return;
-            }
-            mat.SetPass(pass);
+			if (mat != null)
+			{
+				mat.SetPass(0);
+			}
+			else
+			{
+				DefaultMaterial.SetColor("_Color", Color.white);
+				DefaultMaterial.SetPass(0);
+			}
             GL.PushMatrix();
             if (is2D)
             {
@@ -66,19 +63,24 @@ namespace QTool
         /// <summary>
         /// 顺时针三点
         /// </summary>
-        public static void DrawTriangle(VertexInfo a, VertexInfo b, VertexInfo c)
+        public static void DrawTriangle(Vector3 a, Vector3 b, Vector3 c)
         {
-         
             GL.Begin(GL.TRIANGLES);
-            GL.Vertex(a.position);
-            GL.TexCoord(a.uv);
-            GL.Vertex(b.position);
-            GL.TexCoord(a.uv);
-            GL.Vertex(c.position);
-            GL.TexCoord(a.uv);
+            GL.Vertex(a);
+            GL.Vertex(b);
+            GL.Vertex(c);
             GL.End();
         }
-    }
+		public static void DrawQUADS(Rect rect)
+		{
+			GL.Begin(GL.QUADS);
+			GL.Vertex(new Vector3(rect.xMin, rect.yMin));
+			GL.Vertex(new Vector3(rect.xMin, rect.yMax));
+			GL.Vertex(new Vector3(rect.xMax, rect.yMax));
+			GL.Vertex(new Vector3(rect.xMax, rect.yMin));
+			GL.End();
+		}
+	}
 
     public abstract class OnPostRenderBase : MonoBehaviour
     {

@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.Rendering;
+
 namespace QTool
 {
 	public class QToolManager : InstanceManager<QToolManager>
@@ -21,6 +23,7 @@ namespace QTool
 		public event Action OnDestroyEvent = null;
 		public event Action OnLateDestroyEvent = null;
 		public event Action OnGUIEvent = null;
+		public event Action OnPostRenderEvent = null;
 		private void Update()
 		{
 			OnUpdateEvent?.Invoke();
@@ -46,6 +49,22 @@ namespace QTool
 			{
 				Debug.LogError("GUI绘制出错：" + e.ToShortString(1000));
 			}
+		}
+		private void OnEnable()
+		{
+			RenderPipelineManager.endCameraRendering += OnEndCameraRendering;
+		}
+		private void OnDisable()
+		{
+			RenderPipelineManager.endCameraRendering -= OnEndCameraRendering;
+		}
+		private void OnEndCameraRendering(ScriptableRenderContext context, Camera camera)
+		{
+			OnPostRender();
+		}
+		private void OnPostRender()
+		{
+			OnPostRenderEvent?.Invoke();
 		}
 	}
     public abstract class QToolManagerBase<T>:MonoBehaviour where T : QToolManagerBase<T>
