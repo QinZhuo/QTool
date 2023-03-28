@@ -45,11 +45,24 @@ namespace QTool
 			},
 			border = new RectOffset { bottom = RectRaudius, left = RectRaudius, right = RectRaudius, top = RectRaudius },
 		}; 
-		private static GUIStyle _VerticalScrollbar;
-		public static GUIStyle VerticalScrollbarStyle => _VerticalScrollbar ??= new GUIStyle()
+		private static GUIStyle _VerticalScrollbarStyle;
+		public static GUIStyle VerticalScrollbarStyle => _VerticalScrollbarStyle ??= new GUIStyle()
 		{
 			name=nameof(VerticalScrollbarStyle),
 			fixedWidth=15,
+			alignment = TextAnchor.MiddleCenter,
+			normal = new GUIStyleState
+			{
+				background = GetBackTexture(ButtonColor, RectRaudius),
+				textColor = ContentColor,
+			},
+			border = new RectOffset { bottom = RectRaudius, left = RectRaudius, right = RectRaudius, top = RectRaudius },
+		};
+		private static GUIStyle _VerticalScrollbarStyleThumb;
+		public static GUIStyle VerticalScrollbarStyleThumb => _VerticalScrollbarStyleThumb ??= new GUIStyle()
+		{
+			name = nameof(VerticalScrollbarStyleThumb),
+			fixedWidth = 15,
 			alignment = TextAnchor.MiddleCenter,
 			normal = new GUIStyleState
 			{

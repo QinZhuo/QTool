@@ -138,7 +138,12 @@ namespace QTool
 								{
 									using (new GUILayout.HorizontalScope())
 									{
-										memeberInfo.Get(component).Draw(memeberInfo.QName, memeberInfo.Type);
+										var value= memeberInfo.Get(component);
+										var newValue= value.Draw(memeberInfo.QName, memeberInfo.Type);
+										if (!Equals(value, newValue))
+										{
+											memeberInfo.Set(component, newValue);
+										}
 									}
 								}
 							}
@@ -220,9 +225,12 @@ namespace QTool
 		[System.Diagnostics.Conditional("DEVELOPMENT_BUILD"), System.Diagnostics.Conditional("UNITY_EDITOR")]
 		private static void OpenPanel()
 		{
+			GUI.skin.verticalScrollbar = QGUI.VerticalScrollbarStyle;
+			GUI.skin.verticalScrollbarThumb = QGUI.VerticalScrollbarStyleThumb;
 			QTime.ChangeScale(nameof(QDebug), 0);
 			DebugPanelShow = true;
 			GameTexture = new RenderTexture(QScreen.Width/2, QScreen.Width/2, 30);
+			
 		}
 		[System.Diagnostics.Conditional("DEVELOPMENT_BUILD"), System.Diagnostics.Conditional("UNITY_EDITOR")]
 		private static void ClosePanel()
