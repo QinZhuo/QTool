@@ -226,6 +226,7 @@ namespace QTool
 			tex.Apply();
 			return tex;
 		});
+		public static List<Texture2D> Texture2DCache = new List<Texture2D>();
 		public static Texture2D GetTexture(int size = 8)
 		{
 			var tex = new Texture2D(size * 2 + 1, size * 2 + 1);
@@ -237,6 +238,7 @@ namespace QTool
 				}
 			}
 			tex.Apply();
+			Texture2DCache.Add(tex);
 			return tex;
 		}
 		public static Texture2D GetBackTexture(Color color, int radius = 8, int line = 1)
