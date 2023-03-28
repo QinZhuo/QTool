@@ -164,7 +164,7 @@ namespace QTool
 				if (obj is QCommandInfo commandInfo)
 				{
 					GUILayout.BeginHorizontal();
-					QGUI.LabelField(commandInfo.name);
+					QGUI.Label(commandInfo.name);
 					for (int i = 0; i < commandInfo.paramInfos.Length; i++)
 					{
 						var info = commandInfo.paramInfos[i];

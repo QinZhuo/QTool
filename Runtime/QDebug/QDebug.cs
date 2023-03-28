@@ -1,5 +1,3 @@
-
-
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -7,7 +5,7 @@ using Unity.Profiling;
 using UnityEngine;
 using System.Reflection;
 using UnityEngine.SceneManagement;
-
+using QTool.Inspector;
 namespace QTool
 {
 	public static class QDebug
@@ -17,7 +15,8 @@ namespace QTool
 		static bool DebugPanelShow = false;
 		private static QToolBar toolBar = null;
 
-		static Vector2 ScrollPosition = Vector2.zero;
+		static Vector2 LeftScrollPosition = Vector2.zero;
+		static Vector2 RightScrollPosition = Vector2.zero;
 		[System.Diagnostics.Conditional("DEVELOPMENT_BUILD"), System.Diagnostics.Conditional("UNITY_EDITOR")]
 		public static void QDebugGUI()
 		{
@@ -27,9 +26,9 @@ namespace QTool
 			GUILayout.Label(FPS.ToString());
 			GUILayout.EndHorizontal();
 			GUILayout.EndArea();
-			GUILayout.BeginArea(QScreen.AspectGUIRect);
 			if (DebugPanelShow)
 			{
+				GUILayout.BeginArea(QScreen.AspectGUIRect,QGUI.BackStyle);
 				InitCommond();
 				GUILayout.BeginHorizontal(QGUI.BackStyle);
 				var select = toolBar.Draw();
@@ -39,36 +38,157 @@ namespace QTool
 					if (QGUI.Button("运行命令"))
 					{
 						qCommand.Invoke(qCommand.TempValues.ToArray());
-						Close();
+						ClosePanel();
 					}
 				}
-				else if (nameof(Close).Equals(select))
+				else if (nameof(ClosePanel).Equals(select))
 				{
-					Close();
+					ClosePanel();
 				}
 				GUILayout.EndHorizontal();
-				GUILayout.Label("场景层级", QGUI.BackStyle, GUILayout.Width(QScreen.Width * 0.2f), GUILayout.Height(QGUI.Height));
-				using (var scroll = new GUILayout.ScrollViewScope(ScrollPosition, QGUI.BackStyle, GUILayout.Width(QScreen.Width * 0.2f)))
+				using (new GUILayout.HorizontalScope())
 				{
-					for (int i = 0; i < SceneManager.sceneCount; i++)
+					using (new GUILayout.VerticalScope(GUILayout.Width(QScreen.Width * 0.2f)))
 					{
-						DrawScene(SceneManager.GetSceneAt(i));
+						GUILayout.Label("场景层级", QGUI.BackStyle, GUILayout.Height(QGUI.Height));
+						using (var scroll = new GUILayout.ScrollViewScope(LeftScrollPosition, false, false, QGUI.VerticalScrollbarStyle, QGUI.VerticalScrollbarStyle, QGUI.BackStyle))
+						{
+							for (int i = 0; i < SceneManager.sceneCount; i++)
+							{
+								DrawScene(SceneManager.GetSceneAt(i));
+							}
+							DrawScene(DontDestroyScene);
+							LeftScrollPosition = scroll.scrollPosition;
+						}
 					}
-					DrawScene(DontDestroyScene);
-					ScrollPosition = scroll.scrollPosition;
+					if (Camera.main != null)
+					{
+						Camera.main.targetTexture = GameTexture;
+						Camera.main.Render();
+						GUI.DrawTexture(GUILayoutUtility.GetAspectRect(QScreen.Aspect), GameTexture);
+						Camera.main.targetTexture = null;
+					}
+					else
+					{
+						GUI.DrawTexture(GUILayoutUtility.GetAspectRect(QScreen.Aspect), GameTexture);
+					}
+					using (new GUILayout.VerticalScope(GUILayout.Width(QScreen.Width * 0.2f)))
+					{
+						GUILayout.Label("物体属性", QGUI.BackStyle, GUILayout.Height(QGUI.Height));
+						using (var scroll = new GUILayout.ScrollViewScope(RightScrollPosition, false, false, QGUI.VerticalScrollbarStyle, QGUI.VerticalScrollbarStyle, QGUI.BackStyle))
+						{
+							DrawSelectObject();
+							RightScrollPosition = scroll.scrollPosition;
+						}
+					}
+					
+				}
+				GUILayout.EndArea();
+			}
+			else if(Event.current.type!= EventType.Layout)
+			{
+				if ((QDemoInput.Ctrl && QDemoInput.Enter)|| InputCircle > 720)
+				{
+					OpenPanel();
 				}
 			}
-			else if (QDemoInput.Ctrl && QDemoInput.Enter)
+		}
+		static QDictionary<int, List<GameObject>> rootGameObjects = new QDictionary<int, List<GameObject>>((key) => new List<GameObject>());
+		private static void DrawScene(Scene scene)
+		{
+			GUILayout.Label(scene.name, QGUI.BackStyle);
+			scene.GetRootGameObjects(rootGameObjects[scene.handle]);
+			foreach (var obj in rootGameObjects[scene.handle])
 			{
-				QTime.ChangeScale(nameof(QDebug), 0);
-				DebugPanelShow = true;
+				DrawSceneObject(obj);
 			}
-			else if (InputCircle > 720)
+		}
+
+		public static GameObject SelectObject { get; private set; }
+		private static void DrawSelectObject()
+		{
+			if (SelectObject != null)
 			{
-				QTime.ChangeScale(nameof(QDebug), 0);
-				DebugPanelShow = true;
+				using (new GUILayout.HorizontalScope())
+				{
+					if (QGUI.Toggle("", SelectObject.activeSelf) != SelectObject.activeSelf)
+					{
+						SelectObject.SetActive(!SelectObject.activeSelf);
+					}
+					SelectObject.name = GUILayout.TextField(SelectObject.name, QGUI.TextFieldStyle, QGUI.HeightLayout, GUILayout.ExpandWidth(true));
+				}
+
+				foreach (var component in SelectObject.GetComponents<Component>())
+				{
+					if (component == null) continue;
+					var typeInfo = QInspectorType.Get(component.GetType());
+					var show = false;
+					using (new GUILayout.HorizontalScope(QGUI.BackStyle))
+					{
+						show = QGUI.Foldout(typeInfo.Type.Name);
+					}
+					if (show)
+					{
+						using (new GUILayout.HorizontalScope())
+						{
+							GUILayout.Space(QGUI.Height);
+							using (new GUILayout.VerticalScope())
+							{
+								foreach (var memeberInfo in typeInfo.Members)
+								{
+									using (new GUILayout.HorizontalScope())
+									{
+										memeberInfo.Get(component).Draw(memeberInfo.QName, memeberInfo.Type);
+									}
+								}
+							}
+						}
+					}
+				}
 			}
-			GUILayout.EndArea();
+		}
+		private static void DrawSceneObject(GameObject obj)
+		{
+			if (obj == null) return;
+			if (SelectObject == obj)
+			{
+				GUILayout.BeginHorizontal(QGUI.SelectStyle);
+			}
+			else
+			{
+				GUILayout.BeginHorizontal();
+			}
+			var showChild = false;
+			if (obj.transform.childCount > 0)
+			{
+				showChild = QGUI.Foldout("", obj.GetHashCode());
+			}
+			else
+			{
+				GUILayout.Space(QGUI.Height);
+			}
+
+			QGUI.PushContentColor(obj.activeInHierarchy ? Color.white : Color.gray);
+			if (GUILayout.Button(obj.name, QGUI.LabelStyle, QGUI.HeightLayout))
+			{
+				SelectObject = obj;
+			}
+			QGUI.PopContentColor();
+			GUILayout.EndHorizontal();
+			if (showChild)
+			{
+				using (new GUILayout.HorizontalScope())
+				{
+					GUILayout.Space(QGUI.Height);
+					using (new GUILayout.VerticalScope())
+					{
+						for (int i = 0; i < obj.transform.childCount; i++)
+						{
+							DrawSceneObject(obj.transform.GetChild(i).gameObject);
+						}
+					}
+				}
+			}
 		}
 		private static Scene? _DontDestroyScene = null;
 		public static Scene DontDestroyScene => _DontDestroyScene ??= GetDontDestroyOnLoadScene();
@@ -96,12 +216,22 @@ namespace QTool
 					GameObject.DestroyImmediate(temp);
 			}
 		}
+		private static RenderTexture GameTexture = null;
 		[System.Diagnostics.Conditional("DEVELOPMENT_BUILD"), System.Diagnostics.Conditional("UNITY_EDITOR")]
-		private static void Close()
+		private static void OpenPanel()
+		{
+			QTime.ChangeScale(nameof(QDebug), 0);
+			DebugPanelShow = true;
+			GameTexture = new RenderTexture(QScreen.Width/2, QScreen.Width/2, 30);
+		}
+		[System.Diagnostics.Conditional("DEVELOPMENT_BUILD"), System.Diagnostics.Conditional("UNITY_EDITOR")]
+		private static void ClosePanel()
 		{
 			DebugPanelShow = false;
 			QTime.RevertScale(nameof(QDebug));
 			toolBar.CancelSelect();
+			GameTexture.Release();
+			GameTexture = null;
 		}
 		[System.Diagnostics.Conditional("DEVELOPMENT_BUILD"), System.Diagnostics.Conditional("UNITY_EDITOR")]
 		private static void InitCommond()
@@ -109,7 +239,7 @@ namespace QTool
 			if (toolBar == null)
 			{
 				toolBar = new QToolBar();
-				toolBar["关闭"].Value = nameof(Close);
+				toolBar["关闭"].Value = nameof(ClosePanel);
 				foreach (var kv in QCommand.NameDictionary)
 				{
 					if (kv.Value.IsStringCommond)
@@ -155,57 +285,7 @@ namespace QTool
 				return angle;
 			}
 		}
-		private static void DrawScene(Scene scene)
-		{
-			GUILayout.Label(scene.name,QGUI.BackStyle);
-			foreach (var obj in scene.GetRootGameObjects())
-			{
-				DrawSceneObject(obj);
-			}
-		}
-
-		private static void DrawSceneObject(GameObject obj)
-		{
-			if (obj == null) return;
-			if (obj.transform.childCount > 0)
-			{
-				GUILayout.BeginHorizontal();
-				var showChild = QGUI.Foldout("", obj.GetHashCode());
-				QGUI.PushContentColor(obj.activeInHierarchy ? Color.white : Color.gray);
-				if (QGUI.Button(obj.name))
-				{
-					obj.SetActive(!obj.activeInHierarchy);
-				}
-				QGUI.PopContentColor();
-				GUILayout.EndHorizontal();
-				if (showChild)
-				{
-					using (new GUILayout.HorizontalScope())
-					{
-						GUILayout.Space(QGUI.Height);
-						using (new GUILayout.VerticalScope())
-						{
-							for (int i = 0; i < obj.transform.childCount; i++)
-							{
-								DrawSceneObject(obj.transform.GetChild(i).gameObject);
-							}
-						}
-					}
-				}
-			}
-			else
-			{
-				GUILayout.BeginHorizontal();
-				GUILayout.Space(QGUI.Height);
-				QGUI.PushContentColor(obj.activeInHierarchy ? Color.white : Color.gray);
-				if (QGUI.Button(obj.name))
-				{
-					obj.SetActive(!obj.activeInHierarchy);
-				}
-				QGUI.PopContentColor();
-				GUILayout.EndHorizontal();
-			}
-		}
+	
 		public static void DebugRun(string key, Action action)
 		{
 			GC.Collect();

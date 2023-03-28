@@ -5,23 +5,23 @@ using System;
 using QTool.Inspector;
 using QTool.Reflection;
 using System.Reflection;
-using QTool.FlowGraph;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
 namespace QTool
 {
-	
+
 	public static class QGUI
 	{
-		public static Color BackColor { get; private set; } = new Color32(32, 32, 32, 255);
+		public static Color SelectColor { get; private set; } = new Color32(15, 129, 190, 100);
+		public static Color BackColor { get; private set; } = new Color32(45, 45, 45, 255);
 		public static Color AlphaBackColor { get; private set; } = new Color32(0, 0, 0, 40);
 		public static Color ContentColor { get; private set; } = new Color32(225, 225, 225, 255);
 		public static Color ButtonColor { get; private set; } = new Color32(70, 70, 70, 255);
-		private static Texture2D _BackTexture = null;
-		private static GUIStyle _btnStyle;
-		public static GUIStyle ButtonStyle => _btnStyle ??= new GUIStyle()
+		private static GUIStyle _ButtonStyle;
+		public static GUIStyle ButtonStyle => _ButtonStyle ??= new GUIStyle()
 		{
+			name = nameof(ButtonStyle),
 			alignment = TextAnchor.MiddleCenter,
 			normal = new GUIStyleState
 			{
@@ -44,37 +44,78 @@ namespace QTool
 				textColor = ContentColor,
 			},
 			border = new RectOffset { bottom = RectRaudius, left = RectRaudius, right = RectRaudius, top = RectRaudius },
+		}; 
+		private static GUIStyle _VerticalScrollbar;
+		public static GUIStyle VerticalScrollbarStyle => _VerticalScrollbar ??= new GUIStyle()
+		{
+			name=nameof(VerticalScrollbarStyle),
+			fixedWidth=15,
+			alignment = TextAnchor.MiddleCenter,
+			normal = new GUIStyleState
+			{
+				background = GetBackTexture(ButtonColor, RectRaudius),
+				textColor = ContentColor,
+			},
+			border = new RectOffset { bottom = RectRaudius, left = RectRaudius, right = RectRaudius, top = RectRaudius },
 		};
 		private static GUIStyle _ToggleStyle;
 		public static GUIStyle ToggleStyle => _ToggleStyle ??= new GUIStyle()
 		{
+			name = nameof(ToggleStyle),
 			alignment = TextAnchor.MiddleCenter,
 			normal = new GUIStyleState
 			{
-				background =GetTexture(35).DrawCircle(ButtonColor,20).DrawCircle(Color.black, 15),
+				background =GetTexture(34).DrawCircle(ButtonColor,20).DrawCircle(Color.black, 15),
 				textColor = ContentColor,
 			},
 			onNormal = new GUIStyleState
 			{
-				background = GetTexture(35).DrawCircle(ButtonColor, 20).DrawCircle(Color.black, 15).DrawCircle(ButtonColor, 10),
+				background = GetTexture(34).DrawCircle(ButtonColor, 20).DrawCircle(Color.black, 15).DrawCircle(ButtonColor, 10),
 				textColor = ContentColor,
 			},
 		};
-		private static GUIStyle _TextStyle;
-		public static GUIStyle TextStyle => _TextStyle ??= new GUIStyle()
+		private static GUIStyle _LabelStyle;
+		public static GUIStyle LabelStyle => _LabelStyle ??= new GUIStyle()
 		{
+			name = nameof(LabelStyle),
+			normal = new GUIStyleState
+			{
+				textColor = ContentColor,
+			},
+			border = new RectOffset(RectRaudius, RectRaudius, RectRaudius, RectRaudius),
+			padding = new RectOffset ( RectRaudius, RectRaudius, RectRaudius, RectRaudius),
+			alignment = TextAnchor.MiddleLeft,
+		};
+		private static GUIStyle _SelectStyle;
+		public static GUIStyle SelectStyle => _SelectStyle ??= new GUIStyle()
+		{
+			name = nameof(SelectStyle),
+			normal = new GUIStyleState
+			{
+				background=GetBackTexture(SelectColor, RectRaudius),
+				textColor = ContentColor,
+			},
+			border = new RectOffset(RectRaudius, RectRaudius, RectRaudius, RectRaudius),
+		};
+		private static GUIStyle _TextFieldStyle;
+		public static GUIStyle TextFieldStyle => _TextFieldStyle ??= new GUIStyle()
+		{
+			name = nameof(TextFieldStyle),
 			normal = new GUIStyleState
 			{
 				background = GetBackTexture(AlphaBackColor, RectRaudius),
 				textColor = ContentColor,
 			},
-			border = new RectOffset { bottom = RectRaudius, left = RectRaudius, right = RectRaudius, top = RectRaudius },
-			alignment= TextAnchor.MiddleLeft,
+			
+			border = new RectOffset(RectRaudius, RectRaudius, RectRaudius, RectRaudius),
+			padding = new RectOffset(RectRaudius, RectRaudius, RectRaudius, RectRaudius),
+			alignment = TextAnchor.MiddleLeft,
 		};
 		public const int RectRaudius = 4;
 		private static GUIStyle _AlphaBackStyle;
 		public static GUIStyle AlphaBackStyle => _AlphaBackStyle ??= new GUIStyle()
 		{
+			name = nameof(AlphaBackStyle),
 			alignment = TextAnchor.MiddleCenter,
 			normal = new GUIStyleState
 			{
@@ -86,6 +127,7 @@ namespace QTool
 		private static GUIStyle _BackStyle;
 		public static GUIStyle BackStyle => _BackStyle ??= new GUIStyle()
 		{
+			name = nameof(BackStyle),
 			alignment = TextAnchor.MiddleCenter,
 			normal = new GUIStyleState
 			{
@@ -146,11 +188,11 @@ namespace QTool
 				{
 					if (toolBar.Values.Count > 4)
 					{
-						toolBar.Select = GUILayout.Toolbar(toolBar.Select, toolBar.Values.ToArray(), ButtonStyle, LayoutHeight);
+						toolBar.Select = GUILayout.Toolbar(toolBar.Select, toolBar.Values.ToArray(), ButtonStyle, HeightLayout);
 					}
 					else
 					{
-						toolBar.Select = GUILayout.Toolbar(toolBar.Select, toolBar.Values.ToArray(),ButtonStyle, GUILayout.Width(toolBar.Width * toolBar.Values.Count), LayoutHeight);
+						toolBar.Select = GUILayout.Toolbar(toolBar.Select, toolBar.Values.ToArray(),ButtonStyle, GUILayout.Width(toolBar.Width * toolBar.Values.Count), HeightLayout);
 					}
 				}
 			}
@@ -206,7 +248,7 @@ namespace QTool
 		}
 		public const float Size = 10;
 		public const float Height = Size *3f;
-		public static GUILayoutOption LayoutHeight { get; private set; } = GUILayout.Height(Height);
+		public static GUILayoutOption HeightLayout { get; private set; } = GUILayout.Height(Height);
 		public static QDictionary<int, Action> OnChangeDelayCall = new QDictionary<int, Action>();
 		public static QDictionary<Type, Func<object, string, object>> DrawOverride = new QDictionary<Type, Func<object, string, object>>();
 		public static List<string> TypeMenuList = new List<string>() { typeof(UnityEngine.Object).FullName.Replace('.', '/') };
@@ -225,16 +267,19 @@ namespace QTool
 		{
 			if (width > 0)
 			{
-				return GUILayout.Button(text, ButtonStyle,LayoutHeight, GUILayout.Width(width));
+				return GUILayout.Button(text, ButtonStyle,HeightLayout, GUILayout.Width(width));
 			}
 			else
 			{
 
-				return GUILayout.Button(text, ButtonStyle, LayoutHeight);
+				return GUILayout.Button(text, ButtonStyle, HeightLayout);
 			}
 		}
-
-		public static void LabelField(string name, string value = null)
+		public static void Label(string value)
+		{
+			GUILayout.Label(value, LabelStyle, HeightLayout);
+		}
+		public static void LabelField(string name, string value)
 		{
 #if UNITY_EDITOR
 			if (!IsRuntimeDraw)
@@ -252,8 +297,8 @@ namespace QTool
 #endif
 			{
 				GUILayout.BeginHorizontal();
-				GUILayout.Label(name, LayoutHeight);
-				GUILayout.Label(value, LayoutHeight);
+				GUILayout.Label(name,LabelStyle, HeightLayout);
+				GUILayout.Label(value,LabelStyle, HeightLayout);
 				GUILayout.EndHorizontal();
 			}
 		}
@@ -275,7 +320,7 @@ namespace QTool
 #endif
 			{
 				GUILayout.BeginHorizontal();
-				GUILayout.Label(lable, LayoutHeight);
+				GUILayout.Label(lable, HeightLayout);
 				text = TextField(text);
 				GUILayout.EndHorizontal();
 				return text;
@@ -283,7 +328,7 @@ namespace QTool
 		}
 		public static string TextField(string text)
 		{
-			return GUILayout.TextField(text, TextStyle, LayoutHeight, GUILayout.MinWidth(80));
+			return GUILayout.TextField(text, TextFieldStyle, HeightLayout, GUILayout.MinWidth(Height*3));
 		}
 		public static int IntField(string lable, int value)
 		{
@@ -303,7 +348,7 @@ namespace QTool
 #endif
 			{
 				GUILayout.BeginHorizontal();
-				GUILayout.Label(lable, LayoutHeight);
+				GUILayout.Label(lable, HeightLayout);
 				var str = TextField(value.ToString());
 				GUILayout.EndHorizontal();
 				if (int.TryParse(str, out var newInt))
@@ -327,7 +372,7 @@ namespace QTool
 #endif
 			{
 				GUILayout.BeginHorizontal();
-				GUILayout.Label(select.ToString(),TextStyle, LayoutHeight);
+				GUILayout.Label(values.Get(select).ToString(), LabelStyle, HeightLayout);
 				GUILayout.EndHorizontal();
 				return select;
 			}
@@ -343,7 +388,7 @@ namespace QTool
 #endif
 			{
 				GUILayout.BeginHorizontal();
-				GUILayout.Label(select.ToString(), TextStyle, LayoutHeight);
+				GUILayout.Label(values.Get(select)?.ToString(), LabelStyle, HeightLayout);
 				GUILayout.EndHorizontal();
 				return select;
 			}
@@ -368,8 +413,8 @@ namespace QTool
 				//var dataList= QEnumListData.Get(value,"");
 				GUILayout.BeginHorizontal();
 				// GUILayout.SelectionGrid(dataList.SelectIndex, dataList.List.ToArray(), 1);
-				GUILayout.Label(lable, TextStyle, LayoutHeight);
-				GUILayout.Label(value.ToString(), TextStyle, LayoutHeight);
+				GUILayout.Label(lable, LabelStyle, HeightLayout);
+				GUILayout.Label(value.ToString(), LabelStyle, HeightLayout);
 				GUILayout.EndHorizontal();
 				return value;
 			}
@@ -394,8 +439,8 @@ namespace QTool
 				//var dataList= QEnumListData.Get(value,"");
 				GUILayout.BeginHorizontal();
 				// GUILayout.SelectionGrid(dataList.SelectIndex, dataList.List.ToArray(), 1);
-				GUILayout.Label(lable, TextStyle, LayoutHeight);
-				GUILayout.Label(value.ToString(), TextStyle, LayoutHeight);
+				GUILayout.Label(lable, LabelStyle, HeightLayout);
+				GUILayout.Label(value.ToString(), LabelStyle, HeightLayout);
 				GUILayout.EndHorizontal();
 				return value;
 			}
@@ -418,7 +463,7 @@ namespace QTool
 #endif
 			{
 				GUILayout.BeginHorizontal();
-				GUILayout.Label(lable, TextStyle, LayoutHeight);
+				GUILayout.Label(lable, LabelStyle, HeightLayout);
 				var str = TextField(value.ToString());
 				GUILayout.EndHorizontal();
 				if (long.TryParse(str, out var newInt))
@@ -449,7 +494,7 @@ namespace QTool
 #endif
 			{
 				GUILayout.BeginHorizontal();
-				GUILayout.Label(lable, LayoutHeight);
+				GUILayout.Label(lable, HeightLayout);
 				var str = TextField(value.ToString());
 				GUILayout.EndHorizontal();
 				if (float.TryParse(str, out var newInt))
@@ -480,7 +525,7 @@ namespace QTool
 #endif
 			{
 				GUILayout.BeginHorizontal();
-				GUILayout.Label(lable, TextStyle, LayoutHeight);
+				GUILayout.Label(lable, LabelStyle, HeightLayout);
 				var str = TextField(value.ToString());
 				GUILayout.EndHorizontal();
 				if (double.TryParse(str, out var newInt))
@@ -511,8 +556,8 @@ namespace QTool
 #endif
 			{
 				GUILayout.BeginHorizontal();
-				GUILayout.Label(lable, LayoutHeight);
-				GUILayout.Label(value.ToString(), LayoutHeight);
+				GUILayout.Label(lable, HeightLayout);
+				GUILayout.Label(value.ToString(), HeightLayout);
 				GUILayout.EndHorizontal();
 				return value;
 			}
@@ -534,10 +579,16 @@ namespace QTool
 			else
 #endif
 			{
-				GUILayout.BeginHorizontal();
-				GUILayout.Label(lable, TextStyle, LayoutHeight);
-				value = GUILayout.Toggle(value,"", ToggleStyle, LayoutHeight);
-				GUILayout.EndHorizontal();
+				if (!lable.IsNull())
+				{
+					GUILayout.BeginHorizontal();
+				}
+				value = GUILayout.Toggle(value, "", ToggleStyle, HeightLayout, GUILayout.Width(Height));
+				if (!lable.IsNull())
+				{
+					GUILayout.Label(lable, LabelStyle, HeightLayout);
+					GUILayout.EndHorizontal();
+				}
 				return value;
 			}
 		}
@@ -559,13 +610,15 @@ namespace QTool
 			else
 #endif
 			{
-				if (key.IsNull())
+				if (!key.IsNull())
 				{
-					FoldoutCache[hashCode] = GUILayout.Toggle(FoldoutCache[hashCode], key, ToggleStyle, LayoutHeight,GUILayout.Width(Height));
+					GUILayout.BeginHorizontal();
 				}
-				else
+				FoldoutCache[hashCode] = GUILayout.Toggle(FoldoutCache[hashCode], "", ToggleStyle, HeightLayout,GUILayout.Width(Height));
+				if (!key.IsNull())
 				{
-					FoldoutCache[hashCode] = GUILayout.Toggle(FoldoutCache[hashCode], key, ToggleStyle, LayoutHeight);
+					GUILayout.Label(key, LabelStyle, HeightLayout);
+					GUILayout.EndHorizontal();
 				}
 			}
 			return FoldoutCache[hashCode];
@@ -631,7 +684,7 @@ namespace QTool
 			{
 				if (obj == null)
 				{
-					LabelField(name);
+					Label(name);
 					return obj;
 				}
 				else
@@ -718,7 +771,10 @@ namespace QTool
 										objType = TypeList[newType];
 										obj = objType.CreateInstance();
 									}
-									obj = Draw(obj, name, objType);
+									if (objType != type)
+									{
+										obj = Draw(obj, name, objType);
+									}
 								}
 							}
 							break;
@@ -818,7 +874,7 @@ namespace QTool
 											}
 											else
 											{
-												LabelField(name);
+												Label(name);
 											}
 										}
 										if (!canHideChild || !hasName)
@@ -827,7 +883,7 @@ namespace QTool
 											{
 												if (hasName)
 												{
-													GUILayout.Space(10);
+													GUILayout.Space(Size);
 												}
 												using (new GUILayout.VerticalScope())
 												{
@@ -1197,13 +1253,7 @@ namespace QTool
 			}
 			return EditorGUI.GetPropertyHeight(property, containsChild && property.isExpanded);
 		}
-		public static bool Toggle(string label, bool value, params GUILayoutOption[] options)
-		{
-			PushColor(value ? Color.black : Color.white);
-			value = GUILayout.Toggle(value, label, ToggleStyle, options);
-			PopColor();
-			return value;
-		}
+		
 		static QDictionary<string, string[]> yearCache = new QDictionary<string, string[]>();
 		static QDictionary<string, string[]> monthCache = new QDictionary<string, string[]>();
 		static QDictionary<string, string[]> dayCache = new QDictionary<string, string[]>();
@@ -1629,7 +1679,7 @@ namespace QTool
 #endif
 				else
 				{
-					QGUI.LabelField("错误函数" + funcKey);
+					QGUI.Label("错误函数" + funcKey);
 				}
 			}
 			if (drawer.List.Count <= 0)

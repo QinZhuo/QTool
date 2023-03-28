@@ -57,7 +57,7 @@ namespace QTool
 				GUILayout.Label("事件：" + QAnalysisData.EventList.Count, GUILayout.Width(120));
 				GUILayout.Label("玩家：" + QAnalysisData.Instance.PlayerDataList.Count, GUILayout.Width(80));
 				var editorTest = PlayerPrefs.HasKey(nameof(QAnalysis) + "_EditorTest");
-				var newValue = QGUI.Toggle("编辑器测试", editorTest, GUILayout.Width(100));
+				var newValue = QGUI.Toggle("编辑器测试", editorTest);
 				if (newValue != editorTest)
 				{
 					if (newValue)
