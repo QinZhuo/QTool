@@ -354,10 +354,19 @@ namespace QTool
 				PullAndCommitPush(path,commit);
 			}
 			EditorUtility.ClearProgressBar();
-			UnityEditor.PackageManager.Client.Resolve();
+			AssetDatabase.Refresh();
+			FreshPackage();
+		}
+		public static async void FreshPackage()
+		{
+			var list = Client.List();
+			await list;
+			foreach (var package in list.Result)
+			{
+				Debug.Log("更新[" + package.displayName + " " + package.status);
+			}
 			AssetDatabase.Refresh();
 		}
-	
 		public static string Status(string path)
 		{
 			return PathRun(nameof(Status).ToLower() + " -s "+"\""+Path.GetFullPath( path)+"\"", path);
