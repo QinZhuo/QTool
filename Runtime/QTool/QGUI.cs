@@ -78,12 +78,28 @@ namespace QTool
 			alignment = TextAnchor.MiddleCenter,
 			normal = new GUIStyleState
 			{
-				background =GetTexture(34).DrawCircle(ButtonColor,20).DrawCircle(Color.black, 15).DrawEnd(),
+				background = GetTexture(34).DrawCircle(ButtonColor, 20).DrawCircle(Color.black, 15).DrawEnd(),
 				textColor = ContentColor,
 			},
 			onNormal = new GUIStyleState
 			{
 				background = GetTexture(34).DrawCircle(ButtonColor, 20).DrawCircle(Color.black, 15).DrawCircle(ButtonColor, 10).DrawEnd(),
+				textColor = ContentColor,
+			},
+		};
+		private static GUIStyle _FoldoutStyle;
+		public static GUIStyle FoldoutStyle => _FoldoutStyle ??= new GUIStyle()
+		{
+			name = nameof(FoldoutStyle),
+			alignment = TextAnchor.MiddleCenter,
+			normal = new GUIStyleState
+			{
+				background =GetTexture(32).DrawTriangle(ButtonColor,16).DrawEnd(),
+				textColor = ContentColor,
+			},
+			onNormal = new GUIStyleState
+			{
+				background = GetTexture(32).DrawTriangle(ButtonColor,16,false).DrawEnd(),
 				textColor = ContentColor,
 			},
 		};
@@ -248,6 +264,37 @@ namespace QTool
 		public static Texture2D DrawEnd(this Texture2D tex)
 		{
 			tex.Apply();
+			return tex;
+		}
+		public static Texture2D DrawTriangle(this Texture2D tex, Color color, int radius = 8,bool down=true)
+		{
+			for (int j = 0; j < tex.height; j++)
+			{
+				for (int i = 0; i < tex.width; i++)
+				{
+					var x = i - tex.width / 2+radius;
+					var y = j - tex.height / 2+radius;
+					if (down)
+					{
+						if (x >= radius - y / Mathf.Sqrt(3) &&
+						x <= radius + y / Mathf.Sqrt(3) &&
+						y <= radius * Mathf.Sqrt(3))
+						{
+							tex.SetPixel(i, j, color);
+						}
+					}
+					else
+					{
+						if (y >= radius - x / Mathf.Sqrt(3) &&
+						   y <= radius + x / Mathf.Sqrt(3) &&
+						   x <= radius * Mathf.Sqrt(3))
+						{
+							tex.SetPixel(i, j, color);
+						}
+					}
+					
+				}
+			}
 			return tex;
 		}
 		public static Texture2D DrawCircle(this Texture2D tex, Color color, int radius = 8)
@@ -635,7 +682,7 @@ namespace QTool
 				{
 					GUILayout.BeginHorizontal();
 				}
-				FoldoutCache[hashCode] = GUILayout.Toggle(FoldoutCache[hashCode], "", ToggleStyle, HeightLayout,GUILayout.Width(Height));
+				FoldoutCache[hashCode] = GUILayout.Toggle(FoldoutCache[hashCode], "", FoldoutStyle, HeightLayout,GUILayout.Width(Height));
 				if (!key.IsNull())
 				{
 					GUILayout.Label(key, LabelStyle, HeightLayout);
