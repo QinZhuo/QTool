@@ -78,12 +78,12 @@ namespace QTool
 			alignment = TextAnchor.MiddleCenter,
 			normal = new GUIStyleState
 			{
-				background =GetTexture(34).DrawCircle(ButtonColor,20).DrawCircle(Color.black, 15),
+				background =GetTexture(34).DrawCircle(ButtonColor,20).DrawCircle(Color.black, 15).DrawEnd(),
 				textColor = ContentColor,
 			},
 			onNormal = new GUIStyleState
 			{
-				background = GetTexture(34).DrawCircle(ButtonColor, 20).DrawCircle(Color.black, 15).DrawCircle(ButtonColor, 10),
+				background = GetTexture(34).DrawCircle(ButtonColor, 20).DrawCircle(Color.black, 15).DrawCircle(ButtonColor, 10).DrawEnd(),
 				textColor = ContentColor,
 			},
 		};
@@ -236,11 +236,17 @@ namespace QTool
 					tex.SetPixel(i, j, Color.clear);
 				}
 			}
+			tex.Apply();
 			return tex;
 		}
 		public static Texture2D GetBackTexture(Color color, int radius = 8, int line = 1)
 		{
-			return GetTexture(radius).DrawCircle(Color.Lerp(color, Color.black, 0.5f), radius).DrawCircle(color, radius - 1);
+			return GetTexture(radius).DrawCircle(Color.Lerp(color, Color.black, 0.5f), radius).DrawCircle(color, radius - 1).DrawEnd();
+		}
+		public static Texture2D DrawEnd(this Texture2D tex)
+		{
+			tex.Apply();
+			return tex;
 		}
 		public static Texture2D DrawCircle(this Texture2D tex, Color color, int radius = 8)
 		{
