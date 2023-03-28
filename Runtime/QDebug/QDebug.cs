@@ -229,7 +229,7 @@ namespace QTool
 			GUI.skin.verticalScrollbarThumb = QGUI.VerticalScrollbarStyleThumb;
 			QTime.ChangeScale(nameof(QDebug), 0);
 			DebugPanelShow = true;
-			GameTexture = new RenderTexture(QScreen.Width/2, QScreen.Width/2, 30);
+			GameTexture = new RenderTexture(QScreen.Width/2, QScreen.Height/2, 30);
 			
 		}
 		[System.Diagnostics.Conditional("DEVELOPMENT_BUILD"), System.Diagnostics.Conditional("UNITY_EDITOR")]
