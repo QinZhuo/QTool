@@ -63,12 +63,12 @@ namespace QTool
 			}
 			else if (QDemoInput.Ctrl && QDemoInput.Enter)
 			{
-				QTime.ChangeScale(nameof(QCommand), 0);
+				QTime.ChangeScale(nameof(QDebug), 0);
 				DebugPanelShow = true;
 			}
 			else if(InputCircle>720)
 			{
-				QTime.ChangeScale(nameof(QCommand), 0);
+				QTime.ChangeScale(nameof(QDebug), 0);
 				DebugPanelShow = true;
 			}
 		}
@@ -76,6 +76,7 @@ namespace QTool
 		private static void Close()
 		{
 			DebugPanelShow = false;
+			QTime.RevertScale(nameof(QDebug));
 			toolBar.CancelSelect();
 		}
 		[System.Diagnostics.Conditional("DEVELOPMENT_BUILD"), System.Diagnostics.Conditional("UNITY_EDITOR")]
