@@ -47,7 +47,7 @@ namespace QTool
 			}
 			catch (Exception e)
 			{
-				Debug.LogError("GUI绘制出错：" + e.ToShortString(1000));
+				Debug.LogError("GUI绘制出错：" + e.ToShortString(3000));
 			}
 		}
 		private void OnEnable()

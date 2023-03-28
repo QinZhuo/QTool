@@ -27,27 +27,26 @@ namespace QTool
 			GUILayout.Label(FPS.ToString());
 			GUILayout.EndHorizontal();
 			GUILayout.EndArea();
+			GUILayout.BeginArea(QScreen.AspectGUIRect);
 			if (DebugPanelShow)
 			{
-				GUILayout.BeginArea(QScreen.AspectGUIRect);
 				InitCommond();
-				using (new GUILayout.HorizontalScope(QGUI.BackStyle))
+				GUILayout.BeginHorizontal(QGUI.BackStyle);
+				var select = toolBar.Draw();
+				if (select is QCommandInfo qCommand)
 				{
-					var select = toolBar.Draw();
-					if (select is QCommandInfo qCommand)
+					qCommand.Draw("命令");
+					if (QGUI.Button("运行命令"))
 					{
-						qCommand.Draw("命令");
-						if (QGUI.Button("运行命令"))
-						{
-							qCommand.Invoke(qCommand.TempValues.ToArray());
-							Close();
-						}
-					}
-					else if (nameof(Close).Equals(select))
-					{
+						qCommand.Invoke(qCommand.TempValues.ToArray());
 						Close();
 					}
 				}
+				else if (nameof(Close).Equals(select))
+				{
+					Close();
+				}
+				GUILayout.EndHorizontal();
 				GUILayout.Label("场景层级", QGUI.BackStyle, GUILayout.Width(QScreen.Width * 0.2f), GUILayout.Height(QGUI.Height));
 				using (var scroll = new GUILayout.ScrollViewScope(ScrollPosition, QGUI.BackStyle, GUILayout.Width(QScreen.Width * 0.2f)))
 				{
@@ -58,7 +57,6 @@ namespace QTool
 					DrawScene(DontDestroyScene);
 					ScrollPosition = scroll.scrollPosition;
 				}
-				GUILayout.EndArea();
 			}
 			else if (QDemoInput.Ctrl && QDemoInput.Enter)
 			{
@@ -70,6 +68,7 @@ namespace QTool
 				QTime.ChangeScale(nameof(QDebug), 0);
 				DebugPanelShow = true;
 			}
+			GUILayout.EndArea();
 		}
 		private static Scene? _DontDestroyScene = null;
 		public static Scene DontDestroyScene => _DontDestroyScene ??= GetDontDestroyOnLoadScene();
