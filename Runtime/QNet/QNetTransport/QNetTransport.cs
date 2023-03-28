@@ -201,7 +201,7 @@ namespace QTool.Net
 		{
 			if (!ServerActive)
 			{
-				if (GUILayout.Button("开启主机",QGUI.ButtonStyle, GUILayout.Width(200), GUILayout.Height(30)))
+				if (GUILayout.Button("开启主机", GUILayout.Width(200), GUILayout.Height(30)))
 				{
 					GetComponent<QNetManager>().StartHost();
 				}

@@ -55,48 +55,82 @@ namespace QTool
 	{
 		public static Color BackColor { get; private set; } = new Color32(32, 32, 32, 255);
 		public static Color AlphaBackColor { get; private set; } = new Color32(0, 0, 0, 40);
-		public static Texture2D BackTexture => _BackTexture ??= ColorTexture[BackColor];
-		private static Texture2D _BackTexture = null;
-		private static GUIStyle _btnStyle;
-		public static GUIStyle ButtonStyle => _btnStyle ??= new GUIStyle()
-		{
-			alignment = TextAnchor.MiddleCenter,
-			normal = new GUIStyleState
-			{
-				background = GetBackTexture(new Color32(70, 70, 70, 255), RectRaudius),
-				textColor = new Color32(225, 225, 225, 255),
-			},
-			hover = new GUIStyleState
-			{
-				background = GetBackTexture(new Color32(90, 90, 90, 255), RectRaudius),
-				textColor = new Color32(225, 225, 225, 255),
-			},
-			active = new GUIStyleState
-			{
-				background = GetBackTexture(new Color32(55, 55, 55, 255), RectRaudius),
-				textColor = new Color32(225, 225, 225, 255),
-			},
-			onNormal = new GUIStyleState
-			{
-				background = GetBackTexture(new Color32(80, 80, 80, 255), RectRaudius),
-				textColor = new Color32(225, 225, 225, 255),
-			},
-			border = new RectOffset { bottom = RectRaudius, left = RectRaudius, right = RectRaudius, top = RectRaudius },
-		};
-		private static GUIStyle _TextStyle;
-		public static GUIStyle TextStyle => _TextStyle ??= new GUIStyle()
-		{
-			alignment = TextAnchor.MiddleCenter,
-			normal = new GUIStyleState
-			{
-				background = GetBackTexture(AlphaBackColor, RectRaudius),
-				textColor = new Color32(225, 225, 225, 255),
-			},
-			border = new RectOffset { bottom = RectRaudius, left = RectRaudius, right = RectRaudius, top = RectRaudius },
-		};
+
 		public const int RectRaudius = 4;
-		private static GUIStyle _AlphaBackStyle;
-		public static GUIStyle AlphaBackStyle => _AlphaBackStyle ??= new GUIStyle()
+		private static GUISkin _Skin = null;
+		public static GUISkin Skin => _Skin??= new GUISkin
+		{
+			button= new GUIStyle()
+			{
+				alignment = TextAnchor.MiddleCenter,
+				normal = new GUIStyleState
+				{
+					background = GetBackTexture(new Color32(70, 70, 70, 255), RectRaudius),
+					textColor = new Color32(225, 225, 225, 255),
+				},
+				hover = new GUIStyleState
+				{
+					background = GetBackTexture(new Color32(90, 90, 90, 255), RectRaudius),
+					textColor = new Color32(225, 225, 225, 255),
+				},
+				active = new GUIStyleState
+				{
+					background = GetBackTexture(new Color32(55, 55, 55, 255), RectRaudius),
+					textColor = new Color32(225, 225, 225, 255),
+				},
+				onNormal = new GUIStyleState
+				{
+					background = GetBackTexture(new Color32(80, 80, 80, 255), RectRaudius),
+					textColor = new Color32(225, 225, 225, 255),
+				},
+				border = new RectOffset { bottom = RectRaudius, left = RectRaudius, right = RectRaudius, top = RectRaudius },
+			},
+			textField= new GUIStyle()
+			{
+				alignment = TextAnchor.MiddleCenter,
+				normal = new GUIStyleState
+				{
+					background = GetBackTexture(AlphaBackColor, RectRaudius),
+					textColor = new Color32(225, 225, 225, 255),
+				},
+				border = new RectOffset { bottom = RectRaudius, left = RectRaudius, right = RectRaudius, top = RectRaudius },
+			},
+			scrollView = new GUIStyle()
+			{
+				alignment = TextAnchor.MiddleCenter,
+				normal = new GUIStyleState
+				{
+					background = GetBackTexture(BackColor, RectRaudius),
+					textColor = new Color32(225, 225, 225, 255),
+				},
+				border = new RectOffset(RectRaudius, RectRaudius, RectRaudius, RectRaudius),
+				overflow = new RectOffset(2, 2, 2, 2),
+			},
+			window = new GUIStyle()
+			{
+				alignment = TextAnchor.MiddleCenter,
+				normal = new GUIStyleState
+				{
+					background = GetBackTexture(BackColor, RectRaudius),
+					textColor = new Color32(225, 225, 225, 255),
+				},
+				border = new RectOffset(RectRaudius, RectRaudius, RectRaudius, RectRaudius),
+				overflow = new RectOffset(2, 2, 2, 2),
+			},
+			box = new GUIStyle()
+			{
+				alignment = TextAnchor.MiddleCenter,
+				normal = new GUIStyleState
+				{
+					background = GetBackTexture(BackColor, RectRaudius),
+					textColor = new Color32(225, 225, 225, 255),
+				},
+				border = new RectOffset(RectRaudius, RectRaudius, RectRaudius, RectRaudius),
+				overflow = new RectOffset(2, 2, 2, 2),
+			},
+		};
+		private static GUIStyle _AlphaBackStyle = null;
+		public static GUIStyle AlphaBackStyle => _AlphaBackStyle??= new GUIStyle()
 		{
 			alignment = TextAnchor.MiddleCenter,
 			normal = new GUIStyleState
@@ -106,18 +140,8 @@ namespace QTool
 			border = new RectOffset { bottom = RectRaudius, left = RectRaudius, right = RectRaudius, top = RectRaudius },
 			overflow = new RectOffset(2, 2, 2, 2),
 		};
-		private static GUIStyle _BackStyle;
-		public static GUIStyle BackStyle => _BackStyle ??= new GUIStyle()
-		{
-			alignment = TextAnchor.MiddleCenter,
-			normal = new GUIStyleState
-			{
-				background = GetBackTexture(BackColor, RectRaudius),
-				textColor = new Color32(225, 225, 225, 255),
-			},
-			border = new RectOffset(RectRaudius, RectRaudius, RectRaudius, RectRaudius),
-			overflow = new RectOffset(2, 2, 2, 2),
-		};
+	
+	
 		static Stack<Color> colorStack = new Stack<Color>();
 		public static void PushColor(Color newColor)
 		{
@@ -169,11 +193,11 @@ namespace QTool
 				{
 					if (toolBar.Values.Count > 4)
 					{
-						toolBar.Select = GUILayout.Toolbar(toolBar.Select, toolBar.Values.ToArray(), ButtonStyle, LayoutHeight);
+						toolBar.Select = GUILayout.Toolbar(toolBar.Select, toolBar.Values.ToArray(), LayoutHeight);
 					}
 					else
 					{
-						toolBar.Select = GUILayout.Toolbar(toolBar.Select, toolBar.Values.ToArray(), ButtonStyle, GUILayout.Width(toolBar.Width * toolBar.Values.Count), LayoutHeight);
+						toolBar.Select = GUILayout.Toolbar(toolBar.Select, toolBar.Values.ToArray(), GUILayout.Width(toolBar.Width * toolBar.Values.Count), LayoutHeight);
 					}
 				}
 			}
@@ -232,7 +256,7 @@ namespace QTool
 			return tex;
 		}
 		public const float Size = 10;
-		public const float Height = Size * 3f;
+		public const float Height = Size * 2f;
 		public static GUILayoutOption LayoutHeight { get; private set; } = GUILayout.Height(Height);
 		public static QDictionary<int, Action> OnChangeDelayCall = new QDictionary<int, Action>();
 		public static QDictionary<Type, Func<object, string, object>> DrawOverride = new QDictionary<Type, Func<object, string, object>>();
@@ -243,21 +267,23 @@ namespace QTool
 		public static void BeginRuntimeGUI()
 		{
 			IsRuntimeDraw = true;
+			GUI.skin = Skin;
 		}
 		public static void EndRuntimeGUI()
 		{
 			IsRuntimeDraw = false;
+			GUI.skin = null;
 		}
 		public static bool Button(string text, float width = -1)
 		{
 			if (width > 0)
 			{
-				return GUILayout.Button(text, ButtonStyle, LayoutHeight, GUILayout.Width(width));
+				return GUILayout.Button(text, LayoutHeight, GUILayout.Width(width));
 			}
 			else
 			{
 
-				return GUILayout.Button(text, ButtonStyle, LayoutHeight);
+				return GUILayout.Button(text, LayoutHeight);
 			}
 		}
 
@@ -310,7 +336,7 @@ namespace QTool
 		}
 		public static string TextField(string text)
 		{
-			return GUILayout.TextField(text,TextStyle ,LayoutHeight, GUILayout.MinWidth(80));
+			return GUILayout.TextField(text ,LayoutHeight, GUILayout.MinWidth(80));
 		}
 		public static int IntField(string lable, int value)
 		{
@@ -588,7 +614,7 @@ namespace QTool
 			{
 				if (key.IsNull())
 				{
-					FoldoutCache[hashCode] = GUILayout.Toggle(FoldoutCache[hashCode], key,LayoutHeight,GUILayout.Width(Size*3));
+					FoldoutCache[hashCode] = GUILayout.Toggle(FoldoutCache[hashCode], key,LayoutHeight,GUILayout.Width(Height));
 				}
 				else
 				{

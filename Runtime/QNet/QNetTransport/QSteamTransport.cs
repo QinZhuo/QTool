@@ -137,7 +137,7 @@ namespace QTool.Net
 						{
 							foreach (var lobby in QSteam.LobbyList)
 							{
-								if (GUILayout.Button(lobby.ToString(),QGUI.ButtonStyle, GUILayout.Width(175), GUILayout.Height(40)))
+								if (GUILayout.Button(lobby.ToString(), GUILayout.Width(175), GUILayout.Height(40)))
 								{
 									GetComponent<QNetManager>().StartClient(lobby.SteamID.ToString());
 								}
@@ -145,7 +145,7 @@ namespace QTool.Net
 							ScrollPosition = scroll.scrollPosition;
 						}
 					}
-					if (GUILayout.Button("刷新房间", QGUI.ButtonStyle, GUILayout.Width(200), GUILayout.Height(30)))
+					if (GUILayout.Button("刷新房间", GUILayout.Width(200), GUILayout.Height(30)))
 					{
 						_ = QSteam.FreshLobbys();
 					}

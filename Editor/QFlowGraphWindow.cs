@@ -381,7 +381,7 @@ namespace QTool.FlowGraph
         {
             ViewRange.size = position.size;
             mousePos = Event.current.mousePosition + ViewRange.position;
-			GUI.DrawTexture(new Rect(Vector2.zero, position.size), QGUI.BackTexture);
+			GUI.DrawTexture(new Rect(Vector2.zero, position.size), QGUI.ColorTexture[QGUI.BackColor]);
 			if (Graph==null)
             {
                 if (GUILayout.Button("创建新的QFlowGraph"))

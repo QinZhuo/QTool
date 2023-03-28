@@ -29,10 +29,10 @@ namespace QTool
 			GUILayout.EndArea();
 			if (DebugPanelShow)
 			{
-				GUI.Box(QScreen.AspectGUIRect, "", QGUI.BackStyle);
+				GUI.Box(QScreen.AspectGUIRect, "");
 				GUILayout.BeginArea(QScreen.AspectGUIRect);
 				InitCommond();
-				using (new GUILayout.HorizontalScope(QGUI.BackStyle))
+				using (new GUILayout.HorizontalScope(QGUI.Skin.scrollView))
 				{
 					var select = toolBar.Draw();
 					if (select is QCommandInfo qCommand)
@@ -50,8 +50,8 @@ namespace QTool
 					}
 				}
 				GUILayout.Space(QGUI.Size);
-				GUILayout.Label("场景层级", QGUI.BackStyle, GUILayout.Width(QScreen.Width * 0.2f), GUILayout.Height(QGUI.Size * 2));
-				using (var scroll = new GUILayout.ScrollViewScope(ScrollPosition, QGUI.BackStyle, GUILayout.Width(QScreen.Width * 0.2f)))
+				GUILayout.Label("场景层级", QGUI.Skin.scrollView, GUILayout.Width(QScreen.Width * 0.2f), GUILayout.Height(QGUI.Height));
+				using (var scroll = new GUILayout.ScrollViewScope(ScrollPosition, GUILayout.Width(QScreen.Width * 0.2f)))
 				{
 					for (int i = 0; i < SceneManager.sceneCount; i++)
 					{
@@ -170,11 +170,13 @@ namespace QTool
 			else
 			{
 				GUILayout.BeginHorizontal();
-				GUILayout.Space(QGUI.Height-2);
+				GUILayout.Space(QGUI.Height);
+				QGUI.PushContentColor(obj.activeInHierarchy ? Color.white : Color.gray);
 				if (QGUI.Button(obj.name))
 				{
 					obj.SetActive(!obj.activeInHierarchy);
 				}
+				QGUI.PopContentColor();
 				GUILayout.EndHorizontal();
 			}
 		}
