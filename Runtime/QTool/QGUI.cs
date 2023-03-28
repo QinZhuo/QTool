@@ -272,7 +272,6 @@ namespace QTool
 		public static void EndRuntimeGUI()
 		{
 			IsRuntimeDraw = false;
-			GUI.skin = null;
 		}
 		public static bool Button(string text, float width = -1)
 		{
