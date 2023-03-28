@@ -29,10 +29,9 @@ namespace QTool
 			GUILayout.EndArea();
 			if (DebugPanelShow)
 			{
-				GUI.Box(QScreen.AspectGUIRect, "");
 				GUILayout.BeginArea(QScreen.AspectGUIRect);
 				InitCommond();
-				using (new GUILayout.HorizontalScope(QGUI.Skin.scrollView))
+				using (new GUILayout.HorizontalScope(QGUI.BackStyle))
 				{
 					var select = toolBar.Draw();
 					if (select is QCommandInfo qCommand)
@@ -49,14 +48,14 @@ namespace QTool
 						Close();
 					}
 				}
-				GUILayout.Space(QGUI.Size);
-				GUILayout.Label("场景层级", QGUI.Skin.scrollView, GUILayout.Width(QScreen.Width * 0.2f), GUILayout.Height(QGUI.Height));
-				using (var scroll = new GUILayout.ScrollViewScope(ScrollPosition, GUILayout.Width(QScreen.Width * 0.2f)))
+				GUILayout.Label("场景层级", QGUI.BackStyle, GUILayout.Width(QScreen.Width * 0.2f), GUILayout.Height(QGUI.Height));
+				using (var scroll = new GUILayout.ScrollViewScope(ScrollPosition, QGUI.BackStyle, GUILayout.Width(QScreen.Width * 0.2f)))
 				{
 					for (int i = 0; i < SceneManager.sceneCount; i++)
 					{
 						DrawScene(SceneManager.GetSceneAt(i));
 					}
+					DrawScene(DontDestroyScene);
 					ScrollPosition = scroll.scrollPosition;
 				}
 				GUILayout.EndArea();
@@ -66,10 +65,36 @@ namespace QTool
 				QTime.ChangeScale(nameof(QDebug), 0);
 				DebugPanelShow = true;
 			}
-			else if(InputCircle>720)
+			else if (InputCircle > 720)
 			{
 				QTime.ChangeScale(nameof(QDebug), 0);
 				DebugPanelShow = true;
+			}
+		}
+		private static Scene? _DontDestroyScene = null;
+		public static Scene DontDestroyScene => _DontDestroyScene ??= GetDontDestroyOnLoadScene();
+		private static Scene GetDontDestroyOnLoadScene()
+		{
+			GameObject temp = null;
+			try
+			{
+				temp = new GameObject();
+				GameObject.DontDestroyOnLoad(temp);
+				Scene dontDestroyOnLoad = temp.scene;
+				GameObject.DestroyImmediate(temp);
+				temp = null;
+
+				return dontDestroyOnLoad;
+			}
+			catch (System.Exception e)
+			{
+				Debug.LogException(e);
+				return new Scene();
+			}
+			finally
+			{
+				if (temp != null)
+					GameObject.DestroyImmediate(temp);
 			}
 		}
 		[System.Diagnostics.Conditional("DEVELOPMENT_BUILD"), System.Diagnostics.Conditional("UNITY_EDITOR")]
@@ -133,6 +158,7 @@ namespace QTool
 		}
 		private static void DrawScene(Scene scene)
 		{
+			GUILayout.Label(scene.name,QGUI.BackStyle);
 			foreach (var obj in scene.GetRootGameObjects())
 			{
 				DrawSceneObject(obj);

@@ -734,11 +734,11 @@ namespace QTool.FlowGraph
 				}
 			}
 		}
-		public static Texture2D CircleTexture => _CircleTexture ??= QGUI.GetCircleTexture(Color.white);
+		public static Texture2D CircleTexture => _CircleTexture ??= QGUI.GetTexture(32).DrawCircle(Color.white, 32);
 		static Texture2D _CircleTexture = null;
-		public static Texture2D DotTexture => _DotTexture ??= QGUI.GetCircleTexture(Color.white).DrawCircle(Color.black, 20);
+		public static Texture2D DotTexture => _DotTexture ??= QGUI.GetTexture(32).DrawCircle(Color.white, 32).DrawCircle(Color.black, 20);
 		static Texture2D _DotTexture = null;
-		public static Texture2D DotConnectTexture => _DotConnectTexture??= QGUI.GetCircleTexture(Color.white).DrawCircle(Color.black, 20).DrawCircle(Color.white,15);
+		public static Texture2D DotConnectTexture => _DotConnectTexture ??= QGUI.GetTexture(32).DrawCircle(Color.white, 32).DrawCircle(Color.black, 20).DrawCircle(Color.black, 15);
 		static Texture2D _DotConnectTexture = null;
 		Rect DrawDot(Vector2 center,float size,Color color,bool isConnect)
         {
