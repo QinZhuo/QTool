@@ -50,15 +50,7 @@ namespace QTool
 		public static async void FreshPackage()
 		{
 			StaticButton.SetEnabled(false);
-			var list = Client.List();
-			await list;
-			if (list.Result != null)
-			{
-				foreach (var package in list.Result)
-				{
-					Debug.Log("更新[" + package.displayName + " " + package.status);
-				}
-			}
+			await Client.List();
 			StaticButton.SetEnabled(true);
 		}
 	}
