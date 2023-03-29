@@ -214,14 +214,7 @@ namespace QTool
 				}
 				else
 				{
-					if (toolBar.Values.Count > 4)
-					{
-						toolBar.Select = GUILayout.Toolbar(toolBar.Select, toolBar.Values.ToArray(), ButtonStyle, HeightLayout);
-					}
-					else
-					{
-						toolBar.Select = GUILayout.Toolbar(toolBar.Select, toolBar.Values.ToArray(),ButtonStyle, GUILayout.Width(toolBar.Width * toolBar.Values.Count), HeightLayout);
-					}
+					toolBar.Select = GUILayout.SelectionGrid(toolBar.Select, toolBar.Values.ToArray(),10, ButtonStyle, GUILayout.MinHeight(QGUI.Height));
 				}
 			}
 			return toolBar.Value;

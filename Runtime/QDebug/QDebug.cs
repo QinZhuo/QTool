@@ -19,6 +19,7 @@ namespace QTool
 
 		static Vector2 LeftScrollPosition = Vector2.zero;
 		static Vector2 RightScrollPosition = Vector2.zero;
+		static string ObjectFilter = default;
 		[System.Diagnostics.Conditional("DEVELOPMENT_BUILD"), System.Diagnostics.Conditional("UNITY_EDITOR")]
 		public static void QDebugGUI()
 		{
@@ -56,6 +57,7 @@ namespace QTool
 					using (new GUILayout.VerticalScope(GUILayout.Width(QScreen.Width * 0.2f)))
 					{
 						QGUI.Title("层级");
+						ObjectFilter=QGUI.TextField(ObjectFilter);
 						using (var scroll = new GUILayout.ScrollViewScope(LeftScrollPosition, false, false, QGUI.VerticalScrollbarStyle, QGUI.VerticalScrollbarStyle, QGUI.AlphaBackStyle))
 						{
 							for (int i = 0; i < SceneManager.sceneCount; i++)
@@ -125,7 +127,10 @@ namespace QTool
 			scene.GetRootGameObjects(rootGameObjects[scene.handle]);
 			foreach (var obj in rootGameObjects[scene.handle])
 			{
-				DrawSceneObject(obj);
+				if (ObjectFilter.IsNull() || obj.name.Contains(ObjectFilter))
+				{
+					DrawSceneObject(obj);
+				}
 			}
 		}
 
