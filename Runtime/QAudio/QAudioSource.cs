@@ -161,11 +161,7 @@ namespace QTool
 			if (other.StartAudio)
 			{
 				PlayStart(other.StartAudio.Audio.clip);
-				if (!other.StartAudio.IsPlaying)
-				{
-					other.StartAudio.Stop();
-				}
-				StartAudio.Audio.time = other.StartAudio.Audio.time;
+				StartAudio.Copy(other.StartAudio);
 			}
 			if (other.Audio.isPlaying)
 			{
@@ -174,6 +170,7 @@ namespace QTool
 			else
 			{
 				Audio.clip = other.Audio.clip;
+				Audio.Stop();
 			}
 			Audio.time = other.Audio.time;
 		}
