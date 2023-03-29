@@ -6,6 +6,8 @@ using UnityEngine;
 using System.Reflection;
 using UnityEngine.SceneManagement;
 using QTool.Inspector;
+using UnityEngine.Profiling;
+
 namespace QTool
 {
 	public static class QDebug
@@ -20,12 +22,6 @@ namespace QTool
 		[System.Diagnostics.Conditional("DEVELOPMENT_BUILD"), System.Diagnostics.Conditional("UNITY_EDITOR")]
 		public static void QDebugGUI()
 		{
-			GUILayout.BeginArea(QScreen.AspectGUIRect);
-			GUILayout.BeginHorizontal();
-			GUILayout.FlexibleSpace();
-			GUILayout.Label(FPS.ToString());
-			GUILayout.EndHorizontal();
-			GUILayout.EndArea();
 			if (DebugPanelShow)
 			{
 				GUILayout.BeginArea(QScreen.AspectGUIRect,QGUI.BackStyle);
@@ -50,8 +46,8 @@ namespace QTool
 				{
 					using (new GUILayout.VerticalScope(GUILayout.Width(QScreen.Width * 0.2f)))
 					{
-						GUILayout.Label("场景层级", QGUI.BackStyle, GUILayout.Height(QGUI.Height));
-						using (var scroll = new GUILayout.ScrollViewScope(LeftScrollPosition, false, false, QGUI.VerticalScrollbarStyle, QGUI.VerticalScrollbarStyle, QGUI.BackStyle))
+						QGUI.Title("层级");
+						using (var scroll = new GUILayout.ScrollViewScope(LeftScrollPosition, false, false, QGUI.VerticalScrollbarStyle, QGUI.VerticalScrollbarStyle, QGUI.AlphaBackStyle))
 						{
 							for (int i = 0; i < SceneManager.sceneCount; i++)
 							{
@@ -61,21 +57,30 @@ namespace QTool
 							LeftScrollPosition = scroll.scrollPosition;
 						}
 					}
-					if (Camera.main != null)
+					using (new GUILayout.VerticalScope(GUILayout.Width(QScreen.Width *0.6f)))
 					{
-						Camera.main.targetTexture = GameTexture;
-						Camera.main.Render();
-						GUI.DrawTexture(GUILayoutUtility.GetAspectRect(QScreen.Aspect), GameTexture);
-						Camera.main.targetTexture = null;
-					}
-					else
-					{
-						GUI.DrawTexture(GUILayoutUtility.GetAspectRect(QScreen.Aspect), GameTexture);
+						QGUI.Title("游戏");
+						using (new GUILayout.HorizontalScope(QGUI.AlphaBackStyle, QGUI.HeightLayout))
+						{
+							DebugInfo();
+						}
+						var GameRect = GUILayoutUtility.GetAspectRect(QScreen.Aspect);
+						if (Camera.main != null)
+						{
+							Camera.main.targetTexture = GameTexture;
+							Camera.main.Render();
+							GUI.DrawTexture(GameRect, GameTexture);
+							Camera.main.targetTexture = null;
+						}
+						else
+						{
+							GUI.DrawTexture(GameRect, GameTexture);
+						}
 					}
 					using (new GUILayout.VerticalScope(GUILayout.Width(QScreen.Width * 0.2f)))
 					{
-						GUILayout.Label("物体属性", QGUI.BackStyle, GUILayout.Height(QGUI.Height));
-						using (var scroll = new GUILayout.ScrollViewScope(RightScrollPosition, false, false, QGUI.VerticalScrollbarStyle, QGUI.VerticalScrollbarStyle, QGUI.BackStyle))
+						QGUI.Title("属性");
+						using (var scroll = new GUILayout.ScrollViewScope(RightScrollPosition, false, false, QGUI.VerticalScrollbarStyle, QGUI.VerticalScrollbarStyle, QGUI.AlphaBackStyle))
 						{
 							DrawSelectObject();
 							RightScrollPosition = scroll.scrollPosition;
@@ -85,13 +90,27 @@ namespace QTool
 				}
 				GUILayout.EndArea();
 			}
-			else if(Event.current.type!= EventType.Layout)
+			else
 			{
-				if ((QDemoInput.Ctrl && QDemoInput.Enter)|| InputCircle > 720)
+				GUILayout.BeginArea(QScreen.AspectGUIRect);
+				DebugInfo();
+				GUILayout.EndArea();
+				if (Event.current.type != EventType.Layout )
 				{
-					OpenPanel();
+					if ((QDemoInput.Ctrl && QDemoInput.Enter) || InputCircle > 720)
+					{
+						OpenPanel();
+					}
 				}
 			}
+		}
+		private static void DebugInfo()
+		{
+			GUILayout.BeginHorizontal();
+			QGUI.Label("帧率："+FPS.ToString());
+			QGUI.Label("内存：" +Profiler.GetTotalAllocatedMemoryLong().ToSizeString()+" / " + (SystemInfo.systemMemorySize*1024L*1024L).ToSizeString());
+			QGUI.Label("Mono堆：" + Profiler.GetMonoUsedSizeLong().ToSizeString() + "/" + Profiler.GetMonoHeapSizeLong().ToSizeString());
+			GUILayout.EndHorizontal();
 		}
 		static QDictionary<int, List<GameObject>> rootGameObjects = new QDictionary<int, List<GameObject>>((key) => new List<GameObject>());
 		private static void DrawScene(Scene scene)

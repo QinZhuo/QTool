@@ -21,7 +21,6 @@ namespace QTool
 		private static GUIStyle _ButtonStyle;
 		public static GUIStyle ButtonStyle => _ButtonStyle ??= new GUIStyle()
 		{
-			name = nameof(ButtonStyle),
 			alignment = TextAnchor.MiddleCenter,
 			normal = new GUIStyleState
 			{
@@ -48,7 +47,6 @@ namespace QTool
 		private static GUIStyle _VerticalScrollbarStyle;
 		public static GUIStyle VerticalScrollbarStyle => _VerticalScrollbarStyle ??= new GUIStyle()
 		{
-			name=nameof(VerticalScrollbarStyle),
 			fixedWidth=15,
 			alignment = TextAnchor.MiddleCenter,
 			normal = new GUIStyleState
@@ -61,7 +59,6 @@ namespace QTool
 		private static GUIStyle _VerticalScrollbarStyleThumb;
 		public static GUIStyle VerticalScrollbarStyleThumb => _VerticalScrollbarStyleThumb ??= new GUIStyle()
 		{
-			name = nameof(VerticalScrollbarStyleThumb),
 			fixedWidth = 15,
 			alignment = TextAnchor.MiddleCenter,
 			normal = new GUIStyleState
@@ -74,7 +71,6 @@ namespace QTool
 		private static GUIStyle _ToggleStyle;
 		public static GUIStyle ToggleStyle => _ToggleStyle ??= new GUIStyle()
 		{
-			name = nameof(ToggleStyle),
 			alignment = TextAnchor.MiddleCenter,
 			normal = new GUIStyleState
 			{
@@ -90,23 +86,21 @@ namespace QTool
 		private static GUIStyle _FoldoutStyle;
 		public static GUIStyle FoldoutStyle => _FoldoutStyle ??= new GUIStyle()
 		{
-			name = nameof(FoldoutStyle),
 			alignment = TextAnchor.MiddleCenter,
 			normal = new GUIStyleState
 			{
-				background =GetTexture(32).DrawTriangle(ButtonColor,16).DrawEnd(),
+				background =GetTexture(32).DrawTriangle(ButtonColor,14).DrawEnd(),
 				textColor = ContentColor,
 			},
 			onNormal = new GUIStyleState
 			{
-				background = GetTexture(32).DrawTriangle(ButtonColor,16,false).DrawEnd(),
+				background = GetTexture(32).DrawTriangle(ButtonColor,14,false).DrawEnd(),
 				textColor = ContentColor,
 			},
 		};
 		private static GUIStyle _LabelStyle;
 		public static GUIStyle LabelStyle => _LabelStyle ??= new GUIStyle()
 		{
-			name = nameof(LabelStyle),
 			normal = new GUIStyleState
 			{
 				textColor = ContentColor,
@@ -118,7 +112,6 @@ namespace QTool
 		private static GUIStyle _SelectStyle;
 		public static GUIStyle SelectStyle => _SelectStyle ??= new GUIStyle()
 		{
-			name = nameof(SelectStyle),
 			normal = new GUIStyleState
 			{
 				background=GetBackTexture(SelectColor, RectRaudius),
@@ -129,7 +122,6 @@ namespace QTool
 		private static GUIStyle _TextFieldStyle;
 		public static GUIStyle TextFieldStyle => _TextFieldStyle ??= new GUIStyle()
 		{
-			name = nameof(TextFieldStyle),
 			normal = new GUIStyleState
 			{
 				background = GetBackTexture(AlphaBackColor, RectRaudius),
@@ -141,22 +133,9 @@ namespace QTool
 			alignment = TextAnchor.MiddleLeft,
 		};
 		public const int RectRaudius = 4;
-		private static GUIStyle _AlphaBackStyle;
-		public static GUIStyle AlphaBackStyle => _AlphaBackStyle ??= new GUIStyle()
-		{
-			name = nameof(AlphaBackStyle),
-			alignment = TextAnchor.MiddleCenter,
-			normal = new GUIStyleState
-			{
-				background = GetBackTexture(AlphaBackColor, RectRaudius),
-			},
-			border = new RectOffset { bottom = RectRaudius, left = RectRaudius, right = RectRaudius, top = RectRaudius },
-			overflow = new RectOffset(2, 2, 2, 2),
-		};
-		private static GUIStyle _BackStyle;
+		
 		public static GUIStyle BackStyle => _BackStyle ??= new GUIStyle()
 		{
-			name = nameof(BackStyle),
 			alignment = TextAnchor.MiddleCenter,
 			normal = new GUIStyleState
 			{
@@ -166,6 +145,25 @@ namespace QTool
 			border = new RectOffset(RectRaudius, RectRaudius, RectRaudius, RectRaudius),
 			overflow = new RectOffset(2, 2, 2, 2),
 		};
+		private static GUIStyle _BackStyle;
+		public static GUIStyle AlphaBackStyle => _AlphaBackStyle ??= new GUIStyle(BackStyle)
+		{
+			normal = new GUIStyleState
+			{
+				background = GetBackTexture(AlphaBackColor, RectRaudius),
+				textColor = ContentColor,
+			},
+		}; 
+		private static GUIStyle _AlphaBackStyle;
+		public static GUIStyle TitleStyle => _TitleStyle ??= new GUIStyle(BackStyle)
+		{
+			normal = new GUIStyleState
+			{
+				background = GetBackTexture(new Color32(20,20,20,100), RectRaudius),
+				textColor = ContentColor,
+			},
+		};
+		static GUIStyle _TitleStyle;
 		static Stack<Color> colorStack = new Stack<Color>();
 		public static void PushColor(Color newColor)
 		{
@@ -342,6 +340,10 @@ namespace QTool
 
 				return GUILayout.Button(text, ButtonStyle, HeightLayout);
 			}
+		}
+		public static void Title(string value)
+		{
+			GUILayout.Label(value, TitleStyle, GUILayout.Height(Height/2));
 		}
 		public static void Label(string value)
 		{
@@ -1066,7 +1068,7 @@ namespace QTool
 					{
 						using (new GUILayout.VerticalScope(AlphaBackStyle))
 						{
-							GUILayout.Label(SettingType.QName(), TitleLable);
+							GUILayout.Label(SettingType.QName(), TitleStyle);
 							new SerializedObject(SettingType.InvokeFunction(nameof(QTool.QToolSetting.Instance)) as ScriptableObject).Draw();
 						}
 					}
@@ -1088,8 +1090,7 @@ namespace QTool
 			}
 			GUI.Label(lastRect, info, CenterLable);
 		}
-		public static GUIStyle TitleLable => _titleLabel ??= new GUIStyle(EditorStyles.label) { alignment = TextAnchor.MiddleCenter, fontStyle = FontStyle.Bold };
-		static GUIStyle _titleLabel;
+		
 		public static GUIStyle CenterLable => _centerLable ??= new GUIStyle(EditorStyles.label) { alignment = TextAnchor.MiddleCenter, richText = true };
 		static GUIStyle _centerLable;
 		public static GUIStyle TextArea => _textArea ??= new GUIStyle(EditorStyles.textField) { alignment = TextAnchor.MiddleCenter };
