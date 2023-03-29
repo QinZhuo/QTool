@@ -41,8 +41,12 @@ namespace QTool
 			try
 			{
 				QGUI.BeginRuntimeGUI();
-				OnGUIEvent?.Invoke();
-				QDebug.QDebugGUI();
+				using (new GUILayout.AreaScope(QScreen.AspectGUIRect))
+				{
+					QDebug.DebugInfo();
+					OnGUIEvent?.Invoke();
+				}
+				QDebug.DebugPanel();
 				QGUI.EndRuntimeGUI();
 			}
 			catch (Exception e)

@@ -23,7 +23,7 @@ namespace QTool
 		static string ObjectFilterTemp = default;
 		static QDictionary<Transform, bool> ObjectFilterCache = new QDictionary<Transform, bool>();
 		[System.Diagnostics.Conditional("DEVELOPMENT_BUILD"), System.Diagnostics.Conditional("UNITY_EDITOR")]
-		public static void QDebugGUI()
+		public static void DebugPanel()
 		{
 			if (DebugPanelShow)
 			{
@@ -56,7 +56,7 @@ namespace QTool
 				}
 				using (new GUILayout.HorizontalScope())
 				{
-					using (new GUILayout.VerticalScope(GUILayout.Width(QScreen.Width * 0.2f)))
+					using (new GUILayout.VerticalScope(GUILayout.Width(QScreen.AspectGUIRect.width * 0.2f)))
 					{
 						QGUI.Title("层级");
 						using (new GUILayout.HorizontalScope())
@@ -82,7 +82,7 @@ namespace QTool
 							LeftScrollPosition = scroll.scrollPosition;
 						}
 					}
-					using (new GUILayout.VerticalScope(GUILayout.Width(QScreen.Width *0.6f)))
+					using (new GUILayout.VerticalScope(GUILayout.Width(QScreen.AspectGUIRect.width * 0.6f)))
 					{
 						QGUI.Title("游戏");
 						using (new GUILayout.HorizontalScope(QGUI.AlphaBackStyle, QGUI.HeightLayout))
@@ -102,7 +102,7 @@ namespace QTool
 							GUI.DrawTexture(GameRect, GameTexture);
 						}
 					}
-					using (new GUILayout.VerticalScope(GUILayout.Width(QScreen.Width * 0.2f)))
+					using (new GUILayout.VerticalScope(GUILayout.Width(QScreen.AspectGUIRect.width * 0.2f)))
 					{
 						QGUI.Title("属性");
 						using (var scroll = new GUILayout.ScrollViewScope(RightScrollPosition, QGUI.AlphaBackStyle))
@@ -117,20 +117,18 @@ namespace QTool
 			}
 			else
 			{
-				DebugInfo();
 				if ((QDemoInput.Ctrl && QDemoInput.Enter) || InputCircle > 720)
 				{
 					OpenPanel();
 				}
 			}
 		}
-		private static void DebugInfo()
+		public static void DebugInfo()
 		{
-			GUILayout.BeginHorizontal(QGUI.AlphaBackStyle);
+			GUILayout.BeginHorizontal();
 			GUILayout.FlexibleSpace();
+			QGUI.Label("内存：" + Profiler.GetTotalAllocatedMemoryLong().ToSizeString() + " / " + Profiler.GetTotalReservedMemoryLong().ToSizeString());
 			QGUI.Label("帧率："+FPS.ToString());
-			QGUI.Label("内存：" +Profiler.GetTotalAllocatedMemoryLong().ToSizeString()+" / " + (SystemInfo.systemMemorySize*1024L*1024L).ToSizeString());
-			QGUI.Label("Mono堆：" + Profiler.GetMonoUsedSizeLong().ToSizeString() + "/" + Profiler.GetMonoHeapSizeLong().ToSizeString());
 			GUILayout.EndHorizontal();
 		}
 		static QDictionary<int, List<GameObject>> rootGameObjects = new QDictionary<int, List<GameObject>>((key) => new List<GameObject>());
