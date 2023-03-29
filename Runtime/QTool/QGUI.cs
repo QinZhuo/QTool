@@ -203,18 +203,16 @@ namespace QTool
 			{
 				if (toolBar.Selected)
 				{
-					GUILayout.BeginHorizontal();
-					if (!toolBar.ChildToolBar.Selected && Button("返回", toolBar.Width))
+					var value= toolBar.ChildToolBar.Draw();
+					if (Equals(toolBar.ChildToolBar?.ChildToolBar?.Value, "返回"))
 					{
 						toolBar.CancelSelect();
 					}
-					var result = toolBar.ChildToolBar.Draw();
-					GUILayout.EndHorizontal();
-					return result;
+					return value;
 				}
 				else
 				{
-					toolBar.Select = GUILayout.SelectionGrid(toolBar.Select, toolBar.Values.ToArray(),10, ButtonStyle, GUILayout.MinHeight(QGUI.Height));
+					toolBar.Select = GUILayout.SelectionGrid(toolBar.Select, toolBar.Values.ToArray(),10, ButtonStyle,GUILayout.MinHeight(Height));
 				}
 			}
 			return toolBar.Value;
@@ -1388,8 +1386,8 @@ namespace QTool
 	}
 	public class QToolBar
 	{
-		internal List<string> Values = new List<string>();
-		internal List<QToolBar> ChildToolbars = new List<QToolBar>();
+		internal List<string> Values = new List<string>() ;
+		internal List<QToolBar> ChildToolbars = new List<QToolBar>() ;
 		public QToolBar ChildToolBar => ChildToolbars.Get(Select);
 		public int Select { get; internal set; } = -1;
 		public bool Selected => Select >= 0;
@@ -1414,8 +1412,14 @@ namespace QTool
 				var index = Values.IndexOf(key);
 				if (index < 0)
 				{
+					if (ChildToolbars.Count == 0&&!Value.IsNull())
+					{
+						Values.Add("返回");
+						ChildToolbars.Add(new QToolBar { Value = "返回" });
+					}
 					Values.Add(key);
 					var newToolBar = new QToolBar();
+					newToolBar.Value = key;
 					ChildToolbars.Add(newToolBar);
 					return newToolBar;
 				}
@@ -1424,6 +1428,10 @@ namespace QTool
 					return ChildToolbars[index];
 				}
 			}
+		}
+		public override string ToString()
+		{
+			return Selected?(Value + "/" + ChildToolBar): Value?.ToString();
 		}
 	}
 #if UNITY_EDITOR

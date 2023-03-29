@@ -20,6 +20,7 @@ namespace QTool
 		static Vector2 LeftScrollPosition = Vector2.zero;
 		static Vector2 RightScrollPosition = Vector2.zero;
 		static string ObjectFilter = default;
+		static QDictionary<Transform, bool> ObjectFilterCache = new QDictionary<Transform, bool>();
 		[System.Diagnostics.Conditional("DEVELOPMENT_BUILD"), System.Diagnostics.Conditional("UNITY_EDITOR")]
 		public static void QDebugGUI()
 		{
@@ -57,7 +58,12 @@ namespace QTool
 					using (new GUILayout.VerticalScope(GUILayout.Width(QScreen.Width * 0.2f)))
 					{
 						QGUI.Title("层级");
-						ObjectFilter=QGUI.TextField(ObjectFilter);
+						var newFilter=QGUI.TextField(ObjectFilter)?.ToLower();
+						if(newFilter!= ObjectFilter)
+						{
+							ObjectFilter = newFilter;
+							ObjectFilterCache.Clear();
+						}
 						using (var scroll = new GUILayout.ScrollViewScope(LeftScrollPosition, false, false, QGUI.VerticalScrollbarStyle, QGUI.VerticalScrollbarStyle, QGUI.AlphaBackStyle))
 						{
 							for (int i = 0; i < SceneManager.sceneCount; i++)
@@ -121,16 +127,14 @@ namespace QTool
 			GUILayout.EndHorizontal();
 		}
 		static QDictionary<int, List<GameObject>> rootGameObjects = new QDictionary<int, List<GameObject>>((key) => new List<GameObject>());
+	
 		private static void DrawScene(Scene scene)
 		{
 			GUILayout.Label(scene.name, QGUI.BackStyle);
 			scene.GetRootGameObjects(rootGameObjects[scene.handle]);
 			foreach (var obj in rootGameObjects[scene.handle])
 			{
-				if (ObjectFilter.IsNull() || obj.name.Contains(ObjectFilter))
-				{
-					DrawSceneObject(obj);
-				}
+				DrawSceneObject(obj);
 			}
 		}
 
@@ -182,39 +186,61 @@ namespace QTool
 				}
 			}
 		}
+		private static bool IsShow(Transform transform)
+		{
+			if (ObjectFilter.IsNull()) return true;
+			if (!ObjectFilterCache.ContainsKey(transform))
+			{
+				ObjectFilterCache[transform] = transform.name.ToLower().Contains(ObjectFilter);
+			}
+			return ObjectFilterCache[transform];
+		}
 		private static void DrawSceneObject(GameObject obj)
 		{
 			if (obj == null) return;
-			if (SelectObject == obj)
-			{
-				GUILayout.BeginHorizontal(QGUI.SelectStyle);
-			}
-			else
-			{
-				GUILayout.BeginHorizontal();
-			}
-			var showChild = false;
-			if (obj.transform.childCount > 0)
-			{
-				showChild = QGUI.Foldout("", obj.GetHashCode());
-			}
-			else
-			{
-				GUILayout.Space(QGUI.Height);
-			}
 
-			QGUI.PushContentColor(obj.activeInHierarchy ? Color.white : Color.gray);
-			if (GUILayout.Button(obj.name, QGUI.LabelStyle, QGUI.HeightLayout))
+			var showChild = false;
+			if (IsShow(obj.transform))
 			{
-				SelectObject = obj;
+				if (SelectObject == obj)
+				{
+					GUILayout.BeginHorizontal(QGUI.SelectStyle);
+				}
+				else
+				{
+					GUILayout.BeginHorizontal();
+				}
+				if (ObjectFilter.IsNull())
+				{
+					if (obj.transform.childCount > 0)
+					{
+						showChild = QGUI.Foldout("", obj.GetHashCode());
+					}
+					else
+					{
+						GUILayout.Space(QGUI.Height);
+					}
+				}
+				QGUI.PushContentColor(obj.activeInHierarchy ? Color.white : Color.gray);
+				if (GUILayout.Button(obj.name, QGUI.LabelStyle, QGUI.HeightLayout))
+				{
+					SelectObject = obj;
+				}
+				QGUI.PopContentColor();
+				GUILayout.EndHorizontal();
 			}
-			QGUI.PopContentColor();
-			GUILayout.EndHorizontal();
+			else
+			{
+				showChild = true;
+			}
 			if (showChild)
 			{
 				using (new GUILayout.HorizontalScope())
 				{
-					GUILayout.Space(QGUI.Height);
+					if (ObjectFilter.IsNull())
+					{
+						GUILayout.Space(QGUI.Height);
+					}
 					using (new GUILayout.VerticalScope())
 					{
 						for (int i = 0; i < obj.transform.childCount; i++)
