@@ -22,6 +22,7 @@ namespace QTool
 				var task = Client.Add(CurInfo.packageId);
 				await task;
 				FreshPackage();
+				StaticButton.SetEnabled(true);
 			}
 		});
 		public VisualElement CreateExtensionUI()
@@ -46,15 +47,9 @@ namespace QTool
 				StaticButton.visible = packageInfo.source == PackageSource.Git;
 			}
 		}
-		public static async void FreshPackage()
+		public static void FreshPackage()
 		{
-			StaticButton.SetEnabled(false);
-			await Client.List();
-			if (!EditorApplication.isCompiling)
-			{
-				UnityEditor.Compilation.CompilationPipeline.RequestScriptCompilation();
-			}
-			StaticButton.SetEnabled(true);
+			Client.Resolve();
 		}
 	}
 
