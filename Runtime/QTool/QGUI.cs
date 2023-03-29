@@ -19,23 +19,7 @@ namespace QTool
 		public static Color AlphaBackColor { get; private set; } = new Color32(0, 0, 0, 40);
 		public static Color ContentColor { get; private set; } = new Color32(225, 225, 225, 255);
 		public static Color ButtonColor { get; private set; } = new Color32(70, 70, 70, 255);
-		public static GUISkin Skin => _Skin ??= new GUISkin()
-		{
-			box=BackStyle,
-			font=GUI.skin.font,
-			window=BackStyle,
-			label=LabelStyle,
-			textField=TextFieldStyle,
-			textArea=TextFieldStyle,
-			button=ButtonStyle,
-			scrollView=BackStyle,
-			toggle=ToggleStyle,
-			verticalScrollbar=ScrollbarStyle,
-			verticalScrollbarThumb = ScrollbarStyle,
-			horizontalScrollbar = ScrollbarStyle,
-			horizontalScrollbarThumb = ScrollbarStyle,
-		};
-		private static GUISkin _Skin = null;
+	
 		private static GUIStyle _ButtonStyle;
 		public static GUIStyle ButtonStyle => _ButtonStyle ??= new GUIStyle()
 		{
@@ -331,15 +315,22 @@ namespace QTool
 		public static void BeginRuntimeGUI()
 		{
 			IsRuntimeDraw = true;
-			GUI.skin = Skin;
+			GUI.skin.box = BackStyle;
+			GUI.skin.window = BackStyle;
+			GUI.skin.label = LabelStyle;
+			GUI.skin.textField = TextFieldStyle;
+			GUI.skin.textArea = TextFieldStyle;
+			GUI.skin.button = ButtonStyle;
+			GUI.skin.scrollView = BackStyle;
+			GUI.skin.toggle = ToggleStyle;
+			GUI.skin.verticalScrollbar = ScrollbarStyle;
+			GUI.skin.verticalScrollbarThumb = ScrollbarStyle;
+			GUI.skin.horizontalScrollbar = ScrollbarStyle;
+			GUI.skin.horizontalScrollbarThumb = ScrollbarStyle;
 		}
 		public static void EndRuntimeGUI()
 		{
 			IsRuntimeDraw = false;
-			if (GUI.skin == Skin)
-			{
-				GUI.skin = null;
-			}
 		}
 		public static async Task WaitLayout()
 		{
