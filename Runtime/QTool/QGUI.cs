@@ -46,9 +46,8 @@ namespace QTool
 			},
 			border = new RectOffset { bottom = RectRaudius, left = RectRaudius, right = RectRaudius, top = RectRaudius },
 		}; 
-		public static GUIStyle ScrollbarStyle => _ScrollbarStyle ??= new GUIStyle()
+		private static GUIStyle ScrollbarStyle => _ScrollbarStyle ??= new GUIStyle()
 		{
-			fixedWidth=15,
 			alignment = TextAnchor.MiddleCenter,
 			normal = new GUIStyleState
 			{
@@ -94,6 +93,14 @@ namespace QTool
 		public static GUIStyle LabelStyle => _LabelStyle ??= new GUIStyle()
 		{
 			normal = new GUIStyleState
+			{
+				textColor = ContentColor,
+			},
+			hover = new GUIStyleState
+			{
+				textColor = ContentColor,
+			},
+			active = new GUIStyleState
 			{
 				textColor = ContentColor,
 			},
@@ -327,10 +334,26 @@ namespace QTool
 				Skin.button = ButtonStyle;
 				Skin.scrollView = BackStyle;
 				Skin.toggle = ToggleStyle;
-				Skin.verticalScrollbar = new GUIStyle(ScrollbarStyle);
-				Skin.verticalScrollbarThumb = new GUIStyle(ScrollbarStyle);
-				Skin.horizontalScrollbar = new GUIStyle(ScrollbarStyle);
-				Skin.horizontalScrollbarThumb = new GUIStyle(ScrollbarStyle);
+				Skin.verticalScrollbar = new GUIStyle(ScrollbarStyle)
+				{
+					fixedWidth = Size
+				};
+				Skin.verticalScrollbarThumb = new GUIStyle(ScrollbarStyle)
+				{
+					fixedWidth = Size
+				};
+				Skin.verticalScrollbarUpButton = new GUIStyle(ButtonStyle);
+				Skin.verticalScrollbarDownButton = new GUIStyle(ButtonStyle);
+				Skin.horizontalScrollbar = new GUIStyle(ScrollbarStyle)
+				{
+					fixedHeight = Size
+				};
+				Skin.horizontalScrollbarThumb = new GUIStyle(ScrollbarStyle)
+				{
+					fixedHeight = Size
+				};
+				Skin.horizontalScrollbarLeftButton = new GUIStyle(ButtonStyle);
+				Skin.horizontalScrollbarRightButton = new GUIStyle(ButtonStyle);
 			}
 			GUI.skin = Skin;
 		}
