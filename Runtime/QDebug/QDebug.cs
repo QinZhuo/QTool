@@ -20,6 +20,7 @@ namespace QTool
 		static Vector2 LeftScrollPosition = Vector2.zero;
 		static Vector2 RightScrollPosition = Vector2.zero;
 		static string ObjectFilter = default;
+		static string ObjectFilterTemp = default;
 		static QDictionary<Transform, bool> ObjectFilterCache = new QDictionary<Transform, bool>();
 		[System.Diagnostics.Conditional("DEVELOPMENT_BUILD"), System.Diagnostics.Conditional("UNITY_EDITOR")]
 		public static void QDebugGUI()
@@ -58,13 +59,20 @@ namespace QTool
 					using (new GUILayout.VerticalScope(GUILayout.Width(QScreen.Width * 0.2f)))
 					{
 						QGUI.Title("层级");
-						var newFilter=QGUI.TextField(ObjectFilter)?.ToLower();
-						if(newFilter!= ObjectFilter)
+						using (new GUILayout.HorizontalScope())
 						{
-							ObjectFilter = newFilter;
-							ObjectFilterCache.Clear();
+							ObjectFilterTemp = QGUI.TextField(ObjectFilterTemp)?.ToLower();
+							if (QGUI.Button("过滤"))
+							{
+								ObjectFilter = ObjectFilterTemp;
+								ObjectFilterCache.Clear();
+							}
+							if(ObjectFilterTemp.IsNull())
+							{
+								ObjectFilter = default;
+							}
 						}
-						using (var scroll = new GUILayout.ScrollViewScope(LeftScrollPosition, false, false, QGUI.VerticalScrollbarStyle, QGUI.VerticalScrollbarStyle, QGUI.AlphaBackStyle))
+						using (var scroll = new GUILayout.ScrollViewScope(LeftScrollPosition, QGUI.AlphaBackStyle))
 						{
 							for (int i = 0; i < SceneManager.sceneCount; i++)
 							{
@@ -97,7 +105,7 @@ namespace QTool
 					using (new GUILayout.VerticalScope(GUILayout.Width(QScreen.Width * 0.2f)))
 					{
 						QGUI.Title("属性");
-						using (var scroll = new GUILayout.ScrollViewScope(RightScrollPosition, false, false, QGUI.VerticalScrollbarStyle, QGUI.VerticalScrollbarStyle, QGUI.AlphaBackStyle))
+						using (var scroll = new GUILayout.ScrollViewScope(RightScrollPosition, QGUI.AlphaBackStyle))
 						{
 							DrawSelectObject();
 							RightScrollPosition = scroll.scrollPosition;
@@ -281,8 +289,6 @@ namespace QTool
 		[System.Diagnostics.Conditional("DEVELOPMENT_BUILD"), System.Diagnostics.Conditional("UNITY_EDITOR")]
 		private static async void OpenPanel()
 		{
-			GUI.skin.verticalScrollbar = QGUI.VerticalScrollbarStyle;
-			GUI.skin.verticalScrollbarThumb = QGUI.VerticalScrollbarStyleThumb;
 			await QGUI.WaitLayout();
 			QTime.ChangeScale(nameof(QDebug), 0);
 			DebugPanelShow = true;
