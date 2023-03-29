@@ -26,22 +26,31 @@ namespace QTool
 			{
 				GUILayout.BeginArea(QScreen.AspectGUIRect,QGUI.BackStyle);
 				InitCommond();
-				GUILayout.BeginHorizontal(QGUI.BackStyle);
-				var select = toolBar.Draw();
-				if (select is QCommandInfo qCommand)
+				using (new GUILayout.HorizontalScope(QGUI.BackStyle))
 				{
-					qCommand.Draw("命令");
-					if (QGUI.Button("运行命令"))
+					try
 					{
-						qCommand.Invoke(qCommand.TempValues.ToArray());
-						ClosePanel();
+						var select = toolBar.Draw();
+						if (select is QCommandInfo qCommand)
+						{
+							qCommand.Draw("命令");
+							if (QGUI.Button("运行命令"))
+							{
+								qCommand.Invoke(qCommand.TempValues.ToArray());
+								ClosePanel();
+							}
+						}
+						else if (nameof(ClosePanel).Equals(select))
+						{
+							ClosePanel();
+						}
 					}
+					catch (Exception e)
+					{
+						Debug.LogError("绘制命令UI出错:" + e);
+					}
+					
 				}
-				else if (nameof(ClosePanel).Equals(select))
-				{
-					ClosePanel();
-				}
-				GUILayout.EndHorizontal();
 				using (new GUILayout.HorizontalScope())
 				{
 					using (new GUILayout.VerticalScope(GUILayout.Width(QScreen.Width * 0.2f)))

@@ -442,7 +442,7 @@ namespace QTool
 #endif
 			{
 				GUILayout.BeginHorizontal();
-				GUILayout.Label(values.Get(select).ToString(), LabelStyle, HeightLayout);
+				GUILayout.Label(values?.Get(select)?.ToString(), LabelStyle, HeightLayout);
 				GUILayout.EndHorizontal();
 				return select;
 			}
