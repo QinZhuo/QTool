@@ -104,12 +104,9 @@ namespace QTool
 				GUILayout.BeginArea(QScreen.AspectGUIRect);
 				DebugInfo();
 				GUILayout.EndArea();
-				if (Event.current.type != EventType.Layout )
+				if ((QDemoInput.Ctrl && QDemoInput.Enter) || InputCircle > 720)
 				{
-					if ((QDemoInput.Ctrl && QDemoInput.Enter) || InputCircle > 720)
-					{
-						OpenPanel();
-					}
+					OpenPanel();
 				}
 			}
 		}
@@ -251,22 +248,24 @@ namespace QTool
 		}
 		private static RenderTexture GameTexture = null;
 		[System.Diagnostics.Conditional("DEVELOPMENT_BUILD"), System.Diagnostics.Conditional("UNITY_EDITOR")]
-		private static void OpenPanel()
+		private static async void OpenPanel()
 		{
 			GUI.skin.verticalScrollbar = QGUI.VerticalScrollbarStyle;
 			GUI.skin.verticalScrollbarThumb = QGUI.VerticalScrollbarStyleThumb;
+			await QGUI.WaitLayout();
 			QTime.ChangeScale(nameof(QDebug), 0);
 			DebugPanelShow = true;
 			GameTexture = new RenderTexture(QScreen.Width/2, QScreen.Height/2, 30);
 			
 		}
 		[System.Diagnostics.Conditional("DEVELOPMENT_BUILD"), System.Diagnostics.Conditional("UNITY_EDITOR")]
-		private static void ClosePanel()
+		private static async void ClosePanel()
 		{
+			await QGUI.WaitLayout();
 			DebugPanelShow = false;
 			QTime.RevertScale(nameof(QDebug));
 			toolBar.CancelSelect();
-			GameTexture.Release();
+			GameTexture?.Release();
 			GameTexture = null;
 		}
 		[System.Diagnostics.Conditional("DEVELOPMENT_BUILD"), System.Diagnostics.Conditional("UNITY_EDITOR")]

@@ -5,6 +5,7 @@ using System;
 using QTool.Inspector;
 using QTool.Reflection;
 using System.Reflection;
+using System.Threading.Tasks;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -328,6 +329,10 @@ namespace QTool
 		public static void EndRuntimeGUI()
 		{
 			IsRuntimeDraw = false;
+		}
+		public static async Task WaitLayout()
+		{
+			await QTask.Wait(() => Event.current?.type != EventType.Layout);
 		}
 		public static bool Button(string text, float width = -1)
 		{
