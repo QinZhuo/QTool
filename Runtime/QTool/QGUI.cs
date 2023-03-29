@@ -312,21 +312,27 @@ namespace QTool
 		public static List<Type> TypeList = new List<Type>() { typeof(UnityEngine.Object) };
 
 		private static bool IsRuntimeDraw { get; set; }
+		private static GUISkin Skin { get; set; }
 		public static void BeginRuntimeGUI()
 		{
 			IsRuntimeDraw = true;
-			GUI.skin.box = BackStyle;
-			GUI.skin.window = BackStyle;
-			GUI.skin.label = LabelStyle;
-			GUI.skin.textField = TextFieldStyle;
-			GUI.skin.textArea = TextFieldStyle;
-			GUI.skin.button = ButtonStyle;
-			GUI.skin.scrollView = BackStyle;
-			GUI.skin.toggle = ToggleStyle;
-			GUI.skin.verticalScrollbar = ScrollbarStyle;
-			GUI.skin.verticalScrollbarThumb = ScrollbarStyle;
-			GUI.skin.horizontalScrollbar = ScrollbarStyle;
-			GUI.skin.horizontalScrollbarThumb = ScrollbarStyle;
+			if (Skin == null)
+			{
+				Skin = ScriptableObject.CreateInstance<GUISkin>();
+				Skin.box = BackStyle;
+				Skin.window = BackStyle;
+				Skin.label = LabelStyle;
+				Skin.textField = TextFieldStyle;
+				Skin.textArea = TextFieldStyle;
+				Skin.button = ButtonStyle;
+				Skin.scrollView = BackStyle;
+				Skin.toggle = ToggleStyle;
+				Skin.verticalScrollbar = new GUIStyle(ScrollbarStyle);
+				Skin.verticalScrollbarThumb = new GUIStyle(ScrollbarStyle);
+				Skin.horizontalScrollbar = new GUIStyle(ScrollbarStyle);
+				Skin.horizontalScrollbarThumb = new GUIStyle(ScrollbarStyle);
+			}
+			GUI.skin = Skin;
 		}
 		public static void EndRuntimeGUI()
 		{
