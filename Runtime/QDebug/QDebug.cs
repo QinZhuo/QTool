@@ -117,9 +117,7 @@ namespace QTool
 			}
 			else
 			{
-				GUILayout.BeginArea(QScreen.AspectGUIRect);
 				DebugInfo();
-				GUILayout.EndArea();
 				if ((QDemoInput.Ctrl && QDemoInput.Enter) || InputCircle > 720)
 				{
 					OpenPanel();
@@ -128,7 +126,8 @@ namespace QTool
 		}
 		private static void DebugInfo()
 		{
-			GUILayout.BeginHorizontal();
+			GUILayout.BeginHorizontal(QGUI.AlphaBackStyle);
+			GUILayout.FlexibleSpace();
 			QGUI.Label("帧率："+FPS.ToString());
 			QGUI.Label("内存：" +Profiler.GetTotalAllocatedMemoryLong().ToSizeString()+" / " + (SystemInfo.systemMemorySize*1024L*1024L).ToSizeString());
 			QGUI.Label("Mono堆：" + Profiler.GetMonoUsedSizeLong().ToSizeString() + "/" + Profiler.GetMonoHeapSizeLong().ToSizeString());
