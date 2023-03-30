@@ -362,7 +362,9 @@ namespace QTool.Asset {
 		{
 			if (texture == null || textureImporter.textureType == TextureImporterType.Cursor) return;
 			var setting = QToolSetting.Instance;
-			if (textureImporter.assetPath.EndsWith(".png") && textureImporter.textureType == TextureImporterType.Sprite && textureImporter.spriteImportMode == SpriteImportMode.Single && (texture.width % 4 != 0 || texture.height % 4 != 0))
+			var size = texture.width * texture.height;
+			if (size <= MinCompressionSize|| size >= MaxCompressionSize) return;
+			if (textureImporter.assetPath.EndsWith(".png") && textureImporter.textureType == TextureImporterType.Sprite && textureImporter.spriteImportMode == SpriteImportMode.Single && (texture.width % 4 != 0 || texture.height % 4 != 0) )
 			{
 				var last = textureImporter.isReadable;
 				if (!last)
@@ -396,8 +398,7 @@ namespace QTool.Asset {
 					textureImporter.SaveAndReimport();
 				}
 			}
-			var size = texture.width * texture.height;
-			if (!textureImporter.crunchedCompression && size > MinCompressionSize && size < MaxCompressionSize)
+			if (!textureImporter.crunchedCompression)
 			{
 				QDebug.Log("重新导入图片[" + textureImporter.assetPath + "]");
 
