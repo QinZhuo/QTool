@@ -81,13 +81,13 @@ namespace QTool
 		{
 			await QTask.Wait(time / 2,true);
 			await SceneManager.LoadSceneAsync(sceneName);
-			GCCollect();
+			await GCCollectAsync();
 			await QTask.Wait(time / 2,true);
 		}
-		public static void GCCollect()
+		public static async Task GCCollectAsync()
 		{
-			Resources.UnloadUnusedAssets();
-			System.GC.Collect();
+			await Resources.UnloadUnusedAssets();
+			await Task.Run(GC.Collect);
 		}
 		private static PlayerLoopSystem AddPlayerLoop(this PlayerLoopSystem playerLoop,Type type, Action action)
 		{
