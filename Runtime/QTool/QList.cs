@@ -450,9 +450,9 @@ namespace QTool
 			string[] Suffix = { "Byte", "KB", "MB", "GB", "TB" };
 			int i = 0;
 			double dblSByte = longLength;
-			if (longLength > 1024)
-				for (i = 0; (longLength / 1024) > 0; i++, longLength /= 1024)
-					dblSByte = longLength / 1024.0;
+			if (longLength > 1000)
+				for (i = 0; (longLength / 1000) > 0; i++, longLength /= 1000)
+					dblSByte = longLength / 1000.0;
 			if (i == 0)
 			{
 				return dblSByte.ToString("f0") + "" + Suffix[i];

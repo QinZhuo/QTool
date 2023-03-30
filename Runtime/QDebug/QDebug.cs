@@ -126,8 +126,9 @@ namespace QTool
 		public static void DebugInfo()
 		{
 			GUILayout.BeginHorizontal();
-			GUILayout.FlexibleSpace();
-			QGUI.Label("内存：" + Profiler.GetTotalAllocatedMemoryLong().ToSizeString() + " / " + Profiler.GetTotalReservedMemoryLong().ToSizeString());
+			GUILayout.FlexibleSpace(); 
+			var useSize = Profiler.GetTotalAllocatedMemoryLong();
+			QGUI.Label("内存：" + useSize.ToSizeString() + " / " + (useSize+ Profiler.GetTotalReservedMemoryLong()).ToSizeString());
 			QGUI.Label("帧率："+FPS.ToString());
 			GUILayout.EndHorizontal();
 		}
