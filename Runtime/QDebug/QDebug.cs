@@ -27,9 +27,9 @@ namespace QTool
 		{
 			if (DebugPanelShow)
 			{
-				GUILayout.BeginArea(QScreen.AspectGUIRect,QGUI.BackStyle);
+				GUILayout.BeginArea(QScreen.AspectGUIRect,QGUI.Skin.box);
 				InitCommond();
-				using (new GUILayout.HorizontalScope(QGUI.BackStyle))
+				using (new GUILayout.HorizontalScope(QGUI.Skin.box))
 				{
 					try
 					{
@@ -72,7 +72,7 @@ namespace QTool
 								ObjectFilter = default;
 							}
 						}
-						using (var scroll = new GUILayout.ScrollViewScope(LeftScrollPosition, QGUI.AlphaBackStyle))
+						using (var scroll = new GUILayout.ScrollViewScope(LeftScrollPosition, QGUI.Skin.box))
 						{
 							for (int i = 0; i < SceneManager.sceneCount; i++)
 							{
@@ -85,7 +85,7 @@ namespace QTool
 					using (new GUILayout.VerticalScope(GUILayout.Width(QScreen.AspectGUIRect.width * 0.6f)))
 					{
 						QGUI.Title("游戏");
-						using (new GUILayout.HorizontalScope(QGUI.AlphaBackStyle, QGUI.HeightLayout))
+						using (new GUILayout.HorizontalScope(QGUI.Skin.box, QGUI.HeightLayout))
 						{
 							DebugInfo();
 						}
@@ -105,7 +105,7 @@ namespace QTool
 					using (new GUILayout.VerticalScope(GUILayout.Width(QScreen.AspectGUIRect.width * 0.2f)))
 					{
 						QGUI.Title("属性");
-						using (var scroll = new GUILayout.ScrollViewScope(RightScrollPosition, QGUI.AlphaBackStyle))
+						using (var scroll = new GUILayout.ScrollViewScope(RightScrollPosition, QGUI.Skin.box))
 						{
 							DrawSelectObject();
 							RightScrollPosition = scroll.scrollPosition;
@@ -136,7 +136,7 @@ namespace QTool
 	
 		private static void DrawScene(Scene scene)
 		{
-			GUILayout.Label(scene.name, QGUI.BackStyle);
+			GUILayout.Label(scene.name, QGUI.Skin.box);
 			scene.GetRootGameObjects(rootGameObjects[scene.handle]);
 			foreach (var obj in rootGameObjects[scene.handle])
 			{
@@ -155,7 +155,7 @@ namespace QTool
 					{
 						SelectObject.SetActive(!SelectObject.activeSelf);
 					}
-					SelectObject.name = GUILayout.TextField(SelectObject.name, QGUI.TextFieldStyle, QGUI.HeightLayout, GUILayout.ExpandWidth(true));
+					SelectObject.name = GUILayout.TextField(SelectObject.name, QGUI.Skin.textField, QGUI.HeightLayout, GUILayout.ExpandWidth(true));
 				}
 
 				foreach (var component in SelectObject.GetComponents<Component>())
@@ -163,7 +163,7 @@ namespace QTool
 					if (component == null) continue;
 					var typeInfo = QInspectorType.Get(component.GetType());
 					var show = false;
-					using (new GUILayout.HorizontalScope(QGUI.BackStyle))
+					using (new GUILayout.HorizontalScope(QGUI.Skin.box))
 					{
 						show = QGUI.Foldout(typeInfo.Type.Name);
 					}
@@ -228,7 +228,7 @@ namespace QTool
 					}
 				}
 				QGUI.PushContentColor(obj.activeInHierarchy ? Color.white : Color.gray);
-				if (GUILayout.Button(obj.name, QGUI.LabelStyle, QGUI.HeightLayout))
+				if (GUILayout.Button(obj.name, QGUI.Skin.label, QGUI.HeightLayout))
 				{
 					SelectObject = obj;
 				}

@@ -279,12 +279,12 @@ namespace QTool.Inspector
 			if (property.propertyType == SerializedPropertyType.Boolean)
 			{
 				position.height = 30;
-				QGUI.PushColor(property.boolValue ? Color.black : Color.white);
-				property.boolValue = EditorGUI.Toggle(position, property.boolValue, QGUI.AlphaBackStyle);
+				QGUI.PushColor(property.boolValue ?Color.Lerp(Color.white,Color.black,0.2f): Color.white);
+				if( GUI.Button(position, (attribute as QToggleAttribute).name, QGUI.Skin.button))
+				{
+					property.boolValue = !property.boolValue;
+				}
 				QGUI.PopColor();
-				var style = EditorStyles.largeLabel;
-				style.alignment = TextAnchor.MiddleCenter;
-				EditorGUI.LabelField(position, (attribute as QToggleAttribute).name, style);
 			}
 			else
 			{
