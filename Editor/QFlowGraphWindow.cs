@@ -78,7 +78,11 @@ namespace QTool.FlowGraph
             }
             Instance.titleContent = new GUIContent((graph?.Name== null?"":graph.Name + " - ") + nameof(QFlowGraph));
 			Graph = graph;
-            Instance.ViewRange = new Rect(graph.ViewPos, Instance.position.size);
+			if (Graph == null)
+			{
+				AutoLoadPath();
+			}
+			Instance.ViewRange = new Rect(graph==null?Vector2.zero:graph.ViewPos, Instance.position.size);
 			Instance.Show();
 			Instance.OnSave = OnSave;
 

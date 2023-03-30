@@ -18,7 +18,7 @@ namespace QTool.Asset {
 	{
 
 		#region 资源Id
-		[MenuItem("QTool/资源管理/资源Id/查找当前场景所有Mesh丢失")]
+		[MenuItem("QTool/资源管理/场景资源/查找当前场景所有Mesh丢失")]
 		static void FindAllMeshNull()
 		{
 			var meshs = GameObject.FindObjectsOfType<MeshFilter>();
@@ -208,7 +208,7 @@ namespace QTool.Asset {
 			}
 		}
 
-		[MenuItem("QTool/资源管理/资源Id/解析URL编码资源名")]
+		[MenuItem("QTool/资源管理/资源名/解析URL编码资源名")]
 		public static void ParseURLName()
 		{
 			foreach (var asset in Selection.objects)
@@ -232,7 +232,7 @@ namespace QTool.Asset {
 		#endregion
 		#region 批量处理
 
-		[MenuItem("QTool/资源管理/批量处理/转换动画事件格式")]
+		[MenuItem("QTool/资源管理/批量处理/转换所有动画事件")]
 		static void FreshAnimationEvent()
 		{
 
@@ -287,10 +287,9 @@ namespace QTool.Asset {
 				}
 			}
 		}
-		[MenuItem("QTool/资源管理/批量处理/所有资源格式")]
+		[MenuItem("QTool/资源管理/批量处理/显示所有资源格式")]
 		static void FindAllAssetExtension()
 		{
-
 			QDictionary<string, string> list = new QDictionary<string, string>();
 			foreach (var path in AssetDatabase.GetAllAssetPaths())
 			{
@@ -299,21 +298,7 @@ namespace QTool.Asset {
 			}
 			Debug.LogError(list.ToOneString());
 		}
-		[MenuItem("QTool/资源管理/批量处理/删除图集")]
-		public static void DeleteAllAtlas()
-		{
-			foreach (var path in AssetDatabase.GetAllAssetPaths())
-			{
-				if (!path.StartsWith("Assets/")) continue;
-				if (path.EndsWith(".spriteatlas") || path.EndsWith(".spriteatlasv2"))
-				{
-					Debug.LogError("删除 " + path);
-					AssetDatabase.DeleteAsset(path);
-				}
-			};
-			AssetDatabase.SaveAssets();
-		}
-		[MenuItem("QTool/资源管理/批量处理/设置资源格式")]
+		[MenuItem("QTool/资源管理/批量处理/优化所有资源")]
 		public static void FreshAllImporter()
 		{
 			var paths = AssetDatabase.GetAllAssetPaths();
@@ -371,6 +356,7 @@ namespace QTool.Asset {
 			}
 		}
 		public readonly static List<int> TextureSize = new List<int> { 1, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096 };
+		public const float MaxCompressionSize = 512 * 512;
 		public static void ReImportTexture(Texture2D texture, TextureImporter textureImporter)
 		{
 			if (texture == null || textureImporter.textureType == TextureImporterType.Cursor) return;
@@ -410,7 +396,7 @@ namespace QTool.Asset {
 				}
 			}
 
-			if (!textureImporter.crunchedCompression)
+			if (!textureImporter.crunchedCompression&&(texture.width*texture.height< MaxCompressionSize))
 			{
 				QDebug.Log("重新导入图片[" + textureImporter.assetPath + "]");
 
