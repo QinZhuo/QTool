@@ -357,6 +357,7 @@ namespace QTool.Asset {
 		}
 		public readonly static List<int> TextureSize = new List<int> { 1, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096 };
 		public const float MaxCompressionSize = 512 * 512;
+		public const float MinCompressionSize = 8 * 8;
 		public static void ReImportTexture(Texture2D texture, TextureImporter textureImporter)
 		{
 			if (texture == null || textureImporter.textureType == TextureImporterType.Cursor) return;
@@ -395,8 +396,8 @@ namespace QTool.Asset {
 					textureImporter.SaveAndReimport();
 				}
 			}
-
-			if (!textureImporter.crunchedCompression&&(texture.width*texture.height< MaxCompressionSize))
+			var size = texture.width * texture.height;
+			if (!textureImporter.crunchedCompression && size > MinCompressionSize && size < MaxCompressionSize)
 			{
 				QDebug.Log("重新导入图片[" + textureImporter.assetPath + "]");
 
@@ -432,13 +433,13 @@ namespace QTool.Asset {
 				textureImporter.crunchedCompression = true;
 				textureImporter.textureCompression = TextureImporterCompression.Compressed;
 				textureImporter.compressionQuality = setting.compressionQuality;
-//				var defualtSetting = textureImporter.GetDefaultPlatformTextureSettings();
-//#if UNITY_SWITCH_API
-//				var switchSetting = defualtSetting.QDataCopy();
-//				switchSetting.name = nameof(RuntimePlatform.Switch);
-//				switchSetting.textureCompression = TextureImporterCompression.CompressedLQ;
-//				textureImporter.SetPlatformTextureSettings(switchSetting);
-//#endif
+				//				var defualtSetting = textureImporter.GetDefaultPlatformTextureSettings();
+				//#if UNITY_SWITCH_API
+				//				var switchSetting = defualtSetting.QDataCopy();
+				//				switchSetting.name = nameof(RuntimePlatform.Switch);
+				//				switchSetting.textureCompression = TextureImporterCompression.CompressedLQ;
+				//				textureImporter.SetPlatformTextureSettings(switchSetting);
+				//#endif
 				textureImporter.SaveAndReimport();
 
 			}
