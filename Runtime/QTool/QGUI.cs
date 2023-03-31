@@ -42,7 +42,7 @@ namespace QTool
 		{
 			normal = new GUIStyleState
 			{
-				background=Resources.Load<Texture2D>(nameof(SelectStyle)),
+				background=Resources.Load<Texture2D>(nameof(QGUI) + "/" + nameof(SelectStyle)),
 				textColor = ContentColor,
 			},
 			border = new RectOffset(RectRaudius, RectRaudius, RectRaudius, RectRaudius),
@@ -514,7 +514,7 @@ namespace QTool
 			{
 				GUILayout.BeginHorizontal();
 				GUILayout.Label(lable, HeightLayout);
-				GUILayout.Label(value.ToString(), HeightLayout);
+				GUILayout.Label(value?.ToString(), HeightLayout);
 				GUILayout.EndHorizontal();
 				return value;
 			}
