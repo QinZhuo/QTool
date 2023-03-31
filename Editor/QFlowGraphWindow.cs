@@ -738,8 +738,7 @@ namespace QTool.FlowGraph
 				}
 			}
 		}
-		public static Texture2D CircleTexture => _CircleTexture ??= Resources.Load<Texture2D>(nameof(QGUI)+"/"+nameof(CircleTexture)); 
-		static Texture2D _CircleTexture = null;
+	
 		public static Texture2D DotTexture => _DotTexture ??= Resources.Load<Texture2D>(nameof(QGUI) + "/" + nameof(DotTexture));
 		static Texture2D _DotTexture = null;
 		public static Texture2D DotConnectTexture => _DotConnectTexture ??= Resources.Load<Texture2D>(nameof(QGUI) + "/" + nameof(DotConnectTexture));
@@ -769,7 +768,7 @@ namespace QTool.FlowGraph
 			rect.size = Vector3.one * QGUI.Size*0.8f;
 			rect.center = center;
 			QGUI.PushColor(color);
-			GUI.DrawTexture(rect, CircleTexture);
+			GUI.DrawTexture(rect, DotConnectTexture);  
 			QGUI.PopColor();
 		}
        
