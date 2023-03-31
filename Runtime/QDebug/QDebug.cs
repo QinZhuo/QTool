@@ -178,9 +178,9 @@ namespace QTool
 								{
 									using (new GUILayout.HorizontalScope())
 									{
-										var value= memeberInfo.Get(component);
-										var newValue= value.Draw(memeberInfo.QName, memeberInfo.Type);
-										if (!Equals(value, newValue))
+										var value = memeberInfo.Get(component);
+										var newValue = value.Draw(memeberInfo.QName, memeberInfo.Type);
+										if (memeberInfo.Type.IsValueType || !Equals(value, newValue))
 										{
 											memeberInfo.Set(component, newValue);
 										}
