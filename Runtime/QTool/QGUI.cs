@@ -120,7 +120,6 @@ namespace QTool
 			tex.Apply();
 			return tex;
 		});
-		public static List<Texture2D> Texture2DCache = new List<Texture2D>();
 		public static Texture2D GetTexture(int size = 8)
 		{
 			var tex = new Texture2D(size * 2 , size * 2 );
@@ -132,17 +131,6 @@ namespace QTool
 				}
 			}
 			tex.Apply();
-			Texture2DCache.Add(tex);
-			return tex;
-		}
-		public static Texture2D GetBackTexture(Color color, int radius = 8, int line = 1)
-		{
-			return GetTexture(radius).DrawCircle(Color.Lerp(color, Color.black, 0.5f), radius).DrawCircle(color, radius - 1).DrawEnd();
-		}
-		public static Texture2D DrawEnd(this Texture2D tex)
-		{
-			tex.Apply();
-			tex.SavePNG( "Assets/QGUIImage/"+ tex.GetHashCode() + ".png");
 			return tex;
 		}
 		public static Texture2D DrawTriangle(this Texture2D tex, Color color, int radius = 8,bool down=true)
@@ -200,9 +188,7 @@ namespace QTool
 		public static QDictionary<Type, Func<object, string, object>> DrawOverride = new QDictionary<Type, Func<object, string, object>>();
 		public static List<string> TypeMenuList = new List<string>() { typeof(UnityEngine.Object).FullName.Replace('.', '/') };
 		public static List<Type> TypeList = new List<Type>() { typeof(UnityEngine.Object) };
-
 		private static bool IsRuntimeDraw { get; set; }
-		static bool fa = false;
 		public static void BeginRuntimeGUI()
 		{
 			IsRuntimeDraw = true;
@@ -753,11 +739,8 @@ namespace QTool
 								}
 								else
 								{
-
-									PushBackColor(BackColor);
 									using (new GUILayout.VerticalScope(Skin.box))
 									{
-										PopBackColor();
 										var show = false;
 										if (hasName)
 										{
@@ -816,13 +799,8 @@ namespace QTool
 										obj = typeInfo.ArrayRank == 0 ? type.CreateInstance() : type.CreateInstance(null, 0);
 										list = obj as IList;
 									}
-									var color = GUI.backgroundColor;
-									GUI.backgroundColor = BackColor;
-
 									using (new GUILayout.VerticalScope(Skin.box))
 									{
-
-										GUI.backgroundColor = color;
 										var canHideChild = DrawElement == null;
 										if (hasName)
 										{
@@ -1297,6 +1275,12 @@ namespace QTool
 		public QToolBar()
 		{
 		}
+		private QToolBar(string key)
+		{
+			Value = key;
+			Values.Add("返回");
+			ChildToolbars.Add(new QToolBar { Value = "返回" });
+		}
 		public QToolBar this[string key]
 		{
 			get
@@ -1304,14 +1288,8 @@ namespace QTool
 				var index = Values.IndexOf(key);
 				if (index < 0)
 				{
-					if (ChildToolbars.Count == 0&&!Value.IsNull())
-					{
-						Values.Add("返回");
-						ChildToolbars.Add(new QToolBar { Value = "返回" });
-					}
 					Values.Add(key);
-					var newToolBar = new QToolBar();
-					newToolBar.Value = key;
+					var newToolBar = new QToolBar(key);
 					ChildToolbars.Add(newToolBar);
 					return newToolBar;
 				}
