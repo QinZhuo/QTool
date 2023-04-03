@@ -7,71 +7,29 @@ using UnityEditor;
 using UnityEditor.Callbacks;
 using UnityEngine;
 using QTool.Reflection;
-using UnityEngine.SceneManagement;
 namespace QTool.FlowGraph
 {
-
-	public class QGUIWindow<WindowType,OpenType> 
-#if UNITY_EDITOR
-		: EditorWindow
-#endif
-		where OpenType : UnityEngine.Object
-		where WindowType : QGUIWindow<WindowType, OpenType>
-	{
-
-		public static string OpenPathKey =>typeof(OpenType) + "_Path";
-#if UNITY_EDITOR
-		[OnOpenAsset(0)]
-		public static bool OnOpen(int instanceID, int line)
-		{
-			var asset = EditorUtility.InstanceIDToObject(instanceID) as OpenType;
-			if (asset != null)
-			{
-				PlayerPrefs.SetString(OpenPathKey, AssetDatabase.GetAssetPath(asset));
-				GetWindow().Open(asset);
-				return true;
-			}
-			return false;
-		}
-#endif
-		public virtual void Open(OpenType asset)
-		{
-
-		}
-		public static WindowType GetWindow() 
-		{
-			return GetWindow<WindowType>();
-		}
-#if !UNITY_EDITOR
-		public Vector2 minSize;
-		public GUIContent titleContent = default;
-		public Rect position;
-		public static T GetWindow<T>() where T : new()
-		{
-			return new T();
-		}
-		public void Show()
-		{
-
-		}
-		public void Repaint()
-		{
-
-		}
-		public void BeginWindows()
-		{
-
-		}
-		public void EndWindows()
-		{
-
-		}
-#endif
-	}
-	public class QFlowGraphWindow: QGUIWindow<QFlowGraphWindow, QFlowGraphAsset>
-	{
+	
+    public class QFlowGraphWindow : EditorWindow
+    {
 		
 		static QFlowGraph Graph = null;
+        [OnOpenAsset(0)]
+        public static bool OnOpen(int instanceID, int line)
+        {
+            var asset = EditorUtility.InstanceIDToObject(instanceID) as QFlowGraphAsset;
+            if (asset != null)
+            {
+				PlayerPrefs.SetString(OpenPathKey, AssetDatabase.GetAssetPath(asset));
+				Open(asset.Graph, asset.Save);
+                return true;
+			}
+            return false;
+        }
+		public static string OpenPathKey => nameof(QFlowGraphWindow) + "_" + nameof(Graph) + "Path";
+
+
+
 		public static QFlowGraphWindow Instance { get; private set; }
 		public event Action OnSave;
 		public static void AutoLoadPath()
@@ -86,11 +44,7 @@ namespace QTool.FlowGraph
 			var asset = AssetDatabase.LoadAssetAtPath<QFlowGraphAsset>(path);
 			Open(asset.Graph, asset.Save);
 		}
-		public override void Open(QFlowGraphAsset asset)
-		{
-			Open(asset.Graph, asset.Save);
-		}
-		public static void Open(QFlowGraph graph,Action OnSave)
+        public static void Open(QFlowGraph graph,Action OnSave)
         {
             if (Instance == null)
             {
@@ -660,7 +614,7 @@ namespace QTool.FlowGraph
 				default: break;
             }
         }
-#region 图形绘制
+        #region 图形绘制
         static float Fix(float pos, float min, float max, float fixStep)
         {
             while (pos > max)
@@ -759,7 +713,8 @@ namespace QTool.FlowGraph
 				}
 			}
 		}
-	
+		public static Texture2D CircleTexture => _CircleTexture ??= Resources.Load<Texture2D>(nameof(QGUI)+"/"+nameof(CircleTexture)); 
+		static Texture2D _CircleTexture = null;
 		public static Texture2D DotTexture => _DotTexture ??= Resources.Load<Texture2D>(nameof(QGUI) + "/" + nameof(DotTexture));
 		static Texture2D _DotTexture = null;
 		public static Texture2D DotConnectTexture => _DotConnectTexture ??= Resources.Load<Texture2D>(nameof(QGUI) + "/" + nameof(DotConnectTexture));
@@ -789,7 +744,7 @@ namespace QTool.FlowGraph
 			rect.size = Vector3.one * QGUI.Size*0.8f;
 			rect.center = center;
 			QGUI.PushColor(color);
-			GUI.DrawTexture(rect, DotConnectTexture);  
+			GUI.DrawTexture(rect, CircleTexture);
 			QGUI.PopColor();
 		}
        
@@ -860,7 +815,7 @@ namespace QTool.FlowGraph
 			}
 		}
 
-#endregion
+        #endregion
 
         void StartConnect(PortId? startPort)
         {
@@ -903,11 +858,11 @@ namespace QTool.FlowGraph
 			leftRect.width /= 2;
 			EditorGUI.LabelField(leftRect, label.text);
 			leftRect.x += leftRect.width;
-			if (property.serializedObject.targetObject.IsPrefabInstance(out var prefab)&&prefab)
+			if (property.serializedObject.targetObject.IsPrefabInstance(out var prefab))
 			{
 				if (GUI.Button(leftRect, "进入预制体编辑"))
 				{
-					AssetDatabase.OpenAsset(prefab);
+					UnityEditor.AssetDatabase.OpenAsset(prefab);
 				}
 			}
 			else
