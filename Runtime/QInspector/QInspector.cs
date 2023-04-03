@@ -60,7 +60,6 @@ namespace QTool
 			this.funcKey = GetKeyListFunc;
 		}
 	}
-
 }
 namespace QTool.Inspector
 { 

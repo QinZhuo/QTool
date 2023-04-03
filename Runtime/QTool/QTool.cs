@@ -507,22 +507,26 @@ namespace QTool
 		{
 			prefab = null;
 #if UNITY_EDITOR
-			if (obj==null|| obj.IsPrefab())
+			if (obj == null || obj.IsPrefab())
 			{
 				return false;
 			}
-			if(UnityEditor.PrefabUtility.IsPartOfPrefabInstance(obj))
+			if (UnityEditor.PrefabUtility.IsPartOfPrefabInstance(obj))
 			{
 				prefab = UnityEditor.PrefabUtility.GetCorrespondingObjectFromSource(obj.GetGameObject());
 				return true;
 			}
-			else if(UnityEditor.Experimental.SceneManagement.PrefabStageUtility.GetCurrentPrefabStage()!=null)
+			else if (UnityEditor.Experimental.SceneManagement.PrefabStageUtility.GetCurrentPrefabStage() != null)
 			{
-				if (UnityEditor.Experimental.SceneManagement.PrefabStageUtility.GetPrefabStage(obj.GetGameObject()) != null)
+				var stage = UnityEditor.Experimental.SceneManagement.PrefabStageUtility.GetPrefabStage(obj.GetGameObject());
+				if (stage != null)
 				{
-					prefab = UnityEditor.AssetDatabase.LoadAssetAtPath<GameObject>(UnityEditor.Experimental.SceneManagement.PrefabStageUtility.GetPrefabStage(obj.GetGameObject()).assetPath);
+					if (stage.assetPath != UnityEditor.Experimental.SceneManagement.PrefabStageUtility.GetCurrentPrefabStage().assetPath)
+					{
+						prefab = UnityEditor.AssetDatabase.LoadAssetAtPath<GameObject>(stage.assetPath);
+						return true;
+					}
 				}
-				return true;
 			}
 #endif
 			return false;

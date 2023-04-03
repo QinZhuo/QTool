@@ -1351,6 +1351,50 @@ namespace QTool
 				}
 			}
 		}
+		public static object SetPathObject(this object target, string path,object value)
+		{
+			if (path.SplitTowString(".", out var start, out var end))
+			{
+				try
+				{
+					if (start == "Array" && end.StartsWith("data"))
+					{
+						var list = target as IList;
+						if (list == null)
+						{
+							return null;
+						}
+						else
+						{
+							return list[int.Parse(end.GetBlockValue('[', ']'))];
+						}
+					}
+					else
+					{
+
+						return target.GetPathObject(start).SetPathObject(end,value);
+					}
+
+				}
+				catch (Exception e)
+				{
+					throw new Exception("路径出错：" + path, e);
+				}
+			}
+			else
+			{
+				var memebers = QReflectionType.Get(target.GetType()).Members;
+				if (memebers.ContainsKey(path))
+				{
+					memebers[path].Set(target,value);
+					return value;
+				}
+				else
+				{
+					throw new Exception(" 找不到 key " + path);
+				}
+			}
+		}
 		public static bool GetPathBool(this object target, string key)
 		{
 			var not = key.Contains("!");
@@ -1448,7 +1492,10 @@ namespace QTool
 		{
 			return property?.serializedObject.targetObject.GetPathObject(property.propertyPath);
 		}
-
+		public static object SetObject(this SerializedProperty property,object value)
+		{
+			return property?.serializedObject.targetObject.SetPathObject(property.propertyPath,value);
+		}
 
 
 
