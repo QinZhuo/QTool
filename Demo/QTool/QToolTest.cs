@@ -42,6 +42,14 @@ namespace QTool.Test
 		[QName("位置测试")]
 		public Transform testObject;
 		public Color color;
+		//private void OnGUI()
+		//{
+		//	using (new GUI.GroupScope(new Rect(0, 100, 300, 300), QGUI.Skin.window))
+		//	{
+		//		GUI.Window(0, new Rect(0, 0, 200, 200), (id) => { GUI.Label(new Rect(0, 0, 100, 100), "laskd"); }, "13");
+				
+		//	}
+		//}
 		[QName("解析类型测试")]
         public void CreateTest()
         {

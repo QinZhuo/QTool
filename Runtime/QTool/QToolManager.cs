@@ -24,6 +24,7 @@ namespace QTool
 		public event Action OnLateDestroyEvent = null;
 		public event Action OnGUIEvent = null;
 		public event Action OnPostRenderEvent = null;
+		public List<QGUIWindow> Windows { get; private set; } = new List<QGUIWindow>();
 		private void Update()
 		{
 			OnUpdateEvent?.Invoke();
@@ -41,12 +42,22 @@ namespace QTool
 			try
 			{
 				QGUI.BeginRuntimeGUI();
-				using (new GUILayout.AreaScope(QScreen.AspectGUIRect))
+				if (Windows.Count == 0)
 				{
-					QDebug.DebugInfo();
-					OnGUIEvent?.Invoke();
+					using (new GUILayout.AreaScope(QScreen.AspectGUIRect))
+					{
+						QDebug.DebugInfo();
+						OnGUIEvent?.Invoke();
+					}
+					QDebug.DebugPanel();
 				}
-				QDebug.DebugPanel();
+				else
+				{
+					using (new GUILayout.AreaScope(QScreen.AspectGUIRect,"",QGUI.Skin.box))
+					{
+						Windows[Windows.Count - 1].Draw();
+					}
+				}
 				QGUI.EndRuntimeGUI();
 			}
 			catch (Exception e)

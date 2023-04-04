@@ -28,8 +28,7 @@ namespace QTool.FlowGraph
 					if (GUILayout.Button("编辑"))
 					{
 						var graph = obj as QFlowGraph;
-						Debug.LogError("未适配窗口");
-						// Open(graph, () => { graph.SetDirty(); });
+						QFlowGraphWindow.Open(graph, () => { graph.SetDirty(); });
 					}
 					return obj;
 				}

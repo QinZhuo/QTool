@@ -66,8 +66,8 @@ namespace QTool.FlowGraph
 
 		public static QFlowGraphWindow Instance { get; private set; }
 		public event Action OnSave;
-	
-        public static void Open(QFlowGraph graph,Action OnSave)
+
+		public static void Open(QFlowGraph graph,Action OnSave)
         {
             if (Instance == null)
             {
@@ -95,7 +95,7 @@ namespace QTool.FlowGraph
 			AutoLoadPath();
 		}
 #endif
-		private void OnLostFocus()
+		protected override void OnLostFocus()
         { 
 			if (Graph != null)
 			{
@@ -197,10 +197,10 @@ namespace QTool.FlowGraph
 
 				   });
                 }
-                menu.AddSeparator("");
                 if (!string.IsNullOrWhiteSpace(GUIUtility.systemCopyBuffer))
-                {
-                    menu.AddItem(new GUIContent("粘贴"), false, Parse);
+				{
+					menu.AddSeparator("");
+					menu.AddItem(new GUIContent("粘贴"), false, Parse);
                 }
             }
             else
@@ -219,11 +219,11 @@ namespace QTool.FlowGraph
                     }
                     menu.AddItem(new GUIContent("删除"), false, DeleteSelectNodes);
                     menu.AddItem(new GUIContent("清空连接"), false, ClearAllConnect);
-                    menu.AddSeparator("");
                     if (Application.isPlaying)
-                    {
-                        menu.AddItem(new GUIContent("运行节点"), false, () =>
-                        {
+					{
+						menu.AddSeparator("");
+						menu.AddItem(new GUIContent("运行节点"), false, () =>
+						{
 							Graph.Run(curNode.Key);
                         });
                     }
@@ -354,7 +354,7 @@ namespace QTool.FlowGraph
         QFlowNode curNode;
         PortId? curPortId;
         PortId? nearPortId;
-        private void OnGUI()
+       protected override void OnQGUI()
         {
             ViewRange.size = position.size;
             mousePos = Event.current.mousePosition + ViewRange.position;
@@ -404,7 +404,7 @@ namespace QTool.FlowGraph
 						}
 					}
 					QGUI.PushBackColor(color);
-					var newRect = GUI.Window(i, node.rect, DrawNode, node.ViewName);
+					var newRect = Window(i, node.rect, DrawNode, node.ViewName);
 					if (newRect != node.rect)
 					{
 						var offset = newRect.position - node.rect.position;
@@ -633,6 +633,7 @@ namespace QTool.FlowGraph
         Rect windowRect;
         void DrawNode(int id)
         {
+			QGUI.BeginRuntimeGUI();
             var node = Graph.NodeList[id];
 			if (node == null) return;
             windowRect = node.rect;
@@ -660,8 +661,8 @@ namespace QTool.FlowGraph
                 node.rect.height = GUILayoutUtility.GetLastRect().height + 30;
             }
             GUI.DragWindow();
-
-        }
+			QGUI.EndRuntimeGUI();
+		}
         void DrawCurve(Vector2 start, Vector2 end,Color color,bool isFlow=false)
         {
             if (!ViewRange.Contains(start) &&!ViewRange.Contains(end)) return;

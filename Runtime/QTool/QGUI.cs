@@ -205,12 +205,18 @@ namespace QTool
 		public static bool IsRuntime { get;private set; }
 		public static void BeginRuntimeGUI()
 		{
-			IsRuntime = true;
-			GUI.skin = Skin;
+			if (Application.isPlaying)
+			{
+				IsRuntime = true;
+				GUI.skin = Skin;
+			}
 		}
 		public static void EndRuntimeGUI()
-		{ 
-			IsRuntime = false; 
+		{
+			if (Application.isPlaying)
+			{
+				IsRuntime = false;
+			}
 		}
 		public static async Task WaitLayout()
 		{
@@ -1310,32 +1316,123 @@ namespace QTool
 		}
 	}
 
-	public class QGUIWindow
+	public abstract class QGUIWindow
 #if UNITY_EDITOR
 		: EditorWindow
 #endif
 	{
 #if !UNITY_EDITOR
-		public Vector2 minSize;
-		public GUIContent titleContent;
-		public Rect position;
-		public void Show()
-		{
-
-		}
+		public Vector2 minSize = default;
+		public GUIContent titleContent = default;
+		public Rect position = default;
+		
 		public void Repaint()
 		{
 
 		}
-		public void BeginWindows()
-		{
-
-		}
-		public void EndWindows()
-		{
-
-		}
+	
 #endif
+		public
+#if UNITY_EDITOR
+			new
+#endif
+			void BeginWindows()
+		{
+#if UNITY_EDITOR
+			if (!QGUI.IsRuntime)
+			{
+				base.BeginWindows();
+			}
+#endif
+		}
+		public
+#if UNITY_EDITOR
+			new
+#endif
+			void EndWindows()
+		{
+#if UNITY_EDITOR
+			if (!QGUI.IsRuntime)
+			{
+				base.EndWindows();
+			}
+#endif
+		}
+		public
+#if UNITY_EDITOR
+			new
+#endif
+		void Show()
+		{
+#if UNITY_EDITOR
+			if (!QGUI.IsRuntime)
+			{
+				base.Show();
+			}
+			else
+#endif
+			{
+				QToolManager.Instance.Windows.AddCheckExist(this);
+			}
+		}
+		public
+#if UNITY_EDITOR
+			new
+#endif
+		void Close()
+		{
+#if UNITY_EDITOR
+			if (!QGUI.IsRuntime)
+			{
+				base.Close();
+			}
+			else
+#endif
+
+			{
+				OnLostFocus();
+				QToolManager.Instance.Windows.Remove(this);
+			}
+		}
+		private void OnGUI()
+		{
+			OnQGUI();
+		}
+		private Vector2 ChildWindowOffset = default;
+		public Rect Window(int id, Rect clientRect, GUI.WindowFunction func, string text)
+		{
+			if (QGUI.IsRuntime)
+			{
+				clientRect.position += ChildWindowOffset;
+			}
+			clientRect=GUI.Window(id, clientRect, func, text);
+
+			if (QGUI.IsRuntime)
+			{
+				clientRect.position -= ChildWindowOffset;
+			}
+			return clientRect;
+		}
+		internal void Draw() {
+
+			using (new GUILayout.HorizontalScope(QGUI.Skin.box, GUILayout.Height(QGUI.Size * 2)))
+			{
+				GUILayout.Label(titleContent);
+				GUILayout.FlexibleSpace();
+				if (GUILayout.Button("关闭", GUILayout.Height(QGUI.Size * 2)))
+				{
+					Close();
+				}
+			}
+			ChildWindowOffset = QScreen.AspectGUIRect.position + new Vector2(0, QGUI.Size * 2);
+			var rect = new Rect(0, QGUI.Size * 2, QScreen.AspectGUIRect.width, QScreen.AspectGUIRect.height - QGUI.Size * 2);
+			using (new GUILayout.AreaScope(rect))
+			{
+				OnQGUI();
+			}
+		}
+		protected abstract void OnQGUI();
+		protected abstract void OnLostFocus();
 		public
 #if UNITY_EDITOR
 			new
@@ -1748,6 +1845,9 @@ namespace QTool
 		}
 		public void ShowAsContext()
 		{
+#if UNITY_EDITOR
+			menu.ShowAsContext();
+#endif
 		}
 	}
 }
