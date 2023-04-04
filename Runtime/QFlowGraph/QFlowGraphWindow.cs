@@ -1,20 +1,20 @@
-using QTool.Inspector;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Threading.Tasks;
+#if UNITY_EDITOR
 using UnityEditor;
 using UnityEditor.Callbacks;
+#endif
 using UnityEngine;
 using QTool.Reflection;
 namespace QTool.FlowGraph
 {
-	
-    public class QFlowGraphWindow : EditorWindow
-    {
+    public class QFlowGraphWindow : QGUIWindow
+	{
 		
+		public static string OpenPathKey => nameof(QFlowGraphWindow) + "_" + nameof(Graph) + "Path";
 		static QFlowGraph Graph = null;
-        [OnOpenAsset(0)]
+#if UNITY_EDITOR
+		[OnOpenAsset(0)]
         public static bool OnOpen(int instanceID, int line)
         {
             var asset = EditorUtility.InstanceIDToObject(instanceID) as QFlowGraphAsset;
@@ -26,12 +26,6 @@ namespace QTool.FlowGraph
 			}
             return false;
         }
-		public static string OpenPathKey => nameof(QFlowGraphWindow) + "_" + nameof(Graph) + "Path";
-
-
-
-		public static QFlowGraphWindow Instance { get; private set; }
-		public event Action OnSave;
 		public static void AutoLoadPath()
 		{
 			if (Graph != null) return;
@@ -44,6 +38,35 @@ namespace QTool.FlowGraph
 			var asset = AssetDatabase.LoadAssetAtPath<QFlowGraphAsset>(path);
 			Open(asset.Graph, asset.Save);
 		}
+		[MenuItem("Assets/QTool/Create/QFlowGraph")]
+		public static void CreateNewFile()
+		{
+			var selectPath = Application.dataPath;
+			if (Selection.activeObject != null)
+			{
+				selectPath = AssetDatabase.GetAssetPath(Selection.activeObject);
+			}
+			var path = EditorUtility.SaveFilePanel("保存QFG文件", selectPath, nameof(QFlowGraphAsset), "qfg");
+			if (!string.IsNullOrWhiteSpace(path))
+			{
+				QFileManager.Save(path, (new QFlowGraph()).ToQData());
+				AssetDatabase.Refresh();
+				var asset = AssetDatabase.LoadAssetAtPath<QFlowGraphAsset>(path.ToAssetPath());
+				Open(asset.Graph, asset.Save);
+			}
+		}
+		[MenuItem("QTool/窗口/流程图")]
+		public static void OpenWindow()
+		{
+			Open(null, null);
+		}
+#endif
+
+
+
+		public static QFlowGraphWindow Instance { get; private set; }
+		public event Action OnSave;
+	
         public static void Open(QFlowGraph graph,Action OnSave)
         {
             if (Instance == null)
@@ -53,43 +76,26 @@ namespace QTool.FlowGraph
             }
             Instance.titleContent = new GUIContent((graph?.Name== null?"":graph.Name + " - ") + nameof(QFlowGraph));
 			Graph = graph;
+#if UNITY_EDITOR
 			if (Graph == null)
 			{
 				AutoLoadPath();
 			}
+#endif
 			Instance.ViewRange = new Rect(graph==null?Vector2.zero:graph.ViewPos, Instance.position.size);
 			Instance.Show();
 			Instance.OnSave = OnSave;
 
 		}
-        [MenuItem("Assets/QTool/Create/QFlowGraph")]
-        public static void CreateNewFile()
-        {
-            var selectPath = Application.dataPath;
-            if(Selection.activeObject !=null)
-            {
-                selectPath= AssetDatabase.GetAssetPath(Selection.activeObject);
-            }
-            var path = EditorUtility.SaveFilePanel("保存QFG文件", selectPath, nameof(QFlowGraphAsset), "qfg");  
-			if (!string.IsNullOrWhiteSpace(path))
-			{
-				QFileManager.Save(path, (new QFlowGraph()).ToQData());
-				AssetDatabase.Refresh();
-				var asset = AssetDatabase.LoadAssetAtPath<QFlowGraphAsset>(path.ToAssetPath());
-				Open(asset.Graph, asset.Save);
-			}
-        }
-        [MenuItem("QTool/窗口/流程图")]
-        public static void OpenWindow()
-        {
-            Open(null,null); 
-        }
 
-        private void OnFocus()
+
+#if UNITY_EDITOR
+		private void OnFocus()
         {
 			AutoLoadPath();
 		}
-        private void OnLostFocus()
+#endif
+		private void OnLostFocus()
         { 
 			if (Graph != null)
 			{
@@ -102,7 +108,7 @@ namespace QTool.FlowGraph
         private Rect ViewRange;
         void CreateMenu(PortId fromPortId)
         {
-			GenericMenu menu = new GenericMenu();
+			QGenericMenu menu = new QGenericMenu();
             var fromPort = Graph.GetPort(fromPortId);
             foreach (var info in QCommand.KeyDictionary)
             {
@@ -177,7 +183,7 @@ namespace QTool.FlowGraph
 		}
         private void ShowMenu()
         {
-            GenericMenu menu = new GenericMenu();
+			QGenericMenu menu = new QGenericMenu();
             if (curNode == null)
             {
                 foreach (var kv in QCommand.KeyDictionary)
@@ -195,10 +201,6 @@ namespace QTool.FlowGraph
                 if (!string.IsNullOrWhiteSpace(GUIUtility.systemCopyBuffer))
                 {
                     menu.AddItem(new GUIContent("粘贴"), false, Parse);
-                }
-                else
-                {
-                    menu.AddDisabledItem(new GUIContent("粘贴"));
                 }
             }
             else
@@ -224,10 +226,6 @@ namespace QTool.FlowGraph
                         {
 							Graph.Run(curNode.Key);
                         });
-                    }
-                    else
-                    {
-                        menu.AddDisabledItem(new GUIContent("运行节点"));
                     }
                 }
 
@@ -365,9 +363,13 @@ namespace QTool.FlowGraph
             {
                 if (GUILayout.Button("创建新的QFlowGraph"))
                 {
-                    CreateNewFile();
-                }
-                return;
+#if UNITY_EDITOR
+					CreateNewFile();
+#else
+					Graph = new QFlowGraph();
+#endif
+				}
+				return;
             }
             Controls();
             BeginWindows();
@@ -593,6 +595,7 @@ namespace QTool.FlowGraph
                                 break;
                         }
                     }break;
+#if UNITY_EDITOR
 				case EventType.DragUpdated:
 					DragAndDrop.visualMode = DragAndDropVisualMode.Generic;
 					break;
@@ -600,6 +603,7 @@ namespace QTool.FlowGraph
 					DragAndDrop.AcceptDrag();
 					AddObject(DragAndDrop.objectReferences);
 					break;
+#endif
 				case EventType.ScrollWheel:
 					if (Event.current.shift)
 					{
@@ -614,7 +618,7 @@ namespace QTool.FlowGraph
 				default: break;
             }
         }
-        #region 图形绘制
+#region 图形绘制
         static float Fix(float pos, float min, float max, float fixStep)
         {
             while (pos > max)
@@ -632,12 +636,14 @@ namespace QTool.FlowGraph
             var node = Graph.NodeList[id];
 			if (node == null) return;
             windowRect = node.rect;
+#if UNITY_EDITOR
 			EditorGUI.DrawRect(new Rect(1, 21, windowRect.width - 2, 2), QGUI.AlphaBackColor);
 			EditorGUI.DrawRect(new Rect(1, 21, windowRect.width - 2, windowRect.height - 20), QGUI.AlphaBackColor);
-			EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.Space(QGUI.Size*2);
-            EditorGUILayout.BeginVertical();
-			EditorGUILayout.Space(QGUI.Size);
+#endif
+			GUILayout.BeginHorizontal();
+			GUILayout.Space(QGUI.Size*2);
+            GUILayout.BeginVertical();
+			GUILayout.Space(QGUI.Size);
 			if (node.command == null)
             {
 				GUILayout.Label("丢失【" + node.commandKey + "】 ",GUILayout.MaxWidth(200));
@@ -646,9 +652,9 @@ namespace QTool.FlowGraph
 			{
 				DrawPort(port);
 			}
-			EditorGUILayout.EndVertical();
-            EditorGUILayout.Space(QGUI.Size*2);
-            EditorGUILayout.EndHorizontal();
+			GUILayout.EndVertical();
+			GUILayout.Space(QGUI.Size*2);
+			GUILayout.EndHorizontal();
             if (Event.current.type== EventType.Repaint)
             {
                 node.rect.height = GUILayoutUtility.GetLastRect().height + 30;
@@ -675,7 +681,9 @@ namespace QTool.FlowGraph
 			var t = Mathf.Clamp(start.x - end.x, 0, 100) / 100;
 			var startOffset = Vector2.Lerp(start + Vector2.right * size, new Vector2(start.x + 100, yMax),t );
 			var endOffset= Vector2.Lerp(end + Vector2.left * size, new Vector2(end.x - 100, yMax), t);
+#if UNITY_EDITOR
 			Handles.DrawBezier(start, end, startOffset, endOffset, color, null, 3f);
+#endif
 		}
 		public void DrawCurve()
 		{
@@ -771,7 +779,7 @@ namespace QTool.FlowGraph
 					}
 					else
 					{
-						EditorGUILayout.LabelField(port.ViewName, port.IsOutput ? QGUI.RightLabel : QGUI.LeftLable);
+						GUILayout.Label(port.ViewName, port.IsOutput ? QGUI.RightLabel : QGUI.LeftLable);
 					}
 				}
 				lastRect = GUILayoutUtility.GetLastRect();
@@ -788,7 +796,7 @@ namespace QTool.FlowGraph
 			}
 			else
 			{
-				EditorGUILayout.LabelField(name, curDrawPort.IsOutput ? QGUI.RightLabel : QGUI.LeftLable);
+				GUILayout.Label(name, curDrawPort.IsOutput ? QGUI.RightLabel : QGUI.LeftLable);
 			}
 			DrawPortDot(GUILayoutUtility.GetLastRect(), curDrawPort.GetPortId(i), curDrawPort.IsOutput, curDrawPort.ConnectType);
 			return value;
@@ -815,7 +823,7 @@ namespace QTool.FlowGraph
 			}
 		}
 
-        #endregion
+#endregion
 
         void StartConnect(PortId? startPort)
         {
@@ -849,6 +857,7 @@ namespace QTool.FlowGraph
     
       
     }
+#if UNITY_EDITOR
 	[CustomPropertyDrawer(typeof(QFlowGraph))]
 	public class QFlowGraphDrawer : PropertyDrawer
 	{
@@ -881,4 +890,5 @@ namespace QTool.FlowGraph
 			return base.GetPropertyHeight(property, label);
 		}
 	}
+#endif
 }

@@ -14,8 +14,19 @@ namespace QTool
 
 	public static class QGUI
 	{
+		#region GUI样式
+
+		public static GUIStyle Lable => Skin.label;
 		public static GUISkin Skin => _Skin ??= Resources.Load<GUISkin>(nameof(QGUI) + "/" + nameof(QGUI)+ nameof(Skin));
 		private static GUISkin _Skin;
+		public static GUIStyle CenterLable => _centerLable ??= new GUIStyle(Skin.label) { alignment = TextAnchor.MiddleCenter, richText = true };
+		static GUIStyle _centerLable;
+		public static GUIStyle TextArea => _textArea ??= new GUIStyle(Skin.textField) { alignment = TextAnchor.MiddleCenter };
+		static GUIStyle _textArea;
+		public static GUIStyle LeftLable => _leftLable ??= new GUIStyle(Skin.label) { alignment= TextAnchor.MiddleLeft };
+		static GUIStyle _leftLable;
+		public static GUIStyle RightLabel => _rightLabel ??= new GUIStyle(Skin.label) { alignment = TextAnchor.MiddleRight };
+		static GUIStyle _rightLabel;
 		public static Color SelectColor { get; private set; } = new Color32(15, 129, 190, 100);
 		public static Color BackColor { get; private set; } = new Color32(45, 45, 45, 255);
 		public static Color AlphaBackColor { get; private set; } = new Color32(0, 0, 0, 40);
@@ -79,6 +90,9 @@ namespace QTool
 		{
 			GUI.contentColor = contentColorStack.Pop();
 		}
+
+		#endregion
+
 		static QDictionary<QToolBar, Vector2> ToolBarScroll = new QDictionary<QToolBar, Vector2>(); 
 		public static object Draw(this QToolBar toolBar)
 		{
@@ -188,15 +202,15 @@ namespace QTool
 		public static QDictionary<Type, Func<object, string, object>> DrawOverride = new QDictionary<Type, Func<object, string, object>>();
 		public static List<string> TypeMenuList = new List<string>() { typeof(UnityEngine.Object).FullName.Replace('.', '/') };
 		public static List<Type> TypeList = new List<Type>() { typeof(UnityEngine.Object) };
-		private static bool IsRuntimeDraw { get; set; }
+		public static bool IsRuntime { get;private set; }
 		public static void BeginRuntimeGUI()
 		{
-			IsRuntimeDraw = true;
+			IsRuntime = true;
 			GUI.skin = Skin;
 		}
 		public static void EndRuntimeGUI()
 		{ 
-			IsRuntimeDraw = false; 
+			IsRuntime = false; 
 		}
 		public static async Task WaitLayout()
 		{
@@ -225,7 +239,7 @@ namespace QTool
 		public static void LabelField(string name, string value)
 		{
 #if UNITY_EDITOR
-			if (!IsRuntimeDraw)
+			if (!IsRuntime)
 			{
 				if (value.IsNull())
 				{
@@ -248,7 +262,7 @@ namespace QTool
 		public static string TextField(string name, string text)
 		{
 #if UNITY_EDITOR
-			if (!IsRuntimeDraw)
+			if (!IsRuntime)
 			{
 				if (name.IsNull())
 				{
@@ -276,7 +290,7 @@ namespace QTool
 		public static int IntField(string lable, int value)
 		{
 #if UNITY_EDITOR
-			if (!IsRuntimeDraw)
+			if (!IsRuntime)
 			{
 				if (lable.IsNull())
 				{
@@ -307,7 +321,7 @@ namespace QTool
 		public static int Popup(int select,string[] values)
 		{
 #if UNITY_EDITOR
-			if (!IsRuntimeDraw)
+			if (!IsRuntime)
 			{
 				return EditorGUILayout.Popup(select, values);
 			}
@@ -323,7 +337,7 @@ namespace QTool
 		public static int Popup(int select, GUIContent[] values)
 		{
 #if UNITY_EDITOR
-			if (!IsRuntimeDraw)
+			if (!IsRuntime)
 			{
 				return EditorGUILayout.Popup(select, values);
 			}
@@ -339,7 +353,7 @@ namespace QTool
 		public static Enum EnumField(string lable, Enum value)
 		{
 #if UNITY_EDITOR
-			if (!IsRuntimeDraw)
+			if (!IsRuntime)
 			{
 				if (lable.IsNull())
 				{
@@ -365,7 +379,7 @@ namespace QTool
 		public static Enum EnumFlagsField(string lable, Enum value)
 		{
 #if UNITY_EDITOR
-			if (!IsRuntimeDraw)
+			if (!IsRuntime)
 			{
 				if (lable.IsNull())
 				{
@@ -391,7 +405,7 @@ namespace QTool
 		public static long LongField(string lable, long value)
 		{
 #if UNITY_EDITOR
-			if (!IsRuntimeDraw)
+			if (!IsRuntime)
 			{
 				if (lable.IsNull())
 				{
@@ -422,7 +436,7 @@ namespace QTool
 		public static float FloatField(string lable, float value)
 		{
 #if UNITY_EDITOR
-			if (!IsRuntimeDraw)
+			if (!IsRuntime)
 			{
 				if (lable.IsNull())
 				{
@@ -453,7 +467,7 @@ namespace QTool
 		public static double DoubleField(string lable, double value)
 		{
 #if UNITY_EDITOR
-			if (!IsRuntimeDraw)
+			if (!IsRuntime)
 			{
 				if (lable.IsNull())
 				{
@@ -484,7 +498,7 @@ namespace QTool
 		public static UnityEngine.Object ObjectField(string lable, UnityEngine.Object value, Type type)
 		{
 #if UNITY_EDITOR
-			if (!IsRuntimeDraw)
+			if (!IsRuntime)
 			{
 				if (lable.IsNull())
 				{
@@ -508,7 +522,7 @@ namespace QTool
 		public static bool Toggle(string lable, bool value)
 		{
 #if UNITY_EDITOR
-			if (!IsRuntimeDraw)
+			if (!IsRuntime)
 			{
 				if (lable.IsNull())
 				{
@@ -546,7 +560,7 @@ namespace QTool
 				hashCode = key.GetHashCode();
 			}
 #if UNITY_EDITOR
-			if (!IsRuntimeDraw)
+			if (!IsRuntime)
 			{
 				FoldoutCache[hashCode] = EditorGUILayout.Foldout(FoldoutCache[hashCode], key);
 			}
@@ -957,16 +971,7 @@ namespace QTool
 			GUI.Label(lastRect, info, CenterLable);
 		}
 		
-		public static GUIStyle CenterLable => _centerLable ??= new GUIStyle(EditorStyles.label) { alignment = TextAnchor.MiddleCenter, richText = true };
-		static GUIStyle _centerLable;
-		public static GUIStyle TextArea => _textArea ??= new GUIStyle(EditorStyles.textField) { alignment = TextAnchor.MiddleCenter };
-		static GUIStyle _textArea;
-		public static GUIStyle RichLable => _richLable ??= new GUIStyle(EditorStyles.label) { richText = true };
-		static GUIStyle _richLable;
-		public static GUIStyle LeftLable => _leftLable ??= new GUIStyle(EditorStyles.label) { richText = true };
-		static GUIStyle _leftLable;
-		public static GUIStyle RightLabel => _rightLabel ??= new GUIStyle(EditorStyles.label) { alignment = TextAnchor.MiddleRight };
-		static GUIStyle _rightLabel;
+	
 		public static void Draw(this SerializedObject serializedObject)
 		{
 			var iterator = serializedObject.GetIterator();
@@ -1304,6 +1309,49 @@ namespace QTool
 			return Selected?(Value + "/" + ChildToolBar): Value?.ToString();
 		}
 	}
+
+	public class QGUIWindow
+#if UNITY_EDITOR
+		: EditorWindow
+#endif
+	{
+#if !UNITY_EDITOR
+		public Vector2 minSize;
+		public GUIContent titleContent;
+		public Rect position;
+		public void Show()
+		{
+
+		}
+		public void Repaint()
+		{
+
+		}
+		public void BeginWindows()
+		{
+
+		}
+		public void EndWindows()
+		{
+
+		}
+#endif
+		public
+#if UNITY_EDITOR
+			new
+#endif
+			static T GetWindow<T>() where T : QGUIWindow, new()
+		{
+#if UNITY_EDITOR
+			if (!QGUI.IsRuntime)
+			{
+				return EditorWindow.GetWindow<T>();
+			}
+#endif
+			return new T();
+		}
+	}
+
 #if UNITY_EDITOR
 	public static class QEditorTool
 	{
@@ -1681,5 +1729,25 @@ namespace QTool
 			return drawer;
 		}
 	}
-
+	public class QGenericMenu
+	{
+#if UNITY_EDITOR
+		GenericMenu menu = new GenericMenu();
+#endif
+		public void AddItem(GUIContent content,bool on,Action action)
+		{
+#if UNITY_EDITOR
+			menu.AddItem(content, on,()=>action());
+#endif
+		}
+		public void AddSeparator(string key="")
+		{
+#if UNITY_EDITOR
+			menu.AddSeparator(key);
+#endif
+		}
+		public void ShowAsContext()
+		{
+		}
+	}
 }
