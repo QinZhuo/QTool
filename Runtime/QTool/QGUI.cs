@@ -1324,7 +1324,7 @@ namespace QTool
 #if !UNITY_EDITOR
 		public Vector2 minSize = default;
 		public GUIContent titleContent = default;
-		public Rect position = default;
+		
 		
 		public void Repaint()
 		{
@@ -1332,6 +1332,38 @@ namespace QTool
 		}
 	
 #endif
+		private Rect _position=default;
+		public
+#if UNITY_EDITOR
+			new
+#endif
+			Rect position {
+			get
+			{
+#if UNITY_EDITOR
+				if (!QGUI.IsRuntime)
+				{
+					return base.position;
+				}else
+#endif
+				{
+					return _position;
+				}
+			}
+			set
+			{
+#if UNITY_EDITOR
+				if (!QGUI.IsRuntime)
+				{
+					base.position=value;
+				}
+				else
+#endif
+				{
+					_position = value;
+				}
+			}
+		}
 		public
 #if UNITY_EDITOR
 			new
@@ -1425,8 +1457,8 @@ namespace QTool
 				}
 			}
 			ChildWindowOffset = QScreen.AspectGUIRect.position + new Vector2(0, QGUI.Size * 2);
-			var rect = new Rect(0, QGUI.Size * 2, QScreen.AspectGUIRect.width, QScreen.AspectGUIRect.height - QGUI.Size * 2);
-			using (new GUILayout.AreaScope(rect))
+			position = new Rect(0, QGUI.Size * 2, QScreen.AspectGUIRect.width, QScreen.AspectGUIRect.height - QGUI.Size * 2);
+			using (new GUILayout.AreaScope(position))
 			{
 				OnQGUI();
 			}

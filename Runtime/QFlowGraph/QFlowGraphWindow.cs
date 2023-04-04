@@ -82,7 +82,7 @@ namespace QTool.FlowGraph
 				AutoLoadPath();
 			}
 #endif
-			Instance.ViewRange = new Rect(graph==null?Vector2.zero:graph.ViewPos, Instance.position.size);
+			Instance.ViewRange = new Rect(Graph.IsNull()?Vector2.zero:graph.ViewPos, Instance.position.size);
 			Instance.Show();
 			Instance.OnSave = OnSave;
 
