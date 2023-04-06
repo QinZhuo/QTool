@@ -91,7 +91,7 @@ namespace QTool
 				Events.Clear();
 				foreach (var eventData in clip.events)
 				{
-					Events.Add(new ClipEventData { name = eventData.stringParameter, time = eventData.time });
+					Events.Add(new ClipEventData { name = eventData.stringParameter, time = eventData.time }); 
 				}
 			}
 		}
@@ -167,5 +167,7 @@ namespace QTool
 			animator.SetTrigger(name);
 		}
 	}
+
+	
 }
 

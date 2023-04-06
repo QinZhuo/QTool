@@ -4,6 +4,7 @@ using UnityEngine;
 using System;
 using QTool.Reflection;
 using System.Reflection;
+using System.Threading.Tasks;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -26,7 +27,18 @@ namespace QTool
             this.name = name;
             this.visibleControl = visibleControl;
         }
-    }
+		public bool Active(object target)
+		{
+			if (visibleControl.IsNull())
+			{
+				return true;
+			}
+			else
+			{
+				return (bool)target.GetPathBool(visibleControl);
+			}
+		}
+	}
 	[AttributeUsage(AttributeTargets.Field | AttributeTargets.Class | AttributeTargets.Method | AttributeTargets.Interface | AttributeTargets.Parameter | AttributeTargets.Property)]
 	public class QOldNameAttribute : Attribute
 	{
@@ -223,9 +235,93 @@ namespace QTool.Inspector
 				}
 			}
 		}
+		public void InvokeQInspectorState(object target,QInspectorState state)
+		{
+			foreach (var kv in inspectorState)
+			{
+				if (kv.Key.state == state)
+				{
+					var result = kv.Value.Invoke(target);
+					if (result is Task task)
+					{
+						_ = task.Run();
+					}
+				}
+			}
+		}
+		public void DrawButton(object target)
+		{
+			foreach (var kv in buttonFunc)
+			{
+				var att = kv.Value;
+
+				if (att.Active(target))
+				{
+					var name = att.name.IsNull() ? kv.Key.Name : att.name;
+#if UNITY_EDITOR
+					if (att is QSelectObjectButtonAttribute)
+					{
+						if (GUILayout.Button(name))
+						{
+							EditorGUIUtility.ShowObjectPicker<GameObject>(null, false, "", name.GetHashCode());
+
+						}
+						if (Event.current.commandName == "ObjectSelectorClosed")
+						{
+							if (EditorGUIUtility.GetObjectPickerControlID() == name.GetHashCode())
+							{
+								var obj = EditorGUIUtility.GetObjectPickerObject();
+								if (obj != null)
+								{
+									kv.Key.Invoke(target, obj);
+								}
+
+							}
+						}
+					}
+					else
+#endif
+					{
+						if (GUILayout.Button(name))
+						{
+							kv.Key.Invoke(target);
+						}
+					}
+
+				}
+			}
+		}
+		public void DrawComponent(Component component)
+		{
+			var show = QGUI.Foldout(Type.Name);
+			if (show)
+			{
+				using (new GUILayout.HorizontalScope())
+				{
+					GUILayout.Space(QGUI.Height);
+					using (new GUILayout.VerticalScope())
+					{
+						foreach (var memeberInfo in Members)
+						{
+							using (new GUILayout.HorizontalScope())
+							{
+								var value = memeberInfo.Get(component);
+								var newValue = value.Draw(memeberInfo.QName, memeberInfo.Type);
+								if (memeberInfo.Type.IsValueType || !Equals(value, newValue))
+								{
+									memeberInfo.Set(component, newValue);
+								}
+							}
+						}
+						DrawButton(component);
+					}
+				}
+
+			}
+		}
 	}
 #if UNITY_EDITOR
-	#region 自定义显示效果
+#region 自定义显示效果
 	[CustomPropertyDrawer(typeof(QNameAttribute))]
 	public class QNameDrawer : PropertyDrawer
 	{
@@ -417,6 +513,6 @@ namespace QTool.Inspector
 			return property.IsShow() ? (toolbar.pageSize > 0 && QEnumListData.Get(property, toolbar.getList).List.Count > toolbar.pageSize ? Height + 20 : Height) : 0;
 		}
 	}
-	#endregion
+#endregion
 #endif
 }

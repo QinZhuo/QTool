@@ -940,7 +940,139 @@ namespace QTool
 				return new GUIContent(obj?.ToString());
 			}
 		}
+		public static object GetPathObject(this object target, string path)
+		{
+			if (path.SplitTowString(".", out var start, out var end))
+			{
+				try
+				{
+					if (start == "Array" && end.StartsWith("data"))
+					{
+						var list = target as IList;
+						if (list == null)
+						{
+							return null;
+						}
+						else
+						{
+							return list[int.Parse(end.GetBlockValue('[', ']'))];
+						}
+					}
+					else
+					{
 
+						return target.GetPathObject(start).GetPathObject(end);
+					}
+
+				}
+				catch (Exception e)
+				{
+					throw new Exception("路径出错：" + path, e);
+				}
+			}
+			else
+			{
+				var memebers = QReflectionType.Get(target.GetType()).Members;
+				if (memebers.ContainsKey(path))
+				{
+					var Get = memebers[path].Get;
+					return Get(target);
+				}
+				else
+				{
+					throw new Exception(" 找不到 key " + path);
+				}
+			}
+		}
+		public static object SetPathObject(this object target, string path, object value)
+		{
+			if (path.SplitTowString(".", out var start, out var end))
+			{
+				try
+				{
+					if (start == "Array" && end.StartsWith("data"))
+					{
+						var list = target as IList;
+						if (list == null)
+						{
+							return null;
+						}
+						else
+						{
+							return list[int.Parse(end.GetBlockValue('[', ']'))];
+						}
+					}
+					else
+					{
+
+						return target.GetPathObject(start).SetPathObject(end, value);
+					}
+
+				}
+				catch (Exception e)
+				{
+					throw new Exception("路径出错：" + path, e);
+				}
+			}
+			else
+			{
+				var memebers = QReflectionType.Get(target.GetType()).Members;
+				if (memebers.ContainsKey(path))
+				{
+					memebers[path].Set(target, value);
+					return value;
+				}
+				else
+				{
+					throw new Exception(" 找不到 key " + path);
+				}
+			}
+		}
+		public static bool GetPathBool(this object target, string key)
+		{
+			var not = key.Contains("!");
+			if (key.SplitTowString("==", out var start, out var value) || key.SplitTowString("!=", out start, out value))
+			{
+				not = false;
+				var info = target.GetPathObject(start)?.ToString() == value;
+				return not ? !(bool)info : (bool)info;
+			}
+			else
+			{
+				if (not)
+				{
+					key = key.TrimStart('!');
+				}
+				object info = null;
+				switch (key)
+				{
+					case nameof(Application.isPlaying):
+						info = Application.isPlaying;
+						break;
+					default:
+						info = target.GetPathObject(key);
+						break;
+				}
+				if (info == null)
+				{
+					return !not;
+				}
+				else
+				{
+					return not ? !(bool)info : (bool)info;
+				}
+
+			}
+
+		}
+		public static Rect HorizontalRect(this Rect rect, float left, float right)
+		{
+			var leftOffset = left * rect.width;
+			var width = (right - left) * rect.width;
+			rect.x += leftOffset;
+			rect.width = width;
+			return rect;
+		}
 #if UNITY_EDITOR
 
 		[UnityEditor.SettingsProvider]
@@ -1315,8 +1447,11 @@ namespace QTool
 			return Selected?(Value + "/" + ChildToolBar): Value?.ToString();
 		}
 	}
-
-	public abstract class QGUIWindow
+	public interface IQGUIEditor
+	{
+		void OnQGUIEditor();
+	}
+	public abstract class QGUIEditorWindow
 #if UNITY_EDITOR
 		: EditorWindow
 #endif
@@ -1469,7 +1604,7 @@ namespace QTool
 #if UNITY_EDITOR
 			new
 #endif
-			static T GetWindow<T>() where T : QGUIWindow, new()
+			static T GetWindow<T>() where T : QGUIEditorWindow, new()
 		{
 #if UNITY_EDITOR
 			if (!QGUI.IsRuntime)
@@ -1484,140 +1619,6 @@ namespace QTool
 #if UNITY_EDITOR
 	public static class QEditorTool
 	{
-		public static object GetPathObject(this object target, string path)
-		{
-			if (path.SplitTowString(".", out var start, out var end))
-			{
-				try
-				{
-					if (start == "Array" && end.StartsWith("data"))
-					{
-						var list = target as IList;
-						if (list == null)
-						{
-							return null;
-						}
-						else
-						{
-							return list[int.Parse(end.GetBlockValue('[', ']'))];
-						}
-					}
-					else
-					{
-
-						return target.GetPathObject(start).GetPathObject(end);
-					}
-
-				}
-				catch (Exception e)
-				{
-					throw new Exception("路径出错：" + path, e);
-				}
-			}
-			else
-			{
-				var memebers = QReflectionType.Get(target.GetType()).Members;
-				if (memebers.ContainsKey(path))
-				{
-					var Get = memebers[path].Get;
-					return Get(target);
-				}
-				else
-				{
-					throw new Exception(" 找不到 key " + path);
-				}
-			}
-		}
-		public static object SetPathObject(this object target, string path,object value)
-		{
-			if (path.SplitTowString(".", out var start, out var end))
-			{
-				try
-				{
-					if (start == "Array" && end.StartsWith("data"))
-					{
-						var list = target as IList;
-						if (list == null)
-						{
-							return null;
-						}
-						else
-						{
-							return list[int.Parse(end.GetBlockValue('[', ']'))];
-						}
-					}
-					else
-					{
-
-						return target.GetPathObject(start).SetPathObject(end,value);
-					}
-
-				}
-				catch (Exception e)
-				{
-					throw new Exception("路径出错：" + path, e);
-				}
-			}
-			else
-			{
-				var memebers = QReflectionType.Get(target.GetType()).Members;
-				if (memebers.ContainsKey(path))
-				{
-					memebers[path].Set(target,value);
-					return value;
-				}
-				else
-				{
-					throw new Exception(" 找不到 key " + path);
-				}
-			}
-		}
-		public static bool GetPathBool(this object target, string key)
-		{
-			var not = key.Contains("!");
-			if (key.SplitTowString("==", out var start, out var value) || key.SplitTowString("!=", out start, out value))
-			{
-				not = false;
-				var info = target.GetPathObject(start)?.ToString() == value;
-				return not ? !(bool)info : (bool)info;
-			}
-			else
-			{
-				if (not)
-				{
-					key = key.TrimStart('!');
-				}
-				object info = null;
-				switch (key)
-				{
-					case nameof(Application.isPlaying):
-						info = Application.isPlaying;
-						break;
-					default:
-						info= target.GetPathObject(key);
-						break;
-				}
-				if (info == null)
-				{
-					return !not;
-				}
-				else
-				{
-					return not ? !(bool)info : (bool)info;
-				}
-
-			}
-
-		}
-		public static Rect HorizontalRect(this Rect rect, float left, float right)
-		{
-			var leftOffset = left * rect.width;
-			var width = (right - left) * rect.width;
-			rect.x += leftOffset;
-			rect.width = width;
-			return rect;
-		}
-
 		public static object[] GetAttributes<T>(this SerializedProperty prop, string parentKey)
 		{
 			var type = string.IsNullOrWhiteSpace(parentKey) ? prop.serializedObject.targetObject?.GetType() : QReflection.ParseType(parentKey);
@@ -1672,20 +1673,6 @@ namespace QTool
 		public static object SetObject(this SerializedProperty property,object value)
 		{
 			return property?.serializedObject.targetObject.SetPathObject(property.propertyPath,value);
-		}
-
-
-
-		public static bool Active(this QNameAttribute att, object target)
-		{
-			if (att.visibleControl.IsNull())
-			{
-				return true;
-			}
-			else
-			{
-				return (bool)target.GetPathBool(att.visibleControl);
-			}
 		}
 		public static bool IsShow(this SerializedProperty property)
 		{

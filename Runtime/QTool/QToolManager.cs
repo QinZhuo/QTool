@@ -24,7 +24,7 @@ namespace QTool
 		public event Action OnLateDestroyEvent = null;
 		public event Action OnGUIEvent = null;
 		public event Action OnPostRenderEvent = null;
-		public List<QGUIWindow> Windows { get; private set; } = new List<QGUIWindow>();
+		public List<QGUIEditorWindow> Windows { get; private set; } = new List<QGUIEditorWindow>();
 		private void Update()
 		{
 			OnUpdateEvent?.Invoke();

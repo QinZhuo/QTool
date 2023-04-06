@@ -162,33 +162,7 @@ namespace QTool
 				{
 					if (component == null) continue;
 					var typeInfo = QInspectorType.Get(component.GetType());
-					var show = false;
-					using (new GUILayout.HorizontalScope(QGUI.Skin.box))
-					{
-						show = QGUI.Foldout(typeInfo.Type.Name);
-					}
-					if (show)
-					{
-						using (new GUILayout.HorizontalScope())
-						{
-							GUILayout.Space(QGUI.Height);
-							using (new GUILayout.VerticalScope())
-							{
-								foreach (var memeberInfo in typeInfo.Members)
-								{
-									using (new GUILayout.HorizontalScope())
-									{
-										var value = memeberInfo.Get(component);
-										var newValue = value.Draw(memeberInfo.QName, memeberInfo.Type);
-										if (memeberInfo.Type.IsValueType || !Equals(value, newValue))
-										{
-											memeberInfo.Set(component, newValue);
-										}
-									}
-								}
-							}
-						}
-					}
+					typeInfo.DrawComponent(component);
 				}
 			}
 		}

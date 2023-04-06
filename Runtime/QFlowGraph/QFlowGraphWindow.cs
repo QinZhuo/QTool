@@ -8,7 +8,7 @@ using UnityEngine;
 using QTool.Reflection;
 namespace QTool.FlowGraph
 {
-    public class QFlowGraphWindow : QGUIWindow
+    public class QFlowGraphWindow : QGUIEditorWindow
 	{
 		
 		public static string OpenPathKey => nameof(QFlowGraphWindow) + "_" + nameof(Graph) + "Path";

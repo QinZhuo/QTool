@@ -21,13 +21,13 @@ namespace QTool.Inspector
 		protected virtual void OnEnable()
 		{
 			typeInfo = QInspectorType.Get(target.GetType());
-			InvokeQInspectorState(QInspectorState.OnEnable);
+			typeInfo.InvokeQInspectorState(target,QInspectorState.OnEnable);
 			EditorApplication.playModeStateChanged += OnPlayMode;
 		}
 
 		protected virtual void OnDestroy()
 		{
-			InvokeQInspectorState(QInspectorState.OnDisable);
+			typeInfo.InvokeQInspectorState(target,QInspectorState.OnDisable);
 			EditorApplication.playModeStateChanged -= OnPlayMode;
 		}
 		public override void OnInspectorGUI()
@@ -38,54 +38,11 @@ namespace QTool.Inspector
 				return;
 			}
 			serializedObject.Draw();
-			DrawButton();
+			typeInfo.DrawButton(target);
 		}
 		private void OnSceneGUI()
 		{
 			MouseCheck();
-		}
-	
-
-		public void DrawButton()
-		{
-			foreach (var kv in typeInfo.buttonFunc)
-			{
-				var att = kv.Value;
-
-				if (att.Active(target))
-				{
-					var name = att.name.IsNull() ? kv.Key.Name : att.name;
-
-					if (att is QSelectObjectButtonAttribute)
-					{
-						if (GUILayout.Button(name))
-						{
-							EditorGUIUtility.ShowObjectPicker<GameObject>(null, false, "", name.GetHashCode());
-
-						}
-						if (Event.current.commandName == "ObjectSelectorClosed")
-						{
-							if (EditorGUIUtility.GetObjectPickerControlID() == name.GetHashCode())
-							{
-								var obj = EditorGUIUtility.GetObjectPickerObject();
-								if (obj != null)
-								{
-									kv.Key.Invoke(target, obj);
-								}
-
-							}
-						}
-					}
-					else
-					{
-						if (GUILayout.Button(name))
-						{
-							kv.Key.Invoke(target);
-						}
-					}
-
-				}
-			}
 		}
 		public void MouseCheck()
 		{
@@ -120,20 +77,7 @@ namespace QTool.Inspector
 				}
 			}
 		}
-		void InvokeQInspectorState(QInspectorState state)
-		{
-			foreach (var kv in typeInfo.inspectorState)
-			{
-				if (kv.Key.state == state)
-				{
-					var result = kv.Value.Invoke(target);
-					if (result is Task task)
-					{
-						_ = task.Run();
-					}
-				}
-			}
-		}
+	
 		void OnPlayMode(PlayModeStateChange state)
 		{
 			QOnPlayModeAttribute.CurrentrState = (PlayModeState)(byte)state;
