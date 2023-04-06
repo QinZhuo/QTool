@@ -1075,20 +1075,73 @@ namespace QTool
 			rect.width = width;
 			return rect;
 		}
-		public static Rect Box(Color color)
+		public static Rect Box(this Color color)
 		{
 			PushColor(color);
-			GUILayout.Box("", Skin.box);
+			GUILayout.Box("", Skin.customStyles[0],GUILayout.Height(Size*2));
 			PopColor();
 			return GUILayoutUtility.GetLastRect();
 		}
-		public static Rect Box(Color color,Rect rect,float left,float right)
+		public static Rect Box(this Color color,Rect rect,float left,float right)
 		{
 			PushColor(color);
 			rect = rect.HorizontalRect(left, right);
-			GUI.Box(rect, "", Skin.box);
+			GUI.Box(rect, "", Skin.customStyles[0]);
 			PopColor();
 			return rect;
+		}
+		public static bool DragBox(this Color color,string key, Rect rect,ref float left,ref float right)
+		{
+			var dragBox= color.Box(rect, left, right);
+			var newBox=dragBox.Drag(rect, key);
+			var drag= newBox != dragBox && Event.current.type != EventType.Layout;
+
+			if (drag)
+			{
+				left=(newBox.xMin-rect.xMin)/rect.width;
+				right = (newBox.xMax - rect.xMin) / rect.width;
+				
+			}
+			left = Mathf.Clamp(left, 0, 1);
+			right = Mathf.Clamp(right, 0, 1);
+			return drag;
+		}
+		private static string DragKey = null;
+		public static Rect Drag(this Rect selectRect,Rect rangeRect,string key)
+		{
+			switch (Event.current.type)
+			{
+				case EventType.MouseDown:
+					{
+						if (selectRect.Contains(Event.current.mousePosition))
+						{
+							DragKey = key;
+							Event.current.Use();
+						}
+					}
+					break;
+				case EventType.MouseDrag:
+					{
+						if (DragKey==key)
+						{
+							selectRect.center = Event.current.mousePosition;
+							selectRect.x = Mathf.Clamp(selectRect.x,rangeRect.xMin, rangeRect.xMax-selectRect.width);
+							selectRect.y = Mathf.Clamp(selectRect.y,rangeRect.yMin, rangeRect.yMax - selectRect.height);
+							Event.current.Use();
+						}
+					}
+					break;
+				case EventType.MouseUp:
+					{
+						if (DragKey == key)
+						{
+							DragKey = null;
+						}
+					}
+					break;
+				default: break;
+			}
+			return selectRect;
 		}
 		public static void ProgressBar(string info, float progress, Color color)
 		{

@@ -1,7 +1,6 @@
-using System.Collections;
+using QTool.Inspector;
 using System.Collections.Generic;
 using UnityEngine;
-using QTool.Inspector;
 namespace QTool
 {
 
@@ -50,48 +49,59 @@ namespace QTool
 		public bool EditClip = false;
 		[SerializeField]
 		[QToolbar(nameof(Animations), pageSize = 5, visibleControl = nameof(EditClip))]
-		[QOnChange(nameof(UpdateAll))]
+		//[QOnChange(nameof(UpdateClip))]
 		private int clipIndex;
-		[QName("时间", nameof(EditClip))]
-		[QOnChange(nameof(UpdateClip))]
-		private float time;
+		
+		private float ClipTim1e=0;
 		private void UpdateClip()
 		{
-			Clip?.SampleAnimation(gameObject, time);
+			Clip?.SampleAnimation(gameObject, ClipTim1e);
 		}
-		private void UpdateAll()
-		{
-			UpdateClip();
-		}
-
+		
+		private bool IsEventDrag=false;
+		private List<AnimationEvent> EventList = new List<AnimationEvent>();
 		public void OnQGUIEditor()
 		{
-			if (Clip != null)
+			EventList.Clear();
+			if (EditClip&&Clip != null)
 			{
-				for (int i = 0; i < Clip.events.Length; i++)
+				EventList.AddRange(Clip.events);
+				var timeRange = QGUI.Box(Color.Lerp(Color.white, Color.clear, 0.6f));
+				var max= Clip.length * Clip.frameRate;
+				for (int i = 1; i <= max; i++)
 				{
-					var eventData = Clip.events[i];
-					var color = eventData.functionName.ToColor();
-					var pos = eventData.time / Clip.length;
-					var rect= QGUI.Box(Color.Lerp(Color.white,Color.black,0.2f));
-					var selectRect= QGUI.Box(color, rect, pos, pos+5/ rect.width);
-					GUI.Label(rect, eventData.functionName,QGUI.CenterLable);
-					if (Event.current.type== EventType.MouseDrag)
+					var pos =( i / Clip.length)/ Clip.frameRate;
+					if (max > 30 && i % 15 != 0)
 					{
-						if (selectRect.Contains(Event.current.mousePosition))
-						{
-							var newTime= (Event.current.mousePosition.x - rect.x) / rect.width * Clip.length; ;
-							if (eventData.time!= newTime)
-							{
-								eventData.time = newTime;
-								Debug.LogError(eventData.time);
-								//UnityEditor.AnimationUtility.SetAnimationEvents
-							}
-						
-						}
+						continue;
+					}
+					var rect = timeRange.HorizontalRect(pos, pos + 0.1f);
+					GUI.Label(rect, i.ToString());
+					UnityEditor.Handles.color = Color.grey;
+					UnityEditor.Handles.DrawLine(new Vector3(rect.x, rect.yMin+4), new Vector3(rect.x, rect.yMax-1));
+
+				}
+				var size = QGUI.Size / timeRange.width ;
+				var left = ClipTim1e / Clip.length;
+				var right = left + size;
+				if (Color.white.DragBox(nameof(ClipTim1e), timeRange,ref left,ref right)){
+					ClipTim1e = (left+size/2)*Clip.length;
+					UpdateClip();
+				}
+				for (int i = 0; i < EventList.Count; i++)
+				{
+					var eventData = EventList[i];
+					var color = eventData.functionName.ToColor();
+					left = eventData.time / Clip.length;
+					right = left + size;
+					var rangeRect= QGUI.Box(Color.Lerp(Color.white,Color.clear,0.6f));
+					GUI.Label(rangeRect, eventData.functionName, QGUI.CenterLable);
+					if (color.DragBox(i + "_"+Clip.name +"_"+ eventData.functionName, rangeRect,ref left, ref right))
+					{
+						EventList[i].time = (left + size / 2) * Clip.length;
+						UnityEditor.AnimationUtility.SetAnimationEvents(Clip, EventList.ToArray());
 					}
 				}
-			
 			}
 		}
 #if UNITY_EDITOR
