@@ -38,7 +38,7 @@ namespace QTool.Inspector
 				return;
 			}
 			serializedObject.Draw();
-			typeInfo.DrawButton(target);
+			typeInfo.DrawGUI(target);
 		}
 		private void OnSceneGUI()
 		{

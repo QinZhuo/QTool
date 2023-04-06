@@ -1067,11 +1067,39 @@ namespace QTool
 		}
 		public static Rect HorizontalRect(this Rect rect, float left, float right)
 		{
+			left = Mathf.Clamp(left,0,1);
+			right = Mathf.Clamp(right, 0, 1);
 			var leftOffset = left * rect.width;
 			var width = (right - left) * rect.width;
 			rect.x += leftOffset;
 			rect.width = width;
 			return rect;
+		}
+		public static Rect Box(Color color)
+		{
+			PushColor(color);
+			GUILayout.Box("", Skin.box);
+			PopColor();
+			return GUILayoutUtility.GetLastRect();
+		}
+		public static Rect Box(Color color,Rect rect,float left,float right)
+		{
+			PushColor(color);
+			rect = rect.HorizontalRect(left, right);
+			GUI.Box(rect, "", Skin.box);
+			PopColor();
+			return rect;
+		}
+		public static void ProgressBar(string info, float progress, Color color)
+		{
+			var rect = Box(Color.white);
+			if (progress > 0)
+			{
+				PushColor(color);
+				Box(color, rect,0, progress);
+				PopColor();
+			}
+			GUI.Label(rect, info, CenterLable);
 		}
 #if UNITY_EDITOR
 
@@ -1093,21 +1121,7 @@ namespace QTool
 				}
 			};
 		}
-		public static void ProgressBar(string info, float progress, Color color)
-		{
-			GUILayout.Box("", Skin.box);
-			var lastRect = GUILayoutUtility.GetLastRect();
-			var rateRect = lastRect;
-			progress = Mathf.Clamp(progress, 0.01f, 1);
-			rateRect.width *= progress;
-			if (progress > 0)
-			{
-				PushColor(color);
-				GUI.Box(rateRect, "", Skin.box);
-				PopColor();
-			}
-			GUI.Label(lastRect, info, CenterLable);
-		}
+	
 		
 	
 		public static void Draw(this SerializedObject serializedObject)

@@ -7,7 +7,7 @@ namespace QTool
 
 	[RequireComponent(typeof(Animator))]
 	[RequireComponent(typeof(QEventTrigger))]
-	public class QAnimator : MonoBehaviour
+	public class QAnimator : MonoBehaviour,IQGUIEditor
 	{
 		Animator _animator;
 		public Animator Animator
@@ -44,58 +44,59 @@ namespace QTool
 		{
 			return Animator.GetBoneTransform(name);
 		}
-#if UNITY_EDITOR
-		[QToggle("预览动画")]
-		public bool PreviewClip;
+		private AnimationClip[] Animations => Animator.runtimeAnimatorController.animationClips;
+		private AnimationClip Clip => Animations.Get(clipIndex);
+		[QToggle("编辑动画")]
+		public bool EditClip = false;
 		[SerializeField]
-		[QToolbar(nameof(Animations), pageSize = 5, visibleControl = nameof(PreviewClip))]
+		[QToolbar(nameof(Animations), pageSize = 5, visibleControl = nameof(EditClip))]
 		[QOnChange(nameof(UpdateAll))]
 		private int clipIndex;
-		private AnimationClip[] Animations => Animator.runtimeAnimatorController.animationClips;
-		[SerializeField]
-		[QName("动画进度", nameof(PreviewClip))]
-		[Range(0, 1)]
+		[QName("时间", nameof(EditClip))]
 		[QOnChange(nameof(UpdateClip))]
-		private float animationStep;
-		[SerializeField]
-		[QReadonly]
-		[QName("时间", nameof(PreviewClip))]
 		private float time;
-		private List<ClipEventData> Events { get; set; }= new List<ClipEventData>();
-		[QToolbar(nameof(Events),visibleControl = nameof(PreviewClip),name ="事件")]
-		public int eventIndex;
-		struct ClipEventData
-		{
-			public string name;
-			public float time;
-			public override string ToString()
-			{
-				return name + " " + time;
-			}
-		}
 		private void UpdateClip()
 		{
-			if (clipIndex < Animations.Length)
-			{
-				var clip = Animations[clipIndex];
-				time = clip.length * animationStep;
-				clip.SampleAnimation(gameObject, time);
-			}
+			Clip?.SampleAnimation(gameObject, time);
 		}
 		private void UpdateAll()
 		{
 			UpdateClip();
-			if (clipIndex < Animations.Length)
+		}
+
+		public void OnQGUIEditor()
+		{
+			if (Clip != null)
 			{
-				var clip = Animations[clipIndex];
-				Events.Clear();
-				foreach (var eventData in clip.events)
+				for (int i = 0; i < Clip.events.Length; i++)
 				{
-					Events.Add(new ClipEventData { name = eventData.stringParameter, time = eventData.time }); 
+					var eventData = Clip.events[i];
+					var color = eventData.functionName.ToColor();
+					var pos = eventData.time / Clip.length;
+					var rect= QGUI.Box(Color.Lerp(Color.white,Color.black,0.2f));
+					var selectRect= QGUI.Box(color, rect, pos, pos+5/ rect.width);
+					GUI.Label(rect, eventData.functionName,QGUI.CenterLable);
+					if (Event.current.type== EventType.MouseDrag)
+					{
+						if (selectRect.Contains(Event.current.mousePosition))
+						{
+							var newTime= (Event.current.mousePosition.x - rect.x) / rect.width * Clip.length; ;
+							if (eventData.time!= newTime)
+							{
+								eventData.time = newTime;
+								Debug.LogError(eventData.time);
+								//UnityEditor.AnimationUtility.SetAnimationEvents
+							}
+						
+						}
+					}
 				}
+			
 			}
 		}
-		[QName("定位动画文件", nameof(PreviewClip))]
+#if UNITY_EDITOR
+
+		[QName("定位动画文件", nameof(EditClip))]
 		public void SelectClip()
 		{
 			if (clipIndex < Animations.Length)
@@ -103,7 +104,8 @@ namespace QTool
 				UnityEditor.Selection.activeObject = Animations[clipIndex];
 			}
 		}
-		
+
+
 		public UnityEditor.Animations.AnimatorController AnimatorController => (Animator.runtimeAnimatorController as UnityEditor.Animations.AnimatorController);
 
 		private List<string> _states = null;

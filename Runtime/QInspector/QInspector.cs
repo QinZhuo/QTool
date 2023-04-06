@@ -249,7 +249,7 @@ namespace QTool.Inspector
 				}
 			}
 		}
-		public void DrawButton(object target)
+		public void DrawGUI(object target)
 		{
 			foreach (var kv in buttonFunc)
 			{
@@ -290,6 +290,10 @@ namespace QTool.Inspector
 
 				}
 			}
+			if(target is IQGUIEditor qGUIEditor)
+			{
+				qGUIEditor.OnQGUIEditor();
+			}
 		}
 		public void DrawComponent(Component component)
 		{
@@ -313,7 +317,7 @@ namespace QTool.Inspector
 								}
 							}
 						}
-						DrawButton(component);
+						DrawGUI(component);
 					}
 				}
 
