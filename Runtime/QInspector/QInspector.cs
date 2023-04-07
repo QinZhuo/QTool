@@ -48,6 +48,7 @@ namespace QTool
 			this.name = name;
 		}
 	}
+	
 	/// <summary>
 	/// 使数据在inspector视窗不可更改
 	/// </summary>
@@ -251,6 +252,10 @@ namespace QTool.Inspector
 		}
 		public void DrawGUI(object target)
 		{
+			if (target is IQGUIEditor qGUIEditor)
+			{
+				qGUIEditor.OnQGUIEditor();
+			}
 			foreach (var kv in buttonFunc)
 			{
 				var att = kv.Value;
@@ -289,10 +294,6 @@ namespace QTool.Inspector
 					}
 
 				}
-			}
-			if(target is IQGUIEditor qGUIEditor)
-			{
-				qGUIEditor.OnQGUIEditor();
 			}
 		}
 		public void DrawComponent(Component component)

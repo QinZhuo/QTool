@@ -136,7 +136,7 @@ namespace QTool
         public List<BoolEventTrigger> boolEventList = new List<BoolEventTrigger>();
         public List<FloatEventTrigger> floatEventList = new List<FloatEventTrigger>();
 		public List<ObjectEventTrigger> objectEventList = new List<ObjectEventTrigger>();
-		public void Awake()
+		protected void Awake()
 		{
 			if (GlobalEvent)
 			{
@@ -162,7 +162,7 @@ namespace QTool
 				}
 			}
 		}
-		public void OnDestroy()
+		protected void OnDestroy()
 		{
 			if (GlobalEvent)
 			{

@@ -1090,20 +1090,17 @@ namespace QTool
 			PopColor();
 			return rect;
 		}
-		public static bool DragBox(this Color color,string key, Rect rect,ref float left,ref float right)
+		public static bool DragBar(this Color color,string key, Rect rect,ref float value)
 		{
-			var dragBox= color.Box(rect, left, right);
+			var size =3/ rect.width;
+			var dragBox= color.Box(rect, value- size, value+size);
 			var newBox=dragBox.Drag(rect, key);
 			var drag= newBox != dragBox && Event.current.type != EventType.Layout;
-
 			if (drag)
 			{
-				left=(newBox.xMin-rect.xMin)/rect.width;
-				right = (newBox.xMax - rect.xMin) / rect.width;
-				
+				value=(newBox.center.x-rect.xMin)/rect.width;
 			}
-			left = Mathf.Clamp(left, 0, 1);
-			right = Mathf.Clamp(right, 0, 1);
+			value = Mathf.Clamp(value, 0, 1);
 			return drag;
 		}
 		private static string DragKey = null;
@@ -1133,10 +1130,7 @@ namespace QTool
 					break;
 				case EventType.MouseUp:
 					{
-						if (DragKey == key)
-						{
-							DragKey = null;
-						}
+						DragKey = null;
 					}
 					break;
 				default: break;
@@ -1154,6 +1148,43 @@ namespace QTool
 			}
 			GUI.Label(rect, info, CenterLable);
 		}
+		public static void RightMenu(this Rect rect, Action<QGenericMenu> action, Action click = null)
+		{
+			if (EventType.MouseUp.Equals(Event.current.type))
+			{
+				if (rect.Contains(Event.current.mousePosition))
+				{
+					switch (Event.current.button)
+					{
+						case 0:
+							{
+								if (click != null)
+								{
+									click.Invoke();
+									Event.current.Use();
+								}
+							}
+							break;
+						case 1:
+							{
+								if (action != null)
+								{
+									var rightMenu = new QGenericMenu();
+									action.Invoke(rightMenu);
+									rightMenu.ShowAsContext();
+									Event.current.Use();
+								}
+
+							}
+							break;
+						default:
+							break;
+					}
+				}
+
+			}
+		}
+
 #if UNITY_EDITOR
 
 		[UnityEditor.SettingsProvider]
@@ -1204,43 +1235,7 @@ namespace QTool
 
 	
 
-		public static void MouseMenuClick(this Rect rect, System.Action<GenericMenu> action, Action click = null)
-		{
-			if (EventType.MouseUp.Equals(Event.current.type))
-			{
-				if (rect.Contains(Event.current.mousePosition))
-				{
-					switch (Event.current.button)
-					{
-						case 0:
-							{
-								if (click != null)
-								{
-									click.Invoke();
-									Event.current.Use();
-								}
-							}
-							break;
-						case 1:
-							{
-								if (action != null)
-								{
-									var rightMenu = new GenericMenu();
-									action.Invoke(rightMenu);
-									rightMenu.ShowAsContext();
-									Event.current.Use();
-								}
-
-							}
-							break;
-						default:
-							break;
-					}
-				}
-
-			}
-		}
-
+	
 		public static void Draw(this SerializedProperty property, Rect rect, GUIContent content = null)
 		{
 			if (!property.IsShow()) return;
@@ -1923,6 +1918,7 @@ namespace QTool
 			menu.AddItem(content, on,()=>action());
 #endif
 		}
+		
 		public void AddSeparator(string key="")
 		{
 #if UNITY_EDITOR

@@ -83,7 +83,6 @@ namespace QTool.Reflection
 		}
 		public MethodInfo MethodInfo { get; private set; }
 		public bool IsPublic => MethodInfo.IsPublic;
-		public Attribute Attribute { get; set; }
 		public object Invoke(object target, params object[] param)
 		{
 			if (ParamInfos.Length > param.Length)
@@ -311,6 +310,7 @@ namespace QTool.Reflection
     #endregion
     public static class QReflection
 	{
+		
 		static Type GetOperaterType(object a,object b)
 		{
 			if (a == null)
