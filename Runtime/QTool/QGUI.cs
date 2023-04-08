@@ -914,7 +914,8 @@ namespace QTool
 			if (obj is UnityEngine.Object uObj)
 			{
 #if UNITY_EDITOR
-				return new GUIContent(uObj.name, AssetPreview.GetAssetPreview(uObj), uObj.ToString());
+				if(uObj==null)return new GUIContent();
+				return new GUIContent(uObj?.name, AssetPreview.GetAssetPreview(uObj), uObj?.ToString());
 #else
 				return new GUIContent(uObj.name, uObj.ToString());
 #endif
