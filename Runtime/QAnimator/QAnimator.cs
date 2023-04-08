@@ -230,7 +230,7 @@ namespace QTool
 			EventList.Clear();
 			if (EditClip&&Clip != null)
 			{
-				EventList.RemoveAll((data) => data.time<=0|| data.time > Clip.length);
+				EventList.RemoveAll((data) => ! (data.time>=0&&data.time<= Clip.length));
 				EventList.AddRange(Clip.events);
 				EventList.Sort((a, b) => string.Compare(a.functionName, b.functionName));
 				TimeTarck();

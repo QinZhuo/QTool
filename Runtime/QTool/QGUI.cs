@@ -1092,15 +1092,15 @@ namespace QTool
 		}
 		public static bool DragBar(this Color color,string key, Rect rect,ref float value,Action<QGenericMenu> action=null)
 		{
-			var size =3/ rect.width;
-			var dragBox= color.Box(rect, value- size, value+size);
+			var width = 6 / rect.width;
+			var dragBox= color.Box(rect, value, value+ width);
 			var newBox=dragBox.Drag(rect, key, action);
 			var drag= newBox != dragBox && Event.current.type != EventType.Layout;
 			if (drag)
 			{
-				value=(newBox.center.x-rect.xMin)/rect.width;
+				value=(newBox.x-rect.xMin)/rect.width;
 			}
-			value = Mathf.Clamp(value, 0, 1);
+			value = Mathf.Clamp(value, 0, 1- width);
 			return drag;
 		}
 		internal static string DragKey { get; set; } = null;
