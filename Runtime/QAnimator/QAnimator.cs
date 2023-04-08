@@ -1,9 +1,9 @@
 using QTool.Inspector;
-using System.Collections.Generic;
-using UnityEngine;
 using QTool.Reflection;
 using System;
+using System.Collections.Generic;
 using System.Reflection;
+using UnityEngine;
 
 namespace QTool
 {
@@ -39,25 +39,16 @@ namespace QTool
 			}
 			return null;
 		}
-		[QAnimatorTrack]
-		public void Attack() {
-			Debug.LogError("start");
-		}
-		[QAnimatorTrack]
-		public void AttackEnd()
-		{
-			Debug.LogError("end");
-		}
-		[QAnimatorTrack]
-		public void QEventTrigger(string eventName)
-		{
-			gameObject.InvokeEvent(eventName);
-		}
 		public Transform GetHumanBone(HumanBodyBones name)
 		{
 			return Animator.GetBoneTransform(name);
 		}
-		private AnimationClip[] Animations => Animator.runtimeAnimatorController.animationClips;
+		private AnimationClip[] Animations =>
+#if UNITY_EDITOR
+			Animator.runtimeAnimatorController.animationClips;
+#else
+			null;
+#endif
 		private AnimationClip Clip => Animations.Get(clipIndex);
 		[QToggle("编辑动画")]
 		public bool EditClip = false;
@@ -73,7 +64,6 @@ namespace QTool
 
 		private bool IsEventDrag = false;
 		private List<AnimationEvent> EventList = new List<AnimationEvent>();
-		private AnimationEvent CurEvent { get; set; }
 		private int GetTimeStep()
 		{
 			var max = Clip.length * Clip.frameRate;
@@ -105,68 +95,55 @@ namespace QTool
 			infos.RemoveAll((func) => func.MethodInfo.GetCustomAttribute<QAnimatorTrackAttribute>() == null);
 			return infos;
 		}
-		public void AddEvent(string name, float time = 0)
+		private void SaveEvents(string lastKey=null, string dragKey=null)
 		{
-			EventList.Add(new AnimationEvent { functionName = name, time = time });
+			if (QGUI.DragKey==lastKey&&!dragKey.IsNull())
+			{
+				QGUI.DragKey = dragKey;
+			}
+#if UNITY_EDITOR
 			UnityEditor.AnimationUtility.SetAnimationEvents(Clip, EventList.ToArray());
+#endif
+		}
+		private AnimationEvent AddEvent(string name, float time = 0)
+		{
+			var newEvent = new AnimationEvent { functionName = name, time = time };
+			EventList.Add(newEvent);
 			if (!name.EndsWith("End"))
 			{
 				var func = EventFunctions.Get(name + "End", (obj) => obj.Name);
 				if (func != null)
 				{
-					AddEvent(func.Name, time + 0.5f);
+					var endEvent= AddEvent(func.Name, time);
+					SetTime(endEvent, time + 0.1f * Clip.length);
 				}
+				SaveEvents();
 			}
+			return newEvent;
+		}
+		private void RemoveEvent(params AnimationEvent[] eventDatas)
+		{
+			foreach (var item in eventDatas)
+			{
+				EventList.Remove(item);
+			}
+			SaveEvents();
 		}
 		List<QFunctionInfo> events = null;
 		List<QFunctionInfo> EventFunctions => events ??= GetAnimationEvents();
-		QDictionary<string, QEventTrack> EventTracks = new QDictionary<string, QEventTrack>((key) => new QEventTrack());
-		class QEventTrack
-		{
-			public Rect Rect;
-			public QAnimatorTrackType Type = QAnimatorTrackType.普通;
-		}
-		enum QAnimatorTrackType
-		{
-			普通,
-			范围,
-		}
+		QDictionary<string, Rect> EventTracks = new QDictionary<string, Rect>();
+		
+	
 		private Rect GetTrack(string name, QFunctionInfo qFunctionInfo = null)
 		{
 			name = name.SplitStartString("End");
 			if (!EventTracks.ContainsKey(name))
 			{
-				if (qFunctionInfo!=null&&qFunctionInfo.ParamInfos.Length > 0)
-				{
-					EventTracks[name].Type = QAnimatorTrackType.范围;
-				}
 				var rect = QGUI.Box(Color.Lerp(Color.white, Color.clear, 0.6f));
-				EventTracks[name].Rect = rect;
+				EventTracks[name] = rect;
 				GUI.Label(rect, name, QGUI.CenterLable);
-				var mousePos = Event.current.mousePosition;
-				var curValue = (mousePos.x - rect.xMin) / rect.width;
-				rect.RightMenu((menu) =>
-				{
-					menu.AddItem("添加事件".ToGUIContent(), false, () =>
-					{
-						AddEvent(name, (int)(curValue * Clip.length * Clip.frameRate) / Clip.frameRate);
-					});
-					CurEvent = EventList.Find((obj) => Mathf.Abs(obj.time / Clip.length - curValue) < 0.01f);
-					if (CurEvent != null)
-					{
-						menu.AddItem("删除事件".ToGUIContent(), false, () =>
-						{
-							EventList.Remove(CurEvent);
-							UnityEditor.AnimationUtility.SetAnimationEvents(Clip, EventList.ToArray());
-						});
-					}
-				},
-				() =>
-				{
-					CurEvent = EventList.Find((obj) => Mathf.Abs(obj.time / Clip.length - curValue) < 0.01f);
-				});
 			}
-			return EventTracks[name].Rect;
+			return EventTracks[name];
 		}
 		private void TimeTarck()
 		{
@@ -175,52 +152,77 @@ namespace QTool
 			var value = ClipTim1e / Clip.length;
 			if (Color.white.DragBar(nameof(ClipTim1e), timeRange, ref value))
 			{
-				ClipTim1e = (int)(value * Clip.length * Clip.frameRate) / Clip.frameRate;
+				ClipTim1e = value * Clip.length;
 				UpdateClip();
 			}
 			var max = Clip.length * Clip.frameRate;
 			var timeStep = GetTimeStep();
+
 			for (int i = 1; i <= max; i++)
 			{
 				var pos = (i / Clip.length) / Clip.frameRate;
-				if (i % timeStep != 0)
+				if (timeStep!=0&& i % timeStep != 0)
 				{
 					continue;
 				}
 				var rect = timeRange.HorizontalRect(pos, pos + 0.1f);
 				GUI.Label(rect, i.ToString());
+#if UNITY_EDITOR
 				UnityEditor.Handles.color = Color.grey;
 				UnityEditor.Handles.DrawLine(new Vector3(rect.x, rect.yMin + 4), new Vector3(rect.x, rect.yMax - 1));
+#endif
 			}
 		}
-		private AnimationEvent GetStart(AnimationEvent end)
+		private AnimationEvent GetLeft(AnimationEvent cur)
 		{
-			var key = end.functionName.SplitStartString("End");
-			AnimationEvent start = null;
+			var key = cur.functionName.SplitStartString("End");
+			AnimationEvent left = null;
 			foreach (var eventData in EventList)
 			{
-				if (eventData.functionName == key && eventData.time <= end.time)
+				if (eventData == cur) continue;
+				if ((eventData.functionName == key || eventData.functionName.SplitStartString("End") == key) && eventData.time < cur.time)
 				{
-					if (start == null)
+					if (left == null)
 					{
-						start = eventData;
+						left = eventData;
 					}
-					else if (eventData.time > start.time)
+					else if (eventData.time > left.time)
 					{
-						start = eventData;
+						left = eventData;
 					}
 				}
 			}
-			return start;
+			return left;
 		}
-		private void SetTime(AnimationEvent cur,float value)
+		private AnimationEvent GetRight(AnimationEvent cur)
 		{
-			var index= EventList.IndexOf(cur);
-			var start = EventList.Get(index - 1);
-			var left =  start != null && start.functionName == cur.functionName ? start.time/Clip.length+0.01f : 0;
-			var end = EventList.Get(index + 1);
-			var right = end != null && end.functionName == cur.functionName ? end.time/Clip.length-0.01f : 1;
-			cur.time = Mathf.Clamp(value, left, right) *Clip.length ;
+			var key = cur.functionName.SplitStartString("End");
+			AnimationEvent right = null;
+			foreach (var eventData in EventList)
+			{
+				if (eventData == cur) continue;
+				if ((eventData.functionName == key||eventData.functionName.SplitStartString("End")==key) && eventData.time > cur.time)
+				{
+					if (right == null)
+					{
+						right = eventData;
+					}
+					else if (eventData.time < right.time)
+					{
+						right = eventData;
+					}
+				}
+			}
+			return right;
+		}
+		private void SetTime(AnimationEvent eventData,float value)
+		{
+			var width= GetTrack(eventData.functionName).width;
+			var start = GetLeft(eventData);
+			var left =  start != null ? start.time/Clip.length+ 6/width : 0;
+			var end = GetRight(eventData);
+			var right = end != null ? end.time/Clip.length- 6 / width : 1;
+			eventData.time = Mathf.Clamp(value, left, right) *Clip.length ;
 		}
 		public void OnQGUIEditor()
 		{
@@ -228,7 +230,7 @@ namespace QTool
 			EventList.Clear();
 			if (EditClip&&Clip != null)
 			{
-				EventList.RemoveAll((data) => data.time > Clip.length);
+				EventList.RemoveAll((data) => data.time<=0|| data.time > Clip.length);
 				EventList.AddRange(Clip.events);
 				EventList.Sort((a, b) => string.Compare(a.functionName, b.functionName));
 				TimeTarck();
@@ -236,35 +238,51 @@ namespace QTool
 				{
 					GetTrack(eventFunc.Name,eventFunc);
 				}
-				int i = 0;
 				foreach (var eventData in EventList)
 				{
 					var trackRect = GetTrack(eventData.functionName);
 					var color = eventData.functionName.ToColor();
 					var value = eventData.time / Clip.length;
-					//trackRect.HorizontalRect(range.Item1, range.Item2)
-					if (color.DragBar(i++ + "_" + eventData.functionName, trackRect, ref value))
+					var key = eventData.GetKey();
+					if (color.DragBar(key, trackRect, ref value,(menu)=> {
+						menu.AddItem("删除事件".ToGUIContent(), false, () => RemoveEvent( eventData));
+					}))
 					{
 						SetTime(eventData, value);
 						ClipTim1e = eventData.time;
 						UpdateClip();
-						UnityEditor.AnimationUtility.SetAnimationEvents(Clip, EventList.ToArray());
+						SaveEvents(key, eventData.GetKey());
 					}
 					if (eventData.functionName.EndsWith("End"))
 					{
-						var start= GetStart(eventData);
-						if (start!=null)
+						var start = GetLeft(eventData);
+						if (start != null)
 						{
-							var box= color.Box(trackRect, start.time / Clip.length, value);
-							var newRect=box.Drag( trackRect, i++ + "_" + eventData.functionName + "Range");
-							if (newRect != trackRect&&Event.current.type!= EventType.Layout)
+							var box = color.Box(trackRect, start.time / Clip.length, value);
+							var newRect = box.Drag(trackRect, key + "_Range", (menu) => {
+								menu.AddItem("删除事件".ToGUIContent(), false, () =>RemoveEvent(start, eventData));
+							});
+							if (newRect != trackRect && Event.current.type != EventType.Layout)
 							{
 								SetTime(start, (newRect.xMin - trackRect.xMin) / trackRect.width);
 								SetTime(eventData, (newRect.xMax - trackRect.xMin) / trackRect.width);
-								UnityEditor.AnimationUtility.SetAnimationEvents(Clip, EventList.ToArray());
+								SaveEvents(key + "_Range",eventData.GetKey()+"_Range");
 							}
 						}
 					}
+				}
+				foreach (var track in EventTracks)
+				{
+					var rect = track.Value;
+					var mousePos = Event.current.mousePosition;
+					var curValue = (mousePos.x - rect.xMin) / rect.width;
+					rect.MouseMenu((menu) =>
+					{
+						menu.AddItem("添加事件".ToGUIContent(), false, () =>
+						{
+							AddEvent(track.Key, curValue * Clip.length);
+						});
+					});
 				}
 			}
 		}
@@ -339,7 +357,7 @@ namespace QTool
 		public static string GetKey(this AnimationEvent animationEvent)
 		{
 			if (animationEvent == null) return "";
-			return animationEvent.functionName + animationEvent.time;
+			return animationEvent.functionName + animationEvent.time.ToString("f3");
 		}
 		public static void SetTrigger(this Animator animator,string name,Vector2 vector2)
 		{

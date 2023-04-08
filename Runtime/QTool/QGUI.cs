@@ -1090,11 +1090,11 @@ namespace QTool
 			PopColor();
 			return rect;
 		}
-		public static bool DragBar(this Color color,string key, Rect rect,ref float value)
+		public static bool DragBar(this Color color,string key, Rect rect,ref float value,Action<QGenericMenu> action=null)
 		{
 			var size =3/ rect.width;
 			var dragBox= color.Box(rect, value- size, value+size);
-			var newBox=dragBox.Drag(rect, key);
+			var newBox=dragBox.Drag(rect, key, action);
 			var drag= newBox != dragBox && Event.current.type != EventType.Layout;
 			if (drag)
 			{
@@ -1103,8 +1103,8 @@ namespace QTool
 			value = Mathf.Clamp(value, 0, 1);
 			return drag;
 		}
-		private static string DragKey = null;
-		public static Rect Drag(this Rect selectRect,Rect rangeRect,string key)
+		internal static string DragKey { get; set; } = null;
+		public static Rect Drag(this Rect selectRect,Rect rangeRect,string key,Action<QGenericMenu> action)
 		{
 			switch (Event.current.type)
 			{
@@ -1135,6 +1135,7 @@ namespace QTool
 					break;
 				default: break;
 			}
+			selectRect.MouseMenu(action);
 			return selectRect;
 		}
 		public static void ProgressBar(string info, float progress, Color color)
@@ -1148,7 +1149,7 @@ namespace QTool
 			}
 			GUI.Label(rect, info, CenterLable);
 		}
-		public static void RightMenu(this Rect rect, Action<QGenericMenu> action, Action click = null)
+		public static void MouseMenu(this Rect rect, Action<QGenericMenu> action)
 		{
 			if (EventType.MouseUp.Equals(Event.current.type))
 			{
@@ -1156,15 +1157,6 @@ namespace QTool
 				{
 					switch (Event.current.button)
 					{
-						case 0:
-							{
-								if (click != null)
-								{
-									click.Invoke();
-									Event.current.Use();
-								}
-							}
-							break;
 						case 1:
 							{
 								if (action != null)
