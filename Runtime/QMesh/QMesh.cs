@@ -172,7 +172,7 @@ namespace QTool
 			root.sharedMesh.RecalculateBounds();
 			root.bones = bones.ToArray();
 			root.materials = matList.ToArray();
-			root.localBounds =root.sharedMesh.bounds;
+			root.localBounds = root.GetBounds();
 		}
 	}
 }
