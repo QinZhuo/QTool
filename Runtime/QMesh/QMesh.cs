@@ -156,12 +156,12 @@ namespace QTool
 				}
 				foreach (var bone in skinedMesh.bones)
 				{
-					bones.Add(childs.Get(bone.name, (trans) => trans.name));
+					bones.AddCheckExist(childs.Get(bone.name, (trans) => trans.name));
 				}
 			}
 			if (root.sharedMesh == null)
 			{
-				root.sharedMesh = new UnityEngine.Mesh();
+				root.sharedMesh = new Mesh();
 			}
 			else
 			{
@@ -172,7 +172,6 @@ namespace QTool
 			root.sharedMesh.RecalculateBounds();
 			root.bones = bones.ToArray();
 			root.materials = matList.ToArray();
-			root.localBounds =default;
 		}
 	}
 }
