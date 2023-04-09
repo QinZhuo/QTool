@@ -172,6 +172,16 @@ namespace QTool
 			root.bones = bones.ToArray();
 			root.materials = matList.ToArray();
 			root.sharedMesh.RecalculateBounds();
+			root.localBounds = default;
+#if UNITY_EDITOR
+			if (!Application.isPlaying)
+			{
+				if(root.IsPrefabInstance(out var prefab))
+				{
+					UnityEditor.AssetDatabase.CreateAsset(root.sharedMesh,UnityEditor.AssetDatabase.GetAssetPath(prefab).SplitStartString(".prefab") + "/" + nameof(QCombineMesh) + ".mesh");
+				}
+			}
+#endif
 		}
 	}
 }
