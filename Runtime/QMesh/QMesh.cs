@@ -176,11 +176,10 @@ namespace QTool
 #if UNITY_EDITOR
 			if (!Application.isPlaying)
 			{
-				if(root.IsPrefabInstance(out var prefab))
+				if(!root.sharedMesh.IsAsset()&& root.IsPrefabInstance(out var prefab))
 				{
-					var path= UnityEditor.AssetDatabase.GetAssetPath(prefab).SplitStartString(".prefab") + "/" + nameof(QCombineMesh) + ".mesh";
-					
-					UnityEditor.AssetDatabase.CreateAsset(root.sharedMesh, path.CheckDirectoryPath() );
+					var path= UnityEditor.AssetDatabase.GetAssetPath(prefab).SplitStartString(".prefab") +"_"+ nameof(QCombineMesh) + ".mesh";
+					UnityEditor.AssetDatabase.CreateAsset(root.sharedMesh, path);
 				}
 			}
 #endif
