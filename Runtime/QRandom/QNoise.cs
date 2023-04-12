@@ -79,7 +79,7 @@ namespace QTool
 				var intx = FixIndex(ref x);
 				var inty = FixIndex(ref y);
 				var intz = FixIndex(ref z);
-				var xt = Curve(x - intx);
+				var xt = x - intx;
 				var y1 = GetValue(intx, inty, intz).Lerp(GetValue(intx + 1, inty, intz), xt);
 				var y2 = GetValue(intx, inty + 1, intz).Lerp(GetValue(intx + 1, inty + 1, intz), xt);
 				var y3 = GetValue(intx, inty, intz + 1).Lerp(GetValue(intx + 1, inty, intz + 1), xt);
@@ -108,7 +108,7 @@ namespace QTool
 	/// <summary>
 	/// 柏林噪声
 	/// </summary>
-	public class QPerlinNoise : QWhiteNoise
+	public class QPerlinNoise : QValueNoise
 	{
 		public override float this[float x, float y]
 		{
@@ -116,11 +116,13 @@ namespace QTool
 			{
 				var intx = FixIndex(ref x);
 				var inty = FixIndex(ref y);
-				var xt = Curve(x - intx);
-				var yt = Curve(y - inty);
-				var y1 = Grad(GetValue(intx, inty), xt, yt).Lerp(Grad(GetValue(intx + 1, inty), xt - 1, yt), xt);
-				var y2 = Grad(GetValue(intx, inty + 1), xt, yt - 1).Lerp(Grad(GetValue(intx + 1, inty + 1), xt - 1, yt - 1), xt);
-				return (y1.Lerp(y2, yt) + 1f) / 2f;
+				var xt = x - intx;
+				var cxt = Curve(xt);
+				var yt = y - inty ;
+				var cyt = Curve(yt);
+				var y1 = Grad(GetValue(intx, inty), xt, yt).Lerp(Grad(GetValue(intx + 1, inty), xt - 1, yt), cxt);
+				var y2 = Grad(GetValue(intx, inty + 1), xt, yt - 1).Lerp(Grad(GetValue(intx + 1, inty + 1), xt - 1, yt - 1), cxt);
+				return (y1.Lerp(y2, cyt) + 1f) / 2f;
 			}
 		}
 		
