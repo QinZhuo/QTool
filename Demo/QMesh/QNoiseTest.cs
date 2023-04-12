@@ -12,23 +12,18 @@ namespace QTool.Mesh
 		private Texture2D texture;
 		public void NoiseTest()
 		{
-			QVoxel voxel = new QValueNoise();
-
+			var noise = new QNoise();
 			texture = new Texture2D(512, 512);
 			for (int y = 0; y < texture.height; y++)
 			{
 				for (int x = 0; x < texture.height; x++)
 				{
-					float n = voxel[x/10f, y/10f];
+					float n = noise[x*1f/ texture.width, y*1f/ texture.height];
 					texture.SetPixel(x, y, new Color(n, n, n, 1));
 				}
 			}
-
-
 			texture.Apply();
-			gameObject.GenerateMesh(voxel, material);
-
-			
+			gameObject.GenerateMesh(new QNoiseVoxel(noise), material);
 		}
 		void Start()
 		{

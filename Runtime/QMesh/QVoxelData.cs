@@ -72,6 +72,18 @@ namespace QTool
 		}
 		public override float this[int x,int y,int z]=> Voxels[new Vector3Int(x,y,z)];
 	}
+	public class QNoiseVoxel : QVoxel
+	{
+		private QNoise qNoise;
+		public QNoiseVoxel(QNoise qNoise)
+		{
+			this.qNoise = qNoise;
+			Surface = 0.5f;
+			Min = Vector3Int.one * -10;
+			Max = Vector3Int.one * 10;
+		}
+		public override float this[int x, int y, int z] => qNoise[x/ 20f, y/ 20f, z/20f];
+	}
 	public abstract class QVoxel:QSerializeObject
 	{
 		[QName("Colors")]

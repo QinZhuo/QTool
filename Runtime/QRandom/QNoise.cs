@@ -3,65 +3,83 @@ using System.Collections.Generic;
 using UnityEngine;
 namespace QTool
 {
-
-	public abstract class QNoiseVoxel:QVoxel
+	public class QNoise
 	{
-	
-		public QNoiseVoxel()
-		{
-			Surface = 0.5f;
-			Max = Vector3Int.one * 8;
-			Min = Vector3Int.one;
-		}
-		
-	}
-	public class QValueNoise : QNoiseVoxel
-	{
-
-		private QNoiseTable Table { get; set; }
-		public QValueNoise(int seed = 0) 
-		{
-			Table = QNoiseTable.Tables[seed];
-		}
-		public override float this[int x] => Table[x];
-
-		public override float this[int x, int y] => Table[x, y];
-
-		public override float this[int x, int y, int z] => Table[x, y, z];
-	}
-
-    internal class QNoiseTable
-	{
-		public static QDictionary<int, QNoiseTable> Tables = new QDictionary<int, QNoiseTable>((seed) => new QNoiseTable(seed));
 		const int Size = 1024;
-		System.Random Random = null;
+		const int Range = Size - 1;
 		float[] Table = new float[Size];
-		private QNoiseTable(int seed = 0)
+		public float Scale=10;
+		public QNoise(int seed = 0)
 		{
-			Random = new System.Random(seed);
+			var Random = new System.Random(seed);
 			for (int i = 0; i < Size; i++)
 			{
-				Table[i] = (Random.Next()%Size)/(1f*Size);
+				Table[i] = (Random.Next()&Range) / (1f * Size);
 			}
 		}
-		public float this[int x]=>Table[x%Size];
-		int GetIndex(int i)
+		private int OffsetIndex(int i)
 		{
-			return (int)(this[i] * Size) ;
+			return (int)(GetValue(i) * Size);
 		}
-		public float this[int x, int y]
+		private float GetValue(int x)
+		{
+			return Table[x & Range];
+		}
+		private float GetValue(int x,int y)
+		{
+			return GetValue(y + OffsetIndex(x));
+		}
+		private float GetValue(int x, int y,int z)
+		{
+			return GetValue(z + OffsetIndex(y + OffsetIndex(x)));
+		}
+		private int FixIndex(ref float value)
+		{
+			value *= Scale;
+			return (int)value;
+		}
+		public float this[float x]
 		{
 			get
 			{
-				return this[y + GetIndex(x)];
+				var intx = FixIndex(ref x);
+				return GetValue(intx).LerpTo(GetValue(intx + 1), x - intx);
 			}
 		}
-		public float this[int x, int y, int z]
+		public float this[float x, float y]
 		{
 			get
 			{
-				return this[z + GetIndex(y + GetIndex(x))];
+				var intx = FixIndex(ref x);
+				var inty = FixIndex(ref y);
+				var xt = x - intx;
+				var y1 = GetValue(intx,inty).LerpTo(GetValue(intx+1, inty), xt);
+				var y2 = GetValue(intx, inty+1).LerpTo(GetValue(intx+1, inty + 1), xt);
+				return y1.LerpTo(y2, y - inty);
 			}
 		}
+		public float this[float x, float y, float z]
+		{
+			get
+			{
+				var intx = FixIndex(ref x);
+				var inty = FixIndex(ref y);
+				var intz = FixIndex(ref z);
+				var xt = x - intx;
+				var y1 = GetValue(intx, inty,intz).LerpTo(GetValue(intx+1, inty, intz), xt);
+				var y2 = GetValue(intx, inty+1, intz).LerpTo(GetValue(intx+1, inty+1, intz), xt);
+				var y3 = GetValue(intx, inty, intz+1).LerpTo(GetValue(intx+1, inty, intz+1), xt);
+				var y4 = GetValue(intx, inty+1, intz+1).LerpTo(GetValue(intx+1, inty+1, intz+1), xt);
+				var yt = y - inty;
+				var z1 = y1.LerpTo(y2, yt);
+				var z2 = y3.LerpTo(y4, yt);
+				return z1.LerpTo(z2, z - intz);
+			}
+		}
+	}
+
+	public class QValueNoise:QNoise
+	{
+
 	}
 }
