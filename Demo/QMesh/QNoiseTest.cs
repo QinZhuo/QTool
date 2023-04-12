@@ -11,13 +11,17 @@ namespace QTool.Mesh
 		private Texture2D texture;
 		public void NoiseTest()
 		{
-			var noise = new QTurbulenceNoise();
+			var noise = new QPerlinNoise();
 			texture = new Texture2D(256, 256);
 			for (int y = 0; y < texture.height; y++)
 			{
 				for (int x = 0; x < texture.height; x++)
 				{
 					float n = noise[x*1f/ texture.width, y*1f/ texture.height];
+					if (n < 0 || n > 1)
+					{
+						Debug.LogError(n);
+					}
 					texture.SetPixel(x, y, new Color(n, n, n, 1));
 				}
 			}
@@ -32,10 +36,7 @@ namespace QTool.Mesh
 					{
 						var value= noise[x / 40f, y / 40f, z / 40f]; 
 						voxelData[x, y, z] = value;
-						if (value<0||value > 1)
-						{
-							Debug.LogError(value);
-						}
+						
 					}
 				}
 			}

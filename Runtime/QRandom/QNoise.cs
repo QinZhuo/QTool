@@ -35,19 +35,19 @@ namespace QTool
 		{
 			return (int)(GetValue(index) * Size);
 		}
-		private float GetValue(int x)
+		protected float GetValue(int x)
 		{
 			return Table[x & Range];
 		}
-		private float GetValue(int x, int y)
+		protected float GetValue(int x, int y)
 		{
 			return GetValue(y + OffsetIndex(x));
 		}
-		private float GetValue(int x, int y, int z)
+		protected float GetValue(int x, int y, int z)
 		{
 			return GetValue(z + OffsetIndex(y + OffsetIndex(x)));
 		}
-		private int FixIndex(ref float value)
+		protected int FixIndex(ref float value)
 		{
 			value *= Scale;
 			return Mathf.FloorToInt(value);
@@ -104,6 +104,61 @@ namespace QTool
 		{
 			return x * x * x * (x * (x * 6.0f - 15.0f) + 10.0f);
 		}
+	}
+	/// <summary>
+	/// 柏林噪声
+	/// </summary>
+	public class QPerlinNoise : QWhiteNoise
+	{
+		public override float this[float x, float y]
+		{
+			get
+			{
+				var intx = FixIndex(ref x);
+				var inty = FixIndex(ref y);
+				var xt = Curve(x - intx);
+				var yt = Curve(y - inty);
+				var y1 = Grad(GetValue(intx, inty), xt, yt).Lerp(Grad(GetValue(intx + 1, inty), xt - 1, yt), xt);
+				var y2 = Grad(GetValue(intx, inty + 1), xt, yt - 1).Lerp(Grad(GetValue(intx + 1, inty + 1), xt - 1, yt - 1), xt);
+				return (y1.Lerp(y2, yt) + 1f) / 2f;
+			}
+		}
+		
+		private float Grad(float value, float x)
+		{
+			var hash = (int)(value * byte.MaxValue);
+			int h = hash & 15;
+			float grad = 1.0f + (h & 7);    // Gradient value 1.0, 2.0, ..., 8.0
+			if ((h & 8) != 0) grad = -grad; // Set a random sign for the gradient
+			return (grad * x);              // Multiply the gradient with the distance
+		}
+
+		private float Grad(float value, float x, float y)
+		{
+			var hash = (int)(value * byte.MaxValue);
+			int h = hash & 7;           // Convert low 3 bits of hash code
+			float u = h < 4 ? x : y;  // into 8 simple gradient directions,
+			float v = h < 4 ? y : x;  // and compute the dot product with (x,y).
+			return ((h & 1) != 0 ? -u : u) + ((h & 2) != 0 ? -v :  v);
+		}
+
+		private float Grad(int hash, float x, float y, float z)
+		{
+			int h = hash & 15;     // Convert low 4 bits of hash code into 12 simple
+			float u = h < 8 ? x : y; // gradient directions, and compute dot product.
+			float v = h < 4 ? y : h == 12 || h == 14 ? x : z; // Fix repeats at h = 12 to 15
+			return ((h & 1) != 0 ? -u : u) + ((h & 2) != 0 ? -v : v);
+		}
+
+		private float Grad(int hash, float x, float y, float z, float t)
+		{
+			int h = hash & 31;          // Convert low 5 bits of hash code into 32 simple
+			float u = h < 24 ? x : y; // gradient directions, and compute dot product.
+			float v = h < 16 ? y : z;
+			float w = h < 8 ? z : t;
+			return ((h & 1) != 0 ? -u : u) + ((h & 2) != 0 ? -v : v) + ((h & 4) != 0 ? -w : w);
+		}
+
 	}
 	/// <summary>
 	/// 噪声层级 更改噪声的频率幅度
@@ -216,4 +271,5 @@ namespace QTool
 			return System.Math.Abs(base.ChangeResult(value) * 2 - 1);
 		}
 	}
+	
 }
