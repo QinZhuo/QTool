@@ -8,12 +8,11 @@ namespace QTool.Mesh
 	public class QNoiseTest : MonoBehaviour
 	{
 		public Material material;
-		public int size = 50;
 		private Texture2D texture;
 		public void NoiseTest()
 		{
-			var noise = new QValueNoise();
-			texture = new Texture2D(512, 512);
+			var noise = new QTurbulenceNoise();
+			texture = new Texture2D(256, 256);
 			for (int y = 0; y < texture.height; y++)
 			{
 				for (int x = 0; x < texture.height; x++)
@@ -23,7 +22,24 @@ namespace QTool.Mesh
 				}
 			}
 			texture.Apply();
-			gameObject.GenerateMesh(new QNoiseVoxel(noise), material);
+			var voxelData = new QVoxelData();
+			voxelData.Surface = 0.4f;
+			for (int x = -10; x <10; x++)
+			{
+				for (int y = -10; y <10; y++)
+				{
+					for (int z = -10; z < 10; z++)
+					{
+						var value= noise[x / 40f, y / 40f, z / 40f]; 
+						voxelData[x, y, z] = value;
+						if (value<0||value > 1)
+						{
+							Debug.LogError(value);
+						}
+					}
+				}
+			}
+			gameObject.GenerateMesh(voxelData, material);
 		}
 		void Start()
 		{

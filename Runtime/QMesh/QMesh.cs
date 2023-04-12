@@ -68,7 +68,7 @@ namespace QTool
 	{
 
 
-		public static void GenerateMesh(this GameObject root, QVoxel qVoxelData,Material mat=null)
+		public static void GenerateMesh(this GameObject root, QVoxelData qVoxelData,Material mat=null)
 		{
 			var filter = root.GetComponent<MeshFilter>(true);
 			if (qVoxelData.MeshData.Mesh == null)

@@ -6,8 +6,10 @@ using UnityEngine;
 namespace QTool
 {
 	[System.Serializable]
-	public class QVoxelData: QVoxel
-	{ 
+	public class QVoxelData: QSerializeObject
+	{
+		[QName("Colors")]
+		public List<Color32> Colors { get; protected set; } = new List<Color32> { Color.white };
 		[QName("Voxels")]
 		public QDictionary<Vector3Int, float> Voxels { get; private set; } = new QDictionary<Vector3Int, float>();
 		public QVoxelData() { }
@@ -70,29 +72,28 @@ namespace QTool
 			MeshData.Clear();
 			SetDirty();
 		}
-		public override float this[int x,int y,int z]=> Voxels[new Vector3Int(x,y,z)];
-	}
-	public class QNoiseVoxel : QVoxel
-	{
-		private QNoise qNoise;
-		public QNoiseVoxel(QNoise qNoise)
-		{
-			this.qNoise = qNoise;
-			Surface = 0.5f;
-			Min = Vector3Int.one * -10;
-			Max = Vector3Int.one * 10;
+		public float this[int x, int y, int z] { 
+			get => Voxels[new Vector3Int(x, y, z)];
+			set
+			{
+				SetVoxel(new Vector3Int(x, y, z), value);
+			}
 		}
-		public override float this[int x, int y, int z] => qNoise[x/ 20f, y/ 20f, z/20f];
-	}
-	public abstract class QVoxel:QSerializeObject
-	{
-		[QName("Colors")]
-		public List<Color32> Colors { get;protected set; } = new List<Color32>{ Color.white };
-		public void ReplaceColor(int index,Color32 color)
+		public override void SetDirty()
+		{
+			base.SetDirty();
+			MeshData.SetDirty();
+		}
+		public void ReplaceColor(int index, Color32 color)
 		{
 			if (index <= 0) return;
 			Colors[index] = color;
 			SetDirty();
+		}
+		public Mesh GenerateMesh()
+		{
+			QMarchingCubes.GenerateMeshData(this);
+			return MeshData.Mesh;
 		}
 		public Color32 GetColor(float value)
 		{
@@ -100,48 +101,17 @@ namespace QTool
 			{
 				return Color.clear;
 			}
-			var index =Mathf.RoundToInt(value - Surface);
+			var index = Mathf.RoundToInt(value - Surface);
 			if (index < 0 || index >= Colors.Count)
 			{
 				return Color.white;
 			}
 			return Colors[index];
 		}
-		public override void OnDeserializeOver()
-		{
-		}
-		public override void SetDirty()
-		{
-			base.SetDirty();
-			MeshData.SetDirty();
-		}
 		public float Surface { get; set; } = 0f;
 		public Vector3Int Max { get; set; } = Vector3Int.one * int.MinValue;
 		public Vector3Int Min { get; set; } = Vector3Int.one * int.MaxValue;
-		public Vector3Int Size => Max - Min+Vector3Int.one;
-		public virtual float this[int x] =>this[x,0,0];
-		public virtual float this[int x, int y]=>this[x,y,0];
-		public abstract float this[int x, int y, int z] { get; }
-		public float this[float x]
-		{
-			get
-			{
-				var intx = (int)x;
-				return this[intx].Lerp(this[intx + 1], x - intx);
-			}
-		}
-		public float this[float x, float y]
-		{
-			get
-			{
-				var intx = (int)x;
-				var inty = (int)y;
-				var xt = x - intx;
-				var y1 = this[intx, inty].Lerp(this[intx + 1, inty], xt);
-				var y2 = this[intx, inty + 1].Lerp(this[intx + 1, inty + 1], xt);
-				return y1.Lerp(y2, y - inty);
-			}
-		}
+		public Vector3Int Size => Max - Min + Vector3Int.one;
 		public float this[float x, float y, float z]
 		{
 			get
@@ -160,16 +130,13 @@ namespace QTool
 				return z1.Lerp(z2, z - intz);
 			}
 		}
-		public float this[Vector3Int pos]=>this[pos.x,pos.y,pos.z];
+		public float this[Vector3Int pos] => this[pos.x, pos.y, pos.z];
 		[QIgnore]
 		public QMeshData MeshData { private set; get; } = new QMeshData();
-		public QVoxel()
+		public override void OnDeserializeOver()
 		{
-			MeshData = new QMeshData();
+			
 		}
-		public UnityEngine.Mesh GenerateMesh() {
-			QMarchingCubes.GenerateMeshData(this);
-			return MeshData.Mesh;
-		} 
 	}
+
 }

@@ -9,7 +9,7 @@ namespace QTool
 		{
 			UnityEngine.Shader.EnableKeyword(nameof(QMarchingCubes) + nameof(Shader));
 		}
-		public static void GenerateMeshData(this QVoxel voxelData,bool gup=true)
+		public static void GenerateMeshData(this QVoxelData voxelData,bool gup=true)
 		{
 			if (voxelData.MeshData.Changing||!voxelData.MeshData.Dirty) return;
 			voxelData.MeshData.Clear();
@@ -28,7 +28,7 @@ namespace QTool
 		
 #region GUP
 		public static ComputeShader Shader;
-		static void GenerateGPU(QVoxel voxelData)
+		static void GenerateGPU(QVoxelData voxelData)
 		{
 			if (Shader == null)
 			{
@@ -87,7 +87,7 @@ namespace QTool
 #endregion
 
 #region CPU
-		static void GenerateCPU(QVoxel voxelData)
+		static void GenerateCPU(QVoxelData voxelData)
 		{
 			for (int x = voxelData.Min.x - 1; x <= voxelData.Max.x; x++)
 			{
@@ -101,7 +101,7 @@ namespace QTool
 				}
 			}
 		}
-		static void GenerateCube(QVoxel voxelData, Vector3Int pos)
+		static void GenerateCube(QVoxelData voxelData, Vector3Int pos)
 		{
 			int cubeIndex = 0;
 			var cube = new Vector4[8];
