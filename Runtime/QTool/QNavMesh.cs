@@ -41,8 +41,6 @@ namespace QTool
 		}
 		public async static Task UpdateNavMeshAsync()
 		{
-			if (!IsUpdateOver) return;
-			IsUpdateOver = false;
 			navMeshInstance.Remove();
 			Markups.Clear();
 			SourceList.Clear();
@@ -60,7 +58,6 @@ namespace QTool
 			{
 				NavMeshBuilder.UpdateNavMeshData(navMesh, NavMesh.GetSettingsByID(0), SourceList, Bounds);
 			}
-			IsUpdateOver = true;
 		}
 	}
 }

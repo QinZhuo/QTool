@@ -91,7 +91,6 @@ namespace QTool
 			var index =Mathf.RoundToInt(value - Surface);
 			if (index < 0 || index >= Colors.Count)
 			{
-				Debug.LogError(index + "/" + Colors.Count);
 				return Color.white;
 			}
 			return Colors[index];
