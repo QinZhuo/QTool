@@ -43,7 +43,7 @@ namespace QTool
 			get
 			{
 				var intx = FixIndex(ref x);
-				return GetValue(intx).LerpTo(GetValue(intx + 1), x - intx);
+				return GetValue(intx).Lerp(GetValue(intx + 1), x - intx);
 			}
 		}
 		public float this[float x, float y]
@@ -53,9 +53,9 @@ namespace QTool
 				var intx = FixIndex(ref x);
 				var inty = FixIndex(ref y);
 				var xt = x - intx;
-				var y1 = GetValue(intx,inty).LerpTo(GetValue(intx+1, inty), xt);
-				var y2 = GetValue(intx, inty+1).LerpTo(GetValue(intx+1, inty + 1), xt);
-				return y1.LerpTo(y2, y - inty);
+				var y1 = GetValue(intx,inty).Lerp(GetValue(intx+1, inty), xt);
+				var y2 = GetValue(intx, inty+1).Lerp(GetValue(intx+1, inty + 1), xt);
+				return y1.Lerp(y2, y - inty);
 			}
 		}
 		public float this[float x, float y, float z]
@@ -66,14 +66,14 @@ namespace QTool
 				var inty = FixIndex(ref y);
 				var intz = FixIndex(ref z);
 				var xt = x - intx;
-				var y1 = GetValue(intx, inty,intz).LerpTo(GetValue(intx+1, inty, intz), xt);
-				var y2 = GetValue(intx, inty+1, intz).LerpTo(GetValue(intx+1, inty+1, intz), xt);
-				var y3 = GetValue(intx, inty, intz+1).LerpTo(GetValue(intx+1, inty, intz+1), xt);
-				var y4 = GetValue(intx, inty+1, intz+1).LerpTo(GetValue(intx+1, inty+1, intz+1), xt);
+				var y1 = GetValue(intx, inty,intz).Lerp(GetValue(intx+1, inty, intz), xt);
+				var y2 = GetValue(intx, inty+1, intz).Lerp(GetValue(intx+1, inty+1, intz), xt);
+				var y3 = GetValue(intx, inty, intz+1).Lerp(GetValue(intx+1, inty, intz+1), xt);
+				var y4 = GetValue(intx, inty+1, intz+1).Lerp(GetValue(intx+1, inty+1, intz+1), xt);
 				var yt = y - inty;
-				var z1 = y1.LerpTo(y2, yt);
-				var z2 = y3.LerpTo(y4, yt);
-				return z1.LerpTo(z2, z - intz);
+				var z1 = y1.Lerp(y2, yt);
+				var z2 = y3.Lerp(y4, yt);
+				return z1.Lerp(z2, z - intz);
 			}
 		}
 	}

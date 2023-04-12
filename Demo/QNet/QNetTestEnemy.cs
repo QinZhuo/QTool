@@ -16,7 +16,7 @@ public class QNetTestEnemy : QNetBehaviour
 	public void SetLevel(int newLevel)
 	{
 		Level = newLevel;
-		transform.localScale = Vector3.one * QLerp.LerpTo(0.3f,1.5f, Level / 4f);
+		transform.localScale = Vector3.one * QLerp.Lerp(0.3f,1.5f, Level / 4f);
 		if (Level <= 0)
 		{
 			Destroy(gameObject);

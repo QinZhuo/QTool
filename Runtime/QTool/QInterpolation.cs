@@ -8,33 +8,33 @@ namespace QTool
 	/// </summary>
     public static class QLerp
 	{
-		public static double LerpTo(this double a, double b, float t)
+		public static double Lerp(this double a, double b, float t)
 		{
 			var dir = b - a;
 			return a + dir * t;
 		}
-		public static float LerpTo(this float a, float b, float t)
+		public static float Lerp(this float a, float b, float t)
         {
             var dir = b - a;
             return a + dir * t;
         }
-        public static Vector2 LerpTo(this Vector2 star, Vector2 end, float t)
+        public static Vector2 Lerp(this Vector2 star, Vector2 end, float t)
         {
-            return new Vector2(LerpTo(star.x, end.x, t), LerpTo(star.y, end.y, t));
+            return new Vector2(Lerp(star.x, end.x, t), Lerp(star.y, end.y, t));
         }
-        public static Vector3 LerpTo(this Vector3 star, Vector3 end, float t)
+        public static Vector3 Lerp(this Vector3 star, Vector3 end, float t)
         {
-            return new Vector3(LerpTo(star.x, end.x, t), LerpTo(star.y, end.y, t), LerpTo(star.z, end.z, t));
+            return new Vector3(Lerp(star.x, end.x, t), Lerp(star.y, end.y, t), Lerp(star.z, end.z, t));
         }
-        public static Quaternion LerpTo(this Quaternion star, Quaternion end, float t)
+        public static Quaternion Lerp(this Quaternion star, Quaternion end, float t)
         {
             return Quaternion.Lerp(star, end, t);
         }
-        public static Color LerpTo(this Color star, Color end, float t)
+        public static Color Lerp(this Color star, Color end, float t)
         {
             return Color.Lerp(star, end, t);
         }
-        public static string LerpTo(this string a, string b, float t)
+        public static string Lerp(this string a, string b, float t)
         {
             var str = "";
             for (int i = 0; i < a.Length || i < b.Length; i++)

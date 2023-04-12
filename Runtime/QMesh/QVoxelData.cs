@@ -127,7 +127,7 @@ namespace QTool
 			get
 			{
 				var intx = (int)x;
-				return this[intx].LerpTo(this[intx + 1], x - intx);
+				return this[intx].Lerp(this[intx + 1], x - intx);
 			}
 		}
 		public float this[float x, float y]
@@ -137,9 +137,9 @@ namespace QTool
 				var intx = (int)x;
 				var inty = (int)y;
 				var xt = x - intx;
-				var y1 = this[intx, inty].LerpTo(this[intx + 1, inty], xt);
-				var y2 = this[intx, inty + 1].LerpTo(this[intx + 1, inty + 1], xt);
-				return y1.LerpTo(y2, y - inty);
+				var y1 = this[intx, inty].Lerp(this[intx + 1, inty], xt);
+				var y2 = this[intx, inty + 1].Lerp(this[intx + 1, inty + 1], xt);
+				return y1.Lerp(y2, y - inty);
 			}
 		}
 		public float this[float x, float y, float z]
@@ -150,14 +150,14 @@ namespace QTool
 				var inty = (int)y;
 				var intz = (int)z;
 				var xt = x - intx;
-				var y1 = this[intx, inty, intz].LerpTo(this[intx + 1, inty, intz], xt);
-				var y2 = this[intx, inty + 1, intz].LerpTo(this[intx + 1, inty + 1, intz], xt);
-				var y3 = this[intx, inty, intz + 1].LerpTo(this[intx + 1, inty, intz + 1], xt);
-				var y4 = this[intx, inty + 1, intz + 1].LerpTo(this[intx + 1, inty + 1, intz + 1], xt);
+				var y1 = this[intx, inty, intz].Lerp(this[intx + 1, inty, intz], xt);
+				var y2 = this[intx, inty + 1, intz].Lerp(this[intx + 1, inty + 1, intz], xt);
+				var y3 = this[intx, inty, intz + 1].Lerp(this[intx + 1, inty, intz + 1], xt);
+				var y4 = this[intx, inty + 1, intz + 1].Lerp(this[intx + 1, inty + 1, intz + 1], xt);
 				var yt = y - inty;
-				var z1 = y1.LerpTo(y2, yt);
-				var z2 = y3.LerpTo(y4, yt);
-				return z1.LerpTo(z2, z - intz);
+				var z1 = y1.Lerp(y2, yt);
+				var z2 = y3.Lerp(y4, yt);
+				return z1.Lerp(z2, z - intz);
 			}
 		}
 		public float this[Vector3Int pos]=>this[pos.x,pos.y,pos.z];

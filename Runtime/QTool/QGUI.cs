@@ -859,14 +859,14 @@ namespace QTool
 															using (new GUILayout.HorizontalScope())
 															{
 																GUILayout.FlexibleSpace();
-																QGUI.PushColor(Color.blue.LerpTo(Color.white, 0.5f));
+																QGUI.PushColor(Color.blue.Lerp(Color.white, 0.5f));
 																if (GUILayout.Button(new GUIContent("", "新增当前数据"), GUILayout.Width(10), GUILayout.Height(10)))
 																{
 																	obj = list.CreateAt(typeInfo, i);
 																	IndexChange?.Invoke(-1, i + 1);
 																}
 																QGUI.PopColor();
-																QGUI.PushColor(Color.red.LerpTo(Color.white, 0.5f));
+																QGUI.PushColor(Color.red.Lerp(Color.white, 0.5f));
 																if (GUILayout.Button(new GUIContent("", "删除当前数据"), GUILayout.Width(10), GUILayout.Height(10)))
 																{
 																	obj = list.RemoveAt(typeInfo, i);
