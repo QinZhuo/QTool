@@ -57,7 +57,7 @@ namespace QTool
 	public static class QBezier
 	{
 		static List<Vector3> PointList = new List<Vector3>();
-		public static Vector3 BezierTo(this Vector3 a, Vector3 b, float t, params Vector3[] point)
+		public static Vector3 Bezier(this Vector3 a, Vector3 b, float t, params Vector3[] point)
 		{
 			if (point.Length > 0)
 			{
@@ -69,7 +69,7 @@ namespace QTool
 				}
 
 				var tb = Vector3.Lerp(point[point.Length - 1], b, t);
-				return BezierTo(ta, tb, t, PointList.ToArray());
+				return Bezier(ta, tb, t, PointList.ToArray());
 			}
 			else
 			{
