@@ -23,7 +23,7 @@ namespace QTool
 
 	{
 		[QName("随机生成")]
-		private static IEnumerator RandomCreate(QFlowNode This,[QInputPort("场景"),QFlowPort] GameObject root,string randomKey,GameObject prefab, int count = 1,[QOutputPort,QFlowPort] GameObject newObject=default)
+		private static IEnumerator RandomCreate(QFlowNode This,[QInputPort("场景"),QFlowPort] GameObject root,[QName("位置点")]string pointKey,[QName("预制体")]GameObject prefab,[QName("创建数目")] int count = 1,[QOutputPort,QFlowPort] GameObject newObject=default)
 		{
 			var pointList = new List<QRandomPoint>(); 
 			if (root == null)
@@ -34,7 +34,7 @@ namespace QTool
 			{
 				pointList.AddRange(root.GetComponentsInChildren<QRandomPoint>());
 			}
-			pointList.RemoveAll((point) => !randomKey.Contains(point.key)||!point.CanCreate);
+			pointList.RemoveAll((point) => !pointKey.Contains(point.key)||!point.CanCreate);
 			pointList.Random();
 			for (int i = 0; i < count&&i<pointList.Count; i++)
 			{
