@@ -313,17 +313,14 @@ namespace QTool.Reflection
 		
 		static Type GetOperaterType(object a,object b)
 		{
-			if (a == null)
+			Type type = a!=null ? a.GetType() : b?.GetType();
+			if (type == null)
 			{
-				return b?.GetType();
-			}
-			else if(b==null)
-			{
-				return a?.GetType();
+				return typeof(object);
 			}
 			else
 			{
-				return a?.GetType();
+				return type;
 			}
 		}
 		public static object OperaterAdd(this object a, object b)
