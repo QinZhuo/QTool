@@ -1,3 +1,4 @@
+using QTool.FlowGraph;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -55,6 +56,34 @@ namespace QTool
 		}
 	}
 
-
+	[QCommandType("基础/程序生成")]
+	public static class QRandomNode
+	{
+		[QName("随机生成")]
+		private static IEnumerator RandomCreate(QFlowNode This, [QInputPort("场景"), QFlowPort] GameObject root, [QName("位置点")] string pointKey, [QName("预制体")] GameObject prefab, [QName("创建数目")] int count = 1, [QOutputPort, QFlowPort] GameObject newObject = default)
+		{
+			var pointList = new List<QPositionPoint>();
+			if (root == null)
+			{
+				pointList.AddRange(Object.FindObjectsOfType<QPositionPoint>());
+			}
+			else
+			{
+				pointList.AddRange(root.GetComponentsInChildren<QPositionPoint>());
+			}
+			pointList.RemoveAll((point) => !pointKey.Contains(point.name) || !point.CanCreate);
+			pointList.Random();
+			for (int i = 0; i < count && i < pointList.Count; i++)
+			{
+				newObject = prefab.CheckInstantiate(pointList[i].transform);
+				newObject.transform.rotation = pointList[i].transform.rotation;
+				if (This != null)
+				{
+					This[nameof(newObject)] = newObject;
+					yield return This.RunPortIEnumerator(nameof(newObject));
+				}
+			}
+		}
+	}
 
 }

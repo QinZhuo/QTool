@@ -34,6 +34,10 @@ namespace QTool.FlowGraph
 						UnityEditor.AssetDatabase.Refresh();
 					}
 				}
+				else
+				{
+					this.SetDirty();
+				}
 #endif
             }
             catch (System.Exception e)

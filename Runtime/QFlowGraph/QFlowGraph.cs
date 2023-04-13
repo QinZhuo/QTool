@@ -255,6 +255,7 @@ namespace QTool.FlowGraph
 
 		public IEnumerator RunIEnumerator(string startNode)
         {
+			if (startNode.IsNull()) yield break;
 			if (!Application.isPlaying)
 			{
 				Debug.LogError("运行流程图[" + Name + "]出错 不能在非运行时运行流程图");
@@ -449,6 +450,48 @@ namespace QTool.FlowGraph
 				}
 			}
         }
+		public PortId? GetConnectPortId(QFlowGraph graph,bool isFlow)
+		{
+			switch (ConnectList.Count)
+			{
+				case 0:return null;
+				case 1:
+					{
+						var connect = FirstConnect;
+						if (isFlow&&!graph.GetPort(connect).IsFlow)
+						{
+							return null;
+						}
+						return connect;
+					}
+				default:
+					{
+						if (isFlow)
+						{
+							foreach (var connect in ConnectList)
+							{
+								var port = graph.GetPort(connect);
+								if (port.IsFlow)
+								{
+									return port.GetPortId(connect.index);
+								}
+							}
+						}
+						else
+						{
+							foreach (var connect in ConnectList)
+							{
+								var port = graph.GetPort(connect);
+								if (port.ConnectType != typeof(QFlow))
+								{
+									return port.GetPortId(connect.index);
+								}
+							}
+						}
+					}
+					return null;
+			}
+		}
     }
 	public class QFlowPort : IKey<string>
 	{
@@ -531,7 +574,7 @@ namespace QTool.FlowGraph
 			}
 			if (!IsOutput)
 			{
-				if (!InputPort.HasAutoValue && !HasConnect(index))
+				if (InputPort!=null&&!InputPort.HasAutoValue && !HasConnect(index))
 				{
 					return true;
 				}
@@ -569,66 +612,65 @@ namespace QTool.FlowGraph
         {
             get
             {
-                if (ValueType == QFlow.Type|| Node.command==null) return null;
-                if (FlowPort == null)
-                {
-					if (IsOutput)
+                if (ConnectType == QFlow.Type|| Node.command==null) return null;
+			
+				if (IsOutput)
+				{
+					if (OutputPort.autoRunNode)
 					{
-						if (OutputPort.autoRunNode)
+						Node.Run();
+						if (_value != null)
 						{
-							Node.Run();
-							if (_value != null)
+							ConnectType = _value.GetType();
+						}
+					}
+				}
+				else
+				{
+					if (IsList)
+					{
+						if (_value is IList list)
+						{
+							for (int i = 0; i < ConnectInfolist.Count; i++)
 							{
-								ConnectType = _value.GetType();
+								if (HasConnect(i) && list.Count > i)
+								{
+									var element = Node.GetConnectValue(Key, i);
+									if (element != null && CanConnect(element.GetType()))
+									{
+										list[i] = element;
+									}
+								}
 							}
 						}
 					}
 					else
 					{
-						if (IsList)
+						if (HasConnect())
 						{
-							if(_value is IList list)
-							{
-								for (int i = 0; i < ConnectInfolist.Count; i++)
-								{
-									if (HasConnect(i) && list.Count > i)
-									{
-										var element = Node.GetConnectValue(Key,i);
-										if (element != null && CanConnect( element.GetType()))
-										{
-											list[i] = element;
-										}
-									}
-								}
-							}
+							return GetConnectValue();
 						}
 						else
 						{
-							if (HasConnect())
+							if (InputPort.HasAutoValue)
 							{
-								return GetConnectValue();
-							}
-							else
-							{
-								if (InputPort.HasAutoValue)
-								{
-									return Node.Graph.Values[InputPort.autoGetValue];
-								}
+								return Node.Graph.Values[InputPort.autoGetValue];
 							}
 						}
 					}
 				}
-                if (_value.IsNull())
+				if (_value.IsNull())
                 {
 					_value = StringValue.ParseQDataType(ValueType, true, _value);
 				}
-                return _value;
+				return _value;
             }
 			set
 			{
-				if (ValueType == QFlow.Type || Node.command == null) return;
+				if (ConnectType == QFlow.Type || Node.command == null) return;
 				if (!IsList && Equals(_value, value)) return;
 				if (_value.IsNull() && value.IsNull()) return;
+
 				_value = value;
                 StringValue = value.ToQDataType(ValueType);
                 if (NameAttribute != null)
@@ -663,21 +705,16 @@ namespace QTool.FlowGraph
 				return Value;
 			}
 		}
-		public QFlowPort GetConnectPort(int index = 0)
-		{
-			if (HasConnect(index))
-			{
-				var connectPortKey = this[index].FirstConnect.Value;
-				return Node.Graph[connectPortKey.node].Ports[connectPortKey.port];
-			}
-			return null;
-		}
+	
 		public QFlowNode GetConnectNode(int index = 0)
 		{
 			if (HasConnect(index))
 			{
-				var connectPortKey = this[index].FirstConnect.Value;
-				return Node.Graph[connectPortKey.node];
+				var connectPortKey = this[index].GetConnectPortId(Node.Graph, true);
+				if (connectPortKey != null)
+				{
+					return Node.Graph[connectPortKey.Value.node];
+				}
 			}
 			return null;
 		}
@@ -685,8 +722,7 @@ namespace QTool.FlowGraph
 		{
 			if (HasConnect(index))
 			{
-				var connectPortKey =this[index].FirstConnect.Value;
-				return Node.Graph.GetPortValue(connectPortKey);
+				return Node.Graph.GetPortValue(this[index].GetConnectPortId(Node.Graph, false));
 			}
 			return null;
 		}
@@ -1029,7 +1065,7 @@ namespace QTool.FlowGraph
                     {
 						Ports.RemoveKey(QFlowKey.NextPort);
                     }
-                    if (port.FlowPort == null)
+                    if (port.ConnectType!= QFlow.Type)
                     {
                         if (paramInfo.IsOut ||( Key != QFlowKey.ResultPort && !port.ValueType.IsValueType))
                         {
@@ -1221,7 +1257,7 @@ namespace QTool.FlowGraph
             if (Ports.ContainsKey(portKey))
             {
 				var node = GetConnectNode(portKey,index);
-                return Graph.RunIEnumerator(node.Key);
+                return Graph.RunIEnumerator(node?.Key);
             }
             else
             {

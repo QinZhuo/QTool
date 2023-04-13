@@ -681,7 +681,7 @@ namespace QTool.FlowGraph
 				var connectInfo = Graph.GetConnectInfo(connectStartPort);
 				var color = GetTypeColor(Graph.GetPort(connectStartPort).ConnectType);
 				DrawCurve(connectInfo.rect.center, mousePos, color, Graph.GetPort(connectStartPort).IsFlow);
-				DrawCircle(mousePos - ViewRange.position, color);
+				DrawDot(mousePos - ViewRange.position, 1, color, true);
 				if (nearPortId != null)
 				{
 					DrawCurve(connectInfo.rect.center, Graph.GetConnectInfo(nearPortId.Value).rect.center,Color.Lerp( color,Color.clear,0.4f), Graph.GetPort(connectStartPort).IsFlow);
@@ -701,7 +701,7 @@ namespace QTool.FlowGraph
 								var next = Graph.GetConnectInfo(connect);
 								if (next != null)
 								{
-									DrawCurve(c.rect.center, next.rect.center, color, port.IsFlow);
+									DrawCurve(c.rect.center, next.rect.center, color, port.IsFlow&&Graph.GetPort(connect).IsFlow);
 								}
 							}
 						}
@@ -710,8 +710,7 @@ namespace QTool.FlowGraph
 				}
 			}
 		}
-		public static Texture2D CircleTexture => _CircleTexture ??= Resources.Load<Texture2D>(nameof(QGUI)+"/"+nameof(CircleTexture)); 
-		static Texture2D _CircleTexture = null;
+
 		public static Texture2D DotTexture => _DotTexture ??= Resources.Load<Texture2D>(nameof(QGUI) + "/" + nameof(DotTexture));
 		static Texture2D _DotTexture = null;
 		public static Texture2D DotConnectTexture => _DotConnectTexture ??= Resources.Load<Texture2D>(nameof(QGUI) + "/" + nameof(DotConnectTexture));
@@ -735,15 +734,6 @@ namespace QTool.FlowGraph
 			rect.center = center;
 			return rect;
         }
-		void DrawCircle(Vector2 center, Color color)
-		{
-			var rect = new Rect();
-			rect.size = Vector3.one * QGUI.Size*0.8f;
-			rect.center = center;
-			QGUI.PushColor(color);
-			GUI.DrawTexture(rect, CircleTexture);
-			QGUI.PopColor();
-		}
        
         void DrawPort(QFlowPort port)
         {
