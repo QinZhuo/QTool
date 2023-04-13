@@ -9,16 +9,18 @@ namespace QTool
 		{
 			UnityEngine.Shader.EnableKeyword(nameof(QMarchingCubes) + nameof(Shader));
 		}
-		public static void GenerateMeshData(this QVoxelData voxelData,bool gup=true)
+		public static void GenerateMeshData(this QVoxelData voxelData)
 		{
 			if (voxelData.MeshData.Changing||!voxelData.MeshData.Dirty) return;
 			voxelData.MeshData.Clear();
 			voxelData.MeshData.Changing = true;
+#if UseComputeShader
 			if (SystemInfo.supportsComputeShaders&& gup)
 			{ 
 				GenerateGPU(voxelData);
 			}
 			else
+#endif
 			{
 				GenerateCPU(voxelData);
 			}
