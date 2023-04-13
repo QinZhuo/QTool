@@ -109,6 +109,7 @@ namespace QTool
         {
             type.ForeachFunction((methodInfo) =>
             {
+				if (methodInfo.GetAttribute<QIgnoreAttribute>() != null) return;
                 var typeKey = type.Name; 
                 var typeName = type.QName();
                 if (methodInfo.DeclaringType != typeof(object))
@@ -118,7 +119,7 @@ namespace QTool
                     NameDictionary[methodInfo.QName().SplitEndString("/")] = info;
 
                 }
-            }, BindingFlags.Public | BindingFlags.Static);
+            }, BindingFlags.Public | BindingFlags.Static| BindingFlags.NonPublic);
             TypeList.AddCheckExist(type);
 
 			QDebug.Log("初始化命令："+type+"\n" + KeyDictionary.ToOneString());

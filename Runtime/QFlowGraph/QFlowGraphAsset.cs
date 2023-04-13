@@ -4,6 +4,7 @@ using UnityEngine;
 namespace QTool.FlowGraph
 {
   
+	[CreateAssetMenu(menuName = nameof(QTool)+"/"+nameof(QFlowGraphAsset))]
     public class QFlowGraphAsset : ScriptableObject
     {
 		[SerializeField]
@@ -24,10 +25,14 @@ namespace QTool.FlowGraph
 #if UNITY_EDITOR
 				Graph.Name = name;
 				Graph.OnBeforeSerialize();
-				QFileManager.Save(UnityEditor.AssetDatabase.GetAssetPath(this), Graph.SerializeString);
-				if (!Application.isPlaying)
+				var path = UnityEditor.AssetDatabase.GetAssetPath(this);
+				if (!path.EndsWith(".asset"))
 				{
-					UnityEditor.AssetDatabase.Refresh();
+					QFileManager.Save(path, Graph.SerializeString);
+					if (!Application.isPlaying)
+					{
+						UnityEditor.AssetDatabase.Refresh();
+					}
 				}
 #endif
             }

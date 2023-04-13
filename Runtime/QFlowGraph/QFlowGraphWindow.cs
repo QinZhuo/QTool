@@ -36,22 +36,8 @@ namespace QTool.FlowGraph
 				return;
 			}
 			var asset = AssetDatabase.LoadAssetAtPath<QFlowGraphAsset>(path);
-			Open(asset.Graph, asset.Save);
-		}
-		[MenuItem("Assets/QTool/Create/QFlowGraph")]
-		public static void CreateNewFile()
-		{
-			var selectPath = Application.dataPath;
-			if (Selection.activeObject != null)
+			if (asset != null)
 			{
-				selectPath = AssetDatabase.GetAssetPath(Selection.activeObject);
-			}
-			var path = EditorUtility.SaveFilePanel("保存QFG文件", selectPath, nameof(QFlowGraphAsset), "qfg");
-			if (!string.IsNullOrWhiteSpace(path))
-			{
-				QFileManager.Save(path, (new QFlowGraph()).ToQData());
-				AssetDatabase.Refresh();
-				var asset = AssetDatabase.LoadAssetAtPath<QFlowGraphAsset>(path.ToAssetPath());
 				Open(asset.Graph, asset.Save);
 			}
 		}
@@ -364,7 +350,9 @@ namespace QTool.FlowGraph
                 if (GUILayout.Button("创建新的QFlowGraph"))
                 {
 #if UNITY_EDITOR
-					CreateNewFile();
+					var graphAsset = CreateInstance<QFlowGraphAsset>();
+					AssetDatabase.CreateAsset(graphAsset, "Assets/" + nameof(QFlowGraphAsset) + ".qfg");
+					Graph = graphAsset.Graph;
 #else
 					Graph = new QFlowGraph();
 #endif
@@ -692,11 +680,11 @@ namespace QTool.FlowGraph
 			{
 				var connectInfo = Graph.GetConnectInfo(connectStartPort);
 				var color = GetTypeColor(Graph.GetPort(connectStartPort).ConnectType);
-				DrawCurve(connectInfo.rect.center, mousePos, color, Graph.GetPort(connectStartPort).ConnectType == typeof(QFlow));
+				DrawCurve(connectInfo.rect.center, mousePos, color, Graph.GetPort(connectStartPort).IsFlow);
 				DrawCircle(mousePos - ViewRange.position, color);
 				if (nearPortId != null)
 				{
-					DrawCurve(connectInfo.rect.center, Graph.GetConnectInfo(nearPortId.Value).rect.center,Color.Lerp( color,Color.clear,0.4f), Graph.GetPort(connectStartPort).ConnectType == typeof(QFlow));
+					DrawCurve(connectInfo.rect.center, Graph.GetConnectInfo(nearPortId.Value).rect.center,Color.Lerp( color,Color.clear,0.4f), Graph.GetPort(connectStartPort).IsFlow);
 				}
 			}
 			foreach (var name in Graph.NodeList)
@@ -713,7 +701,7 @@ namespace QTool.FlowGraph
 								var next = Graph.GetConnectInfo(connect);
 								if (next != null)
 								{
-									DrawCurve(c.rect.center, next.rect.center, color, port.ConnectType == typeof(QFlow));
+									DrawCurve(c.rect.center, next.rect.center, color, port.IsFlow);
 								}
 							}
 						}

@@ -178,7 +178,7 @@ namespace QTool.FlowGraph
 		}
 		[QName("流程图/分支/全部完成")]
 		
-		public static IEnumerator AllOver(QFlowNode This,[QInputPort(true)]List<QFlow> branchs)
+		public static IEnumerator AllOver(QFlowNode This,[QFlowPort(onlyOneRunning =true)]List<QFlow> branchs)
 		{
 			List<int> taskList = new List<int> { };
 			for (int i = 0; i < branchs.Count; i++)

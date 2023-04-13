@@ -151,18 +151,6 @@ namespace QTool
             Application.persistentDataPath.ClearData();
         }
 		
-		[MenuItem("Assets/QTool/生成QId")]
-		public static void GetObjectQId()
-		{
-			if (Selection.objects.Length > 0)
-			{
-				foreach (var obj in Selection.objects)
-				{
-					var id = QIdObject.GetId(obj);
-				}
-			}
-		}
-		
 		#region OldBuild
 
 		//		public static string Build( string[] scenes,BuildOptions options= BuildOptions.None)
