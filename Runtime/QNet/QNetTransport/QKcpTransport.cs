@@ -158,7 +158,7 @@ namespace QTool.Net
 			base.DebugGUI();
 			if (ServerActive)
 			{
-				QGUI.LabelField("本地IP",Tool.LocalIp);
+				QGUI.LabelField("本地IP",QTool.LocalIp);
 			}
 			if (!ClientConnected)
 			{

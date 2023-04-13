@@ -147,7 +147,7 @@ namespace QTool
 			}
 		}
 	}
-	public partial class Tool
+	public static class QPrefabTool
 	{
 		public static QPrefab SaveQPrefab(this GameObject gameObject,GameObject prefab=null,params Type[] ignoreComponent)
 		{

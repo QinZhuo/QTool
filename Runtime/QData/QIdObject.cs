@@ -130,7 +130,7 @@ namespace QTool
 
 				Object obj = null;
 #if UNITY_EDITOR
-				if (Tool.IsBuilding) return obj;
+				if (QTool.IsBuilding) return obj;
 #endif
 				string loadPath = null;
 				if (id.Contains("/" + nameof(Resources) + "/"))

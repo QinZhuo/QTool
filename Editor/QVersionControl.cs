@@ -92,7 +92,7 @@ namespace QTool
 					path = Path.GetDirectoryName(path);
 				}
 			}
-			return Tool.ProcessCommand("git", commond, path);
+			return QTool.ProcessCommand("git", commond, path);
 		}
 		static string Add(string addPath,string folderPath)
 		{

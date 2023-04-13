@@ -353,7 +353,7 @@ namespace QTool
 			return base.CheckGet(obj);
 		}
 	}
-	public static partial class Tool
+	public static class QPoolTool
 	{
 		/// <summary>
 		/// 对象池回收

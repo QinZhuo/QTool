@@ -34,14 +34,14 @@ namespace QTool
 				if (SteamAPI.RestartAppIfNecessary(new AppId_t(QToolSetting.Instance.SteamId)))
 				{
 					Debug.LogError(nameof(QSteam) + " 游戏验证未通过");
-					Tool.Quit();
+					QTool.Quit();
 					return;
 				}
 			}
 			catch (System.DllNotFoundException e)
 			{
 				Debug.LogError(nameof(QSteam) + " 无法加载[lib]steam_api.dll/so/dylib。它可能不在正确的位置。有关详细信息，请参阅自述文件\n" + e);
-				Tool.Quit();
+				QTool.Quit();
 				return;
 			}
 			if (!SteamAPI.Init())

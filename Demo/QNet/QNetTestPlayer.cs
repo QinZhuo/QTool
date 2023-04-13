@@ -31,7 +31,7 @@ public class QNetTestPlayer : QNetBehaviour
 		{
 			transform.position += PlayerValue("位置", new Vector3(QDemoInput.MoveDirection.x, 0, QDemoInput.MoveDirection.y)) * NetDeltaTime * 3;
 		}
-		var pos = PlayerValue("目标", Tool.RayCastPlane(Camera.main.ScreenPointToRay(QDemoInput.PointerPosition),Vector3.up,transform.position));
+		var pos = PlayerValue("目标", QTool.QTool.RayCastPlane(Camera.main.ScreenPointToRay(QDemoInput.PointerPosition), Vector3.up, transform.position));
 		transform.LookAt(pos);
 		shootTimer.Check(NetDeltaTime, false);
 		if (PlayerValue("射击",QDemoInput.PointerPress)&&shootTimer.Check())

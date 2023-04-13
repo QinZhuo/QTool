@@ -67,7 +67,7 @@ namespace QTool
 				return;
 			}
 			Trigger(nameof(QAnalysisEventName.游戏_开始),new StartInfo().Start());
-			Trigger(nameof(QAnalysisEventName.系统地区), Tool.RealyCulture.EnglishName);
+			Trigger(nameof(QAnalysisEventName.系统地区), QTool.RealyCulture.EnglishName);
 			errorInfoList.Clear();
 			Application.focusChanged += OnFocus;
 			Application.logMessageReceived += LogCallback;

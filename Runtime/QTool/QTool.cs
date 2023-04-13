@@ -21,7 +21,7 @@ namespace QTool
 {
 
 
-    public static partial class Tool
+    public static class QTool
     {
 		public static bool IsBuilding { set; get; }
 		public static CultureInfo RealyCulture= CultureInfo.CurrentCulture;
@@ -62,7 +62,7 @@ namespace QTool
 		static List<List<List<string>>> translateData = new List<List<List<string>>>();
 		public static async Task<string> NetworkTranslateAsync(this string chineseText, string toLanguage="en",string fromLanguage= "zh-CN")
 		{
-			var jsonStr= await Tool.RunURLAsync(string.Format(NetworkTranslateURL, chineseText, toLanguage,fromLanguage ));
+			var jsonStr= await QTool.RunURLAsync(string.Format(NetworkTranslateURL, chineseText, toLanguage,fromLanguage ));
 			jsonStr.ParseQData(translateData);
 			return translateData[0][0][0];
 		}

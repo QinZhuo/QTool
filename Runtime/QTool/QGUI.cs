@@ -1192,7 +1192,7 @@ namespace QTool
 						using (new GUILayout.VerticalScope(Skin.box))
 						{
 							GUILayout.Label(SettingType.QName(), Skin.box);
-							new SerializedObject(SettingType.InvokeFunction(nameof(QTool.QToolSetting.Instance)) as ScriptableObject).Draw();
+							new SerializedObject(SettingType.InvokeFunction(nameof(global::QTool.QToolSetting.Instance)) as ScriptableObject).Draw();
 						}
 					}
 				}

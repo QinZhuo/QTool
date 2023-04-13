@@ -72,8 +72,8 @@ namespace QTool
 		[MenuItem("QTool/翻译/查看翻译语言信息")]
 		public static void LanguageTest()
 		{
-			Debug.LogError(QTool.QTranslate.QTranslateData.ToString());
-			GUIUtility.systemCopyBuffer = QTool.QTranslate.QTranslateData.ToString();
+			Debug.LogError(global::QTool.QTranslate.QTranslateData.ToString());
+			GUIUtility.systemCopyBuffer = global::QTool.QTranslate.QTranslateData.ToString();
 		}
 		[MenuItem("QTool/翻译/生成自动翻译文件")]
 		public static async void AutoTranslate() 
@@ -275,12 +275,12 @@ namespace QTool
 		{
 			BuildPlayerWindow.RegisterBuildPlayerHandler(
 			buildPlayerOptions => {
-				Tool.IsBuilding = true;
+				QTool.IsBuilding = true;
 #if Addressable
 				AddressableAssetSettings.BuildPlayerContent();
 #endif
 				BuildPlayerWindow.DefaultBuildMethods.BuildPlayer(buildPlayerOptions);
-				Tool.IsBuilding = false;
+				QTool.IsBuilding = false;
 			});
 		}
 		public static string BuildPath => Application.dataPath.Substring(0, Application.dataPath.LastIndexOf("Assets")) + "Builds/" + EditorUserBuildSettings.selectedBuildTargetGroup + "/" + PlayerSettings.productName + "_v" + PlayerSettings.bundleVersion.Replace(".", "_");

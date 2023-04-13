@@ -309,7 +309,7 @@ namespace QTool
 			return "{" + Key + ":" + Value + "}";
 		}
 	}
-	public static partial class Tool
+	public static class QListTool
 	{
 		public static string SplitEndString(this string str, string splitStart)
 		{
@@ -468,7 +468,7 @@ namespace QTool
 			{
 				return "";
 			}
-			return Tool.BuildString((writer) =>
+			return QTool.BuildString((writer) =>
 			{
 				int i = 0;
 				if (toString == null)

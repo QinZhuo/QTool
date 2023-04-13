@@ -677,7 +677,7 @@ namespace QTool
 		static Stack<char> BlockStack = new Stack<char>();
 		public static string ReadObjectString(this StringReader reader,string ignore="")
 		{
-			return Tool.BuildString((writer) =>
+			return QTool.BuildString((writer) =>
 			{
 				int index = -1;
 				BlockStack.Clear();
