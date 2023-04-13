@@ -26,7 +26,7 @@ namespace QTool
 			return table;
 		});
 		private float[] Table = null;
-		public float Scale = 10;
+		public float Frequency { get; set; } = 10;
 		public QWhiteNoise(int seed = 0)
 		{
 			Table = Tables[seed];
@@ -47,9 +47,9 @@ namespace QTool
 		{
 			return GetValue(z + OffsetIndex(y + OffsetIndex(x)));
 		}
-		protected int FixIndex(ref float value)
+		protected virtual int FixIndex(ref float value)
 		{
-			value *= Scale;
+			value *= Frequency;
 			return Mathf.FloorToInt(value);
 		}
 		public virtual float this[float x]
@@ -154,7 +154,7 @@ namespace QTool
 				return (z1.Lerp(z2, Curve(zt))+1)/2;
 			}
 		}
-		private float Grad(float value, float x)
+		public static float Grad(float value, float x)
 		{
 			var hash = (int)(value * byte.MaxValue);
 			int h = hash & 15;
@@ -163,7 +163,7 @@ namespace QTool
 			return (grad * x);              // Multiply the gradient with the distance
 		}
 
-		private float Grad(float value, float x, float y)
+		public static float Grad(float value, float x, float y)
 		{
 			var hash = (int)(value * byte.MaxValue);
 			int h = hash & 7;           // Convert low 3 bits of hash code
@@ -172,13 +172,131 @@ namespace QTool
 			return ((h & 1) != 0 ? -u : u) + ((h & 2) != 0 ? -v :  v);
 		}
 
-		private float Grad(float value, float x, float y, float z)
+		public static float Grad(float value, float x, float y, float z)
 		{
 			var hash = (int)(value * byte.MaxValue);
 			int h = hash & 15;     // Convert low 4 bits of hash code into 12 simple
 			float u = h < 8 ? x : y; // gradient directions, and compute dot product.
 			float v = h < 4 ? y : h == 12 || h == 14 ? x : z; // Fix repeats at h = 12 to 15
 			return ((h & 1) != 0 ? -u : u) + ((h & 2) != 0 ? -v : v);
+		}
+	}
+	public class QSimplexNoise : QPerlinNoise
+	{
+		protected override int FixIndex(ref float value)
+		{
+			value *= Frequency*0.5f;
+			return Mathf.FloorToInt(value);
+		}
+		private void FixIndex(ref float x,ref float y,out int intx,out int inty)
+		{
+			x *= Frequency * 0.5f;
+			y *= Frequency * 0.5f;
+			var sum = (x + y) * 0.366025403f;
+			intx = Mathf.FloorToInt(x + sum);
+			inty = Mathf.FloorToInt(y + sum);
+		}
+		private void FixIndex(ref float x, ref float y,ref float z, out int intx, out int inty,out int intz)
+		{
+			x *= Frequency * 0.5f;
+			y *= Frequency * 0.5f;
+			z *= Frequency * 0.5f;
+			var sum = (x + y + z) * 0.333333333f;
+			intx = Mathf.FloorToInt(x + sum);
+			inty = Mathf.FloorToInt(y + sum);
+			intz = Mathf.FloorToInt(z + sum);
+		}
+		public override float this[float x] {
+			get
+			{
+				var intx = FixIndex(ref x);
+				return (GetSimplexValue(intx, x - intx)+GetSimplexValue(intx + 1, x - intx - 1)*0.395f+1)/2;
+			}
+		}
+		public override float this[float x, float y]
+		{
+			get
+			{
+				FixIndex(ref x,ref y, out var intx, out var inty);
+				const float G = 0.211324865f;
+				float t = (intx + inty) * G;
+				float xt = x - intx + t; 
+				float yt = y - inty + t;
+				int xo1, yo1; 
+				if (xt > yt) { xo1 = 1; yo1 = 0; }
+				else { xo1 = 0; yo1 = 1; }
+				var n0 = GetSimplexValue(intx, inty, xt, yt);
+				var n1 = GetSimplexValue(intx+xo1, inty+yo1, xt - xo1 + G, yt - yo1 + G);
+				var n2 = GetSimplexValue(intx+1, inty+1, xt - 1.0f + 2.0f * G, yt - 1.0f + 2.0f * G);
+				return (n0 + n1 + n2) * 30 +0.5f;
+			}
+		}
+		public override float this[float x, float y, float z] {
+			get
+			{
+				FixIndex(ref x, ref y,ref z, out var intx, out var inty,out var intz);
+				const float G = 0.166666667f;
+				float t = (intx + inty + intz) * G;
+				float xt = x - intx + t;
+				float yt = y - inty + t;
+				float zt = z - intz + t;
+				int xo1, yo1, zo1;
+				int xo2, yo2, zo2;
+				if (xt >= yt)
+				{
+					if (yt >= zt)
+					{ xo1 = 1; yo1 = 0; zo1 = 0; xo2 = 1; yo2 = 1; zo2 = 0; } 
+					else if (xt >= zt) { xo1 = 1; yo1 = 0; zo1 = 0; xo2 = 1; yo2 = 0; zo2 = 1; }
+					else { xo1 = 0; yo1 = 0; zo1 = 1; xo2 = 1; yo2 = 0; zo2 = 1; } 
+				}
+				else
+				{ 
+					if (yt < zt) { xo1 = 0; yo1 = 0; zo1 = 1; xo2 = 0; yo2 = 1; zo2 = 1; }
+					else if (xt < zt) { xo1 = 0; yo1 = 1; zo1 = 0; xo2 = 0; yo2 = 1; zo2 = 1; } 
+					else { xo1 = 0; yo1 = 1; zo1 = 0; xo2 = 1; yo2 = 1; zo2 = 0; } 
+				}
+				var n0 = GetSimplexValue(intx, inty,intz, xt, yt,zt);
+				var n1 = GetSimplexValue(intx + xo1, inty + yo1, intz + zo1, xt - xo1 + G, yt - yo1 + G, zt - zo1 + G);
+				var n2 = GetSimplexValue(intx + xo2, inty + yo2, intz + zo2, xt - xo2 + G * 2, yt - yo2 + G * 2, zt - zo2 + G * 2);
+				var n3 = GetSimplexValue(intx + 1, inty + 1, intz + 1, xt - 1 + G * 3, yt - 1 + G * 3, zt - 1 + G * 3);
+				return (n0 + n1 + n2 + n3) * 16 + 0.5f;
+			}
+		}
+		private float GetSimplexValue(int x,float xt)
+		{
+			var temp= 1 - x * x;
+			temp *= temp;
+			return temp * temp* Grad(GetValue(x), xt);
+		}
+		private float GetSimplexValue(int x,int y, float xt,float yt)
+		{
+			var temp = 0.5f - xt * xt - yt * yt;
+			if (temp < 0)
+			{
+				return 0;
+			}
+			else
+			{
+				temp *= temp;
+				return temp * temp * Grad(GetValue(x, y), xt, yt);
+			}
+		}
+		private float GetSimplexValue(int x, int y,int z, float xt, float yt,float zt)
+		{
+			var temp = 0.6f - xt * xt - yt * yt - zt * zt;
+			if (temp < 0)
+			{
+				return 0;
+			}
+			else
+			{
+				temp *= temp;
+				return temp * temp * Grad(GetValue(x, y, z), xt, yt, zt);
+			}
+		}
+		public override float Curve(float x)
+		{
+			return x;
 		}
 	}
 	/// <summary>

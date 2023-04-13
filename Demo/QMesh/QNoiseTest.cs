@@ -11,7 +11,7 @@ namespace QTool.Mesh
 		private Texture2D texture;
 		public void NoiseTest()
 		{
-			var noise = new QPerlinNoise() { Scale = 5 };
+			var noise = new QSimplexNoise() { Frequency = 5 };
 			texture = new Texture2D(256, 256);
 			for (int y = 0; y < texture.height; y++)
 			{
