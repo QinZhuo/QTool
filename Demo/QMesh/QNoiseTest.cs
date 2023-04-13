@@ -11,7 +11,7 @@ namespace QTool.Mesh
 		private Texture2D texture;
 		public void NoiseTest()
 		{
-			var noise = new QPerlinNoise();
+			var noise = new QPerlinNoise() { Scale = 5 };
 			texture = new Texture2D(256, 256);
 			for (int y = 0; y < texture.height; y++)
 			{
@@ -27,14 +27,14 @@ namespace QTool.Mesh
 			}
 			texture.Apply();
 			var voxelData = new QVoxelData();
-			voxelData.Surface = 0.4f;
+			voxelData.Surface = 0.5f;
 			for (int x = -10; x <10; x++)
 			{
 				for (int y = -10; y <10; y++)
 				{
 					for (int z = -10; z < 10; z++)
 					{
-						var value= noise[x / 40f, y / 40f, z / 40f]; 
+						var value= noise[x / 20f, y / 20f, z / 20f]; 
 						voxelData[x, y, z] = value;
 						
 					}

@@ -79,7 +79,7 @@ namespace QTool
 				var intx = FixIndex(ref x);
 				var inty = FixIndex(ref y);
 				var intz = FixIndex(ref z);
-				var xt = x - intx;
+				var xt = Curve(x - intx);
 				var y1 = GetValue(intx, inty, intz).Lerp(GetValue(intx + 1, inty, intz), xt);
 				var y2 = GetValue(intx, inty + 1, intz).Lerp(GetValue(intx + 1, inty + 1, intz), xt);
 				var y3 = GetValue(intx, inty, intz + 1).Lerp(GetValue(intx + 1, inty, intz + 1), xt);
@@ -106,10 +106,18 @@ namespace QTool
 		}
 	}
 	/// <summary>
-	/// 柏林噪声
+	/// 柏林噪声 使用随机方向信息计算得出最终数值
 	/// </summary>
 	public class QPerlinNoise : QValueNoise
 	{
+		public override float this[float x]
+		{
+			get
+			{
+				var intx = FixIndex(ref x);
+				return Grad(GetValue(intx),x-intx).Lerp(Grad(GetValue(intx + 1),x-intx-1), Curve(x - intx));
+			}
+		}
 		public override float this[float x, float y]
 		{
 			get
@@ -125,7 +133,27 @@ namespace QTool
 				return (y1.Lerp(y2, cyt) + 1f) / 2f;
 			}
 		}
-		
+		public override float this[float x, float y, float z]
+		{
+			get
+			{
+				var intx = FixIndex(ref x);
+				var inty = FixIndex(ref y);
+				var intz = FixIndex(ref z);
+				var xt = x - intx;
+				var yt = y - inty;
+				var zt = z - intz;
+				var cxt = Curve(xt);
+				var y1 = Grad(GetValue(intx, inty, intz),xt,yt,zt).Lerp(Grad(GetValue(intx + 1, inty, intz),xt-1,yt,zt), cxt);
+				var y2 = Grad(GetValue(intx , inty + 1, intz), xt , yt - 1, zt).Lerp(Grad(GetValue(intx + 1, inty + 1, intz), xt - 1, yt - 1, zt), cxt);
+				var y3 = Grad(GetValue(intx, inty, intz + 1), xt , yt, zt - 1).Lerp(Grad(GetValue(intx + 1, inty , intz + 1), xt - 1, yt , zt - 1), cxt);
+				var y4 = Grad(GetValue(intx , inty + 1, intz + 1), xt, yt - 1, zt - 1).Lerp(Grad(GetValue(intx + 1, inty + 1, intz + 1), xt - 1, yt - 1, zt - 1), cxt);
+				var cyt = Curve(yt);
+				var z1 = y1.Lerp(y2, cyt);
+				var z2 = y3.Lerp(y4, cyt);
+				return (z1.Lerp(z2, Curve(zt))+1)/2;
+			}
+		}
 		private float Grad(float value, float x)
 		{
 			var hash = (int)(value * byte.MaxValue);
@@ -144,23 +172,14 @@ namespace QTool
 			return ((h & 1) != 0 ? -u : u) + ((h & 2) != 0 ? -v :  v);
 		}
 
-		private float Grad(int hash, float x, float y, float z)
+		private float Grad(float value, float x, float y, float z)
 		{
+			var hash = (int)(value * byte.MaxValue);
 			int h = hash & 15;     // Convert low 4 bits of hash code into 12 simple
 			float u = h < 8 ? x : y; // gradient directions, and compute dot product.
 			float v = h < 4 ? y : h == 12 || h == 14 ? x : z; // Fix repeats at h = 12 to 15
 			return ((h & 1) != 0 ? -u : u) + ((h & 2) != 0 ? -v : v);
 		}
-
-		private float Grad(int hash, float x, float y, float z, float t)
-		{
-			int h = hash & 31;          // Convert low 5 bits of hash code into 32 simple
-			float u = h < 24 ? x : y; // gradient directions, and compute dot product.
-			float v = h < 16 ? y : z;
-			float w = h < 8 ? z : t;
-			return ((h & 1) != 0 ? -u : u) + ((h & 2) != 0 ? -v : v) + ((h & 4) != 0 ? -w : w);
-		}
-
 	}
 	/// <summary>
 	/// 噪声层级 更改噪声的频率幅度
@@ -229,7 +248,7 @@ namespace QTool
 				{
 					value += noise[x];
 				}
-				return ChangeResult(value);
+				return FixResult(value);
 			}
 		}
 
@@ -242,7 +261,7 @@ namespace QTool
 				{
 					value += noise[x,y];
 				}
-				return ChangeResult(value);
+				return FixResult(value);
 			}
 		}
 		public float this[float x, float y, float z]
@@ -254,10 +273,10 @@ namespace QTool
 				{
 					value += noise[x, y, z];
 				}
-				return ChangeResult(value);
+				return FixResult(value);
 			}
 		}
-		public virtual float ChangeResult(float value)
+		public virtual float FixResult(float value)
 		{
 			return value / AmplitudeSum;
 		}
@@ -268,9 +287,9 @@ namespace QTool
 	public class QTurbulenceNoise: QFractionNoise
 	{
 		public QTurbulenceNoise() : base(new QValueNoise()) { }
-		public override float ChangeResult(float value)
+		public override float FixResult(float value)
 		{
-			return System.Math.Abs(base.ChangeResult(value) * 2 - 1);
+			return System.Math.Abs(base.FixResult(value) * 2 - 1);
 		}
 	}
 	
