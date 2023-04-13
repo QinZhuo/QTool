@@ -76,7 +76,37 @@ namespace QTool
 				UpdateTimeScale();
 			}
         }
-    }
+
+
+#if UNITY_EDITOR
+		static void StartUpdateEditorTime()
+		{
+			if (!updateEditorTime)
+			{
+				updateEditorTime = true;
+				UnityEditor.EditorApplication.update += () =>
+				{
+					editorDeltaTime = (float)(UnityEditor.EditorApplication.timeSinceStartup - lastTime);
+					lastTime = UnityEditor.EditorApplication.timeSinceStartup;
+				};
+			}
+		}
+
+		static bool updateEditorTime = false;
+		static double lastTime;
+#endif
+		static float editorDeltaTime;
+		public static float EditorDeltaTime
+		{
+			get
+			{
+#if UNITY_EDITOR
+				StartUpdateEditorTime();
+#endif
+				return editorDeltaTime > 1 ? 0 : editorDeltaTime;
+			}
+		}
+	}
 	public class QTimer
 	{
         public float Time { get; protected set; }
@@ -135,5 +165,6 @@ namespace QTool
 				return false;
 			}
 		}
+
 	}
 }

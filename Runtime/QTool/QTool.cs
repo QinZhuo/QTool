@@ -711,34 +711,7 @@ namespace QTool
 			return transform.GridFixed(gridSize).ToGrid(gridSize);
 		}
 
-#if UNITY_EDITOR
-		static void StartUpdateEditorTime()
-		{
-			if (!updateEditorTime)
-			{
-				updateEditorTime = true;
-				UnityEditor.EditorApplication.update += () =>
-				{
-					editorDeltaTime = (float)(UnityEditor.EditorApplication.timeSinceStartup - lastTime);
-					lastTime = UnityEditor.EditorApplication.timeSinceStartup;
-				};
-			}
-		}
 
-		static bool updateEditorTime = false;
-		static double lastTime;
-#endif
-		static float editorDeltaTime;
-		public static float EditorDeltaTime
-		{
-			get
-			{
-#if UNITY_EDITOR
-				StartUpdateEditorTime();
-#endif
-				return editorDeltaTime > 1 ? 0 : editorDeltaTime;
-			}
-		}
 		public static void AddAssetObject(this UnityEngine.Object obj, UnityEngine.Object childObj)
 		{
 #if UNITY_EDITOR
