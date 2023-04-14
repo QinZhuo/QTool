@@ -623,6 +623,7 @@ namespace QTool.Reflection
 						}
 						return true;
 					});
+					typeList.Remove(rootType);
 					AllTypesCache[rootType] = typeList.ToArray();
 				}
 			}
