@@ -77,20 +77,20 @@ namespace QTool
 			return req.downloadHandler.text;
 		}
 
-		public static async Task LoadSceneAsync(this string sceneName,float time=2f)
+		public static async Task LoadSceneAsync(this string sceneName)
 		{
-			await QTask.Wait(time / 2,true);
 			var startTime = QDebug.Timestamp;
-			QDebug.Log("异步加载场景[" + sceneName + "]");
+			QDebug.Log("异步加载场景开始[" + sceneName + "]");
 			await SceneManager.LoadSceneAsync(sceneName);
+			QDebug.Log("异步加载场景结束[" + sceneName + "]",startTime);
 			await GCCollectAsync();
-			QDebug.Log("成功加载场景[" + sceneName + "]",startTime);
-			await QTask.Wait(time / 2,true);
 		}
 		public static async Task GCCollectAsync()
 		{
+			var startTime = QDebug.Timestamp;
 			await Resources.UnloadUnusedAssets();
 			await Task.Run(GC.Collect);
+			QDebug.Log("垃圾回收", startTime);
 		}
 		private static PlayerLoopSystem AddPlayerLoop(this PlayerLoopSystem playerLoop,Type type, Action action)
 		{
