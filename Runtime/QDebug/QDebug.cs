@@ -372,14 +372,12 @@ namespace QTool
 		[System.Diagnostics.Conditional("DEVELOPMENT_BUILD"), System.Diagnostics.Conditional("UNITY_EDITOR")]
 		public static void StartProfiler(string key)
 		{
-			var profiler = ProfilerMarkerList[key];
-			profiler.Begin();
+			ProfilerMarkerList[key].Begin();
 		}
 		[System.Diagnostics.Conditional("DEVELOPMENT_BUILD"), System.Diagnostics.Conditional("UNITY_EDITOR")]
 		public static void StopProfiler(string key)
 		{
-			var profiler = ProfilerMarkerList[key];
-			profiler.End();
+			ProfilerMarkerList[key].End();
 		}
 		[System.Diagnostics.Conditional("DEVELOPMENT_BUILD"), System.Diagnostics.Conditional("UNITY_EDITOR")]
 		public static void ChangeProfilerCount(string key, int changeCount=0)
@@ -390,7 +388,6 @@ namespace QTool
 #endif
 		}
 #if Profiler
-
 		private static readonly ProfilerCategory filerCategory = ProfilerCategory.Scripts;
 		private static QDictionary<string, ProfilerCounterValue<int>> ProfilerCount = new QDictionary<string, ProfilerCounterValue<int>>((key) => new ProfilerCounterValue<int>(filerCategory, key, ProfilerMarkerDataUnit.Count, ProfilerCounterOptions.FlushOnEndOfFrame));
 #endif

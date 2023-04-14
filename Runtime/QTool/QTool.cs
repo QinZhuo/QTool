@@ -89,7 +89,9 @@ namespace QTool
 		{
 			var startTime = QDebug.Timestamp;
 			await Resources.UnloadUnusedAssets();
-			await Task.Run(GC.Collect);
+			QDebug.Log(nameof(Resources)+" 资源回收", startTime);
+			startTime = QDebug.Timestamp;
+			_ =Task.Run(GC.Collect);
 			QDebug.Log("垃圾回收", startTime);
 		}
 		private static PlayerLoopSystem AddPlayerLoop(this PlayerLoopSystem playerLoop,Type type, Action action)
