@@ -12,8 +12,8 @@ namespace QTool
 {
 	public static class QDebug
 	{
-		public static int FPS => (int)Fps.SecondeSum;
-		internal static QAverageValue Fps = new QAverageValue();
+		public static int FPS =>(int)(1f/GetIntervalSeconds(LastFrameTime));
+		public static long LastFrameTime { internal set; get; }
 		static bool DebugPanelShow = false;
 		private static QToolBar toolBar = null;
 

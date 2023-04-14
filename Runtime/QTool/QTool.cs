@@ -82,17 +82,13 @@ namespace QTool
 			var startTime = QDebug.Timestamp;
 			QDebug.Log("异步加载场景开始[" + sceneName + "]");
 			await SceneManager.LoadSceneAsync(sceneName);
-			QDebug.Log("异步加载场景结束[" + sceneName + "]",startTime);
-			await GCCollectAsync();
+			GCCollect();
+			QDebug.Log("异步加载场景结束[" + sceneName + "]", startTime);
 		}
-		public static async Task GCCollectAsync()
+		public static void GCCollect()
 		{
-			var startTime = QDebug.Timestamp;
-			await Resources.UnloadUnusedAssets();
-			QDebug.Log(nameof(Resources)+" 资源回收", startTime);
-			startTime = QDebug.Timestamp;
-			_ =Task.Run(GC.Collect);
-			QDebug.Log("垃圾回收", startTime);
+			Resources.UnloadUnusedAssets();
+			Task.Run(GC.Collect);
 		}
 		private static PlayerLoopSystem AddPlayerLoop(this PlayerLoopSystem playerLoop,Type type, Action action)
 		{
