@@ -65,13 +65,15 @@ namespace QTool
 			var pointList = new List<QPositionPoint>();
 			if (root == null)
 			{
-				pointList.AddRange(Object.FindObjectsOfType<QPositionPoint>());
+				pointList.AddRange(QPositionPoint.GetPoints(pointKey));
+				pointList.RemoveAll((point) => point.HasChild);
 			}
 			else
 			{
+				var keyPotnts= QPositionPoint.GetPoints(pointKey);
 				pointList.AddRange(root.GetComponentsInChildren<QPositionPoint>());
+				pointList.RemoveAll((point) => !keyPotnts.Contains(point) || point.HasChild);
 			}
-			pointList.RemoveAll((point) => !pointKey.Contains(point.name) || !point.CanCreate);
 			pointList.Random();
 			for (int i = 0; i < count && i < pointList.Count; i++)
 			{
