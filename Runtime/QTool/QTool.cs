@@ -76,14 +76,18 @@ namespace QTool
 			}
 			return req.downloadHandler.text;
 		}
-
+		public static List<Task> PreLoadTaskList = new List<Task>();
 		public static async Task LoadSceneAsync(this string sceneName)
 		{
+			await PreLoadTaskList.WaitAllOver();
+			PreLoadTaskList.Clear();
 			var startTime = QDebug.Timestamp;
 			QDebug.Log("异步加载场景开始[" + sceneName + "]");
 			await SceneManager.LoadSceneAsync(sceneName);
 			GCCollect();
 			QDebug.Log("异步加载场景结束[" + sceneName + "]", startTime);
+			await PreLoadTaskList.WaitAllOver();
+			PreLoadTaskList.Clear();
 		}
 		public static void GCCollect()
 		{

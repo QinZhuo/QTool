@@ -25,6 +25,12 @@ namespace QTool.Asset
 			key = key.Replace('\\', '/');
 			return Resources.Load<TObj>(DirectoryPath + "/" + key);
 		}
+		public static async Task<TObj> LoadAsync(string key)
+		{
+			if (key.IsNull()) return null;
+			key = key.Replace('\\', '/');
+			return await Resources.LoadAsync<TObj>(DirectoryPath + "/" + key) as TObj;
+		}
 	}
 	public abstract class QPrefabLoader<TPath> : QAssetLoader<TPath, GameObject> where TPath : QPrefabLoader<TPath>
 	{
