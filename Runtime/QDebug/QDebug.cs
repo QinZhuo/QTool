@@ -361,7 +361,7 @@ namespace QTool
 		[System.Diagnostics.Conditional("DEVELOPMENT_BUILD"), System.Diagnostics.Conditional("UNITY_EDITOR")]
 		public static void Log(object obj,long startTimestamp)
 		{
-			Debug.Log("[" + nameof(QDebug) + "]  " + obj+" 时间 "+GetIntervalSeconds(startTimestamp).ToString("f2")+" s");
+			Debug.Log("[" + nameof(QDebug) + "]  " + obj+" 时间 "+GetIntervalSeconds(startTimestamp).ToString("f3")+" s");
 		}
 		[System.Diagnostics.Conditional("DEVELOPMENT_BUILD"), System.Diagnostics.Conditional("UNITY_EDITOR")]
 		public static void LogWarning(object obj)

@@ -884,8 +884,7 @@ namespace QTool
 				}
 				list.Add((T)t);
 			}
-			QDebug.Log("解析QDataList<" + type.Name + ">数据 " + list.Count ,startTime);
-
+			QDebug.Log("解析 QDataList<" + type.Name + "> 数据 " + list.Count+" 条 ",startTime);
 			return list;
 		}
 	}

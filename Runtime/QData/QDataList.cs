@@ -35,7 +35,7 @@ namespace QTool
 					dataList.Add(new QDataList(fileValue) { LoadPath = loadPath });
 				}, "{}");
 			}
-			QDebug.Log("加载QDataList[" + name + "]数据" + dataList.Count ,startTime);
+			QDebug.Log("加载 QDataList." + name + " 数据 " + dataList.Count+" 条",startTime);
 			return dataList;
 		}
 		public static QDataList GetData(string path,System.Func<QDataList> autoCreate=null)
