@@ -120,7 +120,7 @@ namespace QTool
 		{
 			if (id.StartsWith("{") && id.EndsWith("}"))
 			{
-				id = id.SplitEndString(":").TrimEnd('}').Trim();
+				id = id.GetBlockValue(":\"", "\"");
 			}
 			var path= GetResourcesPath(id);
 			var obj = await Resources.LoadAsync(path, type);
