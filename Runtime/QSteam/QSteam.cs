@@ -48,7 +48,7 @@ namespace QTool
 			{
 				Debug.LogError(nameof(QSteam) + " 初始化失败");
 #if !UNITY_EDITOR
-				Tool.Quit();
+				QTool.Quit();
 #endif
 				return;
 			}
