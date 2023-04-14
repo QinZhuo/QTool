@@ -21,6 +21,7 @@ namespace QTool.Reflection
 		public Attribute Attribute { get; set; }
 		public MemberInfo MemeberInfo { get; private set; }
 		public bool IsPublic { get; private set; }
+		public bool IsUnityObject { get; private set; }
 		public QMemeberInfo(FieldInfo info)
 		{
 			MemeberInfo = info;
@@ -31,6 +32,7 @@ namespace QTool.Reflection
 			Set = info.SetValue;
 			Get = info.GetValue;
 			IsPublic = info.IsPublic;
+			IsUnityObject= Type.Is(typeof(UnityEngine.Object));
 		}
 		public QMemeberInfo(PropertyInfo info)
 		{
@@ -40,6 +42,7 @@ namespace QTool.Reflection
 			Key = info.Name;
 			Type = info.PropertyType;
 			IsPublic = true;
+			IsUnityObject = Type.Is(typeof(UnityEngine.Object));
 			if (info.SetMethod != null)
 			{
 				Set =(obj,value)=> info.SetMethod.Invoke(obj,new object[] { value });

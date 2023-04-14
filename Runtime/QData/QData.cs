@@ -169,7 +169,7 @@ namespace QTool
 										writer.Write('{');
 										writer.WriteCheckString("QId");
 										writer.Write(':');
-										writer.WriteCheckString(QIdObject.GetId(obj as UnityEngine.Object));
+										writer.WriteCheckString(QIdTool.GetQId(obj as UnityEngine.Object));
 										writer.Write('}');
 									}
 								
@@ -453,7 +453,7 @@ namespace QTool
 										{
 											str = reader.ReadCheckString();
 										}
-										target = QIdObject.GetObject(str, type);
+										target = QIdTool.GetObject(str, type);
 									}
 									reader.NextIsSplit('}');
 									break;
@@ -836,7 +836,7 @@ namespace QTool
 			}
 			return qdataList;
 		}
-		public static List<T> ParseQdataList<T>(this QDataList qdataList, List<T> list,Type type=null) 
+		public static List<T> ParseQDataList<T>(this QDataList qdataList, List<T> list,Type type=null) 
 		{
 			var startTime = QDebug.Timestamp;
 			if (type == null)
@@ -885,6 +885,66 @@ namespace QTool
 				list.Add((T)t);
 			}
 			QDebug.Log("解析 QDataList<" + type.Name + "> 数据 " + list.Count+" 条 ",startTime);
+			return list;
+		}
+
+		public static async Task<List<T>> ParseQDataListAsync<T>(this QDataList qdataList, List<T> list, Type type = null)
+		{
+			var startTime = QDebug.Timestamp;
+			if (type == null)
+			{
+				type = typeof(T);
+				if (type == typeof(object))
+				{
+					throw new Exception(nameof(QDataList) + "类型出错 " + type);
+				}
+			}
+			var typeInfo = QSerializeType.Get(type);
+			list.Clear();
+			var titleRow = qdataList.TitleRow;
+			var memeberList = new List<QMemeberInfo>();
+			foreach (var title in titleRow)
+			{
+				var member = typeInfo.GetMemberInfo(title);
+				if (member == null)
+				{
+					Debug.LogWarning("读取 " + type.Name + "出错 不存在属性 " + title);
+				}
+				memeberList.Add(member);
+			}
+			foreach (var row in qdataList)
+			{
+				await QTask.Step();
+				if (row == titleRow) continue;
+				var t = type.CreateInstance();
+				for (int i = 0; i < titleRow.Count; i++)
+				{
+					var member = memeberList[i];
+					if (member != null)
+					{
+						try
+						{
+							var value = row[i].ParseElement();
+							if (member.IsUnityObject)
+							{
+								var obj = await QIdTool.LoadObjectAsync(value, member.Type);
+								member.Set(t, obj);
+							}
+							else
+							{
+								member.Set(t, value.ParseQDataType(member.Type, false));
+							}
+						}
+						catch (System.Exception e)
+						{
+							Debug.LogError("读取 " + type.Name + "出错 设置[" + row.Key + "]属性 " + member.Key + "(" + member.Type + ")异常：\n" + e);
+						}
+
+					}
+				}
+				list.Add((T)t);
+			}
+			QDebug.Log("解析 QDataList<" + type.Name + "> 数据 " + list.Count + " 条 ", startTime);
 			return list;
 		}
 	}

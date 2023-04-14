@@ -590,7 +590,7 @@ namespace QTool
 		public static string DrawQIdObject(string lable, string id, Type type, Rect? rect = null, params GUILayoutOption[] options)
 		{
 			var name = lable + "【" + (id == null ? "" : id.Substring(0, Mathf.Min(4, id.Length))) + "~】";
-			var oldObj = QIdObject.GetObject(id, type);
+			var oldObj = QIdTool.GetObject(id, type);
 			var newObj = oldObj;
 			if (rect == null)
 			{
@@ -604,7 +604,7 @@ namespace QTool
 #endif
 			if (newObj != oldObj)
 			{
-				id = QIdObject.GetId(newObj);
+				id = QIdTool.GetQId(newObj);
 			}
 			return id;
 		}

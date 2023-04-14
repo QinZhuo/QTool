@@ -31,9 +31,9 @@ namespace QTool
 		{
 			if (editor.target.IsAsset())
 			{
-				if (QIdObject.AssetIdCache.ContainsKey(editor.target))
+				if (QIdTool.AssetIdCache.ContainsKey(editor.target))
 				{
-					GUILayout.Label("QId : " + QIdObject.AssetIdCache[editor.target]);
+					GUILayout.Label("QId : " + QIdTool.AssetIdCache[editor.target]);
 				}
 			}
 			else

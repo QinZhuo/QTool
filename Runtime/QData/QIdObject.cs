@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 namespace QTool
 {
@@ -14,7 +15,7 @@ namespace QTool
 			{
 				if (_obj == null)
 				{
-					_obj = GetObject(id, typeof(Object));
+					_obj = QIdTool.GetObject(id,typeof(Object));
 				}
 				return _obj;
 			}
@@ -22,9 +23,11 @@ namespace QTool
 
 		public T Get<T>() where T : Object
 		{
-			return GetObject<T>(id);
+			return QIdTool.GetObject<T>(id);
 		}
-
+	}
+	public static class QIdTool
+	{
 #if UNITY_EDITOR
 		public static QDictionary<string, Object> AssetObjectCache = new QDictionary<string, Object>();
 		public static QDictionary<Object, string> AssetIdCache = new QDictionary<Object, string>();
@@ -52,7 +55,8 @@ namespace QTool
 			}
 		}
 #endif
-		public static string GetId(Object obj)
+
+		public static string GetQId(Object obj)
 		{
 			if (obj != null)
 			{
@@ -65,7 +69,7 @@ namespace QTool
 					obj = monoObj.gameObject;
 				}
 #if UNITY_EDITOR
-				if (!Application.isPlaying&&obj.IsAsset())
+				if (!Application.isPlaying && obj.IsAsset())
 				{
 					InitCache();
 					if (!AssetIdCache.ContainsKey(obj))
@@ -102,7 +106,7 @@ namespace QTool
 							qId = gameObj.AddComponent<QId>();
 							gameObj.SetDirty();
 						}
-						if (!Application.isPlaying && !gameObj.activeSelf&& QSceneObjectSetting.Instance!=null)
+						if (!Application.isPlaying && !gameObj.activeSelf && QSceneObjectSetting.Instance != null)
 						{
 							QSceneObjectSetting.Instance.qIdInitList.AddCheckExist(qId);
 						}
@@ -112,7 +116,37 @@ namespace QTool
 			}
 			return "";
 		}
-
+		internal static async Task<Object> LoadObjectAsync(string id, System.Type type)
+		{
+			if (id.StartsWith("{") && id.EndsWith("}"))
+			{
+				id = id.SplitEndString(":").TrimEnd('}').Trim();
+			}
+			var path= GetResourcesPath(id);
+			var obj = await Resources.LoadAsync(path, type);
+			if(obj is QIdReference idReference)
+			{
+				obj = idReference.obj;
+			}
+			return obj;
+		}
+		private static string GetResourcesPath(string id)
+		{
+			string loadPath = null;
+			if (id.Contains("/" + nameof(Resources) + "/"))
+			{
+				loadPath = id.SplitEndString("/" + nameof(Resources) + "/");
+				if (loadPath.Contains("."))
+				{
+					loadPath = loadPath.WithoutExtension();
+				}
+			}
+			else
+			{
+				loadPath = nameof(QIdReference) + "/" + id;
+			}
+			return loadPath;
+		}
 		public static Object GetObject(string id, System.Type type)
 		{
 
@@ -132,20 +166,7 @@ namespace QTool
 #if UNITY_EDITOR
 				if (QTool.IsBuilding) return obj;
 #endif
-				string loadPath = null;
-				if (id.Contains("/" + nameof(Resources) + "/"))
-				{
-					loadPath = id.SplitEndString("/" + nameof(Resources) + "/");
-					if (loadPath.Contains("."))
-					{
-						loadPath = loadPath.WithoutExtension();
-					}
-				}
-				else
-				{
-					loadPath = nameof(QIdReference) + "/" + id;
-				}
-
+				var loadPath = GetResourcesPath(id);
 				obj = Resources.Load(loadPath);
 				if (obj == null && id.Contains("_"))
 				{
@@ -171,7 +192,7 @@ namespace QTool
 					obj = UnityEditor.AssetDatabase.LoadAssetAtPath(id, type);
 					if (obj != null)
 					{
-						GetId(obj);
+						GetQId(obj);
 						return obj;
 					}
 				}
@@ -184,6 +205,5 @@ namespace QTool
 		{
 			return GetObject(id, typeof(T)) as T;
 		}
-
 	}
 }

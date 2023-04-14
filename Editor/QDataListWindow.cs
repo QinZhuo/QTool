@@ -54,7 +54,7 @@ namespace QTool.FlowGraph
 				{
 					typeInfo = QSerializeType.Get(type);
 					qdataList = QDataList.GetData(path);
-					qdataList.ParseQdataList(objList, type);
+					qdataList.ParseQDataList(objList, type);
 					for (int i = 0; i < qdataList.TitleRow.Count; i++)
 					{
 						Members[i] = typeInfo.GetMemberInfo(qdataList.TitleRow[i]);

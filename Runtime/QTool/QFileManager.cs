@@ -409,7 +409,7 @@ namespace QTool
 		}
 		public static List<T> LoadQDataList<T>(this List<T> data, string path)
 		{
-			return new QDataList(Load(path, data.ToQDataList().ToString())).ParseQdataList(data);
+			return new QDataList(Load(path, data.ToQDataList().ToString())).ParseQDataList(data);
 		} 
 		public static void SaveBytes<T>(this T data,string path)
 		{
