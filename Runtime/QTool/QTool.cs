@@ -76,24 +76,7 @@ namespace QTool
 			}
 			return req.downloadHandler.text;
 		}
-		public static List<Task> PreLoadTaskList = new List<Task>();
-		public static async Task LoadSceneAsync(this string sceneName)
-		{
-			await PreLoadTaskList.WaitAllOver();
-			PreLoadTaskList.Clear();
-			var startTime = QDebug.Timestamp;
-			QDebug.Log("异步加载场景开始[" + sceneName + "]");
-			await SceneManager.LoadSceneAsync(sceneName);
-			GCCollect();
-			QDebug.Log("异步加载场景结束[" + sceneName + "]", startTime);
-			await PreLoadTaskList.WaitAllOver();
-			PreLoadTaskList.Clear();
-		}
-		public static void GCCollect()
-		{
-			Resources.UnloadUnusedAssets();
-			Task.Run(GC.Collect);
-		}
+	
 		private static PlayerLoopSystem AddPlayerLoop(this PlayerLoopSystem playerLoop,Type type, Action action)
 		{
 			var loopList = playerLoop.subSystemList.ToList();
@@ -879,6 +862,33 @@ namespace QTool
 		}
 	}
    
-
+	public static class QSceneTool
+	{
+		public static List<Task> PreLoadTaskList = new List<Task>();
+		public static async Task LoadSceneAsync(this string sceneName)
+		{
+			IsLoading = true;
+			await PreLoadTaskList.WaitAllOver();
+			PreLoadTaskList.Clear();
+			var startTime = QDebug.Timestamp;
+			QDebug.Log("异步加载场景开始[" + sceneName + "]");
+			await SceneManager.LoadSceneAsync(sceneName);
+			GCCollect();
+			QDebug.Log("异步加载场景结束[" + sceneName + "]", startTime);
+			await PreLoadTaskList.WaitAllOver();
+			PreLoadTaskList.Clear();
+			IsLoading = false;
+		}
+		public static bool IsLoading { get; private set; } = false;
+		public static async Task WaitLoading()
+		{
+			await QTask.Wait(() => !IsLoading);
+		}
+		public static void GCCollect()
+		{
+			Resources.UnloadUnusedAssets();
+			Task.Run(GC.Collect);
+		}
+	}
 
 }
