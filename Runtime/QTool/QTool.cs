@@ -80,11 +80,11 @@ namespace QTool
 		public static async Task LoadSceneAsync(this string sceneName,float time=2f)
 		{
 			await QTask.Wait(time / 2,true);
-			var startTime = DateTime.Now;
+			var startTime = QDebug.Timestamp;
 			QDebug.Log("异步加载场景[" + sceneName + "]");
 			await SceneManager.LoadSceneAsync(sceneName);
-			//await GCCollectAsync();
-			QDebug.Log("成功加载场景[" + sceneName + "] 时间 "+(DateTime.Now-startTime).TotalSeconds.ToString("f3")+" s");
+			await GCCollectAsync();
+			QDebug.Log("成功加载场景[" + sceneName + "]",startTime);
 			await QTask.Wait(time / 2,true);
 		}
 		public static async Task GCCollectAsync()

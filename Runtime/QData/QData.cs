@@ -838,6 +838,7 @@ namespace QTool
 		}
 		public static List<T> ParseQdataList<T>(this QDataList qdataList, List<T> list,Type type=null) 
 		{
+			var startTime = QDebug.Timestamp;
 			if (type == null)
 			{
 				type = typeof(T);
@@ -883,7 +884,8 @@ namespace QTool
 				}
 				list.Add((T)t);
 			}
-			QDebug.Log("读取 " + type.Name + " 完成：\n" + list.ToOneString() + "\n\nQDataList:\n" + qdataList);
+			QDebug.Log("解析QDataList<" + type.Name + ">数据 " + list.Count ,startTime);
+
 			return list;
 		}
 	}

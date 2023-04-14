@@ -26,6 +26,7 @@ namespace QTool
 		}
 		public static QDataList GetResourcesData(string name, System.Func<QDataList> autoCreate = null)
 		{
+			var startTime = QDebug.Timestamp;
 			var dataList= GetData(GetResourcesDataPath(name),autoCreate);
 			if (QToolSetting.Instance.modeList.Contains(name))
 			{
@@ -34,6 +35,7 @@ namespace QTool
 					dataList.Add(new QDataList(fileValue) { LoadPath = loadPath });
 				}, "{}");
 			}
+			QDebug.Log("加载QDataList[" + name + "]数据" + dataList.Count ,startTime);
 			return dataList;
 		}
 		public static QDataList GetData(string path,System.Func<QDataList> autoCreate=null)

@@ -329,7 +329,11 @@ namespace QTool
 				return angle;
 			}
 		}
-	
+		public static long Timestamp => System.Diagnostics.Stopwatch.GetTimestamp();
+		public static float GetIntervalSeconds(long startTime)
+		{
+			return (Timestamp - startTime) / 10000000f;
+		}
 		public static void DebugRun(string key, Action action)
 		{
 			GC.Collect();
@@ -353,6 +357,11 @@ namespace QTool
 		public static void Log(object obj)
 		{
 			Debug.Log("[" + nameof(QDebug) + "]  " + obj);
+		}
+		[System.Diagnostics.Conditional("DEVELOPMENT_BUILD"), System.Diagnostics.Conditional("UNITY_EDITOR")]
+		public static void Log(object obj,long startTimestamp)
+		{
+			Debug.Log("[" + nameof(QDebug) + "]  " + obj+" 时间 "+GetIntervalSeconds(startTimestamp).ToString("f2")+" s");
 		}
 		[System.Diagnostics.Conditional("DEVELOPMENT_BUILD"), System.Diagnostics.Conditional("UNITY_EDITOR")]
 		public static void LogWarning(object obj)
