@@ -922,9 +922,9 @@ namespace QTool
 					var member = memeberList[i];
 					if (member != null)
 					{
+						var value = row[i].ParseElement();
 						try
 						{
-							var value = row[i].ParseElement();
 							if (member.IsUnityObject)
 							{
 								var obj = await QIdTool.LoadObjectAsync(value, member.Type);
@@ -937,7 +937,7 @@ namespace QTool
 						}
 						catch (System.Exception e)
 						{
-							Debug.LogError("读取 " + type.Name + "出错 设置[" + row.Key + "]属性 " + member.Key + "(" + member.Type + ")异常：\n" + e);
+							Debug.LogError("读取 " + type.Name + "出错 设置[" + row.Key + "]属性 " + member.Key + "(" + member.Type + ")异常["+value+"]：\n" + e);
 						}
 
 					}
