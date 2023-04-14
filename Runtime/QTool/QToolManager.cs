@@ -28,7 +28,6 @@ namespace QTool
 		private void Update()
 		{
 			OnUpdateEvent?.Invoke();
-			QDebug.LastFrameTime = QDebug.Timestamp;
 		}
 		private void OnDestroy()
 		{

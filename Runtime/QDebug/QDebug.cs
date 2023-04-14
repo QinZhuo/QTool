@@ -12,10 +12,23 @@ namespace QTool
 {
 	public static class QDebug
 	{
-		public static int FPS =>(int)(1f/GetIntervalSeconds(LastFrameTime));
-		public static long LastFrameTime { internal set; get; }
+		public static int FPS { get; private set; } = 0;
+		public static long LastFrameTime { private set; get; } = 0;
 		static bool DebugPanelShow = false;
 		private static QToolBar toolBar = null;
+		[RuntimeInitializeOnLoadMethod]
+		private static void Init()
+		{
+			QToolManager.Instance.OnUpdateEvent += Update;
+		}
+		public static void Update()
+		{
+			if (LastFrameTime > 0)
+			{
+				FPS = (int)(1f / GetIntervalSeconds(LastFrameTime));
+			}
+			LastFrameTime = QDebug.Timestamp;
+		}
 
 		static Vector2 LeftScrollPosition = Vector2.zero;
 		static Vector2 RightScrollPosition = Vector2.zero;
@@ -361,7 +374,7 @@ namespace QTool
 		[System.Diagnostics.Conditional("DEVELOPMENT_BUILD"), System.Diagnostics.Conditional("UNITY_EDITOR")]
 		public static void Log(object obj,long startTimestamp)
 		{
-			Debug.Log("[" + nameof(QDebug) + "]  " + obj+" 时间 "+GetIntervalSeconds(startTimestamp).ToString("f3")+" s"+" 帧率 "+FPS);
+			Debug.Log("[" + nameof(QDebug) + "]  " + obj+" 时间 "+GetIntervalSeconds(startTimestamp).ToString("f3")+" s"+" 帧率 "+ (int)(1f / GetIntervalSeconds(LastFrameTime)));
 		}
 		[System.Diagnostics.Conditional("DEVELOPMENT_BUILD"), System.Diagnostics.Conditional("UNITY_EDITOR")]
 		public static void LogWarning(object obj)
