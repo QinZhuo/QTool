@@ -1,8 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 using UnityEngine;
-
+using QTool.Reflection;
 namespace QTool
 {
 	/// <summary>
@@ -206,7 +207,20 @@ namespace QTool
             }
           
         }
-
+		/// <summary>
+		/// 异步预加载所有QDataList<T>数据表
+		/// </summary>
+		public static void PreLoadAllAsync()
+		{
+			foreach (var type in typeof(QDataList<>).GetAllTypes())
+			{
+				var result= type.InvokeStaticFunction("LoadAsync");
+				if(result is Task task)
+				{
+					QSceneTool.PreLoadList.Add(task);
+				}
+			}
+		}
     }
 	/// <summary>
 	/// 运行时静态数据表 从Resouces文件夹加载字符数据 通过静态函数访问 只读
@@ -232,6 +246,15 @@ namespace QTool
 			}
 			return value;
 		}
+		public static async Task LoadAsync()
+		{
+			if (_list == null)
+			{
+				_list = new QList<string, T>();
+				await Data.ParseQDataListAsync(_list);
+			}
+		}
+		static QDataList Data => QDataList.GetResourcesData(typeof(T).Name, () => new List<T> { new T { Key = "测试Key" }, }.ToQDataList());
 		static QList<string, T> _list = null;
 		public static QList<string, T> List
 		{
@@ -239,9 +262,8 @@ namespace QTool
 			{
 				if (_list == null)
 				{
-					var qdataList = QDataList.GetResourcesData(typeof(T).Name, () => new List<T> { new T { Key = "测试Key" }, }.ToQDataList());
 					_list = new QList<string, T>();
-					qdataList.ParseQDataList(_list);
+					Data.ParseQDataList(_list);
 				}
 				return _list;
 			}
