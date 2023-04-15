@@ -488,10 +488,7 @@ namespace QTool.FlowGraph
 								}
 							}
 						}
-						else if (Event.current.button == 1)
-						{
-							ControlState = EditorState.MoveOffset;
-						}
+						
                         
                     }
                     break;
@@ -506,6 +503,7 @@ namespace QTool.FlowGraph
                                     Repaint();
                                 }
                                 break;
+							case EditorState.None:
                             case EditorState.MoveOffset:
                                 if (Event.current.delta.magnitude < 100)
                                 {
