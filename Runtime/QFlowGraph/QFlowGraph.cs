@@ -612,7 +612,7 @@ namespace QTool.FlowGraph
         {
             get
             {
-                if (ConnectType == QFlow.Type|| Node.command==null) return null;
+                if (ValueType == QFlow.Type|| Node.command==null) return null;
 			
 				if (IsOutput)
 				{
@@ -660,17 +660,16 @@ namespace QTool.FlowGraph
 					}
 				}
 				if (_value.IsNull())
-                {
+				{
 					_value = StringValue.ParseQDataType(ValueType, true, _value);
 				}
 				return _value;
             }
 			set
 			{
-				if (ConnectType == QFlow.Type || Node.command == null) return;
+				if (ValueType == QFlow.Type || Node.command == null) return;
 				if (!IsList && Equals(_value, value)) return;
 				if (_value.IsNull() && value.IsNull()) return;
-
 				_value = value;
                 StringValue = value.ToQDataType(ValueType);
                 if (NameAttribute != null)
