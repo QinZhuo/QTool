@@ -450,9 +450,9 @@ namespace QTool.FlowGraph
                 case EventType.MouseDown:
                     {
                         UpdateCurrentData();
-                        if(ControlState== EditorState.None&&Event.current.button == 0)
-                        {
-                            if (curPortId != null)
+						if (Event.current.button == 0)
+						{
+							if (curPortId != null&& ControlState == EditorState.None)
                             {
                                 if (Graph.GetPort(curPortId.Value).IsOutput)
                                 {
@@ -470,20 +470,28 @@ namespace QTool.FlowGraph
                                 }
                                 Event.current.Use();
                             }
-                            else 
+                            else if(ControlState == EditorState.None)
                             {
                                 if (curNode == null)
                                 {
                                     StartPos = mousePos;
                                     SelectBox = new Rect(StartPos, Vector2.zero);
                                     ControlState = EditorState.BoxSelect;
-                                }
-                                else
-                                {
-                                    ControlState = EditorState.MoveNode;
-                                }
-                            }
-                        }
+								}
+								else
+								{
+									if (!SelectNodes.Contains(curNode))
+									{
+										SelectNodes.Clear();
+									}
+									ControlState = EditorState.MoveNode;
+								}
+							}
+						}
+						else if (Event.current.button == 1)
+						{
+							ControlState = EditorState.MoveOffset;
+						}
                         
                     }
                     break;
@@ -498,7 +506,6 @@ namespace QTool.FlowGraph
                                     Repaint();
                                 }
                                 break;
-                            case EditorState.None:
                             case EditorState.MoveOffset:
                                 if (Event.current.delta.magnitude < 100)
                                 {
