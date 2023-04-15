@@ -25,7 +25,7 @@ namespace QTool
 				GenerateCPU(voxelData);
 			}
 			voxelData.MeshData.Changing = false;
-			voxelData.MeshData.FreshMesh();
+			voxelData.MeshData.UpdateMesh();
 		}
 		
 #region GUP

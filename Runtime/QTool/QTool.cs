@@ -519,6 +519,24 @@ namespace QTool
 #endif
 			return false;
 		}
+		public static void PrefabSaveAsset(this GameObject prefabInstance, UnityEngine.Object asset)
+		{
+#if UNITY_EDITOR
+			if (!Application.isPlaying)
+			{
+				if (!asset.IsAsset() && prefabInstance.IsPrefabInstance(out var prefab))
+				{
+					if (asset.name.IsNull())
+					{
+						asset.name = prefab.name + "_" + asset.GetType().Name;
+					}
+					var path = UnityEditor.AssetDatabase.GetAssetPath(prefab).SplitStartString(".prefab") + "/" + asset.name+ ".asset";
+					path.CheckDirectoryPath();
+					UnityEditor.AssetDatabase.CreateAsset(asset, path);
+				}
+			}
+#endif
+		}
 		public static GameObject GetGameObject(this UnityEngine.Object obj)
 		{
 			if (obj == null)

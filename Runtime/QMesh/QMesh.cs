@@ -36,14 +36,14 @@ namespace QTool
 		}
 		public bool Dirty { get; private set; } = true;
 		public bool Changing { get; set; } = false;
-		public UnityEngine.Mesh Mesh { get;  set; } 
+		public Mesh Mesh { get;  set; } 
 		public void SetDirty()
 		{
 			Dirty = true;
 		}
-		public void FreshMesh()
+		public void UpdateMesh()
 		{
-			if (Mesh == null) Mesh = new UnityEngine.Mesh();
+			if (Mesh == null) Mesh = new Mesh();
 			Dirty = false;
 			Mesh.Clear(false);
 			Mesh.vertices = vertices.ToArray();
@@ -66,30 +66,32 @@ namespace QTool
 	}
 	public static class QMeshTool
 	{
-
-
-		public static void GenerateMesh(this GameObject root, QVoxelData qVoxelData,Material mat=null)
+		public static void GenerateMesh(this GameObject root, QVoxelData qVoxelData, Material mat = null)
+		{
+			qVoxelData.GenerateMesh();
+			root.GenerateMesh(qVoxelData.MeshData.Mesh, mat);
+		}
+		public static void GenerateMesh(this GameObject root, QMeshData meshData, Material mat = null)
+		{
+			meshData.UpdateMesh();
+			root.GenerateMesh(meshData.Mesh, mat);
+		}
+		public static void GenerateMesh(this GameObject root, Mesh Mesh,Material mat=null)
 		{
 			var filter = root.GetComponent<MeshFilter>(true);
-			if (qVoxelData.MeshData.Mesh == null)
+			if (Mesh == null)
 			{
-				qVoxelData.MeshData.Mesh = filter.sharedMesh;
+				Mesh = filter.sharedMesh;
 			}
-			else if(qVoxelData.MeshData.Mesh!=filter.sharedMesh)
+			else if(Mesh!=filter.sharedMesh)
 			{
-				filter.sharedMesh = qVoxelData.MeshData.Mesh;
+				filter.sharedMesh = Mesh;
 			}
-			filter.sharedMesh = qVoxelData.GenerateMesh();
-#if UNITY_EDITOR
-			if (qVoxelData.MeshData.Mesh.name.IsNull())
+			filter.sharedMesh = Mesh;
+			if (Mesh.name.IsNull())
 			{
-				qVoxelData.MeshData.Mesh.name = nameof(QVoxelMesh) + "_" + qVoxelData.MeshData.Mesh.GetHashCode();
-				var path = "Assets/" + nameof(QVoxelMesh) + "/" + qVoxelData.MeshData.Mesh.name + ".asset";
-				QFileManager.CheckDirectoryPath(path);
-				UnityEditor.AssetDatabase.CreateAsset(qVoxelData.MeshData.Mesh, path);
-				UnityEditor.AssetDatabase.SaveAssets();
+				root.PrefabSaveAsset(Mesh);
 			}
-#endif
 			var renderer = root.GetComponent<MeshRenderer>(true);
 			if (mat != null)
 			{
@@ -173,16 +175,7 @@ namespace QTool
 			root.materials = matList.ToArray();
 			root.sharedMesh.RecalculateBounds();
 			root.localBounds = default;
-#if UNITY_EDITOR
-			if (!Application.isPlaying)
-			{
-				if(!root.sharedMesh.IsAsset()&& root.IsPrefabInstance(out var prefab))
-				{
-					var path= UnityEditor.AssetDatabase.GetAssetPath(prefab).SplitStartString(".prefab") +"_"+ nameof(QCombineMesh) + ".mesh";
-					UnityEditor.AssetDatabase.CreateAsset(root.sharedMesh, path);
-				}
-			}
-#endif
+
 		}
 	}
 }
