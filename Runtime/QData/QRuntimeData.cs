@@ -46,27 +46,11 @@ namespace QTool
 			return Value.ToString();
 		}
 	}
-	public class QRuntimeRangeValue : QRuntimeValue
-	{
-		public QRuntimeRangeValue() { }
-		public QRuntimeRangeValue(float value) : base(value)
-		{
-			CurrentValue = value;
-		}
-		private QValue _CurrentValue = 0;
-		public float CurrentValue { get => _CurrentValue; set => _CurrentValue = Mathf.Clamp(value, MinValue, MaxValue); }
-		public float MaxValue => Value;
-		public QValue MinValue { get; set; } = 0;
-		public override string ToString()
-		{
-			return CurrentValue + "/" + Value;
-		}
-	}
+
 	public class QRuntimeValue
 	{
 		public QRuntimeValue()
 		{
-
 		}
 		public QRuntimeValue(float value)
 		{
@@ -78,20 +62,71 @@ namespace QTool
 			OffsetValue = 0;
 			PercentValue = 1;
 		}
-		[QName(nameof(OriginValue))]
 		public QValue OriginValue { get; private set; } = 0f;
-		public QValue OffsetValue { get; set; } = 0f;
-		public QValue PercentValue { get; set; } = 1;
-		public float Value
-		{
-			get
+		private QValue _OffsetValue = 0;
+		public QValue OffsetValue {
+			get => _OffsetValue;
+			set
 			{
-				return (OriginValue + OffsetValue) * PercentValue;
+				if (_OffsetValue != value)
+				{
+					_OffsetValue = value;
+					FreshValue();
+				}
 			}
+		}
+		private QValue _PercentValue = 1;
+		public QValue PercentValue
+		{
+			get => _PercentValue;
+			set
+			{
+				if (_PercentValue != value)
+				{
+					_PercentValue = value;
+					FreshValue();
+				}
+			}
+		}
+		public QValue Value { get; private set; }
+		public Action OnValueChange = null;
+		public void FreshValue()
+		{
+			Value = (OriginValue + OffsetValue) * PercentValue;
+			OnValueChange?.Invoke();
 		}
 		public override string ToString()
 		{
 			return Value.ToString();
+		}
+	}
+	public class QRuntimeRangeValue : QRuntimeValue
+	{
+		public QRuntimeRangeValue() { }
+		public QRuntimeRangeValue(float value) : base(value)
+		{
+			CurrentValue = value;
+		}
+
+		public QValue MinValue { get; set; } = 0;
+		public float MaxValue => Value;
+		private QValue _CurrentValue = 0;
+		public Action OnCurrentValueChange = null;
+		public float CurrentValue
+		{
+			get => _CurrentValue;
+			set
+			{
+				if (_CurrentValue != value)
+				{
+					_CurrentValue = Mathf.Clamp(value, MinValue, MaxValue);
+					OnCurrentValueChange?.Invoke();
+				}
+			}
+		}
+		public override string ToString()
+		{
+			return CurrentValue + "/" + Value;
 		}
 	}
 	public class QRuntimeData
