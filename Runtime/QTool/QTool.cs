@@ -273,9 +273,9 @@ namespace QTool
 			return gameObject.name.SplitStartString("(").TrimEnd();
 		}
 
-		class QKeyParseData : QDataList<QKeyParseData>, IKey<string>
+		class QKeyParseData : QDataList<QKeyParseData>
 		{
-			public string Key { get; set; }
+			public override string Key { get; set; }
 			public float Float;
 		}
 		public static Vector3 ToVector3(this Vector3Int vector3Int)

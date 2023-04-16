@@ -225,8 +225,9 @@ namespace QTool
 	/// <summary>
 	/// 运行时静态数据表 从Resouces文件夹加载字符数据 通过静态函数访问 只读
 	/// </summary>
-	public class QDataList<T> where T : QDataList<T>, IKey<string>, new()
+	public abstract class QDataList<T>: IKey<string> where T : QDataList<T>, new()
 	{
+		public abstract string Key { get; set; }
 		public static bool ContainsKey(string key)
 		{
 			return List.ContainsKey(key);

@@ -4,9 +4,9 @@ using System.Collections.Generic;
 using UnityEngine;
 namespace QTool.Test
 {
-	public class QDataListTestType : QDataList<QDataListTestType>, IKey<string>
+	public class QDataListTestType : QDataList<QDataListTestType>
 	{
-		public string Key { get; set; }
+		public override string Key { get; set; }
 		[QName("数值")]
 		[QEnum(nameof(QDataListTestType) + "." + nameof(List))]
 		public string value = "";
