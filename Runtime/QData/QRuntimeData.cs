@@ -55,12 +55,14 @@ namespace QTool
 		public QRuntimeValue(float value)
 		{
 			OriginValue = value;
+			FreshValue();
 		}
 		public void Reset(float value)
 		{
 			OriginValue = value;
 			OffsetValue = 0;
 			PercentValue = 1;
+			FreshValue();
 		}
 		public QValue OriginValue { get; private set; } = 0f;
 		private QValue _OffsetValue = 0;
@@ -88,7 +90,7 @@ namespace QTool
 				}
 			}
 		}
-		public QValue Value { get; private set; }
+		public QValue Value { get; private set; } = 0;
 		public event Action<float> OnValueChange = null;
 		public void FreshValue()
 		{
