@@ -150,7 +150,7 @@ namespace QTool.Test
 		[QName("QRuntimeValue测试")]
 		public void QRuntimeValueTest()
 		{
-			QRuntimeData data = new QRuntimeData();
+			QRuntimeValues data = new QRuntimeValues();
 			data.Values["test"] = new QRuntimeValue(10);
 			data.Values["test"].OffsetValue += 90;
 			data.Values["test"].PercentValue = 1.5f;
