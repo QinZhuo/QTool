@@ -89,7 +89,7 @@ namespace QTool
 			}
 		}
 		public QValue Value { get; private set; }
-		public Action<float> OnValueChange = null;
+		public event Action<float> OnValueChange = null;
 		public void FreshValue()
 		{
 			Value = (OriginValue + OffsetValue) * PercentValue;
@@ -111,7 +111,7 @@ namespace QTool
 		public QValue MinValue { get; set; } = 0;
 		public float MaxValue => Value;
 		private QValue _CurrentValue = 0;
-		public Action<float> OnCurrentValueChange = null;
+		public event Action<float> OnCurrentValueChange = null;
 		public float CurrentValue
 		{
 			get => _CurrentValue;
