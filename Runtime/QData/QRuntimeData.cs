@@ -89,11 +89,11 @@ namespace QTool
 			}
 		}
 		public QValue Value { get; private set; }
-		public Action OnValueChange = null;
+		public Action<float> OnValueChange = null;
 		public void FreshValue()
 		{
 			Value = (OriginValue + OffsetValue) * PercentValue;
-			OnValueChange?.Invoke();
+			OnValueChange?.Invoke(Value);
 		}
 		public override string ToString()
 		{
@@ -111,7 +111,7 @@ namespace QTool
 		public QValue MinValue { get; set; } = 0;
 		public float MaxValue => Value;
 		private QValue _CurrentValue = 0;
-		public Action OnCurrentValueChange = null;
+		public Action<float> OnCurrentValueChange = null;
 		public float CurrentValue
 		{
 			get => _CurrentValue;
@@ -120,7 +120,7 @@ namespace QTool
 				if (_CurrentValue != value)
 				{
 					_CurrentValue = Mathf.Clamp(value, MinValue, MaxValue);
-					OnCurrentValueChange?.Invoke();
+					OnCurrentValueChange?.Invoke(_CurrentValue);
 				}
 			}
 		}
