@@ -927,7 +927,7 @@ namespace QTool
 						{
 							if (member.IsUnityObject)
 							{
-								var obj= QIdTool.LoadObjectAsync(value, member.Type).Run() ;
+								var obj=await QIdTool.LoadObjectAsync(value, member.Type).Run() ;
 								member.Set(t, obj);
 							}
 							else
