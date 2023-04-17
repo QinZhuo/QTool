@@ -838,7 +838,7 @@ namespace QTool
 		}
 		public static List<T> ParseQDataList<T>(this QDataList qdataList, List<T> list,Type type=null) 
 		{
-			var startTime = QDebug.Timestamp;
+			QDebug.BeginMarker("解析 QDataList<" + type.Name + "> 数据");
 			if (type == null)
 			{
 				type = typeof(T);
@@ -884,13 +884,13 @@ namespace QTool
 				}
 				list.Add((T)t);
 			}
-			QDebug.Log("解析 QDataList<" + type.Name + "> 数据 " + list.Count+" 条 ",startTime);
+			QDebug.EndMarker("解析 QDataList<" + type.Name + "> 数据", list.Count + " 条 ");
 			return list;
 		}
 
 		public static async Task<List<T>> ParseQDataListAsync<T>(this QDataList qdataList, List<T> list, Type type = null)
 		{
-			var startTime = QDebug.Timestamp;
+			QDebug.BeginMarker("异步解析 QDataList<" + type.Name + "> 数据");
 			if (type == null)
 			{
 				type = typeof(T);
@@ -944,7 +944,7 @@ namespace QTool
 				}
 				list.Add((T)t);
 			}
-			QDebug.Log("异步解析 QDataList<" + type.Name + "> 数据 " + list.Count + " 条 ", startTime);
+			QDebug.EndMarker("异步解析 QDataList<" + type.Name + "> 数据", list.Count + " 条 ");
 			return list;
 		}
 	}

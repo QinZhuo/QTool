@@ -888,11 +888,11 @@ namespace QTool
 			IsLoading = true;
 			await PreLoadList.WaitAllOver();
 			PreLoadList.Clear();
-			var startTime = QDebug.Timestamp;
 			QDebug.Log("异步加载场景开始[" + sceneName + "]");
+			QDebug.BeginMarker("异步加载场景结束[" + sceneName + "]");
 			await SceneManager.LoadSceneAsync(sceneName);
 			GCCollect();
-			QDebug.Log("异步加载场景结束[" + sceneName + "]", startTime);
+			QDebug.Log("异步加载场景结束[" + sceneName + "]");
 			await PreLoadList.WaitAllOver();
 			PreLoadList.Clear();
 			IsLoading = false;

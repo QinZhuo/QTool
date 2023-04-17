@@ -101,15 +101,15 @@ namespace QTool
         }
         static void FreshCommands(params Type[] types)
         {
-			var startTime = QDebug.Timestamp;
-            foreach (var t in types)
+			QDebug.BeginMarker(nameof(QCommandType)+"初始化");
+			foreach (var t in types)
 			{
 				if (!TypeList.Contains(t))
                 {
                     FreshTypeCommands(t);
 				}
             }
-			QDebug.Log(nameof(QCommandType) + " 初始化完成 " + types.ToOneString(" ") + " 命令数 " + KeyDictionary.Count, startTime);
+			QDebug.EndMarker(nameof(QCommandType) + "初始化", " 命令数 " + KeyDictionary.Count);
         }
         static void FreshTypeCommands(Type type)
         {

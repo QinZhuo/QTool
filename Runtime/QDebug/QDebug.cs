@@ -13,7 +13,7 @@ namespace QTool
 	public static class QDebug
 	{
 		public static int FPS { get; private set; } = 0;
-		public static long LastFrameTime { private set; get; } = 0;
+		private static long LastFrameTime { set; get; } = 0;
 		static bool DebugPanelShow = false;
 		private static QToolBar toolBar = null;
 		[RuntimeInitializeOnLoadMethod]
@@ -27,7 +27,7 @@ namespace QTool
 			{
 				FPS = (int)(1f / GetIntervalSeconds(LastFrameTime));
 			}
-			LastFrameTime = QDebug.Timestamp;
+			LastFrameTime = QTime.Timestamp;
 		}
 
 		static Vector2 LeftScrollPosition = Vector2.zero;
@@ -342,10 +342,9 @@ namespace QTool
 				return angle;
 			}
 		}
-		public static long Timestamp => System.Diagnostics.Stopwatch.GetTimestamp();
-		public static float GetIntervalSeconds(long startTime)
+		private static float GetIntervalSeconds(long startTime)
 		{
-			return (Timestamp - startTime) / 10000000f;
+			return (QTime.Timestamp - startTime) / 10000000f;
 		}
 		public static void DebugRun(string key, Action action)
 		{
@@ -372,25 +371,23 @@ namespace QTool
 			Debug.Log("[" + nameof(QDebug) + "]  " + obj);
 		}
 		[System.Diagnostics.Conditional("DEVELOPMENT_BUILD"), System.Diagnostics.Conditional("UNITY_EDITOR")]
-		public static void Log(object obj,long startTimestamp)
-		{
-			Debug.Log("[" + nameof(QDebug) + "]  " + obj+" 时间 "+GetIntervalSeconds(startTimestamp).ToString("f3")+" s"+" 帧率 "+ Mathf.Min(FPS,(int)(1f / GetIntervalSeconds(LastFrameTime))));
-		}
-		[System.Diagnostics.Conditional("DEVELOPMENT_BUILD"), System.Diagnostics.Conditional("UNITY_EDITOR")]
 		public static void LogWarning(object obj)
 		{
 			Debug.LogWarning("[" + nameof(QDebug) + "]  " + obj);
 		}
-		public static QDictionary<string, ProfilerMarker> ProfilerMarkerList = new QDictionary<string, ProfilerMarker>((key)=> new ProfilerMarker(key));
+		private static QDictionary<string, ProfilerMarker> ProfilerMarkerList = new QDictionary<string, ProfilerMarker>((key)=> new ProfilerMarker(key));
+		private static QDictionary<string, long> TimestampList= new QDictionary<string, long>();
 		[System.Diagnostics.Conditional("DEVELOPMENT_BUILD"), System.Diagnostics.Conditional("UNITY_EDITOR")]
-		public static void StartProfiler(string key)
+		public static void BeginMarker(string key)
 		{
+			TimestampList[key] =QTime.Timestamp;
 			ProfilerMarkerList[key].Begin();
 		}
 		[System.Diagnostics.Conditional("DEVELOPMENT_BUILD"), System.Diagnostics.Conditional("UNITY_EDITOR")]
-		public static void StopProfiler(string key)
+		public static void EndMarker(string key, string resultInfo = "")
 		{
 			ProfilerMarkerList[key].End();
+			Log(key + " " + resultInfo+ " 时间 " + GetIntervalSeconds(TimestampList[key]).ToString("f3") + " s" + " 帧率 " + Mathf.Min(FPS, (int)(1f / GetIntervalSeconds(LastFrameTime))));
 		}
 		[System.Diagnostics.Conditional("DEVELOPMENT_BUILD"), System.Diagnostics.Conditional("UNITY_EDITOR")]
 		public static void ChangeProfilerCount(string key, int changeCount=0)

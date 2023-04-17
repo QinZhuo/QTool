@@ -8,6 +8,7 @@ namespace QTool
 {
     public static class QTime
     {
+		public static long Timestamp => System.Diagnostics.Stopwatch.GetTimestamp();
 		public static DateTime ParseTimesTamp(long timestamp,int offset=7)
 		{
 			var baseValue = 1;
