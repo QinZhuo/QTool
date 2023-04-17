@@ -838,7 +838,6 @@ namespace QTool
 		}
 		public static List<T> ParseQDataList<T>(this QDataList qdataList, List<T> list,Type type=null) 
 		{
-			QDebug.Begin("解析 QDataList<" + type.Name + "> 数据");
 			if (type == null)
 			{
 				type = typeof(T);
@@ -847,6 +846,7 @@ namespace QTool
 					throw new Exception(nameof(QDataList) + "类型出错 " + type);
 				}
 			}
+			QDebug.Begin("解析 QDataList<" + type.Name + "> 数据");
 			var typeInfo = QSerializeType.Get(type);
 			list.Clear();
 			var titleRow = qdataList.TitleRow;
