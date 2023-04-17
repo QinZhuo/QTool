@@ -17,7 +17,7 @@ namespace QTool
 		}
 		private const string SpaceReplaceKey = nameof(QCommand) + nameof(SpaceReplaceKey);
 		private const string EnterReplaceKey = nameof(QCommand) + nameof(EnterReplaceKey);
-
+		
 		public static object Invoke(string commandStr)
 		{
 			if (string.IsNullOrWhiteSpace(commandStr)) return null;
@@ -69,12 +69,12 @@ namespace QTool
 			return null;
 		}
 
-		public static QList<string, QCommandInfo> KeyDictionary = new QList<string, QCommandInfo>();
-        public static QDictionary<string, QCommandInfo> NameDictionary = new QDictionary<string, QCommandInfo>();
+		public static QList<string, QCommandInfo> KeyDictionary { get; private set; } = new QList<string, QCommandInfo>();
+        public static QDictionary<string, QCommandInfo> NameDictionary { get; private set; } = new QDictionary<string, QCommandInfo>();
         public static List<Type> TypeList = new List<Type>();
         public static QCommandInfo GetCommand(string key)
         {
-            if (key == null)
+			if (key == null)
             {
                 return null;
             }
@@ -90,13 +90,18 @@ namespace QTool
             {
                 return NameDictionary[key];
             }
-            else
+            else if(key.Contains("/"))
             {
-                return KeyDictionary.Get(key, (info) => info.method.Name);
-            }
+				return GetCommand(key.SplitEndString("/"));
+			}
+			else
+			{
+				return null;
+			}
         }
-        internal static void FreshCommands(params Type[] types)
+        static void FreshCommands(params Type[] types)
         {
+			var startTime = QDebug.Timestamp;
             foreach (var t in types)
 			{
 				if (!TypeList.Contains(t))
@@ -104,6 +109,7 @@ namespace QTool
                     FreshTypeCommands(t);
 				}
             }
+			QDebug.Log(nameof(QCommandType) + " 初始化完成 " + types.ToOneString(" ") + " 命令数 " + KeyDictionary.Count, startTime);
         }
         static void FreshTypeCommands(Type type)
         {
@@ -116,19 +122,17 @@ namespace QTool
                 {
                     var info = new QCommandInfo(methodInfo);
                     KeyDictionary[typeKey + '/' + methodInfo.Name] = info;
-                    NameDictionary[methodInfo.QName().SplitEndString("/")] = info;
-
+					NameDictionary[methodInfo.Name] = info;
+					NameDictionary[methodInfo.QName().SplitEndString("/")] = info;
                 }
             }, BindingFlags.Public | BindingFlags.Static| BindingFlags.NonPublic);
             TypeList.AddCheckExist(type);
-
-			QDebug.Log("初始化命令："+type+"\n" + KeyDictionary.ToOneString());
 		}
       
 
     }
 	[QCommandType("基础")]
-	public static class BaseCommands
+	public static class QCommandFunction
 	{
 		[QName("日志/普通日志")]
 		public static void Log(object obj)
