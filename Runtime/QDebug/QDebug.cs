@@ -374,7 +374,7 @@ namespace QTool
 		[System.Diagnostics.Conditional("DEVELOPMENT_BUILD"), System.Diagnostics.Conditional("UNITY_EDITOR")]
 		public static void Log(object obj,long startTimestamp)
 		{
-			Debug.Log("[" + nameof(QDebug) + "]  " + obj+" 时间 "+GetIntervalSeconds(startTimestamp).ToString("f3")+" s"+" 帧率 "+ (int)(1f / GetIntervalSeconds(LastFrameTime)));
+			Debug.Log("[" + nameof(QDebug) + "]  " + obj+" 时间 "+GetIntervalSeconds(startTimestamp).ToString("f3")+" s"+" 帧率 "+ Mathf.Min(FPS,(int)(1f / GetIntervalSeconds(LastFrameTime))));
 		}
 		[System.Diagnostics.Conditional("DEVELOPMENT_BUILD"), System.Diagnostics.Conditional("UNITY_EDITOR")]
 		public static void LogWarning(object obj)
