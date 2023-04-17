@@ -174,14 +174,13 @@ namespace QTool
 						nn.Result result = nn.fs.FileSystem.GetEntryType(ref entryType, path);
 						if (result.IsSuccess())
 						{
-							Debug.Log("存在 " + path);
 							return true;
 						}
 						if (!nn.fs.FileSystem.ResultPathNotFound.Includes(result))
 						{
 							result.abortUnlessSuccess();
 						}
-						Debug.Log("不存在 " + path);
+						QDebug.LogWarning("不存在 " + path);
 						return false;
 #else
 						return false;
@@ -446,7 +445,6 @@ namespace QTool
 							if (!path.StartsWith(nameof(QTool) + ":/"))
 							{
 								path = nameof(QTool) + ":/" + path.Replace('/','_');
-								Debug.Log("转换路径 " + path);
 							}
 						}
 #endif

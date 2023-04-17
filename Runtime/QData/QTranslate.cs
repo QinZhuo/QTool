@@ -244,7 +244,7 @@ namespace QTool
 				Debug.LogError("字体更改出错"+e.ToShortString());
 			}
 		}
-        private void CheckFresh(string key=null)
+        private async void CheckFresh(string key=null)
         {
             if (curValue != value)
             {
@@ -254,6 +254,7 @@ namespace QTool
             try
             {
                 translateResult = Translate(value,Language);
+				await QTask.Step();
                 OnTranslateChange?.Invoke(translateResult);
                
             }
@@ -262,8 +263,5 @@ namespace QTool
                 Debug.LogError("翻译[" + value + "]出错" + e);
             }
         }
-       
-      
-
     }
 }
