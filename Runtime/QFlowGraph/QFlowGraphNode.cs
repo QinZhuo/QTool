@@ -1,6 +1,7 @@
 using QTool.Reflection;
 using System.Collections;
 using System.Collections.Generic;
+using System;
 using UnityEngine;
 namespace QTool.FlowGraph
 {
@@ -118,13 +119,7 @@ namespace QTool.FlowGraph
 		internal const string StartKey = "起点";
 		[QStartNode]
 		[QName("起点/起点")]
-		public static void Start()
-		{
-		}
-
-		[QStartNode]
-		[QName("起点/事件")]
-		public static void Event([QNodeName] string eventKey = "事件名")
+		public static void Start([QNodeName] string startKey = "起点")
 		{
 		}
 		[QName("流程图/内置子图")]
@@ -149,7 +144,7 @@ namespace QTool.FlowGraph
 		{
 			This.Graph.Stop();
 		}
-		[QName("流程图/分支/判断分支")]
+		[QName("流程图/判断分支")]
 		public static void BoolCheck(QFlowNode This, bool boolValue, [QOutputPort] QFlow True, [QOutputPort] QFlow False)
 		{
 			if (boolValue)
@@ -161,7 +156,7 @@ namespace QTool.FlowGraph
 				This.SetNetFlowPort(nameof(False));
 			}
 		}
-		[QName("流程图/分支/异步分支")]
+		[QName("流程图/异步分支")]
 		public static void AsyncBranch(QFlowNode This, [QOutputPort] List<QFlow> branchs)
 		{
 			for (int i = 0; i < branchs.Count; i++)
@@ -178,7 +173,7 @@ namespace QTool.FlowGraph
 			}
 
 		}
-		[QName("流程图/分支/全部完成")]
+		[QName("流程图/全部完成")]
 
 		public static IEnumerator AllOver(QFlowNode This, [QFlowPort(onlyOneRunning = true)] List<QFlow> branchs)
 		{
@@ -204,5 +199,24 @@ namespace QTool.FlowGraph
 			}
 			QDebug.Log("全部完成");
 		}
+		[QName("触发/触发事件")]
+		public static void TriggerEvent(string eventName)
+		{
+			QEventManager.Trigger(eventName);
+		}
+		[QName("触发/触发器")]
+		public static IEnumerator Trigger(QFlowNode This,[QName("预制体")]GameObject prefab,[QName("触发"),QFlowPort,QOutputPort]GameObject triggerObject)
+		{
+			var trigger=prefab.CheckInstantiate()?.GetComponent<QTrigger>();
+			if (trigger != null)
+			{
+				yield return trigger.Run((obj) => { triggerObject = obj; This.RunPort(nameof(triggerObject)); });
+			}
+		}
+		
+	}
+	public abstract class QTrigger:MonoBehaviour
+	{
+		public abstract IEnumerator Run(Action<GameObject> action);
 	}
 }
