@@ -890,7 +890,6 @@ namespace QTool
 
 		public static async Task<List<T>> ParseQDataListAsync<T>(this QDataList qdataList, List<T> list, Type type = null)
 		{
-			QDebug.BeginMarker("异步解析 QDataList<" + type.Name + "> 数据");
 			if (type == null)
 			{
 				type = typeof(T);
@@ -899,6 +898,7 @@ namespace QTool
 					throw new Exception(nameof(QDataList) + "类型出错 " + type);
 				}
 			}
+			QDebug.BeginMarker("异步解析 QDataList<" + type.Name + "> 数据");
 			var typeInfo = QSerializeType.Get(type);
 			list.Clear();
 			var titleRow = qdataList.TitleRow;
