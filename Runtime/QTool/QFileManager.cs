@@ -129,7 +129,8 @@ namespace QTool
             });
         }
 		public const string SecretExtension = ".sec";
-		public static byte[] SecretKey = (Application.companyName.IsNull()||Application.productName.IsNull())? "QTSC".GetBytes():(Application.companyName.Substring(0,2)+Application.productName.Substring(0,2)).GetBytes();
+		private static byte[] _SecretKey = null;
+		public static byte[] SecretKey => _SecretKey??=(Application.companyName.IsNull()||Application.productName.IsNull())? "QTSC".GetBytes():(Application.companyName.Substring(0,2)+Application.productName.Substring(0,2)).GetBytes();
 		public static byte[] Encrypt(this byte[] bytes)
 		{
 			if (bytes == null || bytes.Length == 0) return bytes;
