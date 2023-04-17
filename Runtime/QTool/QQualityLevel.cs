@@ -28,8 +28,12 @@ namespace QTool {
 		private void Awake()
 		{
 			if (!Application.isPlaying) return;
-			Fresh();
 			OnFresh += Fresh;
+		}
+		private void Start()
+		{
+			if (!Application.isPlaying) return;
+			Fresh();
 		}
 		private void OnDestroy()
 		{
