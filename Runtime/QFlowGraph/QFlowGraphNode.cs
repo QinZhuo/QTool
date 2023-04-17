@@ -215,8 +215,5 @@ namespace QTool.FlowGraph
 		}
 		
 	}
-	public abstract class QTrigger:MonoBehaviour
-	{
-		public abstract IEnumerator Run(Action<GameObject> action);
-	}
+
 }
