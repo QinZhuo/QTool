@@ -235,11 +235,11 @@ namespace QTool.FlowGraph
 			}
 			CoroutineList.Clear();
 		}
-		public void Run(string startNode=nameof(QFlowGraphNode.Start))
+		public void Run(string startNode= QFlowGraphNode.StartKey)
 		{
 			StartCoroutine(startNode, RunIEnumerator(startNode));
 		}
-		public void Run(MonoBehaviour component, string startNode = nameof(QFlowGraphNode.Start))
+		public void Run(MonoBehaviour component, string startNode =QFlowGraphNode.StartKey)
 		{
 			this.StartCoroutineOverride = component.StartCoroutine;
 			this.StopCoroutineOverride = component.StopCoroutine;

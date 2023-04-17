@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 1539472545680252240}
   - component: {fileID: 3241145789349601910}
   - component: {fileID: 7159957425794866180}
+  - component: {fileID: 3036328296022404204}
   m_Layer: 0
   m_Name: QNetTestEnemy
   m_TagString: Untagged
@@ -87,6 +88,24 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Id: 
   Prefab: 
+--- !u!143 &3036328296022404204
+CharacterController:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 41579844808977859}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Height: 2
+  m_Radius: 0.5
+  m_SlopeLimit: 45
+  m_StepOffset: 0.3
+  m_SkinWidth: 0.08
+  m_MinMoveDistance: 0.001
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &2227655774878594016
 GameObject:
   m_ObjectHideFlags: 0
@@ -127,7 +146,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2227655774878594016}
-  m_Mesh: {fileID: 4300000, guid: 29020654568e6cc409505a56d6ebb2c0, type: 2}
+  m_Mesh: {fileID: 4300000, guid: f8dee129de1fe944cadd0a903d6f7663, type: 2}
 --- !u!23 &5366360544338406032
 MeshRenderer:
   m_ObjectHideFlags: 0

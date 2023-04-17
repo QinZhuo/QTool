@@ -7,7 +7,7 @@ namespace QTool.FlowGraph
 	[QCommandType("基础")]
 	public static class QFlowGraphNode
 	{
-	
+
 		[QName("数据/获取变量")]
 		[return: QOutputPort(true)]
 		public static object GetValue(QFlowNode This, string key)
@@ -21,7 +21,7 @@ namespace QTool.FlowGraph
 		}
 		[QName("数据/对象实例")]
 		[return: QOutputPort(true)]
-		public static object ObjectInstance([QNodeName]object obj)
+		public static object ObjectInstance([QNodeName] object obj)
 		{
 			return obj;
 		}
@@ -38,24 +38,9 @@ namespace QTool.FlowGraph
 			}
 			return funcInfo.Invoke(obj, param);
 		}
-		
-		[QName("子图/内置子图")]
-		public static IEnumerator SubGraph(QFlowNode This, QFlowGraph subGraph, string startNode = nameof(QFlowGraphNode.Start))
-		{
-			yield return subGraph.CreateInstance().RunIEnumerator(startNode);
-		}
-		[QName("子图/引用子图")]
-		public static IEnumerator GraphAsset(QFlowNode This, [QNodeName] QFlowGraphAsset obj,string startNode= nameof(QFlowGraphNode.Start))
-		{
-			if (obj == null) yield break;
-			var key = obj.GetHashCode().ToString();
-			if (!This.Graph.Values.ContainsKey(key))
-			{
-				This.Graph.Values[key] = obj.Graph.CreateInstance();
-			}
-			yield return (This.Graph.Values[key] as QFlowGraph).RunIEnumerator(startNode);
-		}
-		
+
+	
+
 
 		[QName("运算/加")]
 		[return: QOutputPort(true)]
@@ -129,20 +114,37 @@ namespace QTool.FlowGraph
 		{
 			return !a;
 		}
-
-		
+	
+		internal const string StartKey = "起点";
 		[QStartNode]
-		[QName("流程图/Start")]
+		[QName("起点/起点")]
 		public static void Start()
 		{
 		}
 
 		[QStartNode]
-		[QName("流程图/事件")]
+		[QName("起点/事件")]
 		public static void Event([QNodeName] string eventKey = "事件名")
 		{
 		}
-		[QName("流程图/停止"),QEndNode]
+		[QName("流程图/内置子图")]
+		public static IEnumerator SubGraph(QFlowNode This, QFlowGraph subGraph, string startNode = StartKey)
+		{
+			yield return subGraph.CreateInstance().RunIEnumerator(startNode);
+		}
+
+		[QName("流程图/引用子图")]
+		public static IEnumerator GraphAsset(QFlowNode This, [QNodeName] QFlowGraphAsset obj, string startNode = StartKey)
+		{
+			if (obj == null) yield break;
+			var key = obj.GetHashCode().ToString();
+			if (!This.Graph.Values.ContainsKey(key))
+			{
+				This.Graph.Values[key] = obj.Graph.CreateInstance();
+			}
+			yield return (This.Graph.Values[key] as QFlowGraph).RunIEnumerator(startNode);
+		}
+		[QName("流程图/停止"), QEndNode]
 		public static void Stop(QFlowNode This)
 		{
 			This.Graph.Stop();
@@ -177,15 +179,15 @@ namespace QTool.FlowGraph
 
 		}
 		[QName("流程图/分支/全部完成")]
-		
-		public static IEnumerator AllOver(QFlowNode This,[QFlowPort(onlyOneRunning =true)]List<QFlow> branchs)
+
+		public static IEnumerator AllOver(QFlowNode This, [QFlowPort(onlyOneRunning = true)] List<QFlow> branchs)
 		{
 			List<int> taskList = new List<int> { };
 			for (int i = 0; i < branchs.Count; i++)
 			{
 				taskList.Add(i);
 			}
-			QDebug.Log("全部完成节点开始：[" + taskList.ToOneString("|")+"]");
+			QDebug.Log("全部完成节点开始：[" + taskList.ToOneString("|") + "]");
 			This.TriggerPortList.Clear();
 			while (taskList.Count > 0)
 			{
@@ -194,7 +196,7 @@ namespace QTool.FlowGraph
 					if (port.port == nameof(branchs))
 					{
 						taskList.Remove(port.index);
-						QDebug.Log("完成["+port.index+"]剩余[" + taskList.ToOneString("|") + "]");
+						QDebug.Log("完成[" + port.index + "]剩余[" + taskList.ToOneString("|") + "]");
 					}
 				}
 				This.TriggerPortList.Clear();
