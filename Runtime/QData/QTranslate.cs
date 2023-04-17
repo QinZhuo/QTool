@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 namespace QTool
@@ -249,19 +250,22 @@ namespace QTool
             if (curValue != value)
             {
                 curValue = value;
-                OnValueChange?.Invoke(value);
-            }
-            try
-            {
-                translateResult = Translate(value,Language);
 				await QTask.Step();
-                OnTranslateChange?.Invoke(translateResult);
-               
+				OnValueChange?.Invoke(value);
             }
-            catch (System.Exception e)
-            {
-                Debug.LogError("翻译[" + value + "]出错" + e);
-            }
+			try
+			{
+				await Task.Run(() =>
+				{
+					translateResult = Translate(value, Language);
+				}).Run();
+				await QTask.Step();
+				OnTranslateChange?.Invoke(translateResult);
+			}
+			catch (System.Exception e)
+			{
+				Debug.LogError("翻译[" + value + "]出错" + e);
+			}
         }
     }
 }
