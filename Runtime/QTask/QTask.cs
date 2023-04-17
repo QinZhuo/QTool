@@ -66,6 +66,11 @@ namespace QTool
 				Debug.LogError(task.Exception.ToShortString(2000));
 			}
 		}
+		public static async Task<T> Run<T>(this Task<T> task)
+		{
+			_=(task as Task).Run();
+			return await task;
+		}
 		public static async Task Run(this Task task,Func<Task>  nextAction)
 		{
 			await task.Run();

@@ -252,7 +252,7 @@ namespace QTool
 			if (_list == null)
 			{
 				_list = new QList<string, T>();
-				await Data.ParseQDataListAsync(_list);
+				await Data.ParseQDataListAsync(_list).Run();
 			}
 		}
 		static QDataList Data => QDataList.GetResourcesData(typeof(T).Name, () => new List<T> { new T { Key = "测试Key" }, }.ToQDataList());
