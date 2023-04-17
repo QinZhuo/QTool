@@ -846,7 +846,7 @@ namespace QTool
 					throw new Exception(nameof(QDataList) + "类型出错 " + type);
 				}
 			}
-			QDebug.Begin("解析 QDataList<" + type.Name + "> 数据");
+			QDebug.Begin("解析QDataList<" + type.Name + ">数据");
 			var typeInfo = QSerializeType.Get(type);
 			list.Clear();
 			var titleRow = qdataList.TitleRow;
@@ -884,7 +884,7 @@ namespace QTool
 				}
 				list.Add((T)t);
 			}
-			QDebug.End("解析 QDataList<" + type.Name + "> 数据", list.Count + " 条 ");
+			QDebug.End("解析QDataList<" + type.Name + ">数据", list.Count + " 条 ");
 			return list;
 		}
 
@@ -898,7 +898,7 @@ namespace QTool
 					throw new Exception(nameof(QDataList) + "类型出错 " + type);
 				}
 			}
-			QDebug.Begin("异步解析 QDataList<" + type.Name + "> 数据");
+			QDebug.Begin("异步解析QDataList<" + type.Name + ">数据");
 			var typeInfo = QSerializeType.Get(type);
 			list.Clear();
 			var titleRow = qdataList.TitleRow;
@@ -944,7 +944,7 @@ namespace QTool
 				}
 				list.Add((T)t);
 			}
-			QDebug.End("异步解析 QDataList<" + type.Name + "> 数据", list.Count + " 条 ");
+			QDebug.End("异步解析QDataList<" + type.Name + ">数据", list.Count + " 条 ");
 			return list;
 		}
 	}
