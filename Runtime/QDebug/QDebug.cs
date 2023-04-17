@@ -375,18 +375,15 @@ namespace QTool
 		{
 			Debug.LogWarning("[" + nameof(QDebug) + "]  " + obj);
 		}
-		private static QDictionary<string, ProfilerMarker> ProfilerMarkerList = new QDictionary<string, ProfilerMarker>((key)=> new ProfilerMarker(key));
 		private static QDictionary<string, long> TimestampList= new QDictionary<string, long>();
 		[System.Diagnostics.Conditional("DEVELOPMENT_BUILD"), System.Diagnostics.Conditional("UNITY_EDITOR")]
-		public static void BeginMarker(string key)
+		public static void Begin(string key)
 		{
 			TimestampList[key] =QTime.Timestamp;
-			ProfilerMarkerList[key].Begin();
 		}
 		[System.Diagnostics.Conditional("DEVELOPMENT_BUILD"), System.Diagnostics.Conditional("UNITY_EDITOR")]
-		public static void EndMarker(string key, string resultInfo = "")
+		public static void End(string key, string resultInfo = "")
 		{
-			ProfilerMarkerList[key].End();
 			Log(key + " " + resultInfo+ " 时间 " + GetIntervalSeconds(TimestampList[key]).ToString("f3") + " s" + " 帧率 " + Mathf.Min(FPS, (int)(1f / GetIntervalSeconds(LastFrameTime))));
 		}
 		[System.Diagnostics.Conditional("DEVELOPMENT_BUILD"), System.Diagnostics.Conditional("UNITY_EDITOR")]

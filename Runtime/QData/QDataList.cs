@@ -27,7 +27,7 @@ namespace QTool
 		}
 		public static QDataList GetResourcesData(string name, System.Func<QDataList> autoCreate = null)
 		{
-			QDebug.BeginMarker("加载 QDataList<" + name + "> 数据 ");
+			QDebug.Begin("加载 QDataList<" + name + "> 数据 ");
 			var dataList= GetData(GetResourcesDataPath(name),autoCreate);
 			if (QToolSetting.Instance.modeList.Contains(name))
 			{
@@ -36,7 +36,7 @@ namespace QTool
 					dataList.Add(new QDataList(fileValue) { LoadPath = loadPath });
 				}, "{}");
 			}
-			QDebug.EndMarker("加载 QDataList<" + name + "> 数据 ", dataList.Count + " 条");
+			QDebug.End("加载 QDataList<" + name + "> 数据 ", dataList.Count + " 条");
 			return dataList;
 		}
 		public static QDataList GetData(string path,System.Func<QDataList> autoCreate=null)
