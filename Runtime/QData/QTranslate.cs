@@ -255,10 +255,8 @@ namespace QTool
             }
 			try
 			{
-				await Task.Run(() =>
-				{
-					translateResult = Translate(value, Language);
-				}).Run();
+				await QTask.Step();
+				translateResult = Translate(value, Language);
 				await QTask.Step();
 				OnTranslateChange?.Invoke(translateResult);
 			}
