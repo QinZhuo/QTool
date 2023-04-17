@@ -62,7 +62,6 @@ namespace QTool
 			Clip?.SampleAnimation(gameObject, ClipTim1e);
 		}
 
-		private bool IsEventDrag = false;
 		private List<AnimationEvent> EventList = new List<AnimationEvent>();
 		private int GetTimeStep()
 		{

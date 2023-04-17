@@ -279,7 +279,7 @@ namespace QTool
 					else
 					{
 						Debug.LogError("加入房间 " + LobbyList[i].SteamID + "失败");
-						return false;
+						continue;
 					}
                 }
             }

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 namespace QTool.FlowGraph
 {
-	[QCommandType("行为树")]
+	[QCommandType("基础/行为树")]
 	public static class QBehaviorTreeNode
 	{
 		#region 修饰节点

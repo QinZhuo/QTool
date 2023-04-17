@@ -36,7 +36,7 @@ namespace QTool.FlowGraph
 				}
 				else
 				{
-					this.SetDirty();
+					QTool.SetDirty(this); 
 				}
 #endif
             }
