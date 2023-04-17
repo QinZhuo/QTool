@@ -29,7 +29,7 @@ namespace QTool
 		{
 			QDebug.Begin("加载 QDataList<" + name + "> 数据 ");
 			var dataList= GetData(GetResourcesDataPath(name),autoCreate);
-			if (QToolSetting.Instance.modeList.Contains(name))
+			if (QToolSetting.Instance.modeList!=null&&QToolSetting.Instance.modeList.Contains(name))
 			{
 				QFileManager.LoadAll(GetModPath(name), (fileValue, loadPath) =>
 				{
