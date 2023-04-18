@@ -1029,8 +1029,9 @@ namespace QTool
 			Dirty = false;
 			SerializeString = this.ToQData();
 		}
-		public void OnAfterDeserialize()
+		public async void OnAfterDeserialize()
 		{
+			await QTask.Step();
 			SerializeString.ParseQData(this);
 		}
 		public abstract void OnDeserializeOver();
