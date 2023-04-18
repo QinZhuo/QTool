@@ -575,7 +575,9 @@ namespace QTool
 			{
 				if (obj is Component component&&type.Is(typeof(Component)))
 				{
-					return component.GetComponent(type);
+					var result= component.GetComponent(type);
+					QDebug.Log("转换[" + component + "]=>[" + type + "][" + result + "]");
+					return result;
 				}
 				else
 				{
