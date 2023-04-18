@@ -577,9 +577,7 @@ namespace QTool
 				var objType = obj.GetType();
 				if (!objType.Is(type) && obj is Component component)
 				{
-					var result = component.GetComponent(type);
-					QDebug.Log("转换[" + component + "]=>[" + type + "][" + result + "]");
-					return result;
+					return component.GetComponent(type);
 				}
 				else
 				{
