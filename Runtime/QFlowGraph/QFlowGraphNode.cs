@@ -216,7 +216,8 @@ namespace QTool.FlowGraph
 			{
 				trigger.Start = start;
 				trigger.Target = target;
-				yield return trigger.Run((obj) => { triggerObject = obj; This.RunPort(nameof(triggerObject)); });
+				yield return trigger.Run((obj) => { triggerObject = obj;
+					This.RunPort(nameof(triggerObject)); });
 			}
 			trigger.gameObject.CheckDestory();
 		}
