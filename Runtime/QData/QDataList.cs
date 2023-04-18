@@ -143,10 +143,12 @@ namespace QTool
 							{
 								if (!string.IsNullOrEmpty(row.Key))
 								{
+#if !UNITY_SWITCH
 									if (ContainsKey(row.Key))
 									{
 										QDebug.LogWarning("加载覆盖 [" + row.Key + "] 来自文件 " + LoadPath + "\n旧数据: " + this[row.Key] + "\n新数据: " + row);
 									}
+#endif
 									Add(row);
 								}
 								keyInfo.Write(row.Key);
