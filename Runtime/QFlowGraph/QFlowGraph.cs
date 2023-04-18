@@ -1255,6 +1255,7 @@ namespace QTool.FlowGraph
         {
             if (Ports.ContainsKey(portKey))
             {
+				QDebug.Log("运行端口 [" + portKey + "]");
 				var node = GetConnectNode(portKey,index);
                 return Graph.RunIEnumerator(node?.Key);
             }
