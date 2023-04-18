@@ -605,25 +605,18 @@ namespace QTool
 				action?.Invoke();
 			}
 		}
-		public static Vector3 RayCastPlane(this Ray ray, Vector3 planeNormal, Vector3 planePoint)
+		public static T RayCast<T>(this Ray ray, Func<T, bool> CanCast = null) where T : Component
 		{
-			float d = Vector3.Dot(planePoint - ray.origin, planeNormal) / Vector3.Dot(ray.direction, planeNormal);
-			return d * ray.direction + ray.origin;
-		}
-		public static Vector3 RayCastPlane(this Ray ray, Vector3 planePoint)
-		{
-			var normal = Vector3.up;
-			var angle = Vector3.Angle(ray.direction, Vector3.right);
-			if (angle < 40 || angle >= 140)
+			var hits = Physics.RaycastAll(ray);
+			foreach (var hit in hits)
 			{
-				normal = Vector3.right;
+				var target = hit.collider.GetComponent<T>();
+				if (target != null && (CanCast == null || CanCast(target)))
+				{
+					return target;
+				}
 			}
-			angle = Vector3.Angle(ray.direction, Vector3.forward);
-			if (angle < 40 || angle >= 140)
-			{
-				normal = Vector3.forward;
-			}
-			return RayCastPlane(ray, normal, planePoint);
+			return default;
 		}
 		public static Vector3 RayCast(this Ray ray)
 		{
@@ -633,18 +626,10 @@ namespace QTool
 			}
 			return RayCastPlane(ray, Vector3.up, Vector3.zero);
 		}
-		public static T RayCast<T>(this Ray ray,Func<T,bool> CanCast=null)where T:Component
+		public static Vector3 RayCastPlane(this Ray ray, Vector3 planeNormal, Vector3 planePoint = default)
 		{
-			var hits= Physics.RaycastAll(ray);
-			foreach (var hit in hits)
-			{
-				var target = hit.collider.GetComponent<T>();
-				if (target != null&&(CanCast==null||CanCast(target)))
-				{
-					return target;
-				}
-			}
-			return default;
+			float d = Vector3.Dot(planePoint - ray.origin, planeNormal) / Vector3.Dot(ray.direction, planeNormal);
+			return d * ray.direction + ray.origin;
 		}
 		public static Bounds GetBounds(this GameObject obj)
 		{

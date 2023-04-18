@@ -83,7 +83,7 @@ namespace QTool
 		{
 			if (editorMode)
 			{
-				var rayPos = (brush != QVoxelBrush.平面 || StartPos == null) ? ray.RayCast() : ray.RayCastPlane(StartPos.Value);
+				var rayPos = (brush != QVoxelBrush.平面 || StartPos == null) ? ray.RayCast() : ray.RayCastPlane(Vector3.up,StartPos.Value);
 				var pos = transform.worldToLocalMatrix * (rayPos + ray.direction * 0.4f * transform.localScale.x - transform.position);
 				CurPos = new Vector3Int(Mathf.Clamp(Mathf.RoundToInt(pos.x), -20, 20)
 					, Mathf.Clamp(Mathf.RoundToInt(pos.y), -20, 20)
