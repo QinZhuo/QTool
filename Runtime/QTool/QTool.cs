@@ -563,9 +563,28 @@ namespace QTool
 			{
 				return (T)obj;
 			}
-			catch (System.Exception)
+			catch (Exception e)
 			{
-				Debug.LogError("强制转换"+ typeof(T) + "["+obj + "]出错");
+				Debug.LogError("强制转换" + typeof(T) + "[" + obj + "]出错 " + e);
+			}
+			return default;
+		}
+		public static object AsType(this object obj,Type type)
+		{
+			try
+			{
+				if (obj is Component component)
+				{
+					return component.GetComponent(type);
+				}
+				else
+				{
+					return obj;
+				}
+			}
+			catch (Exception e)
+			{
+				Debug.LogError("强制转换" +type + "[" + obj + "]出错 " + e);
 			}
 			return default;
 		}

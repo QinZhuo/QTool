@@ -654,7 +654,7 @@ namespace QTool.FlowGraph
 						{
 							if (InputPort.HasAutoValue)
 							{
-								return Node.Graph.Values[InputPort.autoGetValue];
+								return Node.Graph.Values[InputPort.autoGetValue].AsType(ValueType);
 							}
 						}
 					}
@@ -721,7 +721,7 @@ namespace QTool.FlowGraph
 		{
 			if (HasConnect(index))
 			{
-				return Node.Graph.GetPortValue(this[index].GetConnectPortId(Node.Graph, false));
+				return Node.Graph.GetPortValue(this[index].GetConnectPortId(Node.Graph, false)).AsType(ValueType);
 			}
 			return null;
 		}

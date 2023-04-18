@@ -205,9 +205,9 @@ namespace QTool.FlowGraph
 			QEventManager.Trigger(eventName);
 		}
 		[QName("触发/触发器")]
-		public static IEnumerator Trigger(QFlowNode This,[QName("起点"),QInputPort("起点")]GameObject start, [QName("目标"), QInputPort("目标")] GameObject target, [QName("预制体")]GameObject prefab,[QName("触发"),QFlowPort,QOutputPort]GameObject triggerObject)
+		public static IEnumerator Trigger(QFlowNode This, [QName("起点"), QInputPort("起点")] Transform start, [QName("目标"), QInputPort("目标")] Transform target, [QName("预制体")] GameObject prefab, [QName("触发"), QFlowPort, QOutputPort] Transform triggerObject)
 		{
-			var trigger=prefab.CheckInstantiate()?.GetComponent<QTrigger>();
+			var trigger = prefab.CheckInstantiate()?.GetComponent<QTrigger>();
 			if (start != null)
 			{
 				trigger.transform.position = start.transform.position;
@@ -216,8 +216,11 @@ namespace QTool.FlowGraph
 			{
 				trigger.Start = start;
 				trigger.Target = target;
-				yield return trigger.Run((obj) => { triggerObject = obj;
-					This.RunPort(nameof(triggerObject)); });
+				yield return trigger.Run((t) =>
+				{
+					This.Graph.Values[nameof(triggerObject)] = t;
+					This.RunPort(nameof(triggerObject));
+				});
 			}
 			trigger.gameObject.CheckDestory();
 		}
