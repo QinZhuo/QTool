@@ -569,13 +569,15 @@ namespace QTool
 			}
 			return default;
 		}
-		public static object AsType(this object obj,Type type)
+		public static object AsType(this object obj, Type type)
 		{
 			try
 			{
-				if (obj is Component component&&type.Is(typeof(Component)))
+				if (obj == null) return null;
+				var objType = obj.GetType();
+				if (!objType.Is(type) && obj is Component component)
 				{
-					var result= component.GetComponent(type);
+					var result = component.GetComponent(type);
 					QDebug.Log("转换[" + component + "]=>[" + type + "][" + result + "]");
 					return result;
 				}
@@ -586,7 +588,7 @@ namespace QTool
 			}
 			catch (Exception e)
 			{
-				Debug.LogError("强制转换" +type + "[" + obj + "]出错 " + e);
+				Debug.LogError("强制转换" + type + "[" + obj + "]出错 " + e);
 			}
 			return default;
 		}
