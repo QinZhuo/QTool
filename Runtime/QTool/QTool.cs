@@ -573,7 +573,7 @@ namespace QTool
 		{
 			try
 			{
-				if (obj is Component component)
+				if (obj is Component component&&type.Is(typeof(Component)))
 				{
 					return component.GetComponent(type);
 				}
