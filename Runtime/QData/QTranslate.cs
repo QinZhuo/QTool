@@ -220,10 +220,7 @@ namespace QTool
 			}
 			return value;
         }
-		private void OnEnable()
-		{
-			CheckFresh();
-		}
+		
 		private void FreshFont(string key=default)
 		{
 			try
