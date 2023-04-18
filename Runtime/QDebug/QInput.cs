@@ -4,7 +4,7 @@ using UnityEngine;
 namespace QTool
 {
 
-	public static class QDemoInput
+	public static class QInput
 	{
 		
 		public static bool PointerPress

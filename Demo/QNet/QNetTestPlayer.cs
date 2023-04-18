@@ -25,16 +25,16 @@ public class QNetTestPlayer : QNetBehaviour
 	{
 		if (agent != null)
 		{
-			agent.Move(PlayerValue("位置", new Vector3(QDemoInput.MoveDirection.x, 0, QDemoInput.MoveDirection.y)) * NetDeltaTime * 3);
+			agent.Move(PlayerValue("位置", new Vector3(QInput.MoveDirection.x, 0, QInput.MoveDirection.y)) * NetDeltaTime * 3);
 		}
 		else
 		{
-			transform.position += PlayerValue("位置", new Vector3(QDemoInput.MoveDirection.x, 0, QDemoInput.MoveDirection.y)) * NetDeltaTime * 3;
+			transform.position += PlayerValue("位置", new Vector3(QInput.MoveDirection.x, 0, QInput.MoveDirection.y)) * NetDeltaTime * 3;
 		}
-		var pos = PlayerValue("目标", QTool.QTool.RayCastPlane(Camera.main.ScreenPointToRay(QDemoInput.PointerPosition), Vector3.up, transform.position));
+		var pos = PlayerValue("目标", QTool.QTool.RayCastPlane(Camera.main.ScreenPointToRay(QInput.PointerPosition), Vector3.up, transform.position));
 		transform.LookAt(pos);
 		shootTimer.Check(NetDeltaTime, false);
-		if (PlayerValue("射击",QDemoInput.PointerPress)&&shootTimer.Check())
+		if (PlayerValue("射击",QInput.PointerPress)&&shootTimer.Check())
 		{
 			var bullet= Instantiate(bulletPrefab, transform.position, transform.rotation);
 			bullet.GetComponent<QNetTestBullet>().Player = this;

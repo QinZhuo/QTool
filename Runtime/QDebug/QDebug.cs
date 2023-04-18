@@ -130,7 +130,7 @@ namespace QTool
 			}
 			else
 			{
-				if ((QDemoInput.Ctrl && QDemoInput.Enter) || InputCircle > 720)
+				if ((QInput.Ctrl && QInput.Enter) || InputCircle > 720)
 				{
 					OpenPanel();
 				}
@@ -323,13 +323,13 @@ namespace QTool
 		{
 			get
 			{
-				if (!QDemoInput.PointerPress || QDemoInput.PointerPosition.IsNull())
+				if (!QInput.PointerPress || QInput.PointerPosition.IsNull())
 				{
 					last = default;
 					angle = 0;
 					return angle;
 				}
-				var point = QDemoInput.PointerPosition;
+				var point = QInput.PointerPosition;
 				if (last.IsNull())
 				{
 					last = point - QScreen.Size / 2;
