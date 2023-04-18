@@ -756,11 +756,15 @@ namespace QTool.FlowGraph
 				else if (ConnectType.Is(type))
                 {
                     return true;
-                } 
+                }
+				else if (ConnectType.Is(typeof(Component)) && type.Is(typeof(Component)))
+				{
+					return true;
+				}
 				else if (CanConnectList.ContainsKey(ConnectType))
                 {
                     return CanConnectList[ConnectType].Contains(type);
-                }
+				}
             }
             return false;
         }
