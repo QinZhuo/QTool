@@ -633,6 +633,19 @@ namespace QTool
 			}
 			return RayCastPlane(ray, Vector3.up, Vector3.zero);
 		}
+		public static T RayCast<T>(this Ray ray,Func<T,bool> CanCast=null)where T:Component
+		{
+			var hits= Physics.RaycastAll(ray);
+			foreach (var hit in hits)
+			{
+				var target = hit.collider.GetComponent<T>();
+				if (target != null&&(CanCast==null||CanCast(target)))
+				{
+					return target;
+				}
+			}
+			return default;
+		}
 		public static Bounds GetBounds(this GameObject obj)
 		{
 			return obj.transform.GetBounds();
