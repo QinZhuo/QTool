@@ -218,7 +218,7 @@ namespace QTool.FlowGraph
 				trigger.Target = target;
 				yield return trigger.Run((t) =>
 				{
-					This.Graph.Values[nameof(triggerObject)] = t;
+					This[nameof(triggerObject)] = t;
 					This.RunPort(nameof(triggerObject));
 				});
 			}
