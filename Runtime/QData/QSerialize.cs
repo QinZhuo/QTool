@@ -35,7 +35,7 @@ namespace QTool
 								return writer;
 							}
                             QSerializeType typeInfo = QSerializeType.Get(type);
-                            switch (typeInfo.objType)
+                            switch (typeInfo.ObjType)
                             {
 								case QObjectType.DynamicObject:
 									{
@@ -177,7 +177,7 @@ namespace QTool
 					var count = reader.ReadInt32();
                     var hasTarget = target != null;
                     typeInfo = QSerializeType.Get(type);
-                    switch (typeInfo.objType)
+                    switch (typeInfo.ObjType)
                     {
 						case QObjectType.DynamicObject:
 							{

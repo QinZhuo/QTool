@@ -717,7 +717,7 @@ namespace QTool
 						obj = TextField(name, obj?.ToString()); break;
 					}
 				case TypeCode.Object:
-					switch (typeInfo.objType)
+					switch (typeInfo.ObjType)
 					{
 						case QObjectType.DynamicObject:
 							{

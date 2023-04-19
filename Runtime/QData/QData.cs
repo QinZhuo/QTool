@@ -120,7 +120,7 @@ namespace QTool
 				case TypeCode.Object:
 					{
 						var typeInfo = QSerializeType.Get(type);
-						switch (typeInfo.objType)
+						switch (typeInfo.ObjType)
 						{
 							case QObjectType.DynamicObject:
 								{
@@ -133,7 +133,7 @@ namespace QTool
 										writer.Write('{');
 										var runtimeType = obj.GetType();
 										var runtimeTypeInfo = QSerializeType.Get(runtimeType);
-										switch (runtimeTypeInfo.objType)
+										switch (runtimeTypeInfo.ObjType)
 										{
 											case QObjectType.DynamicObject:
 												{
@@ -397,7 +397,7 @@ namespace QTool
 				case TypeCode.Object:
 					{
 						var typeInfo = QSerializeType.Get(type);
-						switch (typeInfo.objType)
+						switch (typeInfo.ObjType)
 						{
 							case QObjectType.DynamicObject:
 								{
@@ -1061,7 +1061,7 @@ namespace QTool
 	public class QSerializeType : QTypeInfo<QSerializeType>
 	{
 	
-		public QObjectType objType = QObjectType.Object;
+		public QObjectType ObjType { get; protected set; } = QObjectType.Object;
 		public bool IsIQSerialize { private set; get; }
 		public bool IsIQData { private set; get; }
 		public bool HasCallback { private set; get; }
@@ -1071,10 +1071,10 @@ namespace QTool
 			base.Init(type);
 			if (Code == TypeCode.Object)
 			{
-				objType = QObjectType.Object;
+				ObjType = QObjectType.Object;
 				if (typeof(Task).IsAssignableFrom(type))
 				{
-					objType = QObjectType.CantSerialize;
+					ObjType = QObjectType.CantSerialize;
 					return;
 				}
 				IsIQSerialize = typeof(IQSerialize).IsAssignableFrom(type);
@@ -1082,31 +1082,31 @@ namespace QTool
 				HasCallback= typeof(IQSerializeCallback).IsAssignableFrom(type);
 				if (IsIQData)
 				{
-					objType = QObjectType.Object;
+					ObjType = QObjectType.Object;
 				}
 				else if (typeof(UnityEngine.Object).IsAssignableFrom(type))
 				{
-					objType = QObjectType.UnityObject;
+					ObjType = QObjectType.UnityObject;
 				}
 				else if( type==typeof(System.Object)||type.IsAbstract||type.IsInterface|| type.GetCustomAttribute<QDynamicAttribute>()!=null)
 				{
-					objType = QObjectType.DynamicObject;
+					ObjType = QObjectType.DynamicObject;
 				}
 				else if (IsArray)
 				{
-					objType = QObjectType.Array;
+					ObjType = QObjectType.Array;
 				}
 				else if (IsList)
 				{
-					objType = QObjectType.List;
+					ObjType = QObjectType.List;
 				}
 				else if(IsDictionary)
 				{
-					objType = QObjectType.Dictionary;
+					ObjType = QObjectType.Dictionary;
 				}
 				else if (type == typeof(TimeSpan))
 				{
-					objType = QObjectType.TimeSpan;
+					ObjType = QObjectType.TimeSpan;
 				}
 				else
 				{

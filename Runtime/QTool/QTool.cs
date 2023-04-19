@@ -575,14 +575,29 @@ namespace QTool
 			{
 				if (obj == null) return null;
 				var objType = obj.GetType();
-				if (!objType.Is(type) && obj is Component component)
-				{
-					return component.GetComponent(type);
-				}
-				else
+				if (objType.IsAssignableFrom(type))
 				{
 					return obj;
 				}
+				else
+				{
+					if (obj is Component component)
+					{
+						if (type == typeof(GameObject))
+						{
+							return component.gameObject;
+						}
+						else
+						{
+							return component.GetComponent(type);
+						}
+					}
+					else if (obj is GameObject gameObj)
+					{
+						return gameObj.GetComponent(type);
+					}
+				}
+				return obj;
 			}
 			catch (Exception e)
 			{
