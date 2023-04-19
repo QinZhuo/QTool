@@ -29,39 +29,34 @@ namespace QTool
 		public bool useBoundsHeight=false;
 		Bounds bounds;
 		public Vector3 offset=Vector3.zero;
-		private Vector3 _lastPosition = default;
 		public void FreshPosition()
 		{
 			if (_Target != null)
 			{
 				if (_Target.gameObject.activeInHierarchy)
 				{
-					if (_lastPosition != _Target.position)
+					var runtimeOffset = offset;
+					if (useBoundsHeight)
 					{
-						_lastPosition = _Target.position;
-						var runtimeOffset = offset;
-						if (useBoundsHeight)
+						runtimeOffset += bounds.size.y * Vector3.up;
+					}
+					var position = _Target.position + runtimeOffset;
+					if (Canvas != null)
+					{
+						switch (Canvas.renderMode)
 						{
-							runtimeOffset += bounds.size.y * Vector3.up;
-						}
-						var position = _Target.position + runtimeOffset;
-						if (Canvas != null)
-						{
-							switch (Canvas.renderMode)
-							{
-								case RenderMode.ScreenSpaceOverlay:
-									rectTransform.position = Camera.main.WorldToScreenPoint(position);
-									break;
-								case RenderMode.ScreenSpaceCamera:
-									var point = Camera.main.WorldToViewportPoint(position);
-									rectTransform.position = Canvas.transform.position + new Vector3(Screen.width * (point.x - 0.5f) * rectTransform.lossyScale.x, Screen.height * (point.y - 0.5f) * rectTransform.lossyScale.y, 0);
-									break;
-								case RenderMode.WorldSpace:
-									rectTransform.position = position;
-									break;
-								default:
-									break;
-							}
+							case RenderMode.ScreenSpaceOverlay:
+								rectTransform.position = Camera.main.WorldToScreenPoint(position);
+								break;
+							case RenderMode.ScreenSpaceCamera:
+								var point = Camera.main.WorldToViewportPoint(position);
+								rectTransform.position = Canvas.transform.position + new Vector3(Screen.width * (point.x - 0.5f) * rectTransform.lossyScale.x, Screen.height * (point.y - 0.5f) * rectTransform.lossyScale.y, 0);
+								break;
+							case RenderMode.WorldSpace:
+								rectTransform.position = position;
+								break;
+							default:
+								break;
 						}
 					}
 				}

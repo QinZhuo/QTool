@@ -12,6 +12,13 @@ namespace QTool
 		{
 			ObjectList.Push(obj);
 		}
+		public void FreshPosition()
+		{
+			foreach (var obj in ObjectList.objList)
+			{
+				obj.GetComponent<QFollowUI>()?.FreshPosition();
+			}
+		}
 		public QFollowUI this[Transform target]
 		{
 			get
