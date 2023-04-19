@@ -13,16 +13,15 @@ namespace QTool
 	}
 	public class QBuffSystem<T> where T : QBuffData<T>, new()
 	{
-		public class QBuffRuntime
+		public class QBuffRuntime:QRuntimeObject<T>
 		{
-			public T Data { get; private set; }
 			public int Count { get; set; } = 0;
 			public float Time { get; set; }
 			public float CurrentTime { get; set; }
 			public QFlowGraph Graph { get; private set; }
-			public QBuffRuntime(string key)
+			public override void Init(string key)
 			{
-				Data = QDataList<T>.Get(key);
+				base.Init(key);
 				Graph = Data.Graph.CreateInstance();
 			}
 		}
@@ -57,12 +56,13 @@ namespace QTool
 			}
 			else
 			{
-				var buff = new QBuffRuntime(key)
+				var buff = new QBuffRuntime
 				{
 					Time = time,
 					Count = 1,
 					CurrentTime = time
 				};
+				buff.Init(key);
 				Buffs.Add(key, buff);
 				RunGraph(buff, "添加");
 			}

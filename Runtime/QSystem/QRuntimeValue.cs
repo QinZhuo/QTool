@@ -106,6 +106,28 @@ namespace QTool
 			return Value.ToString();
 		}
 	}
+	public class QRuntimeValues
+	{
+		public QDictionary<string, QRuntimeValue> Values = new QDictionary<string, QRuntimeValue>((key) => new QRuntimeValue());
+		public float this[string key]
+		{
+			get
+			{
+				if (Values.ContainsKey(key))
+				{
+					return Values[key].Value;
+				}
+				else
+				{
+					return 0;
+				}
+			}
+		}
+		public void Clear()
+		{
+			Values.Clear();
+		}
+	}
 	public class QRuntimeRangeValue : QRuntimeValue
 	{
 		public QRuntimeRangeValue() { }
@@ -132,28 +154,6 @@ namespace QTool
 		public override string ToString()
 		{
 			return CurrentValue + "/" + Value;
-		}
-	}
-	public class QRuntimeValues
-	{
-		public QDictionary<string, QRuntimeValue> Values = new QDictionary<string, QRuntimeValue>((key)=>new QRuntimeValue());
-		public float this[string key]
-		{
-			get
-			{
-				if (Values.ContainsKey(key))
-				{
-					return Values[key].Value;
-				}
-				else
-				{
-					return 0;
-				}
-			}
-		}
-		public void Clear()
-		{
-			Values.Clear();
 		}
 	}
 	public class QAverageValue
