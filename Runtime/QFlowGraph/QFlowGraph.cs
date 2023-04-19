@@ -34,8 +34,10 @@ namespace QTool.FlowGraph
 				}
 			};
 		}
-		public override void OnDeserializeOver()
+		public override async void OnAfterDeserialize()
 		{
+			await QTask.Step();
+			base.OnAfterDeserialize();
 			foreach (var state in NodeList)
 			{
 				state.Init(this);
@@ -43,7 +45,7 @@ namespace QTool.FlowGraph
 		}
 		public QFlowGraph CreateInstance()
 		{
-			return this.QDataCopy();
+			return SerializeString.ParseQData(this);
 		}
         public override string ToString()
         {

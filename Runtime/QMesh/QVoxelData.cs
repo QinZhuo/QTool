@@ -133,10 +133,6 @@ namespace QTool
 		public float this[Vector3Int pos] => this[pos.x, pos.y, pos.z];
 		[QIgnore]
 		public QMeshData MeshData { private set; get; } = new QMeshData();
-		public override void OnDeserializeOver()
-		{
-			
-		}
 	}
 
 }

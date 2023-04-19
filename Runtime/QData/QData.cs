@@ -587,10 +587,10 @@ namespace QTool
 								Debug.LogError("不支持类型[" + type + "]");
 								return null;
 						}
-						if (typeInfo.HasCallback && target is IQSerializeCallback callback)
-						{
-							callback.OnDeserializeOver();
-						}
+						//if (typeInfo.HasCallback && target is IQSerializeCallback callback)
+						//{
+						//	callback.OnDeserializeOver();
+						//}
 						return target;
 					}
 
@@ -1008,11 +1008,11 @@ namespace QTool
 		void ToQData(StringWriter writer);
 		void ParseQData(StringReader reader);
 	}
-	public interface IQSerializeCallback
-	{
-		void OnDeserializeOver();
-	}
-	public abstract class QSerializeObject : ISerializationCallbackReceiver, IQSerializeCallback
+	//public interface IQSerializeCallback
+	//{
+	//	void OnDeserializeOver();
+	//}
+	public abstract class QSerializeObject : ISerializationCallbackReceiver
 	{
 		
 		[QIgnore, HideInInspector]
@@ -1023,18 +1023,18 @@ namespace QTool
 		{
 			Dirty = true;
 		}
-		public void OnBeforeSerialize()
+		public virtual void OnBeforeSerialize()
 		{
 			if (!Dirty) return;
 			Dirty = false;
 			SerializeString = this.ToQData();
 		}
-		public async void OnAfterDeserialize()
+		public bool IsDeserializeOver = false;
+		public virtual void OnAfterDeserialize()
 		{
-			await QTask.Step();
 			SerializeString.ParseQData(this);
+			IsDeserializeOver = true;
 		}
-		public abstract void OnDeserializeOver();
 	}
 	[AttributeUsage(AttributeTargets.Method | AttributeTargets.Field | AttributeTargets.Property | AttributeTargets.Interface)]
 	public class QIgnoreAttribute : Attribute
@@ -1064,7 +1064,7 @@ namespace QTool
 		public QObjectType ObjType { get; protected set; } = QObjectType.Object;
 		public bool IsIQSerialize { private set; get; }
 		public bool IsIQData { private set; get; }
-		public bool HasCallback { private set; get; }
+		//public bool HasCallback { private set; get; }
 		protected override void Init(Type type)
 		{
 			Functions = null;
@@ -1079,7 +1079,7 @@ namespace QTool
 				}
 				IsIQSerialize = typeof(IQSerialize).IsAssignableFrom(type);
 				IsIQData = typeof(IQData).IsAssignableFrom(type);
-				HasCallback= typeof(IQSerializeCallback).IsAssignableFrom(type);
+				//HasCallback= typeof(IQSerializeCallback).IsAssignableFrom(type);
 				if (IsIQData)
 				{
 					ObjType = QObjectType.Object;
