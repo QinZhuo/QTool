@@ -662,7 +662,7 @@ namespace QTool.Reflection
         }
 		public static bool Is(this Type type,Type checkType)
 		{
-			if (type.IsAssignableFrom(checkType))
+			if (type==checkType)
 			{
 				return true;
 			}
