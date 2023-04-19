@@ -3,12 +3,19 @@ using System.Collections.Generic;
 using UnityEngine;
 namespace QTool
 {
-	public abstract class QRuntimeObject<T> where T:QDataList<T>,new()
+	public abstract class QRuntimeObject<T,DataT> where T:QRuntimeObject<T,DataT>,new() where DataT : QDataList<DataT>, new()
 	{
-		public T Data { get; private set; }
+		public DataT Data { get; private set; }
+		protected QRuntimeObject() { }
+		public static T Get(string key)
+		{
+			var t= new T();
+			t.Init(key);
+			return t;
+		}
 		public virtual void Init(string key)
 		{
-			Data = QDataList<T>.Get(key);
+			Data = QDataList<DataT>.Get(key);
 		}
 	}
 }

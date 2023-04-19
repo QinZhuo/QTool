@@ -13,7 +13,7 @@ namespace QTool
 	}
 	public class QBuffSystem<T> where T : QBuffData<T>, new()
 	{
-		public class QBuffRuntime:QRuntimeObject<T>
+		public class QBuffRuntime:QRuntimeObject<QBuffRuntime,T>
 		{
 			public int Count { get; set; } = 0;
 			public float Time { get; set; }
@@ -56,12 +56,10 @@ namespace QTool
 			}
 			else
 			{
-				var buff = new QBuffRuntime
-				{
-					Time = time,
-					Count = 1,
-					CurrentTime = time
-				};
+				var buff = QBuffRuntime.Get(key);
+				buff.Time = time;
+				buff.CurrentTime = time;
+				buff.Count = 1;
 				buff.Init(key);
 				Buffs.Add(key, buff);
 				RunGraph(buff, "添加");
