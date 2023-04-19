@@ -527,7 +527,7 @@ namespace QTool.FlowGraph
 		public bool IsList { get; internal set; }
 		public override string ToString()
 		{
-			return name + " (" + ConnectType + ")";
+			return name + " (" + ConnectType + ")["+Key+"]";
 		}
 		public void IndexChange(int a, int b)
 		{

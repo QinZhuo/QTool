@@ -17,7 +17,7 @@ namespace QTool.Test
 		public string textArea;
 		public override string ToString()
 		{
-			return Key + ":[" + value + "]";
+			return "["+Key + "]:[" + value + "]";
 		}
 	}
 }
