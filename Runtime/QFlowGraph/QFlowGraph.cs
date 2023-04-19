@@ -619,10 +619,6 @@ namespace QTool.FlowGraph
 					if (OutputPort.autoRunNode)
 					{
 						Node.Run();
-						if (_value != null)
-						{
-							ConnectType = _value.GetType();
-						}
 					}
 				}
 				else
