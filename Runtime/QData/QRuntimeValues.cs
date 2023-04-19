@@ -223,5 +223,6 @@ namespace QTool
 			return "总记[" + toString(AllSum) + "]平均[" + toString(Value) + "/s]";
 		}
 	}
+	
 }
 
