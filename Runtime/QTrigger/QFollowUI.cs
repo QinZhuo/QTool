@@ -18,6 +18,7 @@ namespace QTool
 				{
 					bounds = _Target.GetBounds();
 				}
+				FreshPosition();
 			}
 		}
 		public QFollowList QFollowList { get; internal set; }
@@ -28,34 +29,39 @@ namespace QTool
 		public bool useBoundsHeight=false;
 		Bounds bounds;
 		public Vector3 offset=Vector3.zero;
-		private void LateUpdate()
-        {
-            if (_Target != null)
-            {
+		private Vector3 _lastPosition = default;
+		public void FreshPosition()
+		{
+			if (_Target != null)
+			{
 				if (_Target.gameObject.activeInHierarchy)
 				{
-					var runtimeOffset = offset;
-					if (useBoundsHeight)
+					if (_lastPosition != _Target.position)
 					{
-						runtimeOffset += bounds.size.y * Vector3.up;
-					}
-					var position = _Target.position + runtimeOffset;
-					if (Canvas != null)
-					{
-						switch (Canvas.renderMode)
+						_lastPosition = _Target.position;
+						var runtimeOffset = offset;
+						if (useBoundsHeight)
 						{
-							case RenderMode.ScreenSpaceOverlay:
-								rectTransform.position = Camera.main.WorldToScreenPoint(position);
-								break;
-							case RenderMode.ScreenSpaceCamera:
-								var point = Camera.main.WorldToViewportPoint(position);
-								rectTransform.position =Canvas.transform.position+new Vector3(Screen.width * (point.x - 0.5f) * rectTransform.lossyScale.x, Screen.height*(point.y-0.5f) * rectTransform.lossyScale.y, 0);
-								break;
-							case RenderMode.WorldSpace:
-								rectTransform.position = position;
-								break;
-							default:
-								break;
+							runtimeOffset += bounds.size.y * Vector3.up;
+						}
+						var position = _Target.position + runtimeOffset;
+						if (Canvas != null)
+						{
+							switch (Canvas.renderMode)
+							{
+								case RenderMode.ScreenSpaceOverlay:
+									rectTransform.position = Camera.main.WorldToScreenPoint(position);
+									break;
+								case RenderMode.ScreenSpaceCamera:
+									var point = Camera.main.WorldToViewportPoint(position);
+									rectTransform.position = Canvas.transform.position + new Vector3(Screen.width * (point.x - 0.5f) * rectTransform.lossyScale.x, Screen.height * (point.y - 0.5f) * rectTransform.lossyScale.y, 0);
+									break;
+								case RenderMode.WorldSpace:
+									rectTransform.position = position;
+									break;
+								default:
+									break;
+							}
 						}
 					}
 				}
@@ -64,7 +70,11 @@ namespace QTool
 			{
 				Recover();
 			}
-        }
+		}
+		private void LateUpdate()
+        {
+			FreshPosition();
+		}
 		public void Recover()
 		{
 			if (QFollowList != null)
