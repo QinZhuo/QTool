@@ -53,13 +53,14 @@ namespace QTool.FlowGraph
 		public static QFlowGraphWindow Instance { get; private set; }
 		public event Action OnSave;
 
-		public static void Open(QFlowGraph graph,Action OnSave)
+		public static async void Open(QFlowGraph graph,Action OnSave)
         {
             if (Instance == null)
             {
                 Instance = GetWindow<QFlowGraphWindow>(); 
                 Instance.minSize = new Vector2(400, 300);
             }
+			await QTask.Step();
             Instance.titleContent = new GUIContent((graph?.Name== null?"":graph.Name + " - ") + nameof(QFlowGraph));
 			Graph = graph;
 #if UNITY_EDITOR
