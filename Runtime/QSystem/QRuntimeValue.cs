@@ -64,6 +64,7 @@ namespace QTool
 			PercentValue = 1;
 			FreshValue();
 		}
+		public string Name { get; set; }
 		public QValue OriginValue { get; private set; } = 0f;
 		private QValue _OffsetValue = 0;
 		public QValue OffsetValue {
@@ -91,43 +92,22 @@ namespace QTool
 			}
 		}
 		public QValue Value { get; private set; } = 0;
-		public event Action OnValueChange = null;
+		public Action<string,float> OnValueChange = null;
 		public void FreshValue()
 		{
 			Value = (OriginValue + OffsetValue) * PercentValue;
-			ValueChange();
+			OnValueChange?.Invoke(Name,Value);
 		}
-		protected void ValueChange()
+		public virtual void InvokeOnValueChange()
 		{
-			OnValueChange?.Invoke();
+			OnValueChange?.Invoke(Name, Value);
 		}
 		public override string ToString()
 		{
 			return Value.ToString();
 		}
 	}
-	public class QRuntimeValues
-	{
-		public QDictionary<string, QRuntimeValue> Values = new QDictionary<string, QRuntimeValue>((key) => new QRuntimeValue());
-		public float this[string key]
-		{
-			get
-			{
-				if (Values.ContainsKey(key))
-				{
-					return Values[key].Value;
-				}
-				else
-				{
-					return 0;
-				}
-			}
-		}
-		public void Clear()
-		{
-			Values.Clear();
-		}
-	}
+
 	public class QRuntimeRangeValue : QRuntimeValue
 	{
 		public QRuntimeRangeValue() { }
@@ -147,13 +127,19 @@ namespace QTool
 				if (_CurrentValue != value)
 				{
 					_CurrentValue = Mathf.Clamp(value, MinValue, MaxValue);
-					ValueChange();
+					OnValueChange?.Invoke("当前"+Name,_CurrentValue);
+
 				}
 			}
 		}
 		public override string ToString()
 		{
 			return CurrentValue + "/" + Value;
+		}
+		public override void InvokeOnValueChange()
+		{
+			base.InvokeOnValueChange();
+			OnValueChange?.Invoke("当前" + Name, CurrentValue);
 		}
 	}
 	public class QAverageValue

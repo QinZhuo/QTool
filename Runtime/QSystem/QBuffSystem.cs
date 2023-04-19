@@ -13,7 +13,7 @@ namespace QTool
 	}
 	public class QBuffSystem<T> where T : QBuffData<T>, new()
 	{
-		public class QBuffRuntime:QRuntimeObject<QBuffRuntime,T>
+		public class QBuffRuntime:QRuntime<QBuffRuntime,T>
 		{
 			public int Count { get; set; } = 0;
 			public float Time { get; set; }
