@@ -42,6 +42,21 @@ namespace QTool
 				}
 			}
 		}
+		private void OnDestroy()
+		{
+			var typeInfo = QSerializeType.Get(typeof(RuntimeT));
+			if (typeInfo != null)
+			{
+				foreach (var member in typeInfo.Members)
+				{
+					if (member.Type.Is(typeof(QRuntimeValue)))
+					{
+						var runtimeValue = member.Get(this).As<QRuntimeValue>();
+						runtimeValue.OnValueChange -= gameObject.InvokeEvent;
+					}
+				}
+			}
+		}
 	}
 }
 
