@@ -1036,7 +1036,7 @@ namespace QTool
 		}
 		public abstract void OnDeserializeOver();
 	}
-	[AttributeUsage(AttributeTargets.Field | AttributeTargets.Property | AttributeTargets.Interface)]
+	[AttributeUsage(AttributeTargets.Method | AttributeTargets.Field | AttributeTargets.Property | AttributeTargets.Interface)]
 	public class QIgnoreAttribute : Attribute
 	{
 
