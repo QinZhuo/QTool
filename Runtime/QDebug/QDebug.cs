@@ -12,7 +12,8 @@ namespace QTool
 {
 	public static class QDebug
 	{
-		public static int FPS { get; private set; } = 0;
+		public static int FPS =>(int)(FrameCount.SecondeSum);
+		private static QAverageValue FrameCount = new QAverageValue();
 		private static long LastFrameTime { set; get; } = 0;
 		static bool DebugPanelShow = false;
 		private static QToolBar toolBar = null;
@@ -23,10 +24,7 @@ namespace QTool
 		}
 		public static void Update()
 		{
-			if (LastFrameTime > 0)
-			{
-				FPS = (int)(1f / GetIntervalSeconds(LastFrameTime));
-			}
+			FrameCount.Push(1);
 			LastFrameTime = QTime.Timestamp;
 		}
 
