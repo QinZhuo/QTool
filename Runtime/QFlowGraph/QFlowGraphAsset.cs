@@ -4,7 +4,7 @@ using UnityEngine;
 namespace QTool.FlowGraph
 {
   
-	[CreateAssetMenu(menuName = nameof(QTool)+"/"+nameof(QFlowGraphAsset))]
+	[CreateAssetMenu(menuName = nameof(QTool)+"/"+"流程图",fileName ="流程图")]
     public class QFlowGraphAsset : ScriptableObject
     {
 		[SerializeField]

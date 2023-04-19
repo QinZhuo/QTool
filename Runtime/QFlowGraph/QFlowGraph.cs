@@ -130,7 +130,7 @@ namespace QTool.FlowGraph
         public QFlowNode AddNode(string commandKey)
         {
             var newNode= Add(new QFlowNode(commandKey));
-			newNode.rect =new Rect(new Vector2(300*1.1f*(NodeList.Count-1),0 ), new Vector2(300, 80));
+			newNode.rect.center = new Vector2(300 * 1.1f * (NodeList.Count - 1), 0);
 			return newNode;
         }
 	
@@ -749,7 +749,11 @@ namespace QTool.FlowGraph
             }
             else if (ConnectType != QFlow.Type && type != QFlow.Type)
             {
-    			if (type == typeof(object))
+				if (ConnectType == typeof(object))
+				{
+					return true;
+				}
+    			else if (type == typeof(object))
                 {
                     return true;
                 }
@@ -930,7 +934,7 @@ namespace QTool.FlowGraph
         }
 		[QName]
         public string commandKey { get; private set; }
-        public Rect rect = new Rect(Vector2.zero, new Vector2(300, 80));
+        public Rect rect = new Rect(Vector2.zero, new Vector2(320, 80)); 
 
 		public object this[string valueKey]
         {

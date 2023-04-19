@@ -104,7 +104,7 @@ namespace QTool.FlowGraph
 					{
 						SelectNodes.Clear();
 						var node =Graph.AddNode(info.Key);
-                        node.rect = new Rect(mousePos, new Vector2(300, 80));
+						node.rect.center = mousePos;;
                         fromPort.Connect( node.Ports[portKey],fromPortId.index);
 						SelectNodes.Add(node);
 
@@ -125,7 +125,7 @@ namespace QTool.FlowGraph
 							{
 								SelectNodes.Clear();
 								var node = Graph.AddNode(nameof(QFlowGraphNode.ObjectFunction));
-								node.rect = new Rect(mousePos, new Vector2(300, 80));
+								node.rect.center = mousePos;
 								fromPort.Connect(node.Ports[QFlowKey.Object], fromPortId.index);
 								node.Ports[QFlowKey.FuncName].Value = funcInfo.Name;
 								var param = new object[funcInfo.ParamInfos.Length];
@@ -154,14 +154,14 @@ namespace QTool.FlowGraph
 				if(obj is QFlowGraphAsset asset)
 				{
 					var node = Graph.AddNode(nameof(QFlowGraphNode.GraphAsset));
-					node.rect = new Rect(mousePos, new Vector2(300, 80));
+					node.rect.center = mousePos;
 					node.Ports[QFlowKey.Object].Value = asset;
 					SelectNodes.Add(node);
 				}
 				else
 				{
 					var node = Graph.AddNode(nameof(QFlowGraphNode.ObjectInstance));
-					node.rect = new Rect(mousePos, new Vector2(300, 80));
+					node.rect.center = mousePos;
 					node.Ports[QFlowKey.Object].Value = obj;
 					SelectNodes.Add(node);
 				}
@@ -178,8 +178,8 @@ namespace QTool.FlowGraph
 					{
 						SelectNodes.Clear();
 						var node =Graph.AddNode(kv.Key);
-                       node.rect = new Rect(mousePos, new Vector2(300, 80));
-					   SelectNodes.Add(node);
+						node.rect.center = mousePos;
+						SelectNodes.Add(node);
 
 				   });
                 }
