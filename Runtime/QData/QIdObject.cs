@@ -118,6 +118,7 @@ namespace QTool
 		}
 		internal static async Task<Object> LoadObjectAsync(string id, System.Type type)
 		{
+			if (id.IsNull()) return null;
 			if (id.StartsWith("{") && id.EndsWith("}"))
 			{
 				id = id.GetBlockValue(":\"", "\"");
