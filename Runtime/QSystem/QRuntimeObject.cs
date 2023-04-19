@@ -34,7 +34,7 @@ namespace QTool
 				{
 					if (member.Type.Is(typeof(QRuntimeValue)))
 					{
-						var runtimeValue = member.Get(this).As<QRuntimeValue>();
+						var runtimeValue = member.Get(Runtime).As<QRuntimeValue>();
 						runtimeValue.Name = member.QName;
 						runtimeValue.OnValueChange += gameObject.InvokeEvent;
 						runtimeValue.InvokeOnValueChange();
@@ -51,7 +51,7 @@ namespace QTool
 				{
 					if (member.Type.Is(typeof(QRuntimeValue)))
 					{
-						var runtimeValue = member.Get(this).As<QRuntimeValue>();
+						var runtimeValue = member.Get(Runtime).As<QRuntimeValue>();
 						runtimeValue.OnValueChange -= gameObject.InvokeEvent;
 					}
 				}
