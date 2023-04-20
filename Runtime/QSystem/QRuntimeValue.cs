@@ -93,10 +93,10 @@ namespace QTool
 		}
 		public QValue Value { get; private set; } = 0;
 		public Action<string,float> OnValueChange = null;
-		public void FreshValue()
+		private void FreshValue()
 		{
 			Value = (OriginValue + OffsetValue) * PercentValue;
-			OnValueChange?.Invoke(Name,Value);
+			InvokeOnValueChange();
 		}
 		public virtual void InvokeOnValueChange()
 		{
@@ -127,8 +127,7 @@ namespace QTool
 				if (_CurrentValue != value)
 				{
 					_CurrentValue = Mathf.Clamp(value, MinValue, MaxValue);
-					OnValueChange?.Invoke("当前"+Name,_CurrentValue);
-
+					OnValueChange?.Invoke("当前" + Name, _CurrentValue);
 				}
 			}
 		}
@@ -140,6 +139,7 @@ namespace QTool
 		{
 			base.InvokeOnValueChange();
 			OnValueChange?.Invoke("当前" + Name, CurrentValue);
+			OnValueChange?.Invoke(Name+"比例", (CurrentValue-MinValue)/MaxValue);
 		}
 	}
 	public class QAverageValue

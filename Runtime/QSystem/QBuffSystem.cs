@@ -36,7 +36,7 @@ namespace QTool
 			{
 				if (Buffs.ContainsKey(key))
 				{
-					return Buffs[key].Count;
+					return Mathf.RoundToInt(Buffs[key].Count.Value);
 				}
 				return 0;
 			}
@@ -51,16 +51,16 @@ namespace QTool
 					case QBuffMergeMode.时间刷新:
 					case QBuffMergeMode.时间叠加:
 					case QBuffMergeMode.时间叠层:
-						buff.Time = time;
+						buff.Time.OffsetValue = time;
 						break;
 					case QBuffMergeMode.永久唯一:
-						buff.Time = -1;
-						buff.CurrentTime =0;
+						buff.Time.OffsetValue = -1;
+						buff.Time.CurrentValue =0;
 						break;
 					default:
 						break;
 				}
-				buff.Count = count;
+				buff.Count.OffsetValue = count;
 				buff.Init(key);
 				Buffs.Add(key, buff);
 				for (int i = 0; i < count; i++)
@@ -74,16 +74,16 @@ namespace QTool
 				switch (buff.Data.Megre)
 				{
 					case QBuffMergeMode.时间刷新:
-						buff.Time = Mathf.Max(buff.Time, time);
+						buff.Time.OffsetValue = Mathf.Max(buff.Time.OffsetValue, time);
 						count = 1;
 						break;
 					case QBuffMergeMode.时间叠加:
-						buff.Time += time;
+						buff.Time.OffsetValue += time;
 						count = 1;
 						break;
 					case QBuffMergeMode.永久叠层:
 					case QBuffMergeMode.时间叠层:
-						buff.Count += count;
+						buff.Count.OffsetValue += count;
 						break;
 					default:
 						return;
@@ -105,13 +105,13 @@ namespace QTool
 					case QBuffMergeMode.永久唯一:
 					case QBuffMergeMode.时间叠加:
 						Buffs.Remove(key);
-						buff.Count = 0;
+						buff.Count.OffsetValue = 0;
 						count = 1;
 						break;
 					case QBuffMergeMode.永久叠层:
 					case QBuffMergeMode.时间叠层:
-						buff.Count-= count;
-						if (buff.Count <= 0)
+						buff.Count.OffsetValue-= count;
+						if (buff.Count.OffsetValue <= 0)
 						{
 							Buffs.Remove(key);
 						}
@@ -136,8 +136,8 @@ namespace QTool
 					case QBuffMergeMode.时间叠层:
 					case QBuffMergeMode.时间刷新:
 					case QBuffMergeMode.时间叠加:
-						buff.Time -= deltaTime;
-						if (buff.Time <= 0)
+						buff.Time.CurrentValue -= deltaTime;
+						if (buff.Time.CurrentValue <= 0)
 						{
 							DelayRemove.Add(buff.Key);
 						}
@@ -201,9 +201,11 @@ namespace QTool
 		}
 		public class QBuffRuntime : QRuntime<QBuffRuntime, BuffData>
 		{
-			public int Count { get; set; } = 1;
-			public float Time { get; internal set; } = -1;
-			public float CurrentTime { get; set; } = 0;
+			[QName("层数")]
+			public QRuntimeValue Count { get; private set; } = new QRuntimeValue();
+			
+			[QName("时间")]
+			public QRuntimeRangeValue Time { get; private set; } = new QRuntimeRangeValue();
 			public QFlowGraph Graph { get; private set; }
 			public QTimer TimeEvent { get; private set; }
 			public override void Init(string key)
