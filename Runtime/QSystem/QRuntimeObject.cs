@@ -34,9 +34,8 @@ namespace QTool
 			{
 				foreach (var member in dataInfo.Members)
 				{
-					if (member.Type.IsValueType)
+					if (member.Type.IsValueType || member.Type == typeof(string))
 					{
-						QDebug.Log("初始化[" + name + "." + member.QName + "]" + member.Get(Data));
 						gameObject.InvokeEvent(member.QName, member.Get(Data)?.ToString());
 					}
 				}
