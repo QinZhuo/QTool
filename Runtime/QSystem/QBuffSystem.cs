@@ -18,13 +18,16 @@ namespace QTool
 	{
 		[QName("叠加方式")]
 		public QBuffMergeMode Megre { get; private set; } = QBuffMergeMode.时间叠层;
-		[QName("触发间隔")]
+		[QName("时间事件")]
 		public float TimeEvent { get; private set; } = 0;
 		[QName("效果")]
 		public QFlowGraph Graph { get; private set; }
 	}
 	public class QBuffSystem<T> where T : QBuffData<T>, new()
 	{
+		const string AddEventKey = "添加";
+		const string RemoveEventKey = "移除";
+		const string TimeEventKey = "时间";
 		public QDictionary<string, QBuffRuntime> Buffs { get; private set; } = new QDictionary<string, QBuffRuntime>();
 		private QDictionary<string, Action<string>> EventActions { get; set; } = new QDictionary<string, Action<string>>();
 		public int this[string key]
@@ -38,8 +41,6 @@ namespace QTool
 				return 0;
 			}
 		}
-		const string AddEventKey = "添加";
-		const string RemoveEventKey = "移除";
 		public void Add(string key,float time=-1,int count=1)
 		{
 			if (!Buffs.ContainsKey(key))
@@ -143,6 +144,13 @@ namespace QTool
 					default:
 						continue;
 				}
+				if (buff.TimeEvent != null)
+				{
+					if (buff.TimeEvent.Check(deltaTime))
+					{
+						buff.TriggerEvent(TimeEventKey);
+					}
+				}
 			}
 			if (DelayRemove.Count > 0)
 			{
@@ -186,10 +194,15 @@ namespace QTool
 			public float Time { get; internal set; } = -1;
 			public float CurrentTime { get; set; } = 0;
 			public QFlowGraph Graph { get; private set; }
+			public QTimer TimeEvent { get; private set; }
 			public override void Init(string key)
 			{
 				base.Init(key);
 				Graph = Data.Graph.CreateInstance();
+				if (Data.TimeEvent > 0)
+				{
+					TimeEvent = new QTimer(Data.TimeEvent);
+				}
 			}
 			public void TriggerEvent(string key)
 			{
