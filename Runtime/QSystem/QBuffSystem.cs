@@ -25,22 +25,6 @@ namespace QTool
 	}
 	public class QBuffSystem<T> where T : QBuffData<T>, new()
 	{
-		public class QBuffRuntime:QRuntime<QBuffRuntime,T>
-		{
-			public int Count { get; set; } = 1;
-			public float Time { get;internal set; } = -1;
-			public float CurrentTime { get; set; } = 0;
-			public QFlowGraph Graph { get; private set; }
-			public override void Init(string key)
-			{
-				base.Init(key);
-				Graph = Data.Graph.CreateInstance();
-			}
-			public void TriggerEvent(string key)
-			{
-				Graph.Run(key);
-			}
-		}
 		public QDictionary<string, QBuffRuntime> Buffs { get; private set; } = new QDictionary<string, QBuffRuntime>();
 		private QDictionary<string, Action<string>> EventActions { get; set; } = new QDictionary<string, Action<string>>();
 		public int this[string key]
@@ -125,6 +109,10 @@ namespace QTool
 					case QBuffMergeMode.永久叠层:
 					case QBuffMergeMode.时间叠层:
 						buff.Count-= count;
+						if (buff.Count <= 0)
+						{
+							Buffs.Remove(key);
+						}
 						break;
 					default:
 						break;
@@ -190,6 +178,22 @@ namespace QTool
 			if (EventActions.ContainsKey(key))
 			{
 				EventActions[key]?.Invoke(key);
+			}
+		}
+		public class QBuffRuntime : QRuntime<QBuffRuntime, T>
+		{
+			public int Count { get; set; } = 1;
+			public float Time { get; internal set; } = -1;
+			public float CurrentTime { get; set; } = 0;
+			public QFlowGraph Graph { get; private set; }
+			public override void Init(string key)
+			{
+				base.Init(key);
+				Graph = Data.Graph.CreateInstance();
+			}
+			public void TriggerEvent(string key)
+			{
+				Graph.Run(key);
 			}
 		}
 	}
