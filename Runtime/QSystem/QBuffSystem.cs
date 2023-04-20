@@ -52,6 +52,7 @@ namespace QTool
 					case QBuffMergeMode.时间叠加:
 					case QBuffMergeMode.时间叠层:
 						buff.Time.OffsetValue = time;
+						buff.Time.CurrentValue = buff.Time.MaxValue;
 						break;
 					case QBuffMergeMode.永久唯一:
 						buff.Time.OffsetValue = -1;
@@ -74,12 +75,15 @@ namespace QTool
 				switch (buff.Data.Megre)
 				{
 					case QBuffMergeMode.时间刷新:
+						var oldValue = buff.Time.OffsetValue;
 						buff.Time.OffsetValue = Mathf.Max(buff.Time.OffsetValue, time);
+						buff.Time.CurrentValue += buff.Time.OffsetValue - oldValue;
 						count = 1;
 						break;
 					case QBuffMergeMode.时间叠加:
 						buff.Time.OffsetValue += time;
-						count = 1;
+						buff.Time.CurrentValue += time;
+					count = 1;
 						break;
 					case QBuffMergeMode.永久叠层:
 					case QBuffMergeMode.时间叠层:
