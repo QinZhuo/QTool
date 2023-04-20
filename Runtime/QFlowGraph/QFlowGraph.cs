@@ -1266,7 +1266,7 @@ namespace QTool.FlowGraph
 		{
 			if (Ports.ContainsKey(portKey))
             {
-				var node = Ports[nameof(portKey)].GetFlowNode(index);
+				var node = Ports[portKey].GetFlowNode(index);
 				return Graph.RunIEnumerator(node?.Key);
             }
             else
