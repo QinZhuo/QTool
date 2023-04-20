@@ -127,7 +127,7 @@ namespace QTool
 				if (_CurrentValue != value)
 				{
 					_CurrentValue = Mathf.Clamp(value, MinValue, MaxValue);
-					OnValueChange?.Invoke("当前" + Name, _CurrentValue);
+					InvokeOnValueChange();
 				}
 			}
 		}
