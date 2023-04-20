@@ -17,7 +17,7 @@ public class QPoolTest : MonoBehaviour
 		Application.targetFrameRate = 60;
 		Pool= QPoolManager.GetPool("测试Pool", prefab);
 	}
-	public ObjectPool<GameObject> Pool;
+	public QObjectPool<GameObject> Pool;
 	private void FixedUpdate()
 	{
 		if (count >= 10)

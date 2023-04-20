@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using QTool.Inspector;
+using QTool.Reflection;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -12,9 +13,9 @@ namespace QTool
     public class QPoolManager: InstanceManager<QPoolManager>
     {
 		public static bool PoolActive => QOnPlayModeAttribute.CurrentrState != PlayModeState.EnteredEditMode;
-		public static QDictionary<string, PoolBase> Pools = new QDictionary<string, PoolBase>();
+		public static QDictionary<string, QPool> Pools = new QDictionary<string, QPool>();
 
-		public static ObjectPool<T> GetPool<T>(string poolName, System.Func<T> newFunc = null) where T : class
+		public static QObjectPool<T> GetPool<T>(string poolName, System.Func<T> newFunc = null) where T : class
         {
 			
             var key = poolName;
@@ -24,9 +25,9 @@ namespace QTool
             }
 			if (Pools.ContainsKey(key))
 			{
-				if (Pools[key] is ObjectPool<T>)
+				if (Pools[key] is QObjectPool<T>)
 				{
-					var pool = Pools[key] as ObjectPool<T>;
+					var pool = Pools[key] as QObjectPool<T>;
 					if (newFunc != null )
 					{
 						pool.newFunc = newFunc;
@@ -46,7 +47,7 @@ namespace QTool
 				{
 					throw new Exception("错误的对象池类型[" + type + "][" + poolName + "]");
 				}
-				var pool = type == typeof(GameObject)?new GameObjectPool(key,newFunc as Func<GameObject>) as ObjectPool<T>: new ObjectPool<T>(key, newFunc) ;
+				var pool = type == typeof(GameObject)?new GameObjectPool(key,newFunc as Func<GameObject>) as QObjectPool<T>: new QObjectPool<T>(key, newFunc) ;
 				lock (Pools)
 				{
 					Pools[key] = pool;
@@ -66,7 +67,7 @@ namespace QTool
 		{
 			if (Pools.ContainsKey(poolName))
 			{
-				return (Pools[poolName] as ObjectPool<T>).Push(obj);
+				return (Pools[poolName] as QObjectPool<T>).Push(obj);
 			}
 			else
 			{
@@ -127,10 +128,10 @@ namespace QTool
        
     }
 
-    public abstract class PoolObject<T>:IPoolObject where T : PoolObject<T>,new()
+    public abstract class QPoolObject<T> where T : QPoolObject<T>,new()
     {
-        internal static ObjectPool<T> _pool;
-        public static ObjectPool<T> Pool
+        internal static QObjectPool<T> _pool;
+        public static QObjectPool<T> Pool
         {
             get
             {
@@ -153,13 +154,11 @@ namespace QTool
         {
             Push(this as T);
         }
-        public abstract void OnPoolRecover();
+		public virtual void Start() { }
+		public abstract void OnDestroy();
     }
-    public interface IPoolObject
-    {
-        void OnPoolRecover();
-    }
-    public abstract class PoolBase
+  
+    public abstract class QPool
     {
         public string Key { get; set; }
         public override string ToString()
@@ -169,7 +168,7 @@ namespace QTool
         }
     }
 
-    public class ObjectPool<T> : PoolBase where T : class
+    public class QObjectPool<T> : QPool where T : class
     {
 		public override string ToString()
 		{
@@ -186,31 +185,27 @@ namespace QTool
         }
         protected virtual T CheckGet(T obj)
         {
-
-            
-			OnGet?.Invoke(obj);
 			UsingPool.AddCheckExist(obj);
 			return obj;
         }
 
-		public event Action<T> OnGet;
-		public event Action<T> OnPush;
 		protected virtual T CheckPush(T obj)
         {
-			OnPush?.Invoke(obj);
-			if (isPoolObj)
-            {
-                (obj as IPoolObject).OnPoolRecover();
-            }
 			UsingPool.Remove(obj);
 			return obj;
         }
+		private async void InvokeStart(T obj)
+		{
+			await QTask.Step();
+			Start?.Invoke(obj);
+		}
         protected T PrivateGet()
         {
 			if (CanUsePool.Count > 0)
 			{
 				T obj = default;
 				obj = CanUsePool.Dequeue();
+				InvokeStart(obj);
 				QDebug.ChangeProfilerCount(Key + " UseCount", AllCount - CanUseCount);
 				return CheckGet(obj);
 			}
@@ -258,6 +253,7 @@ namespace QTool
 				return false;
 			}
 			var resultObj = CheckPush(obj);
+			OnDestroy?.Invoke(obj);
 			CanUsePool.Enqueue(resultObj);
 			QDebug.ChangeProfilerCount(Key + " UseCount", AllCount - CanUseCount);
 			return true;
@@ -277,40 +273,24 @@ namespace QTool
 		}
 
         public Func<T> newFunc;
-        public bool isPoolObj = false;
-        public ObjectPool(string poolName,Func<T> newFunc=null)
+		private QFunctionInfo Start;
+		private QFunctionInfo OnDestroy;
+        public QObjectPool(string poolName,Func<T> newFunc=null)
         {
             var type = typeof(T);
-            isPoolObj = typeof(IPoolObject).IsAssignableFrom(type);
-            this.newFunc = newFunc;
+			Start = type.GetFunction(nameof(Start));
+			OnDestroy = type.GetFunction(nameof(OnDestroy));
+			this.newFunc = newFunc;
             this.Key = poolName;
-
         }
 	
     }
 
-	public class GameObjectPool : ObjectPool<GameObject>
+	public class GameObjectPool : QObjectPool<GameObject>
 	{
 		public GameObject prefab { get; internal set; }
 		public GameObjectPool(string poolName, Func<GameObject> newFunc = null):base(poolName,newFunc)
 		{
-			OnGet += (obj) =>
-			{
-				obj.transform.localScale = prefab.transform.localScale;
-				obj.transform.position = prefab.transform.position;
-				obj.transform.rotation = prefab.transform.rotation;
-				obj.SetActive(true);
-			};
-			OnPush += (obj) =>
-			{
-				if (obj == null||!QPoolManager.PoolActive) return;
-				obj.SetActive(false);
-				obj.transform.SetParent(PoolParent, true);
-				foreach (var poolObj in obj.GetComponents<IPoolObject>())
-				{
-					poolObj.OnPoolRecover();
-				}
-			};
 			SceneManager.sceneLoaded += OnSceneChange;
 		}
 		protected void OnSceneChange(Scene scene, LoadSceneMode mode)
@@ -350,7 +330,21 @@ namespace QTool
 				UsingPool.Remove(obj);
 				obj = PrivateGet();
 			}
+			obj.GetComponent<QPoolTag>().poolKey = Key;
+			obj.transform.localScale = prefab.transform.localScale;
+			obj.transform.position = prefab.transform.position;
+			obj.transform.rotation = prefab.transform.rotation;
+			obj.SetActive(true);
 			return base.CheckGet(obj);
+		}
+		protected override GameObject CheckPush(GameObject obj)
+		{
+			if (obj != null && QPoolManager.PoolActive)
+			{
+				obj.SetActive(false);
+				obj.transform.SetParent(PoolParent, true);
+			}
+			return base.CheckPush(obj);
 		}
 	}
 	public static class QPoolTool

@@ -549,6 +549,15 @@ namespace QTool.Reflection
 			
 			}
 		}
+		public static QFunctionInfo GetFunction(this Type type,string funcName)
+		{
+			var typeInfo = QSerializeType.Get(type);
+			if (typeInfo.Functions.ContainsKey(funcName))
+			{
+				return typeInfo.Functions[funcName];
+			}
+			return null;
+		}
 		public static object InvokeFunction(this object obj, string funcName, params object[] param)
 		{
 			if (funcName.IsNull())
