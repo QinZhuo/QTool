@@ -340,10 +340,7 @@ namespace QTool
 				return angle;
 			}
 		}
-		private static float GetIntervalSeconds(long startTime)
-		{
-			return (QTime.Timestamp - startTime) / 10000000f;
-		}
+	
 		public static void DebugRun(string key, Action action)
 		{
 			GC.Collect();
@@ -382,7 +379,7 @@ namespace QTool
 		[System.Diagnostics.Conditional("DEVELOPMENT_BUILD"), System.Diagnostics.Conditional("UNITY_EDITOR")]
 		public static void End(string key, string resultInfo = "")
 		{
-			Log(key + " " + resultInfo+ " 时间 " + GetIntervalSeconds(TimestampList[key]).ToString("f3") + " s" + " 帧率 " + Mathf.Min(FPS, (int)(1f / GetIntervalSeconds(LastFrameTime))));
+			Log(key + " " + resultInfo+ " 时间 " + TimestampList[key].GetIntervalSeconds().ToString("f3") + " s" + " 帧率 " + Mathf.Min(FPS, (int)(1f / LastFrameTime.GetIntervalSeconds())));
 		}
 		[System.Diagnostics.Conditional("DEVELOPMENT_BUILD"), System.Diagnostics.Conditional("UNITY_EDITOR")]
 		public static void ChangeProfilerCount(string key, int changeCount=0)

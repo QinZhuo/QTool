@@ -888,6 +888,7 @@ namespace QTool.FlowGraph
 	{
 		public const string FuncName = "funcName";
 		public const string Object = "obj";
+		public const string Asset = "asset";
 		public const string Param = "param";
 		public const string FromPort = "#From";
         public const string NextPort = "#Next";

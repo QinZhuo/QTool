@@ -21,10 +21,7 @@ namespace QTool.FlowGraph
             if (asset != null)
             {
 				PlayerPrefs.SetString(OpenPathKey, AssetDatabase.GetAssetPath(asset));
-				if (asset.Graph.Name.IsNull())
-				{
-					Graph.Name = asset.name;
-				}
+				asset.Graph.Name = asset.name;
 #pragma warning disable CS0618
 				Open(asset.Graph, asset.SetDirty);
 #pragma warning restore CS0618
@@ -58,29 +55,23 @@ namespace QTool.FlowGraph
 
 
 
-		public static QFlowGraphWindow Instance { get; private set; }
 		public event Action OnSave;
-
-		public static async void Open(QFlowGraph graph,Action OnSave)
+		public static void Open(QFlowGraph graph,Action OnSave)
 		{
-			if (Instance == null)
-            {
-                Instance = GetWindow<QFlowGraphWindow>(); 
-                Instance.minSize = new Vector2(400, 300);
-            }
-			await QTask.Step();
-            Instance.titleContent = new GUIContent((graph?.Name== null?"":graph.Name + " - ") + nameof(QFlowGraph));
-			Graph = graph;
+			var window = GetWindow<QFlowGraphWindow>();
+			window.minSize = new Vector2(400, 300);
+			window.titleContent = new GUIContent((graph?.Name == null ? "" : graph.Name + " - ") + nameof(QFlowGraph));
+            Graph = graph;
 #if UNITY_EDITOR
 			if (Graph == null)
 			{
 				AutoLoadPath();
 			}
 #endif
-			Instance.ViewRange = new Rect(Graph.IsNull()?Vector2.zero:graph.ViewPos, Instance.position.size);
-			Instance.Show();
-			Instance.OnSave = OnSave;
-			Instance.Repaint();
+			window.ViewRange = new Rect(Graph.IsNull()?Vector2.zero:graph.ViewPos, window.position.size);
+			window.Show();
+			window.OnSave = OnSave;
+			window.Repaint();
 		}
 
 
@@ -164,7 +155,7 @@ namespace QTool.FlowGraph
 				{
 					var node = Graph.AddNode(nameof(QFlowGraphNode.GraphAsset));
 					node.rect.center = mousePos;
-					node.Ports[QFlowKey.Object].Value = asset;
+					node.Ports[QFlowKey.Asset].Value = asset;
 					SelectNodes.Add(node);
 				}
 				else
@@ -452,7 +443,9 @@ namespace QTool.FlowGraph
         Vector2 StartPos = Vector2.zero;
         Rect SelectBox = new Rect();
         List<QFlowNode> SelectNodes = new List<QFlowNode>();
-        void Controls()
+		private long lastClickTime = 0;
+
+		void Controls()
         {
             switch (Event.current.type)
             {
@@ -532,8 +525,7 @@ namespace QTool.FlowGraph
                     break;
                 case EventType.MouseUp:
                     {
-
-                        UpdateCurrentData();
+						UpdateCurrentData();
                         switch (ControlState)
                         {
                             case EditorState.BoxSelect:
@@ -564,10 +556,29 @@ namespace QTool.FlowGraph
                                 }
                                 else
                                 {
-                                    SelectNodes.Clear();
+									SelectNodes.Clear();
                                 }
                                 break;
                             default:
+								{
+									if (Event.current.button == 0)
+									{
+										if (curNode != null && curNode.command.method.Name == nameof(QFlowGraphNode.GraphAsset))
+										{
+
+											if (lastClickTime.GetIntervalSeconds() < 0.5f)
+											{
+												if (curNode["asset"] is QFlowGraphAsset asset)
+												{
+#pragma warning disable CS0618 // 类型或成员已过时
+													Open(asset.Graph, asset.SetDirty);
+#pragma warning restore CS0618 // 类型或成员已过时
+												}
+											}
+											lastClickTime = QTime.Timestamp;
+										}
+									}
+								}
                                 break;
                         } 
 

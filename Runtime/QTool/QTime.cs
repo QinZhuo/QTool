@@ -9,6 +9,10 @@ namespace QTool
     public static class QTime
     {
 		public static long Timestamp => System.Diagnostics.Stopwatch.GetTimestamp();
+		public static float GetIntervalSeconds(this long startTime)
+		{
+			return (QTime.Timestamp - startTime) / 10000000f;
+		}
 		public static DateTime ParseTimesTamp(long timestamp,int offset=7)
 		{
 			var baseValue = 1;

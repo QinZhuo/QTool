@@ -123,13 +123,13 @@ namespace QTool.FlowGraph
 		{
 		}
 		[QName("流程图/引用子图")]
-		public static IEnumerator GraphAsset(QFlowNode This, [QNodeName] QFlowGraphAsset obj, string startNode = StartKey)
+		public static IEnumerator GraphAsset(QFlowNode This, [QNodeName,QName("流程图")] QFlowGraphAsset asset, string startNode = StartKey)
 		{
-			if (obj == null) yield break;
-			var key = obj.GetHashCode().ToString();
+			if (asset == null) yield break;
+			var key = asset.GetHashCode().ToString();
 			if (!This.Graph.Values.ContainsKey(key))
 			{
-				This.Graph.Values[key] = obj.Graph.CreateInstance();
+				This.Graph.Values[key] = asset.Graph.CreateInstance();
 			}
 			yield return (This.Graph.Values[key] as QFlowGraph).RunIEnumerator(startNode);
 		}
