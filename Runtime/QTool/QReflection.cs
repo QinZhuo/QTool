@@ -551,7 +551,7 @@ namespace QTool.Reflection
 		}
 		public static QFunctionInfo GetFunction(this Type type,string funcName)
 		{
-			var typeInfo = QSerializeType.Get(type);
+			var typeInfo = QReflectionType.Get(type);
 			if (typeInfo.Functions.ContainsKey(funcName))
 			{
 				return typeInfo.Functions[funcName];
