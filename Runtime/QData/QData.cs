@@ -1118,6 +1118,7 @@ namespace QTool
 			{
 				Members.RemoveAll((member) =>
 				{
+					Debug.LogError(type+"移除[" + member.QName + "]");
 					return member.MemeberInfo.GetCustomAttribute<QIgnoreAttribute>() != null || (!member.IsPublic && member.MemeberInfo.GetCustomAttribute<QNameAttribute>() == null) || member.Key == "Item" || member.Set == null || member.Get == null || (member.Type.IsArray && member.Type.GetArrayRank() > 1);
 				});
 			}

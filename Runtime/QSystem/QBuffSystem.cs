@@ -23,7 +23,7 @@ namespace QTool
 		[QName("效果")]
 		public QFlowGraph Graph { get; private set; }
 	}
-	public class QBuffSystem<T> where T : QBuffData<T>, new()
+	public class QBuffSystem<BuffData> where BuffData : QBuffData<BuffData>, new()
 	{
 		const string AddEventKey = "添加";
 		const string RemoveEventKey = "移除";
@@ -188,7 +188,7 @@ namespace QTool
 				EventActions[key]?.Invoke(key);
 			}
 		}
-		public class QBuffRuntime : QRuntime<QBuffRuntime, T>
+		public class QBuffRuntime : QRuntime<QBuffRuntime, BuffData>
 		{
 			public int Count { get; set; } = 1;
 			public float Time { get; internal set; } = -1;
