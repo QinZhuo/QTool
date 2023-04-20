@@ -1114,6 +1114,23 @@ namespace QTool
 					}
 				}
 			}
+			Members.Sort(
+				(a, b) =>
+				{
+					if (a.MemeberInfo.DeclaringType == b.MemeberInfo.DeclaringType)
+					{
+						return 0;
+					}
+					else if (a.MemeberInfo.DeclaringType.Is(b.MemeberInfo.DeclaringType))
+					{
+						return 1;
+					}
+					else
+					{
+						return -1;
+					}
+				}
+				);
 			if (!TypeMembers.ContainsKey(type))
 			{
 				Members.RemoveAll((member) =>
