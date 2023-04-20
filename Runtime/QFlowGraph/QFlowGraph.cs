@@ -633,7 +633,7 @@ namespace QTool.FlowGraph
 							{
 								if (HasConnect(i) && list.Count > i)
 								{
-									var element = Node.GetConnectValue(Key, i);
+									var element = Node.Ports[Key].GetConnectValue(i); 
 									if (element != null && CanConnect(element.GetType()))
 									{
 										list[i] = element;
@@ -703,11 +703,23 @@ namespace QTool.FlowGraph
 			}
 		}
 	
-		public QFlowNode GetConnectNode(int index = 0)
+		public QFlowNode GetConnectFlowNode(int index = 0)
 		{
 			if (HasConnect(index))
 			{
 				var connectPortKey = this[index].GetConnectPortId(Node.Graph, true);
+				if (connectPortKey != null)
+				{
+					return Node.Graph[connectPortKey.Value.node];
+				}
+			}
+			return null;
+		}
+		public QFlowNode GetConnectValueNode(int index = 0)
+		{
+			if (HasConnect(index))
+			{
+				var connectPortKey = this[index].GetConnectPortId(Node.Graph, false);
 				if (connectPortKey != null)
 				{
 					return Node.Graph[connectPortKey.Value.node];
@@ -1156,14 +1168,6 @@ namespace QTool.FlowGraph
             }
         }
 		
-		public QFlowNode GetConnectNode(string portKey, int index=0)
-		{
-			return Ports[portKey]?.GetConnectNode(index);
-		}
-		public object GetConnectValue(string portKey, int index = 0)
-		{
-			return Ports[portKey]?.GetConnectValue(index);
-		}
 		public QFlowNode SetNextNode(QFlowNode nextNode)
         {
             Ports[QFlowKey.NextPort].Connect(nextNode.Ports[QFlowKey.FromPort].GetPortId());
@@ -1261,8 +1265,8 @@ namespace QTool.FlowGraph
 		{
 			if (Ports.ContainsKey(portKey))
             {
-				var node = GetConnectNode(portKey,index);
-                return Graph.RunIEnumerator(node?.Key);
+				var node = Ports[nameof(portKey)].GetConnectFlowNode(index);
+				return Graph.RunIEnumerator(node?.Key);
             }
             else
             {

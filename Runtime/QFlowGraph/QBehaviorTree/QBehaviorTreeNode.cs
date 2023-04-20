@@ -11,7 +11,7 @@ namespace QTool.FlowGraph
 		[QName("修饰/取反")]
 		public static IEnumerator Inverse(QFlowNode This, [QOutputPort] QFlow next)
 		{
-			var nextNode = This.GetConnectNode(nameof(next));
+			var nextNode = This.Ports[nameof(next)].GetConnectFlowNode();
 			yield return This.RunPortIEnumerator(nameof(next));
 			if (nextNode.State == QNodeState.成功)
 			{
@@ -36,7 +36,7 @@ namespace QTool.FlowGraph
 			{
 				for (int i = 0; i < maxTimes; i++)
 				{
-					var nextNode = This.GetConnectNode(nameof(next));
+					var nextNode = This.Ports[nameof(next)].GetConnectFlowNode();
 					yield return This.RunPortIEnumerator(nameof(next));
 					switch (loopMode)
 					{
@@ -63,7 +63,7 @@ namespace QTool.FlowGraph
 			{
 				while (true)
 				{
-					var nextNode = This.GetConnectNode(nameof(next));
+					var nextNode = This.Ports[nameof(next)].GetConnectFlowNode();
 					yield return This.RunPortIEnumerator(nameof(next));
 					switch (loopMode)
 					{
@@ -96,7 +96,7 @@ namespace QTool.FlowGraph
 		{
 			for (int i = 0; i < nexts.Count; i++)
 			{
-				var nextNode= This.GetConnectNode(nameof(nexts), i);
+				var nextNode= This.Ports[nameof(nexts)].GetConnectFlowNode(i);
 				if (nextNode != null)
 				{
 					yield return This.RunPortIEnumerator(nameof(nexts), i);
@@ -113,7 +113,7 @@ namespace QTool.FlowGraph
 		{
 			for (int i = 0; i < nexts.Count; i++)
 			{
-				var nextNode = This.GetConnectNode(nameof(nexts), i);
+				var nextNode = This.Ports[nameof(nexts)].GetConnectFlowNode(i);
 				if (nextNode != null)
 				{
 					yield return This.RunPortIEnumerator(nameof(nexts), i);
@@ -132,7 +132,7 @@ namespace QTool.FlowGraph
 			
 			for (int i = 0; i < nexts.Count; i++)
 			{
-				var node= This.GetConnectNode(nameof(nexts), i);
+				var node= This.Ports[nameof(nexts)].GetConnectFlowNode(i);
 				if (node != null)
 				{
 					This.RunPort(nameof(nexts), i);
