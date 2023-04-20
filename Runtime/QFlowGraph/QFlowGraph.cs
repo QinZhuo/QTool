@@ -703,7 +703,7 @@ namespace QTool.FlowGraph
 			}
 		}
 	
-		public QFlowNode GetConnectFlowNode(int index = 0)
+		public QFlowNode GetFlowNode(int index = 0)
 		{
 			if (HasConnect(index))
 			{
@@ -715,7 +715,7 @@ namespace QTool.FlowGraph
 			}
 			return null;
 		}
-		public QFlowNode GetConnectValueNode(int index = 0)
+		public QFlowNode GetValueNode(int index = 0)
 		{
 			if (HasConnect(index))
 			{
@@ -1266,7 +1266,7 @@ namespace QTool.FlowGraph
 		{
 			if (Ports.ContainsKey(portKey))
             {
-				var node = Ports[nameof(portKey)].GetConnectFlowNode(index);
+				var node = Ports[nameof(portKey)].GetFlowNode(index);
 				return Graph.RunIEnumerator(node?.Key);
             }
             else
