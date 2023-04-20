@@ -1018,22 +1018,20 @@ namespace QTool
 		[QIgnore, HideInInspector]
 		public string SerializeString;
 		[QIgnore]
-		bool Dirty { get; set; } = false;
+		internal bool IsDirty { get;private set; } = false;
 		public virtual void SetDirty()
 		{
-			Dirty = true;
+			IsDirty = true;
 		}
 		public virtual void OnBeforeSerialize()
 		{
-			if (!Dirty) return;
-			Dirty = false;
+			if (!IsDirty) return;
+			IsDirty = false;
 			SerializeString = this.ToQData();
 		}
-		public bool IsDeserializeOver = false;
 		public virtual void OnAfterDeserialize()
 		{
 			SerializeString.ParseQData(this);
-			IsDeserializeOver = true;
 		}
 	}
 	[AttributeUsage(AttributeTargets.Method | AttributeTargets.Field | AttributeTargets.Property | AttributeTargets.Interface)]

@@ -122,12 +122,6 @@ namespace QTool.FlowGraph
 		public static void Start([QNodeName] string startKey = "起点")
 		{
 		}
-		[QName("流程图/内置子图")]
-		public static IEnumerator SubGraph(QFlowNode This, QFlowGraph subGraph, string startNode = StartKey)
-		{
-			yield return subGraph.CreateInstance().RunIEnumerator(startNode);
-		}
-
 		[QName("流程图/引用子图")]
 		public static IEnumerator GraphAsset(QFlowNode This, [QNodeName] QFlowGraphAsset obj, string startNode = StartKey)
 		{

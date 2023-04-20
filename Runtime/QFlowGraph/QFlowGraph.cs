@@ -668,7 +668,7 @@ namespace QTool.FlowGraph
 				if (ValueType == QFlow.Type || Node.command == null) return;
 				if (!IsList && Equals(_value, value)) return;
 				if (_value.IsNull() && value.IsNull()) return;
-				_value = value;
+				_value = value; 
                 StringValue = value.ToQDataType(ValueType);
                 if (NameAttribute != null)
                 {

@@ -21,8 +21,14 @@ namespace QTool.FlowGraph
             if (asset != null)
             {
 				PlayerPrefs.SetString(OpenPathKey, AssetDatabase.GetAssetPath(asset));
-				Open(asset.Graph, asset.Save);
-                return true;
+				if (asset.Graph.Name.IsNull())
+				{
+					Graph.Name = asset.name;
+				}
+#pragma warning disable CS0618
+				Open(asset.Graph, asset.SetDirty);
+#pragma warning restore CS0618
+				return true;
 			}
             return false;
         }
@@ -38,7 +44,9 @@ namespace QTool.FlowGraph
 			var asset = AssetDatabase.LoadAssetAtPath<QFlowGraphAsset>(path);
 			if (asset != null)
 			{
-				Open(asset.Graph, asset.Save);
+#pragma warning disable CS0618 
+				Open(asset.Graph, asset.SetDirty);  
+#pragma warning restore CS0618
 			}
 		}
 		[MenuItem("QTool/窗口/流程图")]
@@ -54,8 +62,8 @@ namespace QTool.FlowGraph
 		public event Action OnSave;
 
 		public static async void Open(QFlowGraph graph,Action OnSave)
-        {
-            if (Instance == null)
+		{
+			if (Instance == null)
             {
                 Instance = GetWindow<QFlowGraphWindow>(); 
                 Instance.minSize = new Vector2(400, 300);
@@ -72,7 +80,7 @@ namespace QTool.FlowGraph
 			Instance.ViewRange = new Rect(Graph.IsNull()?Vector2.zero:graph.ViewPos, Instance.position.size);
 			Instance.Show();
 			Instance.OnSave = OnSave;
-
+			Instance.Repaint();
 		}
 
 
@@ -88,7 +96,7 @@ namespace QTool.FlowGraph
 			{
 				Graph.SetDirty();
 				Graph.ViewPos = ViewRange.position;
-				OnSave?.Invoke();
+				OnSave?.Invoke(); 
 			}
         }
 
@@ -352,7 +360,7 @@ namespace QTool.FlowGraph
                 {
 #if UNITY_EDITOR
 					var graphAsset = CreateInstance<QFlowGraphAsset>();
-					AssetDatabase.CreateAsset(graphAsset, "Assets/" + nameof(QFlowGraphAsset) + ".qfg");
+					AssetDatabase.CreateAsset(graphAsset, "Assets/" + nameof(QFlowGraphAsset) + ".asset");
 					Graph = graphAsset.Graph;
 #else
 					Graph = new QFlowGraph();
@@ -848,20 +856,17 @@ namespace QTool.FlowGraph
 	{
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
-			var leftRect = position;
-			leftRect.width /= 2;
-			EditorGUI.LabelField(leftRect, label.text);
-			leftRect.x += leftRect.width;
+			EditorGUI.LabelField(position.HorizontalRect(0,0.5f), label.text);
 			if (property.serializedObject.targetObject.IsPrefabInstance(out var prefab))
 			{
-				if (GUI.Button(leftRect, "进入预制体编辑"))
+				if (GUI.Button(position.HorizontalRect(0.5f, 1), "进入预制体编辑"))
 				{
 					UnityEditor.AssetDatabase.OpenAsset(prefab);
 				}
 			}
 			else
 			{
-				if (GUI.Button(leftRect, "编辑"))
+				if (GUI.Button(position.HorizontalRect(0.5f, 1), "编辑"))
 				{
 					var graph = property.GetObject() as QFlowGraph;
 					var path = property.propertyPath;
