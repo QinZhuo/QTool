@@ -123,7 +123,13 @@ namespace QTool
 		}
 		public static bool Push(GameObject gameObject)
         {
-            return Push(gameObject.name, gameObject);
+			var tag= gameObject.GetComponent<QPoolTag>();
+			if (tag == null)
+			{
+				GameObject.Destroy(gameObject);
+				return false;
+			}
+			return Push(tag.poolKey, gameObject);
         }
        
     }
@@ -330,7 +336,7 @@ namespace QTool
 				UsingPool.Remove(obj);
 				obj = PrivateGet();
 			}
-			obj.GetComponent<QPoolTag>().poolKey = Key;
+			obj.GetComponent<QPoolTag>(true).poolKey = Key;
 			obj.transform.localScale = prefab.transform.localScale;
 			obj.transform.position = prefab.transform.position;
 			obj.transform.rotation = prefab.transform.rotation;
@@ -349,14 +355,6 @@ namespace QTool
 	}
 	public static class QPoolTool
 	{
-		/// <summary>
-		/// 对象池回收
-		/// </summary>
-		/// <param name="poolKey">对象池名</param>
-		public static void PoolRecover(this GameObject poolObj, string poolKey)
-		{
-			QPoolManager.Push(poolKey, poolObj);
-		}
 		public static void PoolRecover(this GameObject poolObj)
 		{
 			QPoolManager.Push(poolObj);
