@@ -6,8 +6,8 @@ namespace QTool
 {
 	public abstract class QRuntime<RuntimeT,DataT> where RuntimeT:QRuntime<RuntimeT,DataT>,new() where DataT : QDataList<DataT>, new()
 	{
-		public string Key { get; private set; }
-		public DataT Data { get; private set; }
+		public string Key { get; protected set; }
+		public DataT Data { get; protected set; }
 		protected QRuntime() { }
 		public static RuntimeT Get(string key)
 		{
