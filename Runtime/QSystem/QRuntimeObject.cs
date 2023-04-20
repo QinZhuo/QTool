@@ -22,13 +22,16 @@ namespace QTool
 			
 		}
 	}
-	public abstract class QRuntimeObject<RuntimeT, DataT> : MonoBehaviour where RuntimeT : QRuntime<RuntimeT, DataT>, new() where DataT : QDataList<DataT>, new()
+	public abstract class QRuntimeObject<RuntimeT, DataT> : MonoBehaviour,IQPoolObject where RuntimeT : QRuntime<RuntimeT, DataT>, new() where DataT : QDataList<DataT>, new()
 	{
 		public RuntimeT Runtime { get; private set; }
-		public DataT Data => Runtime.Data;
+		public DataT Data => Runtime?.Data;
 		public virtual void Start()
 		{
-			Runtime = QRuntime<RuntimeT, DataT>.Get(name);
+			if (Runtime != null)
+			{
+				Runtime = QRuntime<RuntimeT, DataT>.Get(name);
+			}
 			var dataInfo= QSerializeType.Get(typeof(DataT));
 			if (dataInfo != null)
 			{
@@ -55,7 +58,7 @@ namespace QTool
 				}
 			}
 		}
-		private void OnDestroy()
+		public void OnDestroy()
 		{
 			var typeInfo = QSerializeType.Get(typeof(RuntimeT));
 			if (typeInfo != null)
@@ -69,7 +72,9 @@ namespace QTool
 					}
 				}
 			}
+			Runtime = null;
 		}
+
 	}
 }
 

@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using QTool.Inspector;
 using QTool.Reflection;
+using System.Threading.Tasks;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -134,7 +135,7 @@ namespace QTool
        
     }
 
-    public abstract class QPoolObject<T> where T : QPoolObject<T>,new()
+    public abstract class QPoolObject<T> where T : QPoolObject<T>, IQPoolObject, new()
     {
         internal static QObjectPool<T> _pool;
         public static QObjectPool<T> Pool
@@ -200,10 +201,13 @@ namespace QTool
 			UsingPool.Remove(obj);
 			return obj;
         }
-		private async void InvokeStart(T obj)
+		protected virtual async Task InvokeStart(T obj)
 		{
 			await QTask.Step();
-			Start?.Invoke(obj);
+			if (IsQPoolObject)
+			{
+				(obj as IQPoolObject).Start();
+			}
 		}
         protected T PrivateGet()
         {
@@ -259,7 +263,10 @@ namespace QTool
 				return false;
 			}
 			var resultObj = CheckPush(obj);
-			OnDestroy?.Invoke(obj);
+			if (IsQPoolObject)
+			{
+				(obj as IQPoolObject).OnDestroy();
+			}
 			CanUsePool.Enqueue(resultObj);
 			QDebug.ChangeProfilerCount(Key + " UseCount", AllCount - CanUseCount);
 			return true;
@@ -279,19 +286,21 @@ namespace QTool
 		}
 
         public Func<T> newFunc;
-		private QFunctionInfo Start;
-		private QFunctionInfo OnDestroy;
+		public bool IsQPoolObject { get; private set; } = false;
         public QObjectPool(string poolName,Func<T> newFunc=null)
         {
             var type = typeof(T);
-			Start = type.GetFunction(nameof(Start));
-			OnDestroy = type.GetFunction(nameof(OnDestroy));
+			IsQPoolObject = type.IsAssignableFrom(typeof(IQPoolObject));
 			this.newFunc = newFunc;
             this.Key = poolName;
         }
 	
     }
-
+	public interface IQPoolObject
+	{
+		void Start();
+		void OnDestroy();
+	}
 	public class GameObjectPool : QObjectPool<GameObject>
 	{
 		public GameObject prefab { get; internal set; }
@@ -343,12 +352,24 @@ namespace QTool
 			obj.SetActive(true);
 			return base.CheckGet(obj);
 		}
+		protected override async Task InvokeStart(GameObject obj)
+		{
+			await base.InvokeStart(obj);
+			foreach (var poolObj in obj.GetComponents<IQPoolObject>())
+			{
+				poolObj.Start();
+			}
+		}
 		protected override GameObject CheckPush(GameObject obj)
 		{
 			if (obj != null && QPoolManager.PoolActive)
 			{
 				obj.SetActive(false);
 				obj.transform.SetParent(PoolParent, true);
+				foreach (var poolObj in obj.GetComponents<IQPoolObject>())
+				{
+					poolObj.OnDestroy();
+				}
 			}
 			return base.CheckPush(obj);
 		}
