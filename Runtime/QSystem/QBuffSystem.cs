@@ -17,11 +17,11 @@ namespace QTool
 	public abstract class QBuffData<T>:QDataList<T> where T: QBuffData<T>,IKey<string>,new()
 	{
 		[QName("叠加方式")]
-		public QBuffMergeMode Megre { get; private set; } = QBuffMergeMode.时间叠层;
+		public QBuffMergeMode Megre { get; protected set; } = QBuffMergeMode.时间叠层;
 		[QName("时间事件")]
-		public float TimeEvent { get; private set; } = 0;
+		public float TimeEvent { get; protected set; } = 0;
 		[QName("效果")]
-		public QFlowGraph Graph { get; private set; }
+		public QFlowGraph Graph { get; protected set; }
 	}
 	public class QBuffSystem<BuffData> where BuffData : QBuffData<BuffData>, new()
 	{
