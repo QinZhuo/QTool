@@ -21,7 +21,7 @@ namespace QTool
 		[QName("时间事件")]
 		public float TimeEvent { get; protected set; } = 0;
 		[QName("效果")]
-		public QFlowGraph Graph { get; protected set; }
+		public QFlowGraphAsset Effect { get; protected set; }
 	}
 	public class QBuffSystem<BuffData> where BuffData : QBuffData<BuffData>, new()
 	{
@@ -203,7 +203,7 @@ namespace QTool
 			public override void Init(string key)
 			{
 				base.Init(key);
-				Graph = Data.Graph.CreateInstance();
+				Graph = Data.Effect.Graph.CreateInstance();
 				if (Data.TimeEvent > 0)
 				{
 					TimeEvent = new QTimer(Data.TimeEvent);
