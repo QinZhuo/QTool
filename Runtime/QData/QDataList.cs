@@ -230,6 +230,7 @@ namespace QTool
 	/// </summary>
 	public abstract class QDataList<T>: IKey<string> where T : QDataList<T>, new()
 	{
+		[QName("Key")]
 		public virtual string Key { get; set; }
 		public static bool ContainsKey(string key)
 		{
