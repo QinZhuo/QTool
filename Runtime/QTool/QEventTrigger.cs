@@ -235,7 +235,7 @@ namespace QTool
 				}
 				else
 				{
-					QDebug.Log("[" + nameof(QEventTrigger) + "]" + eventName + "_" + value);
+					QDebug.Log("[" + nameof(QEventTrigger) + "]" + eventName + "<"+value.GetType()+">(" + value + ")");
 				}
 				
 			}

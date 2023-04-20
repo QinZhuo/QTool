@@ -6,8 +6,20 @@ using QTool.FlowGraph;
 
 namespace QTool
 {
+	public enum QBuffMergeMode
+	{
+		时间叠层,
+		永久叠层,
+		时间刷新,
+		时间叠加,
+		永久唯一,
+	}
 	public abstract class QBuffData<T>:QDataList<T> where T: QBuffData<T>,IKey<string>,new()
 	{
+		[QName("叠加方式")]
+		public QBuffMergeMode Megre { get; private set; } = QBuffMergeMode.时间叠层;
+		[QName("触发间隔")]
+		public float TimeEvent { get; private set; } = 0;
 		[QName("效果")]
 		public QFlowGraph Graph { get; private set; }
 	}
@@ -15,18 +27,22 @@ namespace QTool
 	{
 		public class QBuffRuntime:QRuntime<QBuffRuntime,T>
 		{
-			public int Count { get; set; } = 0;
-			public float Time { get; set; }
-			public float CurrentTime { get; set; }
+			public int Count { get; set; } = 1;
+			public float Time { get;internal set; } = -1;
+			public float CurrentTime { get; set; } = 0;
 			public QFlowGraph Graph { get; private set; }
 			public override void Init(string key)
 			{
 				base.Init(key);
 				Graph = Data.Graph.CreateInstance();
 			}
+			public void TriggerEvent(string key)
+			{
+				Graph.Run(key);
+			}
 		}
 		public QDictionary<string, QBuffRuntime> Buffs { get; private set; } = new QDictionary<string, QBuffRuntime>();
-		
+		private QDictionary<string, Action<string>> EventActions { get; set; } = new QDictionary<string, Action<string>>();
 		public int this[string key]
 		{
 			get
@@ -38,57 +54,143 @@ namespace QTool
 				return 0;
 			}
 		}
-		public void Add(string key,float time=-1)
+		const string AddEventKey = "添加";
+		const string RemoveEventKey = "移除";
+		public void Add(string key,float time=-1,int count=1)
 		{
-			if (Buffs.ContainsKey(key))
+			if (!Buffs.ContainsKey(key))
 			{
-				var buff = Buffs[key];
-				if (buff.Time > 0)
+				var buff = QBuffRuntime.Get(key);
+				switch (buff.Data.Megre)
 				{
-					buff.Time = Mathf.Max(buff.Time, time);
-					buff.CurrentTime = Mathf.Max(buff.CurrentTime, time);
+					case QBuffMergeMode.时间刷新:
+					case QBuffMergeMode.时间叠加:
+					case QBuffMergeMode.时间叠层:
+						buff.Time = time;
+						break;
+					case QBuffMergeMode.永久唯一:
+						buff.Time = -1;
+						buff.CurrentTime =0;
+						break;
+					default:
+						break;
 				}
-				else
+				buff.Count = count;
+				buff.Init(key);
+				Buffs.Add(key, buff);
+				for (int i = 0; i < count; i++)
 				{
-					buff.Count += 1;
+					OnAdd(buff);
 				}
-				RunGraph(buff,"添加");
 			}
 			else
 			{
-				var buff = QBuffRuntime.Get(key);
-				buff.Time = time;
-				buff.CurrentTime = time;
-				buff.Count = 1;
-				buff.Init(key);
-				Buffs.Add(key, buff);
-				RunGraph(buff, "添加");
+				var buff = Buffs[key];
+				switch (buff.Data.Megre)
+				{
+					case QBuffMergeMode.时间刷新:
+						buff.Time = Mathf.Max(buff.Time, time);
+						count = 1;
+						break;
+					case QBuffMergeMode.时间叠加:
+						buff.Time += time;
+						count = 1;
+						break;
+					case QBuffMergeMode.永久叠层:
+					case QBuffMergeMode.时间叠层:
+						buff.Count += count;
+						break;
+					default:
+						return;
+				}
+				for (int i = 0; i < count; i++)
+				{
+					OnAdd(buff);
+				}
 			}
 		}
-		protected virtual void RunGraph(QBuffRuntime buff,string key)
-		{
-			buff.Graph.Run(key);
-		}
-		public void Remove(string key)
+		public void Remove(string key,int count=1)
 		{
 			if (Buffs.ContainsKey(key))
 			{
 				var buff = Buffs[key];
-				if (buff.Time > 0)
+				switch (buff.Data.Megre)
 				{
-					Buffs.Remove(key);
-				}
-				else
-				{
-					buff.Count--;
-					if (buff.Count == 0)
-					{
+					case QBuffMergeMode.时间刷新:
+					case QBuffMergeMode.永久唯一:
+					case QBuffMergeMode.时间叠加:
 						Buffs.Remove(key);
-					}
+						count = 1;
+						break;
+					case QBuffMergeMode.永久叠层:
+					case QBuffMergeMode.时间叠层:
+						buff.Count-= count;
+						break;
+					default:
+						break;
 				}
-				RunGraph(buff, "移除");
+				for (int i = 0; i < count; i++)
+				{
+					OnRemove(buff);
+				}
 			}
 		}
-
+		private List<string> DelayRemove = new List<string>();
+		public void Update(float deltaTime)
+		{
+			foreach (var kv in Buffs)
+			{
+				var buff = kv.Value;
+				switch (buff.Data.Megre)
+				{
+					case QBuffMergeMode.时间叠层:
+					case QBuffMergeMode.时间刷新:
+					case QBuffMergeMode.时间叠加:
+						buff.Time -= deltaTime;
+						if (buff.Time <= 0)
+						{
+							DelayRemove.Add(buff.Key);
+						}
+						break;
+					default:
+						continue;
+				}
+			}
+			if (DelayRemove.Count > 0)
+			{
+				foreach (var key in DelayRemove)
+				{
+					Remove(key);
+				}
+				DelayRemove.Clear();
+			}
+		}
+		protected virtual void OnAdd(QBuffRuntime buff)
+		{
+			buff.TriggerEvent(AddEventKey);
+			foreach (var node in buff.Graph.NodeList)
+			{
+				if (!node.Is(nameof(QFlowGraphNode.Start))) continue;
+				if (node.Name == AddEventKey || node.Name == RemoveEventKey) continue;
+				EventActions[node.Name] += buff.TriggerEvent;
+			}
+		}
+		protected virtual void OnRemove(QBuffRuntime buff)
+		{
+			buff.TriggerEvent(RemoveEventKey);
+			foreach (var node in buff.Graph.NodeList)
+			{
+				if (!node.Is(nameof(QFlowGraphNode.Start))) continue;
+				if (node.Name == AddEventKey || node.Name == RemoveEventKey) continue;
+				EventActions[node.Name] -= buff.TriggerEvent;
+			}
+		}
+		public void TriggerEvent(string key)
+		{
+			if (EventActions.ContainsKey(key))
+			{
+				EventActions[key]?.Invoke(key);
+			}
+		}
 	}
 }

@@ -1330,6 +1330,14 @@ namespace QTool.FlowGraph
                 port.Value = commandParams[port.paramIndex];
             }
         }
+		public bool Is(string key)
+		{
+			if (command.method.Name == key)
+			{
+				return true;
+			}
+			return false;
+		}
 
     }
 }
