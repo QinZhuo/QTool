@@ -167,22 +167,28 @@ namespace QTool
 		protected virtual void OnAdd(QBuffRuntime buff)
 		{
 			buff.TriggerEvent(AddEventKey);
-			foreach (var node in buff.Graph.NodeList)
+			if (buff.Graph != null)
 			{
-				if (!node.Is(nameof(QFlowGraphNode.Start))) continue;
-				if (node.Name == AddEventKey || node.Name == RemoveEventKey) continue;
-				EventActions[node.Name] += buff.TriggerEvent;
+				foreach (var node in buff.Graph.NodeList)
+				{
+					if (!node.Is(nameof(QFlowGraphNode.Start))) continue;
+					if (node.Name == AddEventKey || node.Name == RemoveEventKey) continue;
+					EventActions[node.Name] += buff.TriggerEvent;
+				}
 			}
 			OnAddBuff?.Invoke(buff);
 		}
 		protected virtual void OnRemove(QBuffRuntime buff)
 		{
 			buff.TriggerEvent(RemoveEventKey);
-			foreach (var node in buff.Graph.NodeList)
+			if (buff.Graph!=null)
 			{
-				if (!node.Is(nameof(QFlowGraphNode.Start))) continue;
-				if (node.Name == AddEventKey || node.Name == RemoveEventKey) continue;
-				EventActions[node.Name] -= buff.TriggerEvent;
+				foreach (var node in buff.Graph.NodeList)
+				{
+					if (!node.Is(nameof(QFlowGraphNode.Start))) continue;
+					if (node.Name == AddEventKey || node.Name == RemoveEventKey) continue;
+					EventActions[node.Name] -= buff.TriggerEvent;
+				}
 			}
 			OnRemoveBuff?.Invoke(buff);
 		}
