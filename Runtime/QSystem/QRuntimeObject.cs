@@ -88,7 +88,7 @@ namespace QTool
 				Runtime = QRuntime<RuntimeT, DataT>.Get(name);
 			}
 		}
-		public void OnDestroy()
+		public virtual void OnDestroy()
 		{
 			if (Runtime != null)
 			{
