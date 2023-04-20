@@ -203,7 +203,10 @@ namespace QTool
 			public override void Init(string key)
 			{
 				base.Init(key);
-				Graph = Data.Effect.Graph.CreateInstance();
+				if (Data.Effect != null)
+				{
+					Graph = Data.Effect.Graph.CreateInstance();
+				}
 				if (Data.TimeEvent > 0)
 				{
 					TimeEvent = new QTimer(Data.TimeEvent);
@@ -211,7 +214,7 @@ namespace QTool
 			}
 			public void TriggerEvent(string key)
 			{
-				Graph.Run(key);
+				Graph?.Run(key);
 			}
 		}
 	}
