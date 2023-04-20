@@ -105,6 +105,7 @@ namespace QTool
 					case QBuffMergeMode.永久唯一:
 					case QBuffMergeMode.时间叠加:
 						Buffs.Remove(key);
+						buff.Count = 0;
 						count = 1;
 						break;
 					case QBuffMergeMode.永久叠层:
@@ -161,6 +162,8 @@ namespace QTool
 				DelayRemove.Clear();
 			}
 		}
+		public event Action<QBuffRuntime> OnAddBuff = null;
+		public event Action<QBuffRuntime> OnRemoveBuff = null;
 		protected virtual void OnAdd(QBuffRuntime buff)
 		{
 			buff.TriggerEvent(AddEventKey);
@@ -170,6 +173,7 @@ namespace QTool
 				if (node.Name == AddEventKey || node.Name == RemoveEventKey) continue;
 				EventActions[node.Name] += buff.TriggerEvent;
 			}
+			OnAddBuff?.Invoke(buff);
 		}
 		protected virtual void OnRemove(QBuffRuntime buff)
 		{
@@ -180,6 +184,7 @@ namespace QTool
 				if (node.Name == AddEventKey || node.Name == RemoveEventKey) continue;
 				EventActions[node.Name] -= buff.TriggerEvent;
 			}
+			OnRemoveBuff?.Invoke(buff);
 		}
 		public void TriggerEvent(string key)
 		{
