@@ -36,6 +36,7 @@ namespace QTool
 				{
 					if (member.Type.IsValueType)
 					{
+						QDebug.Log("初始化[" + name + "." + member.QName + "]" + member.Get(Data));
 						gameObject.InvokeEvent(member.QName, member.Get(Data)?.ToString());
 					}
 				}
