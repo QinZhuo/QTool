@@ -372,6 +372,7 @@ namespace QTool
 								|| trigger.floatEventList.ContainsKey("当前" + member.QName) || trigger.floatEventList.ContainsKey(member.QName + "比例")))
 							{
 								var runtimeValue = member.Get(runtime).As<QRuntimeValue<float>>();
+								runtimeValue.Name = member.QName;
 								runtimeValue.OnValue += gameObject.InvokeEvent;
 								runtimeValue.InvokeOnChange();
 							}
