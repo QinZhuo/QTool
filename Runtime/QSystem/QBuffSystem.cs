@@ -170,7 +170,10 @@ namespace QTool
 		public event Action<QBuffRuntime> OnRemoveBuff = null;
 		protected virtual void OnAdd(QBuffRuntime buff)
 		{
-			buff.TriggerEvent(AddEventKey);
+			if (buff.Graph.ContainsNode(AddEventKey,out var addNode))
+			{
+				buff.TriggerEvent(AddEventKey);
+			}
 			if (buff.Graph != null)
 			{
 				foreach (var node in buff.Graph.NodeList)
@@ -184,7 +187,10 @@ namespace QTool
 		}
 		protected virtual void OnRemove(QBuffRuntime buff)
 		{
-			buff.TriggerEvent(RemoveEventKey);
+			if (buff.Graph.ContainsNode(RemoveEventKey, out var remveNode))
+			{
+				buff.TriggerEvent(RemoveEventKey);
+			}
 			if (buff.Graph!=null)
 			{
 				foreach (var node in buff.Graph.NodeList)

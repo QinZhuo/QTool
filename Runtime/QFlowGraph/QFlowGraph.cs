@@ -272,7 +272,6 @@ namespace QTool.FlowGraph
 			var curNode = this[startNode]; 
 			if (curNode != null)
 			{
-				QDebug.Log("以[ " + curNode.ViewName + " ]为起点 运行流程图 [ " + Name + " ]");
 				while (curNode != null)
 				{
 					yield return curNode.RunIEnumerator();
