@@ -69,7 +69,6 @@ namespace QTool
 		}
 		protected void InvokeOnChange(string key,T value)
 		{
-			QDebug.Log(nameof(QRuntimeValue) + "<" + typeof(T) + ">数据更改[" + value + "]");
 			OnValue?.Invoke(key,value);
 		}
 		public override string ToString()

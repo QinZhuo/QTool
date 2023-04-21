@@ -389,6 +389,12 @@ namespace QTool
 								runtimeValue.OnValue += gameObject.InvokeEvent;
 								runtimeValue.InvokeOnChange();
 							}
+							else
+							{
+								continue;
+							}
+							QDebug.Log("注册 " + gameObject.name + "." + member.QName + " " + member.Type + " 数据更改事件");
+
 						}
 					}
 				}
