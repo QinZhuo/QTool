@@ -368,6 +368,8 @@ namespace QTool
 					{
 						foreach (var member in runtimeInfo.Members)
 						{
+							QDebug.Log("注册 " + gameObject.name + "." + member.QName + " " + member.Type + " 数据更改事件");
+
 							if (member.Type.Is(typeof(QRuntimeValue<float>)) && trigger.floatEventList.ContainsKey(member.QName))
 							{
 								var runtimeValue = member.Get(runtime).As<QRuntimeValue<float>>();
@@ -389,12 +391,7 @@ namespace QTool
 								runtimeValue.OnValue += gameObject.InvokeEvent;
 								runtimeValue.InvokeOnChange();
 							}
-							else
-							{
-								continue;
-							}
-							QDebug.Log("注册 " + gameObject.name + "." + member.QName + " " + member.Type + " 数据更改事件");
-
+							
 						}
 					}
 				}
