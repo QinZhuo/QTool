@@ -135,7 +135,6 @@ namespace QTool
         public List<StringEventTrigger> stringEventList = new List<StringEventTrigger>();
         public List<BoolEventTrigger> boolEventList = new List<BoolEventTrigger>();
         public List<FloatEventTrigger> floatEventList = new List<FloatEventTrigger>();
-		public List<ObjectEventTrigger> objectEventList = new List<ObjectEventTrigger>();
 		protected void Awake()
 		{
 			if (GlobalEvent)
@@ -155,10 +154,6 @@ namespace QTool
 				foreach (var eventTrigger in floatEventList)
 				{
 					QEventManager.Register<float>(eventTrigger.Key, eventTrigger.eventAction.Invoke);
-				}
-				foreach (var eventTrigger in objectEventList)
-				{
-					QEventManager.Register<Object>(eventTrigger.Key, eventTrigger.eventAction.Invoke);
 				}
 			}
 		}
@@ -181,10 +176,6 @@ namespace QTool
 				foreach (var eventTrigger in floatEventList)
 				{
 					QEventManager.UnRegister<float>(eventTrigger.Key, eventTrigger.eventAction.Invoke);
-				}
-				foreach (var eventTrigger in objectEventList)
-				{
-					QEventManager.UnRegister<Object>(eventTrigger.Key, eventTrigger.eventAction.Invoke);
 				}
 			}
 		}
@@ -215,13 +206,6 @@ namespace QTool
 			Log(eventName, value);
 #endif
 			floatEventList.Get(eventName)?.eventAction?.Invoke(value);
-		}
-		public void Invoke(string eventName, Object value)
-		{
-#if UNITY_EDITOR
-			Log(eventName, value);
-#endif
-			objectEventList.Get(eventName)?.eventAction?.Invoke(value);
 		}
 #if UNITY_EDITOR
 		void Log(string eventName, object value=null)

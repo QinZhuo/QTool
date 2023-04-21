@@ -25,58 +25,66 @@ namespace QTool
 	public abstract class QRuntimeObject<RuntimeT, DataT> : MonoBehaviour,IQPoolObject where RuntimeT : QRuntime<RuntimeT, DataT>, new() where DataT : QDataList<DataT>, new()
 	{
 		private RuntimeT _Runtime = null;
-		public RuntimeT Runtime {
+		public RuntimeT Runtime
+		{
 			get => _Runtime;
 			set
 			{
 				if (value != _Runtime)
 				{
-					if (_Runtime != null)
+					var trigger = GetComponent<QEventTrigger>();
+					if (trigger != null)
 					{
-						var typeInfo = QSerializeType.Get(typeof(RuntimeT));
-						if (typeInfo != null)
+						if (_Runtime != null)
 						{
-							foreach (var member in typeInfo.Members)
+
+							var typeInfo = QSerializeType.Get(typeof(RuntimeT));
+							if (typeInfo != null)
 							{
-								if (member.Type.Is(typeof(QRuntimeValue)))
+								foreach (var member in typeInfo.Members)
 								{
-									var runtimeValue = member.Get(_Runtime).As<QRuntimeValue>();
-									runtimeValue.OnValueChange -= gameObject.InvokeEvent;
+									if (member.Type.Is(typeof(QRuntimeValue)) && trigger.floatEventList.ContainsKey(member.QName))
+									{
+										var runtimeValue = member.Get(_Runtime).As<QRuntimeValue>();
+										runtimeValue.OnValueChange -= gameObject.InvokeEvent;
+									}
 								}
 							}
+
 						}
-						
 					}
 					_Runtime = value;
-					if (_Runtime != null)
+					if (trigger != null)
 					{
-						var dataInfo = QSerializeType.Get(typeof(DataT));
-						if (dataInfo != null)
+						if (_Runtime != null)
 						{
-							foreach (var member in dataInfo.Members)
+							var dataInfo = QSerializeType.Get(typeof(DataT));
+							if (dataInfo != null)
 							{
-								if (member.Type.IsValueType || member.Type == typeof(string))
+								foreach (var member in dataInfo.Members)
 								{
-									gameObject.InvokeEvent(member.QName, member.Get(Data)?.ToString());
+									if (member.Type.IsValueType || member.Type == typeof(string))
+									{
+										gameObject.InvokeEvent(member.QName, member.Get(Data)?.ToString());
+									}
 								}
 							}
-						}
-						var runtimeInfo = QSerializeType.Get(typeof(RuntimeT));
-						if (runtimeInfo != null)
-						{
-							foreach (var member in runtimeInfo.Members)
+							var runtimeInfo = QSerializeType.Get(typeof(RuntimeT));
+							if (runtimeInfo != null)
 							{
-								if (member.Type.Is(typeof(QRuntimeValue)))
+								foreach (var member in runtimeInfo.Members)
 								{
-									var runtimeValue = member.Get(Runtime).As<QRuntimeValue>();
-									runtimeValue.Name = member.QName;
-									runtimeValue.OnValueChange += gameObject.InvokeEvent;
-									runtimeValue.InvokeOnValueChange();
+									if (member.Type.Is(typeof(QRuntimeValue)) && trigger.floatEventList.ContainsKey(member.QName))
+									{
+										var runtimeValue = member.Get(Runtime).As<QRuntimeValue>();
+										runtimeValue.Name = member.QName;
+										runtimeValue.OnValueChange += gameObject.InvokeEvent;
+										runtimeValue.InvokeOnValueChange();
+									}
 								}
 							}
 						}
 					}
-					
 				}
 			}
 		}
