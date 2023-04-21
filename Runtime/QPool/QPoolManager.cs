@@ -135,7 +135,7 @@ namespace QTool
        
     }
 
-    public abstract class QPoolObject<T> where T : QPoolObject<T>, IQPoolObject, new()
+    public abstract class QPoolObject<T>:IQPoolObject where T : QPoolObject<T>, new()
     {
         internal static QObjectPool<T> _pool;
         public static QObjectPool<T> Pool
