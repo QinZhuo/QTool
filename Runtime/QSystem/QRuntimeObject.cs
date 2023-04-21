@@ -32,59 +32,9 @@ namespace QTool
 			{
 				if (value != _Runtime)
 				{
-					var trigger = GetComponent<QEventTrigger>();
-					if (trigger != null)
-					{
-						if (_Runtime != null)
-						{
-
-							var typeInfo = QSerializeType.Get(typeof(RuntimeT));
-							if (typeInfo != null)
-							{
-								foreach (var member in typeInfo.Members)
-								{
-									if (member.Type.Is(typeof(QRuntimeValue)) && trigger.floatEventList.ContainsKey(member.QName))
-									{
-										var runtimeValue = member.Get(_Runtime).As<QRuntimeValue>();
-										runtimeValue.OnValueChange -= gameObject.InvokeEvent;
-									}
-								}
-							}
-
-						}
-					}
+					gameObject.UnRegister(_Runtime);
 					_Runtime = value;
-					if (trigger != null)
-					{
-						if (_Runtime != null)
-						{
-							var dataInfo = QSerializeType.Get(typeof(DataT));
-							if (dataInfo != null)
-							{
-								foreach (var member in dataInfo.Members)
-								{
-									if (member.Type.IsValueType || member.Type == typeof(string))
-									{
-										gameObject.InvokeEvent(member.QName, member.Get(Data)?.ToString());
-									}
-								}
-							}
-							var runtimeInfo = QSerializeType.Get(typeof(RuntimeT));
-							if (runtimeInfo != null)
-							{
-								foreach (var member in runtimeInfo.Members)
-								{
-									if (member.Type.Is(typeof(QRuntimeValue)) && trigger.floatEventList.ContainsKey(member.QName))
-									{
-										var runtimeValue = member.Get(Runtime).As<QRuntimeValue>();
-										runtimeValue.Name = member.QName;
-										runtimeValue.OnValueChange += gameObject.InvokeEvent;
-										runtimeValue.InvokeOnValueChange();
-									}
-								}
-							}
-						}
-					}
+					gameObject.Register(_Runtime);
 				}
 			}
 		}

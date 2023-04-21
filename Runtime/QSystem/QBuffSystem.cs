@@ -36,7 +36,7 @@ namespace QTool
 			{
 				if (Buffs.ContainsKey(key))
 				{
-					return Mathf.RoundToInt(Buffs[key].Count.Value);
+					return Buffs[key].Count.IntValue;
 				}
 				return 0;
 			}

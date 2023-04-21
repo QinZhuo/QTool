@@ -46,8 +46,38 @@ namespace QTool
 			return Value.ToString();
 		}
 	}
+	public class QRuntimeValue<T>
+	{
+		public string Name { get; set; }
+		private T _Value = default;
+		public virtual T Value
+		{
+			get => _Value;
+			set
+			{
+				if (!Equals(value,_Value))
+				{
+					_Value = value;
+					InvokeOnChange();
+				}
+			}
+		}
+		public event Action<string, T> OnValue = null;
+		public virtual void InvokeOnChange()
+		{
+			InvokeOnChange(Name, Value);
+		}
+		protected void InvokeOnChange(string key,T value)
+		{
+			OnValue?.Invoke(key,value);
+		}
+		public override string ToString()
+		{
+			return Value?.ToString();
+		}
 
-	public class QRuntimeValue
+	}
+	public class QRuntimeValue: QRuntimeValue<float>
 	{
 		public QRuntimeValue()
 		{
@@ -64,7 +94,6 @@ namespace QTool
 			PercentValue = 1;
 			FreshValue();
 		}
-		public string Name { get; set; }
 		public QValue OriginValue { get; private set; } = 0f;
 		private QValue _OffsetValue = 0;
 		public QValue OffsetValue {
@@ -91,21 +120,15 @@ namespace QTool
 				}
 			}
 		}
-		public QValue Value { get; private set; } = 0;
-		public Action<string,float> OnValueChange = null;
+		private QValue _Value { get; set; } = 0;
+		public override float Value { get => _Value;set { } }
+		public int IntValue => Mathf.RoundToInt(Value);
 		private void FreshValue()
 		{
-			Value = (OriginValue + OffsetValue) * PercentValue;
-			InvokeOnValueChange();
+			_Value = (OriginValue + OffsetValue) * PercentValue;
+			InvokeOnChange();
 		}
-		public virtual void InvokeOnValueChange()
-		{
-			OnValueChange?.Invoke(Name, Value);
-		}
-		public override string ToString()
-		{
-			return Value.ToString();
-		}
+		
 	}
 
 	public class QRuntimeRangeValue : QRuntimeValue
@@ -127,7 +150,7 @@ namespace QTool
 				if (_CurrentValue != value)
 				{
 					_CurrentValue = Mathf.Clamp(value, MinValue, MaxValue);
-					InvokeOnValueChange();
+					InvokeOnChange();
 				}
 			}
 		}
@@ -135,11 +158,11 @@ namespace QTool
 		{
 			return CurrentValue + "/" + Value;
 		}
-		public override void InvokeOnValueChange()
+		public override void InvokeOnChange()
 		{
-			base.InvokeOnValueChange();
-			OnValueChange?.Invoke("当前" + Name, CurrentValue);
-			OnValueChange?.Invoke(Name+"比例", (CurrentValue-MinValue)/MaxValue);
+			base.InvokeOnChange();
+			InvokeOnChange("当前" + Name, CurrentValue);
+			InvokeOnChange(Name+"比例", (CurrentValue-MinValue)/MaxValue);
 		}
 	}
 	public class QAverageValue
