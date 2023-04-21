@@ -87,21 +87,32 @@ namespace QTool.FlowGraph
             get
             {
                 if (string.IsNullOrWhiteSpace(key)) return null;
-				if (NodeList.ContainsKey(key)) {
-					return NodeList[key];
-				}
-				else if(!NodeCache.ContainsKey(key)) 
+				if (ContainsNode(key))
 				{
-					NodeCache[key] = NodeList.Find((obj) => obj.Name == key);
+					if (NodeList.ContainsKey(key))
+					{
+						return NodeList[key];
+					}
+					else
+					{
+						return NodeCache[key];
+					}
 				}
-				var obj= NodeCache[key];
-				if (obj == null)
-				{
-					Debug.LogError("不存在节点【" + key + "】");
-				}
-				return obj;
+				return NodeCache[key];
 			}
         }
+		public bool ContainsNode(string key)
+		{
+			if (NodeList.ContainsKey(key))
+			{
+				return false;
+			}
+			else if (!NodeCache.ContainsKey(key))
+			{
+				NodeCache[key] = NodeList.Find((obj) => obj.Name == key);
+			}
+			return NodeCache[key] != null;
+		}
 		QDictionary<string, QFlowNode> NodeCache = new QDictionary<string, QFlowNode>();
         public ConnectInfo GetConnectInfo(PortId? portId)
         {
@@ -925,8 +936,6 @@ namespace QTool.FlowGraph
         public ReturnType returnType { private set; get; }= ReturnType.Void;
         [QIgnore]
         public List<QFlowPort> OutParamPorts = new List<QFlowPort>();
-		[QIgnore]
-		public bool IsStart { get; private set; } = false;
 
 		public string Name { get; set; }
 		public string Key { get;  set; } = QId.NewId();
@@ -1043,10 +1052,6 @@ namespace QTool.FlowGraph
 			if (command.method.GetAttribute<QStartNodeAttribute>() == null)
 			{
 				AddPort(QFlowKey.FromPort, QInputPortAttribute.Normal);
-			}
-			else
-			{
-				IsStart = true;
 			}
 			if (command.method.GetAttribute<QEndNodeAttribute>() == null)
 			{
