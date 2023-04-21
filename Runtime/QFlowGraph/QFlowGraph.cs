@@ -925,6 +925,8 @@ namespace QTool.FlowGraph
         public ReturnType returnType { private set; get; }= ReturnType.Void;
         [QIgnore]
         public List<QFlowPort> OutParamPorts = new List<QFlowPort>();
+		[QIgnore]
+		public bool IsStart { get; private set; } = false;
 
 		public string Name { get; set; }
 		public string Key { get;  set; } = QId.NewId();
@@ -1038,10 +1040,14 @@ namespace QTool.FlowGraph
 			{
 				Name = command.name.SplitEndString("/");
 			}
-            if (command.method.GetAttribute<QStartNodeAttribute>() == null)
-            {
-                AddPort(QFlowKey.FromPort,QInputPortAttribute.Normal);
-            }
+			if (command.method.GetAttribute<QStartNodeAttribute>() == null)
+			{
+				AddPort(QFlowKey.FromPort, QInputPortAttribute.Normal);
+			}
+			else
+			{
+				IsStart = true;
+			}
 			if (command.method.GetAttribute<QEndNodeAttribute>() == null)
 			{
 				AddPort(QFlowKey.NextPort, QOutputPortAttribute.Normal);
