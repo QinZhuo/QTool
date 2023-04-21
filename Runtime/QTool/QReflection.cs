@@ -671,23 +671,22 @@ namespace QTool.Reflection
         }
 		public static bool Is(this Type type,Type checkType)
 		{
-			return checkType.IsAssignableFrom(type);
-			//if (type==checkType)
-			//{
-			//	return true;
-			//}
-			//else if (type.BaseType == null || type.BaseType.IsAbstract)
-			//{
-			//	return false;
-			//}
-			//else if (type.IsGenericType && !type.IsGenericTypeDefinition)
-			//{
-			//	return type.GetGenericTypeDefinition().Is(checkType);
-			//}
-			//else
-			//{ 
-			//	return type.BaseType.Is(checkType);
-			//}
+			if (checkType.IsAssignableFrom(type))
+			{
+				return true;
+			}
+			else if (type.BaseType == null || type.BaseType.IsAbstract)
+			{
+				return false;
+			}
+			else if (type.IsGenericType && !type.IsGenericTypeDefinition)
+			{
+				return type.GetGenericTypeDefinition().Is(checkType);
+			}
+			else
+			{
+				return type.BaseType.Is(checkType);
+			}
 		}
         static Dictionary<string, Type> TypeBuffer = new Dictionary<string, Type>();
         public static Type ParseType(string typeString)
