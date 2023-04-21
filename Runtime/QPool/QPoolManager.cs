@@ -203,11 +203,11 @@ namespace QTool
         }
 		protected virtual async Task InvokeStart(T obj)
 		{
-			await QTask.Step();
-			if (IsQPoolObject)
-			{
-				(obj as IQPoolObject).Start();
-			}
+			//await QTask.Step();
+			//if (IsQPoolObject)
+			//{
+			//	(obj as IQPoolObject).Start();
+			//}
 		}
         protected T PrivateGet()
         {
@@ -215,7 +215,7 @@ namespace QTool
 			{
 				T obj = default;
 				obj = CanUsePool.Dequeue();
-				InvokeStart(obj);
+				_=InvokeStart(obj);
 				QDebug.ChangeProfilerCount(Key + " UseCount", AllCount - CanUseCount);
 				return CheckGet(obj);
 			}
@@ -355,10 +355,10 @@ namespace QTool
 		protected override async Task InvokeStart(GameObject obj)
 		{
 			await base.InvokeStart(obj);
-			foreach (var poolObj in obj.GetComponents<IQPoolObject>())
-			{
-				poolObj.Start();
-			}
+			//foreach (var poolObj in obj.GetComponents<IQPoolObject>())
+			//{
+			//	poolObj.Start();
+			//}
 		}
 		protected override GameObject CheckPush(GameObject obj)
 		{
@@ -366,10 +366,10 @@ namespace QTool
 			{
 				obj.SetActive(false);
 				obj.transform.SetParent(PoolParent, true);
-				foreach (var poolObj in obj.GetComponents<IQPoolObject>())
-				{
-					poolObj.OnDestroy();
-				}
+				//foreach (var poolObj in obj.GetComponents<IQPoolObject>())
+				//{
+				//	poolObj.OnDestroy();
+				//}
 			}
 			return base.CheckPush(obj);
 		}
