@@ -83,35 +83,30 @@ namespace QTool.FlowGraph
             Values[key] = value;
         }
         public QFlowNode this[string key]
-        {
-            get
-            {
-                if (string.IsNullOrWhiteSpace(key)) return null;
-				if (ContainsNode(key))
+		{
+			get
+			{
+				if (string.IsNullOrWhiteSpace(key)) return null;
+				if (ContainsNode(key, out var node))
 				{
-					if (NodeList.ContainsKey(key))
-					{
-						return NodeList[key];
-					}
-					else
-					{
-						return NodeCache[key];
-					}
+					return node;
 				}
 				return NodeCache[key];
 			}
-        }
-		public bool ContainsNode(string key)
+		}
+		public bool ContainsNode(string key,out QFlowNode node)
 		{
 			if (NodeList.ContainsKey(key))
 			{
-				return false;
+				node= NodeList[key];
+				return true;
 			}
 			else if (!NodeCache.ContainsKey(key))
 			{
 				NodeCache[key] = NodeList.Find((obj) => obj.Name == key);
 			}
-			return NodeCache[key] != null;
+			node = NodeCache[key];
+			return node != null;
 		}
 		QDictionary<string, QFlowNode> NodeCache = new QDictionary<string, QFlowNode>();
         public ConnectInfo GetConnectInfo(PortId? portId)
