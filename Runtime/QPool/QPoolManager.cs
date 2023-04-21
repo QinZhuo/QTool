@@ -354,7 +354,7 @@ namespace QTool
 		}
 		protected override async Task InvokeStart(GameObject obj)
 		{
-			await base.InvokeStart(obj);
+			await QTask.Step();
 			foreach (var poolObj in obj.GetComponents<IQPoolObject>())
 			{
 				poolObj.Start();
