@@ -36,6 +36,32 @@ namespace QTool
 			}
 			return list;
 		}
+		/// <summary>
+		 /// 正态分布随机数
+		 /// </summary>
+		public static float NormalRange(this System.Random random,float min,float max)
+		{
+			if (min == max) return min;
+			var mid = (min + max) / 2;
+			var offset = max - min;
+			return mid + Normal(random) * offset;
+		}
+		/// <summary>
+		/// 正态分布随机数
+		/// </summary>
+		public static float Normal(this System.Random random)
+		{
+			var u = 0f;
+			var v = 0f;
+			var w = 0f;
+			do
+			{
+				u = random.Range(-1, 1);
+				v = random.Range(-1, 1);
+				w = u * u + v * v;
+			} while (w == 0 || w >= 1);
+			return u * Mathf.Sqrt((-2 * Mathf.Log(w)) / w);
+		}
 		public static float Range(this System.Random random,float min,float max)
 		{
 			if (random == null) return UnityEngine.Random.Range(min, max);
