@@ -15,10 +15,11 @@ namespace QTool
 		{
 
 		}
-		public QRelation(string name)
+		public QRelation(string key)
 		{
-			Key = name;
+			Key = key;
 		}
+		public float this[string key]=>this[Relations[key]];
 		public float this[QRelation other]
 		{
 			get
