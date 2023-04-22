@@ -9,8 +9,12 @@ namespace QTool
 	/// </summary>
 	public class QRelation:IKey<string>
 	{
-		public static QList<string, QRelation> Relations = new QList<string, QRelation>();
+		public static QList<string, QRelation> Relations = new QList<string, QRelation>(()=>new QRelation());
 		public string Key { get;  set; }
+		private QRelation()
+		{
+
+		}
 		public QRelation(string name)
 		{
 			Key = name;
