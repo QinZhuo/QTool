@@ -39,7 +39,7 @@ namespace QTool
 			{
 				if (other == null) return;
 				Values[other] = value;
-				other[this] = value;
+				other.Values[this] = value;
 			}
 		}
 		private QDictionary<QRelation, float> Values = new QDictionary<QRelation, float>();
