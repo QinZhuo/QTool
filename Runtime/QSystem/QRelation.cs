@@ -10,6 +10,10 @@ namespace QTool
 	public class QRelation:IKey<string>
 	{
 		public static QList<string, QRelation> Relations = new QList<string, QRelation>(()=>new QRelation());
+		public static float Get(string a,string b)
+		{
+			return Relations[a][b];
+		}
 		public string Key { get;  set; }
 		private QRelation()
 		{
