@@ -7,27 +7,28 @@ namespace QTool
 	/// <summary>
 	/// 关系
 	/// </summary>
-	public class QRelation
+	public class QRelation:IKey<string>
 	{
-		public string Name { get; private set; }
+		public static QList<string, QRelation> Relations = new QList<string, QRelation>();
+		public string Key { get;  set; }
 		public QRelation(string name)
 		{
-			Name = name;
+			Key = name;
 		}
 		public float this[QRelation other]
 		{
 			get
 			{
 				if (other == null) return 0;
-				return Relations[other];
+				return Values[other];
 			}
 			set
 			{
 				if (other == null) return;
-				Relations[other] = value;
+				Values[other] = value;
 				other[this] = value;
 			}
 		}
-		private QDictionary<QRelation, float> Relations = new QDictionary<QRelation, float>();
+		private QDictionary<QRelation, float> Values = new QDictionary<QRelation, float>();
 	}
 }
