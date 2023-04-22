@@ -19,7 +19,11 @@ namespace QTool
 		{
 			Key = key;
 		}
-		public float this[string key]=>this[Relations[key]];
+		public float this[string key]
+		{
+			get => this[Relations[key]];
+			set => this[Relations[key]] = value;
+		}
 		public float this[QRelation other]
 		{
 			get
