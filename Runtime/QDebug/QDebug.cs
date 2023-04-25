@@ -134,6 +134,7 @@ namespace QTool
 				}
 			}
 		}
+		[System.Diagnostics.Conditional("DEVELOPMENT_BUILD"), System.Diagnostics.Conditional("UNITY_EDITOR")]
 		public static void DebugInfo()
 		{
 			GUILayout.BeginHorizontal();
