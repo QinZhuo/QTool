@@ -117,26 +117,27 @@ namespace QTool
 			}
 			return "";
 		}
-		internal static async Task<Object> LoadObjectAsync(string id, System.Type type)
+		internal static async Task<Object> LoadObjectAsync(string key, System.Type type)
 		{
+			var id = key;
 			if (id.IsNull()) return null;
 			if (id.StartsWith("{") && id.EndsWith("}"))
 			{
 				id = id.GetBlockValue(":\"", "\"}");
 			}
-			var path= GetResourcesPath(id);
+			var path = GetResourcesPath(id);
 			var obj = await Resources.LoadAsync(path);
-			if(obj is QIdReference idReference)
+			if (obj is QIdReference idReference)
 			{
 				obj = idReference.obj;
 			}
-			if(obj == null)
-			{
-				Debug.LogError("异步加载资源[" + id + "]("+type+")失败 资源为空");
-			}
-			else if(!obj.GetType().Is(type))
+			if (obj != null && !obj.GetType().Is(type))
 			{
 				obj = await Resources.LoadAsync(path, type);
+			}
+			if (obj == null && !id.IsNull() && id != "null")
+			{
+				Debug.LogError("异步加载资源[" + key + "](" + type + ")失败 资源为空");
 			}
 			return obj;
 		}
