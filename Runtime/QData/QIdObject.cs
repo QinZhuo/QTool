@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
+using QTool.Reflection;
 namespace QTool
 {
 	[System.Serializable]
@@ -124,10 +125,18 @@ namespace QTool
 				id = id.GetBlockValue(":\"", "\"}");
 			}
 			var path= GetResourcesPath(id);
-			var obj = await Resources.LoadAsync(path, type);
+			var obj = await Resources.LoadAsync(path);
 			if(obj is QIdReference idReference)
 			{
 				obj = idReference.obj;
+			}
+			if(obj == null)
+			{
+				Debug.LogError("异步加载资源[" + id + "]("+type+")失败 资源为空");
+			}
+			else if(!obj.GetType().Is(type))
+			{
+				obj = await Resources.LoadAsync(path, type);
 			}
 			return obj;
 		}
