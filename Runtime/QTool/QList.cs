@@ -418,7 +418,7 @@ namespace QTool
 		}
 		public static int RemoveNull<T>(this List<T> array)
 		{
-			return array.RemoveAll(obj => obj == null||((obj is UnityEngine.Object mb)&&mb==null));
+			return array.RemoveAll(obj => obj.IsNull());
 		}
 		public static int RemoveSpace(this List<string> array)
 		{
@@ -705,7 +705,7 @@ namespace QTool
 			for (int i = 0; i < array.Count; i++)
 			{
 				var value = array[i];
-				if (value == null) continue;
+				if (value.IsNull()) continue;
 				if (key.Equals(keyGetter(value)))
 				{
 					return value;
