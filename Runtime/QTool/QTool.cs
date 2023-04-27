@@ -920,14 +920,14 @@ namespace QTool
 		public static async Task LoadSceneAsync(this string sceneName)
 		{
 			IsLoading = true;
-			await PreLoadList.WaitAllOver();
+			await PreLoadList.ToArray().WaitAllOver();
 			PreLoadList.Clear();
 			QDebug.Log("异步加载场景开始[" + sceneName + "]");
 			QDebug.Begin("异步加载场景结束[" + sceneName + "]");
 			await SceneManager.LoadSceneAsync(sceneName);
 			GCCollect();
 			QDebug.End("异步加载场景结束[" + sceneName + "]");
-			await PreLoadList.WaitAllOver();
+			await PreLoadList.ToArray().WaitAllOver();
 			PreLoadList.Clear();
 			IsLoading = false;
 		}
