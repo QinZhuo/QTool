@@ -121,7 +121,7 @@ namespace QTool
 			if (id.IsNull()) return null;
 			if (id.StartsWith("{") && id.EndsWith("}"))
 			{
-				id = id.GetBlockValue(":\"", "\"");
+				id = id.GetBlockValue(":\"", "\"}");
 			}
 			var path= GetResourcesPath(id);
 			var obj = await Resources.LoadAsync(path, type);
@@ -169,15 +169,8 @@ namespace QTool
 #endif
 				var loadPath = GetResourcesPath(id);
 				obj = Resources.Load(loadPath);
-				if (obj == null && id.Contains("_"))
-				{
-					obj = GetObject(id.SplitStartString("_"), type);
-					if (obj != null)
-					{
-						return obj;
-					}
-				}
-				else if (obj is QIdReference qidr)
+
+				if (obj is QIdReference qidr)
 				{
 					obj = qidr.obj;
 				}
