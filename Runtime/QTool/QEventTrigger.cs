@@ -255,10 +255,6 @@ namespace QTool
 	{
 	}
 	[System.Serializable]
-	public class ObjectEvent : UnityEvent<Object>
-	{
-	}
-	[System.Serializable]
 	public class GameObjectEvent : UnityEvent<GameObject>
 	{
 	}
@@ -278,11 +274,7 @@ namespace QTool
     public class StringEventTrigger : EventTriggerBase<StringEvent>
     {
     }
-	[System.Serializable]
-	public class ObjectEventTrigger : EventTriggerBase<ObjectEvent>
-	{
-	}
-
+	
 	public static class ValueEventTriggerExtends
     {
 
