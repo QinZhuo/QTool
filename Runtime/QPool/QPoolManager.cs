@@ -245,8 +245,7 @@ namespace QTool
 		}
 		public bool Push(T obj)
 		{
-
-			if (obj == null || CanUsePool.Contains(obj)) return false;
+			if (obj == null || CanUsePool.Contains(obj)||!QPoolManager.PoolActive) return false;
 			if (!UsingPool.Contains(obj))
 			{
 				if(obj is GameObject gameObj&&Application.isPlaying)
@@ -331,7 +330,7 @@ namespace QTool
 		{
 			get
 			{
-				if (_poolParent == null && QPoolManager.PoolActive && QPoolManager.IsInstanced)
+				if (_poolParent == null && QPoolManager.PoolActive)
 				{
 					_poolParent = QPoolManager.Instance.transform.GetChild(Key, true);
 				}
