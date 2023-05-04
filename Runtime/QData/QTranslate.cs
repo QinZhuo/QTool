@@ -172,11 +172,13 @@ namespace QTool
 			QEventManager.Register<string>(nameof(QTranslate) + "_语言", FreshFont);
 			QEventManager.Register<string>(nameof(QTranslate) + "_语言", CheckFresh);
 		}
-        private void Start()
+        private async void Start()
 		{
-			FreshFont();
+			await QTask.Step();
 			CheckFresh();
-        }
+			await QTask.Step();
+			FreshFont();
+		}
         private void OnDestroy()
         {
 			QEventManager.UnRegister<string>(nameof(QTranslate) + "_语言", FreshFont);
@@ -247,14 +249,12 @@ namespace QTool
             if (curValue != value)
             {
                 curValue = value;
-				await QTask.Step();
 				OnValueChange?.Invoke(value);
             }
 			try
 			{
 				await QTask.Step();
 				translateResult = Translate(value, Language);
-				await QTask.Step();
 				OnTranslateChange?.Invoke(translateResult);
 			}
 			catch (System.Exception e)
