@@ -331,7 +331,7 @@ namespace QTool
 		{
 			get
 			{
-				if (_poolParent == null&&QPoolManager.PoolActive)
+				if (_poolParent == null && QPoolManager.PoolActive && QPoolManager.IsInstanced)
 				{
 					_poolParent = QPoolManager.Instance.transform.GetChild(Key, true);
 				}
