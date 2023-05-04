@@ -13,7 +13,7 @@ namespace QTool
 	
     public class QPoolManager: InstanceManager<QPoolManager>
     {
-		public static bool PoolActive => QOnPlayModeAttribute.CurrentrState != PlayModeState.EnteredEditMode;
+		public static bool PoolActive => QOnPlayModeAttribute.CurrentrState != PlayModeState.EnteredEditMode && QOnPlayModeAttribute.CurrentrState!= PlayModeState.ExitingPlayMode;
 		public static QDictionary<string, QPool> Pools = new QDictionary<string, QPool>();
 
 		public static QObjectPool<T> GetPool<T>(string poolName, System.Func<T> newFunc = null) where T : class
