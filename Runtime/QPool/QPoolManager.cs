@@ -13,7 +13,7 @@ namespace QTool
 	
     public class QPoolManager: InstanceManager<QPoolManager>
     {
-		public static bool PoolActive => QOnPlayModeAttribute.CurrentrState != PlayModeState.EnteredEditMode && QOnPlayModeAttribute.CurrentrState!= PlayModeState.ExitingPlayMode;
+		
 		public static QDictionary<string, QPool> Pools = new QDictionary<string, QPool>();
 
 		public static QObjectPool<T> GetPool<T>(string poolName, System.Func<T> newFunc = null) where T : class
@@ -41,7 +41,7 @@ namespace QTool
 				}
 
 			}
-			else if(newFunc !=null&&PoolActive)
+			else if(newFunc !=null&&QTool.IsPlaying)
 			{
 				var type = typeof(T);
 				if (type.IsSubclassOf(typeof(UnityEngine.Object))&&type!=typeof( GameObject))
@@ -245,7 +245,7 @@ namespace QTool
 		}
 		public bool Push(T obj)
 		{
-			if (obj == null || CanUsePool.Contains(obj)||!QPoolManager.PoolActive) return false;
+			if (obj == null || CanUsePool.Contains(obj)||!QTool.IsPlaying) return false;
 			if (!UsingPool.Contains(obj))
 			{
 				if(obj is GameObject gameObj&&Application.isPlaying)
@@ -309,7 +309,7 @@ namespace QTool
 		}
 		protected void OnSceneChange(Scene scene, LoadSceneMode mode)
 		{
-			if ( QPoolManager.PoolActive)
+			if (QTool.IsPlaying)
 			{
 				SceneManager.sceneLoaded -= OnSceneChange;
 				if (prefab == null)
@@ -330,7 +330,7 @@ namespace QTool
 		{
 			get
 			{
-				if (_poolParent == null && QPoolManager.PoolActive)
+				if (_poolParent == null && QTool.IsPlaying)
 				{
 					_poolParent = QPoolManager.Instance.transform.GetChild(Key, true);
 				}
@@ -361,7 +361,7 @@ namespace QTool
 		}
 		protected override GameObject CheckPush(GameObject obj)
 		{
-			if (!QPoolManager.PoolActive|| PoolParent==null)
+			if (!QTool.IsPlaying || PoolParent==null)
 			{
 				return null;
 			}

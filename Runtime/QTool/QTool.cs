@@ -16,6 +16,7 @@ using UnityEngine.LowLevel;
 using System.Linq;
 using UnityEngine.Playables;
 using System.Net;
+using QTool.Inspector;
 
 namespace QTool
 {
@@ -23,6 +24,7 @@ namespace QTool
 
     public static class QTool
     {
+		public static bool IsPlaying => Application.isPlaying && QOnPlayModeAttribute.CurrentrState != PlayModeState.EnteredEditMode && QOnPlayModeAttribute.CurrentrState != PlayModeState.ExitingPlayMode;
 		public static bool IsBuilding { set; get; }
 		public static CultureInfo RealyCulture= CultureInfo.CurrentCulture;
 		private static string _LocalIp = null;
