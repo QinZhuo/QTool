@@ -361,6 +361,10 @@ namespace QTool
 		}
 		protected override GameObject CheckPush(GameObject obj)
 		{
+			if (!QPoolManager.PoolActive|| PoolParent==null)
+			{
+				return null;
+			}
 			if (obj != null)
 			{
 				obj.SetActive(false);
