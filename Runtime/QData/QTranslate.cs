@@ -222,7 +222,7 @@ namespace QTool
 			}
 			return value;
         }
-		
+		private Font defualtFont;
 		private void FreshFont(string key=default)
 		{
 			try
@@ -235,7 +235,21 @@ namespace QTool
 					}
 					foreach (var text in GetComponents<Text>())
 					{
+						if (defualtFont == null)
+						{
+							defualtFont = text.font;
+						}
 						text.font = LanguageFont[Language];
+					}
+				}
+				else
+				{
+					foreach (var text in GetComponents<Text>())
+					{
+						if (defualtFont != null)
+						{
+							text.font = defualtFont;
+						}
 					}
 				}
 			}
