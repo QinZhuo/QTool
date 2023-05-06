@@ -21,7 +21,7 @@ namespace QTool {
 				OnQualityChange?.Invoke();
 			}
 		}
-		public static System.Action OnQualityChange;
+		public static event System.Action OnQualityChange;
 		[QName("范围"), Range(0, 5)]
 		public Vector2Int levelRange = Vector2Int.zero;
 		private void Awake()
