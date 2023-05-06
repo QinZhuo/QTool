@@ -6,7 +6,6 @@ namespace QTool {
 	[ExecuteInEditMode]
 	public class QQualityActive : MonoBehaviour
 	{
-		#region 质量检测
 		public static int CurLevel { get; private set; } = -1;
 		[RuntimeInitializeOnLoadMethod]
 		static void Init()
@@ -18,14 +17,13 @@ namespace QTool {
 			if (CurLevel != QualitySettings.GetQualityLevel())
 			{
 				CurLevel = QualitySettings.GetQualityLevel();
-				QDebug.Log(nameof(QQualityActive)+" 画质级别 " + CurLevel);
+				QDebug.Log(nameof(QQualityActive) + " 画质级别 " + CurLevel);
 				OnQualityChange?.Invoke();
 			}
 		}
 		public static System.Action OnQualityChange;
-		#endregion
-		[QName("画质级别")]
-		public int level = 0;
+		[QName("范围"), Range(0, 5)]
+		public Vector2Int levelRange = Vector2Int.zero;
 		private void Awake()
 		{
 			if (!Application.isPlaying) return;
@@ -43,8 +41,7 @@ namespace QTool {
 		}
 		void FreshActive()
 		{
-			gameObject.SetActive(level == CurLevel);
+			gameObject.SetActive(CurLevel >= levelRange.x && CurLevel <= levelRange.y);
 		}
 	}
-
 }

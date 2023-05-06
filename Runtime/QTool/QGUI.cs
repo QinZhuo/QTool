@@ -1296,6 +1296,24 @@ namespace QTool
 						}
 					}
 					break;
+				case SerializedPropertyType.Vector2Int:
+					{
+						var range = property.GetAttribute<RangeAttribute>(parentType);
+						if (range != null)
+						{
+							var value = property.vector2IntValue;
+							EditorGUI.LabelField(rect.HorizontalRect(0, 0.4f), content);
+							value.x = EditorGUI.IntField(rect.HorizontalRect(0.4f, 0.5f), value.x);
+							var x = (float)value.x;
+							var y = (float)value.y;
+							EditorGUI.MinMaxSlider(rect.HorizontalRect(0.5f, 0.9f), ref x, ref y, range.min, range.max);
+							value.x =Mathf.RoundToInt(x);
+							value.y = Mathf.RoundToInt(y);
+							value.y = EditorGUI.IntField(rect.HorizontalRect(0.9f, 1), value.y);
+							property.vector2IntValue = value;
+							return true;
+						}
+					}break;
 				case SerializedPropertyType.Vector2:
 					{
 						var range = property.GetAttribute<RangeAttribute>(parentType);
@@ -1330,6 +1348,11 @@ namespace QTool
 		private static bool PrivateDraw(this SerializedProperty property, Rect rect, GUIContent content = null, string parentType = "")
 		{
 			var cur = property.Copy();
+			if (UnityAttributeView(property, rect, content, parentType))
+			{
+				return false;
+			}
+			else
 			if (cur.hasVisibleChildren && !cur.isArray)
 			{
 				rect = new Rect(rect.position, new Vector2(rect.width, cur.GetHeight(false)));
@@ -1348,10 +1371,6 @@ namespace QTool
 					} while (cur.NextVisible(false));
 				}
 				return expanded;
-			}
-			else if (UnityAttributeView(property, rect, content, parentType))
-			{
-				return false;
 			}
 			else
 			{
