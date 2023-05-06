@@ -1303,13 +1303,13 @@ namespace QTool
 						{
 							var value = property.vector2IntValue;
 							EditorGUI.LabelField(rect.HorizontalRect(0, 0.4f), content);
-							value.x = EditorGUI.IntField(rect.HorizontalRect(0.4f, 0.5f), value.x);
+							value.x = EditorGUI.IntField(rect.HorizontalRect(0.4f, 0.48f), value.x);
 							var x = (float)value.x;
 							var y = (float)value.y;
 							EditorGUI.MinMaxSlider(rect.HorizontalRect(0.5f, 0.9f), ref x, ref y, range.min, range.max);
 							value.x =Mathf.RoundToInt(x);
 							value.y = Mathf.RoundToInt(y);
-							value.y = EditorGUI.IntField(rect.HorizontalRect(0.9f, 1), value.y);
+							value.y = EditorGUI.IntField(rect.HorizontalRect(0.92f, 1), value.y);
 							property.vector2IntValue = value;
 							return true;
 						}
@@ -1321,9 +1321,9 @@ namespace QTool
 						{
 							var value = property.vector2Value;
 							EditorGUI.LabelField(rect.HorizontalRect(0, 0.4f), content);
-							value.x = EditorGUI.FloatField(rect.HorizontalRect(0.4f, 0.5f), value.x);
+							value.x = EditorGUI.FloatField(rect.HorizontalRect(0.4f, 0.48f), value.x);
 							EditorGUI.MinMaxSlider(rect.HorizontalRect(0.5f, 0.9f), ref value.x, ref value.y, range.min, range.max);
-							value.y = EditorGUI.FloatField(rect.HorizontalRect(0.9f, 1), value.y);
+							value.y = EditorGUI.FloatField(rect.HorizontalRect(0.92f, 1), value.y);
 							property.vector2Value = value;
 							return true;
 						}
