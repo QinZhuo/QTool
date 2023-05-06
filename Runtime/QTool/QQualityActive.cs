@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.Events;
 namespace QTool {
 	[ExecuteInEditMode]
-	public class QQualityLevel : MonoBehaviour
+	public class QQualityActive : MonoBehaviour
 	{
 		#region 质量检测
 		public static int CurLevel { get; private set; } = -1;
@@ -18,39 +18,32 @@ namespace QTool {
 			if (CurLevel != QualitySettings.GetQualityLevel())
 			{
 				CurLevel = QualitySettings.GetQualityLevel();
-				QDebug.Log(nameof(QQualityLevel)+" 画质级别 " + CurLevel);
-				OnFresh?.Invoke();
+				QDebug.Log(nameof(QQualityActive)+" 画质级别 " + CurLevel);
+				OnQualityChange?.Invoke();
 			}
 		}
-		public static System.Action OnFresh;
+		public static System.Action OnQualityChange;
 		#endregion
-		public List<BoolEvent> OnLevelChange = new List<BoolEvent>();
+		[QName("画质级别")]
+		public int level = 0;
 		private void Awake()
 		{
 			if (!Application.isPlaying) return;
-			OnFresh += Fresh;
+			OnQualityChange += FreshActive;
 		}
 		private void Start()
 		{
 			if (!Application.isPlaying) return;
-			Fresh();
+			FreshActive();
 		}
 		private void OnDestroy()
 		{
 			if (!Application.isPlaying) return;
-			OnFresh -= Fresh;
+			OnQualityChange -= FreshActive;
 		}
-		void Fresh()
+		void FreshActive()
 		{
-			if(OnLevelChange==null)return;
-			for (int i = 0; i < OnLevelChange.Count; i++)
-			{
-				if (i != CurLevel)
-				{
-					OnLevelChange[i]?.Invoke(false);
-				}
-			}
-			OnLevelChange.Get(CurLevel)?.Invoke(true);
+			gameObject.SetActive(level == CurLevel);
 		}
 	}
 
