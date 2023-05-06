@@ -59,6 +59,10 @@ namespace QTool
 				NavMeshBuilder.UpdateNavMeshData(navMesh, NavMesh.GetSettingsByID(0), SourceList, Bounds);
 			}
 		}
+		public static bool CalculatePath(this NavMeshPath path, Vector3 sourcePosition, Vector3 targetPosition, int areaMask = NavMesh.AllAreas)
+		{
+			return NavMesh.CalculatePath(sourcePosition, targetPosition, areaMask, path);
+		}
 	}
 }
 
