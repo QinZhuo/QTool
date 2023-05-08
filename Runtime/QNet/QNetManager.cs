@@ -283,7 +283,6 @@ namespace QTool.Net
 										if (playerPrefab != null)
 										{
 											var obj = GameObject.Instantiate(playerPrefab);
-											obj.name = actionData.Key;
 											PlayerObjects[actionData.Key] = obj;
 											foreach (var qNet in obj.GetComponents<QNetBehaviour>())
 											{
