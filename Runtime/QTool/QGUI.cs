@@ -1860,7 +1860,7 @@ namespace QTool
 			var drawer = DrawerDic[drawerKey];
 			if (!funcKey.IsNull())
 			{
-				if (obj.InvokeFunction(funcKey) is IList itemList)
+				if (obj?.InvokeFunction(funcKey) is IList itemList)
 				{
 					if (drawer.List.Count != itemList.Count)
 					{
