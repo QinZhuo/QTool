@@ -284,6 +284,7 @@ namespace QTool.Net
 										{
 											var obj = GameObject.Instantiate(playerPrefab);
 											PlayerObjects[actionData.Key] = obj;
+											QDebug.Log("创建玩家[" + actionData.Key + "]对象[" + obj + "]");
 											foreach (var qNet in obj.GetComponents<QNetBehaviour>())
 											{
 												qNet.PlayerId = actionData.Key;
