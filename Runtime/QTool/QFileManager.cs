@@ -487,7 +487,7 @@ namespace QTool
 							{
 								UnityEngine.Switch.Notification.EnterExitRequestHandlingSection();
 								Debug.LogWarning("尝试创建文件 " + path);
-								var t = nn.fs.File.Create(path, bytes.LongLength);
+								var t = nn.fs.File.Create(path, 1);
 								t.abortUnlessSuccess();
 								Debug.LogWarning("自动创建文件 " + path);
 							}
