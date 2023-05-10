@@ -485,9 +485,9 @@ namespace QTool
 #if UNITY_SWITCH_API
 							if (!ExistsFile(path))
 							{
-								UnityEngine.Switch.Notification.EnterExitRequestHandlingSection();
+								Notification.EnterExitRequestHandlingSection();
 								QDebug.LogWarning("尝试创建文件 [" + bytes.LongLength + "]" + path);
-								var t = nn.fs.File.Create(path, bytes.LongLength);
+								var t = nn.fs.File.Create(path, 0);
 								t.abortUnlessSuccess();
 								QDebug.LogWarning("自动创建文件 " + path);
 							}
@@ -495,9 +495,9 @@ namespace QTool
 							{
 								Notification.EnterExitRequestHandlingSection(); ;
 							}
-							QDebug.LogWarning("尝试保存文件 [" + bytes.LongLength + "]" + path);
 							nn.Result result = nn.fs.File.Open(ref fileHandle, path, nn.fs.OpenFileMode.Write| nn.fs.OpenFileMode.AllowAppend);
 							result.abortUnlessSuccess();
+							QDebug.LogWarning("尝试保存文件 [" + bytes.LongLength + "]" + path)
 							result = nn.fs.File.Write(fileHandle, 0, bytes, bytes.LongLength, nn.fs.WriteOption.Flush);
 							result.abortUnlessSuccess();
 							nn.fs.File.Close(fileHandle);
