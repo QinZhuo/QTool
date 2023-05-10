@@ -7,7 +7,11 @@ namespace QTool
 	{
 		private void Reset()
 		{
-			voxelData.Clear(); 
+			voxelData.Clear();
+			gameObject.GenerateMesh(voxelData);
+		}
+		private void Start()
+		{
 			gameObject.GenerateMesh(voxelData);
 		}
 		public QVoxelData voxelData = new QVoxelData();

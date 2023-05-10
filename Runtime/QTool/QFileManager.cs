@@ -485,14 +485,16 @@ namespace QTool
 #if UNITY_SWITCH_API
 							if (!ExistsFile(path))
 							{
-								Debug.LogWarning("不存在文件" + path);
 								UnityEngine.Switch.Notification.EnterExitRequestHandlingSection();
+								Debug.LogWarning("尝试创建文件 " + path);
 								var t = nn.fs.File.Create(path, bytes.LongLength);
 								t.abortUnlessSuccess();
-								UnityEngine.Switch.Notification.LeaveExitRequestHandlingSection();
 								Debug.LogWarning("自动创建文件 " + path);
 							}
-							Notification.EnterExitRequestHandlingSection(); ;
+							else
+							{
+								Notification.EnterExitRequestHandlingSection(); ;
+							}
 							nn.Result result = nn.fs.File.Open(ref fileHandle, path, nn.fs.OpenFileMode.Write| nn.fs.OpenFileMode.AllowAppend);
 							result.abortUnlessSuccess();
 							result = nn.fs.File.Write(fileHandle, 0, bytes, bytes.LongLength, nn.fs.WriteOption.Flush);
