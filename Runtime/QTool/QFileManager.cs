@@ -497,7 +497,7 @@ namespace QTool
 							}
 							nn.Result result = nn.fs.File.Open(ref fileHandle, path, nn.fs.OpenFileMode.Write| nn.fs.OpenFileMode.AllowAppend);
 							result.abortUnlessSuccess();
-							QDebug.LogWarning("尝试保存文件 [" + bytes.LongLength + "]" + path)
+							QDebug.LogWarning("尝试保存文件 [" + bytes.LongLength + "]" + path);
 							result = nn.fs.File.Write(fileHandle, 0, bytes, bytes.LongLength, nn.fs.WriteOption.Flush);
 							result.abortUnlessSuccess();
 							nn.fs.File.Close(fileHandle);
