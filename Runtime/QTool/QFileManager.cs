@@ -486,15 +486,16 @@ namespace QTool
 							if (!ExistsFile(path))
 							{
 								UnityEngine.Switch.Notification.EnterExitRequestHandlingSection();
-								Debug.LogWarning("尝试创建文件 [" + bytes.LongLength + "]" + path);
+								QDebug.LogWarning("尝试创建文件 [" + bytes.LongLength + "]" + path);
 								var t = nn.fs.File.Create(path, bytes.LongLength);
 								t.abortUnlessSuccess();
-								Debug.LogWarning("自动创建文件 " + path);
+								QDebug.LogWarning("自动创建文件 " + path);
 							}
 							else
 							{
 								Notification.EnterExitRequestHandlingSection(); ;
 							}
+							QDebug.LogWarning("尝试保存文件 [" + bytes.LongLength + "]" + path);
 							nn.Result result = nn.fs.File.Open(ref fileHandle, path, nn.fs.OpenFileMode.Write| nn.fs.OpenFileMode.AllowAppend);
 							result.abortUnlessSuccess();
 							result = nn.fs.File.Write(fileHandle, 0, bytes, bytes.LongLength, nn.fs.WriteOption.Flush);
