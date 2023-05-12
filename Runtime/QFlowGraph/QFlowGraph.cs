@@ -38,9 +38,13 @@ namespace QTool.FlowGraph
 		{
 			await QTask.Step();
 			base.OnAfterDeserialize();
+			Init();
+		}
+		private void Init()
+		{
 			NodeCache.Clear();
 			foreach (var state in NodeList)
-			{ 
+			{
 				state.Init(this);
 			}
 		}
@@ -48,6 +52,7 @@ namespace QTool.FlowGraph
 		{
 			var graph= SerializeString.ParseQData<QFlowGraph>();
 			graph.SerializeString = SerializeString;
+			graph.Init();
 			return graph;
 		}
         public override string ToString()
