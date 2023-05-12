@@ -23,7 +23,7 @@ namespace QTool.Net
 			}
 			return QNetManager.Instance.PlayerValue(PlayerId, key, value);
 		}
-		public void PlayerAction<T>(string key, T value, Action<T> action)
+		public void PlayerAction<T>(string key, T value, Action<T> action=null)
 		{
 			if (!IsPlayer)
 			{
