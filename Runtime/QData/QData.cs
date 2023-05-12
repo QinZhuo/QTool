@@ -1012,7 +1012,7 @@ namespace QTool
 	//{
 	//	void OnDeserializeOver();
 	//}
-	public abstract class QSerializeObject : ISerializationCallbackReceiver
+	public abstract class QSerializeObject<T> : ISerializationCallbackReceiver where T:QSerializeObject<T>
 	{
 		
 		[QIgnore, HideInInspector]
@@ -1027,11 +1027,11 @@ namespace QTool
 		{
 			if (!IsDirty) return;
 			IsDirty = false;
-			SerializeString = this.ToQData();
+			SerializeString = (this as T).ToQData();
 		}
 		public virtual void OnAfterDeserialize()
 		{
-			SerializeString.ParseQData(this);
+			SerializeString.ParseQData(this as T);
 		}
 	}
 	[AttributeUsage(AttributeTargets.Method | AttributeTargets.Field | AttributeTargets.Property | AttributeTargets.Interface)]

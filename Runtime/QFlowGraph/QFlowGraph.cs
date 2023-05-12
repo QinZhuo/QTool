@@ -7,7 +7,7 @@ using QTool.Reflection;
 namespace QTool.FlowGraph
 {
 	[System.Serializable]
-    public class QFlowGraph: QSerializeObject
+    public class QFlowGraph: QSerializeObject<QFlowGraph>
 	{
 		static QFlowGraph()
 		{
@@ -38,18 +38,15 @@ namespace QTool.FlowGraph
 		{
 			await QTask.Step();
 			base.OnAfterDeserialize();
-			Debug.LogError(GetHashCode() + " 序列化 [" + this.ToShortString(100) + "]");
 			NodeCache.Clear();
 			foreach (var state in NodeList)
-			{
+			{ 
 				state.Init(this);
 			}
 		}
 		public QFlowGraph CreateInstance()
 		{
-			Debug.LogError("尝试创建 " + SerializeString);
-			var graph= SerializeString.ParseQData<QFlowGraph>(new QFlowGraph());
-			Debug.LogError(graph.GetHashCode()+ "创建 [" + SerializeString.ToShortString(100) + "] \n " + graph);
+			var graph= SerializeString.ParseQData<QFlowGraph>();
 			graph.SerializeString = SerializeString;
 			return graph;
 		}
