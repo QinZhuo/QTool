@@ -70,7 +70,7 @@ namespace QTool
 					obj = monoObj.gameObject;
 				}
 #if UNITY_EDITOR
-				if (!Application.isPlaying && obj.IsAsset())
+				if (!QTool.IsBuilding && obj.IsAsset())
 				{
 					InitCache();
 					if (!AssetIdCache.ContainsKey(obj))
