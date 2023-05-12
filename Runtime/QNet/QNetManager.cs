@@ -24,7 +24,7 @@ namespace QTool.Net
 			Physics.autoSimulation = false;
 			Physics.autoSyncTransforms = false;
 			Time.fixedDeltaTime = 1f / netFps;
-			FlowGraph.QFlowGraph.Step = new WaitForNetUpdate();
+			FlowGraph.QFlowGraph.Step = WaitForNetUpdate.Instance;
 			QTool.AddPlayerLoop(typeof(QNetManager), QNetPlayerLoop,"FixedUpdate");
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
 			QToolManager.Instance.OnGUIEvent += DebugGUI;
@@ -506,7 +506,7 @@ namespace QTool.Net
 		{
 			get
 			{
-				if (Index >= 0)
+				if (Index < 0)
 				{
 					Index = QNetManager.Instance.ClientIndex;
 				}
