@@ -500,6 +500,7 @@ namespace QTool.Net
 	}
 	public class WaitForNetUpdate : CustomYieldInstruction
 	{
+		public static WaitForNetUpdate Instance { get; private set; } = new WaitForNetUpdate();
 		private int Index { get; set; } = -1;
 		public override bool keepWaiting
 		{
