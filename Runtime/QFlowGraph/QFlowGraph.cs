@@ -1103,7 +1103,7 @@ namespace QTool.FlowGraph
                     {
 						Ports.RemoveKey(QFlowKey.NextPort);
                     }
-                    if (port.ConnectType!= QFlow.Type)
+                    else
                     {
                         if (paramInfo.IsOut ||( Key != QFlowKey.ResultPort && !port.ValueType.IsValueType))
                         {
@@ -1347,7 +1347,6 @@ namespace QTool.FlowGraph
 			}
 			foreach (var port in OutParamPorts)
             {
-				Debug.LogError(port.name+"   "+ port.Key + " " + commandParams[port.paramIndex]);
                 port.Value = commandParams[port.paramIndex];
             }
         }
