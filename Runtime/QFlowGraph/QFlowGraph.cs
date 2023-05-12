@@ -324,7 +324,13 @@ namespace QTool.FlowGraph
 				Remove(node);
 			}
 		}
-		public static YieldInstruction Step { get; set; } = new WaitForFixedUpdate();
+		public static IEnumerator Step { get; set; } = FixedUpdateStep();
+
+		static WaitForFixedUpdate wait= new WaitForFixedUpdate();
+		static IEnumerator FixedUpdateStep()
+		{
+			yield return wait;
+		}
 	}
     public struct PortId
     {
