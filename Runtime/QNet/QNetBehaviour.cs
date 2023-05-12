@@ -12,11 +12,12 @@ namespace QTool.Net
 		public System.Random Random => QNetManager.Instance.Random;
 		public float NetDeltaTime => QNetManager.Instance.NetDeltaTime;
 		public float NetTime => QNetManager.Instance.NetTime;
-		public string PlayerId { get; internal set; }
+		public string PlayerId { get; internal set; } = null;
+		public bool IsPlayer => !PlayerId.IsNull();
 		public bool IsLoaclPlayer => PlayerId == QNetManager.Instance.transport.ClientId;
 		public T PlayerValue<T>(string key, T value)
 		{
-			if (PlayerId.IsNull())
+			if (!IsPlayer)
 			{
 				throw new System.Exception(this + " 非玩家对象");
 			}
@@ -24,7 +25,7 @@ namespace QTool.Net
 		}
 		public void PlayerAction<T>(string key, T value, Action<T> action)
 		{
-			if (PlayerId.IsNull())
+			if (!IsPlayer)
 			{
 				throw new System.Exception(this + " 非玩家对象");
 			}
