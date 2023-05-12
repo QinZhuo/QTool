@@ -224,7 +224,7 @@ namespace QTool
 				if (Data.Effect != null)
 				{
 					Graph = Data.Effect.Graph.CreateInstance();
-					Debug.LogError("初始化Buff[" + key + "][" + Graph+"]["+ Data.Effect.Graph.SerializeString);
+					Debug.LogError("初始化Buff[" + key + "][" + Graph + "][" + Data.Effect.Graph.SerializeString);
 				}
 				if (Data.TimeEvent > 0)
 				{
