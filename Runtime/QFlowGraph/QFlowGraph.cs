@@ -38,6 +38,7 @@ namespace QTool.FlowGraph
 		{
 			await QTask.Step();
 			base.OnAfterDeserialize();
+			Debug.LogError(GetHashCode() + " deser [" + this + "]");
 			NodeCache.Clear();
 			foreach (var state in NodeList)
 			{
@@ -47,7 +48,7 @@ namespace QTool.FlowGraph
 		public QFlowGraph CreateInstance()
 		{
 			var graph= SerializeString.ParseQData<QFlowGraph>();
-			Debug.LogError("create [" + SerializeString.ToShortString(100) + "]" + graph);
+			Debug.LogError(graph.GetHashCode()+ "create [" + SerializeString.ToShortString(100) + "]" + graph);
 			graph.SerializeString = SerializeString;
 			return graph;
 		}
