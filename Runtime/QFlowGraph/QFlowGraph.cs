@@ -46,7 +46,9 @@ namespace QTool.FlowGraph
 		}
 		public QFlowGraph CreateInstance()
 		{
-			return SerializeString.ParseQData(this);
+			var graph= SerializeString.ParseQData(this);
+			graph.SerializeString = SerializeString;
+			return graph;
 		}
         public override string ToString()
         {
