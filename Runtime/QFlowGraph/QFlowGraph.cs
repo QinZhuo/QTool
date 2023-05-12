@@ -47,7 +47,7 @@ namespace QTool.FlowGraph
 		}
 		public QFlowGraph CreateInstance()
 		{
-			var graph= SerializeString.ParseQData<QFlowGraph>();
+			var graph= SerializeString.ParseQData<QFlowGraph>(new QFlowGraph());
 			Debug.LogError(graph.GetHashCode()+ "创建 [" + SerializeString.ToShortString(100) + "] \n " + graph);
 			graph.SerializeString = SerializeString;
 			return graph;
