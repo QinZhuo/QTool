@@ -1015,8 +1015,8 @@ namespace QTool
 	public abstract class QSerializeObject<T> : ISerializationCallbackReceiver where T:QSerializeObject<T>
 	{
 		
-		[QIgnore, HideInInspector]
-		public string SerializeString;
+		[QIgnore, HideInInspector,SerializeField]
+		protected string SerializeString;
 		[QIgnore]
 		internal bool IsDirty { get;private set; } = false;
 		public virtual void SetDirty()
