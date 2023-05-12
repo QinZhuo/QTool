@@ -984,6 +984,7 @@ namespace QTool.FlowGraph
 				if (Ports.ContainsKey(valueKey))
 				{
 					Ports[valueKey].Value = value;
+					Debug.LogError("value[" + valueKey + "]=" + value);
 				}
 				else
 				{
