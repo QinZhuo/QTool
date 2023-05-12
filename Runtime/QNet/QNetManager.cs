@@ -72,6 +72,26 @@ namespace QTool.Net
 				}
 			}
 		}
+		public void PlayerRegisterAction<T>(string player, string key, Action<T> action = null)
+		{
+			if (transport.ClientConnected)
+			{
+				if (action != null)
+				{
+					QEventManager.Register(player + "_" + key, (object obj) => action?.Invoke((T)obj));
+				}
+			}
+		}
+		public void PlayerUnRegisterAction<T>(string player, string key, Action<T> action = null)
+		{
+			if (transport.ClientConnected)
+			{
+				if (action != null)
+				{
+					QEventManager.UnRegister(player + "_" + key, (object obj) => action?.Invoke((T)obj));
+				}
+			}
+		}
 		QDictionary<string, Action<object>> NetEvent = new QDictionary<string, Action<object>>();
 		public GameObject playerPrefab;
 		internal QDictionary<string, GameObject> PlayerObjects = new QDictionary<string, GameObject>();

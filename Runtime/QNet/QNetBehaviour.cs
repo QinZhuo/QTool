@@ -31,6 +31,22 @@ namespace QTool.Net
 			}
 			QNetManager.Instance.PlayerAction(PlayerId, key, value, action);
 		}
+		public void PlayerRegisterAction<T>(string key, Action<T> action)
+		{
+			if (!IsPlayer)
+			{
+				throw new System.Exception(this + " 非玩家对象");
+			}
+			QNetManager.Instance.PlayerRegisterAction(PlayerId, key, action);
+		}
+		public void PlayerUnRegisterAction<T>(string key, Action<T> action)
+		{
+			if (!IsPlayer)
+			{
+				throw new System.Exception(this + " 非玩家对象");
+			}
+			QNetManager.Instance.PlayerUnRegisterAction(PlayerId, key, action);
+		}
 		internal QNetTypeInfo TypeInfo { get; set; }
 		public virtual void Awake()
 		{
