@@ -1347,6 +1347,7 @@ namespace QTool.FlowGraph
 			}
 			foreach (var port in OutParamPorts)
             {
+				Debug.LogError(port.Key = " " + commandParams[port.paramIndex]);
                 port.Value = commandParams[port.paramIndex];
             }
         }
