@@ -61,6 +61,9 @@ namespace QTool
 		[Range(0,100)]
 		public int compressionQuality = 50;
 #endif
+		[QName("QNet网络同步速度")]
+		[Range(5, 50)]
+		public int qNetFrameSpeed=50;
 		
 		private void OnValidate()
 		{

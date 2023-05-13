@@ -422,7 +422,7 @@ namespace QTool.Net
 		{
 			if (ClientGameData.ContainsKey(ClientIndex + 1))
 			{
-				QTime.ChangeScale(this, 50);
+				QTime.ChangeScale(this, QToolSetting.Instance.qNetFrameSpeed);
 			}
 			else
 			{
