@@ -103,7 +103,7 @@ namespace QTool
 					var dir = Random.Vector2();
 					var offset = dir.normalized * centerOffset + dir * (range - centerOffset);
 					var position = center + new Vector3(offset.x, 0, offset.y);
-					var other = new Ray(position + Vector3.up, Vector3.down).RayCast<T>(null, radius);
+					var other = new Ray(position + Vector3.up*5, Vector3.down).RayCast<T>(null, radius);
 					if (other == null)
 					{
 						newObject = prefab.CheckInstantiate();
