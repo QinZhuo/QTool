@@ -109,6 +109,7 @@ namespace QTool
 			{
 				newObject = prefab.CheckInstantiate(pointList[i].transform);
 				newObject.transform.rotation = pointList[i].transform.rotation;
+				newObject.transform.localPosition = Vector3.zero;
 				if (This != null)
 				{
 					This[nameof(newObject)] = newObject;
