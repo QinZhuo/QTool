@@ -107,7 +107,7 @@ namespace QTool
 					if (other == null)
 					{
 						newObject = prefab.CheckInstantiate();
-						newObject.transform.localPosition = position;
+						newObject.transform.position = position;
 						if (This != null)
 						{
 							This[nameof(newObject)] = newObject;
