@@ -89,11 +89,9 @@ namespace QTool
 		[QIgnore]
 		public static IEnumerator RandomRangeCarete<T>(QFlowNode This, [QInputPort("场景"), QFlowPort] GameObject root, [QName("范围")] float range=10, [QName("中心偏移")] float centerOffset = 0, [QName("预制体")] GameObject prefab = null, [QName("创建数目")] int count = 1, [QOutputPort, QFlowPort] GameObject newObject = default) where T:Component
 		{
-			Debug.LogError(typeof(T) + "  " + count);
 			var center = root == null ? Vector3.zero : root.transform.position;
 			for (int i = 0; i < count; i++)
 			{
-				Debug.LogError("c " + i);
 				var creating = true;
 				while (creating)
 				{
@@ -103,7 +101,6 @@ namespace QTool
 					if (new Ray(position + Vector3.up, Vector3.down).RayCast<T>() == null)
 					{
 						newObject = prefab.CheckInstantiate();
-						Debug.LogError(" create " + newObject);
 						newObject.transform.position = position;
 						if (This != null)
 						{
