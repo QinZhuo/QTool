@@ -114,6 +114,7 @@ namespace QTool
 							yield return This.RunPortIEnumerator(nameof(newObject));
 						}
 						creating = false;
+						yield return QFlowGraph.Step;
 					}
 					else
 					{
