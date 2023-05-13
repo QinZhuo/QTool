@@ -86,8 +86,34 @@ namespace QTool
 	public static class QRandomNode
 	{
 		public static System.Random Random =null;
-		[QName("随机生成")]
-		private static IEnumerator RandomCreate(QFlowNode This, [QInputPort("场景"), QFlowPort] GameObject root, [QName("位置点")] string pointKey, [QName("预制体")] GameObject prefab, [QName("创建数目")] int count = 1, [QOutputPort, QFlowPort] GameObject newObject = default)
+		[QIgnore]
+		public static IEnumerator RandomRangeCarete<T>(QFlowNode This, [QInputPort("场景"), QFlowPort] GameObject root, [QName("范围")] float range, [QName("中心偏移")] float centerOffset = 0, [QName("预制体")] GameObject prefab = null, [QName("创建数目")] int count = 1, [QOutputPort, QFlowPort] GameObject newObject = default) where T:Component
+		{
+			var center = root == null ? Vector3.zero : root.transform.position;
+			for (int i = 0; i < count; i++)
+			{
+				var creating = true;
+				while (creating)
+				{
+					var dir = Random.Direction2D();
+					var offset = dir.normalized * centerOffset + dir;
+					var position = center + new Vector3(offset.x, 0, offset.y);
+					if (new Ray(position + Vector3.up, Vector3.down).RayCast<T>() == null)
+					{
+						newObject = prefab.CheckInstantiate();
+						newObject.transform.position = position;
+						if (This != null)
+						{
+							This[nameof(newObject)] = newObject;
+							yield return This.RunPortIEnumerator(nameof(newObject));
+						}
+						creating = false;
+					}
+				}
+			}
+		}
+		[QName("随机点生成物体")]
+		private static IEnumerator RandomPointCreate(QFlowNode This, [QInputPort("场景"), QFlowPort] GameObject root, [QName("位置点")] string pointKey, [QName("预制体")] GameObject prefab, [QName("创建数目")] int count = 1, [QOutputPort, QFlowPort] GameObject newObject = default)
 		{
 			var pointList = new List<QPositionPoint>();
 			if (root == null)

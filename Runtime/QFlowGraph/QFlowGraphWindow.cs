@@ -564,7 +564,7 @@ namespace QTool.FlowGraph
 								{
 									if (Event.current.button == 0)
 									{
-										if (curNode != null && curNode.command.method.Name == nameof(QFlowGraphNode.GraphAsset))
+										if (curNode?.command != null && curNode.command.method.Name == nameof(QFlowGraphNode.GraphAsset))
 										{
 
 											if (lastClickTime.GetIntervalSeconds() < 0.5f)

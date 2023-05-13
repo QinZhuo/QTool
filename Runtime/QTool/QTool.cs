@@ -643,7 +643,8 @@ namespace QTool
 				action?.Invoke();
 			}
 		}
-		public static T RayCast<T>(this Ray ray, Func<T, bool> CanCast = null) where T : Component
+	
+		public static T RayCast<T>(this Ray ray, Func<T, bool> CanCast = null,LayerMask layerMask=default) where T : Component
 		{
 			var hits = Physics.RaycastAll(ray);
 			foreach (var hit in hits)
@@ -664,6 +665,7 @@ namespace QTool
 			}
 			return RayCastPlane(ray, Vector3.up, Vector3.zero);
 		}
+		
 		public static Vector3 RayCastPlane(this Ray ray, Vector3 planeNormal, Vector3 planePoint = default)
 		{
 			float d = Vector3.Dot(planePoint - ray.origin, planeNormal) / Vector3.Dot(ray.direction, planeNormal);
