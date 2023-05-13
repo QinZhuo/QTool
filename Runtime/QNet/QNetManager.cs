@@ -478,10 +478,11 @@ namespace QTool.Net
 		{
 			[QIgnore]
 			private QDictionary<string, IEnumerator> List { set; get; } = new QDictionary<string, IEnumerator>();
+			private QDictionary<string, IEnumerator> AddList { set; get; } = new QDictionary<string, IEnumerator>();
 			public int Count => List.Count;
 			public void Start(string key, IEnumerator coroutine)
 			{
-				List[key] = coroutine;
+				AddList[key] = coroutine;
 			}
 			public void Stop(string key)
 			{
@@ -510,7 +511,15 @@ namespace QTool.Net
 			private List<string> removeList = new List<string>();
 			public void Update()
 			{
-				foreach (var kv in List)
+				if (AddList.Count > 0)
+				{
+					foreach (var kv in AddList)
+					{
+						List[kv.Key] = kv.Value;
+					}
+					AddList.Clear();
+				}
+				foreach (var kv in List.ToArray())
 				{
 					var ie = kv.Value;
 					if (!UpdateIEnumerator(ie))
@@ -518,11 +527,14 @@ namespace QTool.Net
 						removeList.Add(kv.Key);
 					}
 				}
-				foreach (var key in removeList)
+				if (removeList.Count > 0)
 				{
-					List.Remove(key);
+					foreach (var key in removeList)
+					{
+						List.Remove(key);
+					}
+					removeList.Clear();
 				}
-				removeList.Clear();
 			}
 			public void Stop()
 			{
