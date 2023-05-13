@@ -61,7 +61,7 @@ namespace QTool.FlowGraph
 			var window = GetWindow<QFlowGraphWindow>();
 			window.minSize = new Vector2(400, 300);
 			window.titleContent = new GUIContent((graph?.Name == null ? "" : graph.Name + " - ") + nameof(QFlowGraph));
-			Graph.Deserialize();
+			graph?.Deserialize();
 			Graph = graph;
 #if UNITY_EDITOR
 			if (Graph == null)
