@@ -72,13 +72,13 @@ namespace QTool
 			if (random == null) return UnityEngine.Random.Range(min, max);
 			return random.Next() % (max - min) + min;
 		}
-		public static Vector2 Direction2D(this System.Random random)
+		public static Vector2 Vector2(this System.Random random)
 		{
-			return new Vector2(random.Range(-1, 1f), random.Range(-1, 1f)).normalized;
+			return new Vector2(random.Range(-1, 1f), random.Range(-1, 1f));
 		}
-		public static Vector3 Direction(this System.Random random)
+		public static Vector3 Vector3(this System.Random random)
 		{
-			return new Vector3(random.Range(-1, 1f), random.Range(-1, 1f), random.Range(-1, 1f)).normalized;
+			return new Vector3(random.Range(-1, 1f), random.Range(-1, 1f), random.Range(-1, 1f));
 		}
 	}
 
@@ -95,14 +95,14 @@ namespace QTool
 				var creating = true;
 				while (creating)
 				{
-					var dir = Random.Direction2D();
+					var dir = Random.Vector2();
 					var offset = dir.normalized * centerOffset + dir * (range - centerOffset);
 					var position = center + new Vector3(offset.x, 0, offset.y);
 					if (new Ray(position + Vector3.up, Vector3.down).RayCast<T>() == null)
 					{
 						newObject = prefab.CheckInstantiate();
 						QDebug.Log("随机生成 [ " + position + " ] " + newObject);
-						newObject.transform.position = position;
+						newObject.transform.localPosition = position;
 						if (This != null)
 						{
 							This[nameof(newObject)] = newObject;

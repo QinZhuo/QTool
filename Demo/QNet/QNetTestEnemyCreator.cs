@@ -16,7 +16,7 @@ public class QNetTestEnemyCreator : QNetBehaviour
 	{
 		if (waitTime.Check(NetDeltaTime* QNetTestPlayer.Players.Count))
 		{
-			var dir = Random.Direction2D();
+			var dir = Random.Vector2();
 			Instantiate(prefab, new Vector3(dir.x,0,dir.y) * 20, Quaternion.identity);
 		}	
 	}
