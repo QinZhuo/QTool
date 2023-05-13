@@ -495,11 +495,7 @@ namespace QTool.Net
 			{
 				if (UpdateIEnumerator(childIe)) return true;
 			}
-			else
-			{
-				ret = ie.MoveNext();
-			}
-			return ret;
+			return ie.MoveNext();
 		}
 		private List<string> removeList = new List<string>();
 		public void Update()
