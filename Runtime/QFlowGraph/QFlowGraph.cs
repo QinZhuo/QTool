@@ -217,6 +217,10 @@ namespace QTool.FlowGraph
 	
 		public void Run(string startNode= QFlowGraphNode.StartKey)
 		{
+			if (NodeList.Count == 0)
+			{
+				OnAfterDeserialize();
+			}
 			Coroutine.Start(startNode, RunIEnumerator(startNode));
 		}
 
