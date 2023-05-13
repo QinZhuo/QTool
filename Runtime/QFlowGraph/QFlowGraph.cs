@@ -219,7 +219,7 @@ namespace QTool.FlowGraph
 		{
 			if (NodeList.Count == 0)
 			{
-				OnAfterDeserialize();
+				Deserialize();
 			}
 			Coroutine.Start(startNode, RunIEnumerator(startNode));
 		}
