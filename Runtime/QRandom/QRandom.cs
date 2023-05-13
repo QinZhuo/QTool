@@ -85,6 +85,7 @@ namespace QTool
 	[QCommandType("基础/程序生成")]
 	public static class QRandomNode
 	{
+		public static System.Random Random =null;
 		[QName("随机生成")]
 		private static IEnumerator RandomCreate(QFlowNode This, [QInputPort("场景"), QFlowPort] GameObject root, [QName("位置点")] string pointKey, [QName("预制体")] GameObject prefab, [QName("创建数目")] int count = 1, [QOutputPort, QFlowPort] GameObject newObject = default)
 		{
@@ -100,7 +101,7 @@ namespace QTool
 				pointList.AddRange(root.GetComponentsInChildren<QPositionPoint>());
 				pointList.RemoveAll((point) => !keyPotnts.Contains(point) || point.HasChild);
 			}
-			pointList.Random();
+			pointList.Random(Random);
 			if (pointList.Count < count)
 			{
 				QDebug.LogWarning("位置点[" + pointKey + "]不足 " + pointList.Count + "<" + count);
@@ -109,7 +110,6 @@ namespace QTool
 			{
 				newObject = prefab.CheckInstantiate(pointList[i].transform);
 				newObject.transform.rotation = pointList[i].transform.rotation;
-				newObject.transform.localPosition = Vector3.zero;
 				if (This != null)
 				{
 					This[nameof(newObject)] = newObject;
