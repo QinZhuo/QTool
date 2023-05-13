@@ -100,7 +100,8 @@ namespace QTool
 					var dir = Random.Vector2();
 					var offset = dir.normalized * centerOffset + dir * (range - centerOffset);
 					var position = center + new Vector3(offset.x, 0, offset.y);
-					if (new Ray(position + Vector3.up, Vector3.down).RayCast<T>(null, bounds.size.magnitude) == null)
+					var other = new Ray(position + Vector3.up, Vector3.down).RayCast<T>(null, bounds.size.magnitude);
+					if (other == null)
 					{
 						newObject = prefab.CheckInstantiate();
 						newObject.transform.localPosition = position;
@@ -110,6 +111,10 @@ namespace QTool
 							yield return This.RunPortIEnumerator(nameof(newObject));
 						}
 						creating = false;
+					}
+					else
+					{
+						QDebug.Log(" 碰撞 "+ other+"  " + bounds.size.magnitude);
 					}
 				}
 			}
