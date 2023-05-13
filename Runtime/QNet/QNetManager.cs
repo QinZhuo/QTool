@@ -495,13 +495,6 @@ namespace QTool.Net
 			{
 				if (UpdateIEnumerator(childIe)) return true;
 			}
-			if (ie.Current is CustomYieldInstruction iWait)
-			{
-				if (!iWait.keepWaiting)
-				{
-					ret = ie.MoveNext();
-				}
-			}
 			else
 			{
 				ret = ie.MoveNext();
