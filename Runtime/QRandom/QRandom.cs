@@ -101,6 +101,10 @@ namespace QTool
 				pointList.RemoveAll((point) => !keyPotnts.Contains(point) || point.HasChild);
 			}
 			pointList.Random();
+			if (count < pointList.Count)
+			{
+				Debug.LogError("位置点[" + pointKey + "]不足 " + count + "<" + pointList.Count);
+			}
 			for (int i = 0; i < count && i < pointList.Count; i++)
 			{
 				newObject = prefab.CheckInstantiate(pointList[i].transform);
