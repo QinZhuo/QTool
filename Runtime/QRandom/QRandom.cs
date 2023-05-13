@@ -86,6 +86,7 @@ namespace QTool
 	public static class QRandomNode
 	{
 		public static System.Random Random =null;
+		public static int MaxRandomTimes { get; set; } = 10;
 		[QIgnore]
 		public static IEnumerator RandomRangeCarete<T>(QFlowNode This, [QInputPort("场景"), QFlowPort] GameObject root, [QName("范围")] float range=10, [QName("中心偏移")] float centerOffset = 0, [QName("预制体")] GameObject prefab = null, [QName("创建数目")] int count = 1, [QOutputPort, QFlowPort] GameObject newObject = default,float radius=0) where T:Component
 		{
@@ -98,7 +99,8 @@ namespace QTool
 			for (int i = 0; i < count; i++)
 			{
 				var creating = true;
-				while (creating)
+				var times = 0;
+				while (creating && times++ < MaxRandomTimes)
 				{
 					var dir = Random.Vector2();
 					var offset = dir.normalized * centerOffset + dir * (range - centerOffset);
