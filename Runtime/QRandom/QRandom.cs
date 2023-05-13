@@ -90,8 +90,8 @@ namespace QTool
 		public static IEnumerator RandomRangeCarete<T>(QFlowNode This, [QInputPort("场景"), QFlowPort] GameObject root, [QName("范围")] float range=10, [QName("中心偏移")] float centerOffset = 0, [QName("预制体")] GameObject prefab = null, [QName("创建数目")] int count = 1, [QOutputPort, QFlowPort] GameObject newObject = default) where T:Component
 		{
 			var center = root == null ? Vector3.zero : root.transform.position;
-			var bounds = prefab.GetBounds();
-			
+			var radius = prefab.GetBounds().size.magnitude;
+			QDebug.Log("射线检测半径[" + radius + "]");
 			for (int i = 0; i < count; i++)
 			{
 				var creating = true;
@@ -100,7 +100,7 @@ namespace QTool
 					var dir = Random.Vector2();
 					var offset = dir.normalized * centerOffset + dir * (range - centerOffset);
 					var position = center + new Vector3(offset.x, 0, offset.y);
-					var other = new Ray(position + Vector3.up, Vector3.down).RayCast<T>(null, bounds.size.magnitude);
+					var other = new Ray(position + Vector3.up, Vector3.down).RayCast<T>(null, radius);
 					if (other == null)
 					{
 						newObject = prefab.CheckInstantiate();
@@ -114,7 +114,7 @@ namespace QTool
 					}
 					else
 					{
-						QDebug.Log(" 碰撞 "+ other+"  " + bounds.size.magnitude);
+						QDebug.Log(" 碰撞 " + other);
 					}
 				}
 			}
