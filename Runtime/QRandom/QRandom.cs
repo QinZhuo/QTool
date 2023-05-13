@@ -101,9 +101,9 @@ namespace QTool
 				pointList.RemoveAll((point) => !keyPotnts.Contains(point) || point.HasChild);
 			}
 			pointList.Random();
-			if (count < pointList.Count)
+			if (pointList.Count < count)
 			{
-				Debug.LogError("位置点[" + pointKey + "]不足 " + count + "<" + pointList.Count);
+				QDebug.LogWarning("位置点[" + pointKey + "]不足 " + pointList.Count + "<" + count);
 			}
 			for (int i = 0; i < count && i < pointList.Count; i++)
 			{
