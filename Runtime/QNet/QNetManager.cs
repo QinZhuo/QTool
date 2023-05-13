@@ -6,6 +6,8 @@ using System.Net;
 using System.Timers;
 using UnityEngine;
 using QTool.Reflection;
+using System.Collections;
+
 namespace QTool.Net
 {
 
@@ -17,6 +19,7 @@ namespace QTool.Net
 		[Range(15,60)]
 		private int netFps = 30;
 		public System.Random Random { get; private set; } = null;
+		private QCoroutineList Coroutine = new QCoroutineList();
 		protected override void Awake()
 		{
 			base.Awake();
@@ -25,6 +28,7 @@ namespace QTool.Net
 			Physics.autoSyncTransforms = false;
 			Time.fixedDeltaTime = 1f / netFps;
 			FlowGraph.QFlowGraph.Step = WaitForNetUpdate.Instance;
+			FlowGraph.QFlowGraph.Coroutine = Coroutine;
 			QTool.AddPlayerLoop(typeof(QNetManager), QNetPlayerLoop,"FixedUpdate");
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
 			QToolManager.Instance.OnGUIEvent += DebugGUI;
@@ -341,6 +345,7 @@ namespace QTool.Net
 						ClientActionData[actionData.Key].MergeValues(actionData);
 					}
 					OnNetUpdate?.Invoke();
+					Coroutine.Update();
 					Physics.Simulate(Time.fixedDeltaTime);
 					Physics.SyncTransforms();
 					if (loadEventData != null)
@@ -469,6 +474,61 @@ namespace QTool.Net
 		}
 #endif
 
+		public class QCoroutineList : ICoroutineList
+		{
+			[QIgnore]
+			private QDictionary<string, IEnumerator> List { set; get; } = new QDictionary<string, IEnumerator>();
+			public int Count => List.Count;
+			public void Start(string key, IEnumerator coroutine)
+			{
+				List[key] = coroutine;
+			}
+			public void Stop(string key)
+			{
+				List.Remove(key);
+			}
+			bool UpdateIEnumerator(IEnumerator ie)
+			{
+				bool ret = true;
+				if (ie.Current is IEnumerator childIe)
+				{
+					if (UpdateIEnumerator(childIe)) return true;
+				}
+				if (ie.Current is CustomYieldInstruction iWait)
+				{
+					if (!iWait.keepWaiting)
+					{
+						ret = ie.MoveNext();
+					}
+				}
+				else
+				{
+					ret = ie.MoveNext();
+				}
+				return ret;
+			}
+			private List<string> removeList = new List<string>();
+			public void Update()
+			{
+				foreach (var kv in List)
+				{
+					var ie = kv.Value;
+					if (!UpdateIEnumerator(ie))
+					{
+						removeList.Add(kv.Key);
+					}
+				}
+				foreach (var key in removeList)
+				{
+					List.Remove(key);
+				}
+			}
+			public void Stop()
+			{
+				List.Clear();
+			}
+		}
+
 	}
 	
 	public class QNetActionData : IKey<string>
@@ -498,6 +558,7 @@ namespace QTool.Net
 			Events.Clear();
 		}
 	}
+
 	public class WaitForNetUpdate : CustomYieldInstruction
 	{
 		public static WaitForNetUpdate Instance { get; private set; } = new WaitForNetUpdate();

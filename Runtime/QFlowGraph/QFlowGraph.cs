@@ -67,7 +67,7 @@ namespace QTool.FlowGraph
 		public QList<string,QFlowNode> NodeList { private set; get; } = new QList<string,QFlowNode>();
 		[QName]
 		public QDictionary<string, object> Values { private set; get; } = new QDictionary<string, object>();
-		public bool IsRunning => CoroutineList.Count > 0;
+		public bool IsRunning => Coroutine.Count > 0;
         public T GetValue<T>(string key="")
         {
             var type = typeof(T);
@@ -213,61 +213,12 @@ namespace QTool.FlowGraph
             node.Init(this);
             return node;
 		}
-		[QIgnore]
-		public Func<IEnumerator,Coroutine> StartCoroutineOverride;
-		[QIgnore]
-		public Action<Coroutine> StopCoroutineOverride;
-		[QIgnore]
-		public QDictionary<string, Coroutine> CoroutineList { private set; get; } = new QDictionary<string, Coroutine>();
-		internal void StartCoroutine(string key,IEnumerator coroutine)
-        {
-            if (StartCoroutineOverride == null)
-            {
-				CoroutineList[key] = QToolManager.Instance.StartCoroutine(coroutine);
-            }
-            else
-            {
-				CoroutineList[key] = StartCoroutineOverride(coroutine);
-            }
-        }
-		public void Stop()
-		{
-			if (StopCoroutineOverride == null)
-			{
-				foreach (var kv in CoroutineList)
-				{
-					if(kv.Value is Coroutine cor)
-					{
-						QToolManager.Instance.StopCoroutine(cor);
-					}
-				}
-			}
-			else
-			{
-				foreach (var kv in CoroutineList)
-				{
-					StopCoroutineOverride(kv.Value);
-				}
-			}
-			CoroutineList.Clear();
-		}
+		
+	
 		public void Run(string startNode= QFlowGraphNode.StartKey)
 		{
-			StartCoroutine(startNode, RunIEnumerator(startNode));
+			Coroutine.Start(startNode, RunIEnumerator(startNode));
 		}
-		public void Run(MonoBehaviour component, string startNode =QFlowGraphNode.StartKey)
-		{
-			this.StartCoroutineOverride = component.StartCoroutine;
-			this.StopCoroutineOverride = component.StopCoroutine;
-			StartCoroutine(startNode,  RunIEnumerator(startNode));
-		}
-		public void Run(string startNode, Func<IEnumerator, Coroutine> StartCoroutineOverride , Action<Coroutine> StopCoroutineOverride)
-        {
-            this.StartCoroutineOverride = StartCoroutineOverride;
-			this.StopCoroutineOverride = StopCoroutineOverride;
-            StartCoroutine(startNode,RunIEnumerator(startNode));
-		}
-	
 
 		public IEnumerator RunIEnumerator(string startNode)
         {
@@ -321,17 +272,22 @@ namespace QTool.FlowGraph
 			{
 				Debug.LogError("不存在开始节点 [" + startNode + "]");
 			}
-			CoroutineList.RemoveKey(startNode);
+			Coroutine.Stop(startNode);
         }
-		
+		public void Stop()
+		{
+			Coroutine.Stop();
+		}
 		public void Clear()
 		{
-			this.Stop();
+			Coroutine.Stop();
 			foreach (var node in NodeList.ToArray())
 			{
 				Remove(node);
 			}
 		}
+
+		public static ICoroutineList Coroutine { get; set; } = new QCoroutineList();
 		public static IEnumerator Step { get; set; } = FixedUpdateStep();
 
 		static WaitForFixedUpdate wait= new WaitForFixedUpdate();
@@ -339,8 +295,33 @@ namespace QTool.FlowGraph
 		{
 			yield return wait;
 		}
+		public class QCoroutineList : ICoroutineList
+		{
+			private QDictionary<string, Coroutine> List { set; get; } = new QDictionary<string, Coroutine>();
+			public int Count => List.Count;
+			public void Start(string key, IEnumerator coroutine)
+			{
+				List[key] = QToolManager.Instance.StartCoroutine(coroutine);
+			}
+			public void Stop(string key)
+			{
+				List.Remove(key);
+			}
+			public void Stop()
+			{
+				foreach (var kv in List)
+				{
+					if (kv.Value is Coroutine cor)
+					{
+						QToolManager.Instance.StopCoroutine(cor);
+					}
+				}
+				List.Clear();
+			}
+		}
 	}
-    public struct PortId
+	
+	public struct PortId
     {
         public string node;
         public string port;
@@ -1279,7 +1260,7 @@ namespace QTool.FlowGraph
         }
         public void RunPort(string portKey,int index=0)
         {
-			Graph.StartCoroutine(Key,RunPortIEnumerator(portKey,index));
+			QFlowGraph.Coroutine.Start(Key,RunPortIEnumerator(portKey,index));
         }
         public IEnumerator RunPortIEnumerator(string portKey, int index = 0)
 		{
