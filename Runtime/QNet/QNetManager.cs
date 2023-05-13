@@ -19,7 +19,7 @@ namespace QTool.Net
 		[Range(15,60)]
 		private int netFps = 30;
 		public System.Random Random { get; private set; } = null;
-		private QCoroutineList Coroutine = new QCoroutineList();
+		private QNetCoroutineList Coroutine = new QNetCoroutineList();
 		protected override void Awake()
 		{
 			base.Awake();
@@ -473,77 +473,75 @@ namespace QTool.Net
 			GUILayout.EndVertical();
 		}
 #endif
-
-		public class QCoroutineList : ICoroutineList
+	}
+	public class QNetCoroutineList : ICoroutineList
+	{
+		[QIgnore]
+		private QDictionary<string, IEnumerator> List { set; get; } = new QDictionary<string, IEnumerator>();
+		private QDictionary<string, IEnumerator> AddList { set; get; } = new QDictionary<string, IEnumerator>();
+		public int Count => List.Count;
+		public void Start(string key, IEnumerator coroutine)
 		{
-			[QIgnore]
-			private QDictionary<string, IEnumerator> List { set; get; } = new QDictionary<string, IEnumerator>();
-			private QDictionary<string, IEnumerator> AddList { set; get; } = new QDictionary<string, IEnumerator>();
-			public int Count => List.Count;
-			public void Start(string key, IEnumerator coroutine)
+			AddList[key] = coroutine;
+		}
+		public void Stop(string key)
+		{
+			List.Remove(key);
+		}
+		bool UpdateIEnumerator(IEnumerator ie)
+		{
+			bool ret = true;
+			if (ie.Current is IEnumerator childIe)
 			{
-				AddList[key] = coroutine;
+				if (UpdateIEnumerator(childIe)) return true;
 			}
-			public void Stop(string key)
+			if (ie.Current is CustomYieldInstruction iWait)
 			{
-				List.Remove(key);
-			}
-			bool UpdateIEnumerator(IEnumerator ie)
-			{
-				bool ret = true;
-				if (ie.Current is IEnumerator childIe)
-				{
-					if (UpdateIEnumerator(childIe)) return true;
-				}
-				if (ie.Current is CustomYieldInstruction iWait)
-				{
-					if (!iWait.keepWaiting)
-					{
-						ret = ie.MoveNext();
-					}
-				}
-				else
+				if (!iWait.keepWaiting)
 				{
 					ret = ie.MoveNext();
 				}
-				return ret;
 			}
-			private List<string> removeList = new List<string>();
-			public void Update()
+			else
 			{
-				if (AddList.Count > 0)
+				ret = ie.MoveNext();
+			}
+			return ret;
+		}
+		private List<string> removeList = new List<string>();
+		public void Update()
+		{
+			if (AddList.Count > 0)
+			{
+				foreach (var kv in AddList)
 				{
-					foreach (var kv in AddList)
-					{
-						List[kv.Key] = kv.Value;
-					}
-					AddList.Clear();
+					List[kv.Key] = kv.Value;
 				}
-				foreach (var kv in List.ToArray())
+				AddList.Clear();
+			}
+			foreach (var kv in List.ToArray())
+			{
+				var ie = kv.Value;
+				if (!UpdateIEnumerator(ie))
 				{
-					var ie = kv.Value;
-					if (!UpdateIEnumerator(ie))
-					{
-						removeList.Add(kv.Key);
-					}
-				}
-				if (removeList.Count > 0)
-				{
-					foreach (var key in removeList)
-					{
-						List.Remove(key);
-					}
-					removeList.Clear();
+					removeList.Add(kv.Key);
 				}
 			}
-			public void Stop()
+			if (removeList.Count > 0)
 			{
-				List.Clear();
+				foreach (var key in removeList)
+				{
+					List.Remove(key);
+				}
+				removeList.Clear();
 			}
 		}
-
+		public void Stop()
+		{
+			List.Clear();
+		}
 	}
-	
+
 	public class QNetActionData : IKey<string>
 	{
 		public string Key { get; set; }
