@@ -1014,8 +1014,8 @@ namespace QTool
 	//}
 	public abstract class QSerializeObject<T> : ISerializationCallbackReceiver where T:QSerializeObject<T>
 	{
-		
-		[QIgnore, HideInInspector,SerializeField]
+
+		[QIgnore, HideInInspector, SerializeField]
 		protected string SerializeString;
 		[QIgnore]
 		internal bool IsDirty { get;private set; } = false;
@@ -1029,9 +1029,13 @@ namespace QTool
 			IsDirty = false;
 			SerializeString = (this as T).ToQData();
 		}
-		public virtual void OnAfterDeserialize()
+		public void Fresh()
 		{
 			SerializeString.ParseQData(this as T);
+		}
+		public virtual void OnAfterDeserialize()
+		{
+			Fresh();
 		}
 	}
 	[AttributeUsage(AttributeTargets.Method | AttributeTargets.Field | AttributeTargets.Property | AttributeTargets.Interface)]

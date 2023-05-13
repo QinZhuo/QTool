@@ -61,7 +61,8 @@ namespace QTool.FlowGraph
 			var window = GetWindow<QFlowGraphWindow>();
 			window.minSize = new Vector2(400, 300);
 			window.titleContent = new GUIContent((graph?.Name == null ? "" : graph.Name + " - ") + nameof(QFlowGraph));
-            Graph = graph;
+			graph.Fresh();
+			Graph = graph;
 #if UNITY_EDITOR
 			if (Graph == null)
 			{
@@ -248,7 +249,7 @@ namespace QTool.FlowGraph
 			ForeachSelectNodes((node) => Graph.Remove(node));
 			Repaint();
 		}
-        void ForeachSelectNodes(System.Action<QFlowNode> action)
+        void ForeachSelectNodes(Action<QFlowNode> action)
         {
             if (SelectNodes.Count > 0)
             {
