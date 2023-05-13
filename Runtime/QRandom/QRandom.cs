@@ -93,8 +93,8 @@ namespace QTool
 			if (radius <= 0)
 			{
 				radius = prefab.GetBounds().size.magnitude;
-				QDebug.Log("射线检测半径[" + radius + "]");
 			}
+			QDebug.Log("射线检测半径[" + radius + "]");
 			for (int i = 0; i < count; i++)
 			{
 				var creating = true;
