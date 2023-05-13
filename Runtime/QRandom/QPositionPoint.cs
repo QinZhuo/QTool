@@ -43,7 +43,7 @@ namespace QTool
 		private void OnDrawGizmos()
 		{
 			Gizmos.color = name.ToColor();
-			Gizmos.DrawSphere(transform.position, 0.2f);
+			Gizmos.DrawSphere(transform.position, 0.5f);
 		}
 	}
 	
