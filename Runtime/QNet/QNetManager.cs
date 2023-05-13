@@ -522,6 +522,7 @@ namespace QTool.Net
 				{
 					List.Remove(key);
 				}
+				removeList.Clear();
 			}
 			public void Stop()
 			{
