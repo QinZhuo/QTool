@@ -96,7 +96,7 @@ namespace QTool
 				while (creating)
 				{
 					var dir = Random.Direction2D();
-					var offset = dir.normalized * centerOffset + dir;
+					var offset = dir.normalized * centerOffset + dir * (range - centerOffset);
 					var position = center + new Vector3(offset.x, 0, offset.y);
 					if (new Ray(position + Vector3.up, Vector3.down).RayCast<T>() == null)
 					{
