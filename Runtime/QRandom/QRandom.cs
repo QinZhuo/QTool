@@ -93,8 +93,8 @@ namespace QTool
 			if (radius <= 0)
 			{
 				radius = prefab.GetBounds().size.magnitude;
+				QDebug.Log(prefab + " 射线检测半径[" + radius + "]");
 			}
-			QDebug.Log("射线检测半径[" + radius + "]");
 			for (int i = 0; i < count; i++)
 			{
 				var creating = true;
@@ -103,7 +103,7 @@ namespace QTool
 					var dir = Random.Vector2();
 					var offset = dir.normalized * centerOffset + dir * (range - centerOffset);
 					var position = center + new Vector3(offset.x, 0, offset.y);
-					var other = new Ray(position + Vector3.up*5, Vector3.down).RayCast<T>(null, radius);
+					var other = new Ray(position + Vector3.up, Vector3.down).RayCast<T>(null, radius);
 					if (other == null)
 					{
 						newObject = prefab.CheckInstantiate();
@@ -115,10 +115,6 @@ namespace QTool
 						}
 						creating = false;
 						yield return QFlowGraph.Step;
-					}
-					else
-					{
-						QDebug.Log(" 碰撞 " + other);
 					}
 				}
 			}
