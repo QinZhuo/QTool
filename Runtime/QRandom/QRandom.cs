@@ -101,6 +101,7 @@ namespace QTool
 					if (new Ray(position + Vector3.up, Vector3.down).RayCast<T>() == null)
 					{
 						newObject = prefab.CheckInstantiate();
+						Debug.LogError(" create " + newObject);
 						newObject.transform.position = position;
 						if (This != null)
 						{
