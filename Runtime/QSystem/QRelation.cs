@@ -37,8 +37,8 @@ namespace QTool
 	}
 	public enum QTeamRelaction
 	{
-		队友,
-		敌人,
+		队友 = 0,
+		敌人 = 1,
 	}
 	/// <summary>
 	/// 队伍
