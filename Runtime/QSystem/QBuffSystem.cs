@@ -187,12 +187,12 @@ namespace QTool
 		}
 		protected virtual void OnRemove(QBuffRuntime buff)
 		{
-			if (buff.Graph.ContainsNode(RemoveEventKey, out var remveNode))
-			{
-				buff.TriggerEvent(RemoveEventKey);
-			}
 			if (buff.Graph!=null)
 			{
+				if (buff.Graph.ContainsNode(RemoveEventKey, out var remveNode))
+				{
+					buff.TriggerEvent(RemoveEventKey);
+				}
 				foreach (var node in buff.Graph.NodeList)
 				{
 					if (!node.Is(nameof(QFlowGraphNode.Start))) continue;
