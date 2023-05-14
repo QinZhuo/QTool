@@ -478,27 +478,28 @@ namespace QTool.Net
 	public class QNetCoroutineList : ICoroutineList
 	{
 		[QIgnore]
-		private QDictionary<string, IEnumerator> List { set; get; } = new QDictionary<string, IEnumerator>();
-		private QDictionary<string, IEnumerator> AddList { set; get; } = new QDictionary<string, IEnumerator>();
+		private QDictionary<Coroutine, IEnumerator> List { set; get; } = new QDictionary<Coroutine, IEnumerator>();
+		private QDictionary<Coroutine, IEnumerator> AddList { set; get; } = new QDictionary<Coroutine, IEnumerator>();
 		public int Count => List.Count;
-		public void Start(string key, IEnumerator coroutine)
+		public Coroutine Start(IEnumerator enumerator)
 		{
-			AddList[key] = coroutine;
+			Coroutine coroutine = typeof(Coroutine).CreateInstance() as Coroutine;
+			AddList[coroutine] = enumerator;
+			return coroutine;
 		}
-		public void Stop(string key)
+		public void Stop(Coroutine coroutine)
 		{
-			List.Remove(key);
+			List.Remove(coroutine);
 		}
 		bool UpdateIEnumerator(IEnumerator ie)
 		{
-			bool ret = true;
 			if (ie.Current is IEnumerator childIe)
 			{
 				if (UpdateIEnumerator(childIe)) return true;
 			}
 			return ie.MoveNext();
 		}
-		private List<string> removeList = new List<string>();
+		private List<Coroutine> removeList = new List<Coroutine>();
 		public void Update()
 		{
 			if (AddList.Count > 0)

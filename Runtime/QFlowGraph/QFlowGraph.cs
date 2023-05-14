@@ -221,9 +221,9 @@ namespace QTool.FlowGraph
 			{
 				Deserialize();
 			}
-			Coroutine.Start(startNode, RunIEnumerator(startNode));
+			Cache[startNode]=Coroutine.Start(RunIEnumerator(startNode));
 		}
-
+		internal QDictionary<string, Coroutine> Cache = new QDictionary<string, Coroutine>();
 		public IEnumerator RunIEnumerator(string startNode)
         {
 			if (startNode.IsNull()) yield break;
@@ -276,7 +276,7 @@ namespace QTool.FlowGraph
 			{
 				Debug.LogError("不存在开始节点 [" + startNode + "]");
 			}
-			Coroutine.Stop(startNode);
+			Coroutine.Stop(Cache[startNode]);
         }
 		public void Stop()
 		{
@@ -301,24 +301,23 @@ namespace QTool.FlowGraph
 		}
 		public class QCoroutineList : ICoroutineList
 		{
-			private QDictionary<string, Coroutine> List { set; get; } = new QDictionary<string, Coroutine>();
+			private List<Coroutine> List { set; get; } = new List<Coroutine>();
 			public int Count => List.Count;
-			public void Start(string key, IEnumerator coroutine)
+			public Coroutine Start(IEnumerator enumerator)
 			{
-				List[key] = QToolManager.Instance.StartCoroutine(coroutine);
+				var coroutine = QToolManager.Instance.StartCoroutine(enumerator);
+				List.Add(coroutine);
+				return coroutine;
 			}
-			public void Stop(string key)
+			public void Stop(Coroutine coroutine)
 			{
-				List.Remove(key);
+				List.Remove(coroutine);
 			}
 			public void Stop()
 			{
-				foreach (var kv in List)
+				foreach (var coroutine in List)
 				{
-					if (kv.Value is Coroutine cor)
-					{
-						QToolManager.Instance.StopCoroutine(cor);
-					}
+					QToolManager.Instance.StopCoroutine(coroutine);
 				}
 				List.Clear();
 			}
@@ -1264,7 +1263,7 @@ namespace QTool.FlowGraph
         }
         public void RunPort(string portKey,int index=0)
         {
-			QFlowGraph.Coroutine.Start(Key,RunPortIEnumerator(portKey,index));
+			Graph.Cache[Key] = QFlowGraph.Coroutine.Start(RunPortIEnumerator(portKey, index));
         }
         public IEnumerator RunPortIEnumerator(string portKey, int index = 0)
 		{
@@ -1286,7 +1285,6 @@ namespace QTool.FlowGraph
 				Debug.LogError("不存在命令【" + commandKey + "】");
 				yield break;
 			}
-			QDebug.Log(Graph.Name + " 运行节点 " + Name);
 			State = QNodeState.运行中;
 			object returnObj = null;
 			try
