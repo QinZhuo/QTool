@@ -42,7 +42,7 @@ namespace QTool
 	}
 	public interface IQTeam
 	{
-		public string Team { get; set; }
+		public string Team { get; }
 	}
 	/// <summary>
 	/// 队伍
