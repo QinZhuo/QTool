@@ -27,7 +27,14 @@ namespace QTool
 		private RuntimeT _Runtime = null;
 		public RuntimeT Runtime
 		{
-			get => _Runtime;
+			get
+			{
+				if (_Runtime == null)
+				{
+					Runtime = QRuntime<RuntimeT, DataT>.Get(gameObject.QName());
+				}
+				return _Runtime;
+			}
 			set
 			{
 				if (value != _Runtime)
@@ -41,10 +48,7 @@ namespace QTool
 		public DataT Data => Runtime?.Data;
 		public virtual void Start()
 		{
-			if (Runtime == null)
-			{
-				Runtime = QRuntime<RuntimeT, DataT>.Get(name);
-			}
+			var runtime = Runtime;
 		}
 		public virtual void OnDestroy()
 		{
