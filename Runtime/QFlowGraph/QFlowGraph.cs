@@ -1286,6 +1286,7 @@ namespace QTool.FlowGraph
 				Debug.LogError("不存在命令【" + commandKey + "】");
 				yield break;
 			}
+			QDebug.Log(Graph.Name + " 运行节点 " + Name);
 			State = QNodeState.运行中;
 			object returnObj = null;
 			try
