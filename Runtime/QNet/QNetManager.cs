@@ -27,8 +27,8 @@ namespace QTool.Net
 			Physics.autoSyncTransforms = false;
 			Time.fixedDeltaTime = 1f / netFps;
 			FlowGraph.QFlowGraph.Step = WaitForNetUpdate.Instance;
-			FlowGraph.QFlowGraph.StartCoroutine = QNetCoroutine.Start;
-			FlowGraph.QFlowGraph.StopCoroutine = QNetCoroutine.Stop;
+			FlowGraph.QFlowGraph.StartCoroutineOverride = QNetCoroutine.Start;
+			FlowGraph.QFlowGraph.StopCoroutineOverride  = QNetCoroutine.Stop;
 			QTool.AddPlayerLoop(typeof(QNetManager), QNetPlayerLoop,"FixedUpdate");
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
 			QToolManager.Instance.OnGUIEvent += DebugGUI;

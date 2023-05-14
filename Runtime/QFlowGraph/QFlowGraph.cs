@@ -222,7 +222,7 @@ namespace QTool.FlowGraph
 			{
 				Deserialize();
 			}
-			InternalStartCoroutine(RunIEnumerator(startNode));
+			StartCoroutine(RunIEnumerator(startNode));
 		}
 		public IEnumerator RunIEnumerator(string startNode)
         {
@@ -279,9 +279,9 @@ namespace QTool.FlowGraph
         }
 		public void Stop()
 		{
-			foreach (var coroutine in CoroutineList)
+			foreach (var coroutine in CoroutineList.ToArray())
 			{
-				QToolManager.Instance.StopCoroutine(coroutine);
+				StopCoroutine(coroutine);
 			}
 		}
 		public void Clear()
@@ -292,13 +292,32 @@ namespace QTool.FlowGraph
 				Remove(node);
 			}
 		}
-		internal void InternalStartCoroutine(IEnumerator coroutine)
+		public void StartCoroutine(IEnumerator coroutine)
 		{
 			CoroutineList.Add(coroutine);
-			StartCoroutine(coroutine);
+			if (StartCoroutineOverride == null)
+			{
+				QToolManager.Instance.StartCoroutine(coroutine);
+			}
+			else
+			{
+				StartCoroutineOverride(coroutine);
+			}
 		}
-		public static Action<IEnumerator> StartCoroutine { get; set; } = (ie) => QToolManager.Instance.StartCoroutine(ie);
-		public static Action<IEnumerator> StopCoroutine { get; set; } = QToolManager.Instance.StopCoroutine;
+		public void StopCoroutine(IEnumerator coroutine)
+		{
+			CoroutineList.Remove(coroutine);
+			if (StartCoroutineOverride == null)
+			{
+				QToolManager.Instance.StopCoroutine(coroutine);
+			}
+			else
+			{
+				StopCoroutineOverride(coroutine);
+			}
+		}
+		public static Action<IEnumerator> StartCoroutineOverride { get; set; } = null;
+		public static Action<IEnumerator> StopCoroutineOverride { get; set; } = null;
 		public static IEnumerator Step { get; set; } = FixedUpdateStep();
 
 		static WaitForFixedUpdate wait= new WaitForFixedUpdate();
@@ -1248,7 +1267,7 @@ namespace QTool.FlowGraph
         }
         public void RunPort(string portKey,int index=0)
         {
-			Graph.InternalStartCoroutine(RunPortIEnumerator(portKey, index));
+			Graph.StartCoroutine(RunPortIEnumerator(portKey, index));
         }
         public IEnumerator RunPortIEnumerator(string portKey, int index = 0)
 		{
