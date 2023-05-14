@@ -170,12 +170,12 @@ namespace QTool
 		public event Action<QBuffRuntime> OnRemoveBuff = null;
 		protected virtual void OnAdd(QBuffRuntime buff)
 		{
-			if (buff.Graph.ContainsNode(AddEventKey,out var addNode))
-			{
-				buff.TriggerEvent(AddEventKey);
-			}
 			if (buff.Graph != null)
 			{
+				if (buff.Graph.ContainsNode(AddEventKey, out var addNode))
+				{
+					buff.TriggerEvent(AddEventKey);
+				}
 				foreach (var node in buff.Graph.NodeList)
 				{
 					if (!node.Is(nameof(QFlowGraphNode.Start))) continue;
