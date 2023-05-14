@@ -26,9 +26,9 @@ namespace QTool.Net
 			Physics.autoSimulation = false;
 			Physics.autoSyncTransforms = false;
 			Time.fixedDeltaTime = 1f / netFps;
-			//FlowGraph.QFlowGraph.Step = WaitForNetUpdate.Instance;
-			//FlowGraph.QFlowGraph.StartCoroutineOverride = QNetCoroutine.Start;
-			//FlowGraph.QFlowGraph.StopCoroutineOverride  = QNetCoroutine.Stop;
+			FlowGraph.QFlowGraph.Step = WaitForNetUpdate.Instance;
+			FlowGraph.QFlowGraph.StartCoroutineOverride = QNetCoroutine.Start;
+			FlowGraph.QFlowGraph.StopCoroutineOverride  = QNetCoroutine.Stop;
 			QTool.AddPlayerLoop(typeof(QNetManager), QNetPlayerLoop,"FixedUpdate");
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
 			QToolManager.Instance.OnGUIEvent += DebugGUI;
@@ -347,7 +347,7 @@ namespace QTool.Net
 						ClientActionData[actionData.Key].MergeValues(actionData);
 					}
 					OnNetUpdate?.Invoke();
-					OnCoroutineUpdate?.Invoke();
+					QNetCoroutine.Update();
 					Physics.Simulate(Time.fixedDeltaTime);
 					Physics.SyncTransforms();
 					if (loadEventData != null)
@@ -437,7 +437,6 @@ namespace QTool.Net
 			}
 		}
 		internal event Action OnNetUpdate=null;
-		internal event Action OnCoroutineUpdate = null;
 		internal event Action<QNetSyncFlag> OnSyncCheck = null;
 		#endregion
 
