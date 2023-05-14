@@ -232,6 +232,7 @@ namespace QTool
 			}
 			public void TriggerEvent(string key)
 			{
+				QDebug.Log("[" + key + "]触发[" + key + "]");
 				Graph?.Run(key);
 			}
 		}
