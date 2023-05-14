@@ -49,7 +49,6 @@ namespace QTool
 		public virtual void Start()
 		{
 			var runtime = Runtime;
-			Debug.LogError(this + " [" + GetHashCode() + "] 初始化 ");
 		}
 		public virtual void OnDestroy()
 		{
@@ -57,7 +56,6 @@ namespace QTool
 			{
 				Runtime = null;
 			}
-			Debug.LogError(this + " [" + GetHashCode() + "] 回收 ");
 		}
 
 	}
