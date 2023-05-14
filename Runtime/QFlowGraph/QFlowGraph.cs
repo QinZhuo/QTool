@@ -297,8 +297,8 @@ namespace QTool.FlowGraph
 			CoroutineList.Add(coroutine);
 			StartCoroutine(coroutine);
 		}
-		public static Action<IEnumerator> StartCoroutine = (ie) => QToolManager.Instance.StartCoroutine(ie);
-		public static Action<IEnumerator> StopCoroutine = QToolManager.Instance.StopCoroutine;
+		public static Action<IEnumerator> StartCoroutine { get; set; } = (ie) => QToolManager.Instance.StartCoroutine(ie);
+		public static Action<IEnumerator> StopCoroutine { get; set; } = QToolManager.Instance.StopCoroutine;
 		public static IEnumerator Step { get; set; } = FixedUpdateStep();
 
 		static WaitForFixedUpdate wait= new WaitForFixedUpdate();
