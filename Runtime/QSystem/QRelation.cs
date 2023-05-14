@@ -30,9 +30,13 @@ namespace QTool
 			}
 		}
 		private QDictionary<QRelation, float> Values = new QDictionary<QRelation, float>();
-		public static float Get(string a, string b)
+		public static float GetValue(string a, string b)
 		{
 			return Relations[a][b];
+		}
+		public static QTeamRelaction GetRelaction(string a,string b)
+		{
+			return GetValue(a, b) >= 0 ? QTeamRelaction.队友 : QTeamRelaction.敌人;
 		}
 	}
 	public enum QTeamRelaction
@@ -55,17 +59,17 @@ namespace QTool
 			list.Clear();
 			foreach (var team in Teams)
 			{
-				var relation = QRelation.Get(team.Key, teamKey);
-				if (relactionType == QTeamRelaction.敌人)
+				var relation = QRelation.GetValue(team.Key, teamKey);
+				if (relation < relactionValue)
 				{
-					if (relation < relactionValue)
+					if (relactionType == QTeamRelaction.敌人)
 					{
 						list.AddRange(list);
 					}
 				}
 				else
 				{
-					if (relation >= relactionValue)
+					if(relactionType== QTeamRelaction.队友)
 					{
 						list.AddRange(list);
 					}
@@ -77,7 +81,7 @@ namespace QTool
 	{
 		public static QTeamRelaction GetRelaction<T>(this T a,T b) where T:IQTeam
 		{
-			if (QRelation.Get(a.Team, b.Team) >= 0)
+			if (QRelation.GetValue(a.Team, b.Team) >= 0)
 			{
 				return QTeamRelaction.队友;
 			}
