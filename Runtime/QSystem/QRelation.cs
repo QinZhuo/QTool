@@ -64,14 +64,14 @@ namespace QTool
 				{
 					if (relactionType == QTeamRelaction.敌人)
 					{
-						list.AddRange(list);
+						list.AddRange(team.Value);
 					}
 				}
 				else
 				{
 					if(relactionType== QTeamRelaction.队友)
 					{
-						list.AddRange(list);
+						list.AddRange(team.Value);
 					}
 				}
 			}
