@@ -19,7 +19,6 @@ namespace QTool.Net
 		[Range(15,60)]
 		private int netFps = 30;
 		public System.Random Random { get; private set; } = null;
-		private QNetCoroutineList Coroutine = new QNetCoroutineList();
 		protected override void Awake()
 		{
 			base.Awake();
@@ -28,7 +27,8 @@ namespace QTool.Net
 			Physics.autoSyncTransforms = false;
 			Time.fixedDeltaTime = 1f / netFps;
 			FlowGraph.QFlowGraph.Step = WaitForNetUpdate.Instance;
-			FlowGraph.QFlowGraph.GetCoroutineList =()=>new QNetCoroutineList();
+			FlowGraph.QFlowGraph.StartCoroutine = QNetCoroutine.Start;
+			FlowGraph.QFlowGraph.StopCoroutine = QNetCoroutine.Stop;
 			QTool.AddPlayerLoop(typeof(QNetManager), QNetPlayerLoop,"FixedUpdate");
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
 			QToolManager.Instance.OnGUIEvent += DebugGUI;
@@ -45,6 +45,7 @@ namespace QTool.Net
 			QTime.RevertScale(this);
 			QTool.RemovePlayerLoop(typeof(QNetManager), "FixedUpdate");
 			ServerUpdateTimer?.Clear();
+			QNetCoroutine.StopAll();
 		}
 		public bool NetActive => Application.isPlaying&&( transport.ServerActive || transport.ClientConnected);
 		public T PlayerValue<T>(string player,string key, T localValue)
@@ -346,7 +347,7 @@ namespace QTool.Net
 						ClientActionData[actionData.Key].MergeValues(actionData);
 					}
 					OnNetUpdate?.Invoke();
-					Coroutine.Update();
+					OnCoroutineUpdate?.Invoke();
 					Physics.Simulate(Time.fixedDeltaTime);
 					Physics.SyncTransforms();
 					if (loadEventData != null)
@@ -436,6 +437,7 @@ namespace QTool.Net
 			}
 		}
 		internal event Action OnNetUpdate=null;
+		internal event Action OnCoroutineUpdate = null;
 		internal event Action<QNetSyncFlag> OnSyncCheck = null;
 		#endregion
 
@@ -475,21 +477,19 @@ namespace QTool.Net
 		}
 #endif
 	}
-	public class QNetCoroutineList : ICoroutineList
+	public static class QNetCoroutine
 	{
-		[QIgnore]
-		private List<IEnumerator> List { set; get; } = new List<IEnumerator>();
-		private List<IEnumerator> AddList { set; get; } =new List<IEnumerator>();
-		public int Count => List.Count;
-		public void Start(IEnumerator enumerator)
+		private static List<IEnumerator> List { set; get; } = new List<IEnumerator>();
+		private static List<IEnumerator> AddList { set; get; } =new List<IEnumerator>();
+		public static void Start(IEnumerator enumerator)
 		{
 			AddList.Add(enumerator);
 		}
-		public void Stop(IEnumerator enumerator)
+		public static void Stop(IEnumerator enumerator)
 		{
 			List.Remove(enumerator);
 		}
-		bool UpdateIEnumerator(IEnumerator ie)
+		private static bool UpdateIEnumerator(IEnumerator ie)
 		{
 			if (ie.Current is IEnumerator childIe)
 			{
@@ -497,7 +497,7 @@ namespace QTool.Net
 			}
 			return ie.MoveNext();
 		}
-		public void Update()
+		public static void Update()
 		{
 			if (AddList.Count > 0)
 			{
@@ -506,7 +506,7 @@ namespace QTool.Net
 			}
 			List.RemoveAll((ie) => !UpdateIEnumerator(ie));
 		}
-		public void StopAll()
+		public static void StopAll()
 		{
 			List.Clear();
 		}

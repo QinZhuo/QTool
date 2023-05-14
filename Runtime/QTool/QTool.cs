@@ -916,14 +916,7 @@ namespace QTool
 			}
 		}
 	}
-	public interface ICoroutineList
-	{
-		int Count { get; }
-		void Start(IEnumerator enumerator);
 
-		void Stop(IEnumerator enumerator);
-		void StopAll();
-	}
 	public static class QSceneTool
 	{
 		public static List<Task> PreLoadList = new List<Task>();

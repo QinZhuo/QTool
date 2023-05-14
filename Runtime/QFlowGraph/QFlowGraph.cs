@@ -67,7 +67,7 @@ namespace QTool.FlowGraph
 		public QList<string,QFlowNode> NodeList { private set; get; } = new QList<string,QFlowNode>();
 		[QName]
 		public QDictionary<string, object> Values { private set; get; } = new QDictionary<string, object>();
-		public bool IsRunning => Coroutine.Count > 0;
+		public bool IsRunning => CoroutineList.Count > 0;
         public T GetValue<T>(string key="")
         {
             var type = typeof(T);
@@ -116,6 +116,7 @@ namespace QTool.FlowGraph
 			node = NodeCache[key];
 			return node != null;
 		}
+		private List<IEnumerator> CoroutineList { set; get; } = new List<IEnumerator>();
 		QDictionary<string, QFlowNode> NodeCache = new QDictionary<string, QFlowNode>();
         public ConnectInfo GetConnectInfo(PortId? portId)
         {
@@ -221,7 +222,7 @@ namespace QTool.FlowGraph
 			{
 				Deserialize();
 			}
-			Coroutine.Start(RunIEnumerator(startNode));
+			InternalStartCoroutine(RunIEnumerator(startNode));
 		}
 		public IEnumerator RunIEnumerator(string startNode)
         {
@@ -278,19 +279,26 @@ namespace QTool.FlowGraph
         }
 		public void Stop()
 		{
-			Coroutine.StopAll();
+			foreach (var coroutine in CoroutineList)
+			{
+				QToolManager.Instance.StopCoroutine(coroutine);
+			}
 		}
 		public void Clear()
 		{
-			Coroutine.StopAll();
+			Stop();
 			foreach (var node in NodeList.ToArray())
 			{
 				Remove(node);
 			}
 		}
-
-		public ICoroutineList Coroutine { get; set; } = GetCoroutineList();
-		public static Func<ICoroutineList> GetCoroutineList = () => new QCoroutineList();
+		internal void InternalStartCoroutine(IEnumerator coroutine)
+		{
+			CoroutineList.Add(coroutine);
+			StartCoroutine(coroutine);
+		}
+		public static Action<IEnumerator> StartCoroutine = (ie) => QToolManager.Instance.StartCoroutine(ie);
+		public static Action<IEnumerator> StopCoroutine = QToolManager.Instance.StopCoroutine;
 		public static IEnumerator Step { get; set; } = FixedUpdateStep();
 
 		static WaitForFixedUpdate wait= new WaitForFixedUpdate();
@@ -298,30 +306,7 @@ namespace QTool.FlowGraph
 		{
 			yield return wait;
 		}
-		public class QCoroutineList : ICoroutineList
-		{
-			[QIgnore]
-			private List<IEnumerator> List { set; get; } = new List<IEnumerator>();
-			public int Count => List.Count;
-			public void Start(IEnumerator enumerator)
-			{
-				QToolManager.Instance.StartCoroutine(enumerator);
-				List.Add(enumerator);
-			}
-			public void Stop(IEnumerator enumerator)
-			{
-				QToolManager.Instance.StopCoroutine(enumerator);
-				List.Remove(enumerator);
-			}
-			public void StopAll()
-			{
-				foreach (var coroutine in List)
-				{
-					QToolManager.Instance.StopCoroutine(coroutine);
-				}
-				List.Clear();
-			}
-		}
+	
 	}
 	
 	public struct PortId
@@ -1263,7 +1248,7 @@ namespace QTool.FlowGraph
         }
         public void RunPort(string portKey,int index=0)
         {
-			Graph.Coroutine.Start(RunPortIEnumerator(portKey, index));
+			Graph.InternalStartCoroutine(RunPortIEnumerator(portKey, index));
         }
         public IEnumerator RunPortIEnumerator(string portKey, int index = 0)
 		{
