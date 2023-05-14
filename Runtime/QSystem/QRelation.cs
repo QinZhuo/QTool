@@ -40,13 +40,17 @@ namespace QTool
 		队友 = 0,
 		敌人 = 1,
 	}
+	public interface IQTeam
+	{
+		public string Team { get; set; }
+	}
 	/// <summary>
 	/// 队伍
 	/// </summary>
-	public static class QTeam<T>
+	public static class QTeam<T> where T:IQTeam
 	{
 		public static QDictionary<string, List<T>> Teams = new QDictionary<string, List<T>>((key)=>new List<T>());
-		public static void GetList(string teamKey, List<T> list, QTeamRelaction relactionType = QTeamRelaction.敌人, float relactionValue = 0)
+		public static void GetRelactionList(string teamKey, List<T> list, QTeamRelaction relactionType = QTeamRelaction.敌人, float relactionValue = 0)
 		{
 			list.Clear();
 			foreach (var team in Teams)
@@ -67,6 +71,32 @@ namespace QTool
 					}
 				}
 			}
+		}
+	}
+	public static class QTeamTool
+	{
+		public static QTeamRelaction GetRelaction<T>(this T a,T b) where T:IQTeam
+		{
+			if (QRelation.Get(a.Team, b.Team) >= 0)
+			{
+				return QTeamRelaction.队友;
+			}
+			else
+			{
+				return QTeamRelaction.敌人;
+			}
+		}
+		public static void TeamAdd<T>(this T a) where T : IQTeam
+		{
+			QTeam<T>.Teams[a.Team].AddCheckExist(a);
+		}
+		public static void TeamRemove<T>(this T a) where T : IQTeam
+		{
+			QTeam<T>.Teams[a.Team].Remove(a);
+		}
+		public static void GetRelactionList<T>(this T a, List<T> list, QTeamRelaction relactionType = QTeamRelaction.敌人, float relactionValue = 0) where T : IQTeam
+		{
+			QTeam<T>.GetRelactionList(a.Team, list, relactionType, relactionValue);
 		}
 	}
 }
