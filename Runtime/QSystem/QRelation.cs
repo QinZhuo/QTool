@@ -65,7 +65,7 @@ namespace QTool
 				}
 				else
 				{
-					if (relation > relactionValue)
+					if (relation >= relactionValue)
 					{
 						list.AddRange(list);
 					}
