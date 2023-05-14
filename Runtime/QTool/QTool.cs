@@ -599,7 +599,7 @@ namespace QTool
 						return gameObj.GetComponent(type);
 					}
 				}
-				return obj;
+				return default;
 			}
 			catch (Exception e)
 			{
