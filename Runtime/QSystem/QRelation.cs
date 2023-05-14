@@ -1,6 +1,4 @@
-using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 
 namespace QTool
 {
@@ -37,21 +35,36 @@ namespace QTool
 			return Relations[a][b];
 		}
 	}
+	public enum QTeamRelaction
+	{
+		队友,
+		敌人,
+	}
 	/// <summary>
 	/// 队伍
 	/// </summary>
 	public static class QTeam<T>
 	{
 		public static QDictionary<string, List<T>> Teams = new QDictionary<string, List<T>>((key)=>new List<T>());
-		public static void GetList(string teamKey, List<T> list, float min = 0, float max = 10)
+		public static void GetList(string teamKey, List<T> list, QTeamRelaction relactionType = QTeamRelaction.敌人, float relactionValue = 0)
 		{
 			list.Clear();
 			foreach (var team in Teams)
 			{
 				var relation = QRelation.Get(team.Key, teamKey);
-				if (relation <= max && relation >= min)
+				if (relactionType == QTeamRelaction.敌人)
 				{
-					list.AddRange(team.Value);
+					if (relation < relactionValue)
+					{
+						list.AddRange(list);
+					}
+				}
+				else
+				{
+					if (relation > relactionValue)
+					{
+						list.AddRange(list);
+					}
 				}
 			}
 		}
