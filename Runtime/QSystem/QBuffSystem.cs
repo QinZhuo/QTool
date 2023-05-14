@@ -41,7 +41,7 @@ namespace QTool
 				return 0;
 			}
 		}
-		public void Add(string key,float time=-1,int count=1)
+		public void Add(string key, int count = 1, float time = -1)
 		{
 			if (!Buffs.ContainsKey(key))
 			{
@@ -56,7 +56,7 @@ namespace QTool
 						break;
 					case QBuffMergeMode.永久唯一:
 						buff.Time.OffsetValue = -1;
-						buff.Time.CurrentValue =0;
+						buff.Time.CurrentValue = 0;
 						break;
 					default:
 						break;
@@ -83,7 +83,7 @@ namespace QTool
 					case QBuffMergeMode.时间叠加:
 						buff.Time.OffsetValue += time;
 						buff.Time.CurrentValue += time;
-					count = 1;
+						count = 1;
 						break;
 					case QBuffMergeMode.永久叠层:
 					case QBuffMergeMode.时间叠层:
