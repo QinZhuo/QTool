@@ -618,7 +618,7 @@ namespace QTool.FlowGraph
         {
             get
             {
-                if (ValueType == QFlow.Type|| Node.command==null) return null;
+                if (ConnectType==QFlow.Type|| Node.command==null) return null;
 			
 				if (IsOutput)
 				{
