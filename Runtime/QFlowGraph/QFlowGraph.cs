@@ -307,7 +307,7 @@ namespace QTool.FlowGraph
 		public void StopCoroutine(IEnumerator coroutine)
 		{
 			CoroutineList.Remove(coroutine);
-			if (StartCoroutineOverride == null)
+			if (StopCoroutineOverride == null)
 			{
 				QToolManager.Instance.StopCoroutine(coroutine);
 			}
