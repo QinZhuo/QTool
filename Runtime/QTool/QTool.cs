@@ -919,10 +919,10 @@ namespace QTool
 	public interface ICoroutineList
 	{
 		int Count { get; }
-		Coroutine Start(IEnumerator enumerator);
+		void Start(IEnumerator enumerator);
 
-		void Stop(Coroutine key);
-		void Stop();
+		void Stop(IEnumerator enumerator);
+		void StopAll();
 	}
 	public static class QSceneTool
 	{

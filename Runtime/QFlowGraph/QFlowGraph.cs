@@ -221,9 +221,8 @@ namespace QTool.FlowGraph
 			{
 				Deserialize();
 			}
-			Cache[startNode]=Coroutine.Start(RunIEnumerator(startNode));
+			Coroutine.Start(RunIEnumerator(startNode));
 		}
-		internal QDictionary<string, Coroutine> Cache = new QDictionary<string, Coroutine>();
 		public IEnumerator RunIEnumerator(string startNode)
         {
 			if (startNode.IsNull()) yield break;
@@ -276,22 +275,22 @@ namespace QTool.FlowGraph
 			{
 				Debug.LogError("不存在开始节点 [" + startNode + "]");
 			}
-			Coroutine.Stop(Cache[startNode]);
         }
 		public void Stop()
 		{
-			Coroutine.Stop();
+			Coroutine.StopAll();
 		}
 		public void Clear()
 		{
-			Coroutine.Stop();
+			Coroutine.StopAll();
 			foreach (var node in NodeList.ToArray())
 			{
 				Remove(node);
 			}
 		}
 
-		public static ICoroutineList Coroutine { get; set; } = new QCoroutineList();
+		public ICoroutineList Coroutine { get; set; } = GetCoroutineList();
+		public static Func<ICoroutineList> GetCoroutineList = () => new QCoroutineList();
 		public static IEnumerator Step { get; set; } = FixedUpdateStep();
 
 		static WaitForFixedUpdate wait= new WaitForFixedUpdate();
@@ -301,19 +300,20 @@ namespace QTool.FlowGraph
 		}
 		public class QCoroutineList : ICoroutineList
 		{
-			private List<Coroutine> List { set; get; } = new List<Coroutine>();
+			[QIgnore]
+			private List<IEnumerator> List { set; get; } = new List<IEnumerator>();
 			public int Count => List.Count;
-			public Coroutine Start(IEnumerator enumerator)
+			public void Start(IEnumerator enumerator)
 			{
-				var coroutine = QToolManager.Instance.StartCoroutine(enumerator);
-				List.Add(coroutine);
-				return coroutine;
+				QToolManager.Instance.StartCoroutine(enumerator);
+				List.Add(enumerator);
 			}
-			public void Stop(Coroutine coroutine)
+			public void Stop(IEnumerator enumerator)
 			{
-				List.Remove(coroutine);
+				QToolManager.Instance.StopCoroutine(enumerator);
+				List.Remove(enumerator);
 			}
-			public void Stop()
+			public void StopAll()
 			{
 				foreach (var coroutine in List)
 				{
@@ -1263,7 +1263,7 @@ namespace QTool.FlowGraph
         }
         public void RunPort(string portKey,int index=0)
         {
-			Graph.Cache[Key] = QFlowGraph.Coroutine.Start(RunPortIEnumerator(portKey, index));
+			Graph.Coroutine.Start(RunPortIEnumerator(portKey, index));
         }
         public IEnumerator RunPortIEnumerator(string portKey, int index = 0)
 		{

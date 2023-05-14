@@ -28,7 +28,7 @@ namespace QTool.Net
 			Physics.autoSyncTransforms = false;
 			Time.fixedDeltaTime = 1f / netFps;
 			FlowGraph.QFlowGraph.Step = WaitForNetUpdate.Instance;
-			FlowGraph.QFlowGraph.Coroutine = Coroutine;
+			FlowGraph.QFlowGraph.GetCoroutineList =()=>new QNetCoroutineList();
 			QTool.AddPlayerLoop(typeof(QNetManager), QNetPlayerLoop,"FixedUpdate");
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
 			QToolManager.Instance.OnGUIEvent += DebugGUI;
@@ -478,18 +478,16 @@ namespace QTool.Net
 	public class QNetCoroutineList : ICoroutineList
 	{
 		[QIgnore]
-		private QDictionary<Coroutine, IEnumerator> List { set; get; } = new QDictionary<Coroutine, IEnumerator>();
-		private QDictionary<Coroutine, IEnumerator> AddList { set; get; } = new QDictionary<Coroutine, IEnumerator>();
+		private List<IEnumerator> List { set; get; } = new List<IEnumerator>();
+		private List<IEnumerator> AddList { set; get; } =new List<IEnumerator>();
 		public int Count => List.Count;
-		public Coroutine Start(IEnumerator enumerator)
+		public void Start(IEnumerator enumerator)
 		{
-			Coroutine coroutine = typeof(Coroutine).CreateInstance() as Coroutine;
-			AddList[coroutine] = enumerator;
-			return coroutine;
+			AddList.Add(enumerator);
 		}
-		public void Stop(Coroutine coroutine)
+		public void Stop(IEnumerator enumerator)
 		{
-			List.Remove(coroutine);
+			List.Remove(enumerator);
 		}
 		bool UpdateIEnumerator(IEnumerator ie)
 		{
@@ -499,35 +497,16 @@ namespace QTool.Net
 			}
 			return ie.MoveNext();
 		}
-		private List<Coroutine> removeList = new List<Coroutine>();
 		public void Update()
 		{
 			if (AddList.Count > 0)
 			{
-				foreach (var kv in AddList)
-				{
-					List[kv.Key] = kv.Value;
-				}
+				List.AddRange(AddList);
 				AddList.Clear();
 			}
-			foreach (var kv in List.ToArray())
-			{
-				var ie = kv.Value;
-				if (!UpdateIEnumerator(ie))
-				{
-					removeList.Add(kv.Key);
-				}
-			}
-			if (removeList.Count > 0)
-			{
-				foreach (var key in removeList)
-				{
-					List.Remove(key);
-				}
-				removeList.Clear();
-			}
+			List.RemoveAll((ie) => !UpdateIEnumerator(ie));
 		}
-		public void Stop()
+		public void StopAll()
 		{
 			List.Clear();
 		}
