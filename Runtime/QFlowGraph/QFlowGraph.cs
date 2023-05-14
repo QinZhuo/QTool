@@ -116,7 +116,9 @@ namespace QTool.FlowGraph
 			node = NodeCache[key];
 			return node != null;
 		}
+		[QIgnore]
 		private List<IEnumerator> CoroutineList { set; get; } = new List<IEnumerator>();
+		[QIgnore]
 		QDictionary<string, QFlowNode> NodeCache = new QDictionary<string, QFlowNode>();
         public ConnectInfo GetConnectInfo(PortId? portId)
         {
