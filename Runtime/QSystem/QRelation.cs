@@ -86,11 +86,11 @@ namespace QTool
 				return QTeamRelaction.敌人;
 			}
 		}
-		public static void TeamAdd<T>(this T a) where T : IQTeam
+		public static void QTeamAdd<T>(this T a) where T : IQTeam
 		{
 			QTeam<T>.Teams[a.Team].AddCheckExist(a);
 		}
-		public static void TeamRemove<T>(this T a) where T : IQTeam
+		public static void QTeamRemove<T>(this T a) where T : IQTeam
 		{
 			QTeam<T>.Teams[a.Team].Remove(a);
 		}
