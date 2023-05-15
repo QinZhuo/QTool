@@ -20,6 +20,8 @@ namespace QTool
 		public QBuffMergeMode Megre { get; protected set; } = QBuffMergeMode.时间叠层;
 		[QName("时间事件")]
 		public float TimeEvent { get; protected set; } = 0;
+		[QName("效果说明")]
+		public virtual string EffectInfo { get; set; }
 		[QName("效果")]
 		public QFlowGraphAsset Effect { get; protected set; }
 	}
