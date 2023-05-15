@@ -104,15 +104,7 @@ namespace QTool
 				{
 					OnAdd(buff);
 				}
-				if (buff.Graph != null)
-				{
-					foreach (var node in buff.Graph.NodeList)
-					{
-						if (!node.Is(nameof(QFlowGraphNode.Start))) continue;
-						if (node.Name == AddEventKey || node.Name == RemoveEventKey || !node.Name.StartsWith("叠层")) continue;
-						EventActions[node.Name] += buff.TriggerEvent;
-					}
-				}
+			
 			}
 			else
 			{
@@ -141,6 +133,7 @@ namespace QTool
 				{
 					OnAdd(buff);
 				}
+				PrivateAdd(buff);
 			}
 		}
 		public void Remove(string key,int count=1)
@@ -171,6 +164,18 @@ namespace QTool
 				for (int i = 0; i < count; i++)
 				{
 					OnRemove(buff);
+				}
+			}
+		}
+		private void PrivateAdd(QBuffData<BuffData>.QBuffRuntime buff)
+		{
+			if (buff.Graph != null)
+			{
+				foreach (var node in buff.Graph.NodeList)
+				{
+					if (!node.Is(nameof(QFlowGraphNode.Start))) continue;
+					if (node.Name == AddEventKey || node.Name == RemoveEventKey || !node.Name.StartsWith("叠层")) continue;
+					EventActions[node.Name] += buff.TriggerEvent;
 				}
 			}
 		}
