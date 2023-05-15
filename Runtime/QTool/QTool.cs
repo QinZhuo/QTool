@@ -609,7 +609,12 @@ namespace QTool
 					{
 						return gameObj.GetComponent(type);
 					}
+					else if(type.IsPrimitive)
+					{
+						return obj;
+					}
 				}
+
 				return default;
 			}
 			catch (Exception e)
