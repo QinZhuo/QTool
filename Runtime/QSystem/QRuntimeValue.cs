@@ -121,7 +121,13 @@ namespace QTool
 			}
 		}
 		private QValue _Value { get; set; } = 0;
-		public override float Value { get => _Value;set { } }
+		public override float Value
+		{
+			get => _Value; set
+			{
+				throw new Exception(nameof(QRuntimeValue) + " 无法直接更改 " + nameof(Value) + " 可尝试更改 " + nameof(OffsetValue));
+			}
+		}
 		public int IntValue => Mathf.RoundToInt(Value);
 		private void FreshValue()
 		{

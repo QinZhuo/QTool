@@ -15,7 +15,7 @@ namespace QTool
 			t.Init(key);
 			return t;
 		}
-		public virtual void Init(string key)
+		protected virtual void Init(string key)
 		{
 			Key = key;
 			Data = QDataList<DataT>.Get(key);

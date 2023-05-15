@@ -62,7 +62,6 @@ namespace QTool
 						break;
 				}
 				buff.Count.OffsetValue = count;
-				buff.Init(key);
 				Buffs.Add(key, buff);
 				for (int i = 0; i < count; i++)
 				{
@@ -218,7 +217,7 @@ namespace QTool
 			public QRuntimeRangeValue Time { get; private set; } = new QRuntimeRangeValue();
 			public QFlowGraph Graph { get; private set; }
 			public QTimer TimeEvent { get; private set; }
-			public override void Init(string key)
+			protected override void Init(string key)
 			{
 				base.Init(key);
 				if (Data.Effect != null)
