@@ -10,6 +10,8 @@ namespace QTool
 	{
 		[QName("最大叠层")]
 		public int MaxCount { get; protected set; } = 1;
+		[QName("效果说明")]
+		public virtual string EffectInfo { get; set; }
 		[QName("效果")]
 		public QFlowGraphAsset Effect { get; protected set; }
 	}
