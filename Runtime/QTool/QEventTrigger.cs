@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using QTool.Reflection;
+using QTool.FlowGraph;
 namespace QTool
 {
 	
@@ -337,91 +338,79 @@ namespace QTool
 		{
 			obj.GetParentTrigger()?.Invoke(eventName.Trim(), value);
 		}
-		public static void Register<RuntimeT, DataT>(this GameObject gameObject, QRuntime<RuntimeT, DataT> runtime) where RuntimeT : QRuntime<RuntimeT, DataT>, new() where DataT : QDataList<DataT>, new()
+		public static void RegisterMember<RuntimeT, DataT>(this GameObject gameObject, QRuntime<RuntimeT, DataT> runtime) where RuntimeT : QRuntime<RuntimeT, DataT>, new() where DataT : QDataList<DataT>, new()
 		{
 			var trigger = gameObject?.GetTrigger();
 			if (trigger != null)
 			{
 				if (runtime != null)
 				{
-					var dataInfo = QSerializeType.Get(typeof(DataT));
-					if (dataInfo != null)
+					runtime.ForeachMember((member) =>
 					{
-						foreach (var member in dataInfo.Members)
+						if (member.Type.IsValueType || member.Type == typeof(string))
 						{
-							if (member.Type.IsValueType || member.Type == typeof(string))
-							{
-								gameObject.InvokeEvent(member.QName, member.Get(runtime.Data)?.ToString());
-							}
+							gameObject.InvokeEvent(member.QName, member.Get(runtime.Data)?.ToString());
 						}
-					}
-					var runtimeInfo = QSerializeType.Get(typeof(RuntimeT));
-					if (runtimeInfo != null)
+					},
+					(member) =>
 					{
-						foreach (var member in runtimeInfo.Members)
-						{
-							if (member.Type.Is(typeof(QRuntimeValue<float>)) && (trigger.floatEventList.ContainsKey(member.QName)
+						if (member.Type.Is(typeof(QRuntimeValue<float>)) && (trigger.floatEventList.ContainsKey(member.QName)
 								|| trigger.floatEventList.ContainsKey("当前" + member.QName) || trigger.floatEventList.ContainsKey(member.QName + "比例")))
-							{
-								var runtimeValue = member.Get(runtime).As<QRuntimeValue<float>>();
-								runtimeValue.Name = member.QName;
-								runtimeValue.OnValue += gameObject.InvokeEvent;
-								runtimeValue.InvokeOnChange();
-							}
-							else if (member.Type.Is(typeof(QRuntimeValue<string>)) && trigger.stringEventList.ContainsKey(member.QName))
-							{
-								var runtimeValue = member.Get(runtime).As<QRuntimeValue<string>>();
-								runtimeValue.Name = member.QName;
-								runtimeValue.OnValue += gameObject.InvokeEvent;
-								runtimeValue.InvokeOnChange();
-							}
-							else if (member.Type.Is(typeof(QRuntimeValue<bool>)) && trigger.boolEventList.ContainsKey(member.QName))
-							{
-								var runtimeValue = member.Get(runtime).As<QRuntimeValue<bool>>();
-								runtimeValue.Name = member.QName;
-								runtimeValue.OnValue += gameObject.InvokeEvent;
-								runtimeValue.InvokeOnChange();
-							}
-							else
-							{
-								continue;
-							}
-							QDebug.Log("注册 " + gameObject.name + "." + member.QName + " " + member.Type + " 数据更改事件");
+						{
+							var runtimeValue = member.Get(runtime).As<QRuntimeValue<float>>();
+							runtimeValue.Name = member.QName;
+							runtimeValue.OnValue += gameObject.InvokeEvent;
+							runtimeValue.InvokeOnChange();
 						}
-					}
+						else if (member.Type.Is(typeof(QRuntimeValue<string>)) && trigger.stringEventList.ContainsKey(member.QName))
+						{
+							var runtimeValue = member.Get(runtime).As<QRuntimeValue<string>>();
+							runtimeValue.Name = member.QName;
+							runtimeValue.OnValue += gameObject.InvokeEvent;
+							runtimeValue.InvokeOnChange();
+						}
+						else if (member.Type.Is(typeof(QRuntimeValue<bool>)) && trigger.boolEventList.ContainsKey(member.QName))
+						{
+							var runtimeValue = member.Get(runtime).As<QRuntimeValue<bool>>();
+							runtimeValue.Name = member.QName;
+							runtimeValue.OnValue += gameObject.InvokeEvent;
+							runtimeValue.InvokeOnChange();
+						}
+						else
+						{
+							return;
+						}
+						QDebug.Log("注册 " + gameObject.name + "." + member.QName + " " + member.Type + " 数据更改事件");
+					});
 				}
 			}
 		}
-		public static void UnRegister<RuntimeT, DataT>(this GameObject gameObject, QRuntime<RuntimeT, DataT> runtime) where RuntimeT : QRuntime<RuntimeT, DataT>, new() where DataT : QDataList<DataT>, new()
+		public static void UnRegisterMember<RuntimeT, DataT>(this GameObject gameObject, QRuntime<RuntimeT, DataT> runtime) where RuntimeT : QRuntime<RuntimeT, DataT>, new() where DataT : QDataList<DataT>, new()
 		{
 			var trigger = gameObject?.GetTrigger();
 			if (trigger != null)
 			{
 				if (runtime != null)
 				{
-					var typeInfo = QSerializeType.Get(typeof(RuntimeT));
-					if (typeInfo != null)
+					runtime.ForeachMember(null, (member) =>
 					{
-						foreach (var member in typeInfo.Members)
-						{
-							if (member.Type.Is(typeof(QRuntimeValue<float>)) && (trigger.floatEventList.ContainsKey(member.QName)
+						if (member.Type.Is(typeof(QRuntimeValue<float>)) && (trigger.floatEventList.ContainsKey(member.QName)
 								|| trigger.floatEventList.ContainsKey("当前" + member.QName) || trigger.floatEventList.ContainsKey(member.QName + "比例")))
-							{
-								var runtimeValue = member.Get(runtime).As<QRuntimeValue<float>>();
-								runtimeValue.OnValue -= gameObject.InvokeEvent;
-							}
-							else if(member.Type.Is(typeof(QRuntimeValue<string>)) && trigger.stringEventList.ContainsKey(member.QName))
-							{
-								var runtimeValue = member.Get(runtime).As<QRuntimeValue<string>>();
-								runtimeValue.OnValue -= gameObject.InvokeEvent;
-							}
-							else if (member.Type.Is(typeof(QRuntimeValue<bool>)) && trigger.boolEventList.ContainsKey(member.QName))
-							{
-								var runtimeValue = member.Get(runtime).As<QRuntimeValue<bool>>();
-								runtimeValue.OnValue -= gameObject.InvokeEvent;
-							}
+						{
+							var runtimeValue = member.Get(runtime).As<QRuntimeValue<float>>();
+							runtimeValue.OnValue -= gameObject.InvokeEvent;
 						}
-					}
+						else if (member.Type.Is(typeof(QRuntimeValue<string>)) && trigger.stringEventList.ContainsKey(member.QName))
+						{
+							var runtimeValue = member.Get(runtime).As<QRuntimeValue<string>>();
+							runtimeValue.OnValue -= gameObject.InvokeEvent;
+						}
+						else if (member.Type.Is(typeof(QRuntimeValue<bool>)) && trigger.boolEventList.ContainsKey(member.QName))
+						{
+							var runtimeValue = member.Get(runtime).As<QRuntimeValue<bool>>();
+							runtimeValue.OnValue -= gameObject.InvokeEvent;
+						}
+					});
 				}
 			}
 		}

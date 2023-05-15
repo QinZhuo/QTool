@@ -40,10 +40,18 @@ namespace QTool
 				if (Data.Effect != null)
 				{
 					Graph = Data.Effect.Graph.CreateInstance();
+					Graph.RegisterMember(this);
 				}
 				if (Data.TimeEvent > 0)
 				{
 					TimeEvent = new QTimer(Data.TimeEvent);
+				}
+			}
+			public override void OnDestroy()
+			{
+				if (Graph != null)
+				{
+					Graph.UnRegisterMember(this);
 				}
 			}
 			public void TriggerEvent(string key)

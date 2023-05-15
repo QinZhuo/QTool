@@ -2,24 +2,47 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using QTool.Reflection;
+using System;
 namespace QTool
 {
-	public abstract class QRuntime<RuntimeT,DataT> where RuntimeT:QRuntime<RuntimeT,DataT>,new() where DataT : QDataList<DataT>, new()
+	public abstract class QRuntime<RuntimeT,DataT>:QPoolObject<RuntimeT> where RuntimeT:QRuntime<RuntimeT,DataT>,new() where DataT : QDataList<DataT>, new()
 	{
 		public string Key { get; protected set; }
 		public DataT Data { get; protected set; }
 		protected QRuntime() { }
 		public static RuntimeT Get(string key)
 		{
-			var t= new RuntimeT();
+			var t= Get();
 			t.Init(key);
 			return t;
+		}
+		public override void OnDestroy()
+		{
+			
 		}
 		protected virtual void Init(string key)
 		{
 			Key = key;
 			Data = QDataList<DataT>.Get(key);
-			
+		}
+		public void ForeachMember(Action<QMemeberInfo> dataMember, Action<QMemeberInfo> runtimeMember)
+		{
+			if (dataMember != null)
+			{
+				var dataInfo = QSerializeType.Get(typeof(DataT));
+				foreach (var member in dataInfo.Members)
+				{
+					dataMember(member);
+				}
+			}
+			if (runtimeMember != null)
+			{
+				var runtimeInfo = QSerializeType.Get(typeof(RuntimeT));
+				foreach (var member in runtimeInfo.Members)
+				{
+					runtimeMember(member);
+				}
+			}
 		}
 	}
 	public abstract class QRuntimeObject<RuntimeT, DataT> : MonoBehaviour,IQPoolObject where RuntimeT : QRuntime<RuntimeT, DataT>, new() where DataT : QDataList<DataT>, new()
@@ -39,9 +62,9 @@ namespace QTool
 			{
 				if (value != _Runtime)
 				{
-					gameObject.UnRegister(_Runtime);
+					gameObject.UnRegisterMember(_Runtime);
 					_Runtime = value;
-					gameObject.Register(_Runtime);
+					gameObject.RegisterMember(_Runtime);
 				}
 			}
 		}

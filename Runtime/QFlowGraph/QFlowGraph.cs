@@ -327,7 +327,71 @@ namespace QTool.FlowGraph
 		{
 			yield return wait;
 		}
-	
+		public void RegisterMember<RuntimeT, DataT>(QRuntime<RuntimeT, DataT> runtime) where RuntimeT : QRuntime<RuntimeT, DataT>, new() where DataT : QDataList<DataT>, new()
+		{
+			if (runtime != null)
+			{
+				runtime.ForeachMember((member) =>
+				{
+					if (member.Type.IsValueType || member.Type == typeof(string))
+					{
+						Values[member.QName] = member.Get(runtime.Data);
+					}
+				},
+				(member) =>
+				{
+					if (member.Type.Is(typeof(QRuntimeValue<float>)))
+					{
+						var runtimeValue = member.Get(runtime).As<QRuntimeValue<float>>();
+						runtimeValue.Name = member.QName;
+						runtimeValue.OnValue += SetValue;
+						runtimeValue.InvokeOnChange();
+					}
+					else if (member.Type.Is(typeof(QRuntimeValue<string>)))
+					{
+						var runtimeValue = member.Get(runtime).As<QRuntimeValue<string>>();
+						runtimeValue.Name = member.QName;
+						runtimeValue.OnValue += SetValue;
+						runtimeValue.InvokeOnChange();
+					}
+					else if (member.Type.Is(typeof(QRuntimeValue<bool>)))
+					{
+						var runtimeValue = member.Get(runtime).As<QRuntimeValue<bool>>();
+						runtimeValue.Name = member.QName;
+						runtimeValue.OnValue += SetValue;
+						runtimeValue.InvokeOnChange();
+					}
+					else
+					{
+						return;
+					}
+				});
+			}
+		}
+		public void UnRegisterMember<RuntimeT, DataT>(QRuntime<RuntimeT, DataT> runtime) where RuntimeT : QRuntime<RuntimeT, DataT>, new() where DataT : QDataList<DataT>, new()
+		{
+			if (runtime != null)
+			{
+				runtime.ForeachMember(null, (member) =>
+				{
+					if (member.Type.Is(typeof(QRuntimeValue<float>)))
+					{
+						var runtimeValue = member.Get(runtime).As<QRuntimeValue<float>>();
+						runtimeValue.OnValue -=SetValue;
+					}
+					else if (member.Type.Is(typeof(QRuntimeValue<string>)))
+					{
+						var runtimeValue = member.Get(runtime).As<QRuntimeValue<string>>();
+						runtimeValue.OnValue -= SetValue;
+					}
+					else if (member.Type.Is(typeof(QRuntimeValue<bool>)))
+					{
+						var runtimeValue = member.Get(runtime).As<QRuntimeValue<bool>>();
+						runtimeValue.OnValue -= SetValue;
+					}
+				});
+			}
+		}
 	}
 	
 	public struct PortId
