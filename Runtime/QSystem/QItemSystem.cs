@@ -151,41 +151,41 @@ namespace QTool
 				return item.Count.IntValue <= 0;
 			});
 		}
-		public event Action<QItemData<ItemData>.QItemRuntime> OnAddBuff = null;
-		public event Action<QItemData<ItemData>.QItemRuntime> OnRemoveBuff = null;
-		protected virtual void OnAdd(QItemData<ItemData>.QItemRuntime buff)
+		public event Action<QItemData<ItemData>.QItemRuntime> OnAddItem = null;
+		public event Action<QItemData<ItemData>.QItemRuntime> OnRemoveItem = null;
+		protected virtual void OnAdd(QItemData<ItemData>.QItemRuntime item)
 		{
-			if (buff.Graph != null)
+			if (item.Graph != null)
 			{
-				if (buff.Graph.ContainsNode(AddEventKey, out var addNode))
+				if (item.Graph.ContainsNode(AddEventKey, out var addNode))
 				{
-					buff.TriggerEvent(AddEventKey);
+					item.TriggerEvent(AddEventKey);
 				}
-				foreach (var node in buff.Graph.NodeList)
+				foreach (var node in item.Graph.NodeList)
 				{
 					if (!node.Is(nameof(QFlowGraphNode.Start))) continue;
 					if (node.Name == AddEventKey || node.Name == RemoveEventKey) continue;
-					EventActions[node.Name] += buff.TriggerEvent;
+					EventActions[node.Name] += item.TriggerEvent;
 				}
 			}
-			OnAddBuff?.Invoke(buff);
+			OnAddItem?.Invoke(item);
 		}
-		protected virtual void OnRemove(QItemData<ItemData>.QItemRuntime buff)
+		protected virtual void OnRemove(QItemData<ItemData>.QItemRuntime item)
 		{
-			if (buff.Graph!=null)
+			if (item.Graph!=null)
 			{
-				if (buff.Graph.ContainsNode(RemoveEventKey, out var remveNode))
+				if (item.Graph.ContainsNode(RemoveEventKey, out var remveNode))
 				{
-					buff.TriggerEvent(RemoveEventKey);
+					item.TriggerEvent(RemoveEventKey);
 				}
-				foreach (var node in buff.Graph.NodeList)
+				foreach (var node in item.Graph.NodeList)
 				{
 					if (!node.Is(nameof(QFlowGraphNode.Start))) continue;
 					if (node.Name == AddEventKey || node.Name == RemoveEventKey) continue;
-					EventActions[node.Name] -= buff.TriggerEvent;
+					EventActions[node.Name] -= item.TriggerEvent;
 				}
 			}
-			OnRemoveBuff?.Invoke(buff);
+			OnRemoveItem?.Invoke(item);
 		}
 		public void TriggerEvent(string key)
 		{
