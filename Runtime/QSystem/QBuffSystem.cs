@@ -24,13 +24,40 @@ namespace QTool
 		public virtual string EffectInfo { get; set; }
 		[QName("效果")]
 		public QFlowGraphAsset Effect { get; protected set; }
+
+		public class QBuffRuntime : QRuntime<QBuffRuntime, T>
+		{
+			[QName("层数")]
+			public QRuntimeValue Count { get; private set; } = new QRuntimeValue();
+
+			[QName("时间")]
+			public QRuntimeRangeValue Time { get; private set; } = new QRuntimeRangeValue();
+			public QFlowGraph Graph { get; private set; }
+			public QTimer TimeEvent { get; private set; }
+			protected override void Init(string key)
+			{
+				base.Init(key);
+				if (Data.Effect != null)
+				{
+					Graph = Data.Effect.Graph.CreateInstance();
+				}
+				if (Data.TimeEvent > 0)
+				{
+					TimeEvent = new QTimer(Data.TimeEvent);
+				}
+			}
+			public void TriggerEvent(string key)
+			{
+				Graph?.Run(key);
+			}
+		}
 	}
 	public class QBuffSystem<BuffData> where BuffData : QBuffData<BuffData>, new()
 	{
 		const string AddEventKey = "添加";
 		const string RemoveEventKey = "移除";
 		const string TimeEventKey = "时间";
-		public QDictionary<string, QBuffRuntime> Buffs { get; private set; } = new QDictionary<string, QBuffRuntime>();
+		public QDictionary<string, QBuffData<BuffData>.QBuffRuntime> Buffs { get; private set; } = new QDictionary<string, QBuffData<BuffData>.QBuffRuntime>();
 		private QDictionary<string, Action<string>> EventActions { get; set; } = new QDictionary<string, Action<string>>();
 		public int this[string key]
 		{
@@ -47,7 +74,7 @@ namespace QTool
 		{
 			if (!Buffs.ContainsKey(key))
 			{
-				var buff = QBuffRuntime.Get(key);
+				var buff = QBuffData<BuffData>.QBuffRuntime.Get(key);
 				switch (buff.Data.Megre)
 				{
 					case QBuffMergeMode.时间刷新:
@@ -167,9 +194,9 @@ namespace QTool
 				DelayRemove.Clear();
 			}
 		}
-		public event Action<QBuffRuntime> OnAddBuff = null;
-		public event Action<QBuffRuntime> OnRemoveBuff = null;
-		protected virtual void OnAdd(QBuffRuntime buff)
+		public event Action<QBuffData<BuffData>.QBuffRuntime> OnAddBuff = null;
+		public event Action<QBuffData<BuffData>.QBuffRuntime> OnRemoveBuff = null;
+		protected virtual void OnAdd(QBuffData<BuffData>.QBuffRuntime buff)
 		{
 			if (buff.Graph != null)
 			{
@@ -186,7 +213,7 @@ namespace QTool
 			}
 			OnAddBuff?.Invoke(buff);
 		}
-		protected virtual void OnRemove(QBuffRuntime buff)
+		protected virtual void OnRemove(QBuffData<BuffData>.QBuffRuntime buff)
 		{
 			if (buff.Graph!=null)
 			{
@@ -210,31 +237,6 @@ namespace QTool
 				EventActions[key]?.Invoke(key);
 			}
 		}
-		public class QBuffRuntime : QRuntime<QBuffRuntime, BuffData>
-		{
-			[QName("层数")]
-			public QRuntimeValue Count { get; private set; } = new QRuntimeValue();
-			
-			[QName("时间")]
-			public QRuntimeRangeValue Time { get; private set; } = new QRuntimeRangeValue();
-			public QFlowGraph Graph { get; private set; }
-			public QTimer TimeEvent { get; private set; }
-			protected override void Init(string key)
-			{
-				base.Init(key);
-				if (Data.Effect != null)
-				{
-					Graph = Data.Effect.Graph.CreateInstance();
-				}
-				if (Data.TimeEvent > 0)
-				{
-					TimeEvent = new QTimer(Data.TimeEvent);
-				}
-			}
-			public void TriggerEvent(string key)
-			{
-				Graph?.Run(key);
-			}
-		}
+		
 	}
 }

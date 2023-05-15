@@ -14,12 +14,30 @@ namespace QTool
 		public virtual string EffectInfo { get; set; }
 		[QName("效果")]
 		public QFlowGraphAsset Effect { get; protected set; }
+		public class QItemRuntime : QRuntime<QItemRuntime, T>
+		{
+			[QName("层数")]
+			public QRuntimeValue Count { get; private set; } = new QRuntimeValue();
+			public QFlowGraph Graph { get; private set; }
+			protected override void Init(string key)
+			{
+				base.Init(key);
+				if (Data.Effect != null)
+				{
+					Graph = Data.Effect.Graph.CreateInstance();
+				}
+			}
+			public void TriggerEvent(string key)
+			{
+				Graph?.Run(key);
+			}
+		}
 	}
 	public class QPackageSystem<ItemData> where ItemData : QItemData<ItemData>, new()
 	{
 		const string AddEventKey = "添加";
 		const string RemoveEventKey = "移除";
-		public List<QItemRuntime> Items { get; private set; } = new List<QItemRuntime>();
+		public List<QItemData<ItemData>.QItemRuntime> Items { get; private set; } = new List<QItemData<ItemData>.QItemRuntime>();
 		private QDictionary<string, Action<string>> EventActions { get; set; } = new QDictionary<string, Action<string>>();
 		public int this[string key]
 		{
@@ -70,7 +88,7 @@ namespace QTool
 			}
 			if (count >= 0)
 			{
-				var item = QItemRuntime.Get(key);
+				var item = QItemData<ItemData>.QItemRuntime.Get(key);
 				item.Count.OffsetValue = count;
 				Items.Add(item);
 				for (int i = 0; i < count; i++)
@@ -114,9 +132,9 @@ namespace QTool
 				return item.Count.IntValue <= 0;
 			});
 		}
-		public event Action<QItemRuntime> OnAddBuff = null;
-		public event Action<QItemRuntime> OnRemoveBuff = null;
-		protected virtual void OnAdd(QItemRuntime buff)
+		public event Action<QItemData<ItemData>.QItemRuntime> OnAddBuff = null;
+		public event Action<QItemData<ItemData>.QItemRuntime> OnRemoveBuff = null;
+		protected virtual void OnAdd(QItemData<ItemData>.QItemRuntime buff)
 		{
 			if (buff.Graph != null)
 			{
@@ -133,7 +151,7 @@ namespace QTool
 			}
 			OnAddBuff?.Invoke(buff);
 		}
-		protected virtual void OnRemove(QItemRuntime buff)
+		protected virtual void OnRemove(QItemData<ItemData>.QItemRuntime buff)
 		{
 			if (buff.Graph!=null)
 			{
@@ -157,23 +175,6 @@ namespace QTool
 				EventActions[key]?.Invoke(key);
 			}
 		}
-		public class QItemRuntime : QRuntime<QItemRuntime, ItemData>
-		{
-			[QName("层数")]
-			public QRuntimeValue Count { get; private set; } = new QRuntimeValue();
-			public QFlowGraph Graph { get; private set; }
-			protected override void Init(string key)
-			{
-				base.Init(key);
-				if (Data.Effect != null)
-				{
-					Graph = Data.Effect.Graph.CreateInstance();
-				}
-			}
-			public void TriggerEvent(string key)
-			{
-				Graph?.Run(key);
-			}
-		}
+		
 	}
 }
