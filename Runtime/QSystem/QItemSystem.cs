@@ -33,7 +33,7 @@ namespace QTool
 			}
 		}
 	}
-	public class QPackageSystem<ItemData> where ItemData : QItemData<ItemData>, new()
+	public class QItemSystem<ItemData> where ItemData : QItemData<ItemData>, new()
 	{
 		const string AddEventKey = "添加";
 		const string RemoveEventKey = "移除";
