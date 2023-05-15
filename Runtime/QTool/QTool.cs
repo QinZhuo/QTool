@@ -618,6 +618,7 @@ namespace QTool
 						return obj?.ToString();
 					}
 				}
+				Debug.LogError("转换[" + obj + "]为空[" + type + "]");
 				return default;
 			}
 			catch (Exception e)
