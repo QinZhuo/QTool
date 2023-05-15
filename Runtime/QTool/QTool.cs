@@ -609,12 +609,15 @@ namespace QTool
 					{
 						return gameObj.GetComponent(type);
 					}
-					else if(type.IsPrimitive)
+					else if (type.IsPrimitive)
 					{
 						return obj;
 					}
+					else if (type == typeof(string))
+					{
+						return obj?.ToString();
+					}
 				}
-
 				return default;
 			}
 			catch (Exception e)
