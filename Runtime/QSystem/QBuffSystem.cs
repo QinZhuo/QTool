@@ -260,6 +260,7 @@ namespace QTool
 			{
 				EventActions[key]?.Invoke(key);
 			}
+			TriggerEvent("叠层" + key);
 		}
 		
 	}
