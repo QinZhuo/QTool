@@ -242,7 +242,7 @@ namespace QTool
 				foreach (var node in buff.Graph.NodeList)
 				{
 					if (!node.Is(nameof(QFlowGraphNode.Start))) continue;
-					if (node.Name == AddEventKey || node.Name == RemoveEventKey) continue;
+					if (node.Name == AddEventKey || node.Name == RemoveEventKey || node.Name.StartsWith("叠层")) continue;
 					EventActions[node.Name] += buff.TriggerEvent;
 				}
 			}
@@ -259,7 +259,7 @@ namespace QTool
 				foreach (var node in buff.Graph.NodeList)
 				{
 					if (!node.Is(nameof(QFlowGraphNode.Start))) continue;
-					if (node.Name == AddEventKey || node.Name == RemoveEventKey) continue;
+					if (node.Name == AddEventKey || node.Name == RemoveEventKey || node.Name.StartsWith("叠层")) continue;
 					EventActions[node.Name] -= buff.TriggerEvent;
 				}
 			}
