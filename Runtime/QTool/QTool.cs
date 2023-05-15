@@ -378,7 +378,7 @@ namespace QTool
 				return Enum.Parse(type, str);
 			}
 		}
-		public static void ForeachFlags<T>(T enumValue,Action<T> action)where T:Enum
+		public static void ForeachFlags<T>(this T enumValue,Action<T> action)where T:Enum
 		{
 			var type = enumValue.GetType();
 			foreach (var value in Enum.GetValues(type))
