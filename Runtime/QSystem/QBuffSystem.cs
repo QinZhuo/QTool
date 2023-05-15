@@ -104,6 +104,12 @@ namespace QTool
 				{
 					OnAdd(buff);
 				}
+				foreach (var node in buff.Graph.NodeList)
+				{
+					if (!node.Is(nameof(QFlowGraphNode.Start))) continue;
+					if (node.Name == AddEventKey || node.Name == RemoveEventKey || !node.Name.StartsWith("叠层")) continue;
+					EventActions[node.Name] += buff.TriggerEvent;
+				}
 			}
 			else
 			{
@@ -144,7 +150,7 @@ namespace QTool
 					case QBuffMergeMode.时间刷新:
 					case QBuffMergeMode.永久唯一:
 					case QBuffMergeMode.时间叠加:
-						Buffs.Remove(key);
+						PrivateRemove(buff);
 						buff.Count.OffsetValue = 0;
 						count = 1;
 						break;
@@ -153,7 +159,7 @@ namespace QTool
 						buff.Count.OffsetValue-= count;
 						if (buff.Count.OffsetValue <= 0)
 						{
-							Buffs.Remove(key);
+							PrivateRemove(buff);
 						}
 						break;
 					default:
@@ -163,6 +169,16 @@ namespace QTool
 				{
 					OnRemove(buff);
 				}
+			}
+		}
+		private void PrivateRemove(QBuffData<BuffData>.QBuffRuntime buff)
+		{
+			Buffs.Remove(buff.Key);
+			foreach (var node in buff.Graph.NodeList)
+			{
+				if (!node.Is(nameof(QFlowGraphNode.Start))) continue;
+				if (node.Name == AddEventKey || node.Name == RemoveEventKey || !node.Name.StartsWith("叠层")) continue;
+				EventActions[node.Name] -= buff.TriggerEvent;
 			}
 		}
 		private List<string> DelayRemove = new List<string>();
