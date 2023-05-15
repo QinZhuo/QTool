@@ -99,7 +99,7 @@ namespace QTool
 						break;
 				}
 				buff.Count.OffsetValue = count;
-				Buffs.Add(key, buff);
+				PrivateAdd(buff);
 				for (int i = 0; i < count; i++)
 				{
 					OnAdd(buff);
@@ -133,7 +133,6 @@ namespace QTool
 				{
 					OnAdd(buff);
 				}
-				PrivateAdd(buff);
 			}
 		}
 		public void Remove(string key,int count=1)
@@ -169,6 +168,7 @@ namespace QTool
 		}
 		private void PrivateAdd(QBuffData<BuffData>.QBuffRuntime buff)
 		{
+			Buffs.Add(buff.Key, buff);
 			if (buff.Graph != null)
 			{
 				foreach (var node in buff.Graph.NodeList)
