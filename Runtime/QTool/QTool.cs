@@ -593,8 +593,16 @@ namespace QTool
 					return obj;
 				}
 				else
-				{
-					if (obj is Component component)
+				{   
+					if (type == typeof(object)||type.IsPrimitive)
+					{
+						return obj;
+					}
+					else if (type == typeof(string))
+					{
+						return obj?.ToString();
+					}
+					else if (obj is Component component)
 					{
 						if (type == typeof(GameObject))
 						{
@@ -609,16 +617,7 @@ namespace QTool
 					{
 						return gameObj.GetComponent(type);
 					}
-					else if (type.IsPrimitive)
-					{
-						return obj;
-					}
-					else if (type == typeof(string))
-					{
-						return obj?.ToString();
-					}
 				}
-				Debug.LogError("转换[" + obj + "]为空[" + type + "]");
 				return default;
 			}
 			catch (Exception e)
