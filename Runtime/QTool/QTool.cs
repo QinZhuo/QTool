@@ -378,6 +378,17 @@ namespace QTool
 				return Enum.Parse(type, str);
 			}
 		}
+		public static void ForeachFlags<T>(T enumValue,Action<T> action)where T:Enum
+		{
+			var type = enumValue.GetType();
+			foreach (var value in Enum.GetValues(type))
+			{
+				if (enumValue.HasFlag((Enum)value))
+				{
+					action((T)value);
+				}
+			}
+		}
 		public static  bool IsInCamera(this Camera camera,Vector3 pos)
 		{
 			Vector3 vec = camera.WorldToViewportPoint(pos);
