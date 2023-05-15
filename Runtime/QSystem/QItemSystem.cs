@@ -54,6 +54,25 @@ namespace QTool
 				return count;
 			}
 		}
+		public void AddBuff(QItemData<ItemData>.QItemRuntime item)
+		{
+			Items.Add(item);
+			for (int i = 0; i < item.Count.IntValue; i++)
+			{
+				OnAdd(item);
+			}
+		}
+		public void RemoveBuff(QItemData<ItemData>.QItemRuntime item)
+		{
+			if (Items.Contains(item))
+			{
+				Items.Remove(item);
+				for (int i = 0; i < item.Count.IntValue; i++)
+				{
+					OnRemove(item);
+				}
+			}
+		}
 		public void Add(string key, int count = 1)
 		{
 			foreach (var item in Items)
