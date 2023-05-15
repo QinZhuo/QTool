@@ -104,11 +104,14 @@ namespace QTool
 				{
 					OnAdd(buff);
 				}
-				foreach (var node in buff.Graph.NodeList)
+				if (buff.Graph != null)
 				{
-					if (!node.Is(nameof(QFlowGraphNode.Start))) continue;
-					if (node.Name == AddEventKey || node.Name == RemoveEventKey || !node.Name.StartsWith("叠层")) continue;
-					EventActions[node.Name] += buff.TriggerEvent;
+					foreach (var node in buff.Graph.NodeList)
+					{
+						if (!node.Is(nameof(QFlowGraphNode.Start))) continue;
+						if (node.Name == AddEventKey || node.Name == RemoveEventKey || !node.Name.StartsWith("叠层")) continue;
+						EventActions[node.Name] += buff.TriggerEvent;
+					}
 				}
 			}
 			else
@@ -174,11 +177,14 @@ namespace QTool
 		private void PrivateRemove(QBuffData<BuffData>.QBuffRuntime buff)
 		{
 			Buffs.Remove(buff.Key);
-			foreach (var node in buff.Graph.NodeList)
+			if (buff.Graph != null)
 			{
-				if (!node.Is(nameof(QFlowGraphNode.Start))) continue;
-				if (node.Name == AddEventKey || node.Name == RemoveEventKey || !node.Name.StartsWith("叠层")) continue;
-				EventActions[node.Name] -= buff.TriggerEvent;
+				foreach (var node in buff.Graph.NodeList)
+				{
+					if (!node.Is(nameof(QFlowGraphNode.Start))) continue;
+					if (node.Name == AddEventKey || node.Name == RemoveEventKey || !node.Name.StartsWith("叠层")) continue;
+					EventActions[node.Name] -= buff.TriggerEvent;
+				}
 			}
 		}
 		private List<string> DelayRemove = new List<string>();
