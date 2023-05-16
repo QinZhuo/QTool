@@ -493,16 +493,11 @@ namespace QTool.Net
 		}
 		private static bool UpdateIEnumerator(IEnumerator ie)
 		{
-			var continueNext =false;
 			if (ie.Current is IEnumerator childIe)
 			{
-				continueNext = UpdateIEnumerator(childIe);
+				if (UpdateIEnumerator(childIe)) return true;
 			}
-			else
-			{
-				continueNext= ie.MoveNext();
-			}
-			return continueNext;
+			return ie.MoveNext();
 		}
 		public static void Update()
 		{
