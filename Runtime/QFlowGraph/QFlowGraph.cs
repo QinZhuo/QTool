@@ -70,11 +70,11 @@ namespace QTool.FlowGraph
 			if (node?.command != null)
 			{
 				info += node.ToInfoString();
-				Debug.LogError(startKey + ":" + info);
 			}
 			if (!startKey.StartsWith("叠层"))
 			{
-				info += ToInfoString("叠层"+startKey);
+				var temp = ToInfoString("叠层" + startKey);
+				info += temp.SplitEndString("叠层");
 			}
 			return info;
 		}
