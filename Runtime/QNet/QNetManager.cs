@@ -513,12 +513,13 @@ namespace QTool.Net
 		public override void Reset()
 		{
 			base.Reset();
+			Index = QNetManager.Instance.ClientIndex;
 		}
 		public override bool keepWaiting
 		{
 			get
 			{
-				if (Index >= 0 && Index == QNetManager.Instance.ClientIndex)
+				if (Index == QNetManager.Instance.ClientIndex)
 				{
 					return true;
 				}
