@@ -18,23 +18,20 @@ namespace QTool
 		{
 			List.Remove(enumerator);
 		}
-		public static void Complete(this IEnumerator enumerator)
-		{
-			int count = 0;
-			while (UpdateIEnumerator(enumerator))
-			{
-				if (++count > 1000)
-				{
-					throw new System.Exception(nameof(QCoroutine) + "." + nameof(Complete) + " 超过最大迭代次数" + 1000);
-				}
-			}
-		}
 		private static bool UpdateIEnumerator(IEnumerator enumerator)
 		{
+			var start = enumerator.Current;
 			var result = enumerator.MoveNext();
-			if (enumerator.Current is IEnumerator child)
+			if (enumerator.Current is IEnumerator nextChild)
 			{
-				if (UpdateIEnumerator(child)) return true;
+				if (UpdateIEnumerator(nextChild))
+				{
+					return true;
+				}
+				else if (start != enumerator.Current)
+				{
+					return UpdateIEnumerator(enumerator);
+				}
 			}
 			return result;
 		}
