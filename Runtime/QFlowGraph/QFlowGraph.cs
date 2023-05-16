@@ -979,7 +979,11 @@ namespace QTool.FlowGraph
 		private Func<QFlowNode, string> NodeToInfoString { get; set; }
 		public string ToInfoString()
 		{
-			if (command?.method == null) return "";
+			if (command?.method == null)
+			{
+				Debug.LogWarning("Node方法丢失[" + commandKey + "]");
+				return "";
+			}
 			if (NodeToInfoString == null)
 			{
 				var method= command.method.DeclaringType.GetStaticMethod(nameof(ToInfoString));
