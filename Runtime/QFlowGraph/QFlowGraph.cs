@@ -65,6 +65,10 @@ namespace QTool.FlowGraph
         }
 		public string ToInfoString(string startKey)
 		{
+			if (NodeList.Count == 0)
+			{
+				Deserialize();
+			}
 			var info = "";
 			var node = this[startKey];
 			if (node?.command != null)
