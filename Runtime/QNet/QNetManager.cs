@@ -493,6 +493,7 @@ namespace QTool.Net
 		}
 		private static bool UpdateIEnumerator(IEnumerator ie)
 		{
+			Debug.LogError("["+QNetManager.Instance.ClientIndex+"] ["+ie.Current+"]");
 			if (ie.Current is IEnumerator childIe)
 			{
 				if (UpdateIEnumerator(childIe)) return true;
