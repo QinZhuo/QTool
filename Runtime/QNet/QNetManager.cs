@@ -518,17 +518,13 @@ namespace QTool.Net
 		{
 			get
 			{
-				if (Index < 0)
-				{
-					Index = QNetManager.Instance.ClientIndex;
-				}
-				if (Index == QNetManager.Instance.ClientIndex)
+				if (Index >= 0 && Index == QNetManager.Instance.ClientIndex)
 				{
 					return true;
 				}
 				else
 				{
-					Index = -1;
+					Index = QNetManager.Instance.ClientIndex;
 					return false;
 				}
 			}
