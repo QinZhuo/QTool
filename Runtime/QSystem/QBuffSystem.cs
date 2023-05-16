@@ -60,7 +60,7 @@ namespace QTool
 				if (Data.Effect != null)
 				{
 					Graph = Data.Effect.Graph.CreateInstance();
-					Graph.RegisterMember(this);
+					Graph.RegisterValue(this);
 				}
 				if (Data.TimeEvent > 0)
 				{
@@ -71,7 +71,7 @@ namespace QTool
 			{
 				if (Graph != null)
 				{
-					Graph.UnRegisterMember(this);
+					Graph.UnRegisterValue(this);
 				}
 			}
 			public void TriggerEvent(string key)

@@ -276,7 +276,7 @@ namespace QTool
     {
     }
 	
-	public static class ValueEventTriggerExtends
+	public static class QEventTool
     {
 
         public static QEventTrigger GetTrigger(this GameObject obj)
@@ -338,7 +338,7 @@ namespace QTool
 		{
 			obj.GetParentTrigger()?.Invoke(eventName.Trim(), value);
 		}
-		public static void RegisterMember<RuntimeT, DataT>(this GameObject gameObject, QRuntime<RuntimeT, DataT> runtime) where RuntimeT : QRuntime<RuntimeT, DataT>, new() where DataT : QDataList<DataT>, new()
+		public static void RegisterEvent<RuntimeT, DataT>(this QRuntime<RuntimeT, DataT> runtime, GameObject gameObject) where RuntimeT : QRuntime<RuntimeT, DataT>, new() where DataT : QDataList<DataT>, new()
 		{
 			var trigger = gameObject?.GetTrigger();
 			if (trigger != null)
@@ -385,7 +385,7 @@ namespace QTool
 				}
 			}
 		}
-		public static void UnRegisterMember<RuntimeT, DataT>(this GameObject gameObject, QRuntime<RuntimeT, DataT> runtime) where RuntimeT : QRuntime<RuntimeT, DataT>, new() where DataT : QDataList<DataT>, new()
+		public static void UnRegisterEvent<RuntimeT, DataT>(this QRuntime<RuntimeT, DataT> runtime,GameObject gameObject) where RuntimeT : QRuntime<RuntimeT, DataT>, new() where DataT : QDataList<DataT>, new()
 		{
 			var trigger = gameObject?.GetTrigger();
 			if (trigger != null)

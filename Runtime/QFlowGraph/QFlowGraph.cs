@@ -325,7 +325,7 @@ namespace QTool.FlowGraph
 		{
 			yield return wait;
 		}
-		public void RegisterMember<RuntimeT, DataT>(QRuntime<RuntimeT, DataT> runtime) where RuntimeT : QRuntime<RuntimeT, DataT>, new() where DataT : QDataList<DataT>, new()
+		public void RegisterValue<RuntimeT, DataT>(QRuntime<RuntimeT, DataT> runtime) where RuntimeT : QRuntime<RuntimeT, DataT>, new() where DataT : QDataList<DataT>, new()
 		{
 			if (runtime != null)
 			{
@@ -366,7 +366,7 @@ namespace QTool.FlowGraph
 				});
 			}
 		}
-		public void UnRegisterMember<RuntimeT, DataT>(QRuntime<RuntimeT, DataT> runtime) where RuntimeT : QRuntime<RuntimeT, DataT>, new() where DataT : QDataList<DataT>, new()
+		public void UnRegisterValue<RuntimeT, DataT>(QRuntime<RuntimeT, DataT> runtime) where RuntimeT : QRuntime<RuntimeT, DataT>, new() where DataT : QDataList<DataT>, new()
 		{
 			if (runtime != null)
 			{

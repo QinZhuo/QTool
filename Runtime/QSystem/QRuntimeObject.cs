@@ -62,9 +62,9 @@ namespace QTool
 			{
 				if (value != _Runtime)
 				{
-					gameObject.UnRegisterMember(_Runtime);
+					_Runtime?.UnRegisterEvent(gameObject);
 					_Runtime = value;
-					gameObject.RegisterMember(_Runtime);
+					_Runtime.RegisterEvent(gameObject);
 				}
 			}
 		}
