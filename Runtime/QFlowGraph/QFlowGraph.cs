@@ -65,7 +65,7 @@ namespace QTool.FlowGraph
         }
 		public string ToInfoString(string startKey)
 		{
-			if (NodeList.Count == 0)
+			if (StartNode.Count == 0)
 			{
 				Deserialize();
 			}
