@@ -513,7 +513,7 @@ namespace QTool.Reflection
 		{
 			if (name.SplitTowString(".", out var start, out var end))
 			{
-				return GetStaticMethod(QReflection.ParseType(start), end);
+				return GetStaticMethod(ParseType(start), end);
 			}
 			var tType = type;
 			while (type.BaseType != null)

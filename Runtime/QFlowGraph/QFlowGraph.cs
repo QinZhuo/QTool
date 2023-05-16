@@ -71,6 +71,7 @@ namespace QTool.FlowGraph
 				if (node?.command != null)
 				{
 					var method = node.command.method.DeclaringType.GetStaticMethod(nameof(ToInfoString));
+					Debug.LogError(node.command.method.DeclaringType.Name + "." + nameof(ToInfoString)+"      "+method);
 					if (method != null)
 					{
 						info += method.Invoke(null,new object[] { node });
