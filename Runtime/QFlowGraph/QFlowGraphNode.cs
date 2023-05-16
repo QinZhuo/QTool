@@ -225,7 +225,10 @@ namespace QTool.FlowGraph
 			switch (node.command.method.Name)
 			{
 				case nameof(Start):
-					info+= node.Name;
+					if (node.Name != QFlowGraphNode.StartKey)
+					{
+						info += node.Name;
+					}
 					break;
 				default:
 					return "";
