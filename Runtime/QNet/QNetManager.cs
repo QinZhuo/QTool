@@ -491,17 +491,12 @@ namespace QTool.Net
 		{
 			List.Remove(enumerator);
 		}
-		private static bool UpdateIEnumerator(IEnumerator ie)
+		private static bool UpdateIEnumerator(IEnumerator enumerator)
 		{
-			if (ie.Current is IEnumerator childIe)
+			var result= enumerator.MoveNext();
+			if (enumerator.Current is IEnumerator child)
 			{
-				if (UpdateIEnumerator(childIe)) return true;
-			}
-			
-			var result= ie.MoveNext();
-			if (result)
-			{
-				Debug.LogError(ie.GetHashCode()+" "+QNetManager.Instance.ClientIndex+"["+ie.Current+"]");
+				if (UpdateIEnumerator(child)) return true;
 			}
 			return result;
 		}
