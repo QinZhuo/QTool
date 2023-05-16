@@ -40,7 +40,7 @@ namespace QTool.FlowGraph
 			return funcInfo.Invoke(obj, param);
 		}
 
-	
+
 
 
 		[QName("运算/加")]
@@ -115,7 +115,7 @@ namespace QTool.FlowGraph
 		{
 			return !a;
 		}
-	
+
 		internal const string StartKey = "起点";
 		[QStartNode]
 		[QName("起点/起点")]
@@ -123,7 +123,7 @@ namespace QTool.FlowGraph
 		{
 		}
 		[QName("流程图/引用子图")]
-		public static IEnumerator GraphAsset(QFlowNode This, [QNodeName,QName("流程图")] QFlowGraphAsset asset, string startNode = StartKey)
+		public static IEnumerator GraphAsset(QFlowNode This, [QNodeName, QName("流程图")] QFlowGraphAsset asset, string startNode = StartKey)
 		{
 			if (asset == null) yield break;
 			var key = asset.GetHashCode().ToString();
@@ -225,18 +225,19 @@ namespace QTool.FlowGraph
 			switch (node.command.method.Name)
 			{
 				case nameof(Start):
-					if (node.Name != QFlowGraphNode.StartKey)
+					if (node.Name != StartKey)
 					{
 						info += node.Name;
 					}
 					break;
+				case nameof(Trigger):
+					return node.Ports["triggerObject"].GetFlowNode()?.ToInfoString();
 				default:
 					return "";
 			}
 			info += node.Ports[QFlowKey.NextPort].GetFlowNode()?.ToInfoString();
 			return info;
 		}
-		
 	}
 
 }
