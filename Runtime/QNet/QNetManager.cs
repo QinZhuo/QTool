@@ -502,7 +502,10 @@ namespace QTool.Net
 			{
 				continueNext= ie.MoveNext();
 			}
-			Debug.LogError(ie.GetHashCode() + "[" + QNetManager.Instance.ClientIndex + "] [" + ie.Current + "]");
+			if (continueNext)
+			{
+				Debug.LogError(ie.GetHashCode() + "[" + QNetManager.Instance.ClientIndex + "] [" + ie.Current + "]");
+			}
 			return continueNext;
 		}
 		public static void Update()
