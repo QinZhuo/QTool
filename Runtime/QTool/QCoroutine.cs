@@ -9,7 +9,7 @@ namespace QTool
 		private static List<IEnumerator> AddList { set; get; } = new List<IEnumerator>();
 		public static void Start(this IEnumerator enumerator)
 		{
-			if (UpdateIEnumerator(enumerator))
+			//if (UpdateIEnumerator(enumerator))
 			{
 				AddList.Add(enumerator);
 			}
@@ -21,7 +21,7 @@ namespace QTool
 		private static bool UpdateIEnumerator(IEnumerator enumerator)
 		{
 			//var start = enumerator.Current;
-			var result = enumerator.MoveNext();
+			
 			if (enumerator.Current is IEnumerator nextChild)
 			{
 				if (UpdateIEnumerator(nextChild))
@@ -33,6 +33,7 @@ namespace QTool
 				//	return UpdateIEnumerator(enumerator);
 				//}
 			}
+			var result = enumerator.MoveNext();
 			return result;
 		}
 		public static void Update()
