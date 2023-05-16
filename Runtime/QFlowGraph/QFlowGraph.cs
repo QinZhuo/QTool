@@ -63,25 +63,19 @@ namespace QTool.FlowGraph
         {
             return this.ToQData();
         }
-		public string ToInfoString(string startKey = QFlowGraphNode.StartKey)
+		public string ToInfoString(string startKey,Func<QFlowNode,string> nodeToInfoString)
 		{
 			var info = "";
 			if (ContainsNode(startKey, out var node))
 			{
 				if (node?.command != null)
 				{
-					var method = node.command.method.DeclaringType.GetStaticMethod(nameof(ToInfoString));
-					Debug.LogError(node.command.method.DeclaringType.Name + "." + nameof(ToInfoString)+"      "+method);
-					if (method != null)
-					{
-						info += method.Invoke(null,new object[] { node });
-						Debug.LogError(info);
-					}
+					info += nodeToInfoString(node);
 				}
 			}
 			if (startKey.StartsWith("叠层"))
 			{
-				info += ToInfoString("叠层" + startKey);
+				info += ToInfoString("叠层" + startKey,nodeToInfoString);
 			}
 			return info;
 		}
