@@ -9,7 +9,7 @@ namespace QTool
 		private static List<IEnumerator> AddList { set; get; } = new List<IEnumerator>();
 		public static void Start(this IEnumerator enumerator)
 		{
-			//if (UpdateIEnumerator(enumerator))
+			if (UpdateIEnumerator(enumerator))
 			{
 				AddList.Add(enumerator);
 			}
