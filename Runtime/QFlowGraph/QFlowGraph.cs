@@ -63,19 +63,19 @@ namespace QTool.FlowGraph
         {
             return this.ToQData();
         }
-		public string ToInfoString(string startKey,Func<QFlowNode,string> nodeToInfoString)
+		public string ToInfoString(string startKey)
 		{
 			var info = "";
 			if (ContainsNode(startKey, out var node))
 			{
 				if (node?.command != null)
 				{
-					info += nodeToInfoString(node);
+					info += node.ToInfoString();
 				}
 			}
 			if (startKey.StartsWith("叠层"))
 			{
-				info += ToInfoString("叠层" + startKey,nodeToInfoString);
+				info += ToInfoString("叠层" );
 			}
 			return info;
 		}
@@ -985,8 +985,26 @@ namespace QTool.FlowGraph
         public override string ToString()
         {
             return "(" + commandKey + ")";
-        }
-        [System.Flags]
+		}
+		private Func<QFlowNode, string> NodeToInfoString { get; set; }
+		public string ToInfoString()
+		{
+			if (command == null) return "";
+			if (NodeToInfoString != null)
+			{
+				var method= command.method.DeclaringType.GetStaticMethod(nameof(ToInfoString));
+				if (method == null)
+				{
+					NodeToInfoString = (node) => "";
+				}
+				else
+				{
+					NodeToInfoString = (node) => method.Invoke(null, new object[] { node })?.ToString();
+				}
+			}
+			return NodeToInfoString(this);
+		}
+		[System.Flags]
         public enum ReturnType
         {
             Void,
@@ -1056,7 +1074,6 @@ namespace QTool.FlowGraph
         public List<PortId> TriggerPortList { get; private set; } = new List<PortId>();
         public QFlowNode()
         {
-
         }
         public QFlowNode(string commandKey)
         {
