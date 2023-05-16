@@ -509,7 +509,7 @@ namespace QTool.Net
 	public class WaitForNetUpdate : CustomYieldInstruction
 	{
 		public static WaitForNetUpdate Instance { get; private set; } = new WaitForNetUpdate();
-		private int Index { get; set; } = -1;
+		private int Index { get; set; } = 0;
 		public override void Reset()
 		{
 			base.Reset();
@@ -519,7 +519,7 @@ namespace QTool.Net
 		{
 			get
 			{
-				if (Index == QNetManager.Instance.ClientIndex)
+				if (Index >=QNetManager.Instance.ClientIndex)
 				{
 					return true;
 				}
