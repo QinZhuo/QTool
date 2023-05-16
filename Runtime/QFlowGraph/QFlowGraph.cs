@@ -70,7 +70,12 @@ namespace QTool.FlowGraph
 			{
 				if (node?.command != null)
 				{
-					info += node.command.method.DeclaringType.InvokeStaticFunction(nameof(ToInfoString), node);
+					var method = node.command.method.DeclaringType.GetStaticMethod(nameof(ToInfoString));
+					if (method != null)
+					{
+						info += method.Invoke(null,new object[] { node });
+						Debug.LogError(info);
+					}
 				}
 			}
 			if (startKey.StartsWith("叠层"))
