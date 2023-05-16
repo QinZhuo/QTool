@@ -1062,7 +1062,6 @@ namespace QTool
 		public QObjectType ObjType { get; protected set; } = QObjectType.Object;
 		public bool IsIQSerialize { private set; get; }
 		public bool IsIQData { private set; get; }
-		//public bool HasCallback { private set; get; }
 		protected override void Init(Type type)
 		{
 			Functions = null;
@@ -1117,6 +1116,10 @@ namespace QTool
 			Members.Sort(
 				(a, b) =>
 				{
+					if (a.MemeberInfo.Name == nameof(Key))
+					{
+						return -1;
+					}
 					if (a.MemeberInfo.DeclaringType == b.MemeberInfo.DeclaringType)
 					{
 						return 0;
