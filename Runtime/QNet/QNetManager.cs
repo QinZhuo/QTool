@@ -497,7 +497,13 @@ namespace QTool.Net
 			{
 				if (UpdateIEnumerator(childIe)) return true;
 			}
-			return ie.MoveNext();
+			
+			var result= ie.MoveNext();
+			if (result)
+			{
+				Debug.LogError(ie.GetHashCode()+" "+QNetManager.Instance.ClientIndex+"["+ie.Current+"]");
+			}
+			return result;
 		}
 		public static void Update()
 		{
