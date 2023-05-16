@@ -297,29 +297,13 @@ namespace QTool.FlowGraph
 		public void StartCoroutine(IEnumerator coroutine)
 		{
 			CoroutineList.Add(coroutine);
-			if (StartCoroutineOverride == null)
-			{
-				QToolManager.Instance.StartCoroutine(coroutine);
-			}
-			else
-			{
-				StartCoroutineOverride(coroutine);
-			}
+			coroutine.Start();
 		}
 		public void StopCoroutine(IEnumerator coroutine)
 		{
 			CoroutineList.Remove(coroutine);
-			if (StopCoroutineOverride == null)
-			{
-				QToolManager.Instance.StopCoroutine(coroutine);
-			}
-			else
-			{
-				StopCoroutineOverride(coroutine);
-			}
+			coroutine.Stop();
 		}
-		public static Action<IEnumerator> StartCoroutineOverride { get; set; } = null;
-		public static Action<IEnumerator> StopCoroutineOverride { get; set; } = null;
 		public static IEnumerator Step { get; set; } = FixedUpdateStep();
 
 		static WaitForFixedUpdate wait= new WaitForFixedUpdate();

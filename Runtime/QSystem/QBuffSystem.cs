@@ -56,7 +56,7 @@ namespace QTool
 			}
 			public void TriggerEvent(string key)
 			{
-				Graph?.Run(key);
+				Graph?.RunIEnumerator(key).Complete();
 			}
 		}
 	}

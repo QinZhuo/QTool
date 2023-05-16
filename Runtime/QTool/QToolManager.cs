@@ -18,6 +18,7 @@ namespace QTool
 			}
 			base.Awake();
 			DontDestroyOnLoad(gameObject);
+			Instance.OnUpdateEvent += QCoroutine.Update;
 		}
 		public event Action OnUpdateEvent = null;
 		public event Action OnDestroyEvent = null;
@@ -33,6 +34,7 @@ namespace QTool
 		{
 			OnDestroyEvent?.Invoke();
 			OnLateDestroyEvent?.Invoke();
+			Instance.OnUpdateEvent -= QCoroutine.Update;
 		}
 	
 	
@@ -81,7 +83,8 @@ namespace QTool
 			OnPostRenderEvent?.Invoke();
 		}
 	}
-    public abstract class QToolManagerBase<T>:MonoBehaviour where T : QToolManagerBase<T>
+
+	public abstract class QToolManagerBase<T>:MonoBehaviour where T : QToolManagerBase<T>
     {
         private static T _instance;
         public static T Instance {

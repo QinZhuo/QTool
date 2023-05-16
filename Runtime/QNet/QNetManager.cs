@@ -27,9 +27,8 @@ namespace QTool.Net
 			Physics.autoSyncTransforms = false;
 			Time.fixedDeltaTime = 1f / netFps;
 			FlowGraph.QFlowGraph.Step = WaitForNetUpdate.Instance;
-			FlowGraph.QFlowGraph.StartCoroutineOverride = QNetCoroutine.Start;
-			FlowGraph.QFlowGraph.StopCoroutineOverride  = QNetCoroutine.Stop;
 			QTool.AddPlayerLoop(typeof(QNetManager), QNetPlayerLoop,"FixedUpdate");
+			QToolManager.Instance.OnUpdateEvent -= QCoroutine.Update;
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
 			QToolManager.Instance.OnGUIEvent += DebugGUI;
 #endif
@@ -42,10 +41,11 @@ namespace QTool.Net
 				QToolManager.Instance.OnGUIEvent -= DebugGUI;
 			}
 #endif
+			QToolManager.Instance.OnUpdateEvent += QCoroutine.Update;
 			QTime.RevertScale(this);
 			QTool.RemovePlayerLoop(typeof(QNetManager), "FixedUpdate");
 			ServerUpdateTimer?.Clear();
-			QNetCoroutine.StopAll();
+			QCoroutine.StopAll();
 		}
 		public bool NetActive => Application.isPlaying&&( transport.ServerActive || transport.ClientConnected);
 		public T PlayerValue<T>(string player,string key, T localValue)
@@ -347,7 +347,7 @@ namespace QTool.Net
 						ClientActionData[actionData.Key].MergeValues(actionData);
 					}
 					OnNetUpdate?.Invoke();
-					QNetCoroutine.Update();
+					QCoroutine.Update();
 					Physics.Simulate(Time.fixedDeltaTime);
 					Physics.SyncTransforms();
 					if (loadEventData != null)
@@ -476,44 +476,7 @@ namespace QTool.Net
 		}
 #endif
 	}
-	public static class QNetCoroutine
-	{
-		private static List<IEnumerator> List { set; get; } = new List<IEnumerator>();
-		private static List<IEnumerator> AddList { set; get; } =new List<IEnumerator>();
-		public static void Start(IEnumerator enumerator)
-		{
-			if (UpdateIEnumerator(enumerator))
-			{
-				AddList.Add(enumerator);
-			}
-		}
-		public static void Stop(IEnumerator enumerator)
-		{
-			List.Remove(enumerator);
-		}
-		private static bool UpdateIEnumerator(IEnumerator enumerator)
-		{
-			var result= enumerator.MoveNext();
-			if (enumerator.Current is IEnumerator child)
-			{
-				if (UpdateIEnumerator(child)) return true;
-			}
-			return result;
-		}
-		public static void Update()
-		{
-			if (AddList.Count > 0)
-			{
-				List.AddRange(AddList);
-				AddList.Clear();
-			}
-			List.RemoveAll((ie) => !UpdateIEnumerator(ie));
-		}
-		public static void StopAll()
-		{
-			List.Clear();
-		}
-	}
+	
 
 	public class QNetActionData : IKey<string>
 	{
