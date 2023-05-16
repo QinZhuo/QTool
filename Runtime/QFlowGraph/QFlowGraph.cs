@@ -1126,6 +1126,9 @@ namespace QTool.FlowGraph
 			if (command.method.GetAttribute<QStartNodeAttribute>() == null)
 			{
 				AddPort(QFlowKey.FromPort, QInputPortAttribute.Normal);
+			}
+			else
+			{
 				Graph.StartNode[Name] = this;
 			}
 			if (command.method.GetAttribute<QEndNodeAttribute>() == null)
