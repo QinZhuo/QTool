@@ -46,10 +46,10 @@ namespace QTool.FlowGraph
 		}
 		private void Init()
 		{
-			NodeCache.Clear();
-			foreach (var state in NodeList)
+			StartNode.Clear();
+			foreach (var node in NodeList)
 			{
-				state.Init(this);
+				node.Init(this);
 			}
 		}
 		public QFlowGraph CreateInstance()
@@ -66,16 +66,14 @@ namespace QTool.FlowGraph
 		public string ToInfoString(string startKey)
 		{
 			var info = "";
-			if (ContainsNode(startKey, out var node))
+			var node = this[startKey];
+			if (node?.command != null)
 			{
-				if (node?.command != null)
-				{
-					info += node.ToInfoString();
-				}
+				info += node.ToInfoString();
 			}
-			if (startKey.StartsWith("叠层"))
+			if (!startKey.StartsWith("叠层"))
 			{
-				info += ToInfoString("叠层" );
+				info += ToInfoString("叠层"+startKey);
 			}
 			return info;
 		}
@@ -87,6 +85,9 @@ namespace QTool.FlowGraph
 		public QList<string,QFlowNode> NodeList { private set; get; } = new QList<string,QFlowNode>();
 		[QName]
 		public QDictionary<string, object> Values { private set; get; } = new QDictionary<string, object>();
+
+		[QIgnore]
+		public QDictionary<string, QFlowNode> StartNode = new QDictionary<string, QFlowNode>();
 		public bool IsRunning => CoroutineList.Count > 0;
         public T GetValue<T>(string key="")
         {
@@ -114,32 +115,21 @@ namespace QTool.FlowGraph
 		{
 			get
 			{
-				if (string.IsNullOrWhiteSpace(key)) return null;
-				if (ContainsNode(key, out var node))
+				if (key.IsNull()) return null;
+
+				if (NodeList.ContainsKey(key))
 				{
-					return node;
+					return NodeList[key];
 				}
-				return NodeCache[key];
+				else if(StartNode.ContainsKey(key))
+				{
+					return StartNode[key];
+				}
+				return null;
 			}
-		}
-		public bool ContainsNode(string key,out QFlowNode node)
-		{
-			if (NodeList.ContainsKey(key))
-			{
-				node= NodeList[key];
-				return true;
-			}
-			else if (!NodeCache.ContainsKey(key))
-			{
-				NodeCache[key] = NodeList.Find((obj) => obj.Name == key);
-			}
-			node = NodeCache[key];
-			return node != null;
 		}
 		[QIgnore]
 		private List<IEnumerator> CoroutineList { set; get; } = new List<IEnumerator>();
-		[QIgnore]
-		QDictionary<string, QFlowNode> NodeCache = new QDictionary<string, QFlowNode>();
         public ConnectInfo GetConnectInfo(PortId? portId)
         {
             if (portId == null) return null;
@@ -1136,6 +1126,7 @@ namespace QTool.FlowGraph
 			if (command.method.GetAttribute<QStartNodeAttribute>() == null)
 			{
 				AddPort(QFlowKey.FromPort, QInputPortAttribute.Normal);
+				Graph.StartNode[Name] = this;
 			}
 			if (command.method.GetAttribute<QEndNodeAttribute>() == null)
 			{

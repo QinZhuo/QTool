@@ -37,7 +37,10 @@ namespace QTool
 			}
 			public void TriggerEvent(string key)
 			{
-				Graph?.Run(key);
+				if (Graph != null&& Graph[key] != null)
+				{
+					Graph.Run(key);
+				}
 			}
 		}
 	}
@@ -165,15 +168,14 @@ namespace QTool
 		{
 			if (item.Graph != null)
 			{
-				if (item.Graph.ContainsNode(AddEventKey, out var addNode))
+				item.TriggerEvent(AddEventKey);
+				foreach (var node in item.Graph.StartNode)
 				{
-					item.TriggerEvent(AddEventKey);
-				}
-				foreach (var node in item.Graph.NodeList)
-				{
-					if (!node.Is(nameof(QFlowGraphNode.Start))) continue;
-					if (node.Name == AddEventKey || node.Name == RemoveEventKey) continue;
-					EventActions[node.Name] += item.TriggerEvent;
+					var name = node.Value.Name;
+					if (name != AddEventKey && name != RemoveEventKey)
+					{
+						EventActions[name] += item.TriggerEvent;
+					}
 				}
 			}
 			OnAddItem?.Invoke(item);
@@ -182,15 +184,14 @@ namespace QTool
 		{
 			if (item.Graph!=null)
 			{
-				if (item.Graph.ContainsNode(RemoveEventKey, out var remveNode))
+				item.TriggerEvent(RemoveEventKey);
+				foreach (var node in item.Graph.StartNode)
 				{
-					item.TriggerEvent(RemoveEventKey);
-				}
-				foreach (var node in item.Graph.NodeList)
-				{
-					if (!node.Is(nameof(QFlowGraphNode.Start))) continue;
-					if (node.Name == AddEventKey || node.Name == RemoveEventKey) continue;
-					EventActions[node.Name] -= item.TriggerEvent;
+					var name = node.Value.Name;
+					if (name != AddEventKey && name != RemoveEventKey)
+					{
+						EventActions[name] -= item.TriggerEvent;
+					}
 				}
 			}
 			OnRemoveItem?.Invoke(item);

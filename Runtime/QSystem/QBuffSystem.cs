@@ -14,17 +14,37 @@ namespace QTool
 		时间叠加,
 		永久唯一,
 	}
-	public abstract class QBuffData<T>:QDataList<T> where T: QBuffData<T>,IKey<string>,new()
+	public abstract class QGraphData<T> : QDataList<T> where T : QGraphData<T>, IKey<string>, new()
+	{
+		[QIgnore]
+		private string _EffctInfo = "";
+		[QName("效果说明")]
+		public string EffectInfo
+		{
+			get
+			{
+				if (_EffctInfo.IsNull() && Effect != null)
+				{
+					var graph = Effect.Graph;
+					_EffctInfo = "";
+					foreach (var kv in graph.StartNode)
+					{
+						graph.ToInfoString(kv.Key);
+					}
+				}
+				return _EffctInfo;
+			}
+			set => _EffctInfo = value;
+		}
+		[QName("效果")]
+		public QFlowGraphAsset Effect { get; set; }
+	}
+	public abstract class QBuffData<T>:QGraphData<T> where T: QBuffData<T>,IKey<string>,new()
 	{
 		[QName("叠加方式")]
 		public QBuffMergeMode Megre { get; protected set; } = QBuffMergeMode.时间叠层;
 		[QName("时间事件")]
 		public float TimeEvent { get; protected set; } = 0;
-		[QName("效果说明")]
-		public virtual string EffectInfo { get; set; }
-		[QName("效果")]
-		public QFlowGraphAsset Effect { get; protected set; }
-
 		public class QBuffRuntime : QRuntime<QBuffRuntime, T>
 		{
 			[QName("层数")]
@@ -56,7 +76,10 @@ namespace QTool
 			}
 			public void TriggerEvent(string key)
 			{
-				Graph?.Run(key);
+				if (Graph != null && Graph[key] != null)
+				{
+					Graph.Run(key);
+				}
 			}
 		}
 	}
@@ -171,11 +194,12 @@ namespace QTool
 			Buffs.Add(buff.Key, buff);
 			if (buff.Graph != null)
 			{
-				foreach (var node in buff.Graph.NodeList)
+				foreach (var node in buff.Graph.StartNode)
 				{
-					if (!node.Is(nameof(QFlowGraphNode.Start))) continue;
-					if (node.Name == AddEventKey || node.Name == RemoveEventKey || !node.Name.StartsWith("叠层")) continue;
-					EventActions[node.Name] += buff.TriggerEvent;
+					if (node.Value.Name.StartsWith("叠层"))
+					{
+						EventActions[node.Value.Name] += buff.TriggerEvent;
+					}
 				}
 			}
 		}
@@ -184,11 +208,12 @@ namespace QTool
 			Buffs.Remove(buff.Key);
 			if (buff.Graph != null)
 			{
-				foreach (var node in buff.Graph.NodeList)
+				foreach (var node in buff.Graph.StartNode)
 				{
-					if (!node.Is(nameof(QFlowGraphNode.Start))) continue;
-					if (node.Name == AddEventKey || node.Name == RemoveEventKey || !node.Name.StartsWith("叠层")) continue;
-					EventActions[node.Name] -= buff.TriggerEvent;
+					if (node.Value.Name.StartsWith("叠层"))
+					{
+						EventActions[node.Value.Name] -= buff.TriggerEvent;
+					}
 				}
 			}
 		}
@@ -235,15 +260,14 @@ namespace QTool
 		{
 			if (buff.Graph != null)
 			{
-				if (buff.Graph.ContainsNode(AddEventKey, out var addNode))
+				buff.TriggerEvent(AddEventKey);
+				foreach (var node in buff.Graph.StartNode)
 				{
-					buff.TriggerEvent(AddEventKey);
-				}
-				foreach (var node in buff.Graph.NodeList)
-				{
-					if (!node.Is(nameof(QFlowGraphNode.Start))) continue;
-					if (node.Name == AddEventKey || node.Name == RemoveEventKey || node.Name.StartsWith("叠层")) continue;
-					EventActions[node.Name] += buff.TriggerEvent;
+					var name = node.Value.Name;
+					if (name != AddEventKey && name != RemoveEventKey && !node.Value.Name.StartsWith("叠层"))
+					{
+						EventActions[node.Value.Name] += buff.TriggerEvent;
+					}
 				}
 			}
 			OnAddBuff?.Invoke(buff);
@@ -252,15 +276,14 @@ namespace QTool
 		{
 			if (buff.Graph!=null)
 			{
-				if (buff.Graph.ContainsNode(RemoveEventKey, out var remveNode))
+				buff.TriggerEvent(RemoveEventKey);
+				foreach (var node in buff.Graph.StartNode)
 				{
-					buff.TriggerEvent(RemoveEventKey);
-				}
-				foreach (var node in buff.Graph.NodeList)
-				{
-					if (!node.Is(nameof(QFlowGraphNode.Start))) continue;
-					if (node.Name == AddEventKey || node.Name == RemoveEventKey || node.Name.StartsWith("叠层")) continue;
-					EventActions[node.Name] -= buff.TriggerEvent;
+					var name = node.Value.Name;
+					if (name != AddEventKey && name != RemoveEventKey && !node.Value.Name.StartsWith("叠层"))
+					{
+						EventActions[node.Value.Name] -= buff.TriggerEvent;
+					}
 				}
 			}
 			OnRemoveBuff?.Invoke(buff);
