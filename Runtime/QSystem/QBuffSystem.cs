@@ -14,7 +14,7 @@ namespace QTool
 		时间叠加,
 		永久唯一,
 	}
-	public abstract class QGraphData<T> : QDataList<T> where T : QGraphData<T>, IKey<string>, new()
+	public abstract class QEffectData<T> : QDataList<T> where T : QEffectData<T>, IKey<string>, new()
 	{
 		[QIgnore]
 		private string _EffctInfo = "";
@@ -39,7 +39,7 @@ namespace QTool
 		[QName("效果")]
 		public QFlowGraphAsset Effect { get; set; }
 	}
-	public abstract class QBuffData<T>:QGraphData<T> where T: QBuffData<T>,IKey<string>,new()
+	public abstract class QBuffData<T>:QEffectData<T> where T: QBuffData<T>,IKey<string>,new()
 	{
 		[QName("叠加方式")]
 		public QBuffMergeMode Megre { get; protected set; } = QBuffMergeMode.时间叠层;

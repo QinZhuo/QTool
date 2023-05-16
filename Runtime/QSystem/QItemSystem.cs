@@ -6,14 +6,10 @@ using QTool.FlowGraph;
 
 namespace QTool
 {
-	public abstract class QItemData<T>:QDataList<T> where T: QItemData<T>,IKey<string>,new()
+	public abstract class QItemData<T>: QEffectData<T> where T: QItemData<T>,IKey<string>,new()
 	{
 		[QName("最大叠层")]
 		public int MaxCount { get; protected set; } = 1;
-		[QName("效果说明")]
-		public virtual string EffectInfo { get; set; }
-		[QName("效果")]
-		public QFlowGraphAsset Effect { get; protected set; }
 		public class QItemRuntime : QRuntime<QItemRuntime, T>
 		{
 			[QName("层数")]

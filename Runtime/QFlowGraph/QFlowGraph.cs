@@ -70,6 +70,7 @@ namespace QTool.FlowGraph
 			if (node?.command != null)
 			{
 				info += node.ToInfoString();
+				Debug.LogError(startKey + ":" + info);
 			}
 			if (!startKey.StartsWith("叠层"))
 			{
