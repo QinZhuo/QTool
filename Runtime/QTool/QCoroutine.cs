@@ -20,7 +20,7 @@ namespace QTool
 		}
 		private static bool UpdateIEnumerator(IEnumerator enumerator)
 		{
-			var start = enumerator.Current;
+			//var start = enumerator.Current;
 			var result = enumerator.MoveNext();
 			if (enumerator.Current is IEnumerator nextChild)
 			{
@@ -28,10 +28,10 @@ namespace QTool
 				{
 					return true;
 				}
-				else if (start != enumerator.Current)
-				{
-					return UpdateIEnumerator(enumerator);
-				}
+				//else if (start != enumerator.Current)
+				//{
+				//	return UpdateIEnumerator(enumerator);
+				//}
 			}
 			return result;
 		}
