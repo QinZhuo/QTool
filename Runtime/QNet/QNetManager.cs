@@ -493,12 +493,17 @@ namespace QTool.Net
 		}
 		private static bool UpdateIEnumerator(IEnumerator ie)
 		{
-			Debug.LogError("["+QNetManager.Instance.ClientIndex+"] ["+ie.Current+"]");
+			var continueNext =false;
 			if (ie.Current is IEnumerator childIe)
 			{
-				if (UpdateIEnumerator(childIe)) return true;
+				continueNext = UpdateIEnumerator(childIe);
 			}
-			return ie.MoveNext();
+			else
+			{
+				continueNext= ie.MoveNext();
+			}
+			Debug.LogError(ie.GetHashCode() + "[" + QNetManager.Instance.ClientIndex + "] [" + ie.Current + "]");
+			return continueNext;
 		}
 		public static void Update()
 		{
