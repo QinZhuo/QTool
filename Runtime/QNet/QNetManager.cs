@@ -510,21 +510,22 @@ namespace QTool.Net
 	{
 		public static WaitForNetUpdate Instance { get; private set; } = new WaitForNetUpdate();
 		private int Index { get; set; } = -1;
+		public override void Reset()
+		{
+			base.Reset();
+			Index = QNetManager.Instance.ClientIndex;
+		}
 		public override bool keepWaiting
 		{
 			get
 			{
-				if (Index < 0)
-				{
-					Index = QNetManager.Instance.ClientIndex;
-				}
 				if (Index == QNetManager.Instance.ClientIndex)
 				{
 					return true;
 				}
 				else
 				{
-					Index = -1;
+					Index = QNetManager.Instance.ClientIndex;
 					return false;
 				}
 			}
