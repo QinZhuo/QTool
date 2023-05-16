@@ -983,7 +983,6 @@ namespace QTool.FlowGraph
 			if (NodeToInfoString == null)
 			{
 				var method= command.method.DeclaringType.GetStaticMethod(nameof(ToInfoString));
-				Debug.LogError(command.method.DeclaringType.Name + "." + Name + "   " + method);
 				if (method == null)
 				{
 					NodeToInfoString = (node) => "";
@@ -993,7 +992,9 @@ namespace QTool.FlowGraph
 					NodeToInfoString = (node) => method.Invoke(null, new object[] { node })?.ToString();
 				}
 			}
-			return NodeToInfoString(this);
+			var info= NodeToInfoString(this);
+			Debug.LogError(this.Name + "[" + info + "]");
+			return info;
 		}
 		[System.Flags]
         public enum ReturnType
