@@ -1012,7 +1012,7 @@ namespace QTool
 	{
 
 		[QIgnore, HideInInspector, SerializeField]
-		protected string SerializeString;
+		internal string SerializeString;
 		[QIgnore]
 		internal bool IsDirty { get;private set; } = false;
 		public virtual void SetDirty()
