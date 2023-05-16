@@ -10,7 +10,7 @@ public class QNetTestEnemy : QNetBehaviour
 	private QNetTestPlayer Target;
 	public QNetTestPlayer GetTarget()
 	{
-		return QNetTestPlayer.Players.RandomGet(Random);
+		return QNetTestPlayer.Players.RandomGet();
 	}
 	public int Level { get; private set; } = 0;
 	public void SetLevel(int newLevel)

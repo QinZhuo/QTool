@@ -290,7 +290,7 @@ namespace QTool.Net
 								case nameof(DefaultNetAction.ServerSeed):
 									{
 										Random = new System.Random((int)eventData.Value);
-										QRandomNode.Random = Random;
+										QRandom.DefaultRandom = Random;
 									}
 									break;
 								default:

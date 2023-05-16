@@ -8,31 +8,32 @@ namespace QTool
 
 	public static class QRandom
 	{
-		public static Color Color(this System.Random random )
+		public static System.Random DefaultRandom = null;
+		public static Color Color(this System.Random random)
 		{
 			return UnityEngine.Color.HSVToRGB(random.Range(0, 1f), 0.5f, 1);
 		}
-		public static T RandomPop<T>(this IList<T> list, System.Random random = null)
+		public static T RandomPop<T>(this IList<T> list)
 		{
 			if (list == null || list.Count == 0) return default;
-			var index = random.Range(0, list.Count);
+			var index = DefaultRandom.Range(0, list.Count);
 			var obj = list[index];
 			list.RemoveAt(index);
 			return obj;
 		}
-		public static T RandomGet<T>(this IList<T> list, System.Random random=null)
+		public static T RandomGet<T>(this IList<T> list)
 		{
 			if (list == null || list.Count == 0) return default;
-			return list[random.Range(0, list.Count)];
+			return list[DefaultRandom.Range(0, list.Count)];
 		}
 
-		public static IList<T> Random<T>(this IList<T> list, System.Random random = null)
+		public static IList<T> Random<T>(this IList<T> list)
 		{
 			for (int i = 0; i < list.Count; i++)
 			{
 				var cur = list[i];
 				list.Remove(cur);
-				list.Insert(random.Range(0, i+1), cur);
+				list.Insert(DefaultRandom.Range(0, i+1), cur);
 			}
 			return list;
 		}
@@ -85,7 +86,6 @@ namespace QTool
 	[QCommandType("基础/程序生成")]
 	public static class QRandomNode
 	{
-		public static System.Random Random =null;
 		public static int MaxRandomTimes { get; set; } = 10;
 		[QIgnore]
 		public static IEnumerator RandomRangeCarete<T>(QFlowNode This, [QInputPort("场景"), QFlowPort] GameObject root, [QName("范围")] float range=10, [QName("中心偏移")] float centerOffset = 0, [QName("预制体")] GameObject prefab = null, [QName("创建数目")] int count = 1, [QFlowPort, QOutputPort, QName("物体")] GameObject newObject = default,float radius=0) where T:Component
@@ -102,7 +102,7 @@ namespace QTool
 				var times = 0;
 				while (creating && times++ < MaxRandomTimes)
 				{
-					var dir = Random.Vector2();
+					var dir = QRandom.DefaultRandom.Vector2();
 					var offset = dir.normalized * centerOffset + dir * (range - centerOffset);
 					var position = center + new Vector3(offset.x, 0, offset.y);
 					var other = new Ray(position + Vector3.up, Vector3.down).RayCast<T>(null, radius);
@@ -135,7 +135,7 @@ namespace QTool
 				pointList.AddRange(root.GetComponentsInChildren<QPositionPoint>());
 				pointList.RemoveAll((point) => !keyPotnts.Contains(point) || point.HasChild);
 			}
-			pointList.Random(Random);
+			pointList.Random();
 			if (pointList.Count < count)
 			{
 				QDebug.LogWarning("位置点[" + pointKey + "]不足 " + pointList.Count + "<" + count);
