@@ -1029,7 +1029,7 @@ namespace QTool
 		{
 			Deserialize();
 		}
-		public void Deserialize()
+		public virtual void Deserialize()
 		{
 			SerializeString.ParseQData(this as T);
 		}

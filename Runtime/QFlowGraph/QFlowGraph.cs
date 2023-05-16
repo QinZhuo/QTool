@@ -38,6 +38,10 @@ namespace QTool.FlowGraph
 		{
 			await QTask.Step();
 			base.OnAfterDeserialize();
+		}
+		public override void Deserialize()
+		{
+			base.Deserialize();
 			Init();
 		}
 		private void Init()
