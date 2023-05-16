@@ -980,7 +980,7 @@ namespace QTool.FlowGraph
 		public string ToInfoString()
 		{
 			if (command?.method == null) return "";
-			if (NodeToInfoString != null)
+			if (NodeToInfoString == null)
 			{
 				var method= command.method.DeclaringType.GetStaticMethod(nameof(ToInfoString));
 				if (method == null)
