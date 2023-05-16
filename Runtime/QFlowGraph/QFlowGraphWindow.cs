@@ -88,7 +88,7 @@ namespace QTool.FlowGraph
 			{
 				Graph.SetDirty();
 				Graph.ViewPos = ViewRange.position;
-				Graph.OnAfterDeserialize();
+				Graph.OnBeforeSerialize();
 				Graph.Deserialize();
 				OnSave?.Invoke(); 
 			}
