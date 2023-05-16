@@ -1120,6 +1120,10 @@ namespace QTool
 					{
 						return -1;
 					}
+					else if(b.MemeberInfo.Name==nameof(Key))
+					{
+						return 1;
+					}
 					if (a.MemeberInfo.DeclaringType == b.MemeberInfo.DeclaringType)
 					{
 						return 0;
