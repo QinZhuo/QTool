@@ -25,7 +25,7 @@ namespace QTool
 			{
 				if (_EffctInfo.IsNull() && Effect != null)
 				{
-					var graph = Effect.Graph;
+					var graph = Effect.Graph.CreateInstance();
 					_EffctInfo = "";
 					foreach (var kv in graph.StartNode)
 					{
