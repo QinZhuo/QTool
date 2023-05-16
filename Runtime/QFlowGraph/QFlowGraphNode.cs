@@ -218,6 +218,17 @@ namespace QTool.FlowGraph
 			}
 			trigger.gameObject.CheckDestory();
 		}
+		[QIgnore]
+		public static string ToInfoString(QFlowNode node)
+		{
+			switch (node.command.method.Name)
+			{
+				case nameof(Start):
+					return node.Name;
+				default:
+					return "";
+			}
+		}
 		
 	}
 
