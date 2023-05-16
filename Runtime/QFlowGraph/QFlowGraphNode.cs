@@ -221,13 +221,17 @@ namespace QTool.FlowGraph
 		[QIgnore]
 		public static string ToInfoString(QFlowNode node)
 		{
+			var info = "";
 			switch (node.command.method.Name)
 			{
 				case nameof(Start):
-					return node.Name;
+					info+= node.Name;
+					break;
 				default:
 					return "";
 			}
+			info += node.Ports[QFlowKey.NextPort].GetFlowNode()?.ToInfoString();
+			return info;
 		}
 		
 	}
