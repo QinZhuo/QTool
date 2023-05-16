@@ -993,9 +993,7 @@ namespace QTool.FlowGraph
 					NodeToInfoString = (node) => method.Invoke(null, new object[] { node })?.ToString();
 				}
 			}
-			var info= NodeToInfoString(this);
-			Debug.LogError(this.Name + "[" + info + "]");
-			return info;
+			return NodeToInfoString(this);
 		}
 		[System.Flags]
         public enum ReturnType

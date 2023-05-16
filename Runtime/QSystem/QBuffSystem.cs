@@ -29,7 +29,7 @@ namespace QTool
 					_EffctInfo = "";
 					foreach (var kv in graph.StartNode)
 					{
-						graph.ToInfoString(kv.Key);
+						_EffctInfo += graph.ToInfoString(kv.Key);
 					}
 				}
 				return _EffctInfo;
