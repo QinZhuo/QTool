@@ -8,6 +8,10 @@ namespace QTool
 	public abstract class QRuntime<RuntimeT,DataT>:QPoolObject<RuntimeT> where RuntimeT:QRuntime<RuntimeT,DataT>,new() where DataT : QDataList<DataT>, new()
 	{
 		public string Key { get; protected set; }
+		public override string ToString()
+		{
+			return Key;
+		}
 		public DataT Data { get; protected set; }
 		protected QRuntime() { }
 		public static RuntimeT Get(string key)

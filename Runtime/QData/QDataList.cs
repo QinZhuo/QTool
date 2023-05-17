@@ -232,6 +232,10 @@ namespace QTool
 	{
 		[QName("Key")]
 		public virtual string Key { get; set; }
+		public override string ToString()
+		{
+			return Key;
+		}
 		public static bool ContainsKey(string key)
 		{
 			return List.ContainsKey(key);
