@@ -22,21 +22,25 @@ namespace QTool
 			Roots.Clear();
 			navMeshInstance.Remove();
 		}
-		public static async void AddRoot(Transform root)
+		public static async void UpdateNavMesh()
+		{
+			await UpdateNavMeshAsync();
+		}
+		public static void AddRoot(Transform root)
 		{
 			if (!Roots.Contains(root))
 			{
 				Bounds.Encapsulate(root.GetBounds());
 				Roots.Add(root);
-				await UpdateNavMeshAsync();
+				
 			}
 		}
-		public static async void RemoveRoot(Transform root)
+		public static void RemoveRoot(Transform root)
 		{
 			if (Roots.Contains(root))
 			{
 				Roots.Remove(root);
-				await UpdateNavMeshAsync();
+				UpdateNavMesh();
 			}
 		}
 		public async static Task UpdateNavMeshAsync()
@@ -46,7 +50,7 @@ namespace QTool
 			SourceList.Clear();
 			foreach (var root in Roots)
 			{
-				NavMeshBuilder.CollectSources(root, -1, NavMeshCollectGeometry.RenderMeshes, 0, Markups, SourceList);
+				NavMeshBuilder.CollectSources(root, -1, NavMeshCollectGeometry.PhysicsColliders, 0, Markups, SourceList);
 			}
 			navMesh = new NavMeshData();
 			navMeshInstance = NavMesh.AddNavMeshData(navMesh);
