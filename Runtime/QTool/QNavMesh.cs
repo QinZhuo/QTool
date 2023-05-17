@@ -8,12 +8,13 @@ namespace QTool
 {
 	public static class QNavMesh
 	{
-		private static Bounds Bounds = default;
+		public static Bounds Bounds = default;
 		private static NavMeshDataInstance navMeshInstance = default;
 		private static NavMeshData navMesh = null;
 		private static List<NavMeshBuildSource> SourceList = new List<NavMeshBuildSource>();
 		private static List<Transform> Roots = new List<Transform>();
 		private static List<NavMeshBuildMarkup> Markups = new List<NavMeshBuildMarkup>();
+		public static NavMeshCollectGeometry CollectGeometry { get; set; } = NavMeshCollectGeometry.RenderMeshes;
 		public static bool IsUpdateOver = true;
 		public static void Clear()
 		{
@@ -50,7 +51,7 @@ namespace QTool
 			SourceList.Clear();
 			foreach (var root in Roots)
 			{
-				NavMeshBuilder.CollectSources(root, -1, NavMeshCollectGeometry.PhysicsColliders, 0, Markups, SourceList);
+				NavMeshBuilder.CollectSources(root, -1, CollectGeometry, 0, Markups, SourceList);
 			}
 			navMesh = new NavMeshData();
 			navMeshInstance = NavMesh.AddNavMeshData(navMesh);
