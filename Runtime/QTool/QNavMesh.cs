@@ -32,7 +32,7 @@ namespace QTool
 			{
 				Bounds.Encapsulate(root.GetBounds());
 				Roots.Add(root);
-				
+				UpdateNavMesh();
 			}
 		}
 		public static void RemoveRoot(Transform root)
