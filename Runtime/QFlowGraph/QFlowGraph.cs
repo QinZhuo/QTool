@@ -325,36 +325,37 @@ namespace QTool.FlowGraph
 		{
 			yield return wait;
 		}
-		public void RegisterValue<RuntimeT, DataT>(QRuntime<RuntimeT, DataT> runtime) where RuntimeT : QRuntime<RuntimeT, DataT>, new() where DataT : QDataList<DataT>, new()
+		public void RegisterValue<RuntimeT, DataT>(QRuntime<RuntimeT, DataT> Runtime) where RuntimeT : QRuntime<RuntimeT, DataT>, new() where DataT : QDataList<DataT>, new()
 		{
-			if (runtime != null)
+			if (Runtime != null)
 			{
-				runtime.ForeachMember((member) =>
+				Values[nameof(Runtime)] = this;	
+				Runtime.ForeachMember((member) =>
 				{
 					if (member.Type.IsValueType || member.Type == typeof(string))
 					{
-						Values[member.QName] = member.Get(runtime.Data);
+						Values[member.QName] = member.Get(Runtime.Data);
 					}
 				},
 				(member) =>
 				{
 					if (member.Type.Is(typeof(QRuntimeValue<float>)))
 					{
-						var runtimeValue = member.Get(runtime).As<QRuntimeValue<float>>();
+						var runtimeValue = member.Get(Runtime).As<QRuntimeValue<float>>();
 						runtimeValue.Name = member.QName;
 						runtimeValue.OnValue += SetValue;
 						runtimeValue.InvokeOnChange();
 					}
 					else if (member.Type.Is(typeof(QRuntimeValue<string>)))
 					{
-						var runtimeValue = member.Get(runtime).As<QRuntimeValue<string>>();
+						var runtimeValue = member.Get(Runtime).As<QRuntimeValue<string>>();
 						runtimeValue.Name = member.QName;
 						runtimeValue.OnValue += SetValue;
 						runtimeValue.InvokeOnChange();
 					}
 					else if (member.Type.Is(typeof(QRuntimeValue<bool>)))
 					{
-						var runtimeValue = member.Get(runtime).As<QRuntimeValue<bool>>();
+						var runtimeValue = member.Get(Runtime).As<QRuntimeValue<bool>>();
 						runtimeValue.Name = member.QName;
 						runtimeValue.OnValue += SetValue;
 						runtimeValue.InvokeOnChange();
@@ -366,25 +367,26 @@ namespace QTool.FlowGraph
 				});
 			}
 		}
-		public void UnRegisterValue<RuntimeT, DataT>(QRuntime<RuntimeT, DataT> runtime) where RuntimeT : QRuntime<RuntimeT, DataT>, new() where DataT : QDataList<DataT>, new()
+		public void UnRegisterValue<RuntimeT, DataT>(QRuntime<RuntimeT, DataT> Runtime) where RuntimeT : QRuntime<RuntimeT, DataT>, new() where DataT : QDataList<DataT>, new()
 		{
-			if (runtime != null)
+			if (Runtime != null)
 			{
-				runtime.ForeachMember(null, (member) =>
+				Values[nameof(Runtime)] = null;
+				Runtime.ForeachMember(null, (member) =>
 				{
 					if (member.Type.Is(typeof(QRuntimeValue<float>)))
 					{
-						var runtimeValue = member.Get(runtime).As<QRuntimeValue<float>>();
+						var runtimeValue = member.Get(Runtime).As<QRuntimeValue<float>>();
 						runtimeValue.OnValue -=SetValue;
 					}
 					else if (member.Type.Is(typeof(QRuntimeValue<string>)))
 					{
-						var runtimeValue = member.Get(runtime).As<QRuntimeValue<string>>();
+						var runtimeValue = member.Get(Runtime).As<QRuntimeValue<string>>();
 						runtimeValue.OnValue -= SetValue;
 					}
 					else if (member.Type.Is(typeof(QRuntimeValue<bool>)))
 					{
-						var runtimeValue = member.Get(runtime).As<QRuntimeValue<bool>>();
+						var runtimeValue = member.Get(Runtime).As<QRuntimeValue<bool>>();
 						runtimeValue.OnValue -= SetValue;
 					}
 				});
