@@ -233,7 +233,7 @@ namespace QTool.FlowGraph
 				case nameof(Trigger):
 					return node.Ports["triggerObject"].ToInfoString();
 				case nameof(GetValue):
-					return "{" + node.Ports["key"] + "}";
+					return "{" + node["key"] + "}";
 				default:
 					return node.Name;
 			}
