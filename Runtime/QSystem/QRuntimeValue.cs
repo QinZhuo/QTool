@@ -125,7 +125,14 @@ namespace QTool
 		{
 			get => _Value; set
 			{
-				throw new Exception(nameof(QRuntimeValue) + " 无法直接更改 " + nameof(Value) + " 可尝试更改 " + nameof(OffsetValue));
+				if (PercentValue == 1)
+				{
+					OffsetValue = 1;
+				}
+				else
+				{
+					throw new Exception(nameof(QRuntimeValue) + "." + nameof(PercentValue) + "不为1 无法直接更改 " + nameof(Value) + " 可尝试更改 " + nameof(OffsetValue));
+				}
 			}
 		}
 		public int IntValue => Mathf.RoundToInt(Value);
