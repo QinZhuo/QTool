@@ -10,7 +10,7 @@ namespace QTool
 	{
 		[QName("最大叠层")]
 		public int MaxCount { get; protected set; } = 1;
-		public class QItemRuntime : QRuntime<QItemRuntime, T>
+		public class Runtime : QRuntime<Runtime, T>
 		{
 			[QName("层数")]
 			public QRuntimeValue Count { get; private set; } = new QRuntimeValue();
@@ -44,7 +44,7 @@ namespace QTool
 	{
 		const string AddEventKey = "添加";
 		const string RemoveEventKey = "移除";
-		public List<QItemData<ItemData>.QItemRuntime> Items { get; private set; } = new List<QItemData<ItemData>.QItemRuntime>();
+		public List<QItemData<ItemData>.Runtime> Items { get; private set; } = new List<QItemData<ItemData>.Runtime>();
 		private QDictionary<string, Action<string>> EventActions { get; set; } = new QDictionary<string, Action<string>>();
 		public int this[string key]
 		{
@@ -61,7 +61,7 @@ namespace QTool
 				return count;
 			}
 		}
-		public void AddBuff(QItemData<ItemData>.QItemRuntime item)
+		public void AddBuff(QItemData<ItemData>.Runtime item)
 		{
 			Items.Add(item);
 			for (int i = 0; i < item.Count.IntValue; i++)
@@ -69,7 +69,7 @@ namespace QTool
 				OnAdd(item);
 			}
 		}
-		public void RemoveBuff(QItemData<ItemData>.QItemRuntime item)
+		public void RemoveBuff(QItemData<ItemData>.Runtime item)
 		{
 			if (Items.Contains(item))
 			{
@@ -114,7 +114,7 @@ namespace QTool
 			}
 			if (count >= 0)
 			{
-				var item = QItemData<ItemData>.QItemRuntime.Get(key);
+				var item = QItemData<ItemData>.Runtime.Get(key);
 				item.Count.OffsetValue = count;
 				Items.Add(item);
 				for (int i = 0; i < count; i++)
@@ -158,9 +158,9 @@ namespace QTool
 				return item.Count.IntValue <= 0;
 			});
 		}
-		public event Action<QItemData<ItemData>.QItemRuntime> OnAddItem = null;
-		public event Action<QItemData<ItemData>.QItemRuntime> OnRemoveItem = null;
-		protected virtual void OnAdd(QItemData<ItemData>.QItemRuntime item)
+		public event Action<QItemData<ItemData>.Runtime> OnAddItem = null;
+		public event Action<QItemData<ItemData>.Runtime> OnRemoveItem = null;
+		protected virtual void OnAdd(QItemData<ItemData>.Runtime item)
 		{
 			if (item.Graph != null)
 			{
@@ -176,7 +176,7 @@ namespace QTool
 			}
 			OnAddItem?.Invoke(item);
 		}
-		protected virtual void OnRemove(QItemData<ItemData>.QItemRuntime item)
+		protected virtual void OnRemove(QItemData<ItemData>.Runtime item)
 		{
 			if (item.Graph!=null)
 			{

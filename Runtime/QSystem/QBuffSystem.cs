@@ -8,11 +8,10 @@ namespace QTool
 {
 	public enum QBuffMergeMode
 	{
-		时间叠层,
-		永久叠层,
-		时间刷新,
-		时间叠加,
-		永久唯一,
+		唯一 = 0,
+		时间 = 1 << 1,
+		叠层 = 1 << 2,
+		时间叠层 = 时间 | 叠层,
 	}
 	public abstract class QEffectData<T> : QDataList<T> where T : QEffectData<T>, IKey<string>, new()
 	{
@@ -45,7 +44,7 @@ namespace QTool
 		public QBuffMergeMode Megre { get; protected set; } = QBuffMergeMode.时间叠层;
 		[QName("时间事件")]
 		public float TimeEvent { get; protected set; } = 0;
-		public class QBuffRuntime : QRuntime<QBuffRuntime, T>
+		public class Runtime : QRuntime<Runtime, T>
 		{
 			[QName("层数")]
 			public QRuntimeValue Count { get; private set; } = new QRuntimeValue();
@@ -88,7 +87,7 @@ namespace QTool
 		const string AddEventKey = "添加";
 		const string RemoveEventKey = "移除";
 		const string TimeEventKey = "时间";
-		public QDictionary<string, QBuffData<BuffData>.QBuffRuntime> Buffs { get; private set; } = new QDictionary<string, QBuffData<BuffData>.QBuffRuntime>();
+		public QDictionary<string, QBuffData<BuffData>.Runtime> Buffs { get; private set; } = new QDictionary<string, QBuffData<BuffData>.Runtime>();
 		private QDictionary<string, Action<string>> EventActions { get; set; } = new QDictionary<string, Action<string>>();
 		public int this[string key]
 		{
@@ -105,21 +104,11 @@ namespace QTool
 		{
 			if (!Buffs.ContainsKey(key))
 			{
-				var buff = QBuffData<BuffData>.QBuffRuntime.Get(key);
-				switch (buff.Data.Megre)
+				var buff = QBuffData<BuffData>.Runtime.Get(key);
+				if (buff.Data.Megre.HasFlag(QBuffMergeMode.时间))
 				{
-					case QBuffMergeMode.时间刷新:
-					case QBuffMergeMode.时间叠加:
-					case QBuffMergeMode.时间叠层:
-						buff.Time.OffsetValue = time;
-						buff.Time.CurrentValue = buff.Time.MaxValue;
-						break;
-					case QBuffMergeMode.永久唯一:
-						buff.Time.OffsetValue = -1;
-						buff.Time.CurrentValue = 0;
-						break;
-					default:
-						break;
+					buff.Time.OffsetValue = time;
+					buff.Time.CurrentValue = buff.Time.MaxValue;
 				}
 				buff.Count.OffsetValue = count;
 				PrivateAdd(buff);
@@ -132,25 +121,24 @@ namespace QTool
 			else
 			{
 				var buff = Buffs[key];
-				switch (buff.Data.Megre)
+				if (buff.Data.Megre.HasFlag(QBuffMergeMode.时间))
 				{
-					case QBuffMergeMode.时间刷新:
-						var oldValue = buff.Time.OffsetValue;
-						buff.Time.OffsetValue = Mathf.Max(buff.Time.OffsetValue, time);
-						buff.Time.CurrentValue += buff.Time.OffsetValue - oldValue;
-						count = 1;
-						break;
-					case QBuffMergeMode.时间叠加:
-						buff.Time.OffsetValue += time;
-						buff.Time.CurrentValue += time;
-						count = 1;
-						break;
-					case QBuffMergeMode.永久叠层:
-					case QBuffMergeMode.时间叠层:
-						buff.Count.OffsetValue += count;
-						break;
-					default:
-						return;
+					buff.Time.OffsetValue += time;
+					buff.Time.CurrentValue += time;
+				}
+				else
+				{
+					var oldValue = buff.Time.OffsetValue;
+					buff.Time.OffsetValue = Mathf.Max(buff.Time.OffsetValue, time);
+					buff.Time.CurrentValue += buff.Time.OffsetValue - oldValue;
+				}
+				if(buff.Data.Megre.HasFlag(QBuffMergeMode.叠层))
+				{
+					buff.Count.OffsetValue += count;
+				}
+				else
+				{
+					buff.Count.OffsetValue = 1;
 				}
 				for (int i = 0; i < count; i++)
 				{
@@ -163,25 +151,19 @@ namespace QTool
 			if (Buffs.ContainsKey(key))
 			{
 				var buff = Buffs[key];
-				switch (buff.Data.Megre)
+				if (buff.Data.Megre.HasFlag(QBuffMergeMode.叠层))
 				{
-					case QBuffMergeMode.时间刷新:
-					case QBuffMergeMode.永久唯一:
-					case QBuffMergeMode.时间叠加:
+					buff.Count.OffsetValue -= count;
+					if (buff.Count.OffsetValue <= 0)
+					{
 						PrivateRemove(buff);
-						buff.Count.OffsetValue = 0;
-						count = 1;
-						break;
-					case QBuffMergeMode.永久叠层:
-					case QBuffMergeMode.时间叠层:
-						buff.Count.OffsetValue-= count;
-						if (buff.Count.OffsetValue <= 0)
-						{
-							PrivateRemove(buff);
-						}
-						break;
-					default:
-						break;
+					}
+				}
+				else
+				{
+					PrivateRemove(buff);
+					buff.Count.OffsetValue = 0;
+					count = 1;
 				}
 				for (int i = 0; i < count; i++)
 				{
@@ -189,28 +171,28 @@ namespace QTool
 				}
 			}
 		}
-		private void PrivateAdd(QBuffData<BuffData>.QBuffRuntime buff)
+		private void PrivateAdd(QBuffData<BuffData>.Runtime buff)
 		{
 			Buffs.Add(buff.Key, buff);
 			if (buff.Graph != null)
 			{
 				foreach (var node in buff.Graph.StartNode)
 				{
-					if (node.Value.Name.StartsWith("叠层"))
+					if(!buff.Data.Megre.HasFlag(QBuffMergeMode.叠层)|| !node.Value.Name.EndsWith("每层"))
 					{
 						EventActions[node.Value.Name] += buff.TriggerEvent;
 					}
 				}
 			}
 		}
-		private void PrivateRemove(QBuffData<BuffData>.QBuffRuntime buff)
+		private void PrivateRemove(QBuffData<BuffData>.Runtime buff)
 		{
 			Buffs.Remove(buff.Key);
 			if (buff.Graph != null)
 			{
 				foreach (var node in buff.Graph.StartNode)
 				{
-					if (node.Value.Name.StartsWith("叠层"))
+					if (!buff.Data.Megre.HasFlag(QBuffMergeMode.叠层) || !node.Value.Name.EndsWith("每层"))
 					{
 						EventActions[node.Value.Name] -= buff.TriggerEvent;
 					}
@@ -223,19 +205,13 @@ namespace QTool
 			foreach (var kv in Buffs)
 			{
 				var buff = kv.Value;
-				switch (buff.Data.Megre)
+				if(buff.Data.Megre.HasFlag(QBuffMergeMode.时间))
 				{
-					case QBuffMergeMode.时间叠层:
-					case QBuffMergeMode.时间刷新:
-					case QBuffMergeMode.时间叠加:
-						buff.Time.CurrentValue -= deltaTime;
-						if (buff.Time.CurrentValue <= 0)
-						{
-							DelayRemove.Add(buff.Key);
-						}
-						break;
-					default:
-						continue;
+					buff.Time.CurrentValue -= deltaTime;
+					if (buff.Time.CurrentValue <= 0)
+					{
+						DelayRemove.Add(buff.Key);
+					}
 				}
 				if (buff.TimeEvent != null)
 				{
@@ -254,9 +230,9 @@ namespace QTool
 				DelayRemove.Clear();
 			}
 		}
-		public event Action<QBuffData<BuffData>.QBuffRuntime> OnAddBuff = null;
-		public event Action<QBuffData<BuffData>.QBuffRuntime> OnRemoveBuff = null;
-		protected virtual void OnAdd(QBuffData<BuffData>.QBuffRuntime buff)
+		public event Action<QBuffData<BuffData>.Runtime> OnAddBuff = null;
+		public event Action<QBuffData<BuffData>.Runtime> OnRemoveBuff = null;
+		protected virtual void OnAdd(QBuffData<BuffData>.Runtime buff)
 		{
 			if (buff.Graph != null)
 			{
@@ -264,25 +240,31 @@ namespace QTool
 				foreach (var node in buff.Graph.StartNode)
 				{
 					var name = node.Value.Name;
-					if (name != AddEventKey && name != RemoveEventKey && !node.Value.Name.StartsWith("叠层"))
+					if (name != AddEventKey && name != RemoveEventKey)
 					{
-						EventActions[node.Value.Name] += buff.TriggerEvent;
+						if (!buff.Data.Megre.HasFlag(QBuffMergeMode.叠层) || node.Value.Name.EndsWith("每层"))
+						{
+							EventActions[node.Value.Name] += buff.TriggerEvent;
+						}
 					}
 				}
 			}
 			OnAddBuff?.Invoke(buff);
 		}
-		protected virtual void OnRemove(QBuffData<BuffData>.QBuffRuntime buff)
+		protected virtual void OnRemove(QBuffData<BuffData>.Runtime buff)
 		{
-			if (buff.Graph!=null)
+			if (buff.Graph != null)
 			{
 				buff.TriggerEvent(RemoveEventKey);
 				foreach (var node in buff.Graph.StartNode)
 				{
 					var name = node.Value.Name;
-					if (name != AddEventKey && name != RemoveEventKey && !node.Value.Name.StartsWith("叠层"))
+					if (name != AddEventKey && name != RemoveEventKey)
 					{
-						EventActions[node.Value.Name] -= buff.TriggerEvent;
+						if (!buff.Data.Megre.HasFlag(QBuffMergeMode.叠层) || node.Value.Name.EndsWith("每层"))
+						{
+							EventActions[node.Value.Name] -= buff.TriggerEvent;
+						}
 					}
 				}
 			}
@@ -294,9 +276,9 @@ namespace QTool
 			{
 				EventActions[key]?.Invoke(key);
 			}
-			if (!key.StartsWith("叠层"))
+			if (!key.EndsWith("每层"))
 			{
-				TriggerEvent("叠层" + key);
+				TriggerEvent(key+"每层");
 			}
 		}
 		
