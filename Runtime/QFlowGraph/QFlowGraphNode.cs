@@ -231,9 +231,11 @@ namespace QTool.FlowGraph
 					}
 					break;
 				case nameof(Trigger):
-					return node.Ports["triggerObject"].GetFlowNode()?.ToInfoString();
+					return node.Ports["triggerObject"].ToInfoString();
+				case nameof(GetValue):
+					return node.Ports["key"].ToInfoString();
 				default:
-					return "";
+					return node.Name;
 			}
 			info += node.Ports[QFlowKey.NextPort].GetFlowNode()?.ToInfoString();
 			return info;

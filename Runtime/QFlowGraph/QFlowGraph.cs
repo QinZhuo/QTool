@@ -576,7 +576,7 @@ namespace QTool.FlowGraph
 				}
 				else if (InputPort != null && InputPort.HasAutoValue && !HasConnect())
 				{
-					return name + " = [" + InputPort.autoGetValue + "]";
+					return name + " = {" + InputPort.autoGetValue + "}";
 				}
 				else
 				{
@@ -594,6 +594,22 @@ namespace QTool.FlowGraph
 		public override string ToString()
 		{
 			return name + " (" + ConnectType + ")["+Key+"]";
+		}
+		public string ToInfoString(int index=0)
+		{
+			if (HasConnect(index))
+			{
+				var node = GetValueNode(index);
+				if (node == null)
+				{
+					node = GetFlowNode(index);
+				}
+				return node.ToInfoString();
+			}
+			else
+			{
+				return GetValue(index)?.ToString();
+			}
 		}
 		public void IndexChange(int a, int b)
 		{
