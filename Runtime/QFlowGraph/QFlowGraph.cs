@@ -393,7 +393,7 @@ namespace QTool.FlowGraph
         public int index ;
         internal PortId(QFlowPort statePort, int index=0)
         {
-            node = statePort.Node.Key;
+            node = statePort.Node?.Key;
             port = statePort.Key;
             this.index = index;
         }
