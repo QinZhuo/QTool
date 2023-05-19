@@ -15,6 +15,8 @@ namespace QTool
 	}
 	public abstract class QEffectData<T> : QDataList<T> where T : QEffectData<T>, IKey<string>, new()
 	{
+		[QName("显示名")]
+		public virtual string ViewName { get; set; }
 		[QIgnore]
 		private string _EffctInfo = "";
 		[QName("效果说明")]

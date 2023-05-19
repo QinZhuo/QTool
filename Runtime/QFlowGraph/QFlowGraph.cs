@@ -973,8 +973,8 @@ namespace QTool.FlowGraph
 		public const string Asset = "asset";
 		public const string Param = "param";
 		public const string FromPort = "#From";
-        public const string NextPort = "#Next";
-        public const string ResultPort = "#Result";
+		public const string NextPort = "#Next";
+		public const string ReturnPort = "return";
         public const string This = "This";
     }
 	public enum QNodeState
@@ -1188,7 +1188,7 @@ namespace QTool.FlowGraph
                     }
                     else
                     {
-                        if (paramInfo.IsOut ||( Key != QFlowKey.ResultPort && !port.ValueType.IsValueType))
+                        if (paramInfo.IsOut ||( Key != QFlowKey.ReturnPort && !port.ValueType.IsValueType))
                         {
                             OutParamPorts.Add(port);
                         }
@@ -1233,7 +1233,7 @@ namespace QTool.FlowGraph
                 {
                     returnType = ReturnType.TaskDelayValue;
                     TaskReturnValueGet = command.method.ReturnType.GetProperty("Result").GetValue;
-                    AddPort(QFlowKey.ResultPort, QOutputPortAttribute.Normal, "结果", command.method.ReturnType.GetTrueType());
+                    AddPort(QFlowKey.ReturnPort, QOutputPortAttribute.Normal, "结果", command.method.ReturnType.GetTrueType());
                 }
             }
             else
@@ -1244,7 +1244,7 @@ namespace QTool.FlowGraph
 					Ports.RemoveKey(QFlowKey.FromPort);
 					Ports.RemoveKey(QFlowKey.NextPort);
 				}
-				AddPort(QFlowKey.ResultPort, outputAtt, "结果", command.method.ReturnType.GetTrueType());
+				AddPort(QFlowKey.ReturnPort, outputAtt, "结果", command.method.ReturnType.GetTrueType());
                 returnType = ReturnType.ReturnValue; 
             }
             Ports.RemoveAll((port) => port.Node == null);
@@ -1342,7 +1342,7 @@ namespace QTool.FlowGraph
             switch (returnType)
             {
                 case ReturnType.ReturnValue:
-                    Ports[QFlowKey.ResultPort].Value = returnObj;
+                    Ports[QFlowKey.ReturnPort].Value = returnObj;
                     break;
                 case ReturnType.CoroutineDelay:
                 case ReturnType.TaskDelayVoid:
@@ -1399,7 +1399,7 @@ namespace QTool.FlowGraph
             switch (returnType)
             {
                 case ReturnType.ReturnValue:
-                    Ports[QFlowKey.ResultPort].Value= returnObj;
+                    Ports[QFlowKey.ReturnPort].Value= returnObj;
                     break;
                 case ReturnType.CoroutineDelay:
                     yield return returnObj;
@@ -1418,7 +1418,7 @@ namespace QTool.FlowGraph
                     }
                     if (returnType== ReturnType.TaskDelayValue)
                     {
-                        Ports[QFlowKey.ResultPort].Value= TaskReturnValueGet(returnObj);
+                        Ports[QFlowKey.ReturnPort].Value= TaskReturnValueGet(returnObj);
                     }
                     break;
                 default:
