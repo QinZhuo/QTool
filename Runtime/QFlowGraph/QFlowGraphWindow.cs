@@ -811,20 +811,23 @@ namespace QTool.FlowGraph
 			var typeColor = GetTypeColor(connectType);
 			Rect dotRect = default;
 			var connectInfo = Graph.GetConnectInfo(port);
-			if (isOutput)
+			if (connectInfo != null)
 			{
-				var center = new Vector2(rect.xMax, rect.y) + Vector2.one * QGUI.Size;
-				dotRect=DrawDot(center, Equals(connectStartPort, port)?1.2f:1, typeColor, connectInfo.ConnectList.Count > 0 || Equals(connectStartPort, port));
-			}
-			else
-			{
-				var center = rect.position + new Vector2(-QGUI.Size, QGUI.Size);
-				var canConnect = connectStartPort != null && Graph.GetPort(connectStartPort).CanConnect(connectType);
-				dotRect = DrawDot(center, (canConnect ? 1.2f : 1), typeColor, connectInfo.ConnectList.Count > 0 || Equals(nearPortId, port));
-			}
-			if (Event.current.type == EventType.Repaint)
-			{
-				connectInfo.rect = new Rect(dotRect.position + windowRect.position, dotRect.size);
+				if (isOutput)
+				{
+					var center = new Vector2(rect.xMax, rect.y) + Vector2.one * QGUI.Size;
+					dotRect = DrawDot(center, Equals(connectStartPort, port) ? 1.2f : 1, typeColor, connectInfo.ConnectList.Count > 0 || Equals(connectStartPort, port));
+				}
+				else
+				{
+					var center = rect.position + new Vector2(-QGUI.Size, QGUI.Size);
+					var canConnect = connectStartPort != null && Graph.GetPort(connectStartPort).CanConnect(connectType);
+					dotRect = DrawDot(center, (canConnect ? 1.2f : 1), typeColor, connectInfo.ConnectList.Count > 0 || Equals(nearPortId, port));
+				}
+				if (Event.current.type == EventType.Repaint)
+				{
+					connectInfo.rect = new Rect(dotRect.position + windowRect.position, dotRect.size);
+				}
 			}
 		}
 
