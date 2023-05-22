@@ -545,11 +545,11 @@ namespace QTool
 				if (!lable.IsNull())
 				{
 					GUILayout.BeginHorizontal();
+					Label(lable);
 				}
 				value = GUILayout.Toggle(value, "", Skin.toggle, HeightLayout, GUILayout.Width(Height));
 				if (!lable.IsNull())
 				{
-					Label(lable);
 					GUILayout.EndHorizontal();
 				}
 				return value;
