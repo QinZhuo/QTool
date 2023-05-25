@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using UnityEditor.Callbacks;
 using UnityEditor.Build;
 using QTool.Inspector;
+using System.IO.Compression;
 
 #if Addressable
 using UnityEditor.AddressableAssets.Settings;
@@ -134,23 +135,28 @@ namespace QTool
 				Debug.LogError("运行：" + path + "出错：\n" + e);
 			}
 		}
-		[MenuItem("QTool/清空缓存/清空全部缓存")]
-        public static void ClearMemery()
+		[MenuItem("QTool/存档/清空全部")]
+        public static void ClearSaveData()
         {
             ClearPlayerPrefs();
             ClearPersistentData();
         }
-        [MenuItem("QTool/清空缓存/清空PlayerPrefs")]
+        [MenuItem("QTool/存档/清空PlayerPrefs")]
         public static void ClearPlayerPrefs()
         {
             PlayerPrefs.DeleteAll();
         }
-        [MenuItem("QTool/清空缓存/清空PersistentData")]
+        [MenuItem("QTool/存档/清空PersistentData")]
         public static void ClearPersistentData()
         {
             Application.persistentDataPath.ClearData();
-        }
-		
+		}
+		[MenuItem("QTool/存档/打开存档位置")]
+		public static void OpenSaveData()
+		{
+			System.Diagnostics.Process.Start("explorer.exe", Application.persistentDataPath.Replace('/','\\'));
+		}
+
 		#region OldBuild
 
 		//		public static string Build( string[] scenes,BuildOptions options= BuildOptions.None)
