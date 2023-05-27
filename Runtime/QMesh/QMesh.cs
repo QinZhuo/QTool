@@ -196,40 +196,40 @@ namespace QTool
 				var combineMaterial = new Material(mats[0]);
 				var texSize = combineMaterial.mainTexture.width;
 				var combineSize = texSize * Mathf.CeilToInt(Mathf.Sqrt(mats.Count));
-				foreach (var textureKey in combineTextures)
-				{
-					var texs = new List<Texture2D>();
-					foreach (var mat in mats)
-					{
-						var tex = mat.GetTexture(textureKey) as Texture2D;
-						if (tex.width != texSize || tex.height != texSize)
-						{
-							tex = tex.ToSizeTexture(texSize, texSize);
-						}
-						texs.Add(tex);
-					}
-					var combineTexture = new Texture2D(combineSize, combineSize);
-					if (UVRects == null)
-					{
-						UVRects = combineTexture.PackTextures(texs.ToArray(), 0);
-					}
-					else
-					{
-						combineTexture.PackTextures(texs.ToArray(), 0);
-					}
-				}
+				//foreach (var textureKey in combineTextures)
+				//{
+				//	var texs = new List<Texture2D>();
+				//	foreach (var mat in mats)
+				//	{
+				//		var tex = mat.GetTexture(textureKey) as Texture2D;
+				//		if (tex.width != texSize || tex.height != texSize)
+				//		{
+				//			tex = tex.ToSizeTexture(texSize, texSize);
+				//		}
+				//		texs.Add(tex);
+				//	}
+				//	var combineTexture = new Texture2D(combineSize, combineSize);
+				//	if (UVRects == null)
+				//	{
+				//		UVRects = combineTexture.PackTextures(texs.ToArray(), 0);
+				//	}
+				//	else
+				//	{
+				//		combineTexture.PackTextures(texs.ToArray(), 0);
+				//	}
+				//}
 				var index = 0;
-				var combineUV = root.sharedMesh.uv;
-				for (int i = 0; i < uvs.Count; i++)
-				{
-					foreach (var uv in uvs[i])
-					{
-						combineUV[index].x = Mathf.Lerp(UVRects[i].xMin, UVRects[i].xMax, uv.x);
-						combineUV[index].y = Mathf.Lerp(UVRects[i].yMin, UVRects[i].yMax, uv.y);
-						index++;
-					}
-				}
-				root.sharedMesh.uv = combineUV;
+				//var combineUV = root.sharedMesh.uv;
+				//for (int i = 0; i < uvs.Count; i++)
+				//{
+				//	foreach (var uv in uvs[i])
+				//	{
+				//		combineUV[index].x = Mathf.Lerp(UVRects[i].xMin, UVRects[i].xMax, uv.x);
+				//		combineUV[index].y = Mathf.Lerp(UVRects[i].yMin, UVRects[i].yMax, uv.y);
+				//		index++;
+				//	}
+				//}
+				//root.sharedMesh.uv = combineUV;
 				root.SetShareMaterails(combineMaterial);
 			}
 			#endregion
