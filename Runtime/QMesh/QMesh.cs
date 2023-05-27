@@ -152,6 +152,8 @@ namespace QTool
 
 			#region 构建骨骼数组
 			var bones = new List<Transform>();
+			var boneWeights = new List<BoneWeight>();
+			int boneOffset = 0;
 			foreach (var skinedMesh in meshes)
 			{
 				matList.AddRange(skinedMesh.sharedMaterials);
@@ -166,8 +168,19 @@ namespace QTool
 				{
 					bones.Add(childs.Get(bone.name, (trans) => trans.name));
 				}
+				foreach (var weight in skinedMesh.sharedMesh.boneWeights)
+				{
+					var newWeight = weight;
+					newWeight.boneIndex0 += boneOffset;
+					newWeight.boneIndex1 += boneOffset;
+					newWeight.boneIndex2 += boneOffset;
+					newWeight.boneIndex3 += boneOffset;
+					boneWeights.Add(newWeight);
+				}
+				boneOffset += skinedMesh.bones.Length;
 			}
 			root.bones = bones.ToArray();
+			root.sharedMesh.boneWeights = boneWeights.ToArray();
 			#endregion
 			root.materials = matList.ToArray();
 			root.sharedMesh.RecalculateBounds();
