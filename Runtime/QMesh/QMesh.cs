@@ -185,16 +185,7 @@ namespace QTool
 				{
 					var newBone = childs.Get(bone.name, (trans) => trans.name);
 					bones.Add(newBone);
-					var bind = newBone.worldToLocalMatrix * root.worldToLocalMatrix;
-					//if (skinedMesh.transform.parent.parent != null)
-					//{
-					//	bind *= skinedMesh.transform.parent.parent.localToWorldMatrix;
-					//}
-					//else
-					//{
-					//	bind*=skinedMesh.transform.parent.localToWorldMatrix;
-					//}
-					bindppses.Add(bind);
+					bindppses.Add(newBone.worldToLocalMatrix * root.localToWorldMatrix);
 				}
 			}
 			root.bones = bones.ToArray();
@@ -202,7 +193,7 @@ namespace QTool
 			root.sharedMesh.bindposes = bindppses.ToArray();
 			#endregion
 			root.sharedMesh.RecalculateBounds();
-			//root.localBounds = default;
+			root.localBounds = root.GetBounds();
 
 		}
 	}
