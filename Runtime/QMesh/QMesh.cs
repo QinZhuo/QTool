@@ -156,12 +156,11 @@ namespace QTool
 				{
 					var combine = new CombineInstance();
 					combine.mesh = skinedMesh.sharedMesh;
-					combine.transform = skinedMesh.localToWorldMatrix;
 					combine.subMeshIndex = sub;
 					combineInfos.Add(combine);
 				}
 			}
-			root.sharedMesh.CombineMeshes(combineInfos.ToArray(),true,true);
+			root.sharedMesh.CombineMeshes(combineInfos.ToArray(),false,false);
 			root.sharedMesh.RecalculateNormals();
 			root.sharedMaterials = mats.ToArray();
 			#endregion
