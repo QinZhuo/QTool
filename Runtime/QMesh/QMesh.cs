@@ -151,10 +151,7 @@ namespace QTool
 			var combineInfos = new List<CombineInstance>();
 			foreach (var skinedMesh in meshes)
 			{
-				for (int i = 0; i < skinedMesh.sharedMaterials.Length; i++)
-				{
-					mats[i] = skinedMesh.sharedMaterials[i];
-				}
+				mats.AddRange(skinedMesh.sharedMaterials);
 				for (int sub = 0; sub < skinedMesh.sharedMesh.subMeshCount; sub++)
 				{
 					var combine = new CombineInstance();
@@ -164,7 +161,7 @@ namespace QTool
 					combineInfos.Add(combine);
 				}
 			}
-			root.sharedMesh.CombineMeshes(combineInfos.ToArray());
+			root.sharedMesh.CombineMeshes(combineInfos.ToArray(),true,true);
 			root.sharedMesh.RecalculateNormals();
 			root.materials = mats.ToArray();
 			#endregion
