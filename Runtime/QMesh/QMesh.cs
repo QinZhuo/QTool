@@ -214,17 +214,15 @@ namespace QTool
 					}
 				}
 				var index = 0;
-				var combineUV = root.sharedMesh.uv;
+				var combineUV =new QList<Vector2>();
 				for (int i = 0; i < uvs.Count; i++)
 				{
 					foreach (var uv in uvs[i])
 					{
-						combineUV[index].x = Mathf.Lerp(UVRects[i].xMin, UVRects[i].xMax, uv.x);
-						combineUV[index].y = Mathf.Lerp(UVRects[i].yMin, UVRects[i].yMax, uv.y);
-						index++;
+						combineUV[index++] = new Vector2(Mathf.Lerp(UVRects[i].xMin, UVRects[i].xMax, uv.x),Mathf.Lerp(UVRects[i].yMin, UVRects[i].yMax, uv.y));
 					}
 				}
-				root.sharedMesh.uv = combineUV;
+				root.sharedMesh.uv = combineUV.ToArray();
 				root.SetShareMaterails(combineMaterial);
 			}
 			#endregion
