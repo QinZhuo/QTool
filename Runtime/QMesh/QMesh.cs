@@ -163,7 +163,7 @@ namespace QTool
 			}
 			root.sharedMesh.CombineMeshes(combineInfos.ToArray(),true,true);
 			root.sharedMesh.RecalculateNormals();
-			root.materials = mats.ToArray();
+			root.sharedMaterials = mats.ToArray();
 			#endregion
 
 			#region 构建骨骼
