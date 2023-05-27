@@ -51,15 +51,22 @@ namespace QTool
 			rt.Release();
 			return texture;
 		}
-		public static Texture2D ToSizeTexture(this Texture2D texture,int width,int height)
+		public static Texture2D ToSizeTexture(this Texture2D texture, int width, int height)
 		{
-			if (texture.width == width && texture.height == height) return texture;
+			if (texture != null && texture.width == width && texture.height == height) return texture;
 			var newTexture = new Texture2D(width, height);
 			for (int y = 0; y < newTexture.height; y++)
 			{
 				for (int x = 0; x < newTexture.width; x++)
 				{
-					newTexture.SetPixel(x, y, texture.GetPixelBilinear((float)x / newTexture.width, (float)y / newTexture.height));
+					if (texture == null)
+					{
+						newTexture.SetPixel(x, y, Color.clear);
+					}
+					else
+					{
+						newTexture.SetPixel(x, y, texture.GetPixelBilinear((float)x / newTexture.width, (float)y / newTexture.height));
+					}
 				}
 			}
 			newTexture.Apply();
