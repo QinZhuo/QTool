@@ -190,7 +190,7 @@ namespace QTool
 			#endregion
 			root.materials = matList.ToArray();
 			root.sharedMesh.RecalculateBounds();
-			root.localBounds = default;
+			//root.localBounds = default;
 
 		}
 	}
