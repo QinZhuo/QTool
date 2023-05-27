@@ -164,17 +164,7 @@ namespace QTool
 			foreach (var skinedMesh in meshes)
 			{
 				uvs.Add(skinedMesh.sharedMesh.uv);
-				if (combineTextures.Length == 0)
-				{
-					mats.AddRange(skinedMesh.sharedMaterials);
-				}
-				else
-				{
-					foreach (var mat in skinedMesh.sharedMaterials)
-					{
-						mats.AddCheckExist(mat);
-					}
-				}
+				mats.AddRange(skinedMesh.sharedMaterials);
 				for (int sub = 0; sub < skinedMesh.sharedMesh.subMeshCount; sub++)
 				{
 					var combine = new CombineInstance();
@@ -215,7 +205,7 @@ namespace QTool
 				}
 				var index = 0;
 				var combineUV =new QList<Vector2>();
-				Debug.LogError(uvs.Count + ":" + UVRects.Length);
+				Debug.LogError(root.sharedMesh.uv.Length + ":" + root.sharedMesh.uv2.Length);
 				for (int i = 0; i < uvs.Count; i++)
 				{
 					foreach (var uv in uvs[i])
