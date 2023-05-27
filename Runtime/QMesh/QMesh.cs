@@ -168,25 +168,6 @@ namespace QTool
 				}
 			}
 			root.bones = bones.ToArray();
-
-			#endregion
-			#region 骨骼权重
-			var boneWeights = new List<BoneWeight>();
-			int boneOffset = 0;
-			foreach (var skinedMesh in meshes)
-			{
-				foreach (var weight in skinedMesh.sharedMesh.boneWeights)
-				{
-					var newWeight = weight;
-					newWeight.boneIndex0 += boneOffset;
-					newWeight.boneIndex1 += boneOffset;
-					newWeight.boneIndex2 += boneOffset;
-					newWeight.boneIndex3 += boneOffset;
-					boneWeights.Add(newWeight);
-				}
-				boneOffset += skinedMesh.bones.Length;
-				root.sharedMesh.boneWeights = boneWeights.ToArray();
-			}
 			#endregion
 			root.materials = matList.ToArray();
 			root.sharedMesh.RecalculateBounds();
