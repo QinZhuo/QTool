@@ -184,8 +184,14 @@ namespace QTool
 					bones.Add(childs.Get(bone.name, (trans) => trans.name));
 				}
 			}
+			List<Matrix4x4> bindppses = new List<Matrix4x4>();
+			foreach (var bone in bones)
+			{
+				bindppses.Add(bone.worldToLocalMatrix * root.localToWorldMatrix);
+			}
 			root.bones = bones.ToArray();
 			root.sharedMesh.boneWeights = boneWeights.ToArray();
+			root.sharedMesh.bindposes = bindppses.ToArray();
 			#endregion
 			root.sharedMesh.RecalculateBounds();
 			//root.localBounds = default;
