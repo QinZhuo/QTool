@@ -90,7 +90,7 @@ namespace QTool
 			}
 			if (combineMeshs.Count > 0)
 			{
-				gameObject.GetComponent<SkinnedMeshRenderer>(true).CombineMeshs(combineMeshs.ToArray());
+				transform.GetChild(nameof(QCombineMesh),true).GetComponent<SkinnedMeshRenderer>(true).CombineMeshs(combineMeshs.ToArray());
 			}
 		}
 		public void CheckBone(SkinnedMeshRenderer skineedMeshRenderer)
