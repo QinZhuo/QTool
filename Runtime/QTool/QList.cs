@@ -295,10 +295,14 @@ namespace QTool
 	}
 
 	[System.Serializable]
-	public struct QKeyValue<TKey, T> : IKey<TKey>
+	public class QKeyValue<TKey, T> : IKey<TKey>
 	{
 		public TKey Key { get; set; }
 		public T Value { get; set; }
+		public QKeyValue()
+		{
+
+		}
 		public QKeyValue(TKey key, T value)
 		{
 			Key = key;
