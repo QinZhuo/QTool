@@ -820,22 +820,6 @@ namespace QTool
 			value.Key = key;
 			array.Add(value);
 		}
-		public static T GetAndCreate<T, KeyType>(this IList<T> array, KeyType key, System.Action<T> creatCallback = null) where T : IKey<KeyType>, new()
-		{
-			var value = array.Get(key);
-			if (value != null)
-			{
-				return value;
-			}
-			else
-			{
-				var t = new T { Key = key };
-				creatCallback?.Invoke(t);
-				array.Add(t);
-				return t;
-			}
-
-
-		}
+		
 	}
 }
