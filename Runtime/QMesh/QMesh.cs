@@ -161,12 +161,12 @@ namespace QTool
 					combineInfos.Add(combine);
 				}
 			}
-			root.sharedMesh.CombineMeshes(combineInfos.ToArray(), true, true);
+			root.sharedMesh.CombineMeshes(combineInfos.ToArray());
 			root.sharedMesh.RecalculateNormals();
 			root.materials = matList.ToArray();
 			#endregion
 
-			#region 构建骨骼数组
+			#region 构建骨骼
 			var bones = new List<Transform>();
 			var boneWeights = new List<BoneWeight>();
 			var bindppses = new List<Matrix4x4>();
@@ -192,7 +192,6 @@ namespace QTool
 			root.sharedMesh.boneWeights = boneWeights.ToArray();
 			root.sharedMesh.bindposes = bindppses.ToArray();
 			#endregion
-		//	root.sharedMesh.RecalculateBounds();
 		}
 	}
 }
