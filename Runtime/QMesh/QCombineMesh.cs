@@ -7,9 +7,9 @@ namespace QTool
 	[RequireComponent(typeof(Animator))]
 	public class QCombineMesh : MonoBehaviour
 	{
-		[QOnChange(nameof(FreshRenderers))]
+		[QName("模型"),QOnChange(nameof(FreshRenderers))]
 		public List<GameObject> modelRoot;
-		[QEnum("get_" + nameof(Renderers))]
+		[QName("合并模块"),QEnum("get_" + nameof(Renderers))]
 		public List<string> skinnedMeshKeys;
 		[HideInInspector]
 		public List<Renderer> renderers;
