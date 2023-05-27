@@ -359,11 +359,15 @@ namespace QTool
 			if (animationEvent == null) return "";
 			return animationEvent.functionName + animationEvent.time.ToString("f3");
 		}
-		public static void SetTrigger(this Animator animator,string name,Vector2 vector2)
+		public static void SetTriggerXY(this Animator animator,string name,Vector2 vector2)
 		{
-			animator.SetFloat(name + "X",vector2.x);
-			animator.SetFloat(name + "Y", vector2.x);
+			animator.SetXY(name, vector2);
 			animator.SetTrigger(name);
+		}
+		public static void SetXY(this Animator animator, string name, Vector2 vector2)
+		{
+			animator.SetFloat(name + "X", vector2.x);
+			animator.SetFloat(name + "Y", vector2.x);
 		}
 	}
 	/// <summary>
