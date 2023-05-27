@@ -168,7 +168,7 @@ namespace QTool
 			#region 构建骨骼
 			var bones = new List<Transform>();
 			var boneWeights = new List<BoneWeight>();
-			var bindppses = new List<Matrix4x4>();
+			//var bindppses = new List<Matrix4x4>();
 			foreach (var skinedMesh in meshes)
 			{
 				foreach (var weight in skinedMesh.sharedMesh.boneWeights)
@@ -182,14 +182,12 @@ namespace QTool
 				}
 				foreach (var bone in skinedMesh.bones)
 				{
-					var newBone = childs.Get(bone.name, (trans) => trans.name);
-					bones.Add(newBone);
-					bindppses.Add(bone.worldToLocalMatrix);
+					bones.Add(childs.Get(bone.name, (trans) => trans.name));
 				}
 			}
 			root.bones = bones.ToArray();
 			root.sharedMesh.boneWeights = boneWeights.ToArray();
-			root.sharedMesh.bindposes = bindppses.ToArray();
+			//root.sharedMesh.bindposes = bindppses.ToArray();
 			#endregion
 		}
 	}
