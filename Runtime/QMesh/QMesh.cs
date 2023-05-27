@@ -202,10 +202,10 @@ namespace QTool
 					{
 						combineTexture.PackTextures(texs.ToArray(), 0);
 					}
+					combineMaterial.SetTexture(textureKey, combineTexture);
 				}
 				var index = 0;
 				var combineUV =new QList<Vector2>();
-				Debug.LogError(root.sharedMesh.uv.Length + ":" + root.sharedMesh.uv2.Length);
 				for (int i = 0; i < uvs.Count; i++)
 				{
 					foreach (var uv in uvs[i])
