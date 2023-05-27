@@ -93,18 +93,18 @@ namespace QTool
 				transform.GetChild(nameof(QCombineMesh),true).GetComponent<SkinnedMeshRenderer>(true).CombineMeshs(combineMeshs.ToArray());
 			}
 		}
-		public void CheckBone(SkinnedMeshRenderer skineedMeshRenderer)
+		public void CheckBone(SkinnedMeshRenderer skinedMeshRenderer)
 		{
 			if (rootBone == null)
 			{
-				if (skineedMeshRenderer.rootBone!=null)
+				if (skinedMeshRenderer.rootBone!=null)
 				{
-					var bone = skineedMeshRenderer.rootBone;
+					var bone = skinedMeshRenderer.rootBone;
 					while (bone.parent!=null&&bone.parent.parent!=null)
 					{
 						bone = bone.parent;
 					}
-					if(skineedMeshRenderer.transform.GetChild(bone.name) == null)
+					if(transform.GetChild(bone.name) == null)
 					{
 						rootBone = Instantiate(bone, transform);
 						rootBone.name = bone.name;
