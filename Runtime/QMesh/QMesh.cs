@@ -162,7 +162,7 @@ namespace QTool
 				}
 			}
 			root.sharedMesh = new Mesh();
-			root.sharedMesh.CombineMeshes(combineInfos.ToArray());
+			root.sharedMesh.CombineMeshes(combineInfos.ToArray(), true, false);
 			root.sharedMesh.RecalculateNormals();
 			root.bones = bones.ToArray();
 			root.materials = matList.ToArray();
