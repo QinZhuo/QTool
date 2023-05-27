@@ -158,7 +158,7 @@ namespace QTool
 				}
 				foreach (var bone in skinedMesh.bones)
 				{
-					bones.AddCheckExist(childs.Get(bone.name, (trans) => trans.name));
+					bones.Add(childs.Get(bone.name, (trans) => trans.name));
 				}
 			}
 			root.sharedMesh = new Mesh();
