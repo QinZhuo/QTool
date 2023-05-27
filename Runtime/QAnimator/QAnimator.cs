@@ -367,7 +367,7 @@ namespace QTool
 		public static void SetXY(this Animator animator, string name, Vector2 vector2)
 		{
 			animator.SetFloat(name + "X", vector2.x);
-			animator.SetFloat(name + "Y", vector2.x);
+			animator.SetFloat(name + "Y", vector2.y);
 		}
 	}
 	/// <summary>
