@@ -25,10 +25,16 @@ namespace QTool
 		}
 		void FreshRenderers()
 		{
+			
 			renderers?.Clear();
 			foreach (var model in modelRoot)
 			{
 				if (model == null) continue;
+				var avatar= model.GetComponent<Animator>()?.avatar;
+				if (avatar != null)
+				{
+					GetComponent<Animator>().avatar = avatar;
+				}
 				var modelRenderers = model.GetComponentsInChildren<Renderer>(true);
 				if (modelRenderers.Length > 0)
 				{
