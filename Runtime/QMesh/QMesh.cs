@@ -143,46 +143,50 @@ namespace QTool
 		public static void CombineMeshs(this SkinnedMeshRenderer root, SkinnedMeshRenderer[] meshes)
 		{
 			var childs = root.GetComponentInParent<Animator>().GetComponentsInChildren<Transform>(true);
+
+			#region 合并Mesh	
 			var matList = new List<Material>();
-			var combineInfos = new List<CombineInstance>();
-
 			root.sharedMesh = new Mesh();
-			root.sharedMesh.CombineMeshes(combineInfos.ToArray(), true, true);
-			root.sharedMesh.RecalculateNormals();
-
-			#region 构建骨骼数组
-			var bones = new List<Transform>();
-			var boneWeights = new List<BoneWeight>();
-			int boneOffset = 0;
+			var combineInfos = new List<CombineInstance>();
 			foreach (var skinedMesh in meshes)
 			{
 				matList.AddRange(skinedMesh.sharedMaterials);
 				for (int sub = 0; sub < skinedMesh.sharedMesh.subMeshCount; sub++)
 				{
-					CombineInstance combine = new CombineInstance();
+					var combine = new CombineInstance();
 					combine.mesh = skinedMesh.sharedMesh;
+					combine.transform = skinedMesh.localToWorldMatrix;
 					combine.subMeshIndex = sub;
 					combineInfos.Add(combine);
+				}
+			}
+			root.sharedMesh.CombineMeshes(combineInfos.ToArray(), true, true);
+			root.sharedMesh.RecalculateNormals();
+			root.materials = matList.ToArray();
+			#endregion
+
+			#region 构建骨骼数组
+			var bones = new List<Transform>();
+			var boneWeights = new List<BoneWeight>();
+			foreach (var skinedMesh in meshes)
+			{
+				foreach (var weight in skinedMesh.sharedMesh.boneWeights)
+				{
+					var newWeight = weight;
+					newWeight.boneIndex0 += bones.Count;
+					newWeight.boneIndex1 += bones.Count;
+					newWeight.boneIndex2 += bones.Count;
+					newWeight.boneIndex3 += bones.Count;
+					boneWeights.Add(newWeight);
 				}
 				foreach (var bone in skinedMesh.bones)
 				{
 					bones.Add(childs.Get(bone.name, (trans) => trans.name));
 				}
-				foreach (var weight in skinedMesh.sharedMesh.boneWeights)
-				{
-					var newWeight = weight;
-					newWeight.boneIndex0 += boneOffset;
-					newWeight.boneIndex1 += boneOffset;
-					newWeight.boneIndex2 += boneOffset;
-					newWeight.boneIndex3 += boneOffset;
-					boneWeights.Add(newWeight);
-				}
-				boneOffset += skinedMesh.bones.Length;
 			}
 			root.bones = bones.ToArray();
 			root.sharedMesh.boneWeights = boneWeights.ToArray();
 			#endregion
-			root.materials = matList.ToArray();
 			root.sharedMesh.RecalculateBounds();
 			//root.localBounds = default;
 
