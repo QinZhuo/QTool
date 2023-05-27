@@ -156,12 +156,12 @@ namespace QTool
 				{
 					var combine = new CombineInstance();
 					combine.mesh = skinedMesh.sharedMesh;
-				//	combine.transform = skinedMesh.localToWorldMatrix;
+					combine.transform = skinedMesh.localToWorldMatrix;
 					combine.subMeshIndex = sub;
 					combineInfos.Add(combine);
 				}
 			}
-			root.sharedMesh.CombineMeshes(combineInfos.ToArray(),true,true);
+			root.sharedMesh.CombineMeshes(combineInfos.ToArray(),false,true);
 			root.sharedMesh.RecalculateNormals();
 			root.sharedMaterials = mats.ToArray();
 			#endregion
@@ -190,7 +190,7 @@ namespace QTool
 			}
 			root.bones = bones.ToArray();
 			root.sharedMesh.boneWeights = boneWeights.ToArray();
-		//	root.sharedMesh.bindposes = bindppses.ToArray();
+			root.sharedMesh.bindposes = bindppses.ToArray();
 			#endregion
 		}
 	}
