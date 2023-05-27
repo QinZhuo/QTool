@@ -51,6 +51,19 @@ namespace QTool
 			rt.Release();
 			return texture;
 		}
+		public static Texture2D ToSizeTexture(this Texture2D texture,int width,int height)
+		{
+			var newTexture = new Texture2D(width, height, texture.format, false);
+			for (int y = 0; y < newTexture.height; y++)
+			{
+				for (int x = 0; x < newTexture.width; x++)
+				{
+					newTexture.SetPixel(x, y, texture.GetPixelBilinear((float)x / newTexture.width, (float)y / newTexture.height));
+				}
+			}
+			newTexture.Apply();
+			return newTexture;
+		}
 		public static Texture2D CaptureAround(this GameObject gameObject, int pixel = 100, int count = 8, bool around = false)
 		{
 			var xCount = around ? count : Mathf.CeilToInt(Mathf.Sqrt(count));

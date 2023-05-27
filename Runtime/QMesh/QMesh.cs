@@ -140,7 +140,18 @@ namespace QTool
 				}
 			}
 		}
-		public static void CombineMeshs(this SkinnedMeshRenderer root, SkinnedMeshRenderer[] meshes,string[] combineTextures=null)
+		public static void SetShareMaterails(this Renderer renderer,params Material[] materials)
+		{
+			if (Application.IsPlaying(renderer))
+			{
+				renderer.sharedMaterials = materials;
+			}
+			else
+			{
+				renderer.sharedMaterials = materials;
+			}
+		}
+		public static void CombineMeshs(this SkinnedMeshRenderer root, SkinnedMeshRenderer[] meshes,params string[] combineTextures)
 		{
 			var animator = root.GetComponentInParent<Animator>();
 			var childs = animator.GetComponentsInChildren<Transform>(true);
@@ -149,9 +160,21 @@ namespace QTool
 			var mats = new QList<Material>();
 			root.sharedMesh = new Mesh();
 			var combineInfos = new List<CombineInstance>();
+			var uvs = new List<Vector2[]>();
 			foreach (var skinedMesh in meshes)
 			{
-				mats.AddRange(skinedMesh.sharedMaterials);
+				uvs.Add(skinedMesh.sharedMesh.uv);
+				if (combineTextures.Length == 0)
+				{
+					mats.AddRange(skinedMesh.sharedMaterials);
+				}
+				else
+				{
+					foreach (var mat in skinedMesh.sharedMaterials)
+					{
+						mats.AddCheckExist(mat);
+					}
+				}
 				for (int sub = 0; sub < skinedMesh.sharedMesh.subMeshCount; sub++)
 				{
 					var combine = new CombineInstance();
@@ -161,9 +184,54 @@ namespace QTool
 					combineInfos.Add(combine);
 				}
 			}
-			root.sharedMesh.CombineMeshes(combineInfos.ToArray(), combineTextures != null, true);
+			root.sharedMesh.CombineMeshes(combineInfos.ToArray(), combineTextures.Length!=0, true);
 			root.sharedMesh.RecalculateNormals();
-			root.sharedMaterials = mats.ToArray();
+			if (combineTextures.Length == 0)
+			{
+				root.SetShareMaterails(mats.ToArray());
+			}
+			else if (mats.Count > 0)
+			{
+				Rect[] UVRects = null;
+				var combineMaterial = new Material(mats[0]);
+				var texSize = combineMaterial.mainTexture.width;
+				var combineSize = texSize * Mathf.CeilToInt(Mathf.Sqrt(mats.Count));
+				foreach (var textureKey in combineTextures)
+				{
+					var texs = new List<Texture2D>();
+					foreach (var mat in mats)
+					{
+						var tex = mat.GetTexture(textureKey) as Texture2D;
+						if (tex.width != texSize || tex.height != texSize)
+						{
+							tex = tex.ToSizeTexture(texSize, texSize);
+						}
+						texs.Add(tex);
+					}
+					var combineTexture = new Texture2D(combineSize, combineSize);
+					if (UVRects == null)
+					{
+						UVRects = combineTexture.PackTextures(texs.ToArray(), 0);
+					}
+					else
+					{
+						combineTexture.PackTextures(texs.ToArray(), 0);
+					}
+				}
+				var index = 0;
+				var combineUV = root.sharedMesh.uv;
+				for (int i = 0; i < uvs.Count; i++)
+				{
+					foreach (var uv in uvs[i])
+					{
+						combineUV[index].x = Mathf.Lerp(UVRects[i].xMin, UVRects[i].xMax, uv.x);
+						combineUV[index].y = Mathf.Lerp(UVRects[i].yMin, UVRects[i].yMax, uv.y);
+						index++;
+					}
+				}
+				root.sharedMesh.uv = combineUV;
+				root.SetShareMaterails(combineMaterial);
+			}
 			#endregion
 
 			#region 构建骨骼

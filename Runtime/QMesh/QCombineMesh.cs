@@ -11,6 +11,8 @@ namespace QTool
 		public List<GameObject> modelRoot;
 		[QName("合并模块"),QEnum("get_" + nameof(Renderers))]
 		public List<string> skinnedMeshKeys;
+		[QName("合并贴图")]
+		public string[] combineTextures;
 		[HideInInspector]
 		public List<Renderer> renderers;
 		List<Renderer> Renderers => renderers;
@@ -90,7 +92,7 @@ namespace QTool
 			}
 			if (combineMeshs.Count > 0)
 			{
-				transform.GetChild(nameof(QCombineMesh), true).GetComponent<SkinnedMeshRenderer>(true).CombineMeshs(combineMeshs.ToArray());
+				transform.GetChild(nameof(QCombineMesh), true).GetComponent<SkinnedMeshRenderer>(true).CombineMeshs(combineMeshs.ToArray(), combineTextures);
 			}
 		}
 		public void CheckBone(SkinnedMeshRenderer skinedMeshRenderer)
