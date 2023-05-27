@@ -76,14 +76,14 @@ namespace QTool
 			meshData.UpdateMesh();
 			root.GenerateMesh(meshData.Mesh, mat);
 		}
-		public static void GenerateMesh(this GameObject root, Mesh Mesh,Material mat=null)
+		public static void GenerateMesh(this GameObject root, Mesh Mesh, Material mat = null)
 		{
 			var filter = root.GetComponent<MeshFilter>(true);
 			if (Mesh == null)
 			{
 				Mesh = filter.sharedMesh;
 			}
-			else if(Mesh!=filter.sharedMesh)
+			else if (Mesh != filter.sharedMesh)
 			{
 				filter.sharedMesh = Mesh;
 			}
@@ -97,7 +97,7 @@ namespace QTool
 			{
 				renderer.material = mat;
 			}
-			var collider= root.GetComponent<MeshCollider>();
+			var collider = root.GetComponent<MeshCollider>();
 			if (collider != null)
 			{
 				collider.sharedMesh = filter.sharedMesh;
@@ -193,8 +193,6 @@ namespace QTool
 			root.sharedMesh.bindposes = bindppses.ToArray();
 			#endregion
 			root.sharedMesh.RecalculateBounds();
-			root.localBounds = root.GetBounds();
-
 		}
 	}
 }
