@@ -145,6 +145,12 @@ namespace QTool
 			var childs = root.GetComponentInParent<Animator>().GetComponentsInChildren<Transform>(true);
 			var matList = new List<Material>();
 			var combineInfos = new List<CombineInstance>();
+
+			root.sharedMesh = new Mesh();
+			root.sharedMesh.CombineMeshes(combineInfos.ToArray(), true, true);
+			root.sharedMesh.RecalculateNormals();
+
+			#region 构建骨骼数组
 			var bones = new List<Transform>();
 			foreach (var skinedMesh in meshes)
 			{
@@ -161,10 +167,10 @@ namespace QTool
 					bones.Add(childs.Get(bone.name, (trans) => trans.name));
 				}
 			}
-			root.sharedMesh = new Mesh();
-			root.sharedMesh.CombineMeshes(combineInfos.ToArray(), true, false);
-			root.sharedMesh.RecalculateNormals();
 			root.bones = bones.ToArray();
+
+			#endregion
+
 			root.materials = matList.ToArray();
 			root.sharedMesh.RecalculateBounds();
 			root.localBounds = default;
