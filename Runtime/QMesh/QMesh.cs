@@ -188,7 +188,7 @@ namespace QTool
 			List<Matrix4x4> bindppses = new List<Matrix4x4>();
 			foreach (var bone in bones)
 			{
-				bindppses.Add(bone.worldToLocalMatrix * animator.transform.localToWorldMatrix);
+				bindppses.Add(bone.worldToLocalMatrix * bone.transform.parent.localToWorldMatrix);
 			}
 			root.bones = bones.ToArray();
 			root.sharedMesh.boneWeights = boneWeights.ToArray();
