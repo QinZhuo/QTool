@@ -104,9 +104,12 @@ namespace QTool
 					{
 						bone = bone.parent;
 					}
-					rootBone = Instantiate(bone, transform);
-					rootBone.name = bone.name;
-					rootBone.SetAsFirstSibling();
+					if(skineedMeshRenderer.transform.GetChild(bone.name) == null)
+					{
+						rootBone = Instantiate(bone, transform);
+						rootBone.name = bone.name;
+						rootBone.SetAsFirstSibling();
+					}
 				}
 			}
 			var meshRnderers = GetComponentsInChildren<MeshRenderer>();
