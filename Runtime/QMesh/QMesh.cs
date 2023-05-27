@@ -201,12 +201,7 @@ namespace QTool
 					var texs = new List<Texture2D>();
 					foreach (var mat in mats)
 					{
-						var tex = mat.GetTexture(textureKey) as Texture2D;
-						if (tex.width != texSize || tex.height != texSize)
-						{
-							tex = tex.ToSizeTexture(texSize, texSize);
-						}
-						texs.Add(tex);
+						texs.Add((mat.GetTexture(textureKey) as Texture2D).ToSizeTexture(texSize,texSize));
 					}
 					var combineTexture = new Texture2D(combineSize, combineSize);
 					if (UVRects == null)

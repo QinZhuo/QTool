@@ -53,7 +53,8 @@ namespace QTool
 		}
 		public static Texture2D ToSizeTexture(this Texture2D texture,int width,int height)
 		{
-			var newTexture = new Texture2D(width, height, texture.format, false);
+			if (texture.width == width && texture.height == height) return texture;
+			var newTexture = new Texture2D(width, height);
 			for (int y = 0; y < newTexture.height; y++)
 			{
 				for (int x = 0; x < newTexture.width; x++)
