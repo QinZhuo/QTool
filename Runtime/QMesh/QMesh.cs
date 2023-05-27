@@ -142,7 +142,7 @@ namespace QTool
 		}
 		public static void CombineMeshs(this SkinnedMeshRenderer root, SkinnedMeshRenderer[] meshes)
 		{
-			var childs = root.GetComponentsInChildren<Transform>(true);
+			var childs = root.GetComponentInParent<Animator>().GetComponentsInChildren<Transform>(true);
 			var matList = new List<Material>();
 			var combineInfos = new List<CombineInstance>();
 			var bones = new List<Transform>();
