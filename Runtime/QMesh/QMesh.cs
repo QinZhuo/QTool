@@ -140,7 +140,7 @@ namespace QTool
 				}
 			}
 		}
-		public static void CombineMeshs(this SkinnedMeshRenderer root, SkinnedMeshRenderer[] meshes)
+		public static void CombineMeshs(this SkinnedMeshRenderer root, SkinnedMeshRenderer[] meshes,string[] combineTextures=null)
 		{
 			var animator = root.GetComponentInParent<Animator>();
 			var childs = animator.GetComponentsInChildren<Transform>(true);
@@ -161,7 +161,7 @@ namespace QTool
 					combineInfos.Add(combine);
 				}
 			}
-			root.sharedMesh.CombineMeshes(combineInfos.ToArray(),false,true);
+			root.sharedMesh.CombineMeshes(combineInfos.ToArray(), combineTextures != null, true);
 			root.sharedMesh.RecalculateNormals();
 			root.sharedMaterials = mats.ToArray();
 			#endregion
