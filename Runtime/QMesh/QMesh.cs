@@ -142,7 +142,8 @@ namespace QTool
 		}
 		public static void CombineMeshs(this SkinnedMeshRenderer root, SkinnedMeshRenderer[] meshes)
 		{
-			var childs = root.GetComponentInParent<Animator>().GetComponentsInChildren<Transform>(true);
+			var animator = root.GetComponentInParent<Animator>();
+			var childs = animator.GetComponentsInChildren<Transform>(true);
 
 			#region 合并Mesh	
 			var matList = new List<Material>();
@@ -187,7 +188,7 @@ namespace QTool
 			List<Matrix4x4> bindppses = new List<Matrix4x4>();
 			foreach (var bone in bones)
 			{
-				bindppses.Add(bone.worldToLocalMatrix * root.localToWorldMatrix);
+				bindppses.Add(bone.worldToLocalMatrix * animator.transform.localToWorldMatrix);
 			}
 			root.bones = bones.ToArray();
 			root.sharedMesh.boneWeights = boneWeights.ToArray();
