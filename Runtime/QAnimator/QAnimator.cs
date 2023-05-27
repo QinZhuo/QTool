@@ -154,6 +154,7 @@ namespace QTool
 				ClipTim1e = value * Clip.length;
 				UpdateClip();
 			}
+			ClipTim1e = Mathf.Clamp(ClipTim1e, 0, Clip.length);
 			var max = Clip.length * Clip.frameRate;
 			var timeStep = GetTimeStep();
 
