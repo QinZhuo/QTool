@@ -185,7 +185,7 @@ namespace QTool
 				{
 					var newBone = childs.Get(bone.name, (trans) => trans.name);
 					bones.Add(newBone);
-					bindppses.Add(bone.worldToLocalMatrix * skinedMesh.localToWorldMatrix);
+					bindppses.Add(bone.worldToLocalMatrix);
 				}
 			}
 			root.bones = bones.ToArray();
