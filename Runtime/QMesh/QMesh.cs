@@ -160,7 +160,7 @@ namespace QTool
 					combineInfos.Add(combine);
 				}
 			}
-			root.sharedMesh.CombineMeshes(combineInfos.ToArray(),false,false);
+			root.sharedMesh.CombineMeshes(combineInfos.ToArray(),true,false);
 			root.sharedMesh.RecalculateNormals();
 			root.sharedMaterials = mats.ToArray();
 			#endregion
