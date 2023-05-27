@@ -192,7 +192,7 @@ namespace QTool
 			root.sharedMesh.boneWeights = boneWeights.ToArray();
 			root.sharedMesh.bindposes = bindppses.ToArray();
 			#endregion
-			root.sharedMesh.RecalculateBounds();
+		//	root.sharedMesh.RecalculateBounds();
 		}
 	}
 }
