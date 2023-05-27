@@ -156,7 +156,7 @@ namespace QTool
 				{
 					var combine = new CombineInstance();
 					combine.mesh = skinedMesh.sharedMesh;
-				//	combine.transform = skinedMesh.localToWorldMatrix;
+					combine.transform = skinedMesh.localToWorldMatrix;
 					combine.subMeshIndex = sub;
 					combineInfos.Add(combine);
 				}
@@ -184,7 +184,7 @@ namespace QTool
 				foreach (var bone in skinedMesh.bones)
 				{
 					bones.Add(childs.Get(bone.name, (trans) => trans.name));
-					var bind = bone.worldToLocalMatrix*skinedMesh.transform.worldToLocalMatrix;
+					var bind = bone.worldToLocalMatrix*skinedMesh.transform.localToWorldMatrix;
 					//if (skinedMesh.transform.parent.parent != null)
 					//{
 					//	bind *= skinedMesh.transform.parent.parent.localToWorldMatrix;
