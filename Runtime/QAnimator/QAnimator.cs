@@ -354,6 +354,12 @@ namespace QTool
 	}
 	public static class QAnimatorTool
 	{
+		public static void Bind(this Animator animator,QHumanBoneBind bind)
+		{
+			var parent= animator.GetBoneTransform(bind.rootBone);
+			var root= bind.transform.GetChild(bind.rootBone.ToString(), true);
+			
+		}
 		public static string GetKey(this AnimationEvent animationEvent)
 		{
 			if (animationEvent == null) return "";
