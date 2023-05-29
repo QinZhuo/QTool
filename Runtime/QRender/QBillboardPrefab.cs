@@ -52,7 +52,7 @@ namespace QTool
 				sprite.sprite = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>(pngPath);
 				sprite.enabled = true;
 				QBillboard.transform.localScale = Vector3.one ;
-				QBillboard.transform.LookAt(QBillboard.transform.position + fromDirection);
+				QBillboard.transform.LookAt(QBillboard.transform.position - fromDirection);
 			}
 			else
 			{
