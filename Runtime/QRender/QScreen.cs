@@ -72,15 +72,14 @@ namespace QTool
 			newTexture.Apply();
 			return newTexture;
 		}
-		public static Texture2D CaptureAround(this GameObject gameObject, int pixel = 100, int count = 8, bool around = false)
+		public static Camera GetCaptureCamera(this GameObject gameObject, int cullingMask = -1)
 		{
-			var xCount = around ? count : Mathf.CeilToInt(Mathf.Sqrt(count));
-			var yCount = around ? count : xCount;
 			var camera = gameObject.transform.GetChild(nameof(Capture) + nameof(Camera), true).GetComponent<Camera>(true);
 			camera.CopyFrom(Camera.main);
 			camera.orthographic = true;
 			camera.clearFlags = CameraClearFlags.Color;
 			camera.backgroundColor = Color.clear;
+			camera.cullingMask = cullingMask;
 #if URP
 			var targetData = Camera.main.GetComponent<UnityEngine.Rendering.Universal.UniversalAdditionalCameraData>();
 			var cameraData = camera.GetComponent<UnityEngine.Rendering.Universal.UniversalAdditionalCameraData>(true);
@@ -99,51 +98,73 @@ namespace QTool
 				cameraData.SetRenderer(curIndex);
 			}
 #endif
-			Bounds bounds = gameObject.GetBounds();
-			var sizeX = count == 1 ? bounds.size.magnitude : new Vector2(bounds.size.x, bounds.size.z).magnitude;
-			var sizeY = count == 1 ? bounds.size.magnitude : bounds.size.y;
-			var weight = Mathf.CeilToInt(pixel * sizeX);
-			var height = Mathf.CeilToInt(pixel * sizeY);
-			var texture = new Texture2D(weight * xCount, height * yCount, TextureFormat.BGRA32, false);
-			camera.nearClipPlane = 0.0f;
-			camera.farClipPlane = sizeX;
-			camera.orthographicSize = Mathf.Max(sizeY, sizeX) / 2;
+			return camera;
+		}
+		public static Texture2D CaptureFrom(this GameObject gameObject, Vector3 from, int pixel = 100, int cullingMask = -1)
+		{
+			var camera = gameObject.GetCaptureCamera(cullingMask);
+			var bounds = gameObject.GetBounds();
+			camera.nearClipPlane = 0;
+			camera.farClipPlane = bounds.size.magnitude;
+			camera.orthographicSize = camera.farClipPlane / 2;
+			camera.transform.position = bounds.center + -from * camera.orthographicSize;
+			camera.transform.LookAt(bounds.center);
+			var size = pixel * (int)bounds.size.magnitude;
+			var texture = new Texture2D(size, size, TextureFormat.BGRA32, false);
+			camera.Capture(size, size, texture);
+			camera.CheckDestory();
+			return texture;
+		}
+		public static Texture2D CaptureAround(this GameObject gameObject, int pixel = 100, int count = 8, bool around = false,int cullingMask = -1)
+		{
 			if (count == 1)
 			{
-				camera.transform.position = bounds.center + -Camera.main.transform.forward * camera.orthographicSize;
-				camera.transform.LookAt(bounds.center);
-				camera.Capture(weight, height, texture, 0, 0);
-			}
-			else if (!around)
-			{
-				camera.transform.position = bounds.center + Vector3.right * camera.orthographicSize;
-				camera.transform.LookAt(bounds.center);
-				var angle = 360f / count;
-				for (int i = 0; i < count; i++)
-				{
-					var x = i % xCount;
-					var y = i / xCount;
-					camera.Capture(weight, height, texture, weight * x, height * y);
-					camera.transform.RotateAround(gameObject.transform.position, Vector3.up, -angle);
-				}
+				return gameObject.CaptureFrom(Vector3.forward, pixel, cullingMask);
 			}
 			else
 			{
-				camera.transform.position = bounds.center + Vector3.right * camera.orthographicSize;
-				camera.transform.LookAt(bounds.center);
-				var angle = 360f / count;
-				for (int y = 0; y < yCount; y++)
+				var xCount = around ? count : Mathf.CeilToInt(Mathf.Sqrt(count));
+				var yCount = around ? count : xCount;
+				var camera = gameObject.GetCaptureCamera(cullingMask);
+				Bounds bounds = gameObject.GetBounds();
+				var sizeX = new Vector2(bounds.size.x, bounds.size.z).magnitude;
+				var sizeY = bounds.size.y;
+				var weight = Mathf.CeilToInt(pixel * sizeX);
+				var height = Mathf.CeilToInt(pixel * sizeY);
+				var texture = new Texture2D(weight * xCount, height * yCount, TextureFormat.BGRA32, false);
+				camera.farClipPlane = sizeX;
+				camera.orthographicSize = Mathf.Max(sizeY, sizeX) / 2;
+				if (!around)
 				{
-					for (int x = 0; x < xCount; x++)
+					camera.transform.position = bounds.center + Vector3.right * camera.orthographicSize;
+					camera.transform.LookAt(bounds.center);
+					var angle = 360f / count;
+					for (int i = 0; i < count; i++)
 					{
+						var x = i % xCount;
+						var y = i / xCount;
 						camera.Capture(weight, height, texture, weight * x, height * y);
 						camera.transform.RotateAround(gameObject.transform.position, Vector3.up, -angle);
 					}
-					camera.transform.RotateAround(gameObject.transform.position, Vector3.forward, -angle);
 				}
+				else
+				{
+					camera.transform.position = bounds.center + Vector3.right * camera.orthographicSize;
+					camera.transform.LookAt(bounds.center);
+					var angle = 360f / count;
+					for (int y = 0; y < yCount; y++)
+					{
+						for (int x = 0; x < xCount; x++)
+						{
+							camera.Capture(weight, height, texture, weight * x, height * y);
+							camera.transform.RotateAround(gameObject.transform.position, Vector3.up, -angle);
+						}
+						camera.transform.RotateAround(gameObject.transform.position, Vector3.forward, -angle);
+					}
+				}
+				camera.CheckDestory();
+				return texture;
 			}
-			camera.gameObject.CheckDestory();
-			return texture;
 		}
 		static bool IsDrag = false;
 		static void OnGUI()

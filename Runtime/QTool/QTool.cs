@@ -832,6 +832,7 @@ namespace QTool
 		public static void CheckDestory(this UnityEngine.Object obj)
 		{
 			if (obj == null) return;
+			obj=obj.GetGameObject();
 #if UNITY_EDITOR
 			if (!Application.isPlaying || !Application.IsPlaying(obj))
 			{
