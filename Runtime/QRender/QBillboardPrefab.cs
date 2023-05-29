@@ -14,7 +14,7 @@ namespace QTool
 		public bool onlySprite = false;
 		public bool AroudMode => !onlySprite;
 		[QName("单方向时拍摄方向","!"+nameof(AroudMode))]
-		public Vector3 fromDirection = Vector3.forward;
+		public Vector3 fromDirection = Vector3.back;
 		[QName("方向数",nameof(AroudMode)), Range(1, 64)]
 		public int count = 1;
 		[QName("仅Y轴旋转", nameof(AroudMode))]
@@ -33,6 +33,7 @@ namespace QTool
 			{
 				QBillboard.GetComponent<SpriteRenderer>().enabled = false;
 			}
+			QBillboard.gameObject.SetActive(false);
 			var bounds = gameObject.GetBounds();
 			var texture = onlySprite? gameObject.CaptureFrom(fromDirection, pixel, layerMask) : gameObject.CaptureAround(pixel, count, false, layerMask);
 			var pngPath = path.Replace(".prefab", "/" + name + "_" + nameof(Texture) + ".png");
@@ -90,7 +91,7 @@ namespace QTool
 					material.DisableKeyword("ONLYY");
 				}
 			}
-			
+			QBillboard.gameObject.SetActive(true);
 			gameObject.ApplyPrefab();
 			QDebug.Log(nameof(QBillboardPrefab) + " " + gameObject + "烘培QBillboard资源成功 " + path);
 		}

@@ -3,6 +3,7 @@ using System.Reflection;
 using UnityEngine;
 using System.Threading.Tasks;
 using System.Collections;
+using QTool.Reflection;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -80,24 +81,20 @@ namespace QTool
 			camera.clearFlags = CameraClearFlags.Color;
 			camera.backgroundColor = Color.clear;
 			camera.cullingMask = cullingMask;
-//#if URP
-//			var targetData = Camera.main.GetComponent<UnityEngine.Rendering.Universal.UniversalAdditionalCameraData>();
-//			var cameraData = camera.GetComponent<UnityEngine.Rendering.Universal.UniversalAdditionalCameraData>(true);
-//			if (targetData != null)
-//			{
-//				cameraData.renderPostProcessing = false;
-//				var curIndex = 0;
-//				for (curIndex = 0; true; curIndex++)
-//				{
-//					var curRenerer = UnityEngine.Rendering.Universal.UniversalRenderPipeline.asset.GetRenderer(curIndex);
-//					if (curRenerer == targetData.scriptableRenderer)
-//					{
-//						break;
-//					}
-//				}
-//				cameraData.SetRenderer(curIndex);
-//			}
-//#endif
+#if URP
+			var cameraData = camera.GetComponent<UnityEngine.Rendering.Universal.UniversalAdditionalCameraData>(true);
+			cameraData.renderPostProcessing = false;
+			var curIndex = 0;
+			for (curIndex = 0; curIndex <= 10; curIndex++)
+			{
+				var curRenerer = UnityEngine.Rendering.Universal.UniversalRenderPipeline.asset.GetRenderer(curIndex);
+				if((curRenerer.GetValue("rendererFeatures") as IList).Count==0)
+				{
+					break;
+				}
+			}
+			cameraData.SetRenderer(curIndex);
+#endif
 			return camera;
 		}
 		public static Texture2D CaptureFrom(this GameObject gameObject, Vector3 from, int pixel = 100, int cullingMask = -1)
@@ -107,7 +104,7 @@ namespace QTool
 			camera.nearClipPlane = 0;
 			camera.farClipPlane = bounds.size.magnitude;
 			camera.orthographicSize = camera.farClipPlane / 2;
-			camera.transform.position = bounds.center + -from * camera.orthographicSize;
+			camera.transform.position = bounds.center + from * camera.orthographicSize;
 			camera.transform.LookAt(bounds.center);
 			var size = pixel * (int)bounds.size.magnitude;
 			try
