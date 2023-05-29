@@ -66,6 +66,13 @@ namespace QTool
 	}
 	public static class QMeshTool
 	{
+		public static Mesh GetMesh(this PrimitiveType primitiveType)
+		{
+			var obj = GameObject.CreatePrimitive(primitiveType);
+			var mesh= obj.GetComponent<MeshFilter>().sharedMesh;
+			obj.CheckDestory();
+			return mesh;
+		}
 		public static void GenerateMesh(this GameObject root, QVoxelData qVoxelData, Material mat = null)
 		{
 			qVoxelData.GenerateMesh();

@@ -112,7 +112,7 @@ namespace QTool
 			var size = pixel * (int)bounds.size.magnitude;
 			var texture = new Texture2D(size, size, TextureFormat.BGRA32, false);
 			camera.Capture(size, size, texture);
-			camera.CheckDestory();
+			camera.gameObject.CheckDestory();
 			return texture;
 		}
 		public static Texture2D CaptureAround(this GameObject gameObject, int pixel = 100, int count = 8, bool around = false,int cullingMask = -1)
@@ -162,7 +162,7 @@ namespace QTool
 						camera.transform.RotateAround(gameObject.transform.position, Vector3.forward, -angle);
 					}
 				}
-				camera.CheckDestory();
+				camera.gameObject.CheckDestory();
 				return texture;
 			}
 		}
