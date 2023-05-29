@@ -35,6 +35,15 @@ namespace QTool
 			}
 			QBillboard.gameObject.SetActive(false);
 			var bounds = gameObject.GetBounds();
+			if (onlySprite)
+			{
+				count = 1;
+			}
+			if (bounds.size.magnitude * pixel * count > 16384)
+			{
+				Debug.LogError(gameObject + " 生成QBillboard图片过大 " + (bounds.size.magnitude * pixel * count));
+				return;
+			}
 			var texture = onlySprite? gameObject.CaptureFrom(fromDirection, pixel, layerMask) : gameObject.CaptureAround(pixel, count, false, layerMask);
 			var pngPath = path.Replace(".prefab", "/" + name + "_" + nameof(Texture) + ".png");
 			pngPath.CheckDirectoryPath();
