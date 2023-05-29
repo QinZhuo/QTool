@@ -114,6 +114,7 @@ namespace QTool
 					}
 					if(transform.GetChild(bone.name) == null)
 					{
+						QDebug.Log(gameObject + " 创建骨骼 " + bone);
 						rootBone = Instantiate(bone, transform);
 						rootBone.name = bone.name;
 						rootBone.SetAsFirstSibling();
