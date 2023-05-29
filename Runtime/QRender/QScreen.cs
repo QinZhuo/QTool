@@ -110,10 +110,17 @@ namespace QTool
 			camera.transform.position = bounds.center + -from * camera.orthographicSize;
 			camera.transform.LookAt(bounds.center);
 			var size = pixel * (int)bounds.size.magnitude;
-			var texture = new Texture2D(size, size, TextureFormat.BGRA32, false);
-			camera.Capture(size, size, texture);
-			camera.gameObject.CheckDestory();
-			return texture;
+			try
+			{
+				var texture = new Texture2D(size, size, TextureFormat.BGRA32, false);
+				camera.Capture(size, size, texture);
+				camera.gameObject.CheckDestory();
+				return texture;
+			}
+			catch (Exception e)
+			{
+				throw new Exception(gameObject + "截图大小[" + size + "]出错", e);
+			}
 		}
 		public static Texture2D CaptureAround(this GameObject gameObject, int pixel = 100, int count = 8, bool around = false,int cullingMask = -1)
 		{
