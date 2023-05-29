@@ -37,6 +37,11 @@ namespace QTool
 			var texture = onlySprite? gameObject.CaptureFrom(fromDirection, pixel, layerMask) : gameObject.CaptureAround(pixel, count, false, layerMask);
 			var pngPath = path.Replace(".prefab", "/" + name + "_" + nameof(Texture) + ".png");
 			pngPath.CheckDirectoryPath();
+			if (bounds.size.magnitude > 50)
+			{
+				Debug.LogError(gameObject+ " 烘培QBillboard资源出错 物体大小过大 "+bounds.size);
+				return;
+			}
 			QFileManager.SavePNG(texture, pngPath);
 			UnityEditor.AssetDatabase.Refresh();
 			if (onlySprite)
