@@ -80,24 +80,24 @@ namespace QTool
 			camera.clearFlags = CameraClearFlags.Color;
 			camera.backgroundColor = Color.clear;
 			camera.cullingMask = cullingMask;
-#if URP
-			var targetData = Camera.main.GetComponent<UnityEngine.Rendering.Universal.UniversalAdditionalCameraData>();
-			var cameraData = camera.GetComponent<UnityEngine.Rendering.Universal.UniversalAdditionalCameraData>(true);
-			if (targetData != null)
-			{
-				cameraData.renderPostProcessing = false;
-				var curIndex = 0;
-				for (curIndex = 0; true; curIndex++)
-				{
-					var curRenerer = UnityEngine.Rendering.Universal.UniversalRenderPipeline.asset.GetRenderer(curIndex);
-					if (curRenerer == targetData.scriptableRenderer)
-					{
-						break;
-					}
-				}
-				cameraData.SetRenderer(curIndex);
-			}
-#endif
+//#if URP
+//			var targetData = Camera.main.GetComponent<UnityEngine.Rendering.Universal.UniversalAdditionalCameraData>();
+//			var cameraData = camera.GetComponent<UnityEngine.Rendering.Universal.UniversalAdditionalCameraData>(true);
+//			if (targetData != null)
+//			{
+//				cameraData.renderPostProcessing = false;
+//				var curIndex = 0;
+//				for (curIndex = 0; true; curIndex++)
+//				{
+//					var curRenerer = UnityEngine.Rendering.Universal.UniversalRenderPipeline.asset.GetRenderer(curIndex);
+//					if (curRenerer == targetData.scriptableRenderer)
+//					{
+//						break;
+//					}
+//				}
+//				cameraData.SetRenderer(curIndex);
+//			}
+//#endif
 			return camera;
 		}
 		public static Texture2D CaptureFrom(this GameObject gameObject, Vector3 from, int pixel = 100, int cullingMask = -1)
