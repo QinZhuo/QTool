@@ -119,7 +119,6 @@ namespace QTool
 		[MenuItem("QTool/测试/QPool对象池信息")]
 		public static void QPoolInfo()
 		{
-			Debug.LogError("---------"+nameof(QPoolManager)+"--------");
 			foreach (var pool in QPoolManager.Pools)
 			{
 				Debug.LogError(pool);
