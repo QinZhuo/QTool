@@ -47,24 +47,18 @@ namespace QTool
 			var texture = onlySprite? gameObject.CaptureFrom(fromDirection, pixel, layerMask) : gameObject.CaptureAround(pixel, count, false, layerMask);
 			var pngPath = path.Replace(".prefab", "/" + name + "_" + nameof(Texture) + ".png");
 			pngPath.CheckDirectoryPath();
-			QFileManager.SavePNG(texture, pngPath);
-			UnityEditor.AssetDatabase.Refresh();
 			if (onlySprite)
 			{
-				var textureImporter = UnityEditor.AssetImporter.GetAtPath(pngPath) as UnityEditor.TextureImporter;
-				textureImporter.textureType = UnityEditor.TextureImporterType.Sprite;
-				textureImporter.spriteImportMode = UnityEditor.SpriteImportMode.Single;
-				textureImporter.spritePixelsPerUnit = pixel;
-				texture = UnityEditor.AssetDatabase.LoadAssetAtPath<Texture2D>(pngPath);
-				UnityEditor.AssetDatabase.ImportAsset(pngPath);
 				var sprite = QBillboard.GetComponent<SpriteRenderer>(true);
-				sprite.sprite = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>(pngPath);
+				sprite.sprite = texture.SaveSprite(pngPath,pixel); 
 				sprite.enabled = true;
 				QBillboard.transform.localScale = Vector3.one ;
 				QBillboard.transform.LookAt(QBillboard.transform.position - fromDirection);
 			}
 			else
 			{
+				QFileManager.SavePNG(texture, pngPath);
+				UnityEditor.AssetDatabase.Refresh();
 				texture = UnityEditor.AssetDatabase.LoadAssetAtPath<Texture2D>(pngPath);
 				QBillboard.GetComponent<MeshFilter>(true).sharedMesh = QMeshTool.GetMesh(PrimitiveType.Quad);
 				QBillboard.transform.SetParent(transform);

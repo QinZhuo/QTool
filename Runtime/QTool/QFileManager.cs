@@ -649,6 +649,19 @@ namespace QTool
 				Save(path,bytes);
 			}
 		}
+#if UNITY_EDITOR
+		public static Sprite SaveSprite(this Texture2D texture, string path,float spritePixelsPerUnit=100)
+		{
+			texture.SavePNG(path);
+			UnityEditor.AssetDatabase.Refresh();
+			var textureImporter = UnityEditor.AssetImporter.GetAtPath(path) as UnityEditor.TextureImporter;
+			textureImporter.textureType = UnityEditor.TextureImporterType.Sprite;
+			textureImporter.spriteImportMode = UnityEditor.SpriteImportMode.Single;
+			textureImporter.spritePixelsPerUnit = spritePixelsPerUnit;
+			UnityEditor.AssetDatabase.ImportAsset(path);
+			return UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>(path);
+		}
+#endif
 		public static Texture2D LoadTexture(this string path)
 		{
 			var bytes =LoadBytes(path);
