@@ -111,13 +111,21 @@ namespace QTool
 			Debug.LogError(newData.ToString());
 			newData.Save(QDataList.GetModPath( nameof(QTranslate.QTranslateData),nameof(AutoTranslate)));
 		}
-		[MenuItem("QTool/工具/运行时信息")]
-		public static void BaseTest()
+		[MenuItem("QTool/测试/QId对象信息")]
+		public static void QIdObjectInfo()
 		{
-			Debug.LogError(nameof(QPoolManager)+"信息 \n"+QPoolManager.Pools.ToOneString());
 			Debug.LogError(nameof(QId) + "信息 \n" + QId.InstanceIdList.ToOneString());
 		}
-		[MenuItem("QTool/工具/运行测试包")]
+		[MenuItem("QTool/测试/QPool对象池信息")]
+		public static void QPoolInfo()
+		{
+			Debug.LogError("---------"+nameof(QPoolManager)+"--------");
+			foreach (var pool in QPoolManager.Pools)
+			{
+				Debug.LogError(pool);
+			}
+		}
+		[MenuItem("QTool/测试/运行测试包")]
 		private static void RunBuild()
 		{
 			var path= PlayerPrefs.GetString(nameof(QToolBuild));

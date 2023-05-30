@@ -171,7 +171,7 @@ namespace QTool
         public override string ToString()
         {
             var type = GetType();
-            return "对象池["+ Key + "](" + type.Name + (type.IsGenericType ? "<" + type.GenericTypeArguments[0] + ">":"")+")";
+			return "对象池【" + Key + "】QObjectPool<" + type.Name + ">：\t";
         }
     }
 
@@ -179,7 +179,7 @@ namespace QTool
     {
 		public override string ToString()
 		{
-			return base.ToString() + " using " + UsingPool.Count + "/" + (UsingPool.Count + CanUsePool.Count);
+			return base.ToString() + " [" + UsingPool.Count + "/" + (UsingPool.Count + CanUsePool.Count) + "]\n" + UsingPool.ToOneString() + "\n";
 		}
 		public readonly List<T> UsingPool = new List<T>();
         public readonly List<T> CanUsePool = new List<T>();
