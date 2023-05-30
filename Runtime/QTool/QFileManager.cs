@@ -658,6 +658,7 @@ namespace QTool
 			textureImporter.textureType = UnityEditor.TextureImporterType.Sprite;
 			textureImporter.spriteImportMode = UnityEditor.SpriteImportMode.Single;
 			textureImporter.spritePixelsPerUnit = spritePixelsPerUnit;
+			textureImporter.maxTextureSize = 16384;
 			UnityEditor.AssetDatabase.ImportAsset(path);
 			return UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>(path);
 		}
