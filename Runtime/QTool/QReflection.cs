@@ -453,7 +453,73 @@ namespace QTool.Reflection
 				return type.Name;
 			}
 		}
-        public static string QName(this MemberInfo type)
+		private static QDictionary<Type, int> MinSizeCache = new QDictionary<Type, int>();
+		public static int MinSize(this Type type)
+		{
+			if (MinSizeCache.ContainsKey(type)) return MinSizeCache[type];
+			var info = QReflectionType.Get(type);
+			var size = 0;
+			switch (info.Code)
+			{
+				case TypeCode.Boolean:
+					size = sizeof(bool); break;
+					break;
+				case TypeCode.Byte:
+					size = sizeof(byte); break;
+					break;
+				case TypeCode.Char:
+					size = sizeof(char); break;
+					break;
+				case TypeCode.DateTime:
+					size = sizeof(long); break;
+				case TypeCode.DBNull:
+					size = 0; break;
+				case TypeCode.Decimal:
+					size = sizeof(decimal); break;
+				case TypeCode.Double:
+					size = sizeof(double); break;
+				case TypeCode.Empty:
+					break;
+				case TypeCode.Int16:
+					size = sizeof(ushort); break;
+				case TypeCode.Int32:
+					size = sizeof(int); break;
+				case TypeCode.Int64:
+					size = sizeof(long); break;
+				case TypeCode.Object:
+					{
+						foreach (var member in info.Members)
+						{
+							if (Type.GetTypeCode(member.Type) != TypeCode.Object)
+							{
+								size += member.Type.MinSize();
+							}
+							else
+							{
+								size += 12;
+							}
+						}
+						break;
+					}
+				case TypeCode.SByte:
+					size = sizeof(sbyte); break;
+				case TypeCode.Single:
+					size = sizeof(float); break;
+				case TypeCode.String:
+					break;
+				case TypeCode.UInt16:
+					size = sizeof(ushort); break;
+				case TypeCode.UInt32:
+					size = sizeof(uint); break;
+				case TypeCode.UInt64:
+					size = sizeof(ulong); break;
+				default:
+					break;
+			}
+			MinSizeCache[type] = size;
+			return size;
+		}
+		public static string QName(this MemberInfo type)
         {
             var att = type.GetCustomAttribute<QNameAttribute>();
             if (att != null && !string.IsNullOrWhiteSpace(att.name))

@@ -121,7 +121,7 @@ namespace QTool
 		{
 			foreach (var pool in QPoolManager.Pools)
 			{
-				Debug.LogError(pool);
+				Debug.LogError(pool.Value);
 			}
 		}
 		[MenuItem("QTool/测试/运行测试包")]
