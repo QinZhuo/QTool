@@ -13,20 +13,20 @@ namespace QTool
 	
     public class QPoolManager: InstanceManager<QPoolManager>
     {
-		public QDictionary<string, QPool> Pools = new QDictionary<string, QPool>();
+		public static QDictionary<string, QPool> Pools = new QDictionary<string, QPool>();
+
 		public static QObjectPool<T> GetPool<T>(string poolName, System.Func<T> newFunc = null) where T : class
         {
-			
             var key = poolName;
             if (string.IsNullOrEmpty(key))
             {
                 key = typeof(T).ToString();
             }
-			if (Instance.Pools.ContainsKey(key))
+			if (Pools.ContainsKey(key))
 			{
-				if (Instance.Pools[key] is QObjectPool<T>)
+				if (Pools[key] is QObjectPool<T>)
 				{
-					var pool = Instance.Pools[key] as QObjectPool<T>;
+					var pool = Pools[key] as QObjectPool<T>;
 					if (newFunc != null )
 					{
 						pool.newFunc = newFunc;
@@ -35,7 +35,7 @@ namespace QTool
 				}
 				else
 				{
-					throw new Exception("已存在重名不同类型对象池" + Instance.Pools[key]);
+					throw new Exception("已存在重名不同类型对象池" + Pools[key]);
 				}
 
 			}
@@ -47,9 +47,9 @@ namespace QTool
 					throw new Exception("错误的对象池类型[" + type + "][" + poolName + "]");
 				}
 				var pool = type == typeof(GameObject)?new GameObjectPool(key,newFunc as Func<GameObject>) as QObjectPool<T>: new QObjectPool<T>(key, newFunc) ;
-				lock (Instance.Pools)
+				lock (Pools)
 				{
-					Instance.Pools[key] = pool;
+					Pools[key] = pool;
 				}
 				return pool;
 			}
@@ -64,9 +64,9 @@ namespace QTool
 		}
 		public static void Push<T>(string poolName, T obj) where T : class
 		{
-			if (Instance.Pools.ContainsKey(poolName))
+			if (Pools.ContainsKey(poolName))
 			{
-				(Instance.Pools[poolName] as QObjectPool<T>).Push(obj);
+				(Pools[poolName] as QObjectPool<T>).Push(obj);
 			}
 			else
 			{
@@ -129,7 +129,7 @@ namespace QTool
 			}
 			Push(tag.poolKey, gameObject);
         }
-	
+		
 	}
 
     public abstract class QPoolObject<T>:IQPoolObject where T : QPoolObject<T>, new()
@@ -165,6 +165,7 @@ namespace QTool
     public abstract class QPool
     {
         public string Key { get; set; }
+
 		public override string ToString()
         {
             var type = GetType();
@@ -267,7 +268,22 @@ namespace QTool
 			IsQPoolObject = type.Is(typeof(IQPoolObject));
 			this.newFunc = newFunc;
             this.Key = poolName;
-        }
+			SceneManager.sceneLoaded += (scene, mode) =>
+			{
+				if (mode == LoadSceneMode.Single)
+				{
+					Clear();
+				}
+			};
+		}
+		public virtual void Clear()
+		{
+			UsingPool.Clear();
+			CanUsePool.Clear();
+			QDebug.ChangeProfilerCount(Key + " " + nameof(AllCount), AllCount);
+			QDebug.ChangeProfilerCount(Key + " UseCount", 0);
+		}
+
 	}
 	public interface IQPoolObject
 	{
@@ -278,6 +294,14 @@ namespace QTool
 	{
 		public GameObject prefab { get; internal set; }
 		public GameObjectPool(string poolName, Func<GameObject> newFunc = null) : base(poolName, newFunc) { }
+
+		public override void Clear()
+		{
+			newFunc = null;
+			prefab = null;
+			base.Clear();
+		}
+
 		Transform _poolParent = null;
 		public Transform PoolParent
 		{
