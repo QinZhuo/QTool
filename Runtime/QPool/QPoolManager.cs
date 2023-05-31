@@ -169,7 +169,7 @@ namespace QTool
 		public override string ToString()
         {
             var type = GetType();
-			return "对象池【" + Key + "】 ";
+			return "对象池【" + Key + "】";
         }
     }
 
@@ -177,7 +177,7 @@ namespace QTool
     {
 		public override string ToString()
 		{
-			return base.ToString() + " [" + UsingPool.Count + "/" + AllCount + "]参考大小[" + (UsingPool.Count * typeof(T).MinSize()).ToSizeString() + "/" + (AllCount * typeof(T).MinSize()).ToSizeString() + "] \n" + UsingPool.ToOneString();
+			return base.ToString() + " 使用情况 " + UsingPool.Count + " / " + AllCount + "  参考大小 " + (UsingPool.Count * typeof(T).MinSize()).ToSizeString() + " / " + (AllCount * typeof(T).MinSize()).ToSizeString() + "\n" + UsingPool.ToOneString();
 		}
 		public readonly List<T> UsingPool = new List<T>();
         public readonly List<T> CanUsePool = new List<T>();
