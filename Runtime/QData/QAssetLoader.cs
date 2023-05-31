@@ -62,7 +62,7 @@ namespace QTool.Asset
 				return null;
 			}
 		}
-		public static bool PoolPush(string key, GameObject obj)
+		public static void PoolPush(string key, GameObject obj)
 		{
 			if (key.Contains(" "))
 			{
@@ -72,9 +72,9 @@ namespace QTool.Asset
 			if (pool == null)
 			{
 				Debug.LogError("不存在对象池【" + DirectoryPath + "_" + key + "】");
-				return false;
+				return;
 			}
-			return pool.Push(obj);
+			pool.Push(obj);
 		}
 	}
 }
