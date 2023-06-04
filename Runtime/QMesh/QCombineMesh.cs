@@ -123,12 +123,12 @@ namespace QTool
 						rootBone.SetAsFirstSibling();
 					}
 				}
-			}
-			var meshRnderers = GetComponentsInChildren<MeshRenderer>();
-			for (int i = 0; i < meshRnderers.Length; i++)
-			{
-				var meshRenderer = meshRnderers[i];
-				meshRenderer.gameObject.CheckDestory();
+				var meshRnderers = GetComponentsInChildren<MeshRenderer>();
+				for (int i = 0; i < meshRnderers.Length; i++)
+				{
+					var meshRenderer = meshRnderers[i];
+					meshRenderer.gameObject.CheckDestory();
+				}
 			}
 		}
 	}
