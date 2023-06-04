@@ -61,7 +61,10 @@ namespace QTool
 			var meshRnderers= GetComponentsInChildren<MeshRenderer>();
 			foreach (var r in meshRnderers)
 			{
-				r.gameObject.SetActive(false);
+				if (renderers.ContainsKey(r.name, (obj) => obj.name))
+				{
+					r.gameObject.SetActive(false);
+				}
 			}
 			foreach (var meshName in skinnedMeshKeys)
 			{
