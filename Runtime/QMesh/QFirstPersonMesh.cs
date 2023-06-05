@@ -11,8 +11,8 @@ namespace QTool
 		{
 			var skinnedMesh = GetComponentInChildren<SkinnedMeshRenderer>();
 			var (aMesh,bMesh)= skinnedMesh.Split(HumanBodyBones.Neck);
-			Instantiate(skinnedMesh.gameObject, skinnedMesh.transform.parent).GetComponent<MeshFilter>().sharedMesh = aMesh;
-			Instantiate(skinnedMesh.gameObject, skinnedMesh.transform.parent).GetComponent<MeshFilter>().sharedMesh = bMesh;
+			Instantiate(skinnedMesh.gameObject, skinnedMesh.transform.parent).GetComponent<SkinnedMeshRenderer>().sharedMesh = aMesh;
+			Instantiate(skinnedMesh.gameObject, skinnedMesh.transform.parent).GetComponent<SkinnedMeshRenderer>().sharedMesh = bMesh;
 		}
 	}
 }
