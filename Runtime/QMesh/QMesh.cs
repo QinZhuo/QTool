@@ -12,8 +12,8 @@ namespace QTool
 		public QList<int> triangles = new QList<int>();
 		public QList<Vector2> uvs = new QList<Vector2>();
 		public QList<Vector4> tangents = new QList<Vector4>();
-		public List<BoneWeight> boneWeights = new List<BoneWeight>();
-		public List<Matrix4x4> bindposes = new List<Matrix4x4>();
+		public QList<BoneWeight> boneWeights = new QList<BoneWeight>();
+		public QList<Matrix4x4> bindposes = new QList<Matrix4x4>();
 		public int Index { get; set; }
 		public bool Dirty { get; private set; } = true;
 		public bool Changing { get; set; } = false;
@@ -49,6 +49,8 @@ namespace QTool
 		public void AddPoint(Mesh mesh,int index)
 		{
 			Add(mesh.vertices[index], mesh.uv[index], mesh.normals[index], mesh.tangents[index]);
+			bindposes.Add(mesh.bindposes[index]);
+			boneWeights.Add(mesh.boneWeights[index]);
 		}
 		public void Add(Vector3 vert, Vector2 uv, Vector3 normal, Vector4 tangent)
 		{
@@ -461,8 +463,6 @@ namespace QTool
 		{
 			QMeshData upMesh = new QMeshData();
 			QMeshData downMesh = new QMeshData();
-			upMesh.bindposes.AddRange(mesh.bindposes);
-			downMesh.boneWeights.AddRange(mesh.boneWeights);
 			bool[] isUp = new bool[mesh.vertices.Length];
 			int[] newTriangles = new int[mesh.vertices.Length];
 
