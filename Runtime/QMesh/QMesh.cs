@@ -256,16 +256,23 @@ namespace QTool
 				renderer.sharedMaterials = materials;
 			}
 		}
-		public static Mesh CombineMeshes(bool mergeSubMeshes,params Mesh[] meshes)
+		public static Mesh CombineMeshes(bool mergeSubMeshes, params Mesh[] meshes)
 		{
-			CombineInstance[] combineInstances = new CombineInstance[meshes.Length];
-			for (int i = 0; i < meshes.Length; i++)
+			List<CombineInstance> combineInstances = new List<CombineInstance>();
+			foreach (var meshInfo in meshes)
 			{
-				combineInstances[i].mesh = meshes[i];
-				combineInstances[i].transform = Matrix4x4.identity;
+				for (int i = 0; i < meshInfo.subMeshCount; i++)
+				{
+					combineInstances.Add(new CombineInstance
+					{
+						mesh = meshInfo,
+						subMeshIndex = i,
+						transform = Matrix4x4.identity,
+					});
+				}
 			}
 			var mesh = new Mesh();
-			mesh.CombineMeshes(combineInstances, mergeSubMeshes);
+			mesh.CombineMeshes(combineInstances.ToArray(), mergeSubMeshes);
 			mesh.RecalculateBounds();
 			return mesh;
 		}
