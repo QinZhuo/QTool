@@ -6,14 +6,14 @@ namespace QTool
 
 	public class QMeshData
 	{
-		public QList<Vector3> vertices = new QList<Vector3>();
-		public QList<Vector3> normals = new QList<Vector3>();
-		public QList<Color32> colors = new QList<Color32>();
-		public QList<int> triangles = new QList<int>();
-		public QList<Vector2> uvs = new QList<Vector2>();
-		public QList<Vector4> tangents = new QList<Vector4>();
-		public QList<BoneWeight> boneWeights = new QList<BoneWeight>();
-		public QList<Matrix4x4> bindposes = new QList<Matrix4x4>();
+		public List<Vector3> vertices = new List<Vector3>();
+		public List<Vector3> normals = new List<Vector3>();
+		public List<Color32> colors = new List<Color32>();
+		public List<int> triangles = new List<int>();
+		public List<Vector2> uvs = new List<Vector2>();
+		public List<Vector4> tangents = new List<Vector4>();
+		public List<BoneWeight> boneWeights = new List<BoneWeight>();
+		public List<Matrix4x4> bindposes = new List<Matrix4x4>();
 		public int Index { get; set; }
 		public bool Dirty { get; private set; } = true;
 		public bool Changing { get; set; } = false;
@@ -38,7 +38,7 @@ namespace QTool
 		}
 		public void AddPoint(Mesh mesh,int index)
 		{
-			Add(mesh.vertices[index], mesh.uv[index], mesh.normals[index], mesh.tangents[index], mesh.boneWeights[index]);
+			Add(mesh.vertices[index], mesh.uv[index], mesh.normals[index], mesh.tangents[index], mesh.boneWeights.Get(index));
 		}
 		public void Add(Vector3 vert, Vector2 uv, Vector3 normal, Vector4 tangent, BoneWeight boneWeight=default)
 		{
@@ -48,7 +48,10 @@ namespace QTool
 			tangents.Add(tangent);
 			if (boneWeight == default)
 			{
-				boneWeights.Add(boneWeights.StackPeek());
+				if (boneWeights.Count > 0)
+				{
+					boneWeights.Add(boneWeights.StackPeek());
+				}
 			}
 			else
 			{
