@@ -463,6 +463,8 @@ namespace QTool
 		{
 			QMeshData upMesh = new QMeshData();
 			QMeshData downMesh = new QMeshData();
+			upMesh.bindposes.AddRange(mesh.bindposes);
+			downMesh.bindposes.AddRange(mesh.bindposes);
 			bool[] isUp = new bool[mesh.vertices.Length];
 			int[] newTriangles = new int[mesh.vertices.Length];
 
