@@ -10,9 +10,13 @@ namespace QTool
 		public void SplitMesh()
 		{
 			var skinnedMesh = GetComponentInChildren<SkinnedMeshRenderer>();
-			var (aMesh,bMesh)= skinnedMesh.Split(HumanBodyBones.Neck);
-			Instantiate(skinnedMesh.gameObject, skinnedMesh.transform.parent).GetComponent<SkinnedMeshRenderer>().sharedMesh = aMesh;
-			Instantiate(skinnedMesh.gameObject, skinnedMesh.transform.parent).GetComponent<SkinnedMeshRenderer>().sharedMesh = bMesh;
+			var (headMesh,bodyMesh)= skinnedMesh.Split(HumanBodyBones.Neck);
+			skinnedMesh.sharedMesh = bodyMesh.CombineMeshes(headMesh);
+			Mesh leftMesh, rightMesh;
+			(leftMesh, bodyMesh) = skinnedMesh.Split(HumanBodyBones.LeftUpperArm);
+			skinnedMesh.sharedMesh = bodyMesh;
+			(rightMesh, bodyMesh) = skinnedMesh.Split(HumanBodyBones.RightUpperArm);
+			skinnedMesh.sharedMesh = bodyMesh.CombineMeshes(leftMesh.CombineMeshes(rightMesh,true));
 		}
 	}
 }

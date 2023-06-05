@@ -269,7 +269,7 @@ namespace QTool
 			mesh.RecalculateBounds();
 			return mesh;
 		}
-		public static Mesh CombineMeshes(this Mesh mesh, Mesh other = null, bool mergeSubMeshes = true)
+		public static Mesh CombineMeshes(this Mesh mesh, Mesh other = null, bool mergeSubMeshes = false)
 		{
 			return CombineMeshes(mergeSubMeshes, mesh, other);
 		}
@@ -442,18 +442,8 @@ namespace QTool
 						newB = a;
 						newC = b;
 					}
-					//Vector3 pos0, pos1;
-					//if (isBody[newA])
-					//	(pos0, pos1) = mesh.SplitTriangle(bodyMesh, otherMesh, point, normal, newTriangles, newA, newB, newC);
-					//else
-					//	(pos1, pos0) = mesh.SplitTriangle(otherMesh, bodyMesh, point, normal, newTriangles, newA, newB, newC);
-
-					//fillPoints.Add(pos0);
-					//fillPoints.Add(pos1);
 				}
 			}
-			//bodyMesh.CombineVertices(0.001f);
-			//otherMesh.CombineVertices(0.001f);
 			return (bodyMesh.GetMesh(), otherMesh.GetMesh());
 		}
 		public static void Split(this MeshFilter meshFilter, Vector3 point, Vector3 normal, bool fill = false)
