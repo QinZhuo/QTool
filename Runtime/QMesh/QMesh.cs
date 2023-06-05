@@ -137,6 +137,7 @@ namespace QTool
 						vertices.RemoveAt(j);
 						normals.RemoveAt(j);
 						tangents.RemoveAt(j);
+						boneWeights.RemoveAt(j);
 						uvs.RemoveAt(j);
 					}
 				}
