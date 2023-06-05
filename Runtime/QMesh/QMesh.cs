@@ -12,6 +12,8 @@ namespace QTool
 		public QList<int> triangles = new QList<int>();
 		public QList<Vector2> uvs = new QList<Vector2>();
 		public QList<Vector4> tangents = new QList<Vector4>();
+		public List<BoneWeight> boneWeights = new List<BoneWeight>();
+		public List<Matrix4x4> bindposes = new List<Matrix4x4>();
 		public int Index { get; set; }
 		public bool Dirty { get; private set; } = true;
 		public bool Changing { get; set; } = false;
@@ -43,6 +45,10 @@ namespace QTool
 			{
 				triangles.Add(mesh.triangles[i] + length);
 			}
+		}
+		public void AddPoint(Mesh mesh,int index)
+		{
+			Add(mesh.vertices[index], mesh.uv[index], mesh.normals[index], mesh.tangents[index]);
 		}
 		public void Add(Vector3 vert, Vector2 uv, Vector3 normal, Vector4 tangent)
 		{
@@ -88,6 +94,8 @@ namespace QTool
 			Mesh.uv = uvs.ToArray();
 			Mesh.colors32 = colors.ToArray();
 			Mesh.triangles = triangles.ToArray();
+			Mesh.boneWeights = boneWeights.ToArray();
+			Mesh.bindposes = bindposes.ToArray();
 			if (normals.Count == 0)
 			{
 				Mesh.RecalculateNormals();
@@ -453,7 +461,8 @@ namespace QTool
 		{
 			QMeshData upMesh = new QMeshData();
 			QMeshData downMesh = new QMeshData();
-
+			upMesh.bindposes.AddRange(mesh.bindposes);
+			downMesh.boneWeights.AddRange(mesh.boneWeights);
 			bool[] isUp = new bool[mesh.vertices.Length];
 			int[] newTriangles = new int[mesh.vertices.Length];
 
@@ -464,15 +473,14 @@ namespace QTool
 				if (isUp[i])
 				{
 					newTriangles[i] = upMesh.vertices.Count;
-					upMesh.Add(vert, mesh.uv[i], mesh.normals[i], mesh.tangents[i]);
+					upMesh.AddPoint(mesh, i);
 				}
 				else
 				{
 					newTriangles[i] = downMesh.vertices.Count;
-					downMesh.Add(vert, mesh.uv[i], mesh.normals[i], mesh.tangents[i]);
+					downMesh.AddPoint(mesh, i);
 				}
 			}
-
 			var fillPoints = new List<Vector3>();
 			int triangleCount = mesh.triangles.Length / 3;
 			for (int i = 0; i < triangleCount; i++)
