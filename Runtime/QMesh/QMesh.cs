@@ -1,10 +1,9 @@
-using System.Collections;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
-using QTool.Inspector;
 namespace QTool
 {
-	
+
 	public class QMeshData
 	{
 		public QList<Vector3> vertices = new QList<Vector3>();
@@ -12,6 +11,46 @@ namespace QTool
 		public QList<Color32> colors = new QList<Color32>();
 		public QList<int> triangles = new QList<int>();
 		public QList<Vector2> uvs = new QList<Vector2>();
+		public QList<Vector4> tangents = new QList<Vector4>();
+		public int Index { get; set; }
+		public bool Dirty { get; private set; } = true;
+		public bool Changing { get; set; } = false;
+		public Mesh Mesh { get; set; }
+		public Vector3 center;
+		public Vector3 size;
+		public QMeshData() { }
+		public QMeshData(Mesh mesh)
+		{
+			vertices.AddRange(mesh.vertices);
+			triangles.AddRange(mesh.triangles);
+			uvs.AddRange(mesh.uv);
+			normals.AddRange(mesh.normals);
+			tangents.AddRange(mesh.tangents);
+			center = mesh.bounds.center;
+			size = mesh.bounds.size;
+		}
+		public void Add(Mesh mesh)
+		{
+			for (int i = 0; i < mesh.vertexCount; i++)
+			{
+				vertices.Add(mesh.vertices[i]);
+				uvs.Add(mesh.uv[i]);
+				normals.Add(mesh.normals[i]);
+				tangents.Add(mesh.tangents[i]);
+			}
+			int length = triangles.Count;
+			for (int i = 0; i < mesh.triangles.Length; i++)
+			{
+				triangles.Add(mesh.triangles[i] + length);
+			}
+		}
+		public void Add(Vector3 vert, Vector2 uv, Vector3 normal, Vector4 tangent)
+		{
+			vertices.Add(vert);
+			uvs.Add(uv);
+			normals.Add(normal);
+			tangents.Add(tangent);
+		}
 		public void AddTriangle(Vector3 a,Vector3 b,Vector3 c,Color color)
 		{
 			AddPoint(a, color);
@@ -24,7 +63,6 @@ namespace QTool
 			vertices.Add(pos);
 			colors.Add(color);
 		}
-		public int Index { get;  set; }
 		public void Clear()
 		{
 			Index = 0;
@@ -33,15 +71,15 @@ namespace QTool
 			colors.Clear();
 			triangles.Clear();
 			uvs.Clear();
+			center = Vector3.zero;
+			size = Vector3.zero;
 		}
-		public bool Dirty { get; private set; } = true;
-		public bool Changing { get; set; } = false;
-		public Mesh Mesh { get;  set; } 
+	
 		public void SetDirty()
 		{
 			Dirty = true;
 		}
-		public void UpdateMesh()
+		public Mesh GetMesh()
 		{
 			if (Mesh == null) Mesh = new Mesh();
 			Dirty = false;
@@ -50,6 +88,7 @@ namespace QTool
 			Mesh.uv = uvs.ToArray();
 			Mesh.colors32 = colors.ToArray();
 			Mesh.triangles = triangles.ToArray();
+			Mesh.tangents = tangents.ToArray();
 			if (normals.Count == 0)
 			{
 				Mesh.RecalculateNormals();
@@ -57,6 +96,107 @@ namespace QTool
 			else
 			{
 				Mesh.normals = normals.ToArray();
+			}
+			if (tangents.Count == 0)
+			{
+				Mesh.RecalculateTangents();
+			}
+			else
+			{
+				Mesh.tangents = tangents.ToArray();
+			}
+			return Mesh;
+		}
+		public void CombineVertices(float range)
+		{
+			range *= range;
+			for (int i = 0; i < vertices.Count; i++)
+			{
+				for (int j = i + 1; j < vertices.Count; j++)
+				{
+					bool dis = (vertices[i] - vertices[j]).sqrMagnitude < range;
+					bool uv = (uvs[i] - uvs[j]).sqrMagnitude < range;
+					bool dir = Vector3.Dot(normals[i], normals[j]) > 0.999f;
+					if (dis && uv && dir)
+					{
+						for (int k = 0; k < triangles.Count; k++)
+						{
+							if (triangles[k] == j)
+								triangles[k] = i;
+							if (triangles[k] > j)
+								triangles[k]--;
+						}
+						vertices.RemoveAt(j);
+						normals.RemoveAt(j);
+						tangents.RemoveAt(j);
+						uvs.RemoveAt(j);
+					}
+				}
+			}
+		}
+		public void MapperCube(Rect range)
+		{
+			if (uvs.Count < vertices.Count)
+				uvs = new QList<Vector2>(vertices.Count);
+			int count = triangles.Count / 3;
+			for (int i = 0; i < count; i++)
+			{
+				int _i0 = triangles[i * 3];
+				int _i1 = triangles[i * 3 + 1];
+				int _i2 = triangles[i * 3 + 2];
+
+				Vector3 v0 = vertices[_i0] - center + size / 2f;
+				Vector3 v1 = vertices[_i1] - center + size / 2f;
+				Vector3 v2 = vertices[_i2] - center + size / 2f;
+				v0 = new Vector3(v0.x / size.x, v0.y / size.y, v0.z / size.z);
+				v1 = new Vector3(v1.x / size.x, v1.y / size.y, v1.z / size.z);
+				v2 = new Vector3(v2.x / size.x, v2.y / size.y, v2.z / size.z);
+
+				Vector3 a = v0 - v1;
+				Vector3 b = v2 - v1;
+				Vector3 dir = Vector3.Cross(a, b);
+				float x = Mathf.Abs(Vector3.Dot(dir, Vector3.right));
+				float y = Mathf.Abs(Vector3.Dot(dir, Vector3.up));
+				float z = Mathf.Abs(Vector3.Dot(dir, Vector3.forward));
+				if (x > y && x > z)
+				{
+					uvs[_i0] = new Vector2(v0.z, v0.y);
+					uvs[_i1] = new Vector2(v1.z, v1.y);
+					uvs[_i2] = new Vector2(v2.z, v2.y);
+				}
+				else if (y > x && y > z)
+				{
+					uvs[_i0] = new Vector2(v0.x, v0.z);
+					uvs[_i1] = new Vector2(v1.x, v1.z);
+					uvs[_i2] = new Vector2(v2.x, v2.z);
+				}
+				else if (z > x && z > y)
+				{
+					uvs[_i0] = new Vector2(v0.x, v0.y);
+					uvs[_i1] = new Vector2(v1.x, v1.y);
+					uvs[_i2] = new Vector2(v2.x, v2.y);
+				}
+				uvs[_i0] = new Vector2(range.xMin + (range.xMax - range.xMin) * uvs[_i0].x, range.yMin + (range.yMax - range.yMin) * uvs[_i0].y);
+				uvs[_i1] = new Vector2(range.xMin + (range.xMax - range.xMin) * uvs[_i1].x, range.yMin + (range.yMax - range.yMin) * uvs[_i1].y);
+				uvs[_i2] = new Vector2(range.xMin + (range.xMax - range.xMin) * uvs[_i2].x, range.yMin + (range.yMax - range.yMin) * uvs[_i2].y);
+			}
+		}
+		public void Reverse()
+		{
+			int count = triangles.Count / 3;
+			for (int i = 0; i < count; i++)
+			{
+				int t = triangles[i * 3 + 2];
+				triangles[i * 3 + 2] = triangles[i * 3 + 1];
+				triangles[i * 3 + 1] = t;
+			}
+			count = vertices.Count;
+			for (int i = 0; i < count; i++)
+			{
+				normals[i] *= -1;
+				Vector4 tan = tangents[i];
+				tan.w = -1;
+				tangents[i] = tan;
 			}
 		}
 		public override string ToString()
@@ -69,9 +209,17 @@ namespace QTool
 		public static Mesh GetMesh(this PrimitiveType primitiveType)
 		{
 			var obj = GameObject.CreatePrimitive(primitiveType);
-			var mesh= obj.GetComponent<MeshFilter>().sharedMesh;
+			var mesh = obj.GetComponent<MeshFilter>().sharedMesh;
 			obj.CheckDestory();
 			return mesh;
+		}
+		public static Vector4 CalculateTangent(this Vector3 normal)
+		{
+			Vector3 tan = Vector3.Cross(normal, Vector3.up);
+			if (tan == Vector3.zero)
+				tan = Vector3.Cross(normal, Vector3.forward);
+			tan = Vector3.Cross(tan, normal);
+			return new Vector4(tan.x, tan.y, tan.z, 1.0f);
 		}
 		public static void GenerateMesh(this GameObject root, QVoxelData qVoxelData, Material mat = null)
 		{
@@ -80,7 +228,7 @@ namespace QTool
 		}
 		public static void GenerateMesh(this GameObject root, QMeshData meshData, Material mat = null)
 		{
-			meshData.UpdateMesh();
+			meshData.GetMesh();
 			root.GenerateMesh(meshData.Mesh, mat);
 		}
 		public static void GenerateMesh(this GameObject root, Mesh Mesh, Material mat = null)
@@ -147,7 +295,7 @@ namespace QTool
 				}
 			}
 		}
-		public static void SetShareMaterails(this Renderer renderer,params Material[] materials)
+		public static void SetShareMaterails(this Renderer renderer, params Material[] materials)
 		{
 			if (Application.IsPlaying(renderer))
 			{
@@ -158,7 +306,7 @@ namespace QTool
 				renderer.sharedMaterials = materials;
 			}
 		}
-		public static void CombineMeshs(this SkinnedMeshRenderer root, SkinnedMeshRenderer[] meshes,params string[] combineTextures)
+		public static void CombineMeshs(this SkinnedMeshRenderer root, SkinnedMeshRenderer[] meshes, params string[] combineTextures)
 		{
 			var animator = root.GetComponentInParent<Animator>();
 			var childs = animator.GetComponentsInChildren<Transform>(true);
@@ -181,7 +329,7 @@ namespace QTool
 					combineInfos.Add(combine);
 				}
 			}
-			root.sharedMesh.CombineMeshes(combineInfos.ToArray(), combineTextures.Length!=0, true);
+			root.sharedMesh.CombineMeshes(combineInfos.ToArray(), combineTextures.Length != 0, true);
 			root.sharedMesh.RecalculateNormals();
 			if (combineTextures.Length == 0)
 			{
@@ -192,7 +340,7 @@ namespace QTool
 				Rect[] UVRects = null;
 				var combineMaterial = new Material(mats[0]);
 				var texSize = Mathf.Min(combineMaterial.mainTexture.width, 512);
-				var combineSize =Mathf.Min(texSize * Mathf.CeilToInt(Mathf.Sqrt(mats.Count)),2048);
+				var combineSize = Mathf.Min(texSize * Mathf.CeilToInt(Mathf.Sqrt(mats.Count)), 2048);
 				foreach (var textureKey in combineTextures)
 				{
 					var texs = new List<Texture2D>();
@@ -216,7 +364,7 @@ namespace QTool
 					combineMaterial.SetTexture(textureKey, combineTexture);
 				}
 				var index = 0;
-				var combineUV =new QList<Vector2>();
+				var combineUV = new QList<Vector2>();
 				for (int i = 0; i < uvs.Count; i++)
 				{
 					foreach (var uv in uvs[i])
@@ -255,6 +403,235 @@ namespace QTool
 			root.sharedMesh.boneWeights = boneWeights.ToArray();
 			root.sharedMesh.bindposes = bindppses.ToArray();
 			#endregion
+		}
+
+		public static void Split(this GameObject gameObject, Vector3 point, Vector3 normal, bool fill = false)
+		{
+			var meshFilter = gameObject.GetComponent<MeshFilter>();
+			point = gameObject.transform.InverseTransformPoint(point);
+			normal = gameObject.transform.InverseTransformDirection(normal);
+			normal.Scale(gameObject.transform.localScale);
+			normal.Normalize();
+			if (meshFilter != null)
+			{
+				var (aMesh, bMesh) = meshFilter.sharedMesh.Split(point, normal, fill);
+				var a = UnityEngine.Object.Instantiate(gameObject);
+				var b = UnityEngine.Object.Instantiate(gameObject);
+				a.GetComponent<MeshFilter>().sharedMesh = aMesh;
+				b.GetComponent<MeshFilter>().sharedMesh = bMesh;
+			}
+			else
+			{
+				var skinnedMesh = gameObject.GetComponent<SkinnedMeshRenderer>();
+				if (skinnedMesh != null)
+				{
+					var (aMesh, bMesh) = skinnedMesh.sharedMesh.Split(point, normal, fill);
+					var a = UnityEngine.Object.Instantiate(gameObject);
+					var b = UnityEngine.Object.Instantiate(gameObject);
+					a.GetComponent<SkinnedMeshRenderer>().sharedMesh = aMesh;
+					b.GetComponent<SkinnedMeshRenderer>().sharedMesh = bMesh;
+				}
+			}
+			gameObject.CheckDestory();
+		}
+		public static (Mesh, Mesh) Split(this Mesh mesh,Vector3 point,Vector3 normal,bool fill=false)
+		{
+			QMeshData upMesh = new QMeshData();
+			QMeshData downMesh = new QMeshData();
+
+			bool[] isUp = new bool[mesh.vertices.Length];
+			int[] newTriangles = new int[mesh.vertices.Length];
+
+			for (int i = 0; i < newTriangles.Length; i++)
+			{
+				var vert = mesh.vertices[i];
+				isUp[i] = Vector3.Dot(vert - point, normal) >= 0f;
+				if (isUp[i])
+				{
+					newTriangles[i] = upMesh.vertices.Count;
+					upMesh.Add(vert, mesh.uv[i], mesh.normals[i], mesh.tangents[i]);
+				}
+				else
+				{
+					newTriangles[i] = downMesh.vertices.Count;
+					downMesh.Add(vert, mesh.uv[i], mesh.normals[i], mesh.tangents[i]);
+				}
+			}
+
+			var fillPoints = new List<Vector3>();
+			int triangleCount = mesh.triangles.Length / 3;
+			for (int i = 0; i < triangleCount; i++)
+			{
+				int a = mesh.triangles[i * 3];
+				int b = mesh.triangles[i * 3 + 1];
+				int c = mesh.triangles[i * 3 + 2];
+
+				bool aIsUp = isUp[a];
+				bool bIsUp = isUp[b];
+				bool cIsUp = isUp[c];
+				if (aIsUp && bIsUp && cIsUp)
+				{
+					upMesh.triangles.Add(newTriangles[a]);
+					upMesh.triangles.Add(newTriangles[b]);
+					upMesh.triangles.Add(newTriangles[c]);
+				}
+				else if (!aIsUp && !bIsUp && !cIsUp)
+				{
+					downMesh.triangles.Add(newTriangles[a]);
+					downMesh.triangles.Add(newTriangles[b]);
+					downMesh.triangles.Add(newTriangles[c]);
+				}
+				else
+				{
+					int newA, newB, newC;
+					if (bIsUp == cIsUp && aIsUp != bIsUp)
+					{
+						newA = a;
+						newB = b;
+						newC = c;
+					}
+					else if (cIsUp == aIsUp && bIsUp != cIsUp)
+					{
+						newA = b;
+						newB = c;
+						newC = a;
+					}
+					else
+					{
+						newA = c;
+						newB = a;
+						newC = b;
+					}
+					Vector3 pos0, pos1;
+					if (isUp[newA])
+						mesh.SplitTriangle(upMesh, downMesh, point, normal, newTriangles, newA, newB, newC, out pos0, out pos1);
+					else
+						mesh.SplitTriangle(downMesh, upMesh, point, normal, newTriangles, newA, newB, newC, out pos1, out pos0);
+					fillPoints.Add(pos0);
+					fillPoints.Add(pos1);
+				}
+			}
+
+			upMesh.CombineVertices(0.001f);
+			upMesh.center = mesh.bounds.center;
+			upMesh.size = mesh.bounds.size;
+			downMesh.CombineVertices(0.001f);
+			downMesh.center = mesh.bounds.center;
+			downMesh.size = mesh.bounds.size;
+			if (fill && fillPoints.Count > 2)
+			{
+				//var fillMesh = Fill(fillPoints, normal);
+				//Instantiate(gameObject).GetComponent<SplitObject>().UpdateMesh(downMesh, cut);
+				//cut.Reverse();
+				//Instantiate(gameObject).GetComponent<SplitObject>().UpdateMesh(upMesh, cut);
+				return (null, null);
+			}
+			else
+			{
+				return (upMesh.GetMesh(), downMesh.GetMesh());
+			}
+		}
+
+		private static void SplitTriangle(this Mesh mesh,QMeshData upMesh, QMeshData downMesh, Vector3 point, Vector3 normal, int[] newTriangles, int up, int down0, int down1, out Vector3 pos0, out Vector3 pos1)
+		{
+			Vector3 v0 = mesh.vertices[up];
+			Vector3 v1 = mesh.vertices[down0];
+			Vector3 v2 = mesh.vertices[down1];
+			float topDot = Vector3.Dot(point - v0, normal);
+			float aScale = Mathf.Clamp01(topDot / Vector3.Dot(v1 - v0, normal));
+			float bScale = Mathf.Clamp01(topDot / Vector3.Dot(v2 - v0, normal));
+			Vector3 pos_a = v0 + (v1 - v0) * aScale;
+			Vector3 pos_b = v0 + (v2 - v0) * bScale;
+
+			Vector2 u0 = mesh.uv[up];
+			Vector2 u1 = mesh.uv[down0];
+			Vector2 u2 = mesh.uv[down1];
+			Vector3 uv_a = (u0 + (u1 - u0) * aScale);
+			Vector3 uv_b = (u0 + (u2 - u0) * bScale);
+
+			Vector3 n0 = mesh.normals[up];
+			Vector3 n1 = mesh.normals[down0];
+			Vector3 n2 = mesh.normals[down1];
+			Vector3 normal_a = (n0 + (n1 - n0) * aScale).normalized;
+			Vector3 normal_b = (n0 + (n2 - n0) * bScale).normalized;
+
+			Vector4 t0 = mesh.tangents[up];
+			Vector4 t1 = mesh.tangents[down0];
+			Vector4 t2 = mesh.tangents[down1];
+			Vector4 tangent_a = (t0 + (t1 - t0) * aScale).normalized;
+			Vector4 tangent_b = (t0 + (t2 - t0) * bScale).normalized;
+			tangent_a.w = t1.w;
+			tangent_b.w = t2.w;
+
+			int top_a = upMesh.vertices.Count;
+			upMesh.Add(pos_a, uv_a, normal_a, tangent_a);
+			int top_b = upMesh.vertices.Count;
+			upMesh.Add(pos_b, uv_b, normal_b, tangent_b);
+			upMesh.triangles.Add(newTriangles[up]);
+			upMesh.triangles.Add(top_a);
+			upMesh.triangles.Add(top_b);
+
+			int down_a = downMesh.vertices.Count;
+			downMesh.Add(pos_a, uv_a, normal_a, tangent_a);
+			int down_b = downMesh.vertices.Count;
+			downMesh.Add(pos_b, uv_b, normal_b, tangent_b);
+
+			downMesh.triangles.Add(newTriangles[down0]);
+			downMesh.triangles.Add(newTriangles[down1]);
+			downMesh.triangles.Add(down_b);
+
+			downMesh.triangles.Add(newTriangles[down0]);
+			downMesh.triangles.Add(down_b);
+			downMesh.triangles.Add(down_a);
+
+			pos0 = pos_a;
+			pos1 = pos_b;
+		}
+
+		public static Mesh Fill(this List<Vector3> edges, Vector3 normal)
+		{
+			if (edges.Count < 3)
+				throw new Exception("edges point less 3!");
+
+			for (int i = 0; i < edges.Count - 3; i++)
+			{
+				Vector3 t = edges[i + 1];
+				Vector3 temp = edges[i + 3];
+				for (int j = i + 2; j < edges.Count - 1; j += 2)
+				{
+					if ((edges[j] - t).sqrMagnitude < 1e-6)
+					{
+						edges[j] = edges[i + 2];
+						edges[i + 3] = edges[j + 1];
+						edges[j + 1] = temp;
+						break;
+					}
+					if ((edges[j + 1] - t).sqrMagnitude < 1e-6)
+					{
+						edges[j + 1] = edges[i + 2];
+						edges[i + 3] = edges[j];
+						edges[j] = temp;
+						break;
+					}
+				}
+				edges.RemoveAt(i + 2);
+			}
+			edges.RemoveAt(edges.Count - 1);
+
+			Vector4 tangent = normal.CalculateTangent();
+
+			var cutEdges = new QMeshData();
+			for (int i = 0; i < edges.Count; i++)
+				cutEdges.Add(edges[i], Vector2.zero, normal, tangent);
+			int count = edges.Count - 1;
+			for (int i = 1; i < count; i++)
+			{
+				cutEdges.triangles.Add(0);
+				cutEdges.triangles.Add(i);
+				cutEdges.triangles.Add(i + 1);
+			}
+			//cutEdges.MapperCube(uvRange);
+			return cutEdges.GetMesh();
 		}
 	}
 }
