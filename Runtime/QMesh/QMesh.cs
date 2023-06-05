@@ -21,16 +21,6 @@ namespace QTool
 		public Vector3 center;
 		public Vector3 size;
 		public QMeshData() { }
-		public QMeshData(Mesh mesh)
-		{
-			vertices.AddRange(mesh.vertices);
-			triangles.AddRange(mesh.triangles);
-			uvs.AddRange(mesh.uv);
-			normals.AddRange(mesh.normals);
-			tangents.AddRange(mesh.tangents);
-			center = mesh.bounds.center;
-			size = mesh.bounds.size;
-		}
 		public void Add(Mesh mesh)
 		{
 			for (int i = 0; i < mesh.vertexCount; i++)
