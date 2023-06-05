@@ -10,7 +10,7 @@ namespace QTool
 		public void SplitMesh()
 		{
 			var animator = GetComponent<Animator>();
-			var skinnedMesh = GetComponent<SkinnedMeshRenderer>();
+			var skinnedMesh = GetComponentInChildren<SkinnedMeshRenderer>();
 			skinnedMesh.gameObject.Split(animator.GetBoneTransform(HumanBodyBones.Neck).position, Vector3.up);
 		}
 	}
