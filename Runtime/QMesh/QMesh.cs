@@ -18,8 +18,6 @@ namespace QTool
 		public bool Dirty { get; private set; } = true;
 		public bool Changing { get; set; } = false;
 		public Mesh Mesh { get; set; }
-		//public Vector3 center;
-		//public Vector3 size;
 		public QMeshData() { }
 		public void Add(Mesh mesh)
 		{
@@ -68,8 +66,8 @@ namespace QTool
 			colors.Clear();
 			triangles.Clear();
 			uvs.Clear();
-			//center = Vector3.zero;
-			//size = Vector3.zero;
+			boneWeights.Clear();
+			bindposes.Clear();
 		}
 	
 		public void SetDirty()
@@ -133,53 +131,6 @@ namespace QTool
 				}
 			}
 		}
-		//public void MapperCube(Rect range)
-		//{
-		//	if (uvs.Count < vertices.Count)
-		//		uvs = new QList<Vector2>(vertices.Count);
-		//	int count = triangles.Count / 3;
-		//	for (int i = 0; i < count; i++)
-		//	{
-		//		int _i0 = triangles[i * 3];
-		//		int _i1 = triangles[i * 3 + 1];
-		//		int _i2 = triangles[i * 3 + 2];
-
-		//		Vector3 v0 = vertices[_i0] - center + size / 2f;
-		//		Vector3 v1 = vertices[_i1] - center + size / 2f;
-		//		Vector3 v2 = vertices[_i2] - center + size / 2f;
-		//		v0 = new Vector3(v0.x / size.x, v0.y / size.y, v0.z / size.z);
-		//		v1 = new Vector3(v1.x / size.x, v1.y / size.y, v1.z / size.z);
-		//		v2 = new Vector3(v2.x / size.x, v2.y / size.y, v2.z / size.z);
-
-		//		Vector3 a = v0 - v1;
-		//		Vector3 b = v2 - v1;
-		//		Vector3 dir = Vector3.Cross(a, b);
-		//		float x = Mathf.Abs(Vector3.Dot(dir, Vector3.right));
-		//		float y = Mathf.Abs(Vector3.Dot(dir, Vector3.up));
-		//		float z = Mathf.Abs(Vector3.Dot(dir, Vector3.forward));
-		//		if (x > y && x > z)
-		//		{
-		//			uvs[_i0] = new Vector2(v0.z, v0.y);
-		//			uvs[_i1] = new Vector2(v1.z, v1.y);
-		//			uvs[_i2] = new Vector2(v2.z, v2.y);
-		//		}
-		//		else if (y > x && y > z)
-		//		{
-		//			uvs[_i0] = new Vector2(v0.x, v0.z);
-		//			uvs[_i1] = new Vector2(v1.x, v1.z);
-		//			uvs[_i2] = new Vector2(v2.x, v2.z);
-		//		}
-		//		else if (z > x && z > y)
-		//		{
-		//			uvs[_i0] = new Vector2(v0.x, v0.y);
-		//			uvs[_i1] = new Vector2(v1.x, v1.y);
-		//			uvs[_i2] = new Vector2(v2.x, v2.y);
-		//		}
-		//		uvs[_i0] = new Vector2(range.xMin + (range.xMax - range.xMin) * uvs[_i0].x, range.yMin + (range.yMax - range.yMin) * uvs[_i0].y);
-		//		uvs[_i1] = new Vector2(range.xMin + (range.xMax - range.xMin) * uvs[_i1].x, range.yMin + (range.yMax - range.yMin) * uvs[_i1].y);
-		//		uvs[_i2] = new Vector2(range.xMin + (range.xMax - range.xMin) * uvs[_i2].x, range.yMin + (range.yMax - range.yMin) * uvs[_i2].y);
-		//	}
-		//}
 		public void Reverse()
 		{
 			int count = triangles.Count / 3;
@@ -298,7 +249,7 @@ namespace QTool
 		{
 			if (Application.IsPlaying(renderer))
 			{
-				renderer.sharedMaterials = materials;
+				renderer.materials = materials;
 			}
 			else
 			{
@@ -421,6 +372,90 @@ namespace QTool
 			#endregion
 		}
 
+		public static (Mesh, Mesh) Split(this SkinnedMeshRenderer skinnedMesh, HumanBodyBones humanBodyBone)
+		{
+			var mesh = skinnedMesh.sharedMesh;
+			QMeshData bodyMesh = new QMeshData();
+			QMeshData otherMesh = new QMeshData();
+			bodyMesh.bindposes.AddRange(mesh.bindposes);
+			otherMesh.bindposes.AddRange(mesh.bindposes);
+			bool[] isBody = new bool[mesh.vertices.Length];
+			int[] newTriangles = new int[mesh.vertices.Length];
+			var bones = new List<Transform>(skinnedMesh.bones);
+			var bodyBone = skinnedMesh.GetComponentInParent<Animator>().GetBoneTransform(humanBodyBone);
+			bones.RemoveAll((bone) => !bone.ParentHas(bodyBone));
+			for (int i = 0; i < newTriangles.Length; i++)
+			{
+				var vert = mesh.vertices[i];
+				isBody[i] = bones.Contains(skinnedMesh.bones[mesh.boneWeights[i].boneIndex0]);
+				if (isBody[i])
+				{
+					newTriangles[i] = bodyMesh.vertices.Count;
+					bodyMesh.AddPoint(mesh, i);
+				}
+				else
+				{
+					newTriangles[i] = otherMesh.vertices.Count;
+					otherMesh.AddPoint(mesh, i);
+				}
+			}
+			int triangleCount = mesh.triangles.Length / 3;
+			for (int i = 0; i < triangleCount; i++)
+			{
+				int a = mesh.triangles[i * 3];
+				int b = mesh.triangles[i * 3 + 1];
+				int c = mesh.triangles[i * 3 + 2];
+
+				bool aIsUp = isBody[a];
+				bool bIsUp = isBody[b];
+				bool cIsUp = isBody[c];
+				if (aIsUp && bIsUp && cIsUp)
+				{
+					bodyMesh.triangles.Add(newTriangles[a]);
+					bodyMesh.triangles.Add(newTriangles[b]);
+					bodyMesh.triangles.Add(newTriangles[c]);
+				}
+				else if (!aIsUp && !bIsUp && !cIsUp)
+				{
+					otherMesh.triangles.Add(newTriangles[a]);
+					otherMesh.triangles.Add(newTriangles[b]);
+					otherMesh.triangles.Add(newTriangles[c]);
+				}
+				else
+				{
+					int newA, newB, newC;
+					if (bIsUp == cIsUp && aIsUp != bIsUp)
+					{
+						newA = a;
+						newB = b;
+						newC = c;
+					}
+					else if (cIsUp == aIsUp && bIsUp != cIsUp)
+					{
+						newA = b;
+						newB = c;
+						newC = a;
+					}
+					else
+					{
+						newA = c;
+						newB = a;
+						newC = b;
+					}
+					//Vector3 pos0, pos1;
+					//if (isBody[newA])
+					//	(pos0, pos1) = mesh.SplitTriangle(bodyMesh, otherMesh, point, normal, newTriangles, newA, newB, newC);
+					//else
+					//	(pos1, pos0) = mesh.SplitTriangle(otherMesh, bodyMesh, point, normal, newTriangles, newA, newB, newC);
+
+					//fillPoints.Add(pos0);
+					//fillPoints.Add(pos1);
+				}
+			}
+			//bodyMesh.CombineVertices(0.001f);
+			//otherMesh.CombineVertices(0.001f);
+			return (bodyMesh.GetMesh(), otherMesh.GetMesh());
+		}
 		public static void Split(this GameObject gameObject, Vector3 point, Vector3 normal, bool fill = false)
 		{
 			var meshFilter = gameObject.GetComponent<MeshFilter>();
@@ -628,6 +663,7 @@ namespace QTool
 			mesh.tangents = tangents;
 			return mesh;
 		}
+	
 		public static Mesh Fill(this List<Vector3> edges, Vector3 normal)
 		{
 			if (edges.Count < 3)
@@ -670,7 +706,6 @@ namespace QTool
 				cutEdges.triangles.Add(i);
 				cutEdges.triangles.Add(i + 1);
 			}
-			//cutEdges.MapperCube(uvRange);
 			return cutEdges.GetMesh();
 		}
 	}
