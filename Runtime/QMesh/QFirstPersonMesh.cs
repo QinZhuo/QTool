@@ -9,9 +9,10 @@ namespace QTool
 		[QName("生成第一人称模型")]
 		public void SplitMesh()
 		{
-			var animator = GetComponent<Animator>();
 			var skinnedMesh = GetComponentInChildren<SkinnedMeshRenderer>();
-			skinnedMesh.Split(HumanBodyBones.Neck);
+			var (aMesh,bMesh)= skinnedMesh.Split(HumanBodyBones.Neck);
+			Instantiate(skinnedMesh.gameObject, skinnedMesh.transform.parent).GetComponent<MeshFilter>().sharedMesh = aMesh;
+			Instantiate(skinnedMesh.gameObject, skinnedMesh.transform.parent).GetComponent<MeshFilter>().sharedMesh = bMesh;
 		}
 	}
 }

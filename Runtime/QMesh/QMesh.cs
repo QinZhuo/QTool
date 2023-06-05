@@ -456,33 +456,16 @@ namespace QTool
 			//otherMesh.CombineVertices(0.001f);
 			return (bodyMesh.GetMesh(), otherMesh.GetMesh());
 		}
-		public static void Split(this GameObject gameObject, Vector3 point, Vector3 normal, bool fill = false)
+		public static void Split(this MeshFilter meshFilter, Vector3 point, Vector3 normal, bool fill = false)
 		{
-			var meshFilter = gameObject.GetComponent<MeshFilter>();
-			point = gameObject.transform.InverseTransformPoint(point);
-			normal = gameObject.transform.InverseTransformDirection(normal);
-			normal.Scale(gameObject.transform.localScale);
+			point = meshFilter.transform.InverseTransformPoint(point);
+			normal = meshFilter.transform.InverseTransformDirection(normal);
+			normal.Scale(meshFilter.transform.localScale);
 			normal.Normalize();
-			var a = UnityEngine.Object.Instantiate(gameObject, gameObject.transform.parent);
-			var b = UnityEngine.Object.Instantiate(gameObject, gameObject.transform.parent);
-			if (meshFilter != null)
-			{
-				
-				var (aMesh, bMesh) = meshFilter.sharedMesh.Split(point, normal, fill);
-				a.GetComponent<MeshFilter>().sharedMesh = aMesh;
-				b.GetComponent<MeshFilter>().sharedMesh = bMesh;
-			}
-			else
-			{
-				var skinnedMesh = gameObject.GetComponent<SkinnedMeshRenderer>();
-				if (skinnedMesh != null)
-				{
-					var (aMesh, bMesh) = skinnedMesh.sharedMesh.Split(point, normal, fill);
-					a.GetComponent<SkinnedMeshRenderer>().sharedMesh = aMesh;
-					b.GetComponent<SkinnedMeshRenderer>().sharedMesh = bMesh;
-				}
-			}
-			gameObject.CheckDestory();
+			var (aMesh, bMesh) = meshFilter.sharedMesh.Split(point, normal, fill);
+			UnityEngine.Object.Instantiate(meshFilter.gameObject, meshFilter.transform.parent).GetComponent<MeshFilter>().sharedMesh = aMesh;
+			UnityEngine.Object.Instantiate(meshFilter.gameObject, meshFilter.transform.parent).GetComponent<MeshFilter>().sharedMesh = bMesh;
+			meshFilter.gameObject.CheckDestory();
 		}
 		public static (Mesh, Mesh) Split(this Mesh mesh, Vector3 point, Vector3 normal, bool fill = false)
 		{
