@@ -101,7 +101,7 @@ namespace QTool
 			}
 			if (combineMeshs.Count > 0)
 			{
-				transform.GetChild(nameof(QCombineMesh), true).GetComponent<SkinnedMeshRenderer>(true).CombineMeshs(combineMeshs.ToArray(), combineTextures);
+				transform.GetChild(nameof(QCombineMesh), true).GetComponent<SkinnedMeshRenderer>(true).CombineMeshes(combineMeshs.ToArray(), combineTextures);
 			}
 		}
 		public void CheckBone(SkinnedMeshRenderer skinedMeshRenderer)

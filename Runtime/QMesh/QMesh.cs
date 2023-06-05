@@ -88,7 +88,6 @@ namespace QTool
 			Mesh.uv = uvs.ToArray();
 			Mesh.colors32 = colors.ToArray();
 			Mesh.triangles = triangles.ToArray();
-			Mesh.tangents = tangents.ToArray();
 			if (normals.Count == 0)
 			{
 				Mesh.RecalculateNormals();
@@ -306,7 +305,24 @@ namespace QTool
 				renderer.sharedMaterials = materials;
 			}
 		}
-		public static void CombineMeshs(this SkinnedMeshRenderer root, SkinnedMeshRenderer[] meshes, params string[] combineTextures)
+		public static Mesh CombineMeshes(bool mergeSubMeshes,params Mesh[] meshes)
+		{
+			CombineInstance[] combineInstances = new CombineInstance[meshes.Length];
+			for (int i = 0; i < meshes.Length; i++)
+			{
+				combineInstances[i].mesh = meshes[i];
+				combineInstances[i].transform = Matrix4x4.identity;
+			}
+			var mesh = new Mesh();
+			mesh.CombineMeshes(combineInstances, mergeSubMeshes);
+			mesh.RecalculateBounds();
+			return mesh;
+		}
+		public static Mesh CombineMeshes(this Mesh mesh, Mesh other = null, bool mergeSubMeshes = true)
+		{
+			return CombineMeshes(mergeSubMeshes, mesh, other);
+		}
+		public static void CombineMeshes(this SkinnedMeshRenderer root, SkinnedMeshRenderer[] meshes, params string[] combineTextures)
 		{
 			var animator = root.GetComponentInParent<Animator>();
 			var childs = animator.GetComponentsInChildren<Transform>(true);
@@ -412,11 +428,12 @@ namespace QTool
 			normal = gameObject.transform.InverseTransformDirection(normal);
 			normal.Scale(gameObject.transform.localScale);
 			normal.Normalize();
+			var a = UnityEngine.Object.Instantiate(gameObject, gameObject.transform.parent);
+			var b = UnityEngine.Object.Instantiate(gameObject, gameObject.transform.parent);
 			if (meshFilter != null)
 			{
+				
 				var (aMesh, bMesh) = meshFilter.sharedMesh.Split(point, normal, fill);
-				var a = UnityEngine.Object.Instantiate(gameObject);
-				var b = UnityEngine.Object.Instantiate(gameObject);
 				a.GetComponent<MeshFilter>().sharedMesh = aMesh;
 				b.GetComponent<MeshFilter>().sharedMesh = bMesh;
 			}
@@ -426,15 +443,13 @@ namespace QTool
 				if (skinnedMesh != null)
 				{
 					var (aMesh, bMesh) = skinnedMesh.sharedMesh.Split(point, normal, fill);
-					var a = UnityEngine.Object.Instantiate(gameObject);
-					var b = UnityEngine.Object.Instantiate(gameObject);
 					a.GetComponent<SkinnedMeshRenderer>().sharedMesh = aMesh;
 					b.GetComponent<SkinnedMeshRenderer>().sharedMesh = bMesh;
 				}
 			}
 			gameObject.CheckDestory();
 		}
-		public static (Mesh, Mesh) Split(this Mesh mesh,Vector3 point,Vector3 normal,bool fill=false)
+		public static (Mesh, Mesh) Split(this Mesh mesh, Vector3 point, Vector3 normal, bool fill = false)
 		{
 			QMeshData upMesh = new QMeshData();
 			QMeshData downMesh = new QMeshData();
@@ -504,14 +519,14 @@ namespace QTool
 					}
 					Vector3 pos0, pos1;
 					if (isUp[newA])
-						mesh.SplitTriangle(upMesh, downMesh, point, normal, newTriangles, newA, newB, newC, out pos0, out pos1);
+						(pos0, pos1) = mesh.SplitTriangle(upMesh, downMesh, point, normal, newTriangles, newA, newB, newC);
 					else
-						mesh.SplitTriangle(downMesh, upMesh, point, normal, newTriangles, newA, newB, newC, out pos1, out pos0);
+						(pos1, pos0) = mesh.SplitTriangle(downMesh, upMesh, point, normal, newTriangles, newA, newB, newC);
+
 					fillPoints.Add(pos0);
 					fillPoints.Add(pos1);
 				}
 			}
-
 			upMesh.CombineVertices(0.001f);
 			upMesh.center = mesh.bounds.center;
 			upMesh.size = mesh.bounds.size;
@@ -520,11 +535,9 @@ namespace QTool
 			downMesh.size = mesh.bounds.size;
 			if (fill && fillPoints.Count > 2)
 			{
-				//var fillMesh = Fill(fillPoints, normal);
-				//Instantiate(gameObject).GetComponent<SplitObject>().UpdateMesh(downMesh, cut);
-				//cut.Reverse();
-				//Instantiate(gameObject).GetComponent<SplitObject>().UpdateMesh(upMesh, cut);
-				return (null, null);
+				var donwFillMesh = Fill(fillPoints, normal);
+				var upFillMesh = donwFillMesh.GetReverseMesh();
+				return (upMesh.GetMesh().CombineMeshes(upFillMesh), downMesh.GetMesh().CombineMeshes(donwFillMesh));
 			}
 			else
 			{
@@ -532,32 +545,32 @@ namespace QTool
 			}
 		}
 
-		private static void SplitTriangle(this Mesh mesh,QMeshData upMesh, QMeshData downMesh, Vector3 point, Vector3 normal, int[] newTriangles, int up, int down0, int down1, out Vector3 pos0, out Vector3 pos1)
+		private static (Vector3,Vector3) SplitTriangle(this Mesh mesh,QMeshData upMesh, QMeshData downMesh, Vector3 point, Vector3 normal, int[] newTriangles, int a, int b, int c)
 		{
-			Vector3 v0 = mesh.vertices[up];
-			Vector3 v1 = mesh.vertices[down0];
-			Vector3 v2 = mesh.vertices[down1];
+			Vector3 v0 = mesh.vertices[a];
+			Vector3 v1 = mesh.vertices[b];
+			Vector3 v2 = mesh.vertices[c];
 			float topDot = Vector3.Dot(point - v0, normal);
 			float aScale = Mathf.Clamp01(topDot / Vector3.Dot(v1 - v0, normal));
 			float bScale = Mathf.Clamp01(topDot / Vector3.Dot(v2 - v0, normal));
 			Vector3 pos_a = v0 + (v1 - v0) * aScale;
 			Vector3 pos_b = v0 + (v2 - v0) * bScale;
 
-			Vector2 u0 = mesh.uv[up];
-			Vector2 u1 = mesh.uv[down0];
-			Vector2 u2 = mesh.uv[down1];
+			Vector2 u0 = mesh.uv[a];
+			Vector2 u1 = mesh.uv[b];
+			Vector2 u2 = mesh.uv[c];
 			Vector3 uv_a = (u0 + (u1 - u0) * aScale);
 			Vector3 uv_b = (u0 + (u2 - u0) * bScale);
 
-			Vector3 n0 = mesh.normals[up];
-			Vector3 n1 = mesh.normals[down0];
-			Vector3 n2 = mesh.normals[down1];
+			Vector3 n0 = mesh.normals[a];
+			Vector3 n1 = mesh.normals[b];
+			Vector3 n2 = mesh.normals[c];
 			Vector3 normal_a = (n0 + (n1 - n0) * aScale).normalized;
 			Vector3 normal_b = (n0 + (n2 - n0) * bScale).normalized;
 
-			Vector4 t0 = mesh.tangents[up];
-			Vector4 t1 = mesh.tangents[down0];
-			Vector4 t2 = mesh.tangents[down1];
+			Vector4 t0 = mesh.tangents[a];
+			Vector4 t1 = mesh.tangents[b];
+			Vector4 t2 = mesh.tangents[c];
 			Vector4 tangent_a = (t0 + (t1 - t0) * aScale).normalized;
 			Vector4 tangent_b = (t0 + (t2 - t0) * bScale).normalized;
 			tangent_a.w = t1.w;
@@ -567,7 +580,7 @@ namespace QTool
 			upMesh.Add(pos_a, uv_a, normal_a, tangent_a);
 			int top_b = upMesh.vertices.Count;
 			upMesh.Add(pos_b, uv_b, normal_b, tangent_b);
-			upMesh.triangles.Add(newTriangles[up]);
+			upMesh.triangles.Add(newTriangles[a]);
 			upMesh.triangles.Add(top_a);
 			upMesh.triangles.Add(top_b);
 
@@ -576,18 +589,49 @@ namespace QTool
 			int down_b = downMesh.vertices.Count;
 			downMesh.Add(pos_b, uv_b, normal_b, tangent_b);
 
-			downMesh.triangles.Add(newTriangles[down0]);
-			downMesh.triangles.Add(newTriangles[down1]);
+			downMesh.triangles.Add(newTriangles[b]);
+			downMesh.triangles.Add(newTriangles[c]);
 			downMesh.triangles.Add(down_b);
 
-			downMesh.triangles.Add(newTriangles[down0]);
+			downMesh.triangles.Add(newTriangles[b]);
 			downMesh.triangles.Add(down_b);
 			downMesh.triangles.Add(down_a);
 
-			pos0 = pos_a;
-			pos1 = pos_b;
+			return (pos_a, pos_b);
 		}
-
+		public static Mesh Copy(this Mesh mesh)
+		{
+			var newMesh = new Mesh();
+			newMesh.vertices = mesh.vertices;
+			newMesh.uv = mesh.uv;
+			newMesh.colors32 = mesh.colors32;
+			newMesh.triangles = mesh.triangles;
+			newMesh.normals = mesh.normals;
+			newMesh.tangents = mesh.tangents;
+			return newMesh;
+		}
+		public static Mesh GetReverseMesh(this Mesh mesh)
+		{
+			mesh = mesh.Copy();
+			var triangles = mesh.triangles;
+			for (int i = 0; i < mesh.triangles.Length; i += 3)
+			{
+				var temp = triangles[i];
+				triangles[i] = triangles[i + 2];
+				triangles[i + 2] = temp;
+			}
+			mesh.triangles = triangles;
+			var normals = mesh.normals;
+			var tangents = mesh.tangents;
+			for (int i = 0; i < mesh.vertices.Length; i++)
+			{
+				normals[i] *= -1;
+				mesh.tangents[i].w *= -1;
+			}
+			mesh.normals = normals;
+			mesh.tangents = tangents;
+			return mesh;
+		}
 		public static Mesh Fill(this List<Vector3> edges, Vector3 normal)
 		{
 			if (edges.Count < 3)

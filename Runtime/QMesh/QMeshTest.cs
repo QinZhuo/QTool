@@ -8,6 +8,6 @@ public class QMeshTest : MonoBehaviour
 	[QName]
 	public void Test()
 	{
-		gameObject.Split(transform.position, normal);
+		gameObject.Split(transform.position, normal,true);
 	}
 }
