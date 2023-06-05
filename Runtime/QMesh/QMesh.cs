@@ -48,15 +48,22 @@ namespace QTool
 		}
 		public void AddPoint(Mesh mesh,int index)
 		{
-			Add(mesh.vertices[index], mesh.uv[index], mesh.normals[index], mesh.tangents[index]);
-			boneWeights.Add(mesh.boneWeights[index]);
+			Add(mesh.vertices[index], mesh.uv[index], mesh.normals[index], mesh.tangents[index], mesh.boneWeights[index]);
 		}
-		public void Add(Vector3 vert, Vector2 uv, Vector3 normal, Vector4 tangent)
+		public void Add(Vector3 vert, Vector2 uv, Vector3 normal, Vector4 tangent, BoneWeight boneWeight=default)
 		{
 			vertices.Add(vert);
 			uvs.Add(uv);
 			normals.Add(normal);
 			tangents.Add(tangent);
+			if (boneWeight == default)
+			{
+				boneWeights.Add(boneWeights.StackPeek());
+			}
+			else
+			{
+				boneWeights.Add(boneWeight);
+			}
 		}
 		public void AddTriangle(Vector3 a,Vector3 b,Vector3 c,Color color)
 		{
