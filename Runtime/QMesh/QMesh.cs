@@ -49,7 +49,6 @@ namespace QTool
 		public void AddPoint(Mesh mesh,int index)
 		{
 			Add(mesh.vertices[index], mesh.uv[index], mesh.normals[index], mesh.tangents[index]);
-			bindposes.Add(mesh.bindposes[index]);
 			boneWeights.Add(mesh.boneWeights[index]);
 		}
 		public void Add(Vector3 vert, Vector2 uv, Vector3 normal, Vector4 tangent)
