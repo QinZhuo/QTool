@@ -40,23 +40,13 @@ namespace QTool
 		{
 			Add(mesh.vertices[index], mesh.uv[index], mesh.normals[index], mesh.tangents[index], mesh.boneWeights.Get(index));
 		}
-		public void Add(Vector3 vert, Vector2 uv, Vector3 normal, Vector4 tangent, BoneWeight boneWeight=default)
+		public void Add(Vector3 vert, Vector2 uv, Vector3 normal, Vector4 tangent, BoneWeight boneWeight)
 		{
 			vertices.Add(vert);
 			uvs.Add(uv);
 			normals.Add(normal);
 			tangents.Add(tangent);
-			if (boneWeight == default)
-			{
-				if (boneWeights.Count > 0)
-				{
-					boneWeights.Add(boneWeights.StackPeek());
-				}
-			}
-			else
-			{
-				boneWeights.Add(boneWeight);
-			}
+			boneWeights.Add(boneWeight);
 		}
 		public void AddTriangle(Vector3 a,Vector3 b,Vector3 c,Color color)
 		{
@@ -583,17 +573,17 @@ namespace QTool
 			tangent_b.w = t2.w;
 
 			int top_a = upMesh.vertices.Count;
-			upMesh.Add(pos_a, uv_a, normal_a, tangent_a);
+			upMesh.Add(pos_a, uv_a, normal_a, tangent_a,mesh.boneWeights[a]);
 			int top_b = upMesh.vertices.Count;
-			upMesh.Add(pos_b, uv_b, normal_b, tangent_b);
+			upMesh.Add(pos_b, uv_b, normal_b, tangent_b, mesh.boneWeights[a]);
 			upMesh.triangles.Add(newTriangles[a]);
 			upMesh.triangles.Add(top_a);
 			upMesh.triangles.Add(top_b);
 
 			int down_a = downMesh.vertices.Count;
-			downMesh.Add(pos_a, uv_a, normal_a, tangent_a);
+			downMesh.Add(pos_a, uv_a, normal_a, tangent_a, mesh.boneWeights[b]);
 			int down_b = downMesh.vertices.Count;
-			downMesh.Add(pos_b, uv_b, normal_b, tangent_b);
+			downMesh.Add(pos_b, uv_b, normal_b, tangent_b, mesh.boneWeights[b]);
 
 			downMesh.triangles.Add(newTriangles[b]);
 			downMesh.triangles.Add(newTriangles[c]);
@@ -672,7 +662,7 @@ namespace QTool
 
 			var cutEdges = new QMeshData();
 			for (int i = 0; i < edges.Count; i++)
-				cutEdges.Add(edges[i], Vector2.zero, normal, tangent);
+				cutEdges.Add(edges[i], Vector2.zero, normal, tangent,default);
 			int count = edges.Count - 1;
 			for (int i = 1; i < count; i++)
 			{
