@@ -325,6 +325,7 @@ namespace QTool
 				var combineSize = Mathf.Min(texSize * Mathf.CeilToInt(Mathf.Sqrt(mats.Count)), 2048);
 				foreach (var textureKey in combineTextures)
 				{
+					if (textureKey.IsNull()) continue;
 					var texs = new List<Texture2D>();
 					foreach (var mat in mats)
 					{
@@ -404,17 +405,16 @@ namespace QTool
 			QMeshData bodyMesh = new QMeshData();
 			splitMesh.bindposes.AddRange(mesh.bindposes);
 			bodyMesh.bindposes.AddRange(mesh.bindposes);
-			var bones = new List<Transform>(skinnedMesh.bones);
-			var bodyBone = skinnedMesh.GetComponentInParent<Animator>().GetBoneTransform(humanBodyBone);
-			bones.RemoveAll((bone) => !bone.ParentHas(bodyBone));
+			var splitBone = skinnedMesh.GetComponentInParent<Animator>().GetBoneTransform(humanBodyBone);
+			var splitBones = new List<Transform>(splitBone.GetComponentsInChildren<Transform>());
 			for (int i = 0; i < mesh.triangles.Length; i += 3)
 			{
-				var isSplit = true;
+				var isSplit = false;
 				for (int t = 0; t < 3; t++)
 				{
-					if (!bones.Contains(skinnedMesh.bones[mesh.boneWeights[mesh.triangles[i + t]].boneIndex0]))
+					if (splitBones.IndexOf(skinnedMesh.bones[mesh.boneWeights[mesh.triangles[i + t]].boneIndex0]) >= 0)
 					{
-						isSplit = false;
+						isSplit = true;
 						break;
 					}
 				}
