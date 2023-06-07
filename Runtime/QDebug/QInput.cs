@@ -29,6 +29,17 @@ namespace QTool
 #endif
 			}
 		}
+		public static Vector2 PointerDirection
+		{
+			get
+			{
+#if ENABLE_INPUT_SYSTEM
+				return UnityEngine.InputSystem.Pointer.current == null ? Vector2.zero : UnityEngine.InputSystem.Pointer.current.delta.ReadValue();
+#else
+				return new Vector2(Input.GetAxisRaw("Mouse X"), Input.GetAxisRaw("Mouse Y"));
+#endif
+			}
+		}
 		public static Vector2 MoveDirection
 		{
 			get
