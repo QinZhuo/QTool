@@ -482,7 +482,7 @@ namespace QTool
 			if (Application.isPlaying) return;
 			if (obj.IsAsset())
 			{
-				var fileName = obj.name;
+				var fileName = "/" + obj.name;
 				if (obj is Material)
 				{
 					fileName += ".mat";
@@ -503,7 +503,7 @@ namespace QTool
 				{
 					fileName += ".asset";
 				}
-				path += "/" + fileName;
+				path += fileName;
 				path.CheckDirectoryPath();
 				UnityEditor.AssetDatabase.CreateAsset(obj, path);
 			}
