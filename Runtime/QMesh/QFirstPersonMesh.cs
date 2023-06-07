@@ -16,7 +16,7 @@ namespace QTool
 #if UNITY_EDITOR
 			if (gameObject.IsPrefabInstance(out var prefab))
 			{
-				newMesh.sharedMesh.CheckSaveAsset(UnityEditor.AssetDatabase.GetAssetPath(prefab).Replace(".prefab","/"+name+".prefab"));
+				newMesh.sharedMesh.CheckSaveAsset(UnityEditor.AssetDatabase.GetAssetPath(prefab).Replace(".prefab","/"+name+".mesh"));
 			}
 #endif
 		}
