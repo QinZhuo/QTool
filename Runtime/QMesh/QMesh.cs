@@ -416,40 +416,34 @@ namespace QTool
 			QDebug.End("合并网格" + root);
 		}
 
-		public static async Task<SkinnedMeshRenderer> Split(this SkinnedMeshRenderer skinnedMesh, HumanBodyBones humanBodyBone)
+		public static SkinnedMeshRenderer Split(this SkinnedMeshRenderer skinnedMesh, HumanBodyBones humanBodyBone)
 		{
 			QDebug.Begin("分割网格" + skinnedMesh);
 			QMeshData bodyMesh = new QMeshData(skinnedMesh.sharedMesh);
 			QMeshData splitMesh = new QMeshData();
 			splitMesh.bindposes.AddRange(bodyMesh.bindposes);
 			var rootBone = skinnedMesh.GetComponentInParent<Animator>().GetBoneTransform(humanBodyBone);
-			Task[] tasks = new Task[bodyMesh.triangles.Count / 3];
 			for (int i = 0; i < bodyMesh.triangles.Count; i += 3)
 			{
-				tasks[i/3]= Task.Run(() =>
+				var isSplit = true;
+				for (int t = 0; t < 3; t++)
 				{
-					var index = i;
-					var isSplit = true;
+					var weight = bodyMesh.boneWeights[bodyMesh.triangles[i + t]];
+					if (!skinnedMesh.bones[weight.boneIndex0].ParentHas(rootBone))
+					{
+						isSplit = false;
+						break;
+					}
+				}
+				if (isSplit)
+				{
 					for (int t = 0; t < 3; t++)
 					{
-						var weight = bodyMesh.boneWeights[bodyMesh.triangles[index + t]];
-						if (!skinnedMesh.bones[weight.boneIndex0].ParentHas(rootBone))
-						{
-							isSplit = false;
-							break;
-						}
+						splitMesh.AddPoint(bodyMesh, bodyMesh.triangles[i + t]);
+						splitMesh.triangles.Add(splitMesh.vertices.Count - 1);
 					}
-					if (isSplit)
-					{
-						for (int t = 0; t < 3; t++)
-						{
-							splitMesh.AddPoint(bodyMesh, bodyMesh.triangles[index + t]);
-							splitMesh.triangles.Add(splitMesh.vertices.Count - 1);
-						}
-					}
-				});
+				}
 			}
-			await tasks.WaitAllOver();
 			var newSkinnedMesh = skinnedMesh.transform.parent.GetChild(skinnedMesh.name + "_" + humanBodyBone, true).GetComponent<SkinnedMeshRenderer>(true);
 			newSkinnedMesh.bones = skinnedMesh.bones;
 			newSkinnedMesh.SetShareMaterails(skinnedMesh.sharedMaterials);
