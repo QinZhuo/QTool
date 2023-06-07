@@ -13,6 +13,12 @@ namespace QTool
 			var newMesh = bodyMesh.Split(HumanBodyBones.LeftShoulder);
 			newMesh.CombineMeshes(new SkinnedMeshRenderer[] { bodyMesh.Split(HumanBodyBones.RightShoulder) }, true);
 			newMesh.name = nameof(QFirstPersonMesh);
+#if UNITY_EDITOR
+			if (gameObject.IsPrefabInstance(out var prefab))
+			{
+				newMesh.sharedMesh.CheckSaveAsset(UnityEditor.AssetDatabase.GetAssetPath(prefab));
+			}
+#endif
 		}
 	}
 }
