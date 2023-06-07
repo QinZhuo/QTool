@@ -477,6 +477,37 @@ namespace QTool
             return flag;
         }
 		
+		public static void CheckSaveAsset(this UnityEngine.Object obj,string path)
+		{
+			if (Application.isPlaying) return;
+			if (obj.IsAsset())
+			{
+				var fileName = obj.name;
+				if (obj is Material)
+				{
+					fileName += ".mat";
+				}
+				else if(obj is Mesh)
+				{
+					fileName += ".mesh";
+				}
+				else if (obj is Texture2D)
+				{
+					fileName += ".png";
+				}
+				else if (obj is GameObject)
+				{
+					fileName += ".prefab";
+				}
+				else
+				{
+					fileName += ".asset";
+				}
+				path = Path.Combine(path, fileName);
+				path.CheckDirectoryPath();
+				UnityEditor.AssetDatabase.CreateAsset(obj, path);
+			}
+		}
 		public static bool IsAsset(this UnityEngine.Object obj)
 		{
 #if UNITY_EDITOR

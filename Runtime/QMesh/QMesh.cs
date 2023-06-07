@@ -315,7 +315,10 @@ namespace QTool
 			foreach (var skinedMesh in meshList)
 			{
 				uvs.Add(skinedMesh.sharedMesh.uv);
-				mats.AddRange(skinedMesh.sharedMaterials);
+				if (!mergeSubMeshes|| mats.Count == 0)
+				{
+					mats.AddRange(skinedMesh.sharedMaterials);
+				}
 				for (int sub = 0; sub < skinedMesh.sharedMesh.subMeshCount; sub++)
 				{
 					var combine = new CombineInstance();
@@ -327,11 +330,7 @@ namespace QTool
 			}
 			newMesh.CombineMeshes(combineInfos.ToArray(), mergeSubMeshes, true);
 			newMesh.RecalculateNormals();
-			if(mergeSubMeshes&& combineTextures.Length == 0)
-			{
-				combineTextures = new string[] { "_MainTex" };
-			}
-			if (!mergeSubMeshes)
+			if (!mergeSubMeshes || combineTextures.Length == 0)
 			{
 				root.SetShareMaterails(mats.ToArray());
 			}
