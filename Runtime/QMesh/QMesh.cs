@@ -428,10 +428,11 @@ namespace QTool
 			{
 				tasks[i/3]= Task.Run(() =>
 				{
+					var index = i;
 					var isSplit = true;
 					for (int t = 0; t < 3; t++)
 					{
-						var weight = bodyMesh.boneWeights[bodyMesh.triangles[i + t]];
+						var weight = bodyMesh.boneWeights[bodyMesh.triangles[index + t]];
 						if (!skinnedMesh.bones[weight.boneIndex0].ParentHas(rootBone))
 						{
 							isSplit = false;
@@ -442,7 +443,7 @@ namespace QTool
 					{
 						for (int t = 0; t < 3; t++)
 						{
-							splitMesh.AddPoint(bodyMesh, bodyMesh.triangles[i + t]);
+							splitMesh.AddPoint(bodyMesh, bodyMesh.triangles[index + t]);
 							splitMesh.triangles.Add(splitMesh.vertices.Count - 1);
 						}
 					}
