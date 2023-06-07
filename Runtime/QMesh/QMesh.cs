@@ -77,6 +77,7 @@ namespace QTool
 		public Mesh GetMesh()
 		{
 			if (Mesh == null) Mesh = new Mesh();
+			QDebug.Begin(nameof(QMeshData) + GetHashCode());
 			Dirty = false;
 			Mesh.Clear(false);
 			Mesh.vertices = vertices.ToArray();
@@ -101,6 +102,7 @@ namespace QTool
 			{
 				Mesh.tangents = tangents.ToArray();
 			}
+			QDebug.End(nameof(QMeshData) + GetHashCode());
 			return Mesh;
 		}
 		public void CombineVertices(float range)
@@ -282,6 +284,7 @@ namespace QTool
 		}
 		public static void CombineMeshes(this SkinnedMeshRenderer root, SkinnedMeshRenderer[] meshes, params string[] combineTextures)
 		{
+			QDebug.Begin("合并网格" + root);
 			var animator = root.GetComponentInParent<Animator>();
 			var childs = animator.GetComponentsInChildren<Transform>(true);
 
@@ -390,10 +393,12 @@ namespace QTool
 					mesh.gameObject.CheckDestory();
 				}
 			}
+			QDebug.End("合并网格" + root);
 		}
 
 		public static SkinnedMeshRenderer Split(this SkinnedMeshRenderer skinnedMesh, HumanBodyBones humanBodyBone)
 		{
+			QDebug.Begin("分割网格" + skinnedMesh);
 			var mesh = skinnedMesh.sharedMesh;
 			QMeshData splitMesh = new QMeshData();
 			QMeshData bodyMesh = new QMeshData();
@@ -469,6 +474,7 @@ namespace QTool
 			newSkinnedMesh.bones = skinnedMesh.bones;
 			newSkinnedMesh.SetShareMaterails(skinnedMesh.sharedMaterials);
 			newSkinnedMesh.sharedMesh = splitMesh.GetMesh();
+			QDebug.End("分割网格" + skinnedMesh);
 			return newSkinnedMesh;
 		}
 		public static void Split(this MeshFilter meshFilter, Vector3 point, Vector3 normal, bool fill = false)
