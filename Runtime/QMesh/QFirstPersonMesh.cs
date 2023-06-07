@@ -3,25 +3,28 @@ using System.Collections.Generic;
 using UnityEngine;
 namespace QTool
 {
-	[RequireComponent(typeof(Animator))]
+	[RequireComponent(typeof(SkinnedMeshRenderer))]
 	public class QFirstPersonMesh : MonoBehaviour
 	{
-
-		[QName("分离第一人称模型")]
-		public void SplitHandMesh()
+		[QName("分割第一人称模型")]
+		public void SplitMesh()
 		{
-			var bodyMesh = GetComponentInChildren<SkinnedMeshRenderer>();
+			var bodyMesh = GetComponent<SkinnedMeshRenderer>();
 			var handMesh = bodyMesh.Split(HumanBodyBones.LeftShoulder);
 			handMesh.CombineMeshes(new SkinnedMeshRenderer[] { bodyMesh.Split(HumanBodyBones.RightShoulder) }, true);
-			handMesh.name = nameof(QFirstPersonMesh);
-			var headMesh=bodyMesh.Split(HumanBodyBones.Head);
-			bodyMesh.CombineMeshes(new SkinnedMeshRenderer[] { handMesh, headMesh });
-//#if UNITY_EDITOR
-//			if (gameObject.IsPrefabInstance(out var prefab))
-//			{
-//				handMesh.sharedMesh.CheckSaveAsset(UnityEditor.AssetDatabase.GetAssetPath(prefab).Replace(".prefab","/"+name+".mesh"));
-//			}
-//#endif
+			var headMesh = bodyMesh.Split(HumanBodyBones.Head);
+			headMesh.name = "头部";
+			bodyMesh.name = "身体";
+			handMesh.name = "手部";
+#if UNITY_EDITOR
+			if (gameObject.IsPrefabInstance(out var prefab))
+			{
+				var path = UnityEditor.AssetDatabase.GetAssetPath(prefab);
+				headMesh.sharedMesh.CheckSaveAsset(path.Replace(".prefab", "/头部.mesh"));
+				bodyMesh.sharedMesh.CheckSaveAsset(path.Replace(".prefab", "/身体.mesh"));
+				handMesh.sharedMesh.CheckSaveAsset(path.Replace(".prefab", "/手部.mesh"));
+			}
+#endif
 		}
 	}
 }
