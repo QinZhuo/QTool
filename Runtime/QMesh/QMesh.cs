@@ -424,7 +424,7 @@ namespace QTool
 					if (isSplit)
 					{
 						targetMesh.AddPoint(mesh, mesh.triangles[i + t]);
-						targetMesh.triangles.Add(targetMesh.triangles.Count);
+						targetMesh.triangles.Add(targetMesh.vertices.Count-1);
 					}
 				}
 			}
