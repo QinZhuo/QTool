@@ -482,28 +482,27 @@ namespace QTool
 			if (Application.isPlaying) return;
 			if (!obj.IsAsset())
 			{
-				var fileName = "/" + obj.name;
+				path = Path.GetDirectoryName(path) + "/" + obj.name;
 				if (obj is Material)
 				{
-					fileName += ".mat";
+					path += ".mat";
 				}
 				else if(obj is Mesh)
 				{
-					fileName += ".mesh";
+					path += ".mesh";
 				}
 				else if (obj is Texture2D)
 				{
-					fileName += ".png";
+					path += ".png";
 				}
 				else if (obj is GameObject)
 				{
-					fileName += ".prefab";
+					path += ".prefab";
 				}
 				else
 				{
-					fileName += ".asset";
+					path += ".asset";
 				}
-				path += fileName;
 				path.CheckDirectoryPath();
 				UnityEditor.AssetDatabase.CreateAsset(obj, path);
 			}
