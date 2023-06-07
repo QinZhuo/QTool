@@ -378,6 +378,13 @@ namespace QTool
 			newMesh.bindposes = bindppses.ToArray();
 			#endregion
 			root.sharedMesh = newMesh;
+			foreach (var mesh in meshes)
+			{
+				if (mesh.transform.parent == root.transform.parent&&mesh!=root)
+				{
+					mesh.gameObject.CheckDestory();
+				}
+			}
 		}
 
 		public static SkinnedMeshRenderer Split(this SkinnedMeshRenderer skinnedMesh, HumanBodyBones humanBodyBone)
@@ -453,9 +460,9 @@ namespace QTool
 				}
 			}
 			skinnedMesh.sharedMesh = bodyMesh.GetMesh();
-			var newSkinnedMesh = skinnedMesh.transform.parent.GetChild(skinnedMesh.name + "_" + humanBodyBone,true).GetComponent<SkinnedMeshRenderer>(true);
+			var newSkinnedMesh = skinnedMesh.transform.parent.GetChild(skinnedMesh.name + "_" + humanBodyBone, true).GetComponent<SkinnedMeshRenderer>(true);
 			newSkinnedMesh.bones = skinnedMesh.bones;
-			newSkinnedMesh.materials = skinnedMesh.materials;
+			newSkinnedMesh.SetShareMaterails(skinnedMesh.sharedMaterials);
 			newSkinnedMesh.sharedMesh = splitMesh.GetMesh();
 			return newSkinnedMesh;
 		}
