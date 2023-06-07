@@ -323,12 +323,12 @@ namespace QTool
 				{
 					var combine = new CombineInstance();
 					combine.mesh = skinedMesh.sharedMesh;
-					combine.transform = Matrix4x4.identity;
+					combine.transform = skinedMesh.transform.localToWorldMatrix;
 					combine.subMeshIndex = sub;
 					combineInfos.Add(combine);
 				}
 			}
-			newMesh.CombineMeshes(combineInfos.ToArray(), mergeSubMeshes, false);
+			newMesh.CombineMeshes(combineInfos.ToArray(), mergeSubMeshes, true);
 			newMesh.RecalculateNormals();
 			if (!mergeSubMeshes || combineTextures.Length == 0)
 			{
