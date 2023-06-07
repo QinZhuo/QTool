@@ -287,7 +287,7 @@ namespace QTool
 
 			#region 合并Mesh	
 			var mats = new QList<Material>();
-			root.sharedMesh = new Mesh();
+			var newMesh = new Mesh();
 			var combineInfos = new List<CombineInstance>();
 			var uvs = new List<Vector2[]>();
 			foreach (var skinedMesh in meshes)
@@ -303,8 +303,8 @@ namespace QTool
 					combineInfos.Add(combine);
 				}
 			}
-			root.sharedMesh.CombineMeshes(combineInfos.ToArray(), combineTextures.Length != 0, true);
-			root.sharedMesh.RecalculateNormals();
+			newMesh.CombineMeshes(combineInfos.ToArray(), combineTextures.Length != 0, true);
+			newMesh.RecalculateNormals();
 			if (combineTextures.Length == 0)
 			{
 				root.SetShareMaterails(mats.ToArray());
@@ -346,7 +346,7 @@ namespace QTool
 						combineUV[index++] = new Vector2(Mathf.Lerp(UVRects[i].xMin, UVRects[i].xMax, uv.x), Mathf.Lerp(UVRects[i].yMin, UVRects[i].yMax, uv.y));
 					}
 				}
-				root.sharedMesh.uv = combineUV.ToArray();
+				newMesh.uv = combineUV.ToArray();
 				root.SetShareMaterails(combineMaterial);
 			}
 			#endregion
@@ -374,9 +374,10 @@ namespace QTool
 				}
 			}
 			root.bones = bones.ToArray();
-			root.sharedMesh.boneWeights = boneWeights.ToArray();
-			root.sharedMesh.bindposes = bindppses.ToArray();
+			newMesh.boneWeights = boneWeights.ToArray();
+			newMesh.bindposes = bindppses.ToArray();
 			#endregion
+			root.sharedMesh = newMesh;
 		}
 
 		public static SkinnedMeshRenderer Split(this SkinnedMeshRenderer skinnedMesh, HumanBodyBones humanBodyBone)
