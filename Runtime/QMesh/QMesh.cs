@@ -290,7 +290,12 @@ namespace QTool
 			var newMesh = new Mesh();
 			var combineInfos = new List<CombineInstance>();
 			var uvs = new List<Vector2[]>();
-			foreach (var skinedMesh in meshes)
+			var meshList = new List<SkinnedMeshRenderer>(meshes);
+			if (root.sharedMesh != null)
+			{
+				meshList.Add(root);
+			}
+			foreach (var skinedMesh in meshList)
 			{
 				uvs.Add(skinedMesh.sharedMesh.uv);
 				mats.AddRange(skinedMesh.sharedMaterials);
@@ -299,19 +304,6 @@ namespace QTool
 					var combine = new CombineInstance();
 					combine.mesh = skinedMesh.sharedMesh;
 					combine.transform = skinedMesh.localToWorldMatrix;
-					combine.subMeshIndex = sub;
-					combineInfos.Add(combine);
-				}
-			}
-			if (root.sharedMesh != null)
-			{
-				uvs.Add(root.sharedMesh.uv);
-				mats.AddRange(root.sharedMaterials);
-				for (int sub = 0; sub < root.sharedMesh.subMeshCount; sub++)
-				{
-					var combine = new CombineInstance();
-					combine.mesh = root.sharedMesh;
-					combine.transform = root.localToWorldMatrix;
 					combine.subMeshIndex = sub;
 					combineInfos.Add(combine);
 				}
@@ -368,7 +360,7 @@ namespace QTool
 			var bones = new List<Transform>();
 			var boneWeights = new List<BoneWeight>();
 			var bindppses = new List<Matrix4x4>();
-			foreach (var skinedMesh in meshes)
+			foreach (var skinedMesh in meshList)
 			{
 				foreach (var weight in skinedMesh.sharedMesh.boneWeights)
 				{
@@ -391,7 +383,7 @@ namespace QTool
 			newMesh.bindposes = bindppses.ToArray();
 			#endregion
 			root.sharedMesh = newMesh;
-			foreach (var mesh in meshes)
+			foreach (var mesh in meshList)
 			{
 				if (mesh.transform.parent == root.transform.parent&&mesh!=root)
 				{
