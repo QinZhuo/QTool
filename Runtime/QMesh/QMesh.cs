@@ -415,7 +415,8 @@ namespace QTool
 				var isSplit = true;
 				for (int t = 0; t < 3; t++)
 				{
-					if (!splitBones.Contains(skinnedMesh.bones[mesh.boneWeights[mesh.triangles[i + t]].boneIndex0]))
+					var weight = mesh.boneWeights[mesh.triangles[i + t]];
+					if (!splitBones.Contains(skinnedMesh.bones[weight.boneIndex0]) || weight.weight0 < 0.5f)
 					{
 						isSplit = false;
 						break;
