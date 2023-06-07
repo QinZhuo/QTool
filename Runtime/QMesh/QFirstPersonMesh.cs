@@ -9,7 +9,7 @@ namespace QTool
 		[QName("分割第一人称模型")]
 		public void SplitMesh()
 		{
-			var bodyMesh = GetComponent<SkinnedMeshRenderer>();
+			var bodyMesh = GetComponentInChildren<SkinnedMeshRenderer>();
 			var handMesh = bodyMesh.Split(HumanBodyBones.LeftShoulder);
 			handMesh.CombineMeshes(new SkinnedMeshRenderer[] { bodyMesh.Split(HumanBodyBones.RightShoulder) }, true);
 			var headMesh = bodyMesh.Split(HumanBodyBones.Head);

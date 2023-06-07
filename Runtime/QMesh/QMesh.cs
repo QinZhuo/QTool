@@ -429,7 +429,7 @@ namespace QTool
 				for (int t = 0; t < 3; t++)
 				{
 					var weight = mesh.boneWeights[mesh.triangles[i + t]];
-					if (!QRectTransformTool.ParentHas(skinnedMesh.bones[(int)weight.boneIndex0], (Transform)rootBone))
+					if (!QRectTransformTool.ParentHas(skinnedMesh.bones[weight.boneIndex0],rootBone))
 					{
 						isSplit = false;
 						break;
