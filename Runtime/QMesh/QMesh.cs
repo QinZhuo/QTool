@@ -417,7 +417,7 @@ namespace QTool
 				for (int t = 0; t < 3; t++)
 				{
 					var weight = mesh.boneWeights[mesh.triangles[i + t]];
-					if (skinnedMesh.bones[weight.boneIndex0].ParentHas(rootBone))
+					if (!skinnedMesh.bones[weight.boneIndex0].ParentHas(rootBone))
 					{
 						isSplit = false;
 						break;
