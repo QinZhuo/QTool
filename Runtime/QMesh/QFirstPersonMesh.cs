@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 namespace QTool
 {
-	[RequireComponent(typeof(SkinnedMeshRenderer))]
+	[RequireComponent(typeof(Animator))]
 	public class QFirstPersonMesh : MonoBehaviour
 	{
 		[QName("分割第一人称模型")]
