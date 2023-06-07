@@ -404,34 +404,27 @@ namespace QTool
 			QMeshData bodyMesh = new QMeshData();
 			splitMesh.bindposes.AddRange(mesh.bindposes);
 			bodyMesh.bindposes.AddRange(mesh.bindposes);
-			bool[] isSplit = new bool[mesh.vertices.Length];
 			var bones = new List<Transform>(skinnedMesh.bones);
 			var bodyBone = skinnedMesh.GetComponentInParent<Animator>().GetBoneTransform(humanBodyBone);
 			bones.RemoveAll((bone) => !bone.ParentHas(bodyBone));
-			for (int i = 0; i < mesh.triangles.Length; i+=3)
+			for (int i = 0; i < mesh.triangles.Length; i += 3)
 			{
-				int a = mesh.triangles[i];
-				int b = mesh.triangles[i + 1];
-				int c = mesh.triangles[i + 2];
-
-				bool aIsSplit = bones.Contains(skinnedMesh.bones[mesh.boneWeights[i ].boneIndex0]);
-				bool bIsSplit = bones.Contains(skinnedMesh.bones[mesh.boneWeights[i + 1].boneIndex0]);
-				bool cIsSplit = bones.Contains(skinnedMesh.bones[mesh.boneWeights[i + 2].boneIndex0]);
-
-				if (aIsSplit && bIsSplit && cIsSplit)
+				var isSplit = true;
+				for (int t = 0; t < 3; t++)
 				{
-					for (int t = 0; t < 3; t++)
+					if (!bones.Contains(skinnedMesh.bones[mesh.boneWeights[mesh.triangles[i + t]].boneIndex0]))
 					{
-						splitMesh.AddPoint(mesh, i + t);
-						splitMesh.triangles.Add(splitMesh.triangles.Count);
+						isSplit = false;
+						break;
 					}
 				}
-				else
+				var targetMesh = isSplit?splitMesh:bodyMesh;
+				for (int t = 0; t < 3; t++)
 				{
-					for (int t = 0; t < 3; t++)
+					if (isSplit)
 					{
-						bodyMesh.AddPoint(mesh, i + t);
-						bodyMesh.triangles.Add(bodyMesh.triangles.Count);
+						targetMesh.AddPoint(mesh, i + t);
+						targetMesh.triangles.Add(targetMesh.triangles.Count);
 					}
 				}
 			}
