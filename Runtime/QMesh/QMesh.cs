@@ -414,28 +414,39 @@ namespace QTool
 			QDebug.End("合并网格" + root);
 		}
 
-		public static SkinnedMeshRenderer Split(this SkinnedMeshRenderer skinnedMesh, HumanBodyBones humanBodyBone)
+		public static SkinnedMeshRenderer SplitFirstPersonMesh(this SkinnedMeshRenderer skinnedMesh)
 		{
 			QDebug.Begin("分割网格" + skinnedMesh);
 			var mesh = skinnedMesh.sharedMesh;
 			QMeshData bodyMesh = new QMeshData();
-			QMeshData splitMesh = new QMeshData();
+			QMeshData headMesh = new QMeshData();
+			QMeshData handMesh = new QMeshData();
 			bodyMesh.bindposes.AddRange(mesh.bindposes);
-			splitMesh.bindposes.AddRange(mesh.bindposes);
-			var rootBone = skinnedMesh.GetComponentInParent<Animator>().GetBoneTransform(humanBodyBone);
+			headMesh.bindposes.AddRange(mesh.bindposes);
+			handMesh.bindposes.AddRange(mesh.bindposes);
+			var handbones = new List<Transform>();
+			var animator = skinnedMesh.GetComponentInParent<Animator>();
+			handbones.AddRange(animator.GetBoneTransform(HumanBodyBones.LeftShoulder).GetComponentsInChildren<Transform>());
+			handbones.AddRange(animator.GetBoneTransform(HumanBodyBones.RightShoulder).GetComponentsInChildren<Transform>());
+			var headbones = new List<Transform>(animator.GetBoneTransform(HumanBodyBones.Neck).GetComponentsInChildren<Transform>());
 			for (int i = 0; i < mesh.triangles.Length; i += 3)
 			{
-				var isSplit = true;
+				var targetMesh = bodyMesh;
 				for (int t = 0; t < 3; t++)
 				{
 					var weight = mesh.boneWeights[mesh.triangles[i + t]];
-					if (!QRectTransformTool.ParentHas(skinnedMesh.bones[weight.boneIndex0],rootBone))
+					var bone = skinnedMesh.bones[weight.boneIndex0];
+					if (headbones.Contains(bone))
 					{
-						isSplit = false;
+						targetMesh = headMesh;
+						break;
+					}
+					else if(handbones.Contains(bone))
+					{
+						targetMesh = handMesh;
 						break;
 					}
 				}
-				var targetMesh = isSplit ? splitMesh : bodyMesh;
 				for (int t = 0; t < 3; t++)
 				{
 					targetMesh.AddPoint(mesh, mesh.triangles[i + t]);
@@ -443,12 +454,18 @@ namespace QTool
 				}
 			}
 			skinnedMesh.sharedMesh = bodyMesh.GetMesh();
-			var newSkinnedMesh = QTool.GetChild(skinnedMesh.transform.parent, (skinnedMesh.name + "_" + humanBodyBone), true).GetComponent<SkinnedMeshRenderer>(true);
-			newSkinnedMesh.bones = skinnedMesh.bones;
-			newSkinnedMesh.SetShareMaterails(skinnedMesh.sharedMaterials);
-			newSkinnedMesh.sharedMesh = splitMesh.GetMesh();
+			var head = QTool.GetChild(skinnedMesh.transform.parent, "头部", true).GetComponent<SkinnedMeshRenderer>(true);
+			head.bones = skinnedMesh.bones;
+			head.SetShareMaterails(skinnedMesh.sharedMaterials);
+			head.sharedMesh = headMesh.GetMesh();
+			var hand = QTool.GetChild(skinnedMesh.transform.parent,"手部", true).GetComponent<SkinnedMeshRenderer>(true);
+			hand.bones = skinnedMesh.bones;
+			hand.SetShareMaterails(skinnedMesh.sharedMaterials);
+			hand.sharedMesh = handMesh.GetMesh();
+			var newHand = GameObject.Instantiate(hand, hand.transform.parent);
 			QDebug.End("分割网格" + skinnedMesh);
-			return newSkinnedMesh;
+			skinnedMesh.CombineMeshes(new SkinnedMeshRenderer[] { hand, head });
+			return newHand;
 		}
 		public static void Split(this MeshFilter meshFilter, Vector3 point, Vector3 normal, bool fill = false)
 		{
