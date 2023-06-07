@@ -379,13 +379,13 @@ namespace QTool
 			#endregion
 		}
 
-		public static (Mesh, Mesh) Split(this SkinnedMeshRenderer skinnedMesh, HumanBodyBones humanBodyBone)
+		public static SkinnedMeshRenderer Split(this SkinnedMeshRenderer skinnedMesh, HumanBodyBones humanBodyBone)
 		{
 			var mesh = skinnedMesh.sharedMesh;
+			QMeshData splitMesh = new QMeshData();
 			QMeshData bodyMesh = new QMeshData();
-			QMeshData otherMesh = new QMeshData();
+			splitMesh.bindposes.AddRange(mesh.bindposes);
 			bodyMesh.bindposes.AddRange(mesh.bindposes);
-			otherMesh.bindposes.AddRange(mesh.bindposes);
 			bool[] isBody = new bool[mesh.vertices.Length];
 			int[] newTriangles = new int[mesh.vertices.Length];
 			var bones = new List<Transform>(skinnedMesh.bones);
@@ -397,13 +397,13 @@ namespace QTool
 				isBody[i] = bones.Contains(skinnedMesh.bones[mesh.boneWeights[i].boneIndex0]);
 				if (isBody[i])
 				{
-					newTriangles[i] = bodyMesh.vertices.Count;
-					bodyMesh.AddPoint(mesh, i);
+					newTriangles[i] = splitMesh.vertices.Count;
+					splitMesh.AddPoint(mesh, i);
 				}
 				else
 				{
-					newTriangles[i] = otherMesh.vertices.Count;
-					otherMesh.AddPoint(mesh, i);
+					newTriangles[i] = bodyMesh.vertices.Count;
+					bodyMesh.AddPoint(mesh, i);
 				}
 			}
 			int triangleCount = mesh.triangles.Length / 3;
@@ -418,15 +418,15 @@ namespace QTool
 				bool cIsUp = isBody[c];
 				if (aIsUp && bIsUp && cIsUp)
 				{
-					bodyMesh.triangles.Add(newTriangles[a]);
-					bodyMesh.triangles.Add(newTriangles[b]);
-					bodyMesh.triangles.Add(newTriangles[c]);
+					splitMesh.triangles.Add(newTriangles[a]);
+					splitMesh.triangles.Add(newTriangles[b]);
+					splitMesh.triangles.Add(newTriangles[c]);
 				}
 				else if (!aIsUp && !bIsUp && !cIsUp)
 				{
-					otherMesh.triangles.Add(newTriangles[a]);
-					otherMesh.triangles.Add(newTriangles[b]);
-					otherMesh.triangles.Add(newTriangles[c]);
+					bodyMesh.triangles.Add(newTriangles[a]);
+					bodyMesh.triangles.Add(newTriangles[b]);
+					bodyMesh.triangles.Add(newTriangles[c]);
 				}
 				else
 				{
@@ -451,7 +451,10 @@ namespace QTool
 					}
 				}
 			}
-			return (bodyMesh.GetMesh(), otherMesh.GetMesh());
+			skinnedMesh.sharedMesh = bodyMesh.GetMesh();
+			var newSkinnedMesh = skinnedMesh.transform.parent.GetChild(skinnedMesh.name + "_" + humanBodyBone).GetComponent<SkinnedMeshRenderer>(true);
+			newSkinnedMesh.sharedMesh = splitMesh.GetMesh();
+			return newSkinnedMesh;
 		}
 		public static void Split(this MeshFilter meshFilter, Vector3 point, Vector3 normal, bool fill = false)
 		{

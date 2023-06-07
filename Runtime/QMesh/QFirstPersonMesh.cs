@@ -9,14 +9,12 @@ namespace QTool
 		[QName("生成第一人称模型")]
 		public void SplitMesh()
 		{
-			var skinnedMesh = GetComponentInChildren<SkinnedMeshRenderer>();
-			var (headMesh,bodyMesh)= skinnedMesh.Split(HumanBodyBones.Neck);
-			skinnedMesh.sharedMesh = bodyMesh.CombineMeshes(headMesh);
-			Mesh leftMesh, rightMesh;
-			(leftMesh, bodyMesh) = skinnedMesh.Split(HumanBodyBones.LeftUpperArm);
-			skinnedMesh.sharedMesh = bodyMesh;
-			(rightMesh, bodyMesh) = skinnedMesh.Split(HumanBodyBones.RightUpperArm);
-			skinnedMesh.sharedMesh = bodyMesh.CombineMeshes(leftMesh.CombineMeshes(rightMesh,true));
+			var bodyMesh = GetComponentInChildren<SkinnedMeshRenderer>();
+			var headMesh= bodyMesh.Split(HumanBodyBones.Neck);
+			bodyMesh.CombineMeshes(new SkinnedMeshRenderer[] { headMesh });
+			var leftMesh = bodyMesh.Split(HumanBodyBones.LeftUpperArm);
+			var rightMesh = bodyMesh.Split(HumanBodyBones.RightUpperArm);
+			bodyMesh.CombineMeshes(new SkinnedMeshRenderer[] { leftMesh,rightMesh });
 		}
 	}
 }
