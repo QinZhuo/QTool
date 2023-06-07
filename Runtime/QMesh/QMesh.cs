@@ -404,68 +404,34 @@ namespace QTool
 			QMeshData bodyMesh = new QMeshData();
 			splitMesh.bindposes.AddRange(mesh.bindposes);
 			bodyMesh.bindposes.AddRange(mesh.bindposes);
-			bool[] isBody = new bool[mesh.vertices.Length];
-			int[] newTriangles = new int[mesh.vertices.Length];
+			bool[] isSplit = new bool[mesh.vertices.Length];
 			var bones = new List<Transform>(skinnedMesh.bones);
 			var bodyBone = skinnedMesh.GetComponentInParent<Animator>().GetBoneTransform(humanBodyBone);
 			bones.RemoveAll((bone) => !bone.ParentHas(bodyBone));
-			for (int i = 0; i < newTriangles.Length; i++)
+			for (int i = 0; i < mesh.triangles.Length; i+=3)
 			{
-				var vert = mesh.vertices[i];
-				isBody[i] = bones.Contains(skinnedMesh.bones[mesh.boneWeights[i].boneIndex0]);
-				if (isBody[i])
-				{
-					newTriangles[i] = splitMesh.vertices.Count;
-					splitMesh.AddPoint(mesh, i);
-				}
-				else
-				{
-					newTriangles[i] = bodyMesh.vertices.Count;
-					bodyMesh.AddPoint(mesh, i);
-				}
-			}
-			int triangleCount = mesh.triangles.Length / 3;
-			for (int i = 0; i < triangleCount; i++)
-			{
-				int a = mesh.triangles[i * 3];
-				int b = mesh.triangles[i * 3 + 1];
-				int c = mesh.triangles[i * 3 + 2];
+				int a = mesh.triangles[i];
+				int b = mesh.triangles[i + 1];
+				int c = mesh.triangles[i + 2];
 
-				bool aIsUp = isBody[a];
-				bool bIsUp = isBody[b];
-				bool cIsUp = isBody[c];
-				if (aIsUp && bIsUp && cIsUp)
+				bool aIsSplit = bones.Contains(skinnedMesh.bones[mesh.boneWeights[i ].boneIndex0]);
+				bool bIsSplit = bones.Contains(skinnedMesh.bones[mesh.boneWeights[i + 1].boneIndex0]);
+				bool cIsSplit = bones.Contains(skinnedMesh.bones[mesh.boneWeights[i + 2].boneIndex0]);
+
+				if (aIsSplit && bIsSplit && cIsSplit)
 				{
-					splitMesh.triangles.Add(newTriangles[a]);
-					splitMesh.triangles.Add(newTriangles[b]);
-					splitMesh.triangles.Add(newTriangles[c]);
-				}
-				else if (!aIsUp && !bIsUp && !cIsUp)
-				{
-					bodyMesh.triangles.Add(newTriangles[a]);
-					bodyMesh.triangles.Add(newTriangles[b]);
-					bodyMesh.triangles.Add(newTriangles[c]);
+					for (int t = 0; t < 3; t++)
+					{
+						splitMesh.AddPoint(mesh, i + t);
+						splitMesh.triangles.Add(splitMesh.triangles.Count);
+					}
 				}
 				else
 				{
-					int newA, newB, newC;
-					if (bIsUp == cIsUp && aIsUp != bIsUp)
+					for (int t = 0; t < 3; t++)
 					{
-						newA = a;
-						newB = b;
-						newC = c;
-					}
-					else if (cIsUp == aIsUp && bIsUp != cIsUp)
-					{
-						newA = b;
-						newB = c;
-						newC = a;
-					}
-					else
-					{
-						newA = c;
-						newB = a;
-						newC = b;
+						bodyMesh.AddPoint(mesh, i + t);
+						bodyMesh.triangles.Add(bodyMesh.triangles.Count);
 					}
 				}
 			}
