@@ -12,7 +12,7 @@ namespace QTool
 			var bodyMesh = GetComponentInChildren<SkinnedMeshRenderer>();
 			var handMesh = bodyMesh.Split(HumanBodyBones.LeftShoulder);
 			handMesh.CombineMeshes(new SkinnedMeshRenderer[] { bodyMesh.Split(HumanBodyBones.RightShoulder) }, true);
-			var headMesh = bodyMesh.Split(HumanBodyBones.Head);
+			var headMesh = bodyMesh.Split(HumanBodyBones.Neck);
 			headMesh.name = "头部";
 			bodyMesh.name = "身体";
 			handMesh.name = "手部";
