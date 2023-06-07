@@ -13,11 +13,8 @@ namespace QTool
 			var headMesh= bodyMesh.Split(HumanBodyBones.Neck);
 			var leftMesh = bodyMesh.Split(HumanBodyBones.LeftShoulder);
 			var rightMesh = bodyMesh.Split(HumanBodyBones.RightShoulder);
-			var lastPos = transform.position;
-			transform.position = Vector3.zero;
 			leftMesh.CombineMeshes(new SkinnedMeshRenderer[] { rightMesh }, true);
 			bodyMesh.CombineMeshes(new SkinnedMeshRenderer[] { headMesh, leftMesh });
-			transform.position = lastPos;
 		}
 	}
 }

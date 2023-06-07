@@ -76,6 +76,7 @@ namespace QTool
 		}
 		public Mesh GetMesh()
 		{
+			if (triangles.Count == 0 || vertices.Count == 0) return null;
 			if (Mesh == null) Mesh = new Mesh();
 			QDebug.Begin(nameof(QMeshData) + GetHashCode());
 			Dirty = false;
@@ -288,6 +289,8 @@ namespace QTool
 			var animator = root.GetComponentInParent<Animator>();
 			var childs = animator.GetComponentsInChildren<Transform>(true);
 
+			var lastPos = animator.transform.position;
+			animator.transform.position = Vector3.zero;
 			#region 合并Mesh	
 			var mats = new QList<Material>();
 			var newMesh = new Mesh();
@@ -390,6 +393,7 @@ namespace QTool
 			newMesh.bindposes = bindppses.ToArray();
 			#endregion
 			root.sharedMesh = newMesh;
+			animator.transform.position = lastPos;
 			foreach (var mesh in meshList)
 			{
 				if (mesh.transform.parent == root.transform.parent&&mesh!=root)
