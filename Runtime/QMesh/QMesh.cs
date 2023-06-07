@@ -418,14 +418,11 @@ namespace QTool
 						break;
 					}
 				}
-				var targetMesh = isSplit?splitMesh:bodyMesh;
+				var targetMesh = isSplit ? splitMesh : bodyMesh;
 				for (int t = 0; t < 3; t++)
 				{
-					if (isSplit)
-					{
-						targetMesh.AddPoint(mesh, mesh.triangles[i + t]);
-						targetMesh.triangles.Add(targetMesh.vertices.Count-1);
-					}
+					targetMesh.AddPoint(mesh, mesh.triangles[i + t]);
+					targetMesh.triangles.Add(targetMesh.vertices.Count - 1);
 				}
 			}
 			skinnedMesh.sharedMesh = bodyMesh.GetMesh();
