@@ -323,7 +323,7 @@ namespace QTool
 				{
 					var combine = new CombineInstance();
 					combine.mesh = skinedMesh.sharedMesh;
-					combine.transform = skinedMesh.localToWorldMatrix;
+					combine.transform = skinedMesh.transform.localToWorldMatrix;
 					combine.subMeshIndex = sub;
 					combineInfos.Add(combine);
 				}
