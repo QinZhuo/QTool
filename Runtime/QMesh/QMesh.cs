@@ -408,7 +408,8 @@ namespace QTool
 			QMeshData bodyMesh = new QMeshData();
 			splitMesh.bindposes.AddRange(mesh.bindposes);
 			bodyMesh.bindposes.AddRange(mesh.bindposes);
-			var splitBones = new List<Transform>(skinnedMesh.GetComponentInParent<Animator>().GetBoneTransform(humanBodyBone).GetComponentsInChildren<Transform>());
+			var rootBone = skinnedMesh.GetComponentInParent<Animator>().GetBoneTransform(humanBodyBone);
+			var splitBones = new List<Transform>(rootBone.GetComponentsInChildren<Transform>());
 			QDebug.Begin("分割顶点 " + splitBones.Count);
 			for (int i = 0; i < mesh.triangles.Length; i += 3)
 			{
@@ -416,7 +417,7 @@ namespace QTool
 				for (int t = 0; t < 3; t++)
 				{
 					var weight = mesh.boneWeights[mesh.triangles[i + t]];
-					if (!splitBones.Contains(skinnedMesh.bones[weight.boneIndex0]) || weight.weight0 <0.6f)
+					if (skinnedMesh.bones[weight.boneIndex0].ParentHas(rootBone))
 					{
 						isSplit = false;
 						break;
