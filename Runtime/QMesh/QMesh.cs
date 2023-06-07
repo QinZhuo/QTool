@@ -424,11 +424,10 @@ namespace QTool
 			bodyMesh.bindposes.AddRange(mesh.bindposes);
 			headMesh.bindposes.AddRange(mesh.bindposes);
 			handMesh.bindposes.AddRange(mesh.bindposes);
-			var handbones = new List<Transform>();
 			var animator = skinnedMesh.GetComponentInParent<Animator>();
-			handbones.AddRange(animator.GetBoneTransform(HumanBodyBones.LeftShoulder).GetComponentsInChildren<Transform>());
-			handbones.AddRange(animator.GetBoneTransform(HumanBodyBones.RightShoulder).GetComponentsInChildren<Transform>());
-			var headbones = new List<Transform>(animator.GetBoneTransform(HumanBodyBones.Neck).GetComponentsInChildren<Transform>());
+			var headbone = animator.GetBoneTransform(HumanBodyBones.Neck);
+			var leftShoulder = animator.GetBoneTransform(HumanBodyBones.LeftShoulder);
+			var rightShoulder = animator.GetBoneTransform(HumanBodyBones.RightShoulder);
 			for (int i = 0; i < mesh.triangles.Length; i += 3)
 			{
 				var targetMesh = bodyMesh;
@@ -436,12 +435,12 @@ namespace QTool
 				{
 					var weight = mesh.boneWeights[mesh.triangles[i + t]];
 					var bone = skinnedMesh.bones[weight.boneIndex0];
-					if (headbones.Contains(bone))
+					if (bone.ParentHas(headbone))
 					{
 						targetMesh = headMesh;
 						break;
 					}
-					else if(handbones.Contains(bone))
+					else if (bone.ParentHas(leftShoulder, rightShoulder))
 					{
 						targetMesh = handMesh;
 						break;
@@ -458,7 +457,7 @@ namespace QTool
 			head.bones = skinnedMesh.bones;
 			head.SetShareMaterails(skinnedMesh.sharedMaterials);
 			head.sharedMesh = headMesh.GetMesh();
-			var hand = QTool.GetChild(skinnedMesh.transform.parent,"手部", true).GetComponent<SkinnedMeshRenderer>(true);
+			var hand = QTool.GetChild(skinnedMesh.transform.parent, "手部", true).GetComponent<SkinnedMeshRenderer>(true);
 			hand.bones = skinnedMesh.bones;
 			hand.SetShareMaterails(skinnedMesh.sharedMaterials);
 			hand.sharedMesh = handMesh.GetMesh();

@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using System.Threading.Tasks;
+using System.Linq;
 
 namespace QTool
 {
@@ -170,19 +170,19 @@ namespace QTool
 		{
 			return rectTransform.transform.position.x + rectTransform.UpRightRectOffset().x;
 		}
-		public static bool ParentHas(this Transform transform, Transform target)
+		public static bool ParentHas(this Transform transform,params Transform[] targets)
 		{
 			if (transform.parent == null)
 			{
 				return false;
 			}
-			else if (transform.parent == target)
+			else if (targets.Contains(transform.parent))
 			{
 				return true;
 			}
 			else
 			{
-				return transform.parent.ParentHas(target);
+				return transform.parent.ParentHas(targets);
 			}
 		}
 	}
