@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 namespace QTool
 {
@@ -404,7 +405,7 @@ namespace QTool
 			QDebug.End("合并网格" + root);
 		}
 
-		public static SkinnedMeshRenderer Split(this SkinnedMeshRenderer skinnedMesh, HumanBodyBones humanBodyBone)
+		public static async Task<SkinnedMeshRenderer> Split(this SkinnedMeshRenderer skinnedMesh, HumanBodyBones humanBodyBone)
 		{
 			QDebug.Begin("分割网格" + skinnedMesh);
 			var mesh = skinnedMesh.sharedMesh;
@@ -413,28 +414,30 @@ namespace QTool
 			splitMesh.bindposes.AddRange(mesh.bindposes);
 			bodyMesh.bindposes.AddRange(mesh.bindposes);
 			var rootBone = skinnedMesh.GetComponentInParent<Animator>().GetBoneTransform(humanBodyBone);
-			var splitBones = new List<Transform>(rootBone.GetComponentsInChildren<Transform>());
-			QDebug.Begin("分割顶点 " + splitBones.Count);
+			Task[] tasks = new Task[mesh.triangles.Length / 3];
 			for (int i = 0; i < mesh.triangles.Length; i += 3)
 			{
-				var isSplit = true;
-				for (int t = 0; t < 3; t++)
+				tasks[i/3]= Task.Run(() =>
 				{
-					var weight = mesh.boneWeights[mesh.triangles[i + t]];
-				//	if (!skinnedMesh.bones[weight.boneIndex0].ParentHas(rootBone))
+					var isSplit = true;
+					for (int t = 0; t < 3; t++)
 					{
-						isSplit = false;
-						break;
+						var weight = mesh.boneWeights[mesh.triangles[i + t]];
+						if (!skinnedMesh.bones[weight.boneIndex0].ParentHas(rootBone))
+						{
+							isSplit = false;
+							break;
+						}
 					}
-				}
-				var targetMesh = isSplit ? splitMesh : bodyMesh;
-				for (int t = 0; t < 3; t++)
-				{
-					targetMesh.AddPoint(mesh, mesh.triangles[i + t]);
-					targetMesh.triangles.Add(targetMesh.vertices.Count - 1);
-				}
+					var targetMesh = isSplit ? splitMesh : bodyMesh;
+					for (int t = 0; t < 3; t++)
+					{
+						targetMesh.AddPoint(mesh, mesh.triangles[i + t]);
+						targetMesh.triangles.Add(targetMesh.vertices.Count - 1);
+					}
+				});
 			}
-			QDebug.End("分割顶点 " + splitBones.Count);
+			await tasks.WaitAllOver();
 			skinnedMesh.sharedMesh = bodyMesh.GetMesh();
 			var newSkinnedMesh = skinnedMesh.transform.parent.GetChild(skinnedMesh.name + "_" + humanBodyBone, true).GetComponent<SkinnedMeshRenderer>(true);
 			newSkinnedMesh.bones = skinnedMesh.bones;
