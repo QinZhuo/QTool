@@ -417,32 +417,33 @@ namespace QTool
 		public static SkinnedMeshRenderer Split(this SkinnedMeshRenderer skinnedMesh, HumanBodyBones humanBodyBone)
 		{
 			QDebug.Begin("分割网格" + skinnedMesh);
-			QMeshData bodyMesh = new QMeshData(skinnedMesh.sharedMesh);
+			var mesh = skinnedMesh.sharedMesh;
+			QMeshData bodyMesh = new QMeshData();
 			QMeshData splitMesh = new QMeshData();
-			splitMesh.bindposes.AddRange(bodyMesh.bindposes);
+			bodyMesh.bindposes.AddRange(mesh.bindposes);
+			splitMesh.bindposes.AddRange(mesh.bindposes);
 			var rootBone = skinnedMesh.GetComponentInParent<Animator>().GetBoneTransform(humanBodyBone);
-			for (int i = 0; i < bodyMesh.triangles.Count; i += 3)
+			for (int i = 0; i < mesh.triangles.Length; i += 3)
 			{
 				var isSplit = true;
 				for (int t = 0; t < 3; t++)
 				{
-					var weight = bodyMesh.boneWeights[bodyMesh.triangles[i + t]];
-					if (!skinnedMesh.bones[weight.boneIndex0].ParentHas(rootBone))
+					var weight = mesh.boneWeights[mesh.triangles[i + t]];
+					if (!QRectTransformTool.ParentHas(skinnedMesh.bones[(int)weight.boneIndex0], (Transform)rootBone))
 					{
 						isSplit = false;
 						break;
 					}
 				}
-				if (isSplit)
+				var targetMesh = isSplit ? splitMesh : bodyMesh;
+				for (int t = 0; t < 3; t++)
 				{
-					for (int t = 0; t < 3; t++)
-					{
-						splitMesh.AddPoint(bodyMesh, bodyMesh.triangles[i + t]);
-						splitMesh.triangles.Add(splitMesh.vertices.Count - 1);
-					}
+					targetMesh.AddPoint(mesh, mesh.triangles[i + t]);
+					targetMesh.triangles.Add(targetMesh.vertices.Count - 1);
 				}
 			}
-			var newSkinnedMesh = skinnedMesh.transform.parent.GetChild(skinnedMesh.name + "_" + humanBodyBone, true).GetComponent<SkinnedMeshRenderer>(true);
+			skinnedMesh.sharedMesh = bodyMesh.GetMesh();
+			var newSkinnedMesh = QTool.GetChild(skinnedMesh.transform.parent, (skinnedMesh.name + "_" + humanBodyBone), true).GetComponent<SkinnedMeshRenderer>(true);
 			newSkinnedMesh.bones = skinnedMesh.bones;
 			newSkinnedMesh.SetShareMaterails(skinnedMesh.sharedMaterials);
 			newSkinnedMesh.sharedMesh = splitMesh.GetMesh();

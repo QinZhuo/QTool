@@ -6,19 +6,22 @@ namespace QTool
 	[RequireComponent(typeof(Animator))]
 	public class QFirstPersonMesh : MonoBehaviour
 	{
-		[QName("分离手部模型")]
+
+		[QName("分离第一人称模型")]
 		public void SplitHandMesh()
 		{
 			var bodyMesh = GetComponentInChildren<SkinnedMeshRenderer>();
-			var newMesh = bodyMesh.Split(HumanBodyBones.LeftShoulder);
-			newMesh.CombineMeshes(new SkinnedMeshRenderer[] { bodyMesh.Split(HumanBodyBones.RightShoulder) }, true);
-			newMesh.name = nameof(QFirstPersonMesh);
-#if UNITY_EDITOR
-			if (gameObject.IsPrefabInstance(out var prefab))
-			{
-				newMesh.sharedMesh.CheckSaveAsset(UnityEditor.AssetDatabase.GetAssetPath(prefab).Replace(".prefab","/"+name+".mesh"));
-			}
-#endif
+			var handMesh = bodyMesh.Split(HumanBodyBones.LeftShoulder);
+			handMesh.CombineMeshes(new SkinnedMeshRenderer[] { bodyMesh.Split(HumanBodyBones.RightShoulder) }, true);
+			handMesh.name = nameof(QFirstPersonMesh);
+			var headMesh=bodyMesh.Split(HumanBodyBones.Head);
+			bodyMesh.CombineMeshes(new SkinnedMeshRenderer[] { handMesh, headMesh });
+//#if UNITY_EDITOR
+//			if (gameObject.IsPrefabInstance(out var prefab))
+//			{
+//				handMesh.sharedMesh.CheckSaveAsset(UnityEditor.AssetDatabase.GetAssetPath(prefab).Replace(".prefab","/"+name+".mesh"));
+//			}
+//#endif
 		}
 	}
 }
