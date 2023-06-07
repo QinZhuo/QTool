@@ -15,9 +15,10 @@ namespace QTool
 			newMesh.name = nameof(QFirstPersonMesh);
 			if ( gameObject.IsPrefabInstance(out var prefab))
 			{
-				var path = UnityEditor.AssetDatabase.GetAssetPath(prefab).SplitStartString(".prefab") + "/" + newMesh.name + ".mesh";
+				var path = UnityEditor.AssetDatabase.GetAssetPath(prefab).SplitStartString(".prefab");
 				path.CheckDirectoryPath();
-				UnityEditor.AssetDatabase.CreateAsset(newMesh.sharedMesh, path);
+				UnityEditor.AssetDatabase.CreateAsset(newMesh.sharedMesh, path+ "/" + newMesh.name + ".mesh");
+				UnityEditor.AssetDatabase.CreateAsset(newMesh.sharedMaterial, path + "/" + newMesh.name + ".mat");
 			}
 		
 		}
