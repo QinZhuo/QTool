@@ -6,13 +6,20 @@ namespace QTool
 	[RequireComponent(typeof(Animator))]
 	public class QFirstPersonMesh : MonoBehaviour
 	{
-		[QName("生成第一人称模型")]
-		public void SplitMesh()
+		[QName("分离手部模型")]
+		public void SplitHandMesh()
 		{
 			var bodyMesh = GetComponentInChildren<SkinnedMeshRenderer>();
-			var leftMesh = bodyMesh.Split(HumanBodyBones.LeftShoulder);
-			var rightMesh = bodyMesh.Split(HumanBodyBones.RightShoulder);
-			leftMesh.CombineMeshes(new SkinnedMeshRenderer[] { rightMesh }, true);
+			var newMesh = bodyMesh.Split(HumanBodyBones.LeftShoulder);
+			newMesh.CombineMeshes(new SkinnedMeshRenderer[] { bodyMesh.Split(HumanBodyBones.RightShoulder) }, true);
+			newMesh.name = nameof(QFirstPersonMesh);
+			if ( gameObject.IsPrefabInstance(out var prefab))
+			{
+				var path = UnityEditor.AssetDatabase.GetAssetPath(prefab).SplitStartString(".prefab") + "/" + newMesh.name + ".mesh";
+				path.CheckDirectoryPath();
+				UnityEditor.AssetDatabase.CreateAsset(newMesh.sharedMesh, path);
+			}
+		
 		}
 	}
 }
