@@ -20,6 +20,11 @@ namespace QTool
 		public bool Changing { get; set; } = false;
 		public Mesh Mesh { get; set; }
 		public QMeshData() { }
+		public QMeshData(Mesh mesh)
+		{
+			Add(mesh);
+			bindposes.AddRange(mesh.bindposes);
+		}
 		public void Add(Mesh mesh)
 		{
 			for (int i = 0; i < mesh.vertexCount; i++)
@@ -29,15 +34,21 @@ namespace QTool
 				normals.Add(mesh.normals[i]);
 				tangents.Add(mesh.tangents[i]);
 			}
-			int length = triangles.Count;
+			int length = vertices.Count;
 			for (int i = 0; i < mesh.triangles.Length; i++)
 			{
 				triangles.Add(mesh.triangles[i] + length);
 			}
+			boneWeights.AddRange(mesh.boneWeights);
+
 		}
 		public void AddPoint(Mesh mesh,int index)
 		{
 			Add(mesh.vertices[index], mesh.uv[index], mesh.normals[index], mesh.tangents[index], mesh.boneWeights.Get(index));
+		}
+		public void AddPoint(QMeshData mesh, int index)
+		{
+			Add(mesh.vertices[index], mesh.uvs[index], mesh.normals[index], mesh.tangents[index], mesh.boneWeights.Get(index));
 		}
 		public void Add(Vector3 vert, Vector2 uv, Vector3 normal, Vector4 tangent, BoneWeight boneWeight)
 		{
@@ -408,37 +419,36 @@ namespace QTool
 		public static async Task<SkinnedMeshRenderer> Split(this SkinnedMeshRenderer skinnedMesh, HumanBodyBones humanBodyBone)
 		{
 			QDebug.Begin("分割网格" + skinnedMesh);
-			var mesh = skinnedMesh.sharedMesh;
+			QMeshData bodyMesh = new QMeshData(skinnedMesh.sharedMesh);
 			QMeshData splitMesh = new QMeshData();
-			QMeshData bodyMesh = new QMeshData();
-			splitMesh.bindposes.AddRange(mesh.bindposes);
-			bodyMesh.bindposes.AddRange(mesh.bindposes);
+			splitMesh.bindposes.AddRange(bodyMesh.bindposes);
 			var rootBone = skinnedMesh.GetComponentInParent<Animator>().GetBoneTransform(humanBodyBone);
-			Task[] tasks = new Task[mesh.triangles.Length / 3];
-			for (int i = 0; i < mesh.triangles.Length; i += 3)
+			Task[] tasks = new Task[bodyMesh.triangles.Count / 3];
+			for (int i = 0; i < bodyMesh.triangles.Count; i += 3)
 			{
 				tasks[i/3]= Task.Run(() =>
 				{
 					var isSplit = true;
 					for (int t = 0; t < 3; t++)
 					{
-						var weight = mesh.boneWeights[mesh.triangles[i + t]];
+						var weight = bodyMesh.boneWeights[bodyMesh.triangles[i + t]];
 						if (!skinnedMesh.bones[weight.boneIndex0].ParentHas(rootBone))
 						{
 							isSplit = false;
 							break;
 						}
 					}
-					var targetMesh = isSplit ? splitMesh : bodyMesh;
-					for (int t = 0; t < 3; t++)
+					if (isSplit)
 					{
-						targetMesh.AddPoint(mesh, mesh.triangles[i + t]);
-						targetMesh.triangles.Add(targetMesh.vertices.Count - 1);
+						for (int t = 0; t < 3; t++)
+						{
+							splitMesh.AddPoint(bodyMesh, bodyMesh.triangles[i + t]);
+							splitMesh.triangles.Add(splitMesh.vertices.Count - 1);
+						}
 					}
 				});
 			}
 			await tasks.WaitAllOver();
-			skinnedMesh.sharedMesh = bodyMesh.GetMesh();
 			var newSkinnedMesh = skinnedMesh.transform.parent.GetChild(skinnedMesh.name + "_" + humanBodyBone, true).GetComponent<SkinnedMeshRenderer>(true);
 			newSkinnedMesh.bones = skinnedMesh.bones;
 			newSkinnedMesh.SetShareMaterails(skinnedMesh.sharedMaterials);
