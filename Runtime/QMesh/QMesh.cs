@@ -409,6 +409,7 @@ namespace QTool
 			splitMesh.bindposes.AddRange(mesh.bindposes);
 			bodyMesh.bindposes.AddRange(mesh.bindposes);
 			var splitBones = new List<Transform>(skinnedMesh.GetComponentInParent<Animator>().GetBoneTransform(humanBodyBone).GetComponentsInChildren<Transform>());
+			QDebug.Begin("分割顶点 " + splitBones.Count);
 			for (int i = 0; i < mesh.triangles.Length; i += 3)
 			{
 				var isSplit = true;
@@ -427,6 +428,7 @@ namespace QTool
 					targetMesh.triangles.Add(targetMesh.vertices.Count - 1);
 				}
 			}
+			QDebug.Begin("分割顶点 " + splitBones.Count);
 			skinnedMesh.sharedMesh = bodyMesh.GetMesh();
 			var newSkinnedMesh = skinnedMesh.transform.parent.GetChild(skinnedMesh.name + "_" + humanBodyBone, true).GetComponent<SkinnedMeshRenderer>(true);
 			newSkinnedMesh.bones = skinnedMesh.bones;
