@@ -426,23 +426,32 @@ namespace QTool
 			for (int i = 0; i < bodyMesh.triangles.Count; i += 3)
 			{
 				var isSplit = true;
-				for (int t = 0; t < 3; t++)
-				{
-					var weight = bodyMesh.boneWeights[bodyMesh.triangles[i + t]];
-					if (!skinnedMesh.bones[weight.boneIndex0].ParentHas(rootBone))
-					{
-						isSplit = false;
-						break;
-					}
-				}
-				if (isSplit)
+				try
 				{
 					for (int t = 0; t < 3; t++)
 					{
-						splitMesh.AddPoint(bodyMesh, bodyMesh.triangles[i + t]);
-						splitMesh.triangles.Add(splitMesh.vertices.Count - 1);
+						var weight = bodyMesh.boneWeights[bodyMesh.triangles[i + t]];
+						if (!skinnedMesh.bones[weight.boneIndex0].ParentHas(rootBone))
+						{
+							isSplit = false;
+							break;
+						}
+					}
+					if (isSplit)
+					{
+						for (int t = 0; t < 3; t++)
+						{
+							splitMesh.AddPoint(bodyMesh, bodyMesh.triangles[i + t]);
+							splitMesh.triangles.Add(splitMesh.vertices.Count - 1);
+						}
 					}
 				}
+				catch (Exception e)
+				{
+
+					throw new Exception(i+" "+bodyMesh.triangles.Count+" "+bodyMesh.vertices.Count,e);
+				}
+				
 			}
 			var newSkinnedMesh = skinnedMesh.transform.parent.GetChild(skinnedMesh.name + "_" + humanBodyBone, true).GetComponent<SkinnedMeshRenderer>(true);
 			newSkinnedMesh.bones = skinnedMesh.bones;
