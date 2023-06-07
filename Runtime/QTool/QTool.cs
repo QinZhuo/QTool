@@ -480,7 +480,7 @@ namespace QTool
 		public static void CheckSaveAsset(this UnityEngine.Object obj,string path)
 		{
 			if (Application.isPlaying) return;
-			if (obj.IsAsset())
+			if (!obj.IsAsset())
 			{
 				var fileName = "/" + obj.name;
 				if (obj is Material)
