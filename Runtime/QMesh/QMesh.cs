@@ -454,10 +454,12 @@ namespace QTool
 			}
 			skinnedMesh.sharedMesh = bodyMesh.GetMesh();
 			var head = QTool.GetChild(skinnedMesh.transform.parent, "头部", true).GetComponent<SkinnedMeshRenderer>(true);
+			head.transform.rotation = skinnedMesh.transform.rotation;
 			head.bones = skinnedMesh.bones;
 			head.SetShareMaterails(skinnedMesh.sharedMaterials);
 			head.sharedMesh = headMesh.GetMesh();
 			var hand = QTool.GetChild(skinnedMesh.transform.parent, "手部", true).GetComponent<SkinnedMeshRenderer>(true);
+			hand.transform.rotation = skinnedMesh.transform.rotation;
 			hand.bones = skinnedMesh.bones;
 			hand.SetShareMaterails(skinnedMesh.sharedMaterials);
 			hand.sharedMesh = handMesh.GetMesh();
