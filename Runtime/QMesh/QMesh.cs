@@ -452,7 +452,7 @@ namespace QTool
 				}
 			}
 			skinnedMesh.sharedMesh = bodyMesh.GetMesh();
-			var newSkinnedMesh = skinnedMesh.transform.parent.GetChild(skinnedMesh.name + "_" + humanBodyBone).GetComponent<SkinnedMeshRenderer>(true);
+			var newSkinnedMesh = skinnedMesh.transform.parent.GetChild(skinnedMesh.name + "_" + humanBodyBone,true).GetComponent<SkinnedMeshRenderer>(true);
 			newSkinnedMesh.sharedMesh = splitMesh.GetMesh();
 			return newSkinnedMesh;
 		}
