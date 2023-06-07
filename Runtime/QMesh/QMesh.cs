@@ -303,6 +303,19 @@ namespace QTool
 					combineInfos.Add(combine);
 				}
 			}
+			if (root.sharedMesh != null)
+			{
+				uvs.Add(root.sharedMesh.uv);
+				mats.AddRange(root.sharedMaterials);
+				for (int sub = 0; sub < root.sharedMesh.subMeshCount; sub++)
+				{
+					var combine = new CombineInstance();
+					combine.mesh = root.sharedMesh;
+					combine.transform = root.localToWorldMatrix;
+					combine.subMeshIndex = sub;
+					combineInfos.Add(combine);
+				}
+			}
 			newMesh.CombineMeshes(combineInfos.ToArray(), combineTextures.Length != 0, true);
 			newMesh.RecalculateNormals();
 			if (combineTextures.Length == 0)

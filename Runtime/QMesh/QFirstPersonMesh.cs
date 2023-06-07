@@ -11,10 +11,10 @@ namespace QTool
 		{
 			var bodyMesh = GetComponentInChildren<SkinnedMeshRenderer>();
 			var headMesh= bodyMesh.Split(HumanBodyBones.Neck);
-			bodyMesh.CombineMeshes(new SkinnedMeshRenderer[] { bodyMesh, headMesh });
-			var leftMesh = bodyMesh.Split(HumanBodyBones.LeftUpperArm);
-			var rightMesh = bodyMesh.Split(HumanBodyBones.RightUpperArm);
-			bodyMesh.CombineMeshes(new SkinnedMeshRenderer[] { bodyMesh, leftMesh, rightMesh });
+			bodyMesh.CombineMeshes(new SkinnedMeshRenderer[] { headMesh });
+			//var leftMesh = bodyMesh.Split(HumanBodyBones.LeftUpperArm);
+			//var rightMesh = bodyMesh.Split(HumanBodyBones.RightUpperArm);
+			//bodyMesh.CombineMeshes(new SkinnedMeshRenderer[] { bodyMesh, leftMesh, rightMesh });
 		}
 	}
 }
