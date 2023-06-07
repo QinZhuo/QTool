@@ -282,7 +282,7 @@ namespace QTool
 		{
 			return CombineMeshes(mergeSubMeshes, mesh, other);
 		}
-		public static void CombineMeshes(this SkinnedMeshRenderer root, SkinnedMeshRenderer[] meshes, params string[] combineTextures)
+		public static void CombineMeshes(this SkinnedMeshRenderer root, SkinnedMeshRenderer[] meshes, bool mergeSubMeshes = false, params string[] combineTextures)
 		{
 			QDebug.Begin("合并网格" + root);
 			var animator = root.GetComponentInParent<Animator>();
@@ -311,9 +311,13 @@ namespace QTool
 					combineInfos.Add(combine);
 				}
 			}
-			newMesh.CombineMeshes(combineInfos.ToArray(), combineTextures.Length != 0,true);
+			newMesh.CombineMeshes(combineInfos.ToArray(), mergeSubMeshes, true);
 			newMesh.RecalculateNormals();
-			if (combineTextures.Length == 0)
+			if(mergeSubMeshes&& combineTextures.Length == 0)
+			{
+				combineTextures = new string[] { "_MainTex" };
+			}
+			if (!mergeSubMeshes)
 			{
 				root.SetShareMaterails(mats.ToArray());
 			}
@@ -325,7 +329,6 @@ namespace QTool
 				var combineSize = Mathf.Min(texSize * Mathf.CeilToInt(Mathf.Sqrt(mats.Count)), 2048);
 				foreach (var textureKey in combineTextures)
 				{
-					if (textureKey.IsNull()) continue;
 					var texs = new List<Texture2D>();
 					foreach (var mat in mats)
 					{
@@ -405,16 +408,15 @@ namespace QTool
 			QMeshData bodyMesh = new QMeshData();
 			splitMesh.bindposes.AddRange(mesh.bindposes);
 			bodyMesh.bindposes.AddRange(mesh.bindposes);
-			var splitBone = skinnedMesh.GetComponentInParent<Animator>().GetBoneTransform(humanBodyBone);
-			var splitBones = new List<Transform>(splitBone.GetComponentsInChildren<Transform>());
+			var splitBones = new List<Transform>(skinnedMesh.GetComponentInParent<Animator>().GetBoneTransform(humanBodyBone).GetComponentsInChildren<Transform>());
 			for (int i = 0; i < mesh.triangles.Length; i += 3)
 			{
-				var isSplit = false;
+				var isSplit = true;
 				for (int t = 0; t < 3; t++)
 				{
-					if (splitBones.IndexOf(skinnedMesh.bones[mesh.boneWeights[mesh.triangles[i + t]].boneIndex0]) >= 0)
+					if (!splitBones.Contains(skinnedMesh.bones[mesh.boneWeights[mesh.triangles[i + t]].boneIndex0]))
 					{
-						isSplit = true;
+						isSplit = false;
 						break;
 					}
 				}
