@@ -503,7 +503,7 @@ namespace QTool
 				{
 					fileName += ".asset";
 				}
-				path = Path.Combine(path, fileName);
+				path += "/" + fileName;
 				path.CheckDirectoryPath();
 				UnityEditor.AssetDatabase.CreateAsset(obj, path);
 			}
