@@ -429,7 +429,7 @@ namespace QTool
 					targetMesh.triangles.Add(targetMesh.vertices.Count - 1);
 				}
 			}
-			QDebug.Begin("分割顶点 " + splitBones.Count);
+			QDebug.End("分割顶点 " + splitBones.Count);
 			skinnedMesh.sharedMesh = bodyMesh.GetMesh();
 			var newSkinnedMesh = skinnedMesh.transform.parent.GetChild(skinnedMesh.name + "_" + humanBodyBone, true).GetComponent<SkinnedMeshRenderer>(true);
 			newSkinnedMesh.bones = skinnedMesh.bones;
