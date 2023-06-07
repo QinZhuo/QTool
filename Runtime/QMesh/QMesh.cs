@@ -27,6 +27,7 @@ namespace QTool
 		}
 		public void Add(Mesh mesh)
 		{
+			int startIndex = vertices.Count;
 			for (int i = 0; i < mesh.vertexCount; i++)
 			{
 				vertices.Add(mesh.vertices[i]);
@@ -34,13 +35,11 @@ namespace QTool
 				normals.Add(mesh.normals[i]);
 				tangents.Add(mesh.tangents[i]);
 			}
-			int length = vertices.Count;
 			for (int i = 0; i < mesh.triangles.Length; i++)
 			{
-				triangles.Add(mesh.triangles[i] + length);
+				triangles.Add(mesh.triangles[i] + startIndex);
 			}
 			boneWeights.AddRange(mesh.boneWeights);
-
 		}
 		public void AddPoint(Mesh mesh,int index)
 		{
@@ -426,32 +425,23 @@ namespace QTool
 			for (int i = 0; i < bodyMesh.triangles.Count; i += 3)
 			{
 				var isSplit = true;
-				try
+				for (int t = 0; t < 3; t++)
+				{
+					var weight = bodyMesh.boneWeights[bodyMesh.triangles[i + t]];
+					if (!skinnedMesh.bones[weight.boneIndex0].ParentHas(rootBone))
+					{
+						isSplit = false;
+						break;
+					}
+				}
+				if (isSplit)
 				{
 					for (int t = 0; t < 3; t++)
 					{
-						var weight = bodyMesh.boneWeights[bodyMesh.triangles[i + t]];
-						if (!skinnedMesh.bones[weight.boneIndex0].ParentHas(rootBone))
-						{
-							isSplit = false;
-							break;
-						}
-					}
-					if (isSplit)
-					{
-						for (int t = 0; t < 3; t++)
-						{
-							splitMesh.AddPoint(bodyMesh, bodyMesh.triangles[i + t]);
-							splitMesh.triangles.Add(splitMesh.vertices.Count - 1);
-						}
+						splitMesh.AddPoint(bodyMesh, bodyMesh.triangles[i + t]);
+						splitMesh.triangles.Add(splitMesh.vertices.Count - 1);
 					}
 				}
-				catch (Exception e)
-				{
-
-					throw new Exception(i+" "+bodyMesh.triangles.Count+" "+bodyMesh.vertices.Count,e);
-				}
-				
 			}
 			var newSkinnedMesh = skinnedMesh.transform.parent.GetChild(skinnedMesh.name + "_" + humanBodyBone, true).GetComponent<SkinnedMeshRenderer>(true);
 			newSkinnedMesh.bones = skinnedMesh.bones;
