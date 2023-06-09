@@ -646,11 +646,11 @@ namespace QTool
 		/// <summary>
 		/// 立即完成当前演出
 		/// </summary>
-		public static void Complete(this PlayableDirector playableDirector)
+		public static void Complete(this PlayableDirector playableDirector,bool playforward=true)
 		{
 			if (playableDirector.playableAsset != null && playableDirector.state == PlayState.Playing)
 			{
-				SetTime(playableDirector, (float)playableDirector.playableAsset.duration);
+				SetTime(playableDirector, playforward ? (float)playableDirector.playableAsset.duration : 0);
 			}
 		}
 		/// <summary>
