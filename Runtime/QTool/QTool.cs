@@ -476,15 +476,18 @@ namespace QTool
             }
             return flag;
         }
-		
+
+		[System.Diagnostics.Conditional("UNITY_EDITOR")]
 		public static void CheckSaveAsset(this UnityEngine.Object obj,string path)
 		{
+#if UNITY_EDITOR
 			if (Application.isPlaying) return;
 			if (!obj.IsAsset())
 			{
 				path.CheckDirectoryPath();
 				UnityEditor.AssetDatabase.CreateAsset(obj, path);
 			}
+#endif
 		}
 		public static bool IsAsset(this UnityEngine.Object obj)
 		{
