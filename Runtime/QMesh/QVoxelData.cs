@@ -13,10 +13,30 @@ namespace QTool
 		[QName("Voxels")]
 		public QDictionary<Vector3Int, float> Voxels { get; private set; } = new QDictionary<Vector3Int, float>();
 		public QVoxelData() { }
-	
+		public void SetVoxel(Texture2D color,Texture2D depth=null,int maxDepthCount=10)
+		{
+			for (int x = 0; x < color.width; x++)
+			{
+				for (int y = 0; y < color.height; y++)
+				{
+					if (depth == null)
+					{
+						SetVoxel(new Vector3Int(x, y, 0), color.GetPixel(x, y));
+					}
+					else
+					{
+						var depthCount = maxDepthCount * depth.GetPixel(x, y).r;
+						for (int z = 0; z < depthCount; z++)
+						{
+							SetVoxel(new Vector3Int(x, y, -z), color.GetPixel(x, y));
+						}
+					}
+				}
+			}
+		}
 		public void SetVoxel(Vector3Int pos, Color color)
 		{
-			if (color.a<=0)
+			if (color.a<=Surface)
 			{
 				SetVoxel(pos, 0);
 				return;
@@ -31,7 +51,7 @@ namespace QTool
 				index = Colors.Count;
 				Colors.Add(color);
 			}
-			SetVoxel(pos, index  + Surface);
+			SetVoxel(pos, index + color.a * 0.1f);
 		}
 		public void SetVoxel(Vector3Int pos,float value)
 		{
@@ -101,7 +121,7 @@ namespace QTool
 			{
 				return Color.clear;
 			}
-			var index = Mathf.RoundToInt(value - Surface);
+			var index = Mathf.RoundToInt(value);
 			if (index < 0 || index >= Colors.Count)
 			{
 				return Color.white;
