@@ -17,6 +17,13 @@ using System.Linq;
 using UnityEngine.Playables;
 using System.Net;
 using QTool.Inspector;
+#if UNITY_EDITOR
+#if UNITY_2022_1_OR_NEWER
+using PrefabStageUtility = UnityEditor.SceneManagement.PrefabStageUtility;
+#else
+using PrefabStageUtility=UnityEditor.Experimental.SceneManagement.PrefabStageUtility;
+#endif
+#endif
 
 namespace QTool
 {
@@ -529,12 +536,12 @@ namespace QTool
 				prefab = UnityEditor.PrefabUtility.GetCorrespondingObjectFromSource(obj.GetGameObject());
 				return true;
 			}
-			else if (UnityEditor.Experimental.SceneManagement.PrefabStageUtility.GetCurrentPrefabStage() != null)
+			else if (PrefabStageUtility.GetCurrentPrefabStage() != null)
 			{
-				var stage = UnityEditor.Experimental.SceneManagement.PrefabStageUtility.GetPrefabStage(obj.GetGameObject());
+				var stage = PrefabStageUtility.GetPrefabStage(obj.GetGameObject());
 				if (stage != null)
 				{
-					if (stage.assetPath != UnityEditor.Experimental.SceneManagement.PrefabStageUtility.GetCurrentPrefabStage().assetPath)
+					if (stage.assetPath != PrefabStageUtility.GetCurrentPrefabStage().assetPath)
 					{
 						prefab = UnityEditor.AssetDatabase.LoadAssetAtPath<GameObject>(stage.assetPath);
 						return true;

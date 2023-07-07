@@ -329,17 +329,23 @@ namespace QTool.Asset {
 			if (audio.length < 1f)
 			{
 				audioSetting = setting.audioImporterSettings.Get(0);
+#if !UNITY_2022_1_OR_NEWER
 				audioImporter.preloadAudioData = true;
+#endif
 			}
 			else if (audio.length < 3f)
 			{
 				audioSetting = setting.audioImporterSettings.Get(1);
+#if !UNITY_2022_1_OR_NEWER
 				audioImporter.preloadAudioData = false;
+#endif
 			}
 			else
 			{
 				audioSetting = setting.audioImporterSettings.Get(2);
+#if !UNITY_2022_1_OR_NEWER
 				audioImporter.preloadAudioData = false;
+#endif
 			}
 			if (!audioImporter.defaultSampleSettings.Equals(audioSetting))
 			{
