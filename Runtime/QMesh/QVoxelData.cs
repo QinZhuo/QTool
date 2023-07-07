@@ -113,7 +113,7 @@ namespace QTool
 		public Mesh GenerateMesh()
 		{
 			QMarchingCubes.GenerateMeshData(this);
-			return MeshData.Mesh;
+			return MeshData.GetMesh();
 		}
 		public Color32 GetColor(float value)
 		{

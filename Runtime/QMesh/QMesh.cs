@@ -18,7 +18,7 @@ namespace QTool
 		public int Index { get; set; }
 		public bool Dirty { get; private set; } = true;
 		public bool Changing { get; set; } = false;
-		public Mesh Mesh { get; set; }
+		private Mesh Mesh { get; set; }
 		public QMeshData() { }
 		public QMeshData(Mesh mesh)
 		{
@@ -87,7 +87,6 @@ namespace QTool
 		}
 		public Mesh GetMesh()
 		{
-			if (triangles.Count == 0 || vertices.Count == 0) return null;
 			if (Mesh == null) Mesh = new Mesh();
 			QDebug.Begin(nameof(QMeshData) + GetHashCode());
 			Dirty = false;
@@ -187,13 +186,11 @@ namespace QTool
 		}
 		public static void GenerateMesh(this GameObject root, QVoxelData qVoxelData, Material mat = null)
 		{
-			qVoxelData.GenerateMesh();
-			root.GenerateMesh(qVoxelData.MeshData.Mesh, mat);
+			root.GenerateMesh(qVoxelData.GenerateMesh(), mat);
 		}
 		public static void GenerateMesh(this GameObject root, QMeshData meshData, Material mat = null)
 		{
-			meshData.GetMesh();
-			root.GenerateMesh(meshData.Mesh, mat);
+			root.GenerateMesh(meshData.GetMesh(), mat);
 		}
 		public static void GenerateMesh(this GameObject root, Mesh Mesh, Material mat = null)
 		{
