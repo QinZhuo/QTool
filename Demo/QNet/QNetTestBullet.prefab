@@ -46,8 +46,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   voxelData:
-    SerializeString: '{"QVoxelData":{"Voxels":{{"x":0,"y":0,"z":0}:1,{"x":0,"y":0,"z":1}:1,{"x":-1,"y":0,"z":0}:1,{"x":1,"y":0,"z":0}:1,{"x":0,"y":0,"z":-1}:1},"Colors":[{"r":0,"g":0,"b":0,"a":0},{"r":255,"g":247,"b":140,"a":255}],"Surface":0,"Max":{"x":1,"y":0,"z":4},"Min":{"x":-1,"y":0,"z":-1}}}'
-  editorMode: 0
+    SerializeString: '{"Colors":[{"r":255,"g":255,"b":255,"a":255},
+
+      {"r":255,"g":247,"b":140,"a":255}],"Voxels":{"{\"x\":-1,\"y\":2,\"z\":-1}":1.1},"Surface":0,"Max":{"x":-1,"y":2,"z":-1},"Min":{"x":-1,"y":2,"z":-1}}'
+  editorMode: 1
   brush: 0
   colorIndex: 1
   brushColor:
@@ -60,7 +62,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3742104868012022914}
-  m_Mesh: {fileID: 4300000, guid: 2fe8396d5fd9f0c44b66ef7d215a8623, type: 2}
+  m_Mesh: {fileID: 0}
 --- !u!23 &3543054751006210256
 MeshRenderer:
   m_ObjectHideFlags: 0
