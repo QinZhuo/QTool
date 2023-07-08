@@ -104,7 +104,7 @@ namespace QTool.Net
 		}
 		public void FixedUpdate()
 		{
-			if (PingTimer.Check(Time.deltaTime) &&ClientConnected)
+			if (ClientConnected&&!ServerActive&&PingTimer.Check(Time.deltaTime))
 			{
 				FreshPing();
 			}

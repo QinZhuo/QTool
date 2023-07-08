@@ -272,17 +272,17 @@ namespace QTool
 	[InitializeOnLoad]
 	public class QToolBuild:Editor, IPreprocessBuildWithReport, IPostprocessBuildWithReport
 	{
-		static QToolBuild()
+		private void Awake()
 		{
 			BuildPlayerWindow.RegisterBuildPlayerHandler(
-			buildPlayerOptions => {
-				QTool.IsBuilding = true;
+	buildPlayerOptions => {
+			QTool.IsBuilding = true;
 #if Addressable
 				AddressableAssetSettings.BuildPlayerContent();
 #endif
-				BuildPlayerWindow.DefaultBuildMethods.BuildPlayer(buildPlayerOptions);
-				QTool.IsBuilding = false;
-			});
+			BuildPlayerWindow.DefaultBuildMethods.BuildPlayer(buildPlayerOptions);
+			QTool.IsBuilding = false;
+		});
 		}
 		public static string BuildPath => Application.dataPath.Substring(0, Application.dataPath.LastIndexOf("Assets")) + "Builds/" + EditorUserBuildSettings.selectedBuildTargetGroup + "/" + PlayerSettings.productName + "_v" + PlayerSettings.bundleVersion.Replace(".", "_");
 

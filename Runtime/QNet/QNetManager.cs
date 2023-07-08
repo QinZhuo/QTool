@@ -326,14 +326,16 @@ namespace QTool.Net
 									break;
 								case nameof(DefaultNetAction.SyncCheck):
 									{
-										var flag = (QNetSyncFlag)eventData.Value;
-
-										if (flag.Index == SyncCheckFlag.Index)
+										if (actionData.Key != transport.ClientId)
 										{
-											if (flag.Value != SyncCheckFlag.Value)
+											var flag = (QNetSyncFlag)eventData.Value;
+											if (flag.Index == SyncCheckFlag.Index)
 											{
-												Debug.LogWarning("[" + flag.Index + "/" + ClientIndex + "]同步验证失败[" + flag + "]:[" + SyncCheckFlag + "]");
-												SyncCheckFlag.Index = -1;
+												if (flag.Value != SyncCheckFlag.Value)
+												{
+													Debug.LogWarning("[" + flag.Index + "/" + ClientIndex + "]同步验证失败[" + flag + "]:[" + SyncCheckFlag + "]");
+													SyncCheckFlag.Index = -1;
+												}
 											}
 										}
 									}
@@ -413,7 +415,7 @@ namespace QTool.Net
 							}
 						}
 					}
-					else if (ClientIndex % (netFps / 2) == 0)
+					if (ClientIndex % (netFps/2 ) == 0)
 					{
 						SyncCheckFlag.Index = ClientIndex;
 						SyncCheckFlag.Value = 0;
