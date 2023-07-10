@@ -27,7 +27,12 @@ namespace QTool
 		});
 		public VisualElement CreateExtensionUI()
 		{
+#if UNITY_2022_1_OR_NEWER
+			return null;
+#else
 			return StaticButton;
+#endif
+
 		}
 
 		public void OnPackageAddedOrUpdated(UnityEditor.PackageManager.PackageInfo packageInfo)
@@ -402,7 +407,7 @@ namespace QTool
 			QDebug.Log(PathRun(nameof(Commit).ToLower() + " -m 初始化", path));
 			Push(path);
 		}
-		#region 忽略文件
+#region 忽略文件
 		public static void GitIgnoreFile()
 		{
 			QFileManager.Save(".gitignore", @"# This .gitignore file should be placed at the root of your Unity project directory
@@ -478,7 +483,7 @@ crashlytics-build.properties
 /[Aa]ssets/[Ss]treamingAssets/aa.meta
 /[Aa]ssets/[Ss]treamingAssets/aa/*");
 		}
-		#endregion
+#endregion
 
 	}
 

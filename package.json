@@ -1,7 +1,7 @@
 {
   "name": "com.qtool.qtool",
 
-  "version": "2023.7.8",
+  "version": "2023.7.10",
   "displayName": "QTool",
   "description": "QTool",
   "unity": "2019.1",
@@ -18,6 +18,11 @@
       "displayName": "Demo",
       "description": "Demo",
       "path": "Demo"
+    },
+    {
+      "displayName": "ComputeShader",
+      "description": "ComputeShader",
+      "path": "ComputeShader"
     }
   ]
 }
