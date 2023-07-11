@@ -587,10 +587,10 @@ namespace QTool
 								Debug.LogError("不支持类型[" + type + "]");
 								return null;
 						}
-						//if (typeInfo.HasCallback && target is IQSerializeCallback callback)
-						//{
-						//	callback.OnDeserializeOver();
-						//}
+						if (typeInfo.HasCallback && target is IQSerializeCallback callback)
+						{
+							callback.OnDeserializeOver();
+						}
 						return target;
 					}
 
@@ -1056,12 +1056,17 @@ namespace QTool
 		TimeSpan,
 		CantSerialize,
 	}
+	public interface IQSerializeCallback
+	{
+		void OnDeserializeOver();
+	}
 	public class QSerializeType : QTypeInfo<QSerializeType>
 	{
 	
 		public QObjectType ObjType { get; protected set; } = QObjectType.Object;
 		public bool IsIQSerialize { private set; get; }
 		public bool IsIQData { private set; get; }
+		public bool HasCallback { private set; get; }
 		protected override void Init(Type type)
 		{
 			Functions = null;
@@ -1076,7 +1081,7 @@ namespace QTool
 				}
 				IsIQSerialize = typeof(IQSerialize).IsAssignableFrom(type);
 				IsIQData = typeof(IQData).IsAssignableFrom(type);
-				//HasCallback= typeof(IQSerializeCallback).IsAssignableFrom(type);
+				HasCallback = typeof(IQSerializeCallback).IsAssignableFrom(type);
 				if (IsIQData)
 				{
 					ObjType = QObjectType.Object;

@@ -279,10 +279,10 @@ namespace QTool
                             Debug.LogError("反序列化类型[" + type + "]出错");
                             return null;
                     }
-					//if (typeInfo.HasCallback&&target is IQSerializeCallback callback)
-					//{
-					//	callback.OnDeserializeOver();
-					//}
+					if (typeInfo.HasCallback && target is IQSerializeCallback callback)
+					{
+						callback.OnDeserializeOver();
+					}
 					return target;
                 #region 基础类型
 

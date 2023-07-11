@@ -46,7 +46,7 @@ namespace QTool
 			return Value.ToString();
 		}
 	}
-	public class QRuntimeValue<T>
+	public class QRuntimeValue<T>:IQSerializeCallback
 	{
 		public string Name { get; set; }
 		private T _Value = default;
@@ -76,6 +76,10 @@ namespace QTool
 			return Value?.ToString();
 		}
 
+		public virtual void OnDeserializeOver()
+		{
+			InvokeOnChange();
+		}
 	}
 	public class QRuntimeValue: QRuntimeValue<float>
 	{
@@ -143,7 +147,11 @@ namespace QTool
 			_Value = (OriginValue + OffsetValue) * PercentValue;
 			InvokeOnChange();
 		}
-		
+		public override void OnDeserializeOver()
+		{
+			FreshValue();
+		}
+
 	}
 
 	public class QRuntimeRangeValue : QRuntimeValue
