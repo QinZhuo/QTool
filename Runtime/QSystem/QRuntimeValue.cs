@@ -94,6 +94,7 @@ namespace QTool
 			PercentValue = 1;
 			FreshValue();
 		}
+		[QName]
 		public QValue OriginValue { get; private set; } = 0f;
 		private QValue _OffsetValue = 0;
 		public QValue OffsetValue {
@@ -121,13 +122,14 @@ namespace QTool
 			}
 		}
 		private QValue _Value { get; set; } = 0;
+		[QIgnore]
 		public override float Value
 		{
 			get => _Value; set
 			{
 				if (PercentValue == 1)
 				{
-					OffsetValue = 1;
+					OffsetValue = value - OriginValue;
 				}
 				else
 				{
