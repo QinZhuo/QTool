@@ -143,6 +143,7 @@ namespace QTool
 				}
 			}
 		}
+		
 		public static async Task<bool> IsCancel(this Task task)
 		{
 			Exception exception = null;
@@ -236,6 +237,35 @@ namespace QTool
 					}
 				}
 				IsCompleted = true;
+				continuation?.Invoke();
+			}
+		}
+		public static FrameAwaiter GetAwaiter(this int count)
+		{
+			return new FrameAwaiter(count);
+		}
+		public struct FrameAwaiter : IAwaiter
+		{
+			public int count;
+			private int startIndex;
+			public bool IsCompleted => QToolManager.Instance.FrameIndex - startIndex >= count;
+			public FrameAwaiter(int count)
+			{
+				this.count = count;
+				startIndex = QToolManager.Instance.FrameIndex;
+			}
+
+			public void GetResult()
+			{
+				
+			}
+
+			public async void OnCompleted(Action continuation)
+			{
+				while (!IsCompleted)
+				{
+					await Step();
+				}
 				continuation?.Invoke();
 			}
 		}

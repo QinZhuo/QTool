@@ -26,8 +26,10 @@ namespace QTool
 		public event Action OnGUIEvent = null;
 		public event Action OnPostRenderEvent = null;
 		public List<QGUIEditorWindow> Windows { get; private set; } = new List<QGUIEditorWindow>();
+		public int FrameIndex { get; private set; } = 0;
 		private void Update()
 		{
+			FrameIndex++;
 			OnUpdateEvent?.Invoke();
 		}
 		private void OnDestroy()

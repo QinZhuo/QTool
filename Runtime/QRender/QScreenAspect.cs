@@ -30,7 +30,7 @@ namespace QTool
 			OnAspectChange -= FreshAspect;
 		}
 
-		public void FreshAspect()
+		public async void FreshAspect()
 		{
 			var camera = GetComponent<Camera>();
 			if (camera != null)
@@ -42,6 +42,7 @@ namespace QTool
 			var rectTransform = GetComponent<RectTransform>();
 			if (rectTransform != null)
 			{
+				await 2;
 				rectTransform.offsetMin = Vector2.zero;
 				rectTransform.offsetMax = Vector2.zero;
 				var offset = rectTransform.Size() * (Vector2.one - QScreen.AspectRect.size)/2;
