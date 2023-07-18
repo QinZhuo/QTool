@@ -72,6 +72,7 @@ namespace QTool
 				return;
 			var path = AssetDatabase.GetAssetPath(editor.target);
 			if (path.EndsWith("unity_builtin_extra")) return;
+			if (!(editor.target is AssetImporter||editor.target is DefaultAsset)) return;
 			GUILayout.Space(10);
 			if (GUILayout.Button(new GUIContent("同步更改")))
 			{
