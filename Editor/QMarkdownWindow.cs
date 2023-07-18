@@ -57,16 +57,19 @@ namespace QTool
 
 		}
 		[SerializeField] private string markdownString = "";
-		private VisualElement markdownView = null;
+		private ScrollView markdownView = null;
 		private void CreateGUI()
 		{
-			var root = rootVisualElement;// new ScrollView();
-			//rootVisualElement.Add(root);
-			markdownView = new VisualElement();
-			var text = new VisualElement().AddTextField(new SerializedObject(this), nameof(markdownString));
-			root.Split(text.parent, markdownView);
+			var root = rootVisualElement;
+			markdownView = new ScrollView();
+			var left = new ScrollView();
+			var text = left.AddTextField(new SerializedObject(this), nameof(markdownString));
+			root.Split(left, markdownView);
 			text.RegisterValueChangedCallback(OnTextChange);
-			
+			left.verticalScroller.valueChanged += (value) =>
+			{
+				markdownView.verticalScroller.value = value / left.verticalScroller.highValue * markdownView.verticalScroller.highValue;
+			};
 		}
 
 		private void OnTextChange(ChangeEvent<string> text)
@@ -91,7 +94,7 @@ namespace QTool
 		public static TwoPaneSplitView Split(this VisualElement root,params VisualElement[] visualElements)
 		{
 			var split = new TwoPaneSplitView();
-			split.fixedPaneInitialDimension = 200;
+			split.fixedPaneInitialDimension = 300;
 			foreach (var visualElement in visualElements)
 			{
 				split.Add(visualElement);
@@ -112,6 +115,12 @@ namespace QTool
 			label.enableRichText = false;
 			root.Add(label);
 			return label;
+		}
+		public static ScrollView AddScrollView(this VisualElement root)
+		{
+			var visual = new ScrollView();
+			root.Add(visual);
+			return visual;
 		}
 		public static TextField AddTextField(this VisualElement root,SerializedObject serializedObject,string path)
 		{
