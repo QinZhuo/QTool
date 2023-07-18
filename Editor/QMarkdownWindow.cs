@@ -12,6 +12,7 @@ namespace QTool
 {
 	public class QMarkdownWindow : EditorWindow
 	{
+		#region 静态函数
 		[UnityEditor.Callbacks.OnOpenAsset(0)]
 		public static bool OnOpen(int instanceID, int line)
 		{
@@ -21,14 +22,14 @@ namespace QTool
 				var ext = Path.GetExtension(path).ToLower();
 				if (".md".Equals(ext) || ".markdown".Equals(ext))
 				{
-					target = textAsset;
+					PlayerPrefs.SetString(nameof(QMarkdownWindow), path);
 					OpenWindow();
 					return true;
 				}
 			}
 			return false;
 		}
-		[SerializeField]private static TextAsset target;
+
 		[MenuItem("QTool/窗口/Markdown")]
 		public static void OpenWindow()
 		{
@@ -36,29 +37,41 @@ namespace QTool
 			window.minSize = new Vector2(250, 400);
 			window.titleContent = new GUIContent("Markdown - " + Application.productName);
 			window.Show();
+			var path = PlayerPrefs.GetString(nameof(QMarkdownWindow));
+			if (!path.IsNull())
+			{
+				var asset= AssetDatabase.LoadAssetAtPath<TextAsset>(path);
+				if (asset != null)
+				{
+					window.markdownString = asset.text;
+				}
+			}
 		}
-	
-		public static string StartKey => nameof(QTool) + "/" + nameof(QMarkdownWindow);
+		#endregion
 		private void OnEnable()
 		{
+			
 		}
 		private void OnLostFocus()
 		{
-		
+
 		}
+		[SerializeField] private string markdownString = "";
+		private VisualElement markdownView = null;
 		private void CreateGUI()
 		{
-			var root = rootVisualElement;
-			var editor = new ScrollView();
-			var view = new ScrollView();
-			root.Split(editor, view);
-			if (target != null)
-			{
-				var text = new TextField();
-				text.multiline = true;
-				editor.Add(text);
-				view.AddMarkdown(target.text);
-			}
+			var root = rootVisualElement;// new ScrollView();
+			//rootVisualElement.Add(root);
+			markdownView = new VisualElement();
+			var text = new VisualElement().AddTextField(new SerializedObject(this), nameof(markdownString));
+			root.Split(text.parent, markdownView);
+			text.RegisterValueChangedCallback(OnTextChange);
+			
+		}
+
+		private void OnTextChange(ChangeEvent<string> text)
+		{
+			markdownView.AddMarkdown(text.newValue);
 		}
 	}
 	[CustomEditor(typeof(TextAsset))]
@@ -75,7 +88,6 @@ namespace QTool
 	public static class QUIElements
 	{
 		private static StyleSheet m_QMarkdown;
-		public static StyleSheet QMarkdown => m_QMarkdown ??= Resources.Load<StyleSheet>(nameof(QMarkdown));
 		public static TwoPaneSplitView Split(this VisualElement root,params VisualElement[] visualElements)
 		{
 			var split = new TwoPaneSplitView();
@@ -101,6 +113,15 @@ namespace QTool
 			root.Add(label);
 			return label;
 		}
+		public static TextField AddTextField(this VisualElement root,SerializedObject serializedObject,string path)
+		{
+			var visual = new TextField();
+			visual.multiline = true;
+			visual.bindingPath = path;
+			visual.Bind(serializedObject);
+			root.Add(visual);
+			return visual;
+		}
 		public static VisualElement ToolTip(this VisualElement root, string text)
 		{
 			root.tooltip = text;
@@ -122,7 +143,8 @@ namespace QTool
 		}
 		public static VisualElement AddMarkdown(this VisualElement root, string markdown)
 		{
-			root.styleSheets.Add(QMarkdown);
+			root.Clear();
+			if (markdown.IsNull()) return root;
 			foreach (var line in markdown.Split('\n'))
 			{
 				line.SplitTowString(" ", out var key, out var text);
@@ -136,13 +158,14 @@ namespace QTool
 					case "######":
 						{
 							var label= root.AddLabel(text).ToolTip(line);
-							label.name = "h"+key.Length;
+							label.style.fontSize = Mathf.Lerp(25, 10, (key.Length - 1) / 5f);
 						}
 						break;
 					case ">":
 						{
 							var label= root.AddLabel("||  "+text).ToolTip(line);
-							label.name = "r";
+							label.style.fontSize = 15;
+							label.style.color = Color.HSVToRGB(1,0, 0.8f);
 						}
 						break;
 					case "-":
