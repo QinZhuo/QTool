@@ -96,7 +96,6 @@ namespace QTool
 		{
 			var label = new Label(text);
 			root.Add(label);
-			label.enableRichText = true;
 			return label;
 		}
 		public static VisualElement ToolTip(this VisualElement root, string text)
@@ -120,7 +119,7 @@ namespace QTool
 		}
 		public static VisualElement AddMarkdown(this VisualElement root, string markdown)
 		{
-			foreach (var line in markdown.Split(Environment.NewLine))
+			foreach (var line in markdown.Split('\n'))
 			{
 				line.SplitTowString(" ", out var key, out var text);
 				switch (key)
