@@ -74,6 +74,8 @@ namespace QTool
 	}
 	public static class QUIElements
 	{
+		private static StyleSheet m_QMarkdown;
+		public static StyleSheet QMarkdown => m_QMarkdown ??= Resources.Load<StyleSheet>(nameof(QMarkdown));
 		public static TwoPaneSplitView Split(this VisualElement root,params VisualElement[] visualElements)
 		{
 			var split = new TwoPaneSplitView();
@@ -95,6 +97,7 @@ namespace QTool
 		public static Label AddLabel(this VisualElement root, string text)
 		{
 			var label = new Label(text);
+			label.enableRichText = false;
 			root.Add(label);
 			return label;
 		}
@@ -119,6 +122,7 @@ namespace QTool
 		}
 		public static VisualElement AddMarkdown(this VisualElement root, string markdown)
 		{
+			root.styleSheets.Add(QMarkdown);
 			foreach (var line in markdown.Split('\n'))
 			{
 				line.SplitTowString(" ", out var key, out var text);
@@ -131,13 +135,14 @@ namespace QTool
 					case "#####":
 					case "######":
 						{
-							var size = Mathf.Lerp(30, 5, key.Length / 6f);
-							root.AddLabel("<size=" + size + ">" + text + "</size>").ToolTip(line);
+							var label= root.AddLabel(text).ToolTip(line);
+							label.name = "h"+key.Length;
 						}
 						break;
 					case ">":
 						{
-							root.AddLabel("<size=15><color=#c0c0c0ff>|| " + text + "</color></size>").ToolTip(line);
+							var label= root.AddLabel("||  "+text).ToolTip(line);
+							label.name = "r";
 						}
 						break;
 					case "-":
