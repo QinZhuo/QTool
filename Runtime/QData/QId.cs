@@ -14,6 +14,17 @@ namespace QTool
 		{
 			return Guid.NewGuid().ToString("N");
 		}
+		public static void InitSceneId()
+		{
+			var ids = GameObject.FindObjectsByType<QId>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+			foreach (var id in ids)
+			{
+				if (!id.isActiveAndEnabled)
+				{
+					InstanceIdList[id.Id] = id;
+				}
+			}
+		}
 		#endregion
 	
         [QReadonly,QName("Id", nameof(IsInstance)),UnityEngine.Serialization.FormerlySerializedAs("InstanceId")]

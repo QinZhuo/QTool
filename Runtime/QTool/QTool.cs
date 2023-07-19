@@ -966,6 +966,7 @@ namespace QTool
 			QDebug.Log("异步加载场景开始[" + sceneName + "]");
 			QDebug.Begin("异步加载场景结束[" + sceneName + "]");
 			await SceneManager.LoadSceneAsync(sceneName);
+			QId.InitSceneId();
 			GCCollect();
 			QDebug.End("异步加载场景结束[" + sceneName + "]");
 			await PreLoadList.ToArray().WaitAllOver();

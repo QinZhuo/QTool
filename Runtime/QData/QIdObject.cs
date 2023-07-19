@@ -107,10 +107,6 @@ namespace QTool
 							qId = gameObj.AddComponent<QId>();
 							gameObj.SetDirty();
 						}
-						if (!Application.isPlaying && !gameObj.activeSelf && QSceneObjectSetting.Instance != null)
-						{
-							QSceneObjectSetting.Instance.qIdInitList.AddCheckExist(qId);
-						}
 						return qId.Id;
 					}
 				}
