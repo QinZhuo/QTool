@@ -16,7 +16,7 @@ namespace QTool
 		}
 		public static void InitSceneId()
 		{
-			var ids = GameObject.FindObjectsByType<QId>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+			var ids = GameObject.FindObjectsOfType<QId>(true);
 			foreach (var id in ids)
 			{
 				if (!id.isActiveAndEnabled)
