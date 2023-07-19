@@ -112,7 +112,9 @@ namespace QTool
 		public static Label AddLabel(this VisualElement root, string text)
 		{
 			var label = new Label(text);
+#if UNITY_2022_1_OR_NEWER
 			label.enableRichText = false;
+#endif
 			root.Add(label);
 			return label;
 		}
