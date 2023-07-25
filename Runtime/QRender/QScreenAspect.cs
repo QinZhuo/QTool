@@ -37,7 +37,6 @@ namespace QTool
 			{
 				camera.aspect = QScreen.TargetAspect;
 				camera.rect = QScreen.AspectRect;
-				Debug.LogError(camera.rect);
 				camera.ResetProjectionMatrix();
 			}
 			var rectTransform = GetComponent<RectTransform>();
