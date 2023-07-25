@@ -182,7 +182,7 @@ namespace QTool
 			else if (IsDrag && !Event.current.isMouse)
 			{
 				IsDrag = false;
-				QTool.DelayInvoke(0.3f, () => IsDragWindow = false);
+				QTool.DelayInvoke(1, () => IsDragWindow = false);
 			}
 		}
 		static void OnUpdate()
