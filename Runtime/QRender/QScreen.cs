@@ -178,11 +178,7 @@ namespace QTool
 				IsDrag = true;
 				Event.current.Use();
 			}
-			else if(Event.current.type == EventType.MouseDrag)
-			{
-				Event.current.Use();
-			}
-			else
+			else if(IsDrag&&!Event.current.isMouse)
 			{
 				IsDrag = false;
 			}
