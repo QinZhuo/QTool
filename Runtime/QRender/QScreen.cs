@@ -176,9 +176,8 @@ namespace QTool
 			if (Event.current.mousePosition.y < 40 && Event.current.type == EventType.MouseDown)
 			{
 				IsDrag = true;
-				//Event.current.Use();
 			}
-			else if(IsDrag&&!Event.current.isMouse)
+			else if (IsDrag && !Event.current.isMouse)
 			{
 				IsDrag = false;
 			}
