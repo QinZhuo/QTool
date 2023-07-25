@@ -176,10 +176,15 @@ namespace QTool
 			if (Event.current.mousePosition.y < 40 && Event.current.type == EventType.MouseDown)
 			{
 				IsDrag = true;
+				QTime.ChangeScale(nameof(QScreen), 0);
 			}
 			else if (IsDrag && !Event.current.isMouse)
 			{
 				IsDrag = false;
+				QTask.DelayInvoke(0.3f, () =>
+				{
+					QTime.ChangeScale(nameof(QScreen), 1);
+				});
 			}
 		}
 		static void OnUpdate()

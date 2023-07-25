@@ -57,7 +57,6 @@ namespace QTool
 		{
 			if (LastAspect != QScreen.Aspect)
 			{
-				Debug.LogError(LastAspect+" => "+QScreen.Aspect);
 				LastAspect = QScreen.Aspect;
 				if (QScreen.Aspect > QScreen.TargetAspect)
 				{
