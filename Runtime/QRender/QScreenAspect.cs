@@ -37,6 +37,7 @@ namespace QTool
 			{
 				camera.aspect = QScreen.TargetAspect;
 				camera.rect = QScreen.AspectRect;
+				Debug.LogError(camera.rect);
 				camera.ResetProjectionMatrix();
 			}
 			var rectTransform = GetComponent<RectTransform>();
@@ -61,19 +62,11 @@ namespace QTool
 				if (QScreen.Aspect > QScreen.TargetAspect)
 				{
 					var offset = (1 - QScreen.TargetAspect / QScreen.Aspect) / 2;
-					if (offset.Similar(0))
-					{
-						offset = 0;
-					}
 					QScreen.AspectRect = new Rect(offset, 0.0f, 1.0f - offset * 2, 1.0f);
 				}
 				else
 				{
 					var offset = (1 - QScreen.Aspect / QScreen.TargetAspect) / 2;
-					if (offset.Similar(0))
-					{
-						offset = 0;
-					}
 					QScreen.AspectRect = new Rect(0.0f, offset, 1.0f, 1.0f - offset * 2);
 				}
 				OnAspectChange?.Invoke();
