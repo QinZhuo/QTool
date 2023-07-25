@@ -171,15 +171,18 @@ namespace QTool
 			}
 		}
 		static bool IsDrag = false;
+		public static bool IsDragWindow { get; private set; }
 		static void OnGUI()
 		{
-			if (Event.current.mousePosition.y < 40 && Event.current.type == EventType.MouseDown)
+			if (!IsDragWindow&&Event.current.mousePosition.y < 40 && Event.current.type == EventType.MouseDown)
 			{
 				IsDrag = true;
+				IsDragWindow = true;
 			}
 			else if (IsDrag && !Event.current.isMouse)
 			{
 				IsDrag = false;
+				QTool.DelayInvoke(0.3f, () => IsDragWindow = false);
 			}
 		}
 		static void OnUpdate()
