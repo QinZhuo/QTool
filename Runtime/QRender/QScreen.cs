@@ -175,15 +175,15 @@ namespace QTool
 		{
 			if (IsDrag)
 			{
-				if(Event.current.type== EventType.MouseUp)
-				{
-					IsDrag = false;
-				}
 				Event.current.Use();
 			}
 			else if(Event.current.mousePosition.y < 40 && Event.current.type == EventType.MouseDown)
 			{
 				IsDrag = true;
+			}
+			if (Event.current.type == EventType.MouseUp)
+			{
+				IsDrag = false;
 			}
 		}
 		static void OnUpdate()
