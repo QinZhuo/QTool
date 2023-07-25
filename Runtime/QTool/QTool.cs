@@ -674,7 +674,13 @@ namespace QTool
 			}
 			playableDirector.Play(value);
 		}
-	
+		public static async void DelayInvoke(this float time, System.Action action, bool ignoreGameTime = true)
+		{
+			if (!await QTask.Wait(time, ignoreGameTime).IsCancel())
+			{
+				action?.Invoke();
+			}
+		}
 		public static T RayCast<T>(this Ray ray, Func<T, bool> CanCast = null,float radius=0) where T : Component
 		{
 			var hits = radius <= 0 ? Physics.RaycastAll(ray) : Physics.SphereCastAll(ray, radius);

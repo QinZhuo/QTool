@@ -81,13 +81,6 @@ namespace QTool
 			await task.Run();
 			nextAction();
 		}
-		public static async void DelayInvoke(this float time, System.Action action, bool ignoreGameTime = true)
-		{
-			if (!await QTask.Wait(time, ignoreGameTime).IsCancel())
-			{
-				action?.Invoke();
-			}
-		}
 		public static int RunningFlag { get; private set; } = QId.NewId().GetHashCode();
 		public static void StopAllWait()
 		{

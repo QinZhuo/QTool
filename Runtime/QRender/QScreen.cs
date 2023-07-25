@@ -171,18 +171,22 @@ namespace QTool
 			}
 		}
 		static bool IsDrag = false;
+		static bool IsDragCooldown= false;
 		static void OnGUI()
 		{
+			if (IsDragCooldown) return;
 			if (Event.current.mousePosition.y < 40 && Event.current.type == EventType.MouseDown)
 			{
 				IsDrag = true;
+				IsDragCooldown = true;
 				QTime.ChangeScale(nameof(QScreen), 0);
 			}
 			else if (IsDrag && !Event.current.isMouse)
 			{
 				IsDrag = false;
-				QTask.DelayInvoke(0.3f, () =>
+				QTool.DelayInvoke(0.3f, () =>
 				{
+					IsDragCooldown = false;
 					QTime.ChangeScale(nameof(QScreen), 1);
 				});
 			}
