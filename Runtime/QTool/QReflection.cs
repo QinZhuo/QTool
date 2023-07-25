@@ -171,6 +171,14 @@ namespace QTool.Reflection
 					 nameof(Transform.localScale),
 				 }
 			},
+			{
+				typeof(Camera),
+				new List<string>
+				{
+					nameof(Camera.aspect),
+					nameof(Camera.rect),
+				}
+			}
 		};
 
 		public QMemeberInfo GetMemberInfo(string keyOrViewName)
