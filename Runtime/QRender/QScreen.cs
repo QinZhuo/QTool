@@ -173,17 +173,17 @@ namespace QTool
 		static bool IsDrag = false;
 		static void OnGUI()
 		{
-			if (Event.current.mousePosition.y < 40 && Event.current.type == EventType.MouseDown)
+			if (Event.current.isMouse)
 			{
-				IsDrag = true;
+				if (Event.current.mousePosition.y < 40 && Event.current.type == EventType.MouseDown)
+				{
+					IsDrag = true;
+				}
+				Event.current.Use();
 			}
-			if (Event.current.type == EventType.MouseUp)
+			else
 			{
 				IsDrag = false;
-			}
-			if (IsDrag)
-			{
-				Event.current.Use();
 			}
 		}
 		static void OnUpdate()
