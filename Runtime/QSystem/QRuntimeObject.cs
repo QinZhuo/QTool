@@ -79,7 +79,7 @@ namespace QTool
 		}
 		public virtual void OnDestroy()
 		{
-			if (Runtime != null)
+			if (_Runtime != null)
 			{
 				Runtime = null;
 			}
