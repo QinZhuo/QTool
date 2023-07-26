@@ -112,7 +112,7 @@ namespace QTool
 				return _instance;
 			}
 		}
-		public static bool IsInstanced => _instance!=null;
+		public static bool IsExist => _instance!=null;
 		protected static T _instance;
 		protected virtual void Awake()
 		{

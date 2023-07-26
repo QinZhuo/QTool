@@ -35,13 +35,13 @@ namespace QTool.Net
 		}
 		private void OnDestroy()
 		{
-#if UNITY_EDITOR || DEVELOPMENT_BUILD
-			if (QToolManager.IsInstanced)
+			if (QToolManager.IsExist)
 			{
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
 				QToolManager.Instance.OnGUIEvent -= DebugGUI;
-			}
 #endif
-			QToolManager.Instance.OnUpdateEvent += QCoroutine.Update;
+				QToolManager.Instance.OnUpdateEvent += QCoroutine.Update;
+			}
 			QTime.RevertScale(this);
 			QTool.RemovePlayerLoop(typeof(QNetManager), "FixedUpdate");
 			ServerUpdateTimer?.Clear();
