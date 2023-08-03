@@ -23,7 +23,11 @@ namespace QTool.Net
 		{
 			base.Awake();
 			Application.runInBackground = true;
+#if UNITY_2022_1_OR_NEWER
+			Physics.simulationMode = SimulationMode.Script;
+#else
 			Physics.autoSimulation = false;
+#endif
 			Physics.autoSyncTransforms = false;
 			Time.fixedDeltaTime = 1f / netFps;
 			FlowGraph.QFlowGraph.Step = WaitForNetUpdate.Instance;
@@ -106,7 +110,7 @@ namespace QTool.Net
 		private int ServerSeed = 0;
 		public float NetDeltaTime => Time.fixedDeltaTime;
 		public float NetTime { get; private set; }
-		#region 服务器数据
+#region 服务器数据
 
 		const int GameDataArray=-101;
 		const int GameDataArrayLength = 200;
@@ -203,9 +207,9 @@ namespace QTool.Net
 			}
 		}
 
-		#endregion
+#endregion
 
-		#region 客户端数据
+#region 客户端数据
 		public QDictionary<int, QList<string, QNetActionData>> ClientGameData = new QDictionary<int, QList<string, QNetActionData>>();
 		public int ClientIndex { get; private set; } =0;
 		internal int IdIndex { get; set; } = 0;
@@ -440,7 +444,7 @@ namespace QTool.Net
 		}
 		internal event Action OnNetUpdate=null;
 		internal event Action<QNetSyncFlag> OnSyncCheck = null;
-		#endregion
+#endregion
 
 		private void FixedUpdate()
 		{

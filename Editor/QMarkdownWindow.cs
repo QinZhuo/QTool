@@ -8,6 +8,7 @@ using System;
 using System.IO;
 using UnityEditor.UIElements;
 using QTool.Reflection;
+
 namespace QTool
 {
 	public class QMarkdownWindow : EditorWindow
@@ -54,7 +55,12 @@ namespace QTool
 		}
 		private void OnLostFocus()
 		{
-
+			var path = PlayerPrefs.GetString(nameof(QMarkdownWindow));
+			if (File.Exists(path))
+			{
+				QFileManager.Save(path,markdownString);
+				AssetDatabase.ImportAsset(path);
+			}
 		}
 		[SerializeField] private string markdownString = "";
 		private ScrollView markdownView = null;

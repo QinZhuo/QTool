@@ -1,4 +1,4 @@
-# QTool
+# QTool 
 
 > QinZhuo的开源工具包 一套基础的开源工具包 其中包括大量游戏开发常用的基础逻辑
 
@@ -9,10 +9,10 @@
 - 使用前需要安装git
 - 在开源网站复制以.git结尾的克隆地址
 - 可以直接使用git拉取代码复制到自己的项目中
-- 也可以是使用 Unity的PackageManager 中 Add from git URL 来以插件包的方式安装 (UPM安装)
+- 也可以是使用 Unity的 包管理器（PackageManager） 中 Add from git URL 来以插件包的方式安装 (UPM安装)
 
 ## 如何更新
-- 通过UPM安装时可以直接在UnityPackageManager中点击拉取Git更新
+- 通过UPM安装时可以直接在Unity的 包管理器（PackageManager）中点击拉取Git更新
 - 通过Git安装时直接拉取Git更新即可 注意不同版本之间的适配
 
 ***
