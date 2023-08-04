@@ -11,7 +11,7 @@ using System.Collections;
 namespace QTool.Net
 {
 
-	public sealed class QNetManager : InstanceBehaviour<QNetManager>
+	public class QNetManager : InstanceBehaviour<QNetManager>
 	{
 		[QEnum,QName("传输方式")]
 		public QNetTransport transport;

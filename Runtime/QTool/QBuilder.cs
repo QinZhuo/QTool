@@ -10,7 +10,7 @@ using System;
 namespace QTool.Builder
 {
 	[DisallowMultipleComponent]
-	public sealed class QBuilder : MonoBehaviour
+	public class QBuilder : MonoBehaviour
 	{
 		public static Type[] PrefabTypes => typeof(QBuilderBrefab<>).GetAllTypes();
 		public static string[] BurshMode { get; private set; } = new string[] { "普通", "框选", };
