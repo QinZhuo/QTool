@@ -599,10 +599,10 @@ namespace QTool.FlowGraph
 		{
 			if (HasConnect(index))
 			{
-				var node = GetValueNode(index);
+				var node = GetFlowNode(index);
 				if (node == null)
 				{
-					node = GetFlowNode(index);
+					node = GetValueNode(index);
 				}
 				return node.ToInfoString();
 			}
