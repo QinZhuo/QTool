@@ -6,6 +6,7 @@ using QTool.Inspector;
 using QTool.Reflection;
 using System.Reflection;
 using System.Threading.Tasks;
+using UnityEngine.UIElements;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -1180,24 +1181,7 @@ namespace QTool
 
 #if UNITY_EDITOR
 
-		[UnityEditor.SettingsProvider]
-		public static SettingsProvider QToolSetting()
-		{
-			return new SettingsProvider("Project/" + nameof(QTool) + "设置", SettingsScope.Project)
-			{
-				guiHandler = (searchContext) =>
-				{
-					foreach (var SettingType in typeof(InstanceScriptable<>).GetAllTypes())
-					{
-						using (new GUILayout.VerticalScope(Skin.box))
-						{
-							GUILayout.Label(SettingType.QName(), Skin.box);
-							new SerializedObject(SettingType.InvokeFunction(nameof(global::QTool.QToolSetting.Instance)) as ScriptableObject).Draw();
-						}
-					}
-				}
-			};
-		}
+	
 	
 		
 	

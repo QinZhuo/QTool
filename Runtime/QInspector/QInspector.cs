@@ -187,17 +187,7 @@ namespace QTool.Inspector
 
     }
   
-    /// <summary>
-    /// 选取对象按钮显示 会调用函数CallFunc传入GameObject
-    /// </summary>
-    [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
-    public class QSelectObjectButtonAttribute : QNameAttribute
-    {
-        public QSelectObjectButtonAttribute(string name,  string showControl = "") : base(name, showControl)
-        {
-        }
-    }
-
+ 
 
 	public class QInspectorType : QTypeInfo<QInspectorType>
 	{
@@ -250,52 +240,7 @@ namespace QTool.Inspector
 				}
 			}
 		}
-		public void DrawGUI(object target)
-		{
-			if (target is IQGUIEditor qGUIEditor)
-			{
-				qGUIEditor.OnQGUIEditor();
-			}
-			foreach (var kv in buttonFunc)
-			{
-				var att = kv.Value;
-
-				if (att.Active(target))
-				{
-					var name = att.name.IsNull() ? kv.Key.Name : att.name;
-#if UNITY_EDITOR
-					if (att is QSelectObjectButtonAttribute)
-					{
-						if (GUILayout.Button(name))
-						{
-							EditorGUIUtility.ShowObjectPicker<GameObject>(null, false, "", name.GetHashCode());
-
-						}
-						if (Event.current.commandName == "ObjectSelectorClosed")
-						{
-							if (EditorGUIUtility.GetObjectPickerControlID() == name.GetHashCode())
-							{
-								var obj = EditorGUIUtility.GetObjectPickerObject();
-								if (obj != null)
-								{
-									kv.Key.Invoke(target, obj);
-								}
-
-							}
-						}
-					}
-					else
-#endif
-					{
-						if (GUILayout.Button(name))
-						{
-							kv.Key.Invoke(target);
-						}
-					}
-
-				}
-			}
-		}
+		
 		public void DrawComponent(Component component)
 		{
 			var show = QGUI.Foldout(Type.Name);
@@ -318,7 +263,7 @@ namespace QTool.Inspector
 								}
 							}
 						}
-						DrawGUI(component);
+					//	DrawGUI(component);
 					}
 				}
 

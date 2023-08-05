@@ -7,6 +7,7 @@ using UnityEditorInternal;
 using UnityEngine;
 using QTool.Reflection;
 using System.Threading.Tasks;
+using UnityEngine.UIElements;
 
 namespace QTool.Inspector
 {
@@ -30,15 +31,22 @@ namespace QTool.Inspector
 			typeInfo.InvokeQInspectorState(target,QInspectorState.OnDisable);
 			EditorApplication.playModeStateChanged -= OnPlayMode;
 		}
-		public override void OnInspectorGUI()
+		//public override void OnInspectorGUI()
+		//{
+		//	if (target == null)
+		//	{
+		//		GUILayout.Label("脚本丢失");
+		//		return;
+		//	}
+		//	serializedObject.Draw();
+		//	typeInfo.DrawGUI(target);
+		//}
+		public override VisualElement CreateInspectorGUI()
 		{
-			if (target == null)
-			{
-				GUILayout.Label("脚本丢失");
-				return;
-			}
-			serializedObject.Draw();
-			typeInfo.DrawGUI(target);
+			var root = new VisualElement();
+			root.Add(serializedObject);
+			root.Add(typeInfo, target);
+			return root;
 		}
 		private void OnSceneGUI()
 		{
