@@ -165,15 +165,10 @@ namespace QTool
 			root.Add(visual);
 			return visual;
 		}
-		public static TreeView AddTreeView(this VisualElement root, Func<VisualElement> makeItem, Action<VisualElement, int> bindItem)
+		public static ListView AddListView(this VisualElement root, IList itemsSource, Func<VisualElement> makeItem, Action<VisualElement, int> bindItem)
 		{
-			var visual = new TreeView(makeItem, bindItem);
-			root.Add(visual);
-			return visual;
-		}
-		public static ListView AddListView(this VisualElement root, IList itemsSource, Func<VisualElement> makeItem, Action<VisualElement, int> bindItem )
-		{
-			var visual = new ListView(itemsSource);
+			var visual = new ListView();
+			visual.itemsSource = itemsSource;
 			visual.makeItem = makeItem;
 			visual.bindItem = bindItem;
 			root.Add(visual);
@@ -191,6 +186,14 @@ namespace QTool
 			root.Add(visual);
 			return visual;
 		}
+#if UNITY_2021_1_OR_NEWER
+		public static TreeView AddTreeView(this VisualElement root, Func<VisualElement> makeItem, Action<VisualElement, int> bindItem)
+		{
+			var visual = new TreeView(makeItem, bindItem);
+			root.Add(visual);
+			return visual;
+		}
+
 		public static GroupBox AddGroupBox(this VisualElement root,string name="")
 		{
 			var visual = new GroupBox();
@@ -200,6 +203,7 @@ namespace QTool
 			root.Add(visual);
 			return visual;
 		}
+#endif
 		public static List<Type> TypeList = new List<Type>() { typeof(UnityEngine.Object),typeof(string) };
 		public static void Add(this VisualElement root, string name, object obj, Type type, Action<object> changeEvent, ICustomAttributeProvider customAttribute = null)
 		{
