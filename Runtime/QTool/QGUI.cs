@@ -94,32 +94,32 @@ namespace QTool
 
 		#endregion
 
-		static QDictionary<QToolBar, Vector2> ToolBarScroll = new QDictionary<QToolBar, Vector2>(); 
-		public static object Draw(this QToolBar toolBar)
-		{
-			if (toolBar == null) return default;
-			if (!toolBar.IsButton)
-			{
-				if (toolBar.Selected)
-				{
-					var value= toolBar.ChildToolBar.Draw();
-					if (Equals(toolBar.ChildToolBar?.ChildToolBar?.Value, "返回"))
-					{
-						toolBar.CancelSelect();
-					}
-					return value;
-				}
-				else
-				{
-					using (var scroll=new GUILayout.ScrollViewScope(ToolBarScroll[toolBar], GUILayout.Height(Height)))
-					{
-						toolBar.Select = GUILayout.Toolbar(toolBar.Select, toolBar.Values.ToArray(), Skin.button, GUILayout.Width(toolBar.Width * toolBar.Values.Count), GUILayout.Height(Height));
-						ToolBarScroll[toolBar] = scroll.scrollPosition;
-					}
-				}
-			}
-			return toolBar.Value;
-		}
+		//static QDictionary<QToolBar, Vector2> ToolBarScroll = new QDictionary<QToolBar, Vector2>(); 
+		//public static object Draw(this QToolBar toolBar)
+		//{
+		//	if (toolBar == null) return default;
+		//	if (!toolBar.IsButton)
+		//	{
+		//		if (toolBar.Selected)
+		//		{
+		//			var value= toolBar.ChildToolBar.Draw();
+		//			if (Equals(toolBar.ChildToolBar?.ChildToolBar?.Value, "返回"))
+		//			{
+		//				toolBar.CancelSelect();
+		//			}
+		//			return value;
+		//		}
+		//		else
+		//		{
+		//			using (var scroll=new GUILayout.ScrollViewScope(ToolBarScroll[toolBar], GUILayout.Height(Height)))
+		//			{
+		//				toolBar.Select = GUILayout.Toolbar(toolBar.Select, toolBar.Values.ToArray(), Skin.button, GUILayout.Width(toolBar.Width * toolBar.Values.Count), GUILayout.Height(Height));
+		//				ToolBarScroll[toolBar] = scroll.scrollPosition;
+		//			}
+		//		}
+		//	}
+		//	return toolBar.Value;
+		//}
 
 
 		public static QDictionary<Color, Texture2D> ColorTexture { get; private set; } = new QDictionary<Color, Texture2D>((key) =>
@@ -1455,56 +1455,56 @@ namespace QTool
 #endif
 
 	}
-	public class QToolBar
-	{
-		internal List<string> Values = new List<string>() ;
-		internal List<QToolBar> ChildToolbars = new List<QToolBar>() ;
-		public QToolBar ChildToolBar => ChildToolbars.Get(Select);
-		public int Select { get; internal set; } = -1;
-		public bool Selected => Select >= 0;
-		public bool IsButton => ChildToolbars.Count == 0;
-		public int Width { get; set; } = 100;
-		public object Value { get; set; }
-		public void CancelSelect()
-		{
-			if (Selected)
-			{
-				ChildToolBar.CancelSelect();
-				Select = -1;
-			}
-		}
-		public QToolBar()
-		{
-		}
-		private QToolBar(string key)
-		{
-			Value = key;
-			Values.Add("返回");
-			ChildToolbars.Add(new QToolBar { Value = "返回" });
-		}
-		public QToolBar this[string key]
-		{
-			get
-			{
-				var index = Values.IndexOf(key);
-				if (index < 0)
-				{
-					Values.Add(key);
-					var newToolBar = new QToolBar(key);
-					ChildToolbars.Add(newToolBar);
-					return newToolBar;
-				}
-				else
-				{
-					return ChildToolbars[index];
-				}
-			}
-		}
-		public override string ToString()
-		{
-			return Selected?(Value + "/" + ChildToolBar): Value?.ToString();
-		}
-	}
+	//public class QToolBar
+	//{
+	//	internal List<string> Values = new List<string>() ;
+	//	internal List<QToolBar> ChildToolbars = new List<QToolBar>() ;
+	//	public QToolBar ChildToolBar => ChildToolbars.Get(Select);
+	//	public int Select { get; internal set; } = -1;
+	//	public bool Selected => Select >= 0;
+	//	public bool IsButton => ChildToolbars.Count == 0;
+	//	public int Width { get; set; } = 100;
+	//	public object Value { get; set; }
+	//	public void CancelSelect()
+	//	{
+	//		if (Selected)
+	//		{
+	//			ChildToolBar.CancelSelect();
+	//			Select = -1;
+	//		}
+	//	}
+	//	public QToolBar()
+	//	{
+	//	}
+	//	private QToolBar(string key)
+	//	{
+	//		Value = key;
+	//		Values.Add("返回");
+	//		ChildToolbars.Add(new QToolBar { Value = "返回" });
+	//	}
+	//	public QToolBar this[string key]
+	//	{
+	//		get
+	//		{
+	//			var index = Values.IndexOf(key);
+	//			if (index < 0)
+	//			{
+	//				Values.Add(key);
+	//				var newToolBar = new QToolBar(key);
+	//				ChildToolbars.Add(newToolBar);
+	//				return newToolBar;
+	//			}
+	//			else
+	//			{
+	//				return ChildToolbars[index];
+	//			}
+	//		}
+	//	}
+	//	public override string ToString()
+	//	{
+	//		return Selected?(Value + "/" + ChildToolBar): Value?.ToString();
+	//	}
+	//}
 	public interface IQGUIEditor
 	{
 		void OnQGUIEditor();
@@ -1649,8 +1649,8 @@ namespace QTool
 					Close();
 				}
 			}
-			ChildWindowOffset = QScreen.AspectGUIRect.position + new Vector2(0, QGUI.Size * 2);
-			position = new Rect(0, QGUI.Size * 2, QScreen.AspectGUIRect.width, QScreen.AspectGUIRect.height - QGUI.Size * 2);
+		//	ChildWindowOffset = QScreen.AspectGUIRect.position + new Vector2(0, QGUI.Size * 2);
+			//position = new Rect(0, QGUI.Size * 2, QScreen.AspectGUIRect.width, QScreen.AspectGUIRect.height - QGUI.Size * 2);
 			using (new GUILayout.AreaScope(position))
 			{
 				OnQGUI();
@@ -1770,7 +1770,7 @@ namespace QTool
 	{
 		static QDictionary<string, QEnumListData> DrawerDic = new QDictionary<string, QEnumListData>((key) => new QEnumListData());
 
-		public List<GUIContent> List = new List<GUIContent>();
+		public List<string> List = new List<string>();
 		public int SelectIndex = 0;
 		public string SelectValue
 		{
@@ -1778,7 +1778,7 @@ namespace QTool
 			{
 				if (SelectIndex >= 0 && SelectIndex < List.Count)
 				{
-					return List[SelectIndex].text == "null" ? null : List[SelectIndex].text;
+					return List[SelectIndex] == "null" ? null : List[SelectIndex];
 				}
 				else
 				{
@@ -1799,7 +1799,7 @@ namespace QTool
 			}
 			else
 			{
-				SelectIndex = List.FindIndex((obj) => obj.text == key);
+				SelectIndex = List.FindIndex((obj) => obj == key);
 			}
 		}
 #if UNITY_EDITOR
@@ -1851,7 +1851,7 @@ namespace QTool
 						drawer.List.Clear();
 						foreach (var item in itemList)
 						{
-							drawer.List.Add(item.ToGUIContent());
+							drawer.List.Add(item.ToGUIContent().text);
 						}
 					}
 				}
@@ -1862,14 +1862,14 @@ namespace QTool
 				{
 					foreach (var childType in type.GetAllTypes())
 					{
-						drawer.List.Add(new GUIContent(childType.Name));
+						drawer.List.Add(childType.Name);
 					}
 				}
 				else if (type.IsEnum)
 				{
 					foreach (var name in Enum.GetNames(type))
 					{
-						drawer.List.Add(name.ToGUIContent());
+						drawer.List.Add(name);
 					}
 				}
 #if UNITY_EDITOR
@@ -1882,7 +1882,7 @@ namespace QTool
 							{
 								foreach (var item in property.enumNames)
 								{
-									drawer.List.Add(new GUIContent(item));
+									drawer.List.Add(item);
 								}
 							}
 							break;
@@ -1898,7 +1898,7 @@ namespace QTool
 			}
 			if (drawer.List.Count <= 0)
 			{
-				drawer.List.AddCheckExist(new GUIContent("null"));
+				drawer.List.AddCheckExist("null");
 			}
 			return drawer;
 		}

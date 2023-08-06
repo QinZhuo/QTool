@@ -820,6 +820,10 @@ namespace QTool
 			value.Key = key;
 			array.Add(value);
 		}
+		public static int IndexOf<T>(this T[] array,T value)
+		{
+			return Array.IndexOf(array, value);
+		}
 		public static T GetAndCreate<T, KeyType>(this IList<T> array, KeyType key, System.Action<T> creatCallback = null) where T : IKey<KeyType>, new()
 		{
 			var value = array.Get(key);

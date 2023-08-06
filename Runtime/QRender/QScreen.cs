@@ -18,7 +18,6 @@ namespace QTool
 		public static float Aspect => Width * 1f / Height;
 		public static float TargetAspect => QToolSetting.Instance.targetAspect;
 		public static Rect AspectRect = new Rect(0, 0, 1, 1);
-		public static Rect AspectGUIRect => new Rect(AspectRect.position * Size, AspectRect.size * Size);
 		public static Texture2D Capture()
 		{
 			return Capture(null);

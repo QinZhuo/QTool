@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using QTool.Inspector;
 using QTool.Reflection;
+using UnityEngine.UIElements;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -64,7 +65,6 @@ namespace QTool
 		[QName("QNet网络同步速度")]
 		[Range(5, 50)]
 		public int qNetFrameSpeed=50;
-		
 		private void OnValidate()
 		{
 			QAnalysisMail?.Init();

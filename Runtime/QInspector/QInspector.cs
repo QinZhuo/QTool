@@ -429,7 +429,7 @@ namespace QTool.Inspector
 					IndexCache[listData.List.GetHashCode()] = property.intValue / toolbar.pageSize;
 				}
 				var start = IndexCache[listData.List.GetHashCode()] * toolbar.pageSize;
-				var tempList = new List<GUIContent>();
+				var tempList = new List<string>();
 				for (int i = start; i < Mathf.Min(start + toolbar.pageSize, listData.List.Count); i++)
 				{
 					tempList.Add(listData.List[i]);

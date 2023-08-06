@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Rendering;
+using UnityEngine.UIElements;
 
 namespace QTool
 {
@@ -19,6 +20,10 @@ namespace QTool
 			base.Awake();
 			DontDestroyOnLoad(gameObject);
 			Instance.OnUpdateEvent += QCoroutine.Update;
+
+			var uiDoc = gameObject.GetComponent<UIDocument>(true);
+			uiDoc.panelSettings = Resources.Load<PanelSettings>(nameof(PanelSettings));
+			RootVisualElement = uiDoc.rootVisualElement;
 		}
 		public event Action OnUpdateEvent = null;
 		public event Action OnDestroyEvent = null;
@@ -27,6 +32,7 @@ namespace QTool
 		public event Action OnPostRenderEvent = null;
 		public List<QGUIEditorWindow> Windows { get; private set; } = new List<QGUIEditorWindow>();
 		public int FrameIndex { get; private set; } = 0;
+		public VisualElement RootVisualElement { get; private set; }
 		private void Update()
 		{
 			FrameIndex++;
@@ -42,31 +48,7 @@ namespace QTool
 	
 		private void OnGUI()
 		{
-			try
-			{
-				QGUI.BeginRuntimeGUI();
-				if (Windows.Count == 0)
-				{
-					using (new GUILayout.AreaScope(QScreen.AspectGUIRect))
-					{
-						QDebug.DebugInfo();
-						OnGUIEvent?.Invoke();
-					}
-					QDebug.DebugPanel();
-				}
-				else
-				{
-					using (new GUILayout.AreaScope(QScreen.AspectGUIRect,"",QGUI.Skin.box))
-					{
-						Windows[Windows.Count - 1].Draw();
-					}
-				}
-				QGUI.EndRuntimeGUI();
-			}
-			catch (Exception e)
-			{
-				Debug.LogError("GUI绘制出错：" + e.ToShortString(3000));
-			}
+			OnGUIEvent?.Invoke();
 		}
 		private void OnEnable()
 		{

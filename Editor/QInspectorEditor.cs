@@ -31,16 +31,6 @@ namespace QTool.Inspector
 			typeInfo.InvokeQInspectorState(target,QInspectorState.OnDisable);
 			EditorApplication.playModeStateChanged -= OnPlayMode;
 		}
-		//public override void OnInspectorGUI()
-		//{
-		//	if (target == null)
-		//	{
-		//		GUILayout.Label("脚本丢失");
-		//		return;
-		//	}
-		//	serializedObject.Draw();
-		//	typeInfo.DrawGUI(target);
-		//}
 		public override VisualElement CreateInspectorGUI()
 		{
 			var root = new VisualElement();
