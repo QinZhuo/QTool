@@ -256,7 +256,17 @@ namespace QTool
 					}
 					else
 					{
-						root.AddInt(name, (int)obj, (value) => { changeEvent(value); });
+						var intValue = 0;
+						try
+						{
+							intValue = (int)obj;
+						}
+						catch (Exception e)
+						{
+							Debug.LogWarning("错误[" + name + "][" + obj?.GetType() + "]["+obj+"] " + e);
+						}
+						root.AddInt(name, intValue, (value) => { changeEvent(value); });
+
 					}
 					break;
 				case TypeCode.Int64:
@@ -294,7 +304,10 @@ namespace QTool
 									root.Remove(objView);
 									root.Add(name, obj, type, changeEvent, customAttribute);
 								});
-								objView.Add("", obj, typePopup.value, changeEvent);
+								if (QSerializeType.Get(typePopup.value).ObjType!= QObjectType.DynamicObject)
+								{
+									objView.Add("", obj, typePopup.value, changeEvent);
+								}
 							}
 							break;
 						case QObjectType.UnityObject:
@@ -419,15 +432,6 @@ namespace QTool
 					}
 				}
 			};
-		}
-		public static TextField AddTextField(this VisualElement root, UnityEditor.SerializedObject serializedObject, string path)
-		{
-			var visual = new TextField();
-			visual.multiline = true;
-			visual.bindingPath = path;
-			visual.Bind(serializedObject);
-			root.Add(visual);
-			return visual;
 		}
 	
 		public static PropertyField Add(this VisualElement root, UnityEditor.SerializedProperty serializedProperty)

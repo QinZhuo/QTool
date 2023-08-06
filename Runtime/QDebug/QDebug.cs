@@ -65,38 +65,44 @@ namespace QTool
 		{
 			var element = new VisualElement();
 			element.style.flexDirection = FlexDirection.Row;
-			var childRoot= element.AddFoldout(gameObject.name).contentContainer;
+			var foldout = element.AddFoldout(gameObject.name);
+			var childRoot= foldout.contentContainer;
 			element.Q<VisualElement>("unity-checkmark").visible = gameObject.transform.childCount > 0;
 			root.Add(element);
+			foldout.Q<Toggle>().RegisterCallback<ClickEvent>((eventData) => { SelectObject(gameObject); });
 			for (int i = 0; i < gameObject.transform.childCount; i++)
 			{
 				childRoot.AddGameObject(gameObject.transform.GetChild(i).gameObject);
 			}
 		}
 
-		public static GameObject SelectObject { get; private set; }
-		private static void DrawSelectObject()
+		private static void SelectObject(GameObject gameObject)
 		{
-			if (SelectObject != null)
+			RightPanel.Clear();
+			if (gameObject != null)
 			{
-				using (new GUILayout.HorizontalScope())
-				{
-					if (QGUI.Toggle("", SelectObject.activeSelf) != SelectObject.activeSelf)
-					{
-						SelectObject.SetActive(!SelectObject.activeSelf);
-					}
-					SelectObject.name = GUILayout.TextField(SelectObject.name, QGUI.Skin.textField, QGUI.HeightLayout, GUILayout.ExpandWidth(true));
-				}
-
-				foreach (var component in SelectObject.GetComponents<Component>())
+				var title = RightPanel.AddVisualElement();
+				title.style.flexDirection = FlexDirection.Row;
+				title.AddToggle("", gameObject.activeSelf, (value) =>gameObject.SetActive(value));
+				title.AddText("", gameObject.name, (value) => gameObject.name = value);
+				foreach (var component in gameObject.GetComponents<Component>())
 				{
 					if (component == null) continue;
-					var typeInfo = QInspectorType.Get(component.GetType());
-					typeInfo.DrawComponent(component);
+					RightPanel.AddComponent(component);
 				}
 			}
 		}
-		
+		private static void AddComponent(this VisualElement root, Component component)
+		{
+			var typeInfo = QInspectorType.Get(component.GetType());
+			root= root.AddFoldout(typeInfo.Type.Name,true);
+			foreach (var memeberInfo in typeInfo.Members)
+			{
+				var value = memeberInfo.Get(component);
+				root.Add(memeberInfo.QName,value, memeberInfo.Type,(value)=>memeberInfo.Set(component,value));
+			}
+		}
+
 		private static Scene? _DontDestroyScene = null;
 		public static Scene DontDestroyScene => _DontDestroyScene ??= GetDontDestroyOnLoadScene();
 		private static Scene GetDontDestroyOnLoadScene()
@@ -188,10 +194,6 @@ namespace QTool
 			DebugPanel.visible = true;
 			LeftPanel.AddScene(GetDontDestroyOnLoadScene());
 			#endregion
-
-			
-
-
 			QTime.ChangeScale(nameof(QDebug), 0);
 			GameTexture = new RenderTexture(QScreen.Width / 2, QScreen.Height / 2, 30);
 		}

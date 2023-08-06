@@ -241,34 +241,7 @@ namespace QTool.Inspector
 			}
 		}
 		
-		public void DrawComponent(Component component)
-		{
-			var show = QGUI.Foldout(Type.Name);
-			if (show)
-			{
-				using (new GUILayout.HorizontalScope())
-				{
-					GUILayout.Space(QGUI.Height);
-					using (new GUILayout.VerticalScope())
-					{
-						foreach (var memeberInfo in Members)
-						{
-							using (new GUILayout.HorizontalScope())
-							{
-								var value = memeberInfo.Get(component);
-								var newValue = value.Draw(memeberInfo.QName, memeberInfo.Type);
-								if (memeberInfo.Type.IsValueType || !Equals(value, newValue))
-								{
-									memeberInfo.Set(component, newValue);
-								}
-							}
-						}
-					//	DrawGUI(component);
-					}
-				}
-
-			}
-		}
+	
 	}
 #if UNITY_EDITOR
 #region 自定义显示效果

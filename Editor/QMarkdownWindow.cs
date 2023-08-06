@@ -69,7 +69,7 @@ namespace QTool
 			var root = rootVisualElement;
 			markdownView = new ScrollView();
 			var left = new ScrollView();
-			var text = left.AddTextField(new SerializedObject(this), nameof(markdownString));
+			var text = left.AddText("", nameof(markdownString),(value)=>markdownString=value);
 			root.Split(left, markdownView);
 			text.RegisterValueChangedCallback(OnTextChange);
 			left.verticalScroller.valueChanged += (value) =>
