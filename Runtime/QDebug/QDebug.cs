@@ -27,6 +27,7 @@ namespace QTool
 		{
 			QToolManager.Instance.OnUpdateEvent += Update;
 		}
+#if UNITY_2021_1_OR_NEWER
 		public static void Update()
 		{
 			if ((QInput.Ctrl && QInput.Enter) || InputCircle > 720)
@@ -204,6 +205,7 @@ namespace QTool
 			GameTexture?.Release();
 			GameTexture = null;
 		}
+#endif
 		static Vector2 last = default;
 		static float angle = 0;
 		private static float InputCircle
@@ -283,5 +285,4 @@ namespace QTool
 		private static QDictionary<string, ProfilerCounterValue<int>> ProfilerCount = new QDictionary<string, ProfilerCounterValue<int>>((key) => new ProfilerCounterValue<int>(filerCategory, key, ProfilerMarkerDataUnit.Count, ProfilerCounterOptions.FlushOnEndOfFrame));
 #endif
 	}
-
 }

@@ -20,10 +20,11 @@ namespace QTool
 			base.Awake();
 			DontDestroyOnLoad(gameObject);
 			Instance.OnUpdateEvent += QCoroutine.Update;
-
+#if UNITY_2021_1_OR_NEWER
 			var uiDoc = gameObject.GetComponent<UIDocument>(true);
 			uiDoc.panelSettings = Resources.Load<PanelSettings>(nameof(PanelSettings));
 			RootVisualElement = uiDoc.rootVisualElement;
+#endif
 		}
 		public event Action OnUpdateEvent = null;
 		public event Action OnDestroyEvent = null;
