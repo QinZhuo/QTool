@@ -41,11 +41,12 @@ namespace QTool
 		#endregion
 		private async void OnFocus()
 		{
-			titleContent = new GUIContent("Markdown - " + Application.productName);
+			
 			var path = PlayerPrefs.GetString(nameof(QMarkdownWindow));
 			if (!path.IsNull())
 			{
 				var asset = AssetDatabase.LoadAssetAtPath<TextAsset>(path);
+				titleContent = new GUIContent(asset+" - Markdown");
 				if (asset != null)
 				{
 					await QTask.Wait(() => markdownText != null);
