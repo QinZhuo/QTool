@@ -36,19 +36,23 @@ namespace QTool
 		{
 			var window= GetWindow<QMarkdownWindow>();
 			window.minSize = new Vector2(250, 400);
-			window.titleContent = new GUIContent("Markdown - " + Application.productName);
 			window.Show();
+		}
+		#endregion
+		private async void OnFocus()
+		{
+			titleContent = new GUIContent("Markdown - " + Application.productName);
 			var path = PlayerPrefs.GetString(nameof(QMarkdownWindow));
 			if (!path.IsNull())
 			{
 				var asset = AssetDatabase.LoadAssetAtPath<TextAsset>(path);
 				if (asset != null)
 				{
-					window.markdownText.value = asset.text;
+					await QTask.Wait(() => markdownText != null);
+					markdownText.value = asset.text;
 				}
 			}
 		}
-		#endregion
 		private void OnLostFocus()
 		{
 			var path = PlayerPrefs.GetString(nameof(QMarkdownWindow));

@@ -477,9 +477,19 @@ namespace QTool
 			return path;
 		}
 #endif
+		
 		public static VisualElement AddMarkdown(this VisualElement root, string markdown)
 		{
 			root.Clear();
+			var newline = false;
+			void CheckNewLine()
+			{
+				if (!newline)
+				{
+					root.AddLabel("");
+					newline = true;
+				}
+			}
 			if (markdown.IsNull()) return root;
 			foreach (var line in markdown.Split('\n'))
 			{
@@ -493,8 +503,11 @@ namespace QTool
 					case "#####":
 					case "######":
 						{
-							var label = root.AddLabel(text).ToolTip(line);
-							label.style.fontSize = Mathf.Lerp(25, 10, (key.Length - 1) / 5f);
+							CheckNewLine();
+							var size = Mathf.Lerp(25, 10, (key.Length - 1) / 5f);
+							root.AddLabel(text).ToolTip(line).style.fontSize = size;
+							newline = false;
+							CheckNewLine();
 						}
 						break;
 					case ">":
@@ -502,21 +515,24 @@ namespace QTool
 							var label = root.AddLabel("||  " + text).ToolTip(line);
 							label.style.fontSize = 15;
 							label.style.color = Color.HSVToRGB(1, 0, 0.8f);
+							newline = false;
 						}
 						break;
 					case "-":
 						{
 							root.AddLabel("◆ " + text).ToolTip(line);
+							newline = false;
 						}
 						break;
 					default:
-						if (line.Length >= 3 && line.Replace("*", "").Replace("-", "").Replace("_", "").IsNull())
+						if (line.IsNull()||line.Length >= 3 && line.Replace("*", "").Replace("-", "").Replace("_", "").IsNull())
 						{
-							root.AddLabel(" ");
+							CheckNewLine();
 						}
 						else
 						{
 							root.AddLabel(line);
+							newline = false;
 						}
 						break;
 				}
