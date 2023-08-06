@@ -91,7 +91,7 @@ namespace QTool
 			root.Add(visual);
 			return visual;
 		}
-		public static TextField AddText(this VisualElement root, string label, string defaultValue = "", Action<string> changeEvent = null)
+		public static TextField AddText(this VisualElement root, string label, string defaultValue = "", Action<string> changeEvent = null, bool multiline = false)
 		{
 			var visual = new TextField(label);
 			visual.value = defaultValue;
@@ -99,6 +99,7 @@ namespace QTool
 			{
 				changeEvent(evt.newValue);
 			});
+			visual.multiline = multiline;
 			root.Add(visual);
 			return visual;
 		}

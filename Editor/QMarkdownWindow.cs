@@ -41,46 +41,41 @@ namespace QTool
 			var path = PlayerPrefs.GetString(nameof(QMarkdownWindow));
 			if (!path.IsNull())
 			{
-				var asset= AssetDatabase.LoadAssetAtPath<TextAsset>(path);
+				var asset = AssetDatabase.LoadAssetAtPath<TextAsset>(path);
 				if (asset != null)
 				{
-					window.markdownString = asset.text;
+					window.markdownText.value = asset.text;
 				}
 			}
 		}
 		#endregion
-		private void OnEnable()
-		{
-			
-		}
 		private void OnLostFocus()
 		{
 			var path = PlayerPrefs.GetString(nameof(QMarkdownWindow));
-			if (File.Exists(path))
+			if (File.Exists(path)&& markdownText!=null)
 			{
-				QFileManager.Save(path,markdownString);
+				QFileManager.Save(path, markdownText.text);
 				AssetDatabase.ImportAsset(path);
 			}
 		}
-		[SerializeField] private string markdownString = "";
+		private TextField markdownText =null;
 		private ScrollView markdownView = null;
 		private void CreateGUI()
 		{
 			var root = rootVisualElement;
 			markdownView = new ScrollView();
 			var left = new ScrollView();
-			var text = left.AddText("", nameof(markdownString),(value)=>markdownString=value);
+			markdownText = left.AddText("", "", OnTextChange, true);
 			root.Split(left, markdownView);
-			text.RegisterValueChangedCallback(OnTextChange);
 			left.verticalScroller.valueChanged += (value) =>
 			{
 				markdownView.verticalScroller.value = value / left.verticalScroller.highValue * markdownView.verticalScroller.highValue;
 			};
 		}
 
-		private void OnTextChange(ChangeEvent<string> text)
+		private void OnTextChange(string text)
 		{
-			markdownView.AddMarkdown(text.newValue);
+			markdownView.AddMarkdown(text);
 		}
 	}
 	[CustomEditor(typeof(TextAsset))]
