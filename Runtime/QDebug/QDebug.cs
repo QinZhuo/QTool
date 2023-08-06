@@ -22,12 +22,13 @@ namespace QTool
 		private static VisualElement RightPanel = null;
 		private static VisualElement MidPanel = null;
 		private static VisualElement DownPanel = null;
+
+#if UNITY_2021_1_OR_NEWER
 		[RuntimeInitializeOnLoadMethod]
 		private static void Init()
 		{
 			QToolManager.Instance.OnUpdateEvent += Update;
 		}
-#if UNITY_2021_1_OR_NEWER
 		public static void Update()
 		{
 			if ((QInput.Ctrl && QInput.Enter) || InputCircle > 720)
