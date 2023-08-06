@@ -46,11 +46,13 @@ namespace QTool
 			if (!path.IsNull())
 			{
 				var asset = AssetDatabase.LoadAssetAtPath<TextAsset>(path);
-				titleContent = new GUIContent(asset+" - Markdown");
+				titleContent = new GUIContent(asset.name+" - Markdown");
 				if (asset != null)
 				{
 					await QTask.Wait(() => markdownText != null);
 					markdownText.value = asset.text;
+					UndoList.Clear();
+					undoButton.visible = false;
 				}
 			}
 		}
@@ -99,6 +101,7 @@ namespace QTool
 			else
 			{
 				UndoList.Push(evt.previousValue);
+				undoButton.visible = true;
 			}
 			undoButton.visible = true;
 			markdownView.AddMarkdown(evt.newValue);
