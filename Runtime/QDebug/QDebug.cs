@@ -161,7 +161,7 @@ namespace QTool
 					{	
 						if (kv.Value.fullName.SplitTowString("/", out var start, out var end))
 						{
-							var group = MidPanel.Q<GroupBox>(start);
+							var group = MidPanel.Q<VisualElement>(start);
 							if (group == null)
 							{
 								MidPanel.AddLabel(start);

@@ -165,12 +165,6 @@ namespace QTool
 			root.Add(visual);
 			return visual;
 		}
-		public static TreeView AddTreeView(this VisualElement root, Func<VisualElement> makeItem, Action<VisualElement, int> bindItem)
-		{
-			var visual = new TreeView(makeItem, bindItem);
-			root.Add(visual);
-			return visual;
-		}
 		public static ListView AddListView(this VisualElement root, IList itemsSource, Func<VisualElement> makeItem, Action<VisualElement, int> bindItem )
 		{
 			var visual = new ListView(itemsSource);
@@ -191,9 +185,13 @@ namespace QTool
 			root.Add(visual);
 			return visual;
 		}
-		public static GroupBox AddGroupBox(this VisualElement root,string name="")
+		public static VisualElement AddGroupBox(this VisualElement root,string name="")
 		{
+#if UNITY_2022_1_OR_NEWER
 			var visual = new GroupBox();
+#else
+			var visual = new ListView();
+#endif
 			visual.name = name;
 			visual.style.flexDirection = FlexDirection.Row;
 			visual.style.flexWrap = Wrap.Wrap;
