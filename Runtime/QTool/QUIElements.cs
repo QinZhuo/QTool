@@ -84,10 +84,13 @@ namespace QTool
 			var visual = new ObjectField(label);
 			visual.objectType = type;
 			visual.value = defaultValue;
-			visual.RegisterCallback<ChangeEvent<UnityEngine.Object>>((evt) =>
+			if (changeEvent != null)
 			{
-				changeEvent(evt.newValue);
-			});
+				visual.RegisterCallback<ChangeEvent<UnityEngine.Object>>((evt) =>
+				{
+					changeEvent(evt.newValue);
+				});
+			}
 			root.Add(visual);
 			return visual;
 		}
@@ -95,10 +98,13 @@ namespace QTool
 		{
 			var visual = new TextField(label);
 			visual.value = defaultValue;
-			visual.RegisterCallback<ChangeEvent<string>>((evt) =>
+			if (changeEvent != null)
 			{
-				changeEvent(evt.newValue);
-			});
+				visual.RegisterCallback<ChangeEvent<string>>((evt) =>
+				{
+					changeEvent(evt.newValue);
+				});
+			}
 			visual.multiline = multiline;
 			root.Add(visual);
 			return visual;

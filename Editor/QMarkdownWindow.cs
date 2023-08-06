@@ -55,6 +55,7 @@ namespace QTool
 		}
 		private void OnLostFocus()
 		{
+			
 			var path = PlayerPrefs.GetString(nameof(QMarkdownWindow));
 			if (File.Exists(path)&& markdownText!=null)
 			{
@@ -64,22 +65,42 @@ namespace QTool
 		}
 		private TextField markdownText =null;
 		private ScrollView markdownView = null;
+		private Button undoButton = null;
+		private Stack<string> UndoList = new Stack<string>();
 		private void CreateGUI()
 		{
 			var root = rootVisualElement;
 			markdownView = new ScrollView();
-			var left = new ScrollView();
-			markdownText = left.AddText("", "", OnTextChange, true);
+			var left = new VisualElement();
+			undoButton= left.AddButton("撤销", Undo);
+			var editorRange = left.AddScrollView();
+			markdownText = editorRange.AddText("", "",null, true);
 			root.Split(left, markdownView);
-			left.verticalScroller.valueChanged += (value) =>
+			markdownText.RegisterCallback<ChangeEvent<string>>(OnTextChange);
+			editorRange.verticalScroller.valueChanged += (value) =>
 			{
-				markdownView.verticalScroller.value = value / left.verticalScroller.highValue * markdownView.verticalScroller.highValue;
+				markdownView.verticalScroller.value = value / editorRange.verticalScroller.highValue * markdownView.verticalScroller.highValue;
 			};
 		}
-
-		private void OnTextChange(string text)
+		public void Undo()
 		{
-			markdownView.AddMarkdown(text);
+			if (UndoList.Count > 0)
+			{
+				markdownText.value = UndoList.Peek();
+			}
+		}
+		private void OnTextChange(ChangeEvent<string> evt)
+		{
+			if (UndoList.Count > 0 && evt.newValue == UndoList.Peek())
+			{
+				UndoList.Pop();
+			}
+			else
+			{
+				UndoList.Push(evt.previousValue);
+			}
+			undoButton.visible = true;
+			markdownView.AddMarkdown(evt.newValue);
 		}
 	}
 	[CustomEditor(typeof(TextAsset))]
