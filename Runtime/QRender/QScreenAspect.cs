@@ -69,10 +69,12 @@ namespace QTool
 					var offset = (1 - QScreen.Aspect / QScreen.TargetAspect) / 2;
 					QScreen.AspectRect = new Rect(0.0f, offset, 1.0f, 1.0f - offset * 2);
 				}
+#if UNITY_2021_1_OR_NEWER
 				QToolManager.Instance.RootVisualElement.style.top = new Length(QScreen.AspectRect.yMin * 100, LengthUnit.Percent);
 				QToolManager.Instance.RootVisualElement.style.left = new Length(QScreen.AspectRect.xMin * 100, LengthUnit.Percent);
 				QToolManager.Instance.RootVisualElement.style.width = new Length(QScreen.AspectRect.width * 100, LengthUnit.Percent);
 				QToolManager.Instance.RootVisualElement.style.height = new Length(QScreen.AspectRect.height * 100, LengthUnit.Percent);
+#endif
 				OnAspectChange?.Invoke();
 			}
 		}
