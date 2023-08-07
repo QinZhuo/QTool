@@ -54,11 +54,11 @@ namespace QTool.FlowGraph
 		}
 		public QFlowGraph CreateInstance()
 		{
-			if (SerializeString.IsNull())
-			{
-				OnBeforeSerialize();
-			}
 			var graph= SerializeString.ParseQData<QFlowGraph>();
+			if (graph == null)
+			{
+				graph = new QFlowGraph();
+			}
 			graph.SerializeString = SerializeString;
 			graph.Init();
 			return graph;
