@@ -1,4 +1,5 @@
 using QTool.FlowGraph;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -37,11 +38,17 @@ namespace QTool
 			}
 			return list;
 		}
-		public static int Split(this System.Random random, ref int sum, int range = 2)
+		public static void Split(this System.Random random,int sum,params Action<int>[] actions)
 		{
-			var result = Mathf.RoundToInt(random.Range(-range, range+1));
-			sum -= result;
-			return result;
+			if (actions.Length == 0) return;
+			actions.Random();
+			for (int i = 0; i < actions.Length-1; i++)
+			{
+				var value = random.Range(0, sum + 1);
+				actions[i](value);
+				sum -= value;
+			}
+			actions[actions.Length - 1](sum);
 		}
 		/// <summary>
 		 /// 正态分布随机数
