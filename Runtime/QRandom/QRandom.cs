@@ -39,7 +39,7 @@ namespace QTool
 		}
 		public static int Split(this System.Random random, ref int sum, int range = 2)
 		{
-			var result = Mathf.RoundToInt(random.Range(-range, range));
+			var result = Mathf.RoundToInt(random.Range(-range, range+1));
 			sum -= result;
 			return result;
 		}
