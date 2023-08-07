@@ -38,11 +38,10 @@ namespace QTool
 			}
 			return list;
 		}
-		public static void Split(this System.Random random,int sum,params Action<int>[] actions)
+		public static void Split(this System.Random random, int sum, params Action<int>[] actions)
 		{
 			if (actions.Length == 0) return;
-			actions.Random();
-			for (int i = 0; i < actions.Length-1; i++)
+			for (int i = 0; i < actions.Length - 1; i++)
 			{
 				var value = random.Range(0, sum + 1);
 				actions[i](value);
