@@ -85,7 +85,34 @@ namespace QTool
 			}
 			return req.downloadHandler.text;
 		}
-	
+		public static T LoadScriptableObject<T>(string key,bool autoCreate=false) where T: ScriptableObject
+		{
+			T obj = null;
+			try
+			{
+				obj = Resources.Load<T>(key);
+			}
+			catch (Exception)
+			{
+				return null;
+			}
+#if UNITY_EDITOR
+			if (obj == null)
+			{
+				QDebug.Log("创建单例" + nameof(T) + "[" + key + "]");
+				obj = ScriptableObject.CreateInstance<T>();
+				var path = ("Assets/Resources/" + key + ".asset");
+				path = QFileManager.CheckDirectoryPath(path);
+				UnityEditor.AssetDatabase.CreateAsset(obj, path);
+				if (!Application.isPlaying)
+				{
+					UnityEditor.AssetDatabase.Refresh();
+				}
+			}
+#endif
+			return obj;
+		}
+
 		private static PlayerLoopSystem AddPlayerLoop(this PlayerLoopSystem playerLoop,Type type, Action action)
 		{
 			var loopList = playerLoop.subSystemList.ToList();

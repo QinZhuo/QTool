@@ -27,32 +27,9 @@ namespace QTool
         {
             get
             {
-                if (_instance == null)
-                {
-					var key = typeof(T).Name;
-					try
-					{
-						_instance = Resources.Load<T>(key);
-					}
-					catch (Exception)
-					{
-						return null;
-					}
-#if UNITY_EDITOR
-					if (_instance==null)
-					{
-						QDebug.Log("创建单例" + nameof(InstanceScriptable<T>) + "[" + typeof(T).Name + "]");
-						var obj = ScriptableObject.CreateInstance<T>();
-                        _instance = obj;
-						var path = ("Assets/Resources/" + key + ".asset");
-						path =QFileManager.CheckDirectoryPath(path);
-						UnityEditor.AssetDatabase.CreateAsset(obj, path);
-						if (!Application.isPlaying)
-						{
-							UnityEditor.AssetDatabase.Refresh();
-						}
-                    }
-#endif
+				if (_instance == null)
+				{
+					_instance = QTool.LoadScriptableObject<T>(typeof(T).Name);
 				}
                 return _instance; 
             }
