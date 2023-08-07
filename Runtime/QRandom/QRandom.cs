@@ -37,6 +37,12 @@ namespace QTool
 			}
 			return list;
 		}
+		public static int Split(this System.Random random,ref int sum,int min=-1,int max=2)
+		{
+			var result= random.Range(min, max);
+			sum -= result;
+			return result;
+		}
 		/// <summary>
 		 /// 正态分布随机数
 		 /// </summary>
