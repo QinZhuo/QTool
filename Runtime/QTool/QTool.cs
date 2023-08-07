@@ -99,7 +99,7 @@ namespace QTool
 #if UNITY_EDITOR
 			if (obj == null)
 			{
-				QDebug.Log("创建单例" + nameof(T) + "[" + key + "]");
+				QDebug.Log("自动创建<" + nameof(T) + "> " + key + "");
 				obj = ScriptableObject.CreateInstance<T>();
 				var path = ("Assets/Resources/" + key + ".asset");
 				path = QFileManager.CheckDirectoryPath(path);
