@@ -85,7 +85,7 @@ namespace QTool
 			}
 			return req.downloadHandler.text;
 		}
-		public static T LoadScriptableObject<T>(string key,bool autoCreate=false) where T: ScriptableObject
+		public static T LoadAndCreate<T>(string key) where T: ScriptableObject
 		{
 			T obj = null;
 			try

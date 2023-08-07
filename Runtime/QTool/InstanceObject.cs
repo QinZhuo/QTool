@@ -29,7 +29,7 @@ namespace QTool
             {
 				if (_instance == null)
 				{
-					_instance = QTool.LoadScriptableObject<T>(typeof(T).Name);
+					_instance = QTool.LoadAndCreate<T>(typeof(T).Name);
 				}
                 return _instance; 
             }
