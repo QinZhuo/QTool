@@ -37,9 +37,9 @@ namespace QTool
 			}
 			return list;
 		}
-		public static int Split(this System.Random random,ref int sum,int min=-1,int max=2)
+		public static int Split(this System.Random random, ref int sum, int range = 2)
 		{
-			var result= random.Range(min, max);
+			var result = Mathf.RoundToInt(random.NormalRange(-range, range));
 			sum -= result;
 			return result;
 		}
