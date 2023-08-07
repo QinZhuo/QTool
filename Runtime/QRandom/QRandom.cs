@@ -41,13 +41,15 @@ namespace QTool
 		public static void Split(this System.Random random, int sum, params Action<int>[] actions)
 		{
 			if (actions.Length == 0) return;
-			for (int i = 0; i < actions.Length - 1; i++)
+			List<Action<int>> actionList = new List<Action<int>>(actions);
+			actionList.Random();
+			for (int i = 0; i < actionList.Count - 1; i++)
 			{
 				var value = random.Range(0, sum + 1);
-				actions[i](value);
+				actionList[i](value);
 				sum -= value;
 			}
-			actions[actions.Length - 1](sum);
+			actionList[actionList.Count - 1](sum);
 		}
 		/// <summary>
 		 /// 正态分布随机数
