@@ -235,6 +235,26 @@ namespace QTool.FlowGraph
 					return node.Ports["triggerObject"].ToInfoString();
 				case nameof(GetValue):
 					return "{" + node["key"] + "}";
+				case nameof(Add):
+					{
+						info = node.Ports["a"].ToInfoString()+"+"+ node.Ports["b"].ToInfoString();
+					}
+					break;
+				case nameof(Subtract):
+					{
+						info = node.Ports["a"].ToInfoString() + "-" + node.Ports["b"].ToInfoString();
+					}
+					break;
+				case nameof(Multiply):
+					{
+						info = node.Ports["a"].ToInfoString() + "x" + node.Ports["b"].ToInfoString();
+					}
+					break;
+				case nameof(Divide):
+					{
+						info = node.Ports["a"].ToInfoString() + "/" + node.Ports["b"].ToInfoString();
+					}
+					break;
 				default:
 					return node.Name;
 			}
