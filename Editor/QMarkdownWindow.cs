@@ -43,6 +43,7 @@ namespace QTool
 		{
 			await QTask.Wait(() => markdownText != null);
 			markdownText.value = Text;
+			OnChangeText(Text);
 		}
 		private TextField markdownText =null;
 		private ScrollView markdownView = null;
@@ -84,17 +85,26 @@ namespace QTool
 	{
 		public static string FilePath
 		{
-			get => PlayerPrefs.GetString(typeof(T).Name + "_" + nameof(FilePath));
+			get => QPlayerPrefs.GetString(typeof(T).Name + "_" + nameof(FilePath));
 			set
 			{
 				if (value != FilePath)
 				{
-					PlayerPrefs.SetString(typeof(T).Name + "_" + nameof(FilePath), value);
+					QPlayerPrefs.SetString(typeof(T).Name + "_" + nameof(FilePath), value);
 					UndoList.Clear();
+					
 					LastOpenTime = default;
+					QPlayerPrefs.Get(typeof(T).Name + "_" + nameof(FilePath) + "List", FilePathList);
+					FilePathList.AddCheckExist(value.Replace('/', '\\'));
+					QPlayerPrefs.Set(typeof(T).Name + "_" + nameof(FilePath) + "List", FilePathList);
+					if (PathPopup != null)
+					{
+						PathPopup.value = value;
+					}
 				}
 			}
 		}
+		private static List<string> FilePathList = new List<string>();
 		private static DateTime LastOpenTime =default;
 		protected virtual void OnFocus()
 		{
@@ -134,11 +144,13 @@ namespace QTool
 				AssetDatabase.ImportAsset(path);
 			}
 		}
-		protected VisualElement Toolbar { get; private set; } = null;
+		protected static VisualElement Toolbar { get; private set; } = null;
+		protected static PopupField<string> PathPopup { get; private set; } = null;
 		protected virtual void CreateGUI()
 		{
 			Toolbar = rootVisualElement.AddVisualElement();
 			Toolbar.style.flexDirection = FlexDirection.Row;
+			PathPopup = Toolbar.AddPopup("", FilePathList, FilePath.Replace('/', '\\'), path => { FilePath = path; OnFocus(); });
 			Toolbar.AddButton("撤销", Undo);
 		}
 		protected abstract void ParseText();

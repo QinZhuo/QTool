@@ -112,6 +112,10 @@ namespace QTool
 	
 		public static PopupField<T> AddPopup<T>(this VisualElement root, string label, List<T> choices, T defaultValue, Action<T> changeEvent = null)
 		{
+			if (!choices.Contains(defaultValue))
+			{
+				choices.Add(defaultValue);
+			}
 			var visual = new PopupField<T>(label, choices, defaultValue);
 			visual.RegisterCallback<ChangeEvent<T>>((evt) =>
 			{
