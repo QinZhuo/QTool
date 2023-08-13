@@ -1013,16 +1013,8 @@ namespace QTool
 
 		[QIgnore, HideInInspector, SerializeField]
 		internal string SerializeString;
-		[QIgnore]
-		internal bool IsDirty { get;private set; } = false;
-		public virtual void SetDirty()
-		{
-			IsDirty = true;
-		}
 		public virtual void OnBeforeSerialize()
 		{
-			if (!IsDirty) return;
-			IsDirty = false;
 			SerializeString = (this as T).ToQData();
 		}
 		public virtual void OnAfterDeserialize()

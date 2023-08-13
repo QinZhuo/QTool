@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using QTool.Reflection;
 namespace QTool.FlowGraph
 {
-	[System.Serializable]
+	[Serializable]
     public class QFlowGraph: QSerializeObject<QFlowGraph>
 	{
 		static QFlowGraph()
@@ -28,7 +28,7 @@ namespace QTool.FlowGraph
 					if (GUILayout.Button("编辑"))
 					{
 						var graph = obj as QFlowGraph;
-						QFlowGraphWindow.Open(graph, () => { graph.SetDirty(); });
+						QFlowGraphWindow.Open(graph);
 					}
 					return obj;
 				}

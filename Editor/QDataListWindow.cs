@@ -119,6 +119,7 @@ namespace QTool.FlowGraph
 								{
 									foldout.value = true;
 								}
+								lastClick = null;
 							}
 							else
 							{

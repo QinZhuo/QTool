@@ -56,7 +56,7 @@ namespace QTool.FlowGraph
 
 
 		public event Action OnSave;
-		public static void Open(QFlowGraph graph,Action OnSave)
+		public static void Open(QFlowGraph graph,Action OnSave=null)
 		{
 			var window = GetWindow<QFlowGraphWindow>();
 			window.minSize = new Vector2(400, 300);
@@ -86,9 +86,9 @@ namespace QTool.FlowGraph
         { 
 			if (Graph != null)
 			{
-				Graph.SetDirty();
 				Graph.ViewPos = ViewRange.position;
-				OnSave?.Invoke(); 
+				Graph.OnBeforeSerialize();
+				OnSave?.Invoke();
 			}
         }
 

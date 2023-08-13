@@ -99,9 +99,8 @@ namespace QTool
 				SetVoxel(new Vector3Int(x, y, z), value);
 			}
 		}
-		public override void SetDirty()
+		public void SetDirty()
 		{
-			base.SetDirty();
 			MeshData.SetDirty();
 		}
 		public void ReplaceColor(int index, Color32 color)
