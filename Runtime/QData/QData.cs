@@ -1015,7 +1015,10 @@ namespace QTool
 		internal string SerializeString;
 		public virtual void OnBeforeSerialize()
 		{
-			SerializeString = (this as T).ToQData();
+			if (!Application.isPlaying)
+			{
+				SerializeString = (this as T).ToQData();
+			}
 		}
 		public virtual void OnAfterDeserialize()
 		{

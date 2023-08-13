@@ -39,6 +39,10 @@ namespace QTool.FlowGraph
 			await QTask.Step();
 			base.OnAfterDeserialize();
 		}
+		public override void OnBeforeSerialize()
+		{
+			base.OnBeforeSerialize();
+		}
 		public override void Deserialize()
 		{
 			base.Deserialize();
