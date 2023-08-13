@@ -63,12 +63,16 @@ namespace QTool.FlowGraph
 					if (y == 0)
 					{
 						var label = visual.AddLabel(value, TextAnchor.MiddleCenter);
-						label.style.width = 150;
+						label.style.width = 180;
+						label.style.marginLeft = 10;
+						label.style.marginRight = 10;
 					}
 					else
 					{
 						var label = visual.AddLabel(value, TextAnchor.MiddleCenter);
-						label.style.width = 150;
+						label.style.width = 180;
+						label.style.marginLeft = 10;
+						label.style.marginRight = 10;
 						label.name = title;
 						label.RegisterCallback<ClickEvent>((eventData) =>
 						{
