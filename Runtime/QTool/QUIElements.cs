@@ -124,17 +124,14 @@ namespace QTool
 			root.Add(visual);
 			return visual;
 		}
-		public static DoubleField AddQEnumAttribute(this VisualElement root, QPopupAttribute att, object obj, Action<object> changeEvent = null)
+		public static PopupField<string> AddQPopupAttribute(this VisualElement root, QPopupAttribute att, object obj, Action<object> changeEvent = null)
 		{
 			var str = obj.ToGUIContent().text;
-			var visual = new DoubleField();
-			var data = QEnumListData.Get(obj?.GetType(), att.funcKey);
-			root.AddPopup("", data.List, str, (value) =>
+			var data = QPopupData.Get(obj?.GetType(), att.funcKey);
+			return root.AddPopup("", data.List, str, (value) =>
 			{
 				changeEvent(value);
 			});
-			root.Add(visual);
-			return visual;
 		}
 		public static IntegerField AddInt(this VisualElement root, string label, int defaultValue = 0, Action<int> changeEvent = null)
 		{
@@ -295,10 +292,10 @@ namespace QTool
 				case TypeCode.Double:
 					return root.AddDouble(name, (double)obj, (value) => { changeEvent(value); });
 				case TypeCode.String:
-					var enumView = customAttribute?.GetAttribute<QPopupAttribute>();
-					if (enumView != null)
+					var qpopup = customAttribute?.GetAttribute<QPopupAttribute>();
+					if (qpopup != null)
 					{
-						return root.AddQEnumAttribute(enumView, obj, (value) => changeEvent(value));
+						return root.AddQPopupAttribute(qpopup, obj, (value) => changeEvent(value));
 					}
 					else
 					{
@@ -348,10 +345,11 @@ namespace QTool
 
 									foreach (var member in typeInfo.Members)
 									{
-										foldout.contentContainer.Add(member.QName, member.Get(obj), member.Type, (value) => { 
+										foldout.contentContainer.Add(member.QName, member.Get(obj), member.Type, (value) =>
+										{
 											member.Set(obj, value);
 											changeEvent?.Invoke(obj);
-										});
+										}, member.MemeberInfo);
 									}
 									return foldout;
 								}
@@ -380,7 +378,7 @@ namespace QTool
 										{
 											list[index] = value;
 											changeEvent?.Invoke(list);
-										});
+										},customAttribute);
 										element.AddManipulator(new ContextualMenuManipulator((menu) => {
 											menu.menu.AppendAction("新增", action => {
 												list= list.CreateAt(QSerializeType.Get(typeInfo.ElementType), index);
@@ -577,6 +575,143 @@ namespace QTool
 				}
 			}
 			return root;
+		}
+	}
+	public class QPopupData
+	{
+		static QDictionary<string, QPopupData> DrawerDic = new QDictionary<string, QPopupData>((key) => new QPopupData());
+
+		public List<string> List = new List<string>();
+		public int SelectIndex = 0;
+		public string SelectValue
+		{
+			get
+			{
+				if (SelectIndex >= 0 && SelectIndex < List.Count)
+				{
+					return List[SelectIndex] == "null" ? null : List[SelectIndex];
+				}
+				else
+				{
+					if (SelectIndex < 0)
+					{
+						SelectIndex = 0;
+					}
+					return default;
+				}
+			}
+		}
+
+		public void UpdateList(string key)
+		{
+			if (key == "null" || key.IsNull())
+			{
+				SelectIndex = 0;
+			}
+			else
+			{
+				SelectIndex = List.FindIndex((obj) => obj == key);
+			}
+		}
+#if UNITY_EDITOR
+		public static QPopupData Get(UnityEditor.SerializedProperty property, string funcKey)
+		{
+			if (property.propertyType ==UnityEditor.SerializedPropertyType.ObjectReference)
+			{
+				return Get(QReflection.ParseType(property.type.SplitEndString("PPtr<$").TrimEnd('>')), funcKey);
+			}
+			else
+			{
+				return Get((object)property, funcKey);
+			}
+		}
+#endif
+
+		public static QPopupData Get(object obj, string funcKey)
+		{
+			Type type = null;
+			if (obj is Type)
+			{
+				type = obj as Type;
+			}
+			else
+			{
+				type = obj?.GetType();
+			}
+			var drawerKey = funcKey;
+			if (drawerKey.IsNull())
+			{
+#if UNITY_EDITOR
+				if (obj is UnityEditor.SerializedProperty property)
+				{
+					drawerKey = property.propertyType + "_" + property.name;
+				}
+				else
+#endif
+				{
+					drawerKey = type + "";
+				}
+			}
+			var drawer = DrawerDic[drawerKey];
+			if (!funcKey.IsNull())
+			{
+				if (obj?.InvokeFunction(funcKey) is IList itemList)
+				{
+					if (drawer.List.Count != itemList.Count)
+					{
+						drawer.List.Clear();
+						foreach (var item in itemList)
+						{
+							drawer.List.Add(item.ToGUIContent().text);
+						}
+					}
+				}
+			}
+			else if (drawer.List.Count == 0)
+			{
+				if (type.IsAbstract)
+				{
+					foreach (var childType in type.GetAllTypes())
+					{
+						drawer.List.Add(childType.Name);
+					}
+				}
+				else if (type.IsEnum)
+				{
+					foreach (var name in Enum.GetNames(type))
+					{
+						drawer.List.Add(name);
+					}
+				}
+#if UNITY_EDITOR
+				else if (obj is UnityEditor.SerializedProperty property)
+				{
+					drawer.List.Clear();
+					switch (property.propertyType)
+					{
+						case UnityEditor.SerializedPropertyType.Enum:
+							{
+								foreach (var item in property.enumNames)
+								{
+									drawer.List.Add(item);
+								}
+							}
+							break;
+						default:
+							break;
+					}
+				}
+#endif
+				else
+				{
+					QGUI.Label("错误函数" + funcKey);
+				}
+			}
+			if (drawer.List.Count <= 0)
+			{
+				drawer.List.AddCheckExist("null");
+			}
+			return drawer;
 		}
 	}
 }

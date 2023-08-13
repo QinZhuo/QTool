@@ -330,7 +330,7 @@ namespace QTool.Inspector
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
 			if (!property.IsShow()) return;
-			var data = QEnumListData.Get(property, (attribute as QPopupAttribute).funcKey);
+			var data = QPopupData.Get(property, (attribute as QPopupAttribute).funcKey);
 			var value = property.propertyType == SerializedPropertyType.String ? property.stringValue : property.objectReferenceValue?.GetType()?.Name;
 			data.UpdateList(value);
 			EditorGUI.LabelField(position.HorizontalRect(0f, 0.3f), property.QName());
@@ -381,7 +381,7 @@ namespace QTool.Inspector
 		public static void Draw(QToolbarAttribute toolbar, Rect position, SerializedProperty property, GUIContent label)
 		{
 			position.height = Height;
-			var listData = QEnumListData.Get(property, toolbar.getList);
+			var listData = QPopupData.Get(property, toolbar.getList);
 			if (listData.List.Count == 0)
 			{
 				GUI.Toolbar(position, 0, new string[] { "无" + toolbar.name });
@@ -433,7 +433,7 @@ namespace QTool.Inspector
 		public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
 		{
 			var toolbar = (attribute as QToolbarAttribute);
-			return property.IsShow() ? (toolbar.pageSize > 0 && QEnumListData.Get(property, toolbar.getList).List.Count > toolbar.pageSize ? Height + 20 : Height) : 0;
+			return property.IsShow() ? (toolbar.pageSize > 0 && QPopupData.Get(property, toolbar.getList).List.Count > toolbar.pageSize ? Height + 20 : Height) : 0;
 		}
 	}
 #endregion

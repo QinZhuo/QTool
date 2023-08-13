@@ -623,7 +623,7 @@ namespace QTool
 			var str = obj.ToGUIContent().text;
 			using (new GUILayout.HorizontalScope())
 			{
-				var data = QEnumListData.Get(obj?.GetType(), att.funcKey);
+				var data = QPopupData.Get(obj?.GetType(), att.funcKey);
 				data.UpdateList(str);
 				if (data.SelectIndex < 0)
 				{
@@ -1766,143 +1766,7 @@ namespace QTool
 		}
 	}
 #endif
-	public class QEnumListData
-	{
-		static QDictionary<string, QEnumListData> DrawerDic = new QDictionary<string, QEnumListData>((key) => new QEnumListData());
-
-		public List<string> List = new List<string>();
-		public int SelectIndex = 0;
-		public string SelectValue
-		{
-			get
-			{
-				if (SelectIndex >= 0 && SelectIndex < List.Count)
-				{
-					return List[SelectIndex] == "null" ? null : List[SelectIndex];
-				}
-				else
-				{
-					if (SelectIndex < 0)
-					{
-						SelectIndex = 0;
-					}
-					return default;
-				}
-			}
-		}
-
-		public void UpdateList(string key)
-		{
-			if (key == "null" || key.IsNull())
-			{
-				SelectIndex = 0;
-			}
-			else
-			{
-				SelectIndex = List.FindIndex((obj) => obj == key);
-			}
-		}
-#if UNITY_EDITOR
-		public static QEnumListData Get(SerializedProperty property, string funcKey)
-		{
-			if (property.propertyType == SerializedPropertyType.ObjectReference)
-			{
-				return Get(QReflection.ParseType(property.type.SplitEndString("PPtr<$").TrimEnd('>')), funcKey);
-			}
-			else
-			{
-				return Get((object)property, funcKey);
-			}
-		}
-#endif
-
-		public static QEnumListData Get(object obj, string funcKey)
-		{
-			Type type = null;
-			if (obj is Type)
-			{
-				type = obj as Type;
-			}
-			else
-			{
-				type = obj?.GetType();
-			}
-			var drawerKey = funcKey;
-			if (drawerKey.IsNull())
-			{
-#if UNITY_EDITOR
-				if (obj is SerializedProperty property)
-				{
-					drawerKey = property.propertyType + "_" + property.name;
-				}
-				else
-#endif
-				{
-					drawerKey = type + "";
-				}
-			}
-			var drawer = DrawerDic[drawerKey];
-			if (!funcKey.IsNull())
-			{
-				if (obj?.InvokeFunction(funcKey) is IList itemList)
-				{
-					if (drawer.List.Count != itemList.Count)
-					{
-						drawer.List.Clear();
-						foreach (var item in itemList)
-						{
-							drawer.List.Add(item.ToGUIContent().text);
-						}
-					}
-				}
-			}
-			else if (drawer.List.Count == 0)
-			{
-				if (type.IsAbstract)
-				{
-					foreach (var childType in type.GetAllTypes())
-					{
-						drawer.List.Add(childType.Name);
-					}
-				}
-				else if (type.IsEnum)
-				{
-					foreach (var name in Enum.GetNames(type))
-					{
-						drawer.List.Add(name);
-					}
-				}
-#if UNITY_EDITOR
-				else if (obj is SerializedProperty property)
-				{
-					drawer.List.Clear();
-					switch (property.propertyType)
-					{
-						case SerializedPropertyType.Enum:
-							{
-								foreach (var item in property.enumNames)
-								{
-									drawer.List.Add(item);
-								}
-							}
-							break;
-						default:
-							break;
-					}
-				}
-#endif
-				else
-				{
-					QGUI.Label("错误函数" + funcKey);
-				}
-			}
-			if (drawer.List.Count <= 0)
-			{
-				drawer.List.AddCheckExist("null");
-			}
-			return drawer;
-		}
-	}
+	
 	public class QGenericMenu
 	{
 #if UNITY_EDITOR

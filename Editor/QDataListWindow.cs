@@ -25,12 +25,17 @@ namespace QTool.FlowGraph
 				if (path.Contains(nameof(QDataList) + "Asset" + '/') && path.EndsWith(".txt"))
 				{
 					FilePath = path;
-					var window = GetWindow<QDataListWindow>();
-					window.minSize = new Vector2(300, 200);
+					OpenWindow();
 					return true;
 				}
 			}
 			return false;
+		}
+		[MenuItem("QTool/窗口/QDataList")]
+		public static void OpenWindow()
+		{
+			var window = GetWindow<QDataListWindow>();
+			window.minSize = new Vector2(500, 300);
 		}
 		public QSerializeType typeInfo;
 		public QDataList qdataList;
@@ -106,7 +111,7 @@ namespace QTool.FlowGraph
 									{
 										member.Set(obj, newValue);
 										label.text = newValue.ToQDataType(member.Type, false).Trim('\"');
-									});
+									}, member.MemeberInfo);
 								}
 								CellView.visible = true;
 								var foldout = CellView.Q<Foldout>();

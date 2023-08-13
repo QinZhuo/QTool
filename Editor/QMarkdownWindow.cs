@@ -32,7 +32,7 @@ namespace QTool
 			return false;
 		}
 
-		[MenuItem("QTool/窗口/Markdown")]
+		[MenuItem("QTool/窗口/QMarkdown")]
 		public static void OpenWindow()
 		{
 			var window = GetWindow<QMarkdownWindow>();
