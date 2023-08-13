@@ -89,6 +89,10 @@ namespace QTool
 		const string StartEventKey = "开始";
 		const string StopEventKey = "停止";
 		const string TimeEventKey = "时间";
+		public event Action<QBuffData<BuffData>.Runtime> OnAddBuff = null;
+		public event Action<QBuffData<BuffData>.Runtime> OnRemoveBuff = null;
+		public event Action<QBuffData<BuffData>.Runtime> OnStartBuff = null;
+		public event Action<QBuffData<BuffData>.Runtime> OnStopBuff = null;
 		public QDictionary<string, QBuffData<BuffData>.Runtime> Buffs { get; private set; } = new QDictionary<string, QBuffData<BuffData>.Runtime>();
 		private QDictionary<string, Action<string>> EventActions { get; set; } = new QDictionary<string, Action<string>>();
 		public int this[string key]
@@ -173,8 +177,9 @@ namespace QTool
 				}
 			}
 		}
-		protected virtual void StartBuff(QBuffData<BuffData>.Runtime buff)
+		private void StartBuff(QBuffData<BuffData>.Runtime buff)
 		{
+			OnStartBuff?.Invoke(buff);
 			Buffs.Add(buff.Key, buff);
 			if (buff.Graph != null)
 			{
@@ -188,8 +193,9 @@ namespace QTool
 			}
 			buff.TriggerEvent(StartEventKey);
 		}
-		protected virtual void StopBuff(QBuffData<BuffData>.Runtime buff)
+		private void StopBuff(QBuffData<BuffData>.Runtime buff)
 		{
+			OnStopBuff?.Invoke(buff);
 			buff.TriggerEvent(StopEventKey);
 			Buffs.Remove(buff.Key);
 			if (buff.Graph != null)
@@ -234,19 +240,21 @@ namespace QTool
 				DelayRemove.Clear();
 			}
 		}
-		public event Action<QBuffData<BuffData>.Runtime> OnAddBuff = null;
-		public event Action<QBuffData<BuffData>.Runtime> OnRemoveBuff = null;
+		
 		protected virtual void OnAdd(QBuffData<BuffData>.Runtime buff)
 		{
 			OnAddBuff?.Invoke(buff);
-			if (buff.Graph != null && buff.Data.Megre.HasFlag(QBuffMergeMode.叠层))
+			if (buff.Graph != null)
 			{
 				buff.TriggerEvent(AddEventKey);
-				foreach (var node in buff.Graph.StartNode)
+				if (buff.Data.Megre.HasFlag(QBuffMergeMode.叠层))
 				{
-					if (node.Value.Name.EndsWith("每层"))
+					foreach (var node in buff.Graph.StartNode)
 					{
-						EventActions[node.Value.Name] += buff.TriggerEvent;
+						if (node.Value.Name.EndsWith("每层"))
+						{
+							EventActions[node.Value.Name] += buff.TriggerEvent;
+						}
 					}
 				}
 			}
@@ -254,14 +262,17 @@ namespace QTool
 		protected virtual void OnRemove(QBuffData<BuffData>.Runtime buff)
 		{
 			OnRemoveBuff?.Invoke(buff);
-			if (buff.Graph != null && buff.Data.Megre.HasFlag(QBuffMergeMode.叠层))
+			if (buff.Graph != null)
 			{
 				buff.TriggerEvent(RemoveEventKey);
-				foreach (var node in buff.Graph.StartNode)
+				if (buff.Data.Megre.HasFlag(QBuffMergeMode.叠层))
 				{
-					if (node.Value.Name.EndsWith("每层"))
+					foreach (var node in buff.Graph.StartNode)
 					{
-						EventActions[node.Value.Name] -= buff.TriggerEvent;
+						if (node.Value.Name.EndsWith("每层"))
+						{
+							EventActions[node.Value.Name] -= buff.TriggerEvent;
+						}
 					}
 				}
 			}
