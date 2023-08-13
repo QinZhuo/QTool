@@ -95,12 +95,13 @@ namespace QTool
 		{
 			OriginValue = value;
 			OffsetValue = 0;
-			PercentValue = 1;
+			ScaleValue = 1;
 			FreshValue();
 		}
 		[QName]
 		public QValue OriginValue { get; private set; } = 0f;
 		private QValue _OffsetValue = 0;
+		[QName]
 		public QValue OffsetValue {
 			get => _OffsetValue;
 			set
@@ -112,15 +113,16 @@ namespace QTool
 				}
 			}
 		}
-		private QValue _PercentValue = 1;
-		public QValue PercentValue
+		private QValue _ScaleValue = 1;
+		[QName,QOldName("PercentValue")]
+		public QValue ScaleValue
 		{
-			get => _PercentValue;
+			get => _ScaleValue;
 			set
 			{
-				if (_PercentValue != value)
+				if (_ScaleValue != value)
 				{
-					_PercentValue = value;
+					_ScaleValue = value;
 					FreshValue();
 				}
 			}
@@ -131,20 +133,20 @@ namespace QTool
 		{
 			get => _Value; set
 			{
-				if (PercentValue == 1)
+				if (ScaleValue == 1)
 				{
 					OffsetValue = value - OriginValue;
 				}
 				else
 				{
-					throw new Exception(nameof(QRuntimeValue) + "." + nameof(PercentValue) + "不为1 无法直接更改 " + nameof(Value) + " 可尝试更改 " + nameof(OffsetValue));
+					throw new Exception(nameof(QRuntimeValue) + "." + nameof(ScaleValue) + "不为1 无法直接更改 " + nameof(Value) + " 可尝试更改 " + nameof(OffsetValue));
 				}
 			}
 		}
 		public int IntValue => Mathf.RoundToInt(Value);
 		private void FreshValue()
 		{
-			_Value = (OriginValue + OffsetValue) * PercentValue;
+			_Value = (OriginValue + OffsetValue) * ScaleValue;
 			InvokeOnChange();
 		}
 		public override void OnDeserializeOver()
