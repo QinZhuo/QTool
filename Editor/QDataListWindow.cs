@@ -26,7 +26,7 @@ namespace QTool.FlowGraph
 				{
 					FilePath = path;
 					var window = GetWindow<QDataListWindow>();
-					window.minSize = new Vector2(400, 300);
+					window.minSize = new Vector2(300, 200);
 					return true;
 				}
 			}
@@ -44,6 +44,7 @@ namespace QTool.FlowGraph
 		{
 			base.CreateGUI();
 			var root = rootVisualElement.AddScrollView();
+			root.style.height = new Length(100, LengthUnit.Percent);
 			CellView = rootVisualElement.AddVisualElement();
 			CellView.style.position = Position.Absolute;
 			CellView.visible = false;
@@ -52,7 +53,7 @@ namespace QTool.FlowGraph
 			listView = root.AddListView(qdataList, (visual, y) =>
 			{
 				visual.Clear();
-
+				var width = 0;
 				for (int x = 0; x < qdataList[y].Count; x++)
 				{
 					var row = qdataList[y];
@@ -66,6 +67,7 @@ namespace QTool.FlowGraph
 						label.style.width = 180;
 						label.style.marginLeft = 10;
 						label.style.marginRight = 10;
+						width += 200;
 					}
 					else
 					{
@@ -124,6 +126,10 @@ namespace QTool.FlowGraph
 					menu.menu.AppendAction("添加行", action => { AddAt(y); listView.Rebuild(); });
 					menu.menu.AppendAction("删除行", action => { RemoveAt(y); listView.Rebuild(); });
 				}));
+				if (y == 0)
+				{
+					listView.style.width = width;
+				}
 			},
 			() =>
 			{
@@ -131,6 +137,7 @@ namespace QTool.FlowGraph
 				layout.style.flexDirection = FlexDirection.Row;
 				return layout;
 			});
+			
 		}
 
 		protected override void OnLostFocus()

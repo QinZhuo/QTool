@@ -56,7 +56,7 @@ namespace QTool
 			var editorRange = new ScrollView();
 			markdownText = editorRange.AddText("", "", null, true);
 			root.Split(editorRange, markdownView);
-			markdownText.RegisterCallback<ChangeEvent<string>>((e) => Text=e.newValue);
+			markdownText.RegisterCallback<ChangeEvent<string>>((e) => Text = e.newValue);
 			editorRange.verticalScroller.valueChanged += (value) =>
 			{
 				markdownView.verticalScroller.value = value / editorRange.verticalScroller.highValue * markdownView.verticalScroller.highValue;
