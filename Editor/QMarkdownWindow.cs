@@ -35,7 +35,7 @@ namespace QTool
 		[MenuItem("QTool/窗口/Markdown")]
 		public static void OpenWindow()
 		{
-			var window= GetWindow<QMarkdownWindow>();
+			var window = GetWindow<QMarkdownWindow>();
 			window.minSize = new Vector2(500, 300);
 		}
 		#endregion
@@ -45,7 +45,7 @@ namespace QTool
 			markdownText.value = Text;
 			OnChangeText(Text);
 		}
-		private TextField markdownText =null;
+		private TextField markdownText = null;
 		private ScrollView markdownView = null;
 
 		protected override void CreateGUI()
@@ -78,7 +78,7 @@ namespace QTool
 			root.AddMarkdown(target as TextAsset);
 			return root;
 		}
-		
+
 	}
 
 	public abstract class QTextEditorWindow<T> : EditorWindow where T : QTextEditorWindow<T>
@@ -92,8 +92,8 @@ namespace QTool
 				{
 					QPlayerPrefs.SetString(typeof(T).Name + "_" + nameof(FilePath), value);
 					UndoList.Clear();
-					LastOpenTime = default;
-					FilePathList= QPlayerPrefs.Get(typeof(T).Name + "_" + nameof(FilePathList), FilePathList);
+					LastWriteTime = default;
+					FilePathList = QPlayerPrefs.Get(typeof(T).Name + "_" + nameof(FilePathList), FilePathList);
 					FilePathList.AddCheckExist(value.Replace('/', '\\'));
 					QPlayerPrefs.Set(typeof(T).Name + "_" + nameof(FilePathList), FilePathList);
 					if (PathPopup != null)
@@ -104,24 +104,23 @@ namespace QTool
 			}
 		}
 		private static List<string> FilePathList = new List<string>();
-		private static DateTime LastOpenTime =default;
+		private static DateTime LastWriteTime = default;
 		protected virtual void OnFocus()
 		{
 			var path = FilePath;
 			if (QFileManager.ExistsFile(path))
 			{
 				var time = QFileManager.GetLastWriteTime(path);
-				if(time > LastOpenTime)
+				if (time > LastWriteTime)
 				{
 					var asset = AssetDatabase.LoadAssetAtPath<TextAsset>(path);
-					titleContent = new GUIContent(asset.name + " - " + typeof(T).Name);
+					titleContent = new GUIContent(asset.name + " - " + typeof(T).Name.SplitStartString("Window"));
 					if (asset != null)
 					{
 						Text = asset.text;
 						ParseText();
-						Changed = false;
 					}
-					time = LastOpenTime;
+					LastWriteTime = time;
 				}
 			}
 		}
@@ -134,10 +133,11 @@ namespace QTool
 				OnChangeText(value);
 			}
 		}
+		public virtual bool AutoSave => true;
 		protected virtual void OnLostFocus()
 		{
 			var path = FilePath;
-			if (!path.IsNull()&& Changed)
+			if (AutoSave && !path.IsNull())
 			{
 				QFileManager.Save(path, Text);
 				AssetDatabase.ImportAsset(path);
@@ -149,13 +149,12 @@ namespace QTool
 		{
 			Toolbar = rootVisualElement.AddVisualElement();
 			Toolbar.style.flexDirection = FlexDirection.Row;
-			PathPopup = Toolbar.AddPopup("", FilePathList, FilePath.Replace('/', '\\'), path => { FilePath = path; OnFocus(); });
+			PathPopup = Toolbar.AddPopup("", FilePathList, FilePath.Replace('/', '\\'), path => { FilePath = path.Replace('\\','/'); OnFocus(); });
 			Toolbar.AddButton("撤销", Undo);
 		}
 		protected abstract void ParseText();
 		private static Stack<string> UndoList = new Stack<string>();
 		private bool IsUndo = false;
-		protected bool Changed = false;
 		public void Undo()
 		{
 			if (UndoList.Count > 0)
@@ -175,7 +174,6 @@ namespace QTool
 					UndoList.Push(newValue);
 				}
 				_Text = newValue;
-				Changed = true;
 			}
 		}
 	}

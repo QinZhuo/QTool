@@ -40,6 +40,7 @@ namespace QTool.FlowGraph
 		ListView listView = null;
 		Label lastClick = null;
 		VisualElement CellView = null;
+		public override bool AutoSave => CellView == null || !CellView.visible;
 		protected override void CreateGUI()
 		{
 			base.CreateGUI();
@@ -50,6 +51,7 @@ namespace QTool.FlowGraph
 			CellView.visible = false;
 			CellView.style.backgroundColor = Color.Lerp(Color.black, Color.white, 0.3f);
 			CellView.style.SetBorder(Color.black);
+		
 			listView = root.AddListView(qdataList, (visual, y) =>
 			{
 				visual.Clear();
@@ -78,12 +80,12 @@ namespace QTool.FlowGraph
 						label.name = title;
 						label.RegisterCallback<ClickEvent>((eventData) =>
 						{
+							if (CellView.visible)
+							{
+								return;
+							}
 							if (lastClick == label)
 							{
-								if (CellView.visible)
-								{
-									return;
-								}
 								CellView.Clear();
 								var pos = label.worldTransform.MultiplyPoint(label.transform.position);
 								CellView.style.left = pos.x;
@@ -115,7 +117,6 @@ namespace QTool.FlowGraph
 							}
 							else
 							{
-								CellView.visible = false;
 								lastClick = label;
 							}
 						});
@@ -137,7 +138,10 @@ namespace QTool.FlowGraph
 				layout.style.flexDirection = FlexDirection.Row;
 				return layout;
 			});
-			
+			root.RegisterCallback<MouseDownEvent>(data =>
+			{
+				CellView.visible = false;
+			});
 		}
 
 		protected override void OnLostFocus()
@@ -151,7 +155,6 @@ namespace QTool.FlowGraph
 		}
 		protected override async void ParseText()
 		{
-			if (CellView!=null&&CellView.visible) return;
 			try
 			{
 				var path = FilePath;
