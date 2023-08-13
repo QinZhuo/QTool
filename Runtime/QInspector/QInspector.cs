@@ -64,10 +64,10 @@ namespace QTool
 	/// 将字符传显示为枚举下拉款通过GetKeyListFunc获取所有可选择的字符串
 	/// </summary>
 	[AttributeUsage(AttributeTargets.Field | AttributeTargets.Property | AttributeTargets.Parameter)]
-	public class QEnumAttribute : PropertyAttribute
+	public class QPopupAttribute : PropertyAttribute
 	{
 		public string funcKey;
-		public QEnumAttribute(string GetKeyListFunc = "")
+		public QPopupAttribute(string GetKeyListFunc = "")
 		{
 			order = 1;
 			this.funcKey = GetKeyListFunc;
@@ -323,14 +323,14 @@ namespace QTool.Inspector
 		}
 	}
 
-	[CustomPropertyDrawer(typeof(QEnumAttribute))]
+	[CustomPropertyDrawer(typeof(QPopupAttribute))]
 	public class QEnumDrawer : QNameDrawer
 	{
 	
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
 			if (!property.IsShow()) return;
-			var data = QEnumListData.Get(property, (attribute as QEnumAttribute).funcKey);
+			var data = QEnumListData.Get(property, (attribute as QPopupAttribute).funcKey);
 			var value = property.propertyType == SerializedPropertyType.String ? property.stringValue : property.objectReferenceValue?.GetType()?.Name;
 			data.UpdateList(value);
 			EditorGUI.LabelField(position.HorizontalRect(0f, 0.3f), property.QName());

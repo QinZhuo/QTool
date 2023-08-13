@@ -8,7 +8,7 @@ namespace QTool.Test
 	{
 		public override string Key { get; set; }
 		[QName("数值")]
-		[QEnum(nameof(QDataListTestType) + "." + nameof(List))]
+		[QPopup(nameof(QDataListTestType) + "." + nameof(List))]
 		public string value = "";
 		public Vector3 v3;
 		public List<int> array;

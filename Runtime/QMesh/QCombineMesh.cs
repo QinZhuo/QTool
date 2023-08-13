@@ -9,7 +9,7 @@ namespace QTool
 	{
 		[QName("模型"),QOnChange(nameof(FreshRenderers))]
 		public List<GameObject> modelRoot;
-		[QName("合并模块"),QEnum("get_" + nameof(Renderers))]
+		[QName("合并模块"),QPopup("get_" + nameof(Renderers))]
 		public List<string> skinnedMeshKeys;
 		[QName("合并贴图")]
 		public string[] combineTextures;

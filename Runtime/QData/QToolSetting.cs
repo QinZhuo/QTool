@@ -18,7 +18,7 @@ namespace QTool
 
 		[QName("强制渲染比例"),Tooltip("只有挂载 "+nameof(QScreenAspect)+" 脚本的相机和UI会生效")]
 		public float targetAspect = 16f/9f;
-		[QName("支持Mod文件夹"),QEnum(nameof(GetModList))]
+		[QName("支持Mod文件夹"),QPopup(nameof(GetModList))]
 		public List<string> modeList = new List<string> { nameof(QTranslate.QTranslateData) };
 		[QName("游戏数据邮箱")]
 		public QMailAccount QAnalysisMail;

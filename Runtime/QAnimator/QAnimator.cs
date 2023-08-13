@@ -331,7 +331,7 @@ namespace QTool
 		{
 			public string Key;
 #if UNITY_EDITOR
-			[QEnum(nameof(States))]
+			[QPopup(nameof(States))]
 #endif
 			public List<string> StateName = new List<string>();
 			private List<int> _StateNameHash = null;

@@ -124,7 +124,7 @@ namespace QTool
 			root.Add(visual);
 			return visual;
 		}
-		public static DoubleField AddQEnumAttribute(this VisualElement root, QEnumAttribute att, object obj, Action<object> changeEvent = null)
+		public static DoubleField AddQEnumAttribute(this VisualElement root, QPopupAttribute att, object obj, Action<object> changeEvent = null)
 		{
 			var str = obj.ToGUIContent().text;
 			var visual = new DoubleField();
@@ -295,7 +295,7 @@ namespace QTool
 				case TypeCode.Double:
 					return root.AddDouble(name, (double)obj, (value) => { changeEvent(value); });
 				case TypeCode.String:
-					var enumView = customAttribute?.GetAttribute<QEnumAttribute>();
+					var enumView = customAttribute?.GetAttribute<QPopupAttribute>();
 					if (enumView != null)
 					{
 						return root.AddQEnumAttribute(enumView, obj, (value) => changeEvent(value));

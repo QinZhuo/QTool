@@ -618,7 +618,7 @@ namespace QTool
 			}
 			return ir;
 		}
-		public static object Draw(this QEnumAttribute att, object obj)
+		public static object Draw(this QPopupAttribute att, object obj)
 		{
 			var str = obj.ToGUIContent().text;
 			using (new GUILayout.HorizontalScope())
@@ -708,7 +708,7 @@ namespace QTool
 				case TypeCode.Double:
 					obj = DoubleField(name, (double)obj); break;
 				case TypeCode.String:
-					var enumView = customAttribute?.GetAttribute<QEnumAttribute>();
+					var enumView = customAttribute?.GetAttribute<QPopupAttribute>();
 					if (enumView != null)
 					{
 						obj = enumView.Draw(obj); break;

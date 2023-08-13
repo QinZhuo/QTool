@@ -22,7 +22,7 @@ namespace QTool.Test
 		[QToggle("显示变量")]
 		public bool toggleTest;
 		[QName("QInspector测试",nameof(toggleTest))]
-		[QEnum(nameof(enumTest))]
+		[QPopup(nameof(enumTest))]
         public string testValue ;
 		public static string[] enumTest=> new string[] { "enumTest1", "enumTest2" };
 		
