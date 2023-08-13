@@ -234,6 +234,7 @@ namespace QTool
 		public event Action<QBuffData<BuffData>.Runtime> OnRemoveBuff = null;
 		protected virtual void OnAdd(QBuffData<BuffData>.Runtime buff)
 		{
+			OnAddBuff?.Invoke(buff);
 			if (buff.Graph != null)
 			{
 				buff.TriggerEvent(AddEventKey);
@@ -249,10 +250,10 @@ namespace QTool
 					}
 				}
 			}
-			OnAddBuff?.Invoke(buff);
 		}
 		protected virtual void OnRemove(QBuffData<BuffData>.Runtime buff)
 		{
+			OnRemoveBuff?.Invoke(buff);
 			if (buff.Graph != null)
 			{
 				buff.TriggerEvent(RemoveEventKey);
@@ -268,7 +269,6 @@ namespace QTool
 					}
 				}
 			}
-			OnRemoveBuff?.Invoke(buff);
 		}
 		public void TriggerEvent(string key)
 		{
