@@ -92,11 +92,10 @@ namespace QTool
 				{
 					QPlayerPrefs.SetString(typeof(T).Name + "_" + nameof(FilePath), value);
 					UndoList.Clear();
-					
 					LastOpenTime = default;
-					QPlayerPrefs.Get(typeof(T).Name + "_" + nameof(FilePath) + "List", FilePathList);
+					FilePathList= QPlayerPrefs.Get(typeof(T).Name + "_" + nameof(FilePathList), FilePathList);
 					FilePathList.AddCheckExist(value.Replace('/', '\\'));
-					QPlayerPrefs.Set(typeof(T).Name + "_" + nameof(FilePath) + "List", FilePathList);
+					QPlayerPrefs.Set(typeof(T).Name + "_" + nameof(FilePathList), FilePathList);
 					if (PathPopup != null)
 					{
 						PathPopup.value = value;

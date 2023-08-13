@@ -387,7 +387,7 @@ namespace QTool
 			get => base[OwnerData.GetTitleIndex(title)];
 			set => base[OwnerData.GetTitleIndex(title)] = value;
 		}
-        public T GetValue<T>(int index=1)
+        public T GetValue<T>(int index=1,T defaultValue=default)
         {
 			if (typeof(T) == typeof(string))
 			{
@@ -395,7 +395,7 @@ namespace QTool
 			}
 			else
 			{
-				return base[index].ParseQData<T>(default, false);
+				return base[index].ParseQData(defaultValue, false);
 			}
         }
 		public void SetValueType(object value,Type type,int index=1)
@@ -415,9 +415,9 @@ namespace QTool
 			SetValueType(value, typeof(T), index);
         }
 	
-		public T GetValue<T>(string title)
+		public T GetValue<T>(string title,T defaultValue=default)
 		{
-			return GetValue<T>(OwnerData.GetTitleIndex(title));
+			return GetValue(OwnerData.GetTitleIndex(title), defaultValue);
 		}
 		public bool HasValue(string title)
 		{

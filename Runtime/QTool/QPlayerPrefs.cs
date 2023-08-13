@@ -56,7 +56,7 @@ namespace QTool
 			}
 			else
 			{
-				return Data[key].GetValue<T>();
+				return Data[key].GetValue(1,defaultValue);
 			}
 		}
 		public static int GetInt(string key, int defaultValue = 0)
