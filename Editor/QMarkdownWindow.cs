@@ -93,12 +93,13 @@ namespace QTool
 					QPlayerPrefs.SetString(typeof(T).Name + "_" + nameof(FilePath), value);
 					UndoList.Clear();
 					LastWriteTime = default;
-					FilePathList = QPlayerPrefs.Get(typeof(T).Name + "_" + nameof(FilePathList), FilePathList);
-					FilePathList.AddCheckExist(value.Replace('/', '\\'));
+					QPlayerPrefs.Get(typeof(T).Name + "_" + nameof(FilePathList), FilePathList);
+					var select = value.Replace('/', '\\');
+					FilePathList.AddCheckExist(select);
 					QPlayerPrefs.Set(typeof(T).Name + "_" + nameof(FilePathList), FilePathList);
 					if (PathPopup != null)
 					{
-						PathPopup.value = value;
+						PathPopup.value = select;
 					}
 				}
 			}
@@ -149,6 +150,7 @@ namespace QTool
 		{
 			Toolbar = rootVisualElement.AddVisualElement();
 			Toolbar.style.flexDirection = FlexDirection.Row;
+			QPlayerPrefs.Get(typeof(T).Name + "_" + nameof(FilePathList), FilePathList);
 			PathPopup = Toolbar.AddPopup("", FilePathList, FilePath.Replace('/', '\\'), path => { FilePath = path.Replace('\\','/'); OnFocus(); });
 			Toolbar.AddButton("撤销", Undo);
 		}
