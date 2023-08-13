@@ -86,6 +86,8 @@ namespace QTool
 	{
 		const string AddEventKey = "添加";
 		const string RemoveEventKey = "移除";
+		const string StartEventKey = "开始";
+		const string EndEventKey = "结束";
 		const string TimeEventKey = "时间";
 		public QDictionary<string, QBuffData<BuffData>.Runtime> Buffs { get; private set; } = new QDictionary<string, QBuffData<BuffData>.Runtime>();
 		private QDictionary<string, Action<string>> EventActions { get; set; } = new QDictionary<string, Action<string>>();
@@ -178,21 +180,23 @@ namespace QTool
 			{
 				foreach (var node in buff.Graph.StartNode)
 				{
-					if(!buff.Data.Megre.HasFlag(QBuffMergeMode.叠层)|| !node.Value.Name.EndsWith("每层"))
+					if(!node.Value.Name.EndsWith("每层"))
 					{
 						EventActions[node.Value.Name] += buff.TriggerEvent;
 					}
 				}
 			}
+			buff.TriggerEvent(StartEventKey);
 		}
 		private void PrivateRemove(QBuffData<BuffData>.Runtime buff)
 		{
+			buff.TriggerEvent(EndEventKey);
 			Buffs.Remove(buff.Key);
 			if (buff.Graph != null)
 			{
 				foreach (var node in buff.Graph.StartNode)
 				{
-					if (!buff.Data.Megre.HasFlag(QBuffMergeMode.叠层) || !node.Value.Name.EndsWith("每层"))
+					if (!node.Value.Name.EndsWith("每层"))
 					{
 						EventActions[node.Value.Name] -= buff.TriggerEvent;
 					}
@@ -235,18 +239,14 @@ namespace QTool
 		protected virtual void OnAdd(QBuffData<BuffData>.Runtime buff)
 		{
 			OnAddBuff?.Invoke(buff);
-			if (buff.Graph != null)
+			if (buff.Graph != null && buff.Data.Megre.HasFlag(QBuffMergeMode.叠层))
 			{
 				buff.TriggerEvent(AddEventKey);
 				foreach (var node in buff.Graph.StartNode)
 				{
-					var name = node.Value.Name;
-					if (name != AddEventKey && name != RemoveEventKey)
+					if (node.Value.Name.EndsWith("每层"))
 					{
-						if (!buff.Data.Megre.HasFlag(QBuffMergeMode.叠层) || node.Value.Name.EndsWith("每层"))
-						{
-							EventActions[node.Value.Name] += buff.TriggerEvent;
-						}
+						EventActions[node.Value.Name] += buff.TriggerEvent;
 					}
 				}
 			}
@@ -254,18 +254,14 @@ namespace QTool
 		protected virtual void OnRemove(QBuffData<BuffData>.Runtime buff)
 		{
 			OnRemoveBuff?.Invoke(buff);
-			if (buff.Graph != null)
+			if (buff.Graph != null && buff.Data.Megre.HasFlag(QBuffMergeMode.叠层))
 			{
 				buff.TriggerEvent(RemoveEventKey);
 				foreach (var node in buff.Graph.StartNode)
 				{
-					var name = node.Value.Name;
-					if (name != AddEventKey && name != RemoveEventKey)
+					if (node.Value.Name.EndsWith("每层"))
 					{
-						if (!buff.Data.Megre.HasFlag(QBuffMergeMode.叠层) || node.Value.Name.EndsWith("每层"))
-						{
-							EventActions[node.Value.Name] -= buff.TriggerEvent;
-						}
+						EventActions[node.Value.Name] -= buff.TriggerEvent;
 					}
 				}
 			}
