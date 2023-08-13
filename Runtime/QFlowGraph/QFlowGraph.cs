@@ -34,15 +34,7 @@ namespace QTool.FlowGraph
 				}
 			};
 		}
-		public override async void OnAfterDeserialize()
-		{
-			await QTask.Step();
-			base.OnAfterDeserialize();
-		}
-		public override void OnBeforeSerialize()
-		{
-			base.OnBeforeSerialize();
-		}
+	
 		public override void Deserialize()
 		{
 			base.Deserialize();
