@@ -87,7 +87,7 @@ namespace QTool
 		const string AddEventKey = "添加";
 		const string RemoveEventKey = "移除";
 		const string StartEventKey = "开始";
-		const string EndEventKey = "结束";
+		const string StopEventKey = "停止";
 		const string TimeEventKey = "时间";
 		public QDictionary<string, QBuffData<BuffData>.Runtime> Buffs { get; private set; } = new QDictionary<string, QBuffData<BuffData>.Runtime>();
 		private QDictionary<string, Action<string>> EventActions { get; set; } = new QDictionary<string, Action<string>>();
@@ -113,7 +113,7 @@ namespace QTool
 					buff.Time.CurrentValue = buff.Time.MaxValue;
 				}
 				buff.Count.OffsetValue = count;
-				PrivateAdd(buff);
+				StartBuff(buff);
 				for (int i = 0; i < count; i++)
 				{
 					OnAdd(buff);
@@ -158,12 +158,12 @@ namespace QTool
 					buff.Count.OffsetValue -= count;
 					if (buff.Count.OffsetValue <= 0)
 					{
-						PrivateRemove(buff);
+						StopBuff(buff);
 					}
 				}
 				else
 				{
-					PrivateRemove(buff);
+					StopBuff(buff);
 					buff.Count.OffsetValue = 0;
 					count = 1;
 				}
@@ -173,7 +173,7 @@ namespace QTool
 				}
 			}
 		}
-		private void PrivateAdd(QBuffData<BuffData>.Runtime buff)
+		protected virtual void StartBuff(QBuffData<BuffData>.Runtime buff)
 		{
 			Buffs.Add(buff.Key, buff);
 			if (buff.Graph != null)
@@ -188,9 +188,9 @@ namespace QTool
 			}
 			buff.TriggerEvent(StartEventKey);
 		}
-		private void PrivateRemove(QBuffData<BuffData>.Runtime buff)
+		protected virtual void StopBuff(QBuffData<BuffData>.Runtime buff)
 		{
-			buff.TriggerEvent(EndEventKey);
+			buff.TriggerEvent(StopEventKey);
 			Buffs.Remove(buff.Key);
 			if (buff.Graph != null)
 			{
