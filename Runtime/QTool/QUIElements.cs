@@ -126,7 +126,7 @@ namespace QTool
 		}
 		public static PopupField<string> AddQPopupAttribute(this VisualElement root, QPopupAttribute att, object obj, Action<object> changeEvent = null)
 		{
-			var str = obj.ToGUIContent().text;
+			var str = obj.ToKeyString();
 			var data = QPopupData.Get(obj?.GetType(), att.funcKey);
 			return root.AddPopup("", data.List, str, (value) =>
 			{
@@ -576,6 +576,8 @@ namespace QTool
 			}
 			return root;
 		}
+
+		
 	}
 	public class QPopupData
 	{
@@ -662,7 +664,7 @@ namespace QTool
 						drawer.List.Clear();
 						foreach (var item in itemList)
 						{
-							drawer.List.Add(item.ToGUIContent().text);
+							drawer.List.Add(item.ToKeyString());
 						}
 					}
 				}

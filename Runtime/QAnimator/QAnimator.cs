@@ -245,7 +245,7 @@ namespace QTool
 					var value = eventData.time / Clip.length;
 					var key = eventData.GetKey();
 					if (color.DragBar(key, trackRect, ref value,(menu)=> {
-						menu.AddItem("删除事件".ToGUIContent(), false, () => RemoveEvent( eventData));
+						menu.AddItem(new GUIContent("删除事件"), false, () => RemoveEvent( eventData));
 					}))
 					{
 						SetTime(eventData, value);
@@ -260,7 +260,7 @@ namespace QTool
 						{
 							var box = color.Box(trackRect, start.time / Clip.length, value);
 							var newRect = box.Drag(trackRect, key + "_Range", (menu) => {
-								menu.AddItem("删除事件".ToGUIContent(), false, () =>RemoveEvent(start, eventData));
+								menu.AddItem(new GUIContent("删除事件"), false, () =>RemoveEvent(start, eventData));
 							});
 							if (newRect != trackRect && Event.current.type != EventType.Layout)
 							{
@@ -278,7 +278,7 @@ namespace QTool
 					var curValue = (mousePos.x - rect.xMin) / rect.width;
 					rect.MouseMenu((menu) =>
 					{
-						menu.AddItem("添加事件".ToGUIContent(), false, () =>
+						menu.AddItem(new GUIContent("添加事件"), false, () =>
 						{
 							AddEvent(track.Key, curValue * Clip.length);
 						});

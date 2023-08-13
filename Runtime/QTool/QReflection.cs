@@ -471,13 +471,10 @@ namespace QTool.Reflection
 			{
 				case TypeCode.Boolean:
 					size = sizeof(bool); break;
-					break;
 				case TypeCode.Byte:
 					size = sizeof(byte); break;
-					break;
 				case TypeCode.Char:
 					size = sizeof(char); break;
-					break;
 				case TypeCode.DateTime:
 					size = sizeof(long); break;
 				case TypeCode.DBNull:
@@ -526,6 +523,33 @@ namespace QTool.Reflection
 			}
 			MinSizeCache[type] = size;
 			return size;
+		}
+		public static string ToKeyString(this object obj)
+		{
+			if (obj is UnityEngine.Object uObj)
+			{
+				return uObj.name;
+			}
+			else if (obj is Color color)
+			{
+				return ColorUtility.ToHtmlStringRGB(color);
+			}
+			else if (obj is Color32 color32)
+			{
+				return ColorUtility.ToHtmlStringRGB(color32);
+			}
+			else if (obj is MemberInfo memberInfo)
+			{
+				return memberInfo.QName();
+			}
+			else if (obj is IKey<string> ikey)
+			{
+				return ikey.Key;
+			}
+			else
+			{
+				return obj?.ToString();
+			}
 		}
 		public static string QName(this MemberInfo type)
         {
@@ -746,6 +770,7 @@ namespace QTool.Reflection
 		public static bool Is(this Type type,Type checkType)
 		{
 			return checkType.IsAssignableFrom(type);
+			#region 复杂检测
 			//if (type==checkType)
 			//{
 			//	return true;
@@ -762,8 +787,9 @@ namespace QTool.Reflection
 			//{ 
 			//	return type.BaseType.Is(checkType);
 			//}
+			#endregion
 		}
-        static Dictionary<string, Type> TypeBuffer = new Dictionary<string, Type>();
+		static Dictionary<string, Type> TypeBuffer = new Dictionary<string, Type>();
         public static Type ParseType(string typeString)
         {
 			if (typeString.IsNull()) return null;

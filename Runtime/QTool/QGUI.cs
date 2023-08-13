@@ -620,7 +620,7 @@ namespace QTool
 		}
 		public static object Draw(this QPopupAttribute att, object obj)
 		{
-			var str = obj.ToGUIContent().text;
+			var str = obj.ToKeyString();
 			using (new GUILayout.HorizontalScope())
 			{
 				var data = QPopupData.Get(obj?.GetType(), att.funcKey);
@@ -909,39 +909,7 @@ namespace QTool
 			}
 			return obj;
 		}
-		public static GUIContent ToGUIContent(this object obj)
-		{
-
-			if (obj is UnityEngine.Object uObj)
-			{
-#if UNITY_EDITOR
-				if(uObj==null)return new GUIContent();
-				return new GUIContent(uObj?.name, AssetPreview.GetAssetPreview(uObj), uObj?.ToString());
-#else
-				return new GUIContent(uObj.name, uObj.ToString());
-#endif
-			}
-			else if (obj is Color color)
-			{
-				return new GUIContent(ColorUtility.ToHtmlStringRGB(color), ColorTexture[color]);
-			}
-			else if (obj is Color32 color32)
-			{
-				return new GUIContent(ColorUtility.ToHtmlStringRGB(color32), ColorTexture[color32]);
-			}
-			else if (obj is MemberInfo memberInfo)
-			{
-				return new GUIContent(memberInfo.QName(), memberInfo.Name);
-			}
-			else if (obj is IKey<string> ikey)
-			{
-				return new GUIContent(ikey.Key, obj.ToString());
-			}
-			else
-			{
-				return new GUIContent(obj?.ToString());
-			}
-		}
+	
 		public static object GetPathObject(this object target, string path)
 		{
 			if (path.SplitTowString(".", out var start, out var end))

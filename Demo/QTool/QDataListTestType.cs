@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 namespace QTool.Test
 {
-	public class QDataListTestType : QDataList<QDataListTestType>
+	public class QDataListTestType : QEffectData<QDataListTestType>
 	{
 		public override string Key { get; set; }
 		[QName("数值")]
@@ -13,11 +13,9 @@ namespace QTool.Test
 		public Vector3 v3;
 		public List<int> array;
 		public TestEnum testEnum;
-		[QName("效果"),TextArea(2,4)]
-		public string textArea;
 		public override string ToString()
 		{
-			return "["+Key + "]:[" + value + "]";
+			return "[" + Key + "]:[" + value + "]";
 		}
 	}
 }
