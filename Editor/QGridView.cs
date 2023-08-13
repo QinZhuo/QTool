@@ -4,7 +4,6 @@ using UnityEngine;
 using System;
 using UnityEditor;
 using System.Reflection;
-using QTool.Inspector;
 namespace QTool
 {
 

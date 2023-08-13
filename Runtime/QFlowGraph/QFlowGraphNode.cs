@@ -8,7 +8,6 @@ namespace QTool.FlowGraph
 	[QCommandType("基础")]
 	public static class QFlowGraphNode
 	{
-
 		[QName("数据/获取变量")]
 		[return: QOutputPort(true)]
 		public static object GetValue(QFlowNode This, string key)
@@ -39,10 +38,6 @@ namespace QTool.FlowGraph
 			}
 			return funcInfo.Invoke(obj, param);
 		}
-
-
-
-
 		[QName("运算/加")]
 		[return: QOutputPort(true)]
 		public static object Add(object a, object b)
@@ -115,7 +110,6 @@ namespace QTool.FlowGraph
 		{
 			return !a;
 		}
-
 		internal const string StartKey = "起点";
 		[QStartNode]
 		[QName("起点/起点")]
@@ -163,12 +157,9 @@ namespace QTool.FlowGraph
 				{
 					This.RunPort(nameof(branchs), i);
 				}
-
 			}
-
 		}
 		[QName("流程图/全部完成")]
-
 		public static IEnumerator AllOver(QFlowNode This, [QFlowPort(onlyOneRunning = true)] List<QFlow> branchs)
 		{
 			List<int> taskList = new List<int> { };
@@ -250,5 +241,4 @@ namespace QTool.FlowGraph
 			return info;
 		}
 	}
-
 }

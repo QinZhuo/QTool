@@ -11,7 +11,8 @@ using QTool.Reflection;
 
 namespace QTool
 {
-	public class QMarkdownWindow : EditorWindow
+
+	public class QMarkdownWindow : QTextEditorWindow<QMarkdownWindow>
 	{
 		#region 静态函数
 		[UnityEditor.Callbacks.OnOpenAsset(0)]
@@ -23,7 +24,7 @@ namespace QTool
 				var ext = Path.GetExtension(path).ToLower();
 				if (".md".Equals(ext) || ".markdown".Equals(ext))
 				{
-					PlayerPrefs.SetString(nameof(QMarkdownWindow), path);
+					FilePath = path;
 					OpenWindow();
 					return true;
 				}
@@ -35,76 +36,36 @@ namespace QTool
 		public static void OpenWindow()
 		{
 			var window= GetWindow<QMarkdownWindow>();
-			window.minSize = new Vector2(250, 400);
-			window.Show();
+			window.minSize = new Vector2(500, 300);
 		}
 		#endregion
-		private async void OnFocus()
+		protected override async void ParseText()
 		{
-			
-			var path = PlayerPrefs.GetString(nameof(QMarkdownWindow));
-			if (!path.IsNull())
-			{
-				var asset = AssetDatabase.LoadAssetAtPath<TextAsset>(path);
-				titleContent = new GUIContent(asset.name+" - Markdown");
-				if (asset != null)
-				{
-					await QTask.Wait(() => markdownText != null);
-					markdownText.value = asset.text;
-					UndoList.Clear();
-					undoButton.visible = false;
-				}
-			}
-		}
-		private void OnLostFocus()
-		{
-			
-			var path = PlayerPrefs.GetString(nameof(QMarkdownWindow));
-			if (File.Exists(path)&& markdownText!=null)
-			{
-				QFileManager.Save(path, markdownText.text);
-				AssetDatabase.ImportAsset(path);
-			}
+			await QTask.Wait(() => markdownText != null);
+			markdownText.value = Text;
 		}
 		private TextField markdownText =null;
 		private ScrollView markdownView = null;
-		private Button undoButton = null;
-		private Stack<string> UndoList = new Stack<string>();
-		private void CreateGUI()
+
+		protected override void CreateGUI()
 		{
+			base.CreateGUI();
 			var root = rootVisualElement;
 			markdownView = new ScrollView();
-			var left = new VisualElement();
-			undoButton= left.AddButton("撤销", Undo);
-			var editorRange = left.AddScrollView();
-			markdownText = editorRange.AddText("", "",null, true);
-			root.Split(left, markdownView);
-			markdownText.RegisterCallback<ChangeEvent<string>>(OnTextChange);
+			var editorRange = new ScrollView();
+			markdownText = editorRange.AddText("", "", null, true);
+			root.Split(editorRange, markdownView);
+			markdownText.RegisterCallback<ChangeEvent<string>>((e) => Text=e.newValue);
 			editorRange.verticalScroller.valueChanged += (value) =>
 			{
 				markdownView.verticalScroller.value = value / editorRange.verticalScroller.highValue * markdownView.verticalScroller.highValue;
 			};
 		}
-		public void Undo()
+		protected override async void OnChangeText(string newValue)
 		{
-			if (UndoList.Count > 0)
-			{
-				markdownText.value = UndoList.Peek();
-			}
-		}
-		private void OnTextChange(ChangeEvent<string> evt)
-		{
-			if (UndoList.Count > 0 && evt.newValue == UndoList.Peek())
-			{
-				UndoList.Pop();
-			}
-			else
-			{
-				UndoList.Push(evt.previousValue);
-				undoButton.visible = true;
-			}
-			undoButton.visible = true;
-			markdownView.AddMarkdown(evt.newValue);
+			base.OnChangeText(newValue);
+			await QTask.Wait(() => markdownView != null);
+			markdownView.AddMarkdown(newValue);
 		}
 	}
 	[CustomEditor(typeof(TextAsset))]
@@ -119,5 +80,93 @@ namespace QTool
 		
 	}
 
+	public abstract class QTextEditorWindow<T> : EditorWindow where T : QTextEditorWindow<T>
+	{
+		public static string FilePath
+		{
+			get => PlayerPrefs.GetString(typeof(T).Name + "_" + nameof(FilePath));
+			set
+			{
+				if (value != FilePath)
+				{
+					PlayerPrefs.SetString(typeof(T).Name + "_" + nameof(FilePath), value);
+					UndoList.Clear();
+					LastOpenTime = default;
+				}
+			}
+		}
+		private static DateTime LastOpenTime =default;
+		protected virtual void OnFocus()
+		{
+			var path = FilePath;
+			if (QFileManager.ExistsFile(path))
+			{
+				var time = QFileManager.GetLastWriteTime(path);
+				if(time > LastOpenTime)
+				{
+					var asset = AssetDatabase.LoadAssetAtPath<TextAsset>(path);
+					titleContent = new GUIContent(asset.name + " - " + typeof(T).Name);
+					if (asset != null)
+					{
+						Text = asset.text;
+						ParseText();
+						Changed = false;
+					}
+					time = LastOpenTime;
+				}
+			}
+		}
+		private string _Text;
+		public virtual string Text
+		{
+			get => _Text;
+			set
+			{
+				OnChangeText(value);
+			}
+		}
+		protected virtual void OnLostFocus()
+		{
+			var path = FilePath;
+			if (!path.IsNull()&& Changed)
+			{
+				QFileManager.Save(path, Text);
+				AssetDatabase.ImportAsset(path);
+			}
+		}
+		protected VisualElement Toolbar { get; private set; } = null;
+		protected virtual void CreateGUI()
+		{
+			Toolbar = rootVisualElement.AddVisualElement();
+			Toolbar.style.flexDirection = FlexDirection.Row;
+			Toolbar.AddButton("撤销", Undo);
+		}
+		protected abstract void ParseText();
+		private static Stack<string> UndoList = new Stack<string>();
+		private bool IsUndo = false;
+		protected bool Changed = false;
+		public void Undo()
+		{
+			if (UndoList.Count > 0)
+			{
+				IsUndo = true;
+				Text = UndoList.Pop();
+				ParseText();
+				IsUndo = false;
+			}
+		}
+		protected virtual void OnChangeText(string newValue)
+		{
+			if (_Text != newValue)
+			{
+				if (!IsUndo)
+				{
+					UndoList.Push(newValue);
+				}
+				_Text = newValue;
+				Changed = true;
+			}
+		}
+	}
 }
 

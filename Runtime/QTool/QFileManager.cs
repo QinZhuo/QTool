@@ -165,6 +165,7 @@ namespace QTool
 		}
 		public static bool ExistsFile(this string path)
 		{
+			if (path.IsNull()) return false;
 			path= CheckDirectoryPath( path);
 			switch (Application.platform)
 			{

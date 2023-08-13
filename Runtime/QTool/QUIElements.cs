@@ -172,12 +172,16 @@ namespace QTool
 			root.Add(visual);
 			return visual;
 		}
-		public static ListView AddListView(this VisualElement root, IList itemsSource, Func<VisualElement> makeItem, Action<VisualElement, int> bindItem)
+		public static ListView AddListView(this VisualElement root, IList itemsSource, Action<VisualElement, int> bindItem=null, Func<VisualElement> makeItem=null)
 		{
 			var visual = new ListView();
 			visual.itemsSource = itemsSource;
-			visual.makeItem = makeItem;
 			visual.bindItem = bindItem;
+			if (makeItem == null)
+			{
+				makeItem = () => new VisualElement();
+			}
+			visual.makeItem = makeItem;
 			root.Add(visual);
 			return visual;
 		}
@@ -212,15 +216,13 @@ namespace QTool
 		}
 #endif
 		public static List<Type> TypeList = new List<Type>() { typeof(UnityEngine.Object),typeof(string) };
-		public static void Add(this VisualElement root, string name, object obj, Type type, Action<object> changeEvent, ICustomAttributeProvider customAttribute = null)
+		public static VisualElement Add(this VisualElement root, string name, object obj, Type type, Action<object> changeEvent, ICustomAttributeProvider customAttribute = null)
 		{
-			var hasName = !string.IsNullOrWhiteSpace(name);
 			if (type == null)
 			{
 				if (obj == null)
 				{
-					root.AddLabel(name);
-					return;
+					return root.AddLabel(name);
 				}
 				else
 				{
@@ -239,7 +241,7 @@ namespace QTool
 			switch (typeInfo.Code)
 			{
 				case TypeCode.Boolean:
-					root.AddToggle(name, (bool)obj, (value) => changeEvent(value)); break;
+					return root.AddToggle(name, (bool)obj, (value) => changeEvent(value)); 
 				case TypeCode.Char:
 				case TypeCode.SByte:
 				case TypeCode.Byte:
@@ -252,14 +254,14 @@ namespace QTool
 						var flagsEnum = type.GetAttribute<FlagsAttribute>();
 						if (flagsEnum != null)
 						{
-							root.AddEnumFlags(name, (Enum)obj, (value) =>
+							return root.AddEnumFlags(name, (Enum)obj, (value) =>
 							 {
 								 changeEvent(value);
 							 });
 						}
 						else
 						{
-							root.AddEnum(name, (Enum)obj, (value) =>
+							return root.AddEnum(name, (Enum)obj, (value) =>
 							{
 								changeEvent(value);
 							});
@@ -276,27 +278,26 @@ namespace QTool
 						{
 							Debug.LogWarning("错误[" + name + "][" + obj?.GetType() + "]["+obj+"] " + e);
 						}
-						root.AddInt(name, intValue, (value) => { changeEvent(value); });
+						return root.AddInt(name, intValue, (value) => { changeEvent(value); });
 
 					}
-					break;
 				case TypeCode.Int64:
 				case TypeCode.UInt64:
-					root.AddInt(name, (int)obj, (value) => { changeEvent(value); }); break;
+					return root.AddInt(name, (int)obj, (value) => { changeEvent(value); });
 				case TypeCode.Single:
-					root.AddFloat(name, (float)obj, (value) => { changeEvent(value); }); break;
+					return root.AddFloat(name, (float)obj, (value) => { changeEvent(value); }); 
 				case TypeCode.Decimal:
 				case TypeCode.Double:
-					root.AddDouble(name, (double)obj, (value) => { changeEvent(value); }); break;
+					return root.AddDouble(name, (double)obj, (value) => { changeEvent(value); });
 				case TypeCode.String:
 					var enumView = customAttribute?.GetAttribute<QEnumAttribute>();
 					if (enumView != null)
 					{
-						root.AddQEnumAttribute(enumView, obj, (value) => changeEvent(value));break;
+						return root.AddQEnumAttribute(enumView, obj, (value) => changeEvent(value));
 					}
 					else
 					{
-						root.AddText(name, (string)obj, (value) => { changeEvent(value); }); break;
+						return root.AddText(name, (string)obj, (value) => { changeEvent(value); });
 					}
 				case TypeCode.Object:
 					switch (typeInfo.ObjType)
@@ -319,13 +320,12 @@ namespace QTool
 								{
 									objView.Add("", obj, typePopup.value, changeEvent);
 								}
+								return objView;
 							}
-							break;
 						case QObjectType.UnityObject:
 							{
-								root.AddObject(name,type, (UnityEngine.Object)obj, (value) => { changeEvent(value); });
+								return root.AddObject(name,type, (UnityEngine.Object)obj, (value) => { changeEvent(value); });
 							}
-							break;
 						case QObjectType.Object:
 							{
 								if (obj == null)
@@ -334,22 +334,23 @@ namespace QTool
 								}
 								if (typeof(QIdObject).IsAssignableFrom(type))
 								{
-									obj = (QIdObject)obj.Draw(name);
+									return root.AddLabel("暂不支持[" + type + "]");
+									//obj = (QIdObject)obj.Draw(name);
 								}
 								else
 								{
-									if (hasName)
-									{
-										root= root.AddFoldout(name).contentContainer;
-									}
+									var foldout = root.AddFoldout(name);
 
 									foreach (var member in typeInfo.Members)
 									{
-										root.Add(member.QName, member.Get(obj), member.Type, (value) => { member.Set(obj, value); });
+										foldout.contentContainer.Add(member.QName, member.Get(obj), member.Type, (value) => { 
+											member.Set(obj, value);
+											changeEvent?.Invoke(obj);
+										});
 									}
+									return foldout;
 								}
 							}
-							break;
 						case QObjectType.Array:
 						case QObjectType.List:
 							{
@@ -365,32 +366,59 @@ namespace QTool
 										obj = typeInfo.ArrayRank == 0 ? type.CreateInstance() : type.CreateInstance(null, 0);
 										list = obj as IList;
 									}
-									root = root.AddFoldout(name).contentContainer;
-									root.AddListView(list, () => new VisualElement(), (element, index) =>
+									var foldout = root.AddFoldout(name);
+									ListView listView = null;
+									listView= foldout.contentContainer.AddListView(list,(element, index) =>
 									{
 										element.Clear();
 										element.Add(index.ToString(), list[index], typeInfo.ElementType, (value) =>
 										{
 											list[index] = value;
+											changeEvent?.Invoke(list);
 										});
+										element.AddManipulator(new ContextualMenuManipulator((menu) => {
+											menu.menu.AppendAction("新增", action => {
+												list= list.CreateAt(QSerializeType.Get(typeInfo.ElementType), index);
+												listView.Rebuild();
+												changeEvent?.Invoke(list);
+											});
+											menu.menu.AppendAction("删除", action => {
+												list= list.RemoveAt(QSerializeType.Get(typeInfo.ElementType), index);
+												listView.Rebuild();
+												changeEvent?.Invoke(list);
+											});
+										}));
 									});
+									return foldout;
 								}
-							}
-							break;
-
+							}break;
 						default:
 							break;
 					}
 					break;
 
 				case TypeCode.DateTime:
-
 				case TypeCode.Empty:
 				case TypeCode.DBNull:
 				default:
-					root.AddLabel(name+"\t"+ obj?.ToString());
-					break;
+					return root.AddLabel(name+"\t"+ obj?.ToString());
 			}
+			return root.AddLabel(name);
+		}
+		public static void SetBorder(this IStyle style,Color color,float width=1,float radius=5)
+		{
+			style.borderTopWidth = width;
+			style.borderBottomWidth = width;
+			style.borderLeftWidth = width;
+			style.borderRightWidth = width;
+			style.borderTopColor = color;
+			style.borderBottomColor = color;
+			style.borderLeftColor = color;
+			style.borderRightColor = color;
+			style.borderTopLeftRadius = radius;
+			style.borderTopRightRadius = radius;
+			style.borderBottomLeftRadius = radius;
+			style.borderBottomRightRadius = radius;
 		}
 		public static VisualElement AddQCommandInfo(this VisualElement root, QCommandInfo commandInfo,Action callBack)
 		{

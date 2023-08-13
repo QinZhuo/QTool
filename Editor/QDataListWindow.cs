@@ -8,10 +8,11 @@ using UnityEditor.Callbacks;
 using UnityEngine;
 using QTool.Reflection;
 using QTool;
+using UnityEngine.UIElements;
 namespace QTool.FlowGraph
 {
 
-	public class QDataListWindow : EditorWindow
+	public class QDataListWindow : QTextEditorWindow<QDataListWindow>
 	{
 
 		[OnOpenAsset(0)]
@@ -19,36 +20,130 @@ namespace QTool.FlowGraph
 		{
 			if (EditorUtility.InstanceIDToObject(instanceID) is TextAsset textAsset)
 			{
-				return Open(textAsset);
+				if (textAsset == null) return false;
+				var path = AssetDatabase.GetAssetPath(textAsset);
+				if (path.Contains(nameof(QDataList) + "Asset" + '/') && path.EndsWith(".txt"))
+				{
+					FilePath = path;
+					var window = GetWindow<QDataListWindow>();
+					window.minSize = new Vector2(400, 300);
+					return true;
+				}
 			}
 			return false;
 		}
 		public QSerializeType typeInfo;
 		public QDataList qdataList;
-		public QGridView gridView;
 		public QList<object> objList = new QList<object>();
 		public QList<QMemeberInfo> Members = new QList<QMemeberInfo>();
-		DateTime lastTime = DateTime.MinValue;
-		public static bool Open(TextAsset textAsset)
+
+		ListView listView = null;
+		Label lastClick = null;
+		VisualElement CellView = null;
+		protected override void CreateGUI()
 		{
-			if (textAsset == null) return false;
-			var path = AssetDatabase.GetAssetPath(textAsset);
-			if (path.Contains(nameof(QDataList) + "Asset" + '/') && path.EndsWith(".txt"))
+			base.CreateGUI();
+			var root = rootVisualElement.AddScrollView();
+			CellView = rootVisualElement.AddVisualElement();
+			CellView.style.position = Position.Absolute;
+			CellView.visible = false;
+			CellView.style.backgroundColor = Color.Lerp(Color.black, Color.white, 0.3f);
+			CellView.style.SetBorder(Color.black);
+			listView = root.AddListView(qdataList, (visual, y) =>
 			{
-				var window = GetWindow<QDataListWindow>();
-				window.minSize = new Vector2(400, 300);
-				window.titleContent = new GUIContent(textAsset.name + " - " + nameof(QDataList));
-				window.Open(path);
-				return true;
-			}
-			return false;
+				visual.Clear();
+
+				for (int x = 0; x < qdataList[y].Count; x++)
+				{
+					var row = qdataList[y];
+					var value = GetValue(x, y);
+					var member = Members[x];
+					var title = qdataList.TitleRow[x];
+					var obj = objList[y - 1];
+					if (y == 0)
+					{
+						var label = visual.AddLabel(value, TextAnchor.MiddleCenter);
+						label.style.width = 150;
+					}
+					else
+					{
+						var label = visual.AddLabel(value, TextAnchor.MiddleCenter);
+						label.style.width = 150;
+						label.name = title;
+						label.RegisterCallback<ClickEvent>((eventData) =>
+						{
+							if (lastClick == label)
+							{
+								if (CellView.visible)
+								{
+									return;
+								}
+								CellView.Clear();
+								var pos = label.worldTransform.MultiplyPoint(label.transform.position);
+								CellView.style.left = pos.x;
+								CellView.style.top = pos.y;
+								CellView.style.width = new StyleLength(label.style.width.value.value * 2);
+								VisualElement view = null;
+								if (typeInfo == null || member == null)
+								{
+									view = CellView.Add("", value, typeof(string), (newValue) =>
+									{
+										row[title] = (string)newValue;
+										label.text = (string)newValue;
+									});
+								}
+								else
+								{
+									view = CellView.Add("", member.Get(obj), member.Type, (newValue) =>
+									{
+										member.Set(obj, newValue);
+										label.text = newValue.ToQDataType(member.Type, false).Trim('\"');
+									});
+								}
+								CellView.visible = true;
+								var foldout = CellView.Q<Foldout>();
+								if (foldout != null)
+								{
+									foldout.value = true;
+								}
+							}
+							else
+							{
+								CellView.visible = false;
+								lastClick = label;
+							}
+						});
+					}
+				}
+				visual.AddManipulator(new ContextualMenuManipulator(menu =>
+				{
+					menu.menu.AppendAction("添加行", action => { AddAt(y); listView.Rebuild(); });
+					menu.menu.AppendAction("删除行", action => { RemoveAt(y); listView.Rebuild(); });
+				}));
+			},
+			() =>
+			{
+				var layout = new VisualElement();
+				layout.style.flexDirection = FlexDirection.Row;
+				return layout;
+			});
 		}
 
-		public void Open(string path)
+		protected override void OnLostFocus()
 		{
+			if (typeInfo != null)
+			{
+				objList.ToQDataList(qdataList, typeInfo.Type);
+			}
+			Text = qdataList?.ToString();
+			base.OnLostFocus();
+		}
+		protected override async void ParseText()
+		{
+			if (CellView!=null&&CellView.visible) return;
 			try
 			{
-				lastTime = QFileManager.GetLastWriteTime(path);
+				var path = FilePath;
 				var type = QReflection.ParseType(path.GetBlockValue(nameof(QDataList) + "Asset" + '/', ".txt").SplitStartString("/"));
 				if (type != null)
 				{
@@ -58,7 +153,7 @@ namespace QTool.FlowGraph
 					for (int i = 0; i < qdataList.TitleRow.Count; i++)
 					{
 						Members[i] = typeInfo.GetMemberInfo(qdataList.TitleRow[i]);
-						if (Members[i]==null)
+						if (Members[i] == null)
 						{
 							Debug.LogError("列[" + type + "]为空");
 						}
@@ -69,53 +164,16 @@ namespace QTool.FlowGraph
 					qdataList = QDataList.GetData(path);
 					typeInfo = null;
 				}
-				PlayerPrefs.SetString(nameof(QDataListWindow) + "_LastPath",path);
+				PlayerPrefs.SetString(nameof(QDataListWindow) + "_LastPath", path);
+				await QTask.Wait(() => listView != null);
+				listView.itemsSource = qdataList;
+				listView.Rebuild();
 			}
 			catch (Exception e)
 			{
 				Debug.LogError("解析QDataList类型[" + typeInfo?.Type + "]出错：\n" + e);
-				OpenNull();
+				Close();
 			}
-			
-		}
-		private void OnLostFocus()
-		{
-			if (gridView.HasChanged&&! QEidtCellWindow.IsShow)
-			{
-				if (typeInfo != null)
-				{
-					objList.ToQDataList(qdataList, typeInfo.Type);
-				} 
-				qdataList?.Save();
-				lastTime = DateTime.Now;
-				gridView.HasChanged = false;
-				AssetDatabase.Refresh();
-			}
-		}
-		internal bool AutoOpen = true;
-		private void OnFocus()
-		{
-			var key = nameof(QDataListWindow) + "_LastPath";
-			if (PlayerPrefs.HasKey(key))
-			{
-				var path = PlayerPrefs.GetString(key);
-				if (QFileManager.GetLastWriteTime(path) > lastTime)
-				{
-					Open(path);
-				}
-			}
-		}
-		private void OnEnable()
-		{
-			if (gridView == null)
-			{
-				gridView = new QGridView(GetValue, () => new Vector2Int
-				{
-					x = qdataList.TitleRow.Count,
-					y = qdataList.Count,
-				}, ClickCell);
-			}
-
 		}
 		public void AddAt(int y)
 		{
@@ -146,124 +204,6 @@ namespace QTool.FlowGraph
 				var obj = objList[y - 1];
 				return member.Get(obj)?.ToQDataType(member.Type,false).Trim('\"');
 			}
-		}
-		public void SetValue(int x, int y,string value)
-		{
-			if (y == 0 || typeInfo == null)
-			{
-				qdataList[y][x] = value;
-			}
-			else
-			{
-				var member = Members[x];
-				if (member == null) return;
-				var obj = objList[y - 1];
-				member.Set(obj, value.ParseQDataType(member.Type, false));
-			}
-		}
-		public bool ClickCell(int x,int y,int buttonIndex)
-		{
-			var change = false;
-			if (buttonIndex == 0)
-			{
-				if (y == 0)
-				{
-					return false;
-				}
-				else if (typeInfo == null)
-				{
-					qdataList[y].SetValueType(QEidtCellWindow.Show(qdataList[y].Key + "." + qdataList.TitleRow[x], qdataList[y][x], typeof(string), out change, null), typeof(string), x);
-				}
-				else
-				{
-					var member = Members[x];
-					if (member == null) return false;
-					var obj = objList[y - 1];
-					member.Set(obj, QEidtCellWindow.Show((obj as IKey<string>).Key + "." + member.QName, member.Get(obj), member.Type, out change, Members[x].MemeberInfo));
-				}
-			}
-			else
-			{
-			
-				if (y > 0)
-				{
-					var menu = new GenericMenu();
-					menu.AddItem(new GUIContent("复制"), false, () =>
-					{
-						GUIUtility.systemCopyBuffer = GetValue(x, y);
-					});
-					menu.AddItem(new GUIContent("粘贴"), false, () =>
-					{
-						try
-						{
-							SetValue(x, y, GUIUtility.systemCopyBuffer);
-							change = true;
-							gridView.HasChanged = true;
-						}
-						catch (Exception e)
-						{
-							Debug.LogError(e);
-						}
-					});
-					menu.AddItem(new GUIContent("清空"), false, () =>
-					{
-						try
-						{
-							SetValue(x, y, "");
-							 change = true;
-							gridView.HasChanged = true;
-						}
-						catch (Exception e)
-						{
-							Debug.LogError(e);
-						}
-					});
-					if (x == 0)
-					{
-						menu.AddItem(new GUIContent("添加行"), false, () =>
-						{
-							AddAt(y);
-							change = true;
-							gridView.HasChanged = true;
-						});
-						menu.AddItem(new GUIContent("删除行"), false, () =>
-						{
-							RemoveAt(y);
-							change = true;
-							gridView.HasChanged = true;
-						});
-					}
-
-					menu.ShowAsContext();
-				}
-			
-			}
-
-			return change;
-
-		}
-		public void OpenNull()
-		{
-			typeInfo = null;
-			qdataList = null;
-			Repaint();
-		
-			
-		}
-		private void OnGUI()
-		{
-			if (qdataList==null ) return;
-			try
-			{
-				gridView.DoLayout(Repaint);
-			}
-			catch (Exception e)
-			{
-
-				Debug.LogError("表格出错：" + e);
-				OpenNull();
-			}
-			
 		}
 	}
 	
