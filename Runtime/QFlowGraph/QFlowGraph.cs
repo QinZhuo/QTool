@@ -1203,13 +1203,9 @@ namespace QTool.FlowGraph
 				}
 				if (port.NameAttribute != null)
 				{
-					if (port.Value != null)
+					if (!port.StringValue.IsNull())
 					{
-						var newName = port.Value?.ToString();
-						if (!newName.IsNull())
-						{
-							Name = newName;
-						}
+						Name = port.StringValue;
 					}
 				}
 
