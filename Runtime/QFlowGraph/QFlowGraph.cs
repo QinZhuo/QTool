@@ -1205,7 +1205,7 @@ namespace QTool.FlowGraph
 				{
 					if (!port.StringValue.IsNull())
 					{
-						Name = port.StringValue;
+						Name = System.IO.Path.GetFileName(port.StringValue);
 					}
 				}
 
