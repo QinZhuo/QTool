@@ -486,6 +486,7 @@ namespace QTool
 		public static PropertyField Add(this VisualElement root, UnityEditor.SerializedProperty serializedProperty)
 		{
 			var visual = new PropertyField(serializedProperty, serializedProperty.QName());
+			visual.name = serializedProperty.name;
 			root.Add(visual);
 			return visual;
 		}
@@ -500,6 +501,19 @@ namespace QTool
 					if ("m_Script".Equals(iterator.name))
 					{
 						visual.SetEnabled(false);
+					}
+					else
+					{
+						var att= iterator.GetAttribute<QNameAttribute>();
+						if (att != null && !att.visibleControl.IsNull())
+						{
+							var copy = iterator.Copy();
+							visual.style.display = copy.IsShow() ? DisplayStyle.Flex : DisplayStyle.None;
+							root.RegisterCallback<ClickEvent>(data =>
+							{
+								visual.style.display = copy.IsShow() ? DisplayStyle.Flex : DisplayStyle.None;
+							});
+						}
 					}
 
 				} while (iterator.NextVisible(false));

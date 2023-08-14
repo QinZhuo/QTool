@@ -53,7 +53,7 @@ namespace QTool.FlowGraph
 			root.style.height = new Length(100, LengthUnit.Percent);
 			CellView = rootVisualElement.AddVisualElement();
 			CellView.style.position = Position.Absolute;
-			CellView.visible = false;
+			CellView.style.display = DisplayStyle.None;
 			CellView.style.backgroundColor = Color.Lerp(Color.black, Color.white, 0.3f);
 			CellView.style.SetBorder(Color.black);
 		
@@ -111,7 +111,7 @@ namespace QTool.FlowGraph
 										label.text = newValue.ToQDataType(member.Type, false).Trim('\"');
 									}, member.MemeberInfo);
 								}
-								CellView.visible = true;
+								CellView.style.display = DisplayStyle.Flex;
 								var foldout = CellView.Q<Foldout>();
 								if (foldout != null)
 								{
@@ -140,7 +140,7 @@ namespace QTool.FlowGraph
 			});
 			root.RegisterCallback<MouseDownEvent>(data =>
 			{
-				CellView.visible = false;
+				CellView.style.display = DisplayStyle.None;
 			});
 		}
 
