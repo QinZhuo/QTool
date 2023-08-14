@@ -1205,7 +1205,14 @@ namespace QTool.FlowGraph
 				{
 					if (!port.StringValue.IsNull())
 					{
-						Name = System.IO.Path.GetFileName(port.StringValue);
+						if (port.StringValue.Contains('/') && port.StringValue.Contains("."))
+						{
+							Name=port.StringValue.GetBlockValue('/', '.');
+						}
+						else
+						{
+							Name = port.StringValue;
+						}
 					}
 				}
 
