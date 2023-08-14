@@ -324,7 +324,7 @@ namespace QTool.Inspector
 	}
 
 	[CustomPropertyDrawer(typeof(QPopupAttribute))]
-	public class QEnumDrawer : QNameDrawer
+	public class QQPopupDrawer : QNameDrawer
 	{
 	
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
