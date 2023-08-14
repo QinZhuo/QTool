@@ -329,7 +329,7 @@ namespace QTool.Inspector
 	}
 
 	[CustomPropertyDrawer(typeof(QPopupAttribute))]
-	public class QPopupDrawer : QNameDrawer
+	public class QPopupDrawer : PropertyDrawer
 	{
 	
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
@@ -379,10 +379,15 @@ namespace QTool.Inspector
 	}
 
 	[CustomPropertyDrawer(typeof(QToolbarAttribute))]
-	public class QToolbarDrawer : QNameDrawer
+	public class QToolbarDrawer : PropertyDrawer
 	{
 		static QDictionary<int, int> IndexCache = new QDictionary<int, int>((key) => -1);
 		const int Height = 30;
+
+		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
+		{
+			Draw(attribute as QToolbarAttribute, position, property, label);
+		}
 		public static void Draw(QToolbarAttribute toolbar, Rect position, SerializedProperty property, GUIContent label)
 		{
 			position.height = Height;
