@@ -30,7 +30,7 @@ namespace QTool.Net
 #endif
 			Physics.autoSyncTransforms = false;
 			Time.fixedDeltaTime = 1f / netFps;
-			FlowGraph.QFlowGraph.Step = WaitForNetUpdate.Instance;
+			FlowGraph.QFlowGraph.Step = new WaitForNetUpdate();
 			QTool.AddPlayerLoop(typeof(QNetManager), QNetPlayerLoop,"FixedUpdate");
 			QToolManager.Instance.OnUpdateEvent -= QCoroutine.Update;
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
@@ -514,7 +514,6 @@ namespace QTool.Net
 
 	public class WaitForNetUpdate : CustomYieldInstruction
 	{
-		public static WaitForNetUpdate Instance { get; private set; } = new WaitForNetUpdate();
 		private int Index { get; set; } = 0;
 		public override void Reset()
 		{
