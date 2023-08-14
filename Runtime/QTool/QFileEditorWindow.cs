@@ -1,0 +1,142 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UIElements;
+
+namespace QTool
+{
+	public abstract class QFileEditorWindow<T>
+#if UNITY_EDITOR
+	: UnityEditor.EditorWindow
+#endif
+	where T : QFileEditorWindow<T>
+	{
+		public static string FilePath
+		{
+			get => QPlayerPrefs.GetString(typeof(T).Name + "_" + nameof(FilePath));
+			set
+			{
+				if (value != FilePath)
+				{
+					QPlayerPrefs.SetString(typeof(T).Name + "_" + nameof(FilePath), value);
+					UndoList.Clear();
+					LastWriteTime = default;
+					QPlayerPrefs.Get(typeof(T).Name + "_" + nameof(FilePathList), FilePathList);
+					var select = value.Replace('/', '\\');
+					FilePathList.AddCheckExist(select);
+					QPlayerPrefs.Set(typeof(T).Name + "_" + nameof(FilePathList), FilePathList);
+					if (PathPopup != null)
+					{
+						PathPopup.value = select;
+					}
+				}
+			}
+		}
+		private static List<string> FilePathList = new List<string>();
+		private static DateTime LastWriteTime = default;
+
+		public new GUIContent titleContent
+		{
+			get
+			{
+#if UNITY_EDITOR
+				return base.titleContent;
+#else
+				return new GUIContent();
+#endif
+			}
+		}
+		public new VisualElement rootVisualElement
+		{
+			get
+			{
+
+#if UNITY_EDITOR
+				return base.rootVisualElement;
+#else
+				return new VisualElement();
+#endif
+			}
+		}
+
+
+		protected virtual void OnFocus()
+		{
+			var path = FilePath;
+			if (QFileManager.ExistsFile(path))
+			{
+				var time = QFileManager.GetLastWriteTime(path);
+				if (time > LastWriteTime)
+				{
+#if UNITY_EDITOR
+					var asset = UnityEditor.AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(path);
+					titleContent.text = asset.name + " - " + typeof(T).Name.SplitStartString("Window");
+					if (asset != null)
+					{
+						Data = GetData(asset);
+						ParseData();
+					}
+					LastWriteTime = time;
+#endif
+				}
+			}
+		}
+		public abstract string GetData(UnityEngine.Object file);
+		public abstract void SaveData();
+		private string _Data;
+		public virtual string Data
+		{
+			get => _Data;
+			set
+			{
+				OnChangeData(value);
+			}
+		}
+		public virtual bool AutoSave => true;
+		protected virtual void OnLostFocus()
+		{
+			var path = FilePath;
+			if (AutoSave && !path.IsNull())
+			{
+				SaveData();
+#if UNITY_EDITOR
+				UnityEditor.AssetDatabase.ImportAsset(path);
+#endif
+			}
+		}
+		protected static PopupField<string> PathPopup { get; private set; } = null;
+		protected virtual void Awake()
+		{
+			var Toolbar = rootVisualElement.AddVisualElement();
+			Toolbar.style.flexDirection = FlexDirection.Row;
+			QPlayerPrefs.Get(typeof(T).Name + "_" + nameof(FilePathList), FilePathList);
+			PathPopup = Toolbar.AddPopup("", FilePathList, FilePath.Replace('/', '\\'), path => { FilePath = path.Replace('\\', '/'); OnFocus(); });
+			Toolbar.AddButton("撤销", Undo);
+		}
+		protected abstract void ParseData();
+		private static Stack<string> UndoList = new Stack<string>();
+		private bool IsUndo = false;
+		public void Undo()
+		{
+			if (UndoList.Count > 0)
+			{
+				IsUndo = true;
+				Data = UndoList.Pop();
+				ParseData();
+				IsUndo = false;
+			}
+		}
+		protected virtual void OnChangeData(string newValue)
+		{
+			if (!Equals(_Data, newValue))
+			{
+				if (!IsUndo)
+				{
+					UndoList.Push(newValue);
+				}
+				_Data = newValue;
+			}
+		}
+	}
+}

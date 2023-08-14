@@ -12,7 +12,7 @@ using UnityEngine.UIElements;
 namespace QTool.FlowGraph
 {
 
-	public class QDataListWindow : QTextEditorWindow<QDataListWindow>
+	public class QDataListWindow : QFileEditorWindow<QDataListWindow>
 	{
 
 		[OnOpenAsset(0)]
@@ -37,6 +37,15 @@ namespace QTool.FlowGraph
 			var window = GetWindow<QDataListWindow>();
 			window.minSize = new Vector2(500, 300);
 		}
+		public override string GetData(UnityEngine.Object file)
+		{
+			return (file as TextAsset).text;
+		}
+
+		public override void SaveData()
+		{
+			QFileManager.Save(FilePath, Data);
+		}
 		public QSerializeType typeInfo;
 		public QDataList qdataList;
 		public QList<object> objList = new QList<object>();
@@ -46,9 +55,10 @@ namespace QTool.FlowGraph
 		Label lastClick = null;
 		VisualElement CellView = null;
 		public override bool AutoSave => CellView == null || !CellView.visible;
-		protected override void CreateGUI()
+		#region 初始化UI
+		protected override void Awake()
 		{
-			base.CreateGUI();
+			base.Awake();
 			var root = rootVisualElement.AddScrollView();
 			root.style.height = new Length(100, LengthUnit.Percent);
 			CellView = rootVisualElement.AddVisualElement();
@@ -56,7 +66,7 @@ namespace QTool.FlowGraph
 			CellView.style.display = DisplayStyle.None;
 			CellView.style.backgroundColor = Color.Lerp(Color.black, Color.white, 0.3f);
 			CellView.style.SetBorder(Color.black);
-		
+
 			listView = root.AddListView(qdataList, (visual, y) =>
 			{
 				visual.Clear();
@@ -143,17 +153,17 @@ namespace QTool.FlowGraph
 				CellView.style.display = DisplayStyle.None;
 			});
 		}
-
+		#endregion
 		protected override void OnLostFocus()
 		{
 			if (typeInfo != null)
 			{
 				objList.ToQDataList(qdataList, typeInfo.Type);
 			}
-			Text = qdataList?.ToString();
+			Data = qdataList?.ToString();
 			base.OnLostFocus();
 		}
-		protected override async void ParseText()
+		protected override void ParseData()
 		{
 			try
 			{
@@ -179,7 +189,6 @@ namespace QTool.FlowGraph
 					typeInfo = null;
 				}
 				PlayerPrefs.SetString(nameof(QDataListWindow) + "_LastPath", path);
-				await QTask.Wait(() => listView != null);
 				listView.itemsSource = qdataList;
 				listView.style.width = qdataList.TitleRow.Count * 200+100;
 				listView.Rebuild();
