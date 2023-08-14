@@ -1211,7 +1211,7 @@ namespace QTool.FlowGraph
 						}
 						else
 						{
-							Name = port.StringValue;
+							Name = port.StringValue.Trim('\"');
 						}
 					}
 				}
