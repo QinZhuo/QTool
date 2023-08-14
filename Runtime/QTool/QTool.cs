@@ -711,6 +711,7 @@ namespace QTool
 		public static T RayCast<T>(this Ray ray, Func<T, bool> CanCast = null,float radius=0) where T : Component
 		{
 			var hits = radius <= 0 ? Physics.RaycastAll(ray) : Physics.SphereCastAll(ray, radius);
+			Debug.DrawRay(ray.origin, ray.direction, typeof(T).Name.ToColor(), 1);
 			foreach (var hit in hits)
 			{
 				var target = hit.collider.GetComponent<T>();
