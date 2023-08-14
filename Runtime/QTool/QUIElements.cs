@@ -625,7 +625,7 @@ namespace QTool
 #if UNITY_EDITOR
 		public static QPopupData Get(UnityEditor.SerializedProperty property, string funcKey)
 		{
-			if (property.propertyType ==UnityEditor.SerializedPropertyType.ObjectReference)
+			if (property.propertyType == UnityEditor.SerializedPropertyType.ObjectReference)
 			{
 				return Get(QReflection.ParseType(property.type.SplitEndString("PPtr<$").TrimEnd('>')), funcKey);
 			}
@@ -713,7 +713,7 @@ namespace QTool
 #endif
 				else
 				{
-					QGUI.Label("错误函数" + funcKey);
+					Debug.LogError("错误函数[" + funcKey + "]");
 				}
 			}
 			if (drawer.List.Count <= 0)

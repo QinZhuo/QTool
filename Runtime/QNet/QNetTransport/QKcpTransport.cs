@@ -153,23 +153,25 @@ namespace QTool.Net
         public override void ServerSendUpdate() => Server.TickOutgoing();
 #if UNITY_EDITOR||DEVELOPMENT_BUILD
 		private string ServerIp = "localhost";
-		public override void DebugGUI()
+		protected UnityEngine.UIElements.TextField IpText = null;
+		protected UnityEngine.UIElements.Button StartClientButton = null;
+		public override void DebugUI()
 		{
-			base.DebugGUI();
-			if (ServerActive)
+			base.DebugUI();
+#if UNITY_2021_1_OR_NEWER
+
+			if (StartClientButton == null&& IpText==null)
 			{
-				QGUI.LabelField("本地IP",QTool.LocalIp);
-			}
-			if (!ClientConnected)
-			{
-				GUILayout.BeginHorizontal();
-				ServerIp = QGUI.TextField("主机IP",ServerIp);
-				if (QGUI.Button("客户端"))
+				IpText = QToolManager.Instance.RootVisualElement.AddText("主机Ip", ServerIp, newValue => ServerIp = newValue);
+				StartClientButton = QToolManager.Instance.RootVisualElement.AddButton("连接主机", () =>
 				{
-					GetComponent<QNetManager>().StartClient(ServerIp);
-				}
-				GUILayout.EndHorizontal();
+					GetComponent<QNetManager>().StartClient(IpText.text);
+				});
 			}
+			IpText.visible = !ClientConnected;
+			StartClientButton.visible = !ClientConnected;
+
+#endif
 		}
 #endif
 	}

@@ -171,7 +171,7 @@ namespace QTool
 		}
 		static bool IsDrag = false;
 		public static event Action OnBeginDragWindow = null;
-		static void OnGUI()
+		private static void OnGUI()
 		{
 			if (!IsDrag && Event.current.mousePosition.y < 40 && Event.current.type == EventType.MouseDown)
 			{

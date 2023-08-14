@@ -33,17 +33,35 @@ namespace QTool.Net
 			FlowGraph.QFlowGraph.Step = new WaitForNetUpdate();
 			QTool.AddPlayerLoop(typeof(QNetManager), QNetPlayerLoop,"FixedUpdate");
 			QToolManager.Instance.OnUpdateEvent -= QCoroutine.Update;
-#if UNITY_EDITOR || DEVELOPMENT_BUILD
-			QToolManager.Instance.OnGUIEvent += DebugGUI;
+
+		}
+		
+		UnityEngine.UIElements.Label DebugInfoLabel = null;
+		[System.Diagnostics.Conditional("DEVELOPMENT_BUILD"), System.Diagnostics.Conditional("UNITY_EDITOR")]
+		private void DebugUI()
+		{
+#if UNITY_2022_1_OR_NEWER
+			var info = "运行信息" + ClientIndex + "/" + ClientGameData.Count + " " + nameof(NetTime) + ":" + new TimeSpan((long)(TimeSpan.TicksPerSecond * NetTime)).ToString(@"hh\:mm\:ss") + " 延迟 " + transport.Ping + " ms";
+			transport.DebugUI();
+			if (DebugInfoLabel == null)
+			{
+				DebugInfoLabel = QToolManager.Instance.RootVisualElement.AddLabel(nameof(DebugInfoLabel));
+			}
+			DebugInfoLabel.text = info;
+#else
+			GUILayout.Label(info);
 #endif
 		}
+#if !UNITY_2022_1_OR_NEWER
+		private void OnGUI()
+		{
+			DebugUI();
+		}
+#endif
 		private void OnDestroy()
 		{
 			if (QToolManager.IsExist)
 			{
-#if UNITY_EDITOR || DEVELOPMENT_BUILD
-				QToolManager.Instance.OnGUIEvent -= DebugGUI;
-#endif
 				QToolManager.Instance.OnUpdateEvent += QCoroutine.Update;
 			}
 			QTime.RevertScale(this);
@@ -459,28 +477,14 @@ namespace QTool.Net
 		}
 		private void Update()
 		{
+#if UNITY_2022_1_OR_NEWER
+			DebugUI();
+#endif
 			transport.ClientReceiveUpdate();
 			transport.ClientSendUpdate();
 			transport.ServerReceiveUpdate();
 			transport.ServerSendUpdate();
 		}
-#if UNITY_EDITOR || DEVELOPMENT_BUILD
-
-
-		private void DebugGUI()
-		{
-			GUILayout.BeginVertical(QGUI.Skin.box,GUILayout.Width(200));
-			if (NetActive)
-			{
-				if (transport.ClientConnected)
-				{
-					QGUI.LabelField("运行信息" , ClientIndex + "/" + ClientGameData.Count+" "+nameof(NetTime)+":"+new TimeSpan((long)( TimeSpan.TicksPerSecond* NetTime)).ToString(@"hh\:mm\:ss")+" 延迟 "+transport.Ping+" ms");
-				}
-			}
-			transport.DebugGUI();
-			GUILayout.EndVertical();
-		}
-#endif
 	}
 	
 

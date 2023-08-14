@@ -625,14 +625,14 @@ crashlytics-build.properties
 		}
 		private void OnGUI()
 		{
-			using (var scroll=new GUILayout.ScrollViewScope(scrollPos,QGUI.Skin.box))
+			using (var scroll=new GUILayout.ScrollViewScope(scrollPos))
 			{
 				foreach (var file in fileList)
 				{
 					using (new GUILayout.HorizontalScope())
 					{
 						file.select = GUILayout.Toggle(file.select, "");
-						if (GUILayout.Button(file.viewString,QGUI.CenterLable))
+						if (GUILayout.Button(file.viewString,QGUI.RichLabel))
 						{
 							file.select =! file.select;
 						}

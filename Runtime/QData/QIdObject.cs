@@ -9,16 +9,17 @@ namespace QTool
 	public class QIdObject
 	{
 		public string id;
-		Object _obj;
+		[SerializeField,HideInInspector,QIgnore]
+		private Object _Object;
 		public Object Object
 		{
 			get
 			{
-				if (_obj == null)
+				if (_Object == null)
 				{
-					_obj = QIdTool.GetObject(id,typeof(Object));
+					_Object = QIdTool.GetObject(id,typeof(Object));
 				}
-				return _obj;
+				return _Object;
 			}
 		}
 

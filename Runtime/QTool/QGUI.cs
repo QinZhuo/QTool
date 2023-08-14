@@ -16,51 +16,17 @@ namespace QTool
 	public static class QGUI
 	{
 		#region GUI样式
-
-		public static GUIStyle Lable => Skin.label;
-		public static GUISkin Skin => _Skin ??= Resources.Load<GUISkin>(nameof(QGUI) + "/" + nameof(QGUI)+ nameof(Skin));
-		private static GUISkin _Skin;
-		public static GUIStyle CenterLable => _centerLable ??= new GUIStyle(Skin.label) { alignment = TextAnchor.MiddleCenter, richText = true };
-		static GUIStyle _centerLable;
-		public static GUIStyle TextArea => _textArea ??= new GUIStyle(Skin.textField) { alignment = TextAnchor.MiddleCenter };
-		static GUIStyle _textArea;
-		public static GUIStyle LeftLable => _leftLable ??= new GUIStyle(Skin.label) { alignment= TextAnchor.MiddleLeft };
-		static GUIStyle _leftLable;
-		public static GUIStyle RightLabel => _rightLabel ??= new GUIStyle(Skin.label) { alignment = TextAnchor.MiddleRight };
-		static GUIStyle _rightLabel;
+		private static GUIStyle _RichLabel;
+		public static GUIStyle RichLabel => _RichLabel ??= new GUIStyle("label")
+		{
+			richText = true
+		};
 		public static Color SelectColor { get; private set; } = new Color32(15, 129, 190, 100);
 		public static Color BackColor { get; private set; } = new Color32(45, 45, 45, 255);
 		public static Color AlphaBackColor { get; private set; } = new Color32(0, 0, 0, 40);
 		public static Color ContentColor { get; private set; } = new Color32(225, 225, 225, 255);
 		public static Color ButtonColor { get; private set; } = new Color32(70, 70, 70, 255);
 
-		public static GUIStyle FoldoutStyle => _FoldoutStyle ??= new GUIStyle()
-		{
-			alignment = TextAnchor.MiddleCenter,
-			normal = new GUIStyleState
-			{
-				background = Resources.Load<Texture2D>(nameof(QGUI) + "/" + nameof(FoldoutStyle)),
-				textColor = ContentColor,
-			},
-			onNormal = new GUIStyleState
-			{
-				background = Resources.Load<Texture2D>(nameof(QGUI) + "/" + nameof(FoldoutStyle) + "On"),
-				textColor = ContentColor,
-			},
-		};
-		private static GUIStyle _FoldoutStyle;
-
-		public static GUIStyle SelectStyle => _SelectStyle ??= new GUIStyle()
-		{
-			normal = new GUIStyleState
-			{
-				background=Resources.Load<Texture2D>(nameof(QGUI) + "/" + nameof(SelectStyle)),
-				textColor = ContentColor,
-			},
-			border = new RectOffset(RectRaudius, RectRaudius, RectRaudius, RectRaudius),
-		};
-		private static GUIStyle _SelectStyle;
-		public const int RectRaudius = 4;
 		static Stack<Color> colorStack = new Stack<Color>();
 		public static void PushColor(Color newColor)
 		{
@@ -94,468 +60,20 @@ namespace QTool
 
 		#endregion
 
-		//static QDictionary<QToolBar, Vector2> ToolBarScroll = new QDictionary<QToolBar, Vector2>(); 
-		//public static object Draw(this QToolBar toolBar)
-		//{
-		//	if (toolBar == null) return default;
-		//	if (!toolBar.IsButton)
-		//	{
-		//		if (toolBar.Selected)
-		//		{
-		//			var value= toolBar.ChildToolBar.Draw();
-		//			if (Equals(toolBar.ChildToolBar?.ChildToolBar?.Value, "返回"))
-		//			{
-		//				toolBar.CancelSelect();
-		//			}
-		//			return value;
-		//		}
-		//		else
-		//		{
-		//			using (var scroll=new GUILayout.ScrollViewScope(ToolBarScroll[toolBar], GUILayout.Height(Height)))
-		//			{
-		//				toolBar.Select = GUILayout.Toolbar(toolBar.Select, toolBar.Values.ToArray(), Skin.button, GUILayout.Width(toolBar.Width * toolBar.Values.Count), GUILayout.Height(Height));
-		//				ToolBarScroll[toolBar] = scroll.scrollPosition;
-		//			}
-		//		}
-		//	}
-		//	return toolBar.Value;
-		//}
-
-
-		public static QDictionary<Color, Texture2D> ColorTexture { get; private set; } = new QDictionary<Color, Texture2D>((key) =>
-		{
-			var tex = new Texture2D(1, 1);
-			for (int i = 0; i < tex.width; i++)
-			{
-				for (int j = 0; j < tex.height; j++)
-				{
-					tex.SetPixel(i, j, key);
-				}
-			}
-			tex.Apply();
-			return tex;
-		});
-		public static Texture2D GetTexture(int size = 8)
-		{
-			var tex = new Texture2D(size * 2 , size * 2 );
-			for (int i = 0; i < tex.width; i++)
-			{
-				for (int j = 0; j < tex.height; j++)
-				{
-					tex.SetPixel(i, j, Color.clear);
-				}
-			}
-			tex.Apply();
-			return tex;
-		}
-		public static Texture2D DrawTriangle(this Texture2D tex, Color color, int radius = 8,bool down=true)
-		{
-			for (int j = 0; j < tex.height; j++)
-			{
-				for (int i = 0; i < tex.width; i++)
-				{
-					var x = i - tex.width / 2+radius;
-					var y = j - tex.height / 2+radius;
-					if (down)
-					{
-						if (x >= radius - y / Mathf.Sqrt(3) &&
-						x <= radius + y / Mathf.Sqrt(3) &&
-						y <= radius * Mathf.Sqrt(3))
-						{
-							tex.SetPixel(i, j, color);
-						}
-					}
-					else
-					{
-						if (y >= radius - x / Mathf.Sqrt(3) &&
-						   y <= radius + x / Mathf.Sqrt(3) &&
-						   x <= radius * Mathf.Sqrt(3))
-						{
-							tex.SetPixel(i, j, color);
-						}
-					}
-					
-				}
-			}
-			return tex;
-		}
-		public static Texture2D DrawCircle(this Texture2D tex, Color color, int radius = 8)
-		{
-			for (int i = 0; i < tex.width; i++)
-			{
-				for (int j = 0; j < tex.height; j++)
-				{
-					var x = i - tex.width / 2;
-					var y = j - tex.height / 2;
-					if (x * x + y * y < radius * radius)
-					{
-						tex.SetPixel(i, j, color);
-					}
-				}
-			}
-			tex.Apply();
-			return tex;
-		}
+		
 		public const float Size = 10;
-		public const float Height = Size *3f;
-		public static GUILayoutOption HeightLayout { get; private set; } = GUILayout.Height(Height);
-		public static QDictionary<int, Action> OnChangeDelayCall = new QDictionary<int, Action>();
+		public const float Height = Size * 3f;
 		public static QDictionary<Type, Func<object, string, object>> DrawOverride = new QDictionary<Type, Func<object, string, object>>();
+
 		public static List<string> TypeMenuList = new List<string>() { typeof(UnityEngine.Object).FullName.Replace('.', '/') };
+
 		public static List<Type> TypeList = new List<Type>() { typeof(UnityEngine.Object) };
-		public static bool IsRuntime { get;private set; }
-		public static void BeginRuntimeGUI()
-		{
-			if (Application.isPlaying)
-			{
-				IsRuntime = true;
-				GUI.skin = Skin;
-			}
-		}
-		public static void EndRuntimeGUI()
-		{
-			if (Application.isPlaying)
-			{
-				IsRuntime = false;
-			}
-		}
+
 		public static async Task WaitLayout()
 		{
 			await QTask.Wait(() => Event.current?.type != EventType.Layout);
 		}
-		public static bool Button(string text, float width = -1)
-		{
-			if (width > 0)
-			{
-				return GUILayout.Button(text,Skin.button, HeightLayout, GUILayout.Width(width));
-			}
-			else
-			{
-
-				return GUILayout.Button(text, Skin.button, HeightLayout);
-			}
-		}
-		public static void Title(string value)
-		{
-			GUILayout.Label(value, Skin.box, GUILayout.Height(Height/2));
-		}
-		public static void Label(string value)
-		{
-			GUILayout.Label(value, Skin.label, HeightLayout);
-		}
-		public static void LabelField(string name, string value)
-		{
-#if UNITY_EDITOR
-			if (!IsRuntime)
-			{
-				if (value.IsNull())
-				{
-					EditorGUILayout.LabelField(name);
-				}
-				else
-				{
-					EditorGUILayout.LabelField(name, value);
-				}
-			}
-			else
-#endif
-			{
-				GUILayout.BeginHorizontal();
-				Label(name);
-				Label(value);
-				GUILayout.EndHorizontal();
-			}
-		}
-		public static string TextField(string name, string text)
-		{
-#if UNITY_EDITOR
-			if (!IsRuntime)
-			{
-				if (name.IsNull())
-				{
-					return EditorGUILayout.TextArea(text);
-				}
-				else
-				{
-					return EditorGUILayout.TextField(name, text);
-				}
-			}
-			else
-#endif
-			{
-				GUILayout.BeginHorizontal();
-				Label(name);
-				text = TextField(text);
-				GUILayout.EndHorizontal();
-				return text;
-			}
-		}
-		public static string TextField(string text)
-		{
-			return GUILayout.TextField(text, Skin.textField, HeightLayout, GUILayout.MinWidth(Height*3));
-		}
-		public static int IntField(string lable, int value)
-		{
-#if UNITY_EDITOR
-			if (!IsRuntime)
-			{
-				if (lable.IsNull())
-				{
-					return EditorGUILayout.IntField(value);
-				}
-				else
-				{
-					return EditorGUILayout.IntField(lable, value);
-				}
-			}
-			else
-#endif
-			{
-				GUILayout.BeginHorizontal();
-				GUILayout.Label(lable, HeightLayout);
-				var str = TextField(value.ToString());
-				GUILayout.EndHorizontal();
-				if (int.TryParse(str, out var newInt))
-				{
-					return newInt;
-				}
-				else
-				{
-					return value;
-				}
-			}
-		}
-		public static int Popup(int select,string[] values)
-		{
-#if UNITY_EDITOR
-			if (!IsRuntime)
-			{
-				return EditorGUILayout.Popup(select, values);
-			}
-			else
-#endif
-			{
-				GUILayout.BeginHorizontal();
-				Label(values?.Get(select)?.ToString());
-				GUILayout.EndHorizontal();
-				return select;
-			}
-		}
-		public static int Popup(int select, GUIContent[] values)
-		{
-#if UNITY_EDITOR
-			if (!IsRuntime)
-			{
-				return EditorGUILayout.Popup(select, values);
-			}
-			else
-#endif
-			{
-				GUILayout.BeginHorizontal();
-				Label(values?.Get(select)?.ToString());
-				GUILayout.EndHorizontal();
-				return select;
-			}
-		}
-		public static Enum EnumField(string lable, Enum value)
-		{
-#if UNITY_EDITOR
-			if (!IsRuntime)
-			{
-				if (lable.IsNull())
-				{
-					return EditorGUILayout.EnumPopup(value);
-				}
-				else
-				{
-					return EditorGUILayout.EnumPopup(lable, value);
-				}
-			}
-			else
-#endif
-			{
-				//var dataList= QEnumListData.Get(value,"");
-				GUILayout.BeginHorizontal();
-				// GUILayout.SelectionGrid(dataList.SelectIndex, dataList.List.ToArray(), 1);
-				Label(lable);
-				Label(value.ToString());
-				GUILayout.EndHorizontal();
-				return value;
-			}
-		}
-		public static Enum EnumFlagsField(string lable, Enum value)
-		{
-#if UNITY_EDITOR
-			if (!IsRuntime)
-			{
-				if (lable.IsNull())
-				{
-					return EditorGUILayout.EnumFlagsField(value);
-				}
-				else
-				{
-					return EditorGUILayout.EnumFlagsField(lable, value);
-				}
-			}
-			else
-#endif
-			{
-				//var dataList= QEnumListData.Get(value,"");
-				GUILayout.BeginHorizontal();
-				// GUILayout.SelectionGrid(dataList.SelectIndex, dataList.List.ToArray(), 1);
-				Label(lable);
-				Label(value.ToString());
-				GUILayout.EndHorizontal();
-				return value;
-			}
-		}
-		public static long LongField(string lable, long value)
-		{
-#if UNITY_EDITOR
-			if (!IsRuntime)
-			{
-				if (lable.IsNull())
-				{
-					return EditorGUILayout.LongField(value);
-				}
-				else
-				{
-					return EditorGUILayout.LongField(lable, value);
-				}
-			}
-			else
-#endif
-			{
-				GUILayout.BeginHorizontal();
-				Label(lable);
-				var str = TextField(value.ToString());
-				GUILayout.EndHorizontal();
-				if (long.TryParse(str, out var newInt))
-				{
-					return newInt;
-				}
-				else
-				{
-					return value;
-				}
-			}
-		}
-		public static float FloatField(string lable, float value)
-		{
-#if UNITY_EDITOR
-			if (!IsRuntime)
-			{
-				if (lable.IsNull())
-				{
-					return EditorGUILayout.FloatField(value);
-				}
-				else
-				{
-					return EditorGUILayout.FloatField(lable, value);
-				}
-			}
-			else
-#endif
-			{
-				GUILayout.BeginHorizontal();
-				GUILayout.Label(lable, HeightLayout);
-				var str = TextField(value.ToString());
-				GUILayout.EndHorizontal();
-				if (float.TryParse(str, out var newInt))
-				{
-					return newInt;
-				}
-				else
-				{
-					return value;
-				}
-			}
-		}
-		public static double DoubleField(string lable, double value)
-		{
-#if UNITY_EDITOR
-			if (!IsRuntime)
-			{
-				if (lable.IsNull())
-				{
-					return EditorGUILayout.DoubleField(value);
-				}
-				else
-				{
-					return EditorGUILayout.DoubleField(lable, value);
-				}
-			}
-			else
-#endif
-			{
-				GUILayout.BeginHorizontal();
-				Label(lable);
-				var str = TextField(value.ToString());
-				GUILayout.EndHorizontal();
-				if (double.TryParse(str, out var newInt))
-				{
-					return newInt;
-				}
-				else
-				{
-					return value;
-				}
-			}
-		}
-		public static UnityEngine.Object ObjectField(string lable, UnityEngine.Object value, Type type)
-		{
-#if UNITY_EDITOR
-			if (!IsRuntime)
-			{
-				if (lable.IsNull())
-				{
-					return EditorGUILayout.ObjectField(value, type, true);
-				}
-				else
-				{
-					return EditorGUILayout.ObjectField(lable, value, type, true);
-				}
-			}
-			else
-#endif
-			{
-				GUILayout.BeginHorizontal();
-				GUILayout.Label(lable, HeightLayout);
-				GUILayout.Label(value?.ToString(), HeightLayout);
-				GUILayout.EndHorizontal();
-				return value;
-			}
-		}
-		public static bool Toggle(string lable, bool value)
-		{
-#if UNITY_EDITOR
-			if (!IsRuntime)
-			{
-				if (lable.IsNull())
-				{
-					return EditorGUILayout.Toggle(value);
-				}
-				else
-				{
-					return EditorGUILayout.Toggle(lable, value);
-				}
-			}
-			else
-#endif
-			{
-				if (!lable.IsNull())
-				{
-					GUILayout.BeginHorizontal();
-					Label(lable);
-				}
-				value = GUILayout.Toggle(value, "", Skin.toggle, HeightLayout, GUILayout.Width(Height));
-				if (!lable.IsNull())
-				{
-					GUILayout.EndHorizontal();
-				}
-				return value;
-			}
-		}
+	
 		private static QDictionary<int, bool> FoldoutCache = new QDictionary<int, bool>();
 		/// <summary>
 		/// 折叠按钮
@@ -566,43 +84,22 @@ namespace QTool
 			{
 				hashCode = key.GetHashCode();
 			}
-#if UNITY_EDITOR
-			if (!IsRuntime)
-			{
-				FoldoutCache[hashCode] = EditorGUILayout.Foldout(FoldoutCache[hashCode], key);
-			}
-			else
-#endif
-			{
-				if (!key.IsNull())
-				{
-					GUILayout.BeginHorizontal();
-				}
-				FoldoutCache[hashCode] = GUILayout.Toggle(FoldoutCache[hashCode], "", FoldoutStyle, HeightLayout,GUILayout.Width(Height));
-				
-				if (!key.IsNull())
-				{
-					Label(key);
-					GUILayout.EndHorizontal();
-				}
-			}
+			FoldoutCache[hashCode] = EditorGUILayout.Foldout(FoldoutCache[hashCode], key);
 			return FoldoutCache[hashCode];
 		}
 		public static string DrawQIdObject(string lable, string id, Type type, Rect? rect = null, params GUILayoutOption[] options)
 		{
-			var name = lable + "【" + (id == null ? "" : id.Substring(0, Mathf.Min(4, id.Length))) + "~】";
+			var name = lable + "[" + id.ToShortString(5) + "]";
 			var oldObj = QIdTool.GetObject(id, type);
 			var newObj = oldObj;
 			if (rect == null)
 			{
-				newObj = ObjectField(name, oldObj, type);
+				newObj = EditorGUILayout.ObjectField(name, oldObj, type,true);
 			}
-#if UNITY_EDITOR
 			else
 			{
 				newObj = EditorGUI.ObjectField(rect.Value, name, oldObj, type, true);
 			}
-#endif
 			if (newObj != oldObj)
 			{
 				id = QIdTool.GetQId(newObj);
@@ -630,7 +127,7 @@ namespace QTool
 					data.SelectIndex = 0;
 					str = data.SelectValue;
 				}
-				var newIndex = Popup(data.SelectIndex, data.List.ToArray());
+				var newIndex = EditorGUILayout.Popup(data.SelectIndex, data.List.ToArray());
 				if (newIndex != data.SelectIndex)
 				{
 					data.SelectIndex = newIndex;
@@ -649,7 +146,7 @@ namespace QTool
 			{
 				if (obj == null)
 				{
-					Label(name);
+					EditorGUILayout.LabelField(name);
 					return obj;
 				}
 				else
@@ -674,7 +171,7 @@ namespace QTool
 			switch (typeInfo.Code)
 			{
 				case TypeCode.Boolean:
-					obj = Toggle(name, (bool)obj); break;
+					obj =EditorGUILayout.Toggle(name, (bool)obj); break;
 				case TypeCode.Char:
 				case TypeCode.SByte:
 				case TypeCode.Byte:
@@ -687,26 +184,26 @@ namespace QTool
 						var flagsEnum = type.GetAttribute<FlagsAttribute>();
 						if (flagsEnum != null)
 						{
-							obj = EnumFlagsField(name, (Enum)obj);
+							obj = EditorGUILayout.EnumFlagsField(name, (Enum)obj);
 						}
 						else
 						{
-							obj = EnumField(name, (Enum)obj);
+							obj = EditorGUILayout.EnumPopup(name, (Enum)obj);
 						}
 					}
 					else
 					{
-						obj = IntField(name, (int)obj);
+						obj = EditorGUILayout.IntField(name, (int)obj);
 					}
 					break;
 				case TypeCode.Int64:
 				case TypeCode.UInt64:
-					obj = LongField(name, (long)obj); break;
+					obj = EditorGUILayout.LongField(name, (long)obj); break;
 				case TypeCode.Single:
-					obj = FloatField(name, (float)obj); break;
+					obj = EditorGUILayout.FloatField(name, (float)obj); break;
 				case TypeCode.Decimal:
 				case TypeCode.Double:
-					obj = DoubleField(name, (double)obj); break;
+					obj = EditorGUILayout.DoubleField(name, (double)obj); break;
 				case TypeCode.String:
 					var enumView = customAttribute?.GetAttribute<QPopupAttribute>();
 					if (enumView != null)
@@ -715,7 +212,7 @@ namespace QTool
 					}
 					else
 					{
-						obj = TextField(name, obj?.ToString()); break;
+						obj = EditorGUILayout.TextField(name, obj?.ToString()); break;
 					}
 				case TypeCode.Object:
 					switch (typeInfo.ObjType)
@@ -730,7 +227,7 @@ namespace QTool
 									}
 									var objType = obj.GetType();
 									var oldType = TypeList.IndexOf(objType);
-									var newType =Popup(oldType, TypeMenuList.ToArray());
+									var newType = EditorGUILayout.Popup(oldType, TypeMenuList.ToArray());
 									if (newType != oldType)
 									{
 										objType = TypeList[newType];
@@ -745,7 +242,7 @@ namespace QTool
 							break;
 						case QObjectType.UnityObject:
 							{
-								obj = ObjectField(name, (UnityEngine.Object)obj, type);
+								obj = EditorGUILayout.ObjectField(name, (UnityEngine.Object)obj, type,true);
 							}
 							break;
 						case QObjectType.Object:
@@ -760,7 +257,7 @@ namespace QTool
 								}
 								else
 								{
-									using (new GUILayout.VerticalScope(Skin.box))
+									using (new GUILayout.VerticalScope())
 									{
 										var show = false;
 										if (hasName)
@@ -820,7 +317,7 @@ namespace QTool
 										obj = typeInfo.ArrayRank == 0 ? type.CreateInstance() : type.CreateInstance(null, 0);
 										list = obj as IList;
 									}
-									using (new GUILayout.VerticalScope(Skin.box))
+									using (new GUILayout.VerticalScope())
 									{
 										var canHideChild = DrawElement == null;
 										if (hasName)
@@ -831,7 +328,7 @@ namespace QTool
 											}
 											else
 											{
-												Label(name);
+												EditorGUILayout.LabelField(name);
 											}
 										}
 										if (!canHideChild || !hasName)
@@ -846,7 +343,7 @@ namespace QTool
 												{
 													for (int i = 0; i < list.Count; i++)
 													{
-														using (new GUILayout.VerticalScope(Skin.box))
+														using (new GUILayout.VerticalScope())
 														{
 															var key = name + "[" + i + "]";
 															if (DrawElement == null)
@@ -904,7 +401,7 @@ namespace QTool
 				case TypeCode.Empty:
 				case TypeCode.DBNull:
 				default:
-					LabelField(name, obj?.ToString());
+					EditorGUILayout.LabelField(name, obj?.ToString());
 					break;
 			}
 			return obj;
@@ -1048,7 +545,7 @@ namespace QTool
 		public static Rect Box(this Color color)
 		{
 			PushColor(color);
-			GUILayout.Box("", Skin.customStyles[0],GUILayout.Height(Size*2));
+			GUILayout.Box("",GUILayout.Height(Size*2));
 			PopColor();
 			return GUILayoutUtility.GetLastRect();
 		}
@@ -1056,11 +553,11 @@ namespace QTool
 		{
 			PushColor(color);
 			rect = rect.HorizontalRect(left, right);
-			GUI.Box(rect, "", Skin.customStyles[0]);
+			GUI.Box(rect, "");
 			PopColor();
 			return rect;
 		}
-		public static bool DragBar(this Color color,string key, Rect rect,ref float value,Action<QGenericMenu> action=null)
+		public static bool DragBar(this Color color,string key, Rect rect,ref float value,Action<GenericMenu> action=null)
 		{
 			var width = 6 / rect.width;
 			var dragBox= color.Box(rect, value, value+ width);
@@ -1074,7 +571,7 @@ namespace QTool
 			return drag;
 		}
 		internal static string DragKey { get; set; } = null;
-		public static Rect Drag(this Rect selectRect,Rect rangeRect,string key,Action<QGenericMenu> action)
+		public static Rect Drag(this Rect selectRect,Rect rangeRect,string key,Action<GenericMenu> action)
 		{
 			switch (Event.current.type)
 			{
@@ -1117,9 +614,9 @@ namespace QTool
 				Box(color, rect,0, progress);
 				PopColor();
 			}
-			GUI.Label(rect, info, CenterLable);
+			GUI.Label(rect, info);
 		}
-		public static void MouseMenu(this Rect rect, Action<QGenericMenu> action)
+		public static void MouseMenu(this Rect rect, Action<GenericMenu> action)
 		{
 			if (EventType.MouseUp.Equals(Event.current.type))
 			{
@@ -1131,7 +628,7 @@ namespace QTool
 							{
 								if (action != null)
 								{
-									var rightMenu = new QGenericMenu();
+									var rightMenu = new GenericMenu();
 									action.Invoke(rightMenu);
 									rightMenu.ShowAsContext();
 									Event.current.Use();
@@ -1184,13 +681,6 @@ namespace QTool
 		public static void Draw(this SerializedProperty property, Rect rect, GUIContent content = null)
 		{
 			if (!property.IsShow()) return;
-			var QOnChange = property.GetAttribute<QOnChangeAttribute>();
-			if (QOnChange != null)
-			{
-				OnChangeDelayCall[property.serializedObject.targetObject.GetHashCode()]?.Invoke();
-				OnChangeDelayCall[property.serializedObject.targetObject.GetHashCode()] = null;
-				EditorGUI.BeginChangeCheck(); ;
-			}
 			var readonlyAtt = property.GetAttribute<QReadonlyAttribute>();
 			if (readonlyAtt != null)
 			{
@@ -1209,13 +699,6 @@ namespace QTool
 				else
 				{
 					QToolbarDrawer.Draw(QToolbar, rect, property, content);
-				}
-			}
-			if (QOnChange != null)
-			{
-				if (EditorGUI.EndChangeCheck())
-				{
-					OnChangeDelayCall[property.serializedObject.targetObject.GetHashCode()] += () => { property.InvokeFunction(QOnChange.changeCallBack); };
 				}
 			}
 			return;
@@ -1423,225 +906,7 @@ namespace QTool
 #endif
 
 	}
-	//public class QToolBar
-	//{
-	//	internal List<string> Values = new List<string>() ;
-	//	internal List<QToolBar> ChildToolbars = new List<QToolBar>() ;
-	//	public QToolBar ChildToolBar => ChildToolbars.Get(Select);
-	//	public int Select { get; internal set; } = -1;
-	//	public bool Selected => Select >= 0;
-	//	public bool IsButton => ChildToolbars.Count == 0;
-	//	public int Width { get; set; } = 100;
-	//	public object Value { get; set; }
-	//	public void CancelSelect()
-	//	{
-	//		if (Selected)
-	//		{
-	//			ChildToolBar.CancelSelect();
-	//			Select = -1;
-	//		}
-	//	}
-	//	public QToolBar()
-	//	{
-	//	}
-	//	private QToolBar(string key)
-	//	{
-	//		Value = key;
-	//		Values.Add("返回");
-	//		ChildToolbars.Add(new QToolBar { Value = "返回" });
-	//	}
-	//	public QToolBar this[string key]
-	//	{
-	//		get
-	//		{
-	//			var index = Values.IndexOf(key);
-	//			if (index < 0)
-	//			{
-	//				Values.Add(key);
-	//				var newToolBar = new QToolBar(key);
-	//				ChildToolbars.Add(newToolBar);
-	//				return newToolBar;
-	//			}
-	//			else
-	//			{
-	//				return ChildToolbars[index];
-	//			}
-	//		}
-	//	}
-	//	public override string ToString()
-	//	{
-	//		return Selected?(Value + "/" + ChildToolBar): Value?.ToString();
-	//	}
-	//}
-	public interface IQGUIEditor
-	{
-		void OnQGUIEditor();
-	}
-	public abstract class QGUIEditorWindow
-#if UNITY_EDITOR
-		: EditorWindow
-#endif
-	{
-#if !UNITY_EDITOR
-		public Vector2 minSize = default;
-		public GUIContent titleContent = default;
-		
-		
-		public void Repaint()
-		{
-
-		}
 	
-#endif
-		private Rect _position=default;
-		public
-#if UNITY_EDITOR
-			new
-#endif
-			Rect position {
-			get
-			{
-#if UNITY_EDITOR
-				if (!QGUI.IsRuntime)
-				{
-					return base.position;
-				}else
-#endif
-				{
-					return _position;
-				}
-			}
-			set
-			{
-#if UNITY_EDITOR
-				if (!QGUI.IsRuntime)
-				{
-					base.position=value;
-				}
-				else
-#endif
-				{
-					_position = value;
-				}
-			}
-		}
-		public
-#if UNITY_EDITOR
-			new
-#endif
-			void BeginWindows()
-		{
-#if UNITY_EDITOR
-			if (!QGUI.IsRuntime)
-			{
-				base.BeginWindows();
-			}
-#endif
-		}
-		public
-#if UNITY_EDITOR
-			new
-#endif
-			void EndWindows()
-		{
-#if UNITY_EDITOR
-			if (!QGUI.IsRuntime)
-			{
-				base.EndWindows();
-			}
-#endif
-		}
-		public
-#if UNITY_EDITOR
-			new
-#endif
-		void Show()
-		{
-#if UNITY_EDITOR
-			if (!QGUI.IsRuntime)
-			{
-				base.Show();
-			}
-			else
-#endif
-			{
-				QToolManager.Instance.Windows.AddCheckExist(this);
-			}
-		}
-		public
-#if UNITY_EDITOR
-			new
-#endif
-		void Close()
-		{
-#if UNITY_EDITOR
-			if (!QGUI.IsRuntime)
-			{
-				base.Close();
-			}
-			else
-#endif
-
-			{
-				OnLostFocus();
-				QToolManager.Instance.Windows.Remove(this);
-			}
-		}
-		private void OnGUI()
-		{
-			OnQGUI();
-		}
-		private Vector2 ChildWindowOffset = default;
-		public Rect Window(int id, Rect clientRect, GUI.WindowFunction func, string text)
-		{
-			if (QGUI.IsRuntime)
-			{
-				clientRect.position += ChildWindowOffset;
-			}
-			clientRect=GUI.Window(id, clientRect, func, text);
-
-			if (QGUI.IsRuntime)
-			{
-				clientRect.position -= ChildWindowOffset;
-			}
-			return clientRect;
-		}
-		internal void Draw() {
-
-			using (new GUILayout.HorizontalScope(QGUI.Skin.box, GUILayout.Height(QGUI.Size * 2)))
-			{
-				GUILayout.Label(titleContent);
-				GUILayout.FlexibleSpace();
-				if (GUILayout.Button("关闭", GUILayout.Height(QGUI.Size * 2)))
-				{
-					Close();
-				}
-			}
-		//	ChildWindowOffset = QScreen.AspectGUIRect.position + new Vector2(0, QGUI.Size * 2);
-			//position = new Rect(0, QGUI.Size * 2, QScreen.AspectGUIRect.width, QScreen.AspectGUIRect.height - QGUI.Size * 2);
-			using (new GUILayout.AreaScope(position))
-			{
-				OnQGUI();
-			}
-		}
-		protected abstract void OnQGUI();
-		protected abstract void OnLostFocus();
-		public
-#if UNITY_EDITOR
-			new
-#endif
-			static T GetWindow<T>() where T : QGUIEditorWindow, new()
-		{
-#if UNITY_EDITOR
-			if (!QGUI.IsRuntime)
-			{
-				return EditorWindow.GetWindow<T>();
-			}
-#endif
-			return new T();
-		}
-	}
-
 #if UNITY_EDITOR
 	public static class QEditorTool
 	{
@@ -1735,29 +1000,5 @@ namespace QTool
 	}
 #endif
 	
-	public class QGenericMenu
-	{
-#if UNITY_EDITOR
-		GenericMenu menu = new GenericMenu();
-#endif
-		public void AddItem(GUIContent content,bool on,Action action)
-		{
-#if UNITY_EDITOR
-			menu.AddItem(content, on,()=>action());
-#endif
-		}
-		
-		public void AddSeparator(string key="")
-		{
-#if UNITY_EDITOR
-			menu.AddSeparator(key);
-#endif
-		}
-		public void ShowAsContext()
-		{
-#if UNITY_EDITOR
-			menu.ShowAsContext();
-#endif
-		}
-	}
+	
 }

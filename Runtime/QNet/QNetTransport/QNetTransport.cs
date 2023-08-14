@@ -193,19 +193,25 @@ namespace QTool.Net
 		public void Update() { }
 		public void LateUpdate() { }
 #pragma warning restore UNT0001
-	
+
+		protected UnityEngine.UIElements.Button StartHostButton=null;
 		/// <summary>
 		/// 用于Debug显示的GUI
 		/// </summary>
-		public virtual void DebugGUI()
+		public virtual void DebugUI()
 		{
-			if (!ServerActive)
+#if UNITY_2021_1_OR_NEWER
+
+			if (StartHostButton == null)
 			{
-				if (GUILayout.Button("开启主机", GUILayout.Width(200), GUILayout.Height(30)))
+				StartHostButton = QToolManager.Instance.RootVisualElement.AddButton("开启主机", () =>
 				{
 					GetComponent<QNetManager>().StartHost();
-				}
+				});
 			}
+			StartHostButton.visible = ServerActive;
+
+#endif
 		}
 	}
 }

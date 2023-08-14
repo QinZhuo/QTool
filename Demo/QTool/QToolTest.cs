@@ -25,7 +25,8 @@ namespace QTool.Test
 		[QPopup(nameof(enumTest))]
         public string testValue ;
 		public static string[] enumTest=> new string[] { "enumTest1", "enumTest2" };
-		
+
+		public QIdObject qIdObject;
         byte[] testBytes;
 		[QName("序列化测试数据来源", nameof(toggleTest))]
         public TTestClass test1;

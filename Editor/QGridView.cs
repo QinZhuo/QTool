@@ -135,7 +135,7 @@ namespace QTool
 			{
 				str = "";
 			}
-			GUILayout.Label(str, QGUI.CenterLable, width, height);
+			GUILayout.Label(str,width, height);
 			var rect = GUILayoutUtility.GetLastRect();
 			if (Event.current.type != EventType.Layout)
 			{

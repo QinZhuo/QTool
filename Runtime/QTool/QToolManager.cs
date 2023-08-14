@@ -31,7 +31,6 @@ namespace QTool
 		public event Action OnLateDestroyEvent = null;
 		public event Action OnGUIEvent = null;
 		public event Action OnPostRenderEvent = null;
-		public List<QGUIEditorWindow> Windows { get; private set; } = new List<QGUIEditorWindow>();
 		public int FrameIndex { get; private set; } = 0;
 #if UNITY_2021_1_OR_NEWER
 		public VisualElement RootVisualElement { get; private set; }

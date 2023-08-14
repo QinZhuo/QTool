@@ -5,8 +5,10 @@ using System;
 using QTool.Reflection;
 using System.Reflection;
 using System.Threading.Tasks;
+using UnityEngine.UIElements;
 #if UNITY_EDITOR
 using UnityEditor;
+using UnityEditor.UIElements;
 #endif
 namespace QTool
 {
@@ -96,7 +98,6 @@ namespace QTool.Inspector
 	[AttributeUsage(AttributeTargets.Field)]
     public class QOnChangeAttribute : PropertyAttribute
     {
-        public bool change;
         public string changeCallBack;
         public QOnChangeAttribute(string changeCallBack)
         {
@@ -248,44 +249,48 @@ namespace QTool.Inspector
 	[CustomPropertyDrawer(typeof(QNameAttribute))]
 	public class QNameDrawer : PropertyDrawer
 	{
-		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
+		public override VisualElement CreatePropertyGUI(SerializedProperty property)
 		{
-			if (label.text == property.displayName)
-			{
-				label.text = property.QName();
-			}
-			if (label.tooltip != property.tooltip)
-			{
-				label.tooltip = property.tooltip;
-			}
-			property.Draw(position, label);
-		}
-		public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
-		{
-			return property.GetHeight();
+			return new PropertyField(property, property.QName());
 		}
 	}
 	[CustomPropertyDrawer(typeof(QReadonlyAttribute))]
 	public class QReadonlyDrawer : QNameDrawer
 	{
+		public override VisualElement CreatePropertyGUI(SerializedProperty property)
+		{
+			var visual= base.CreatePropertyGUI(property);
+			visual.SetEnabled(false);
+			return visual;
+		}
 	}
 	[CustomPropertyDrawer(typeof(QOnChangeAttribute))]
 	public class QOnChangeDrawer : QNameDrawer
 	{
-
+		public override VisualElement CreatePropertyGUI(SerializedProperty property)
+		{
+			var visual= base.CreatePropertyGUI(property);
+			visual.RegisterCallback<SerializedPropertyChangeEvent>(data =>
+			{
+				property.InvokeFunction((attribute as QOnChangeAttribute).changeCallBack);
+			});
+			return visual;
+		}
 	}
 	[CustomPropertyDrawer(typeof(QIdObject))]
 	public class QIdObjectReferenceDrawer : PropertyDrawer
 	{
-	
-		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
+		public override VisualElement CreatePropertyGUI(SerializedProperty property)
 		{
 			var id = property.FindPropertyRelative(nameof(QIdObject.id));
-			id.stringValue =QGUI.DrawQIdObject(label.text, id.stringValue, typeof(UnityEngine.Object), position);
-		}
-		public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
-		{
-			return base.GetPropertyHeight(property, label);
+			var obj = property.FindPropertyRelative("_"+nameof(QIdObject.Object));
+			var visual = new PropertyField(obj, property.QName() + "[" + id.stringValue.ToShortString(5) + "]");
+			visual.RegisterCallback<ChangeEvent<UnityEngine.Object>>(data =>
+			{
+				id.stringValue = QIdTool.GetQId(data.newValue)?.ToString();
+				visual.Q<Label>().text = property.QName() + "[" + id.stringValue.ToShortString(5) + "]";
+			});
+			return visual;
 		}
 	}
 
@@ -298,7 +303,7 @@ namespace QTool.Inspector
 			{
 				position.height = 30;
 				QGUI.PushColor(property.boolValue ?Color.Lerp(Color.white,Color.black,0.2f): Color.white);
-				if( GUI.Button(position, (attribute as QToggleAttribute).name, QGUI.Skin.button))
+				if( GUI.Button(position, (attribute as QToggleAttribute).name))
 				{
 					property.boolValue = !property.boolValue;
 				}
@@ -324,7 +329,7 @@ namespace QTool.Inspector
 	}
 
 	[CustomPropertyDrawer(typeof(QPopupAttribute))]
-	public class QQPopupDrawer : QNameDrawer
+	public class QPopupDrawer : QNameDrawer
 	{
 	
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)

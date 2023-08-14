@@ -114,43 +114,43 @@ namespace QTool.Net
 		}
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
 		private Vector2 ScrollPosition = Vector2.zero;
-		public override void DebugGUI()
+		public override void DebugUI()
 		{
-			if (ServerActive)
-			{
-				QGUI.LabelField("房间",QSteam.CurrentLobby.ToString());
-			}
-			else
-			{
-				if (QGUI.Button("创建房间",200))
-				{
-					GetComponent<QNetManager>().StartHost();
-				}
-			}
-			if (!ClientConnected)
-			{
-				if (QSteam.CurrentLobby.IsNull())
-				{
-					if (QSteam.LobbyList.Count > 0)
-					{
-						using (var scroll = new GUILayout.ScrollViewScope(ScrollPosition, true, false, GUILayout.Width(200)))
-						{
-							foreach (var lobby in QSteam.LobbyList)
-							{
-								if (GUILayout.Button(lobby.ToString(), GUILayout.Width(175), GUILayout.Height(40)))
-								{
-									GetComponent<QNetManager>().StartClient(lobby.SteamID.ToString());
-								}
-							}
-							ScrollPosition = scroll.scrollPosition;
-						}
-					}
-					if (GUILayout.Button("刷新房间", GUILayout.Width(200), GUILayout.Height(30)))
-					{
-						_ = QSteam.FreshLobbys();
-					}
-				}
-			}
+			//if (ServerActive)
+			//{
+			//	QGUI.LabelField("房间",QSteam.CurrentLobby.ToString());
+			//}
+			//else
+			//{
+			//	if (QGUI.Button("创建房间",200))
+			//	{
+			//		GetComponent<QNetManager>().StartHost();
+			//	}
+			//}
+			//if (!ClientConnected)
+			//{
+			//	if (QSteam.CurrentLobby.IsNull())
+			//	{
+			//		if (QSteam.LobbyList.Count > 0)
+			//		{
+			//			using (var scroll = new GUILayout.ScrollViewScope(ScrollPosition, true, false, GUILayout.Width(200)))
+			//			{
+			//				foreach (var lobby in QSteam.LobbyList)
+			//				{
+			//					if (GUILayout.Button(lobby.ToString(), GUILayout.Width(175), GUILayout.Height(40)))
+			//					{
+			//						GetComponent<QNetManager>().StartClient(lobby.SteamID.ToString());
+			//					}
+			//				}
+			//				ScrollPosition = scroll.scrollPosition;
+			//			}
+			//		}
+			//		if (GUILayout.Button("刷新房间", GUILayout.Width(200), GUILayout.Height(30)))
+			//		{
+			//			_ = QSteam.FreshLobbys();
+			//		}
+			//	}
+			//}
 		}
 #endif
 	}

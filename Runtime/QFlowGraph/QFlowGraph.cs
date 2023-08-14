@@ -9,31 +9,7 @@ namespace QTool.FlowGraph
 	[Serializable]
     public class QFlowGraph: QSerializeObject<QFlowGraph>
 	{
-		static QFlowGraph()
-		{
-			QGUI.DrawOverride[typeof(QFlow)] = (obj, name) =>
-			{
-				QGUI.Label(name);
-				return obj;
-			};
-			QGUI.DrawOverride[typeof(QFlowGraph)] = (obj, name) =>
-			{
-				if (obj == null)
-				{
-					obj = new QFlowGraph { Name = name };
-				}
-				using (new GUILayout.HorizontalScope())
-				{
-					GUILayout.Label(name);
-					if (GUILayout.Button("编辑"))
-					{
-						var graph = obj as QFlowGraph;
-						QFlowGraphWindow.Open(graph);
-					}
-					return obj;
-				}
-			};
-		}
+		
 	
 		public override void Deserialize()
 		{

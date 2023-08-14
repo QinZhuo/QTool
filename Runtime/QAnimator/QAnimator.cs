@@ -10,7 +10,7 @@ namespace QTool
 
 	[RequireComponent(typeof(Animator))]
 	[RequireComponent(typeof(QEventTrigger))]
-	public class QAnimator : MonoBehaviour, IQGUIEditor
+	public class QAnimator : MonoBehaviour
 	{
 		Animator _animator;
 		public Animator Animator
@@ -140,7 +140,7 @@ namespace QTool
 			{
 				var rect = QGUI.Box(Color.Lerp(Color.white, Color.clear, 0.6f));
 				EventTracks[name] = rect;
-				GUI.Label(rect, name, QGUI.CenterLable);
+				GUI.Label(rect, name);
 			}
 			return EventTracks[name];
 		}
