@@ -60,7 +60,6 @@ namespace QTool.FlowGraph
 			listView = root.AddListView(qdataList, (visual, y) =>
 			{
 				visual.Clear();
-				var width = 200;
 				for (int x = 0; x < qdataList[y].Count; x++)
 				{
 					var row = qdataList[y];
@@ -74,7 +73,6 @@ namespace QTool.FlowGraph
 						label.style.width = 180;
 						label.style.marginLeft = 10;
 						label.style.marginRight = 10;
-						width += 200;
 					}
 					else
 					{
@@ -133,10 +131,6 @@ namespace QTool.FlowGraph
 					menu.menu.AppendAction("添加行", action => { AddAt(y); listView.Rebuild(); });
 					menu.menu.AppendAction("删除行", action => { RemoveAt(y); listView.Rebuild(); });
 				}));
-				if (y == 0)
-				{
-					listView.style.width = width;
-				}
 			},
 			() =>
 			{
@@ -187,6 +181,7 @@ namespace QTool.FlowGraph
 				PlayerPrefs.SetString(nameof(QDataListWindow) + "_LastPath", path);
 				await QTask.Wait(() => listView != null);
 				listView.itemsSource = qdataList;
+				listView.style.width = qdataList.TitleRow.Count * 200+100;
 				listView.Rebuild();
 			}
 			catch (Exception e)

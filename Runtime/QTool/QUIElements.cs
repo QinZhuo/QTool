@@ -392,6 +392,13 @@ namespace QTool
 											});
 										}));
 									});
+									foldout.AddManipulator(new ContextualMenuManipulator((menu) => {
+										menu.menu.AppendAction("新增", action => {
+											list = list.CreateAt(QSerializeType.Get(typeInfo.ElementType));
+											listView.Rebuild();
+											changeEvent?.Invoke(list);
+										});
+									}));
 									return foldout;
 								}
 							}break;
