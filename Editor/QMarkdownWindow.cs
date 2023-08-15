@@ -47,9 +47,9 @@ namespace QTool
 		}
 		private TextField markdownText = null;
 		private ScrollView markdownView = null;
-		protected override void Awake()
+		protected override void CreateGUI()
 		{
-			base.Awake();
+			base.CreateGUI();
 			var root = rootVisualElement;
 			markdownView = new ScrollView();
 			var editorRange = new ScrollView();
@@ -62,9 +62,10 @@ namespace QTool
 				markdownView.verticalScroller.value = value / editorRange.verticalScroller.highValue * markdownView.verticalScroller.highValue;
 			};
 		}
-		protected override void OnChangeData(string newValue)
-		{
+		protected override async void OnChangeData(string newValue)
+		{ 
 			base.OnChangeData(newValue);
+			await QTask.Wait(() => markdownView != null); 
 			markdownView.AddMarkdown(newValue);
 		}
 

@@ -43,11 +43,249 @@ namespace QTool.FlowGraph
 
 		}
 
-		protected override void ParseData()
+		protected override async void ParseData()
 		{
 			Graph = Data.ParseQData<QFlowGraph>();
-			Debug.LogError(Graph.NodeList.Count);
+			if (Graph == null) return;
+			await QTask.Wait(() => Back != null);
+			Back.Clear();
+			NodeViewList.Clear();
+			foreach (var node in Graph.NodeList)
+			{
+				AddNodeView(Back, node);
+			}
+			foreach (var name in Graph.NodeList)
+			{
+				foreach (var port in name.Ports)
+				{
+					if (port.IsOutput)
+					{
+						var color = port.ConnectType.Name.ToColor();
+						foreach (var c in port.ConnectInfolist)
+						{
+							foreach (var connect in c.ConnectList)
+							{
+								var next = Graph.GetConnectInfo(connect);
+								if (next != null)
+								{
+									var start = GetDotView(port.GetPortId());
+									var end = GetDotView(connect);
+									if (start != null && end != null)
+									{
+										var connectView = Back.AddConnect(color);
+										connectView.name = port.GetHashCode().ToString();
+										connectView.StartElement = start;
+										connectView.EndElement = end;
+										ConnectViewList.Add(connectView);
+									}
+								}
+							}
+						}
+					}
+				}
+			}
 		}
+
+		VisualElement Back = null;
+		protected override void CreateGUI()
+		{
+			base.CreateGUI();
+
+			Back = rootVisualElement.AddVisualElement();
+			Back.style.backgroundColor = Color.Lerp(Color.black, Color.white, 0.1f);
+			Back.style.height = new Length(100, LengthUnit.Percent);
+			Back.RegisterCallback<MouseDownEvent>(data =>
+			{
+				if (CurrentNode == null)
+				{
+					CurrentNode = Back;
+				}
+			});
+			Back.RegisterCallback<MouseMoveEvent>(data =>
+			{
+				if (StartPortDot != null)
+				{
+					if (DragConnect != null)
+					{
+						DragConnect.Start = StartPortDot.worldBound.center;
+						DragConnect.End = data.mousePosition;
+					}
+				}
+				else if (CurrentNode != null)
+				{
+					if (CurrentNode != Back)
+					{
+						CurrentNode.transform.position = data.mousePosition + DragOffset;
+					}
+					else
+					{
+						foreach (var node in NodeViewList)
+						{
+							node.transform.position += new Vector3(data.mouseDelta.x, data.mouseDelta.y);
+
+						}
+					}
+				}
+				foreach (var item in ConnectViewList)
+				{
+					item.MarkDirtyRepaint();
+				}
+			});
+			Back.AddMenu(data =>
+			{
+				var position = data.localMousePosition;
+				if (CurrentNode == null)
+				{
+					foreach (var kv in QCommand.KeyDictionary)
+					{
+						data.menu.AppendAction(kv.fullName, action =>
+						{
+							var node = Graph.AddNode(kv.Key);
+							node.rect.position = position;
+							AddNodeView(Back, node);
+						});
+					}
+				}
+			});
+			Back.RegisterCallback<MouseUpEvent>(data =>
+			{
+				CurrentNode = null;
+			});
+		}
+
+		private void OnGUI()
+		{
+
+		}
+		protected override void OnLostFocus()
+		{
+			base.OnLostFocus();
+			CurrentNode = null;
+		}
+		private VisualElement CurrentNode { get; set; }
+		private VisualElement StartPortDot { get; set; }
+		private QConnectElement DragConnect { get; set; }
+		private Vector2 DragOffset { get; set; }
+		private List<VisualElement> NodeViewList = new List<VisualElement>();
+		private List<QConnectElement> ConnectViewList = new List<QConnectElement>();
+		private VisualElement AddNodeView(VisualElement root, QFlowNode node)
+		{
+			var nodeView = root.AddVisualElement();
+			NodeViewList.Add(nodeView);
+			var color = node.commandKey.ToColor(0.3f, 0.5f);
+			nodeView.style.backgroundColor = color;
+			nodeView.name = node.Key;
+			nodeView.style.SetBorder(Color.black.Lerp(color, 0.5f), 3);
+			nodeView.style.position = Position.Absolute;
+			nodeView.style.left = Mathf.Max(0, node.rect.x);
+			nodeView.style.top = Mathf.Max(0, node.rect.y);
+			nodeView.style.width = Mathf.Max(200, node.rect.width);
+			nodeView.style.height = new StyleLength(StyleKeyword.Auto);
+			nodeView.RegisterCallback<MouseDownEvent>(data =>
+			{
+				CurrentNode = nodeView;
+				DragOffset = nodeView.transform.position - new Vector3(data.mousePosition.x, data.mousePosition.y);
+			});
+			nodeView.AddMenu(data =>
+			{
+				CurrentNode = null;
+				data.menu.AppendAction("运行", action =>
+				{
+					Graph.Run(node.Key);
+				});
+				data.menu.AppendSeparator();
+				data.menu.AppendAction("删除", action =>
+				{
+					Graph.Remove(node);
+					root.Remove(nodeView);
+				});
+			});
+			var label = nodeView.AddLabel(node.Name);
+			label.name = "Title";
+			label.style.unityTextAlign = TextAnchor.MiddleCenter;
+			label.style.height = 20;
+			label.style.backgroundColor = color.Lerp(Color.black, 0.5f);
+			foreach (var port in node.Ports)
+			{
+				AddPortView(nodeView, port);
+			}
+			return nodeView;
+		}
+		public void AddPortView(VisualElement root, QFlowPort port)
+		{
+			if (port.Key == QFlowKey.NextPort || port.Key == QFlowKey.FromPort)
+			{
+				var title = root.Q<Label>("Title");
+				var dot = AddDotView(title, port.ConnectType.Name.ToColor(), port.GetPortId());
+				dot.style.position = Position.Absolute;
+				if (port.IsOutput)
+				{
+					dot.style.right = 0;
+				}
+				else
+				{
+					dot.style.left = 0;
+				}
+			}
+			else
+			{
+				var row = root.AddVisualElement(port.IsOutput ? FlexDirection.RowReverse : FlexDirection.Row);
+				var dot = AddDotView(row, port.ConnectType.Name.ToColor(), port.GetPortId());
+				if (port.IsShowValue())
+				{
+					row.Add(port.ViewName, port.Value, port.ValueType, newValue => port.Value = newValue);
+				}
+				else
+				{
+					row.AddLabel(port.ViewName, port.IsOutput ? TextAnchor.MiddleRight : TextAnchor.MiddleLeft);
+				}
+			}
+		}
+		public QConnectElement GetConnectView(PortId portId)
+		{
+			return Back.Q<QConnectElement>(portId.GetHashCode().ToString());
+		}
+		public VisualElement GetDotView(PortId portId)
+		{
+			return Back.Q<VisualElement>(portId.GetHashCode().ToString());
+		}
+		public VisualElement AddDotView(VisualElement root, Color color, PortId portId)
+		{
+			var dot = root.AddVisualElement();
+			dot.name = portId.GetHashCode().ToString();
+			dot.style.backgroundColor = Color.black;
+			dot.style.width = 12;
+			dot.style.height = 12;
+			dot.style.alignSelf = Align.Center;
+			dot.style.SetBorder(color, 2, 6);
+			dot.RegisterCallback<MouseDownEvent>(data =>
+			{
+				if (StartPortDot == null)
+				{
+					var port = Graph.GetPort(portId);
+					if (port.IsOutput)
+					{
+						StartPortDot = dot;
+						DragConnect = GetConnectView(portId);
+						if (DragConnect == null)
+						{
+							DragConnect = Back.AddConnect(port.ConnectType.Name.ToColor());
+						}
+					}
+				}
+			});
+			dot.RegisterCallback<MouseUpEvent>(data =>
+			{
+				if (StartPortDot != null && StartPortDot != dot)
+				{
+					StartPortDot = null;
+					DragConnect.EndElement = dot;
+					DragConnect = null;
+				}
+			});
+			return dot;
+		}
+
 	}
 
 	//    public class QFlowGraphWindow : EditorWindow

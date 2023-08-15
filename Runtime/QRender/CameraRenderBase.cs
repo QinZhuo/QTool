@@ -60,10 +60,17 @@ namespace QTool
         {
             GL.PopMatrix();
         }
-        /// <summary>
-        /// 顺时针三点
-        /// </summary>
-        public static void DrawTriangle(Vector3 a, Vector3 b, Vector3 c)
+		public static void DrawLine(Vector3 a, Vector3 b)
+		{
+			GL.Begin(GL.LINES);
+			GL.Vertex(a);
+			GL.Vertex(b);
+			GL.End();
+		}
+		/// <summary>
+		/// 顺时针三点
+		/// </summary>
+		public static void DrawTriangle(Vector3 a, Vector3 b, Vector3 c)
         {
             GL.Begin(GL.TRIANGLES);
             GL.Vertex(a);

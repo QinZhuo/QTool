@@ -100,6 +100,7 @@ namespace QTool
 	[QCommandType("基础/程序生成")]
 	public static class QRandomNode
 	{
+		[QIgnore]
 		public static int MaxRandomTimes { get; set; } = 10;
 		[QIgnore]
 		public static IEnumerator RandomRangeCarete<T>(QFlowNode This, [QInputPort("场景"), QFlowPort] GameObject root, [QName("范围")] float range=10, [QName("中心偏移")] float centerOffset = 0, [QName("预制体")] GameObject prefab = null, [QName("创建数目")] int count = 1, [QFlowPort, QOutputPort, QName("物体")] GameObject newObject = default,float radius=0) where T:Component

@@ -187,11 +187,28 @@ namespace QTool
 			root.Add(visual);
 			return visual;
 		}
-		public static VisualElement AddVisualElement(this VisualElement root)
+		public static VisualElement AddVisualElement(this VisualElement root, FlexDirection flexDirection = FlexDirection.Column)
 		{
 			var visual = new VisualElement();
+			visual.style.flexDirection = flexDirection;
 			root.Add(visual);
 			return visual;
+		}
+		public static QConnectElement AddConnect(this VisualElement root,Color color)
+		{
+			var visual = new QConnectElement();
+			root.Add(visual);
+			visual.Color = color;
+			return visual;
+		}
+		public static Vector2 GetWorldPosition(this VisualElement root)
+		{
+			return root.worldTransform.MultiplyPoint(root.transform.position);
+		}
+		public static void SetWorldPosition(this VisualElement root,Vector2 worldPosition)
+		{
+			root.style.position = Position.Absolute;
+			root.transform.position = worldPosition - root.worldBound.position;
 		}
 		public static ScrollView AddScrollView(this VisualElement root)
 		{
@@ -217,6 +234,11 @@ namespace QTool
 			return visual;
 		}
 #endif
+
+		public static void AddMenu(this VisualElement root, Action<ContextualMenuPopulateEvent> menuBuilder)
+		{
+			root.AddManipulator(new ContextualMenuManipulator(menuBuilder));
+		}
 		public static List<Type> TypeList = new List<Type>() { typeof(UnityEngine.Object),typeof(string) };
 		public static VisualElement Add(this VisualElement root, string name, object obj, Type type, Action<object> changeEvent, ICustomAttributeProvider customAttribute = null)
 		{
@@ -312,13 +334,15 @@ namespace QTool
 								}
 								var objView = root.AddVisualElement();
 								objView.style.flexDirection = FlexDirection.Row; ;
-								var typePopup= objView.AddPopup(name, TypeList, obj.GetType(), (newType) =>
+								objView.AddLabel(name);
+								var typePopup= objView.AddPopup("", TypeList, obj.GetType(), (newType) =>
 								{
 									obj = newType.CreateInstance();
 									root.Remove(objView);
 									root.Add(name, obj, type, changeEvent, customAttribute);
 								});
-								if (QSerializeType.Get(typePopup.value).ObjType!= QObjectType.DynamicObject)
+								typePopup.style.maxWidth = 100;
+								if (QSerializeType.Get(typePopup.value).ObjType != QObjectType.DynamicObject)
 								{
 									objView.Add("", obj, typePopup.value, changeEvent);
 								}
@@ -379,7 +403,7 @@ namespace QTool
 											list[index] = value;
 											changeEvent?.Invoke(list);
 										},customAttribute);
-										element.AddManipulator(new ContextualMenuManipulator((menu) => {
+										element.AddMenu((menu) => {
 											menu.menu.AppendAction("新增", action => {
 												list= list.CreateAt(QSerializeType.Get(typeInfo.ElementType), index);
 												listView.Rebuild();
@@ -390,15 +414,15 @@ namespace QTool
 												listView.Rebuild();
 												changeEvent?.Invoke(list);
 											});
-										}));
+										});
 									});
-									foldout.AddManipulator(new ContextualMenuManipulator((menu) => {
+									foldout.AddMenu((menu) => {
 										menu.menu.AppendAction("新增", action => {
 											list = list.CreateAt(QSerializeType.Get(typeInfo.ElementType));
 											listView.Rebuild();
 											changeEvent?.Invoke(list);
 										});
-									}));
+									});
 									return foldout;
 								}
 							}break;

@@ -11,9 +11,9 @@ namespace QTool.FlowGraph
 	{
 		
 	
-		public override void Deserialize()
+		public override void OnDeserializeOver()
 		{
-			base.Deserialize();
+			base.OnDeserializeOver();
 			Init();
 		}
 		private void Init()
@@ -204,7 +204,7 @@ namespace QTool.FlowGraph
 		{
 			if (NodeList.Count == 0)
 			{
-				Deserialize();
+				OnDeserializeOver();
 			}
 			StartCoroutine(RunIEnumerator(startNode));
 		}
@@ -463,11 +463,9 @@ namespace QTool.FlowGraph
 	public struct QFlow
     {
         public static Type Type = typeof(QFlow);
-
     }
     public class ConnectInfo
     {
-        public Rect rect;
         public QList<PortId> ConnectList = new QList<PortId>();
         public void ChangeKey(int oldKey, int newKey,QFlowPort port)
         {
@@ -1021,8 +1019,7 @@ namespace QTool.FlowGraph
         }
 		[QName]
         public string commandKey { get; private set; }
-        public Rect rect = new Rect(Vector2.zero, new Vector2(320, 80)); 
-
+        public Rect rect = new Rect(Vector2.zero, new Vector2(320, 80));
 		public object this[string valueKey]
         {
             get

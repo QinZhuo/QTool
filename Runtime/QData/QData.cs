@@ -1008,7 +1008,7 @@ namespace QTool
 		void ToQData(StringWriter writer);
 		void ParseQData(StringReader reader);
 	}
-	public abstract class QSerializeObject<T> : ISerializationCallbackReceiver where T:QSerializeObject<T>
+	public abstract class QSerializeObject<T> : ISerializationCallbackReceiver, IQSerializeCallback where T:QSerializeObject<T>
 	{
 
 		[QIgnore, HideInInspector, SerializeField]
@@ -1019,11 +1019,12 @@ namespace QTool
 		}
 		public virtual void OnAfterDeserialize()
 		{
-			Deserialize();
-		}
-		public virtual void Deserialize()
-		{
 			SerializeString.ParseQData(this as T);
+			OnDeserializeOver();
+		}
+		public virtual void OnDeserializeOver()
+		{
+
 		}
 	}
 	[AttributeUsage(AttributeTargets.Method | AttributeTargets.Field | AttributeTargets.Property | AttributeTargets.Interface)]

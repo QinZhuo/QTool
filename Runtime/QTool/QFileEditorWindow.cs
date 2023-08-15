@@ -106,13 +106,14 @@ namespace QTool
 			}
 		}
 		protected static PopupField<string> PathPopup { get; private set; } = null;
-		protected virtual void Awake()
+		protected virtual void CreateGUI()
 		{
 			var Toolbar = rootVisualElement.AddVisualElement();
 			Toolbar.style.flexDirection = FlexDirection.Row;
 			QPlayerPrefs.Get(typeof(T).Name + "_" + nameof(FilePathList), FilePathList);
 			PathPopup = Toolbar.AddPopup("", FilePathList, FilePath.Replace('/', '\\'), path => { FilePath = path.Replace('\\', '/'); OnFocus(); });
 			Toolbar.AddButton("撤销", Undo);
+
 		}
 		protected abstract void ParseData();
 		private static Stack<string> UndoList = new Stack<string>();

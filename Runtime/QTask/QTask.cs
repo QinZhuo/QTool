@@ -137,9 +137,12 @@ namespace QTool
 			while (!flagFunc.Invoke())
 			{
 				await Step();
-				if (!playingFlag.Equals(Application.isPlaying) || !RunningFlag.Equals(flag))
+				if (playingFlag)
 				{
-					throw new QTaskCancelException();
+					if (!playingFlag.Equals(Application.isPlaying) || !RunningFlag.Equals(flag))
+					{
+						throw new QTaskCancelException();
+					}
 				}
 			}
 		}

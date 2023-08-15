@@ -56,9 +56,9 @@ namespace QTool.FlowGraph
 		VisualElement CellView = null;
 		public override bool AutoSave => CellView == null || !CellView.visible;
 		#region 初始化UI
-		protected override void Awake()
+		protected override void CreateGUI()
 		{
-			base.Awake();
+			base.CreateGUI();	
 			var root = rootVisualElement.AddScrollView();
 			root.style.height = new Length(100, LengthUnit.Percent);
 			CellView = rootVisualElement.AddVisualElement();
@@ -136,11 +136,11 @@ namespace QTool.FlowGraph
 						});
 					}
 				}
-				visual.AddManipulator(new ContextualMenuManipulator(menu =>
+				visual.AddMenu(menu =>
 				{
 					menu.menu.AppendAction("添加行", action => { AddAt(y); listView.Rebuild(); });
 					menu.menu.AppendAction("删除行", action => { RemoveAt(y); listView.Rebuild(); });
-				}));
+				});
 			},
 			() =>
 			{
@@ -163,7 +163,7 @@ namespace QTool.FlowGraph
 			Data = qdataList?.ToString();
 			base.OnLostFocus();
 		}
-		protected override void ParseData()
+		protected override async void ParseData()
 		{
 			try
 			{
@@ -189,6 +189,7 @@ namespace QTool.FlowGraph
 					typeInfo = null;
 				}
 				PlayerPrefs.SetString(nameof(QDataListWindow) + "_LastPath", path);
+				await QTask.Wait(() => listView != null);
 				listView.itemsSource = qdataList;
 				listView.style.width = qdataList.TitleRow.Count * 200+100;
 				listView.Rebuild();
