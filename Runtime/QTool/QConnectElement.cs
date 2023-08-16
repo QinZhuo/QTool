@@ -15,9 +15,12 @@ namespace QTool
 				painter.strokeColor = Color;
 				painter.lineJoin = LineJoin.Round;
 				painter.lineCap = LineCap.Round;
-				painter.lineWidth = 5;
+				painter.lineWidth = LineWidth;
 				painter.BeginPath();
+				var center = (Start + End) / 2;
 				painter.MoveTo(Start);
+				painter.LineTo(new Vector2(center.x,Start.y));
+				painter.LineTo(new Vector2(center.x,End.y));
 				painter.LineTo(End);
 				painter.Stroke();
 			};
@@ -32,6 +35,16 @@ namespace QTool
 			}
 		}
 		Color _Color;
+		public float LineWidth
+		{
+			get { return _LineWidth; }
+			set
+			{
+				_LineWidth = value;
+				MarkDirtyRepaint();
+			}
+		}
+		float _LineWidth;
 		public Vector2 Start
 		{
 			private get

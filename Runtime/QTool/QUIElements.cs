@@ -194,11 +194,12 @@ namespace QTool
 			root.Add(visual);
 			return visual;
 		}
-		public static QConnectElement AddConnect(this VisualElement root,Color color)
+		public static QConnectElement AddConnect(this VisualElement root, Color color, float lineWidth = 3)
 		{
 			var visual = new QConnectElement();
 			root.Add(visual);
 			visual.Color = color;
+			visual.LineWidth = lineWidth;
 			return visual;
 		}
 		public static Vector2 GetWorldPosition(this VisualElement root)
