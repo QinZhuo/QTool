@@ -451,6 +451,7 @@ namespace QTool
 											changeEvent?.Invoke(list);
 										});
 									});
+									listView.selectionType = SelectionType.None;
 									return foldout;
 								}
 							}break;

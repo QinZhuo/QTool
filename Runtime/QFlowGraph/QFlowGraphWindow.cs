@@ -70,48 +70,51 @@ namespace QTool.FlowGraph
 			Graph = Data.ParseQData<QFlowGraph>();
 			if (Graph == null) return;
 			await QTask.Wait(() => Back != null);
-
 			Back.Clear();
+			ConnectCanvas.Clear();
 			NodeViewList.Clear();
 			foreach (var node in Graph.NodeList)
 			{
 				AddNodeView(Back, node);
 			}
-			await QTask.Wait(0.1f);
-			ConnectCanvas.Clear();
-			foreach (var name in Graph.NodeList)
+		}
+		public void FreshPortConnect(QFlowPort port)
+		{
+			var color = port.ConnectType.Name.ToColor();
+			for (int portIndex = 0; portIndex < port.ConnectInfolist.Count; portIndex++)
 			{
-				foreach (var port in name.Ports)
+				var connectList = port.ConnectInfolist[portIndex].ConnectList;
+				foreach (var connect in connectList)
 				{
+					PortId startId;
+					PortId endId;
 					if (port.IsOutput)
 					{
-						var color = port.ConnectType.Name.ToColor();
-						for (int portIndex = 0; portIndex < port.ConnectInfolist.Count; portIndex++)
+						startId = port.GetPortId(portIndex);
+						endId = connect;
+					}
+					else
+					{
+						startId = connect;
+						endId = port.GetPortId(portIndex);
+					}
+					var start = GetDotView(startId);
+					var end = GetDotView(endId);
+					if (start != null && end != null)
+					{
+						var connectView = GetConnectView(startId, endId);
+						if (connectView == null)
 						{
-							var connectList = port.ConnectInfolist[portIndex].ConnectList;
-							foreach (var connect in connectList)
-							{
-								var next = Graph.GetConnectInfo(connect);
-								if (next != null)
-								{
-									var start = GetDotView(port.GetPortId(portIndex));
-									var end = GetDotView(connect);
-									if (start != null && end != null)
-									{
-										var connectView = ConnectCanvas.AddConnect(color);
-										connectView.name = port.GetPortId(portIndex).ToQData() + " " + connect.ToQData();
-										connectView.StartElement = start;
-										connectView.EndElement = end;
-										ConnectViewList.Add(connectView);
-									}
-								}
-							}
+							connectView = ConnectCanvas.AddConnect(color);
+							connectView.name = startId.ToQData() + " " + endId.ToQData();
+							connectView.StartElement = start;
+							connectView.EndElement = end;
+							ConnectViewList.Add(connectView);
 						}
 					}
 				}
 			}
 		}
-
 		VisualElement Back = null;
 		protected override void CreateGUI()
 		{
@@ -307,8 +310,8 @@ namespace QTool.FlowGraph
 					listView.bindItem += (visual, index) =>
 					{
 						visual.style.flexDirection = port.IsOutput ? FlexDirection.Row : FlexDirection.RowReverse;
-						var dot = AddDotView(visual, port.ConnectType.Name.ToColor(), port.GetPortId(index));
-					
+						AddDotView(visual, port.ConnectType.Name.ToColor(), port.GetPortId(index));
+						FreshPortConnect(port);
 					};
 				}
 				else
@@ -325,6 +328,7 @@ namespace QTool.FlowGraph
 				}
 
 			}
+			FreshPortConnect(port);
 		}
 		public QConnectElement GetConnectView(PortId start, PortId end)
 		{
@@ -369,6 +373,8 @@ namespace QTool.FlowGraph
 								if (Graph.GetPort(end).IsFlow)
 								{
 									DragConnect = GetConnectView(StartPortId.Value, end);
+									Graph.DisConnect(StartPortId.Value, end);
+									FreshConnectDotView(GetDotView(end));
 								}
 							}
 						}
