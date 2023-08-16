@@ -71,11 +71,9 @@ namespace QTool.FlowGraph
 			await QTask.Wait(() => Back != null);
 			if (ConnectCavans == null)
 			{
-				ConnectCavans = rootVisualElement.AddVisualElement();
+				ConnectCavans = new VisualElement();
+				rootVisualElement.Add(ConnectCavans);
 			}
-			rootVisualElement.style.position = Position.Absolute;
-			rootVisualElement.style.width = new Length(100, LengthUnit.Percent);
-			rootVisualElement.style.height = new Length(100, LengthUnit.Percent);
 			Back.Clear();
 			NodeViewList.Clear();
 			foreach (var node in Graph.NodeList)
