@@ -2,10 +2,8 @@ using System;
 using System.Collections.Generic;
 #if UNITY_EDITOR
 using UnityEditor;
-using UnityEditor.Callbacks;
 #endif
 using UnityEngine;
-using QTool.Reflection;
 using UnityEngine.UIElements;
 
 namespace QTool.FlowGraph
@@ -31,16 +29,39 @@ namespace QTool.FlowGraph
 		{
 			var window = GetWindow<QFlowGraphWindow>();
 			window.minSize = new Vector2(500, 300);
+			window.ViewOffset = Vector2.zero;
 		}
 		#endregion
 		public override string GetData(UnityEngine.Object file)
 		{
-			return (file as QFlowGraphAsset).Graph.SerializeString;
+			if (file != null)
+			{
+#if UNITY_EDITOR
+				serializedProperty = new SerializedObject(file).FindProperty(nameof(QFlowGraphAsset.Graph)).FindPropertyRelative(nameof(QFlowGraph.SerializeString));
+#endif
+				return (file as QFlowGraphAsset).Graph.SerializeString;
+			}
+			else if (serializedProperty != null)
+			{
+				return serializedProperty.stringValue;
+			}
+			else
+			{
+				return "";
+			}
 		}
 		private QFlowGraph Graph { get; set; }
 		public override void SaveData()
 		{
-
+			Graph.OnBeforeSerialize();
+			Data = Graph.SerializeString;
+#if UNITY_EDITOR
+			if (serializedProperty != null)
+			{
+				serializedProperty.stringValue = Graph.ToQData();
+				serializedProperty.serializedObject.ApplyModifiedProperties();
+			}
+#endif
 		}
 
 		protected override async void ParseData()
@@ -73,7 +94,7 @@ namespace QTool.FlowGraph
 									if (start != null && end != null)
 									{
 										var connectView = Back.AddConnect(color);
-										connectView.name = port.GetHashCode().ToString();
+										connectView.name = port.GetPortId().ToQData();
 										connectView.StartElement = start;
 										connectView.EndElement = end;
 										ConnectViewList.Add(connectView);
@@ -92,22 +113,29 @@ namespace QTool.FlowGraph
 			base.CreateGUI();
 
 			Back = rootVisualElement.AddVisualElement();
+			Back.style.overflow = Overflow.Hidden;
 			Back.style.backgroundColor = Color.Lerp(Color.black, Color.white, 0.1f);
 			Back.style.height = new Length(100, LengthUnit.Percent);
 			Back.RegisterCallback<MouseDownEvent>(data =>
 			{
-				if (CurrentNode == null)
+				if(data.ctrlKey)
 				{
-					CurrentNode = Back;
+
+				}
+				else
+				{
+					if (CurrentNode == null)
+					{
+						CurrentNode = Back;
+					}
 				}
 			});
 			Back.RegisterCallback<MouseMoveEvent>(data =>
 			{
-				if (StartPortDot != null)
+				if (StartPortId != null)
 				{
 					if (DragConnect != null)
 					{
-						DragConnect.Start = StartPortDot.worldBound.center;
 						DragConnect.End = data.mousePosition;
 					}
 				}
@@ -116,13 +144,15 @@ namespace QTool.FlowGraph
 					if (CurrentNode != Back)
 					{
 						CurrentNode.transform.position = data.mousePosition + DragOffset;
+						Vector2 pos = CurrentNode.transform.position;
+						Graph[CurrentNode.name].rect.position = pos - ViewOffset;
 					}
 					else
 					{
+						ViewOffset += data.mouseDelta;
 						foreach (var node in NodeViewList)
 						{
-							node.transform.position += new Vector3(data.mouseDelta.x, data.mouseDelta.y);
-
+							node.transform.position = Graph[node.name].rect.position + ViewOffset;
 						}
 					}
 				}
@@ -149,13 +179,15 @@ namespace QTool.FlowGraph
 			});
 			Back.RegisterCallback<MouseUpEvent>(data =>
 			{
+				if (StartPortId != null)
+				{
+					StartPortId = null;
+					Back.Remove(DragConnect);
+					ConnectViewList.Remove(DragConnect);
+					DragConnect = null;
+				}
 				CurrentNode = null;
 			});
-		}
-
-		private void OnGUI()
-		{
-
 		}
 		protected override void OnLostFocus()
 		{
@@ -163,8 +195,9 @@ namespace QTool.FlowGraph
 			CurrentNode = null;
 		}
 		private VisualElement CurrentNode { get; set; }
-		private VisualElement StartPortDot { get; set; }
+		private PortId? StartPortId { get; set; }
 		private QConnectElement DragConnect { get; set; }
+		private Vector2 ViewOffset { get; set; }
 		private Vector2 DragOffset { get; set; }
 		private List<VisualElement> NodeViewList = new List<VisualElement>();
 		private List<QConnectElement> ConnectViewList = new List<QConnectElement>();
@@ -177,8 +210,7 @@ namespace QTool.FlowGraph
 			nodeView.name = node.Key;
 			nodeView.style.SetBorder(Color.black.Lerp(color, 0.5f), 3);
 			nodeView.style.position = Position.Absolute;
-			nodeView.style.left = Mathf.Max(0, node.rect.x);
-			nodeView.style.top = Mathf.Max(0, node.rect.y);
+			nodeView.transform.position = node.rect.position+ViewOffset;
 			nodeView.style.width = Mathf.Max(200, node.rect.width);
 			nodeView.style.height = new StyleLength(StyleKeyword.Auto);
 			nodeView.RegisterCallback<MouseDownEvent>(data =>
@@ -230,29 +262,45 @@ namespace QTool.FlowGraph
 			else
 			{
 				var row = root.AddVisualElement(port.IsOutput ? FlexDirection.RowReverse : FlexDirection.Row);
-				var dot = AddDotView(row, port.ConnectType.Name.ToColor(), port.GetPortId());
-				if (port.IsShowValue())
+				if (port.IsList)
 				{
-					row.Add(port.ViewName, port.Value, port.ValueType, newValue => port.Value = newValue);
+					var foldout = row.Add(port.ViewName, port.Value, port.ValueType, newValue => port.Value = newValue);
+					row.Remove(foldout);
+					var listView = foldout.Q<ListView>();
+					row.Add(listView);
+					listView.bindItem += (visual, index) =>
+					{
+						visual.style.flexDirection = port.IsOutput ? FlexDirection.Row : FlexDirection.RowReverse;
+						var dot = AddDotView(visual, port.ConnectType.Name.ToColor(), port.GetPortId(index));
+					};
 				}
 				else
 				{
-					row.AddLabel(port.ViewName, port.IsOutput ? TextAnchor.MiddleRight : TextAnchor.MiddleLeft);
+					var dot = AddDotView(row, port.ConnectType.Name.ToColor(), port.GetPortId());
+					if (port.IsShowValue())
+					{
+						row.Add(port.ViewName, port.Value, port.ValueType, newValue => port.Value = newValue);
+					}
+					else
+					{
+						row.AddLabel(port.ViewName, port.IsOutput ? TextAnchor.MiddleRight : TextAnchor.MiddleLeft);
+					}
 				}
+				
 			}
 		}
 		public QConnectElement GetConnectView(PortId portId)
 		{
-			return Back.Q<QConnectElement>(portId.GetHashCode().ToString());
+			return Back.Q<QConnectElement>(portId.ToQData());
 		}
 		public VisualElement GetDotView(PortId portId)
 		{
-			return Back.Q<VisualElement>(portId.GetHashCode().ToString());
+			return Back.Q<VisualElement>(portId.ToQData());
 		}
 		public VisualElement AddDotView(VisualElement root, Color color, PortId portId)
 		{
 			var dot = root.AddVisualElement();
-			dot.name = portId.GetHashCode().ToString();
+			dot.name = portId.ToQData();
 			dot.style.backgroundColor = Color.black;
 			dot.style.width = 12;
 			dot.style.height = 12;
@@ -260,33 +308,89 @@ namespace QTool.FlowGraph
 			dot.style.SetBorder(color, 2, 6);
 			dot.RegisterCallback<MouseDownEvent>(data =>
 			{
-				if (StartPortDot == null)
+			
+				if (StartPortId == null)
 				{
 					var port = Graph.GetPort(portId);
 					if (port.IsOutput)
 					{
-						StartPortDot = dot;
-						DragConnect = GetConnectView(portId);
-						if (DragConnect == null)
+						StartPortId = portId;
+						if (port.IsFlow)
 						{
-							DragConnect = Back.AddConnect(port.ConnectType.Name.ToColor());
+							DragConnect = GetConnectView(StartPortId.Value);
 						}
+					}
+					else
+					{
+						var connectInfo = Graph.GetConnectInfo(portId);
+						if (connectInfo.ConnectList.Count > 0)
+						{
+							StartPortId = connectInfo.FirstConnect.Value;
+							DragConnect = GetConnectView(StartPortId.Value);
+						}
+						else
+						{
+							return;
+						}
+					}
+					if (DragConnect == null)
+					{
+						var dotView = GetDotView(StartPortId.Value);
+						DragConnect = Back.AddConnect(port.ConnectType.Name.ToColor());
+						DragConnect.name = StartPortId.Value.ToQData();
+						DragConnect.StartElement = dotView;
+						DragConnect.End = dotView.worldBound.center;
+						ConnectViewList.Add(DragConnect);
 					}
 				}
 			});
 			dot.RegisterCallback<MouseUpEvent>(data =>
 			{
-				if (StartPortDot != null && StartPortDot != dot)
+				if (StartPortId != null && !Equals(StartPortId, portId))
 				{
-					StartPortDot = null;
-					DragConnect.EndElement = dot;
-					DragConnect = null;
+					var port = Graph.GetPort(StartPortId);
+					if (port.CanConnect(Graph.GetPort(portId)))
+					{
+						Graph.Connect(StartPortId.Value, portId);
+						StartPortId = null;
+						DragConnect.EndElement = dot;
+						DragConnect = null;
+					}
 				}
 			});
 			return dot;
 		}
-
 	}
+
+#if UNITY_EDITOR
+	[CustomPropertyDrawer(typeof(QFlowGraph))]
+	public class QFlowGraphDrawer : PropertyDrawer
+	{
+		public override VisualElement CreatePropertyGUI(SerializedProperty property)
+		{
+			var root= new VisualElement();
+			root.style.flexDirection = FlexDirection.Row;
+			root.AddLabel(property.QName());
+			root.AddButton("编辑", () =>
+			{
+				if (property.serializedObject.targetObject.IsPrefabInstance(out var prefab))
+				{
+					AssetDatabase.OpenAsset(prefab);
+				}
+				else
+				{
+					var graph = property.GetObject() as QFlowGraph;
+					QFlowGraphWindow.FilePath = "";
+					QFlowGraphWindow.serializedProperty = property.FindPropertyRelative(nameof(QFlowGraph.SerializeString));
+					QFlowGraphWindow.OpenWindow();
+				}
+			});
+			return root;
+		}
+	}
+
+#endif
+
 
 	//    public class QFlowGraphWindow : EditorWindow
 	//	{
@@ -1145,35 +1249,4 @@ namespace QTool.FlowGraph
 
 
 	//    }
-#if UNITY_EDITOR
-	[CustomPropertyDrawer(typeof(QFlowGraph))]
-	public class QFlowGraphDrawer : PropertyDrawer
-	{
-		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
-		{
-			EditorGUI.LabelField(position.HorizontalRect(0,0.5f), label.text);
-			if (property.serializedObject.targetObject.IsPrefabInstance(out var prefab))
-			{
-				if (GUI.Button(position.HorizontalRect(0.5f, 1), "进入预制体编辑"))
-				{
-					UnityEditor.AssetDatabase.OpenAsset(prefab);
-				}
-			}
-			else
-			{
-				if (GUI.Button(position.HorizontalRect(0.5f, 1), "编辑"))
-				{
-					var graph = property.GetObject() as QFlowGraph;
-					var path = property.propertyPath;
-					var targetObject = property.serializedObject.targetObject;
-				//	QFlowGraphWindow.Open(graph, () => { graph.Name = path; targetObject.SetDirty(); });
-				}
-			}
-		}
-		public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
-		{
-			return base.GetPropertyHeight(property, label);
-		}
-	}
-#endif
 }

@@ -240,6 +240,16 @@ namespace QTool
 			root.AddManipulator(new ContextualMenuManipulator(menuBuilder));
 		}
 		public static List<Type> TypeList = new List<Type>() { typeof(UnityEngine.Object),typeof(string) };
+		public static QDictionary<Type, Func<string, object, Action<object>, VisualElement>> TypeOverride = new QDictionary<Type, Func<string, object, Action<object>, VisualElement>>()
+		{
+			{
+				typeof(FlowGraph.QFlow),
+				(name, obj, chaneEvent) =>
+				{
+					return new Label(name);
+				}
+			}
+		};
 		public static VisualElement Add(this VisualElement root, string name, object obj, Type type, Action<object> changeEvent, ICustomAttributeProvider customAttribute = null)
 		{
 			if (type == null)
@@ -261,6 +271,12 @@ namespace QTool
 			if (type != typeof(object) && !TypeList.Contains(type) && !type.IsGenericType)
 			{
 				TypeList.Add(type);
+			}
+			if (TypeOverride.ContainsKey(type))
+			{
+				var visual = TypeOverride[type](name,obj, changeEvent);
+				root.Add(visual);
+				return visual;
 			}
 			switch (typeInfo.Code)
 			{
@@ -395,28 +411,31 @@ namespace QTool
 									}
 									var foldout = root.AddFoldout(name);
 									ListView listView = null;
-									listView= foldout.contentContainer.AddListView(list,(element, index) =>
-									{
-										element.Clear();
-										element.Add(index.ToString(), list[index], typeInfo.ElementType, (value) =>
-										{
-											list[index] = value;
-											changeEvent?.Invoke(list);
-										},customAttribute);
-										element.AddMenu((menu) => {
-											menu.menu.AppendAction("新增", action => {
-												list= list.CreateAt(QSerializeType.Get(typeInfo.ElementType), index);
-												listView.Rebuild();
-												changeEvent?.Invoke(list);
-											});
-											menu.menu.AppendAction("删除", action => {
-												list= list.RemoveAt(QSerializeType.Get(typeInfo.ElementType), index);
-												listView.Rebuild();
-												changeEvent?.Invoke(list);
-											});
-										});
-									});
-									foldout.AddMenu((menu) => {
+									listView = foldout.contentContainer.AddListView(list, (element, index) =>
+									  {
+										  element.Clear();
+										  element.Add(name + index, list[index], typeInfo.ElementType, (value) =>
+										  {
+											  list[index] = value;
+											  changeEvent?.Invoke(list);
+										  }, customAttribute);
+										  element.AddMenu((menu) =>
+										  {
+											  menu.menu.AppendAction("新增", action =>
+											  {
+												  list = list.CreateAt(QSerializeType.Get(typeInfo.ElementType), index);
+												  listView.Rebuild();
+												  changeEvent?.Invoke(list);
+											  });
+											  menu.menu.AppendAction("删除", action =>
+											  {
+												  list = list.RemoveAt(QSerializeType.Get(typeInfo.ElementType), index);
+												  listView.Rebuild();
+												  changeEvent?.Invoke(list);
+											  });
+										  });
+									  });
+									listView.AddMenu((menu) => {
 										menu.menu.AppendAction("新增", action => {
 											list = list.CreateAt(QSerializeType.Get(typeInfo.ElementType));
 											listView.Rebuild();
@@ -528,7 +547,7 @@ namespace QTool
 					}
 					else
 					{
-						var att= iterator.GetAttribute<QNameAttribute>();
+						var att = iterator.GetAttribute<QNameAttribute>();
 						if (att != null && !att.visibleControl.IsNull())
 						{
 							var copy = iterator.Copy();
@@ -541,7 +560,6 @@ namespace QTool
 					}
 
 				} while (iterator.NextVisible(false));
-				serializedObject.ApplyModifiedProperties();
 			}
 		}
 		public static string AddMarkdown(this VisualElement root, TextAsset textAsset)

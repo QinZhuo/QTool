@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
+using QTool.Reflection;
 
 namespace QTool
 {
@@ -19,8 +20,8 @@ namespace QTool
 			{
 				if (value != FilePath)
 				{
-					QPlayerPrefs.SetString(typeof(T).Name + "_" + nameof(FilePath), value);
 					UndoList.Clear();
+					QPlayerPrefs.SetString(typeof(T).Name + "_" + nameof(FilePath), value);
 					LastWriteTime = default;
 					QPlayerPrefs.Get(typeof(T).Name + "_" + nameof(FilePathList), FilePathList);
 					var select = value.Replace('/', '\\');
@@ -59,7 +60,9 @@ namespace QTool
 #endif
 			}
 		}
-
+#if UNITY_EDITOR
+		public static UnityEditor.SerializedProperty serializedProperty { get; set; }
+#endif
 
 		protected virtual void OnFocus()
 		{
@@ -75,17 +78,25 @@ namespace QTool
 					if (asset != null)
 					{
 						Data = GetData(asset);
-						ParseData();
 					}
 					LastWriteTime = time;
 #endif
 				}
 			}
+			else
+			{
+				Data = GetData();
+			}
+			if (!Data.IsNull())
+			{
+				ParseData();
+			}
 		}
-		public abstract string GetData(UnityEngine.Object file);
+		
+		public abstract string GetData(UnityEngine.Object file=null);
 		public abstract void SaveData();
-		private string _Data;
-		public virtual string Data
+		private  string _Data;
+		public string Data
 		{
 			get => _Data;
 			set
@@ -97,12 +108,15 @@ namespace QTool
 		protected virtual void OnLostFocus()
 		{
 			var path = FilePath;
-			if (AutoSave && !path.IsNull())
+			if (AutoSave)
 			{
 				SaveData();
+				if (!path.IsNull())
+				{
 #if UNITY_EDITOR
-				UnityEditor.AssetDatabase.ImportAsset(path);
+					UnityEditor.AssetDatabase.ImportAsset(path);
 #endif
+				}
 			}
 		}
 		protected static PopupField<string> PathPopup { get; private set; } = null;

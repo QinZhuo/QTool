@@ -100,6 +100,10 @@ namespace QTool.FlowGraph
 				return null;
 			}
 		}
+		public void Connect(PortId start, PortId end)
+		{
+			GetPort(start).Connect(end,start.index);
+		}
 		[QIgnore]
 		private List<IEnumerator> CoroutineList { set; get; } = new List<IEnumerator>();
         public ConnectInfo GetConnectInfo(PortId? portId)
@@ -863,11 +867,6 @@ namespace QTool.FlowGraph
             if (IsOutput == port.IsOutput) return false;
 			if (IsFlow && port.IsFlow) return true;
             return CanConnect(port.ConnectType);
-        }
-        public void Connect(QFlowPort port, int index = 0)
-        {
-            if (port == null) return;
-            Connect(port.GetPortId(), index);
         }
         public void Connect(PortId? portId, int index =0)
         {
