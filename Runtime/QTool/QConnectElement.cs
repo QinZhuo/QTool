@@ -17,10 +17,22 @@ namespace QTool
 				painter.lineCap = LineCap.Round;
 				painter.lineWidth = LineWidth;
 				painter.BeginPath();
-				var center = (Start + End) / 2;
 				painter.MoveTo(Start);
-				painter.LineTo(new Vector2(center.x,Start.y));
-				painter.LineTo(new Vector2(center.x,End.y));
+				var size = (End - Start);
+				if (End.x > Start.x || Mathf.Abs(size.x) < Mathf.Abs(size.y))
+				{
+					var center = (Start + End) / 2;
+					painter.LineTo(new Vector2(Start.x + 10, Start.y));
+					painter.LineTo(new Vector2(End.x - 10, End.y));
+				}
+				else
+				{
+					var top = Mathf.Min(Start.y, End.y) - 30;
+					painter.LineTo(new Vector2(Start.x + 10, Start.y));
+					painter.LineTo(new Vector2(Start.x + 10, top));
+					painter.LineTo(new Vector2(End.x - 10, top));
+					painter.LineTo(new Vector2(End.x - 10, End.y));
+				}
 				painter.LineTo(End);
 				painter.Stroke();
 			};
