@@ -361,13 +361,8 @@ namespace QTool.FlowGraph
 						{
 							if (port.HasConnect(StartPortId.Value.index))
 							{
-								var end = port.ConnectInfolist[StartPortId.Value.index].GetConnectPortId(Graph,true);
-								if (end != null)
-								{
-									Debug.LogError("end");
-									Graph.DisConnect(StartPortId.Value, end.Value);
-									DragConnect = GetConnectView(StartPortId.Value, end.Value);
-								}
+								var end = port.ConnectInfolist[StartPortId.Value.index].FirstConnect.Value;
+								DragConnect = GetConnectView(StartPortId.Value, end);
 							}
 						}
 					}
