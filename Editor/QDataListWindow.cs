@@ -66,7 +66,6 @@ namespace QTool.FlowGraph
 			CellView.style.display = DisplayStyle.None;
 			CellView.style.backgroundColor = Color.Lerp(Color.black, Color.white, 0.3f);
 			CellView.style.SetBorder(Color.black);
-
 			listView = root.AddListView(qdataList, (visual, y) =>
 			{
 				visual.Clear();
@@ -93,7 +92,7 @@ namespace QTool.FlowGraph
 						label.name = title;
 						label.RegisterCallback<ClickEvent>((eventData) =>
 						{
-							if (CellView.visible)
+							if (CellView.style.display == DisplayStyle.Flex)
 							{
 								return;
 							}
