@@ -194,6 +194,14 @@ namespace QTool
 			root.Add(visual);
 			return visual;
 		}
+		public static VisualElement SetBackground(this VisualElement root, Color color=default)
+		{
+			root.style.position = Position.Absolute;
+			root.style.height = new Length(100, LengthUnit.Percent);
+			root.style.width = new Length(100, LengthUnit.Percent);
+			root.style.backgroundColor = color;
+			return root;
+		}
 		public static QConnectElement AddConnect(this VisualElement root, Color color, float lineWidth = 3)
 		{
 			var visual = new QConnectElement();

@@ -63,17 +63,14 @@ namespace QTool.FlowGraph
 			}
 #endif
 		}
+
 		private VisualElement ConnectCanvas { get; set; }
 		protected override async void ParseData()
 		{
 			Graph = Data.ParseQData<QFlowGraph>();
 			if (Graph == null) return;
 			await QTask.Wait(() => Back != null);
-			if (ConnectCanvas == null)
-			{
-				ConnectCanvas = new VisualElement();
-				rootVisualElement.Add(ConnectCanvas);
-			}
+
 			Back.Clear();
 			NodeViewList.Clear();
 			foreach (var node in Graph.NodeList)
@@ -84,7 +81,7 @@ namespace QTool.FlowGraph
 			ConnectCanvas.Clear();
 			foreach (var name in Graph.NodeList)
 			{
-				foreach (var port in name.Ports) 
+				foreach (var port in name.Ports)
 				{
 					if (port.IsOutput)
 					{
@@ -102,7 +99,7 @@ namespace QTool.FlowGraph
 									if (start != null && end != null)
 									{
 										var connectView = ConnectCanvas.AddConnect(color);
-										connectView.name = port.GetPortId(portIndex).ToQData()+" "+connect.ToQData();
+										connectView.name = port.GetPortId(portIndex).ToQData() + " " + connect.ToQData();
 										connectView.StartElement = start;
 										connectView.EndElement = end;
 										ConnectViewList.Add(connectView);
@@ -119,15 +116,15 @@ namespace QTool.FlowGraph
 		protected override void CreateGUI()
 		{
 			base.CreateGUI();
-
-			Back = rootVisualElement.AddVisualElement();
-			Back.style.overflow = Overflow.Hidden;
-			Back.style.backgroundColor = Color.Lerp(Color.black, Color.white, 0.1f);
-			Back.style.width = new Length(100, LengthUnit.Percent);
-			Back.style.height = new Length(100, LengthUnit.Percent);
+			var viewRange = rootVisualElement.AddVisualElement();
+			viewRange.style.backgroundColor = Color.Lerp(Color.black, Color.white, 0.1f);
+			viewRange.style.overflow = Overflow.Hidden;
+			viewRange.style.height = new Length(100, LengthUnit.Percent);
+			ConnectCanvas = viewRange.AddVisualElement().SetBackground();
+			Back = viewRange.AddVisualElement().SetBackground();
 			Back.RegisterCallback<MouseDownEvent>(data =>
 			{
-				if(data.ctrlKey)
+				if (data.ctrlKey)
 				{
 
 				}
@@ -173,7 +170,7 @@ namespace QTool.FlowGraph
 			Back.AddMenu(data =>
 			{
 				var position = data.localMousePosition;
-				if (CurrentNode == null)
+				if (CurrentNode == null) 
 				{
 					foreach (var kv in QCommand.KeyDictionary)
 					{
@@ -191,6 +188,7 @@ namespace QTool.FlowGraph
 				if (StartPortId != null)
 				{
 					StartPortId = null;
+					FreshConnectDotView(DragConnect.StartElement);
 					ConnectCanvas.Remove(DragConnect);
 					ConnectViewList.Remove(DragConnect);
 					DragConnect = null;
@@ -219,7 +217,7 @@ namespace QTool.FlowGraph
 			nodeView.name = node.Key;
 			nodeView.style.SetBorder(Color.black.Lerp(color, 0.5f), 3);
 			nodeView.style.position = Position.Absolute;
-			nodeView.transform.position = node.rect.position+ViewOffset;
+			nodeView.transform.position = node.rect.position + ViewOffset;
 			nodeView.style.width = Mathf.Max(200, node.rect.width);
 			nodeView.style.height = new StyleLength(StyleKeyword.Auto);
 			nodeView.RegisterCallback<MouseDownEvent>(data =>
@@ -310,6 +308,7 @@ namespace QTool.FlowGraph
 					{
 						visual.style.flexDirection = port.IsOutput ? FlexDirection.Row : FlexDirection.RowReverse;
 						var dot = AddDotView(visual, port.ConnectType.Name.ToColor(), port.GetPortId(index));
+					
 					};
 				}
 				else
@@ -324,14 +323,14 @@ namespace QTool.FlowGraph
 						row.AddLabel(port.ViewName, port.IsOutput ? TextAnchor.MiddleRight : TextAnchor.MiddleLeft);
 					}
 				}
-				
+
 			}
 		}
 		public QConnectElement GetConnectView(PortId start, PortId end)
 		{
-			return ConnectCanvas.Q<QConnectElement>(start.ToQData()+" "+end.ToQData());
+			return ConnectCanvas.Q<QConnectElement>(start.ToQData() + " " + end.ToQData());
 		}
-		public void RemoveConnectView(PortId start,PortId end)
+		public void RemoveConnectView(PortId start, PortId end)
 		{
 			ConnectCanvas.Remove(GetConnectView(start, end));
 		}
@@ -348,9 +347,14 @@ namespace QTool.FlowGraph
 			dot.style.height = 12;
 			dot.style.alignSelf = Align.Center;
 			dot.style.SetBorder(color, 2, 6);
+			var center = dot.AddVisualElement();
+			center.name = "center";
+			center.style.width = 4;
+			center.style.height = 4;
+			center.transform.position = dot.transform.position + new Vector3(1, 1);
+			center.style.SetBorder(color, 2, 2);
 			dot.RegisterCallback<MouseDownEvent>(data =>
 			{
-			
 				if (StartPortId == null)
 				{
 					var port = Graph.GetPort(portId);
@@ -376,19 +380,21 @@ namespace QTool.FlowGraph
 						{
 							StartPortId = connectInfo.FirstConnect.Value;
 							Graph.DisConnect(StartPortId.Value, portId);
-							DragConnect = GetConnectView(StartPortId.Value,portId);
+							DragConnect = GetConnectView(StartPortId.Value, portId);
+							FreshConnectDotView(GetDotView(portId));
 						}
 						else
 						{
 							return;
 						}
 					}
+					var startDot = GetDotView(StartPortId.Value);
+					FreshConnectDotView(startDot,true);
 					if (DragConnect == null)
 					{
-						var dotView = GetDotView(StartPortId.Value);
 						DragConnect = ConnectCanvas.AddConnect(port.ConnectType.Name.ToColor());
-						DragConnect.StartElement = dotView;
-						DragConnect.End = dotView.worldBound.center;
+						DragConnect.StartElement = startDot;
+						DragConnect.End = startDot.worldBound.center;
 						ConnectViewList.Add(DragConnect);
 					}
 					DragConnect.name = StartPortId.Value.ToQData();
@@ -403,13 +409,29 @@ namespace QTool.FlowGraph
 					{
 						Graph.Connect(StartPortId.Value, portId);
 						DragConnect.name += " " + portId.ToQData();
+						FreshConnectDotView(dot);
+						FreshConnectDotView(DragConnect.StartElement);
 						StartPortId = null;
 						DragConnect.EndElement = dot;
 						DragConnect = null;
 					}
 				}
 			});
+			FreshConnectDotView(dot);
 			return dot;
+		}
+		public void FreshConnectDotView(VisualElement visual, bool? visible = null)
+		{
+			var portId = visual.name.ParseQData<PortId>();
+			var center = visual.Q<VisualElement>("center");
+			if (visible == null)
+			{
+				center.visible = Graph.GetPort(portId).HasConnect(portId.index);
+			}
+			else
+			{
+				center.visible = visible.Value;
+			}
 		}
 	}
 
