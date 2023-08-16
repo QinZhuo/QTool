@@ -63,16 +63,16 @@ namespace QTool.FlowGraph
 			}
 #endif
 		}
-		private VisualElement ConnectCavans { get; set; }
+		private VisualElement ConnectCanvas { get; set; }
 		protected override async void ParseData()
 		{
 			Graph = Data.ParseQData<QFlowGraph>();
 			if (Graph == null) return;
 			await QTask.Wait(() => Back != null);
-			if (ConnectCavans == null)
+			if (ConnectCanvas == null)
 			{
-				ConnectCavans = new VisualElement();
-				rootVisualElement.Add(ConnectCavans);
+				ConnectCanvas = new VisualElement();
+				rootVisualElement.Add(ConnectCanvas);
 			}
 			Back.Clear();
 			NodeViewList.Clear();
@@ -81,7 +81,7 @@ namespace QTool.FlowGraph
 				AddNodeView(Back, node);
 			}
 			await QTask.Wait(0.1f);
-			ConnectCavans.Clear();
+			ConnectCanvas.Clear();
 			foreach (var name in Graph.NodeList)
 			{
 				foreach (var port in name.Ports) 
@@ -101,7 +101,7 @@ namespace QTool.FlowGraph
 									var end = GetDotView(connect);
 									if (start != null && end != null)
 									{
-										var connectView = ConnectCavans.AddConnect(color);
+										var connectView = ConnectCanvas.AddConnect(color);
 										connectView.name = port.GetPortId(portIndex).ToQData()+" "+connect.ToQData();
 										connectView.StartElement = start;
 										connectView.EndElement = end;
@@ -191,7 +191,7 @@ namespace QTool.FlowGraph
 				if (StartPortId != null)
 				{
 					StartPortId = null;
-					ConnectCavans.Remove(DragConnect);
+					ConnectCanvas.Remove(DragConnect);
 					ConnectViewList.Remove(DragConnect);
 					DragConnect = null;
 				}
@@ -329,11 +329,11 @@ namespace QTool.FlowGraph
 		}
 		public QConnectElement GetConnectView(PortId start, PortId end)
 		{
-			return Back.Q<QConnectElement>(start.ToQData()+" "+end.ToQData());
+			return ConnectCanvas.Q<QConnectElement>(start.ToQData()+" "+end.ToQData());
 		}
 		public void RemoveConnectView(PortId start,PortId end)
 		{
-			Back.Remove(GetConnectView(start, end));
+			ConnectCanvas.Remove(GetConnectView(start, end));
 		}
 		public VisualElement GetDotView(PortId portId)
 		{
@@ -383,7 +383,7 @@ namespace QTool.FlowGraph
 					if (DragConnect == null)
 					{
 						var dotView = GetDotView(StartPortId.Value);
-						DragConnect = ConnectCavans.AddConnect(port.ConnectType.Name.ToColor());
+						DragConnect = ConnectCanvas.AddConnect(port.ConnectType.Name.ToColor());
 						DragConnect.StartElement = dotView;
 						DragConnect.End = dotView.worldBound.center;
 						ConnectViewList.Add(DragConnect);

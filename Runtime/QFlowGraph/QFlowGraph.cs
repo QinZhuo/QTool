@@ -114,10 +114,6 @@ namespace QTool.FlowGraph
         {
             if (portId == null) return null;
             var connectInfo= GetPort(portId)?[portId.Value.index];
-			if (connectInfo == null)
-			{
-				Debug.LogError("连接信息为空 " + portId);
-			}
 			return connectInfo;
         }
 		public QFlowPort GetPort(PortId? portId)
