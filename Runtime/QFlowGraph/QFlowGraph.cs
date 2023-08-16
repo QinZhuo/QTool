@@ -104,6 +104,10 @@ namespace QTool.FlowGraph
 		{
 			GetPort(start).Connect(end,start.index);
 		}
+		public void DisConnect(PortId start, PortId end)
+		{
+			GetPort(start).DisConnect(end, start.index);
+		}
 		[QIgnore]
 		private List<IEnumerator> CoroutineList { set; get; } = new List<IEnumerator>();
         public ConnectInfo GetConnectInfo(PortId? portId)
