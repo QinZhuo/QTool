@@ -191,7 +191,7 @@ namespace QTool.FlowGraph
 				if (StartPortId != null)
 				{
 					StartPortId = null;
-					Back.Remove(DragConnect);
+					ConnectCavans.Remove(DragConnect);
 					ConnectViewList.Remove(DragConnect);
 					DragConnect = null;
 				}
