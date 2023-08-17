@@ -299,37 +299,18 @@ namespace QTool.Inspector
 	{
 		public override VisualElement CreatePropertyGUI(SerializedProperty property)
 		{
-			return base.CreatePropertyGUI(property);
+			var button = new Button();
+			button.text = property.QName();
+			button.style.height = 30;
+			var color = button.style.backgroundColor;
+			button.RegisterCallback<ClickEvent>(data =>
+			{
+				property.boolValue = !property.boolValue;
+				property.serializedObject.ApplyModifiedProperties();
+				button.style.backgroundColor = property.boolValue ?Color.black.Lerp(color.value,0.8f): color;
+			});
+			return button;
 		}
-		//public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
-		//{
-		//	if (property.propertyType == SerializedPropertyType.Boolean)
-		//	{
-		//		position.height = 30;
-		//		QGUI.PushColor(property.boolValue ?Color.Lerp(Color.white,Color.black,0.2f): Color.white);
-		//		if( GUI.Button(position, (attribute as QToggleAttribute).name))
-		//		{
-		//			property.boolValue = !property.boolValue;
-		//		}
-		//		QGUI.PopColor();
-		//	}
-		//	else
-		//	{
-		//		property.Draw(position, label);
-		//	}
-
-		//}
-		//public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
-		//{
-		//	if (property.propertyType == SerializedPropertyType.Boolean)
-		//	{
-		//		return 30;
-		//	}
-		//	else
-		//	{
-		//		return property.GetHeight();
-		//	}
-		//}
 	}
 
 	[CustomPropertyDrawer(typeof(QPopupAttribute))]
@@ -337,54 +318,41 @@ namespace QTool.Inspector
 	{
 		public override VisualElement CreatePropertyGUI(SerializedProperty property)
 		{
-			return base.CreatePropertyGUI(property);
+			var popupData = QPopupData.Get(property, (attribute as QPopupAttribute).funcKey);
+			var value = property.propertyType == SerializedPropertyType.String ? property.stringValue : property.objectReferenceValue?.GetType()?.Name;
+			var visual = new PopupField<string>(property.QName(), popupData.List, value);
+			visual.RegisterCallback<ChangeEvent<string>>(data =>
+			{
+				if (property.propertyType == SerializedPropertyType.String)
+				{
+					property.stringValue = data.newValue;
+				}
+				else
+				{
+					var gameObject = (property.serializedObject.targetObject as MonoBehaviour)?.gameObject;
+					if (gameObject != null)
+					{
+						if (!value.IsNull())
+						{
+							GameObject.DestroyImmediate(gameObject.GetComponent(QReflection.ParseType(value)));
+						}
+						value = data.newValue;
+						if (!value.IsNull())
+						{
+							property.objectReferenceValue = gameObject.GetComponent(QReflection.ParseType(value));
+							if (property.objectReferenceValue == null)
+							{
+								property.objectReferenceValue = gameObject.AddComponent(QReflection.ParseType(value));
+							}
+						}
+					}
+
+				}
+				property.serializedObject.ApplyModifiedProperties();
+			});
+			return visual;
 		}
-		//public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
-		//{
-		//	if (!property.IsShow()) return;
-		//	var data = QPopupData.Get(property, (attribute as QPopupAttribute).funcKey);
-		//	var value = property.propertyType == SerializedPropertyType.String ? property.stringValue : property.objectReferenceValue?.GetType()?.Name;
-		//	data.UpdateList(value);
-		//	EditorGUI.LabelField(position.HorizontalRect(0f, 0.3f), property.QName());
-		//	var newIndex = EditorGUI.Popup(position.HorizontalRect(0.7f, 1), data.SelectIndex, data.List.ToArray());
-		//	if (newIndex != data.SelectIndex || value.IsNull())
-		//	{
-		//		data.SelectIndex = newIndex;
-		//		if (property.propertyType == SerializedPropertyType.String)
-		//		{
-		//			property.stringValue = data.SelectValue;
-		//		}
-		//		else
-		//		{
-		//			var gameObject = (property.serializedObject.targetObject as MonoBehaviour)?.gameObject;
-		//			if (gameObject != null)
-		//			{
-		//				if (!value.IsNull())
-		//				{
-		//					GameObject.DestroyImmediate(gameObject.GetComponent(QReflection.ParseType(value)));
-		//				}
-		//				value = data.SelectValue;
-		//				if (!value.IsNull())
-		//				{
-		//					property.objectReferenceValue = gameObject.GetComponent(QReflection.ParseType(value));
-		//					if (property.objectReferenceValue == null)
-		//					{
-		//						property.objectReferenceValue = gameObject.AddComponent(QReflection.ParseType(value));
-		//					}
-		//				}
-		//			}
-
-		//		}
-		//	}
-
-
-		//}
-		//public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
-		//{
-		//	return property.GetHeight();
-		//}
 	}
-
 	[CustomPropertyDrawer(typeof(QToolbarAttribute))]
 	public class QToolbarDrawer : PropertyDrawer
 	{
