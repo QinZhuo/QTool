@@ -327,7 +327,7 @@ namespace QTool.FlowGraph
 		}
 		public Color GetColor(QFlowPort port)
 		{
-			return port.IsFlow ? Color.HSVToRGB(0.6f, 0.5f, 1) : port.ConnectType.GetType().Name.ToColor();
+			return port.IsFlow ? Color.HSVToRGB(0.6f, 0.5f, 1) : port.ConnectType.Name.ToColor();
 		}
 		public QConnectElement AddConnectView(PortId start,PortId? end=null)
 		{
@@ -339,6 +339,7 @@ namespace QTool.FlowGraph
 			if (end != null)
 			{
 				visual.EndElement = GetDotView(end.Value);
+				visual.EndColor = GetColor(Graph.GetPort(end.Value));
 			}
 			ConnectViewList.Add(visual);
 			return visual;
@@ -430,6 +431,7 @@ namespace QTool.FlowGraph
 						FreshConnectDotView(DragConnect.StartElement);
 						StartPortId = null;
 						DragConnect.EndElement = dot;
+						DragConnect.EndColor = GetColor(port);
 						DragConnect = null;
 					}
 				}

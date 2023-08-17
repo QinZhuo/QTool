@@ -12,11 +12,15 @@ namespace QTool
 			generateVisualContent += data =>
 			{
 				var painter = data.painter2D;
-				painter.strokeColor = Color;
 				painter.lineJoin = LineJoin.Round;
 				painter.lineCap = LineCap.Round;
 				painter.lineWidth = LineWidth;
 				painter.BeginPath();
+				var gradient = new Gradient();
+				gradient.SetKeys(new GradientColorKey[] { new GradientColorKey(StartColor, 0), new GradientColorKey(EndColor, 1) },
+					new GradientAlphaKey[] { new GradientAlphaKey(1, 1) });
+				painter.strokeGradient = gradient;
+
 				painter.MoveTo(Start);
 				var size = (End - Start);
 				if (End.x > Start.x || Mathf.Abs(size.x) < Mathf.Abs(size.y))
@@ -37,16 +41,26 @@ namespace QTool
 				painter.Stroke();
 			};
 		}
-		public Color Color
+		public Color StartColor
 		{
-			get { return _Color; }
+			get { return _StartColor; }
 			set
 			{
-				_Color = value;
+				_StartColor = value;
 				MarkDirtyRepaint();
 			}
 		}
-		Color _Color;
+		Color _StartColor;
+		public Color EndColor
+		{
+			get { return _EndColor; }
+			set
+			{
+				_EndColor = value;
+				MarkDirtyRepaint();
+			}
+		}
+		Color _EndColor;
 		public float LineWidth
 		{
 			get { return _LineWidth; }

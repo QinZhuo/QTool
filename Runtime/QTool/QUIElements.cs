@@ -206,7 +206,8 @@ namespace QTool
 		{
 			var visual = new QConnectElement();
 			root.Add(visual);
-			visual.Color = color;
+			visual.StartColor = color;
+			visual.EndColor = color;
 			visual.LineWidth = lineWidth;
 			return visual;
 		}
