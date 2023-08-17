@@ -210,7 +210,7 @@ namespace QTool.FlowGraph
 		{
 			var nodeView = root.AddVisualElement();
 			NodeViewList.Add(nodeView);
-			var color = node.commandKey.ToColor(0.3f, 0.5f);
+			var color = node.commandKey.ToColor(0.3f, 0.4f);
 			nodeView.style.backgroundColor = color;
 			nodeView.name = node.Key;
 			nodeView.style.SetBorder(Color.black.Lerp(color, 0.5f), 3);
