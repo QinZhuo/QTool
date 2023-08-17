@@ -80,7 +80,6 @@ namespace QTool.FlowGraph
 		}
 		public void FreshPortConnect(QFlowPort port)
 		{
-			var color = port.ConnectType.Name.ToColor();
 			for (int portIndex = 0; portIndex < port.ConnectInfolist.Count; portIndex++)
 			{
 				var connectList = port.ConnectInfolist[portIndex].ConnectList;
@@ -105,11 +104,7 @@ namespace QTool.FlowGraph
 						var connectView = GetConnectView(startId, endId);
 						if (connectView == null)
 						{
-							connectView = ConnectCanvas.AddConnect(color);
-							connectView.name = startId.ToQData() + " " + endId.ToQData();
-							connectView.StartElement = start;
-							connectView.EndElement = end;
-							ConnectViewList.Add(connectView);
+							AddConnectView(startId, endId);
 						}
 					}
 				}
@@ -287,7 +282,7 @@ namespace QTool.FlowGraph
 			if (port.Key == QFlowKey.NextPort || port.Key == QFlowKey.FromPort)
 			{
 				var title = root.Q<Label>("Title");
-				var dot = AddDotView(title, port.ConnectType.Name.ToColor(), port.GetPortId());
+				var dot = AddDotView(title, GetColor(port), port.GetPortId());
 				dot.style.position = Position.Absolute;
 				if (port.IsOutput)
 				{
@@ -310,13 +305,13 @@ namespace QTool.FlowGraph
 					listView.bindItem += (visual, index) =>
 					{
 						visual.style.flexDirection = port.IsOutput ? FlexDirection.Row : FlexDirection.RowReverse;
-						AddDotView(visual, port.ConnectType.Name.ToColor(), port.GetPortId(index));
+						AddDotView(visual, GetColor(port), port.GetPortId(index));
 						FreshPortConnect(port);
 					};
 				}
 				else
 				{
-					var dot = AddDotView(row, port.ConnectType.Name.ToColor(), port.GetPortId());
+					var dot = AddDotView(row,GetColor(port), port.GetPortId());
 					if (port.IsShowValue())
 					{
 						row.Add(port.ViewName, port.Value, port.ValueType, newValue => port.Value = newValue);
@@ -329,6 +324,24 @@ namespace QTool.FlowGraph
 
 			}
 			FreshPortConnect(port);
+		}
+		public Color GetColor(QFlowPort port)
+		{
+			return port.IsFlow ? Color.HSVToRGB(0.6f, 0.5f, 1) : port.ConnectType.GetType().Name.ToColor();
+		}
+		public QConnectElement AddConnectView(PortId start,PortId? end=null)
+		{
+			var port = Graph.GetPort(start);
+			var color = GetColor(port);
+			var visual= ConnectCanvas.AddConnect(color,port.IsFlow?4:2);
+			visual.name = start.ToQData() + (end == null ? "" : " " + end.Value.ToQData());
+			visual.StartElement = GetDotView(start);
+			if (end != null)
+			{
+				visual.EndElement = GetDotView(end.Value);
+			}
+			ConnectViewList.Add(visual);
+			return visual;
 		}
 		public QConnectElement GetConnectView(PortId start, PortId end)
 		{
@@ -398,10 +411,8 @@ namespace QTool.FlowGraph
 					FreshConnectDotView(startDot,true);
 					if (DragConnect == null)
 					{
-						DragConnect = ConnectCanvas.AddConnect(port.ConnectType.Name.ToColor());
-						DragConnect.StartElement = startDot;
+						DragConnect=AddConnectView(StartPortId.Value);
 						DragConnect.End = startDot.worldBound.center;
-						ConnectViewList.Add(DragConnect);
 					}
 					DragConnect.name = StartPortId.Value.ToQData();
 				}

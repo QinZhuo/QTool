@@ -22,16 +22,16 @@ namespace QTool
 				if (End.x > Start.x || Mathf.Abs(size.x) < Mathf.Abs(size.y))
 				{
 					var center = (Start + End) / 2;
-					painter.LineTo(new Vector2(Start.x + 10, Start.y));
-					painter.LineTo(new Vector2(End.x - 10, End.y));
+					painter.LineTo(new Vector2(Start.x + 15, Start.y));
+					painter.LineTo(new Vector2(End.x - 15, End.y));
 				}
 				else
 				{
 					var top = Mathf.Min(Start.y, End.y) - 30;
-					painter.LineTo(new Vector2(Start.x + 10, Start.y));
-					painter.LineTo(new Vector2(Start.x + 10, top));
-					painter.LineTo(new Vector2(End.x - 10, top));
-					painter.LineTo(new Vector2(End.x - 10, End.y));
+					painter.LineTo(new Vector2(Start.x + 15, Start.y));
+					painter.LineTo(new Vector2(Start.x + 15, top));
+					painter.LineTo(new Vector2(End.x - 15, top));
+					painter.LineTo(new Vector2(End.x - 15, End.y));
 				}
 				painter.LineTo(End);
 				painter.Stroke();
