@@ -170,8 +170,15 @@ namespace QTool
 				var colorKey = key + s + v;
 				if (!KeyColor.ContainsKey(colorKey))
 				{
-					var colorValue = Mathf.Abs(key[0].GetHashCode() % 700) + Mathf.Abs(key.GetHashCode() % 300f);
-					KeyColor[colorKey] = Color.HSVToRGB(colorValue / 1000, s, v);
+					if (colorKey.SplitTowString("/",out var start,out var end))
+					{
+						var colorValue = Mathf.Abs(start.GetHashCode() % 700f) + Mathf.Abs(end.GetHashCode() % 300f);
+						KeyColor[colorKey] = Color.HSVToRGB(colorValue / 1000f, s, v);
+					}
+					else
+					{
+						KeyColor[colorKey] = Color.HSVToRGB(Mathf.Abs(colorKey.GetHashCode() % 700f) / 1000f, s, v);
+					}
 				}
 				return KeyColor[colorKey];
 			}
