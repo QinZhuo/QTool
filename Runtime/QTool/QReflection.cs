@@ -5,6 +5,9 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Threading.Tasks;
 using UnityEngine;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace QTool.Reflection
 {
@@ -602,8 +605,224 @@ namespace QTool.Reflection
             {
                 return info.Name;
             }
-        }
-        public static Assembly[] GetAllAssemblies()
+		}
+
+		public static object GetPathObject(this object target, string path)
+		{
+			if (path.SplitTowString(".", out var start, out var end))
+			{
+				try
+				{
+					if (start == "Array" && end.StartsWith("data"))
+					{
+						var list = target as IList;
+						if (list == null)
+						{
+							return null;
+						}
+						else
+						{
+							return list[int.Parse(end.GetBlockValue('[', ']'))];
+						}
+					}
+					else
+					{
+
+						return target.GetPathObject(start).GetPathObject(end);
+					}
+
+				}
+				catch (Exception e)
+				{
+					throw new Exception("路径出错：" + path, e);
+				}
+			}
+			else
+			{
+				var memebers = QReflectionType.Get(target.GetType()).Members;
+				if (memebers.ContainsKey(path))
+				{
+					var Get = memebers[path].Get;
+					return Get(target);
+				}
+				else
+				{
+					throw new Exception(" 找不到 key " + path);
+				}
+			}
+		}
+		public static object SetPathObject(this object target, string path, object value)
+		{
+			if (path.SplitTowString(".", out var start, out var end))
+			{
+				try
+				{
+					if (start == "Array" && end.StartsWith("data"))
+					{
+						var list = target as IList;
+						if (list == null)
+						{
+							return null;
+						}
+						else
+						{
+							return list[int.Parse(end.GetBlockValue('[', ']'))];
+						}
+					}
+					else
+					{
+
+						return target.GetPathObject(start).SetPathObject(end, value);
+					}
+
+				}
+				catch (Exception e)
+				{
+					throw new Exception("路径出错：" + path, e);
+				}
+			}
+			else
+			{
+				var memebers = QReflectionType.Get(target.GetType()).Members;
+				if (memebers.ContainsKey(path))
+				{
+					memebers[path].Set(target, value);
+					return value;
+				}
+				else
+				{
+					throw new Exception(" 找不到 key " + path);
+				}
+			}
+		}
+		public static bool GetPathBool(this object target, string key)
+		{
+			var not = key.Contains("!");
+			if (key.SplitTowString("==", out var start, out var value) || key.SplitTowString("!=", out start, out value))
+			{
+				not = false;
+				var info = target.GetPathObject(start)?.ToString() == value;
+				return not ? !(bool)info : (bool)info;
+			}
+			else
+			{
+				if (not)
+				{
+					key = key.TrimStart('!');
+				}
+				object info = null;
+				switch (key)
+				{
+					case nameof(Application.isPlaying):
+						info = Application.isPlaying;
+						break;
+					default:
+						info = target.GetPathObject(key);
+						break;
+				}
+				if (info == null)
+				{
+					return !not;
+				}
+				else
+				{
+					return not ? !(bool)info : (bool)info;
+				}
+
+			}
+
+		}
+	
+		public static FieldInfo GetChildObject(Type type, string key)
+		{
+			if (type == null || string.IsNullOrWhiteSpace(key)) return null;
+			const BindingFlags bindingFlags = System.Reflection.BindingFlags.GetField
+											  | System.Reflection.BindingFlags.GetProperty
+											  | System.Reflection.BindingFlags.Instance
+											  | System.Reflection.BindingFlags.NonPublic
+											  | System.Reflection.BindingFlags.Public;
+			return type.GetField(key, bindingFlags);
+		}
+#if UNITY_EDITOR
+		public static object[] GetAttributes<T>(this SerializedProperty prop, string parentKey)
+		{
+			var type = string.IsNullOrWhiteSpace(parentKey) ? prop.serializedObject.targetObject?.GetType() : QReflection.ParseType(parentKey);
+			var field = GetChildObject(type, prop.name);
+			if (field != null)
+			{
+				return field.GetCustomAttributes(typeof(T), true);
+			}
+			return new object[0];
+		}
+		public static T GetAttribute<T>(this SerializedProperty property, string parentKey = "") where T : Attribute
+		{
+			object[] attributes = GetAttributes<T>(property, parentKey);
+			if (attributes.Length > 0)
+			{
+				return attributes[0] as T;
+			}
+			else
+			{
+				return null;
+			}
+		}
+
+		public static string QName(this SerializedProperty property, string parentName = "")
+		{
+			var att = property.GetAttribute<QNameAttribute>(parentName);
+			if (att != null && !string.IsNullOrWhiteSpace(att.name))
+			{
+				return att.name;
+			}
+			else
+			{
+				return property.displayName;
+			}
+		}
+
+
+		public static object GetObject(this SerializedProperty property)
+		{
+			return property?.serializedObject.targetObject.GetPathObject(property.propertyPath);
+		}
+		public static object SetObject(this SerializedProperty property, object value)
+		{
+			return property?.serializedObject.targetObject.SetPathObject(property.propertyPath, value);
+		}
+		public static bool IsShow(this SerializedProperty property)
+		{
+			var att = property.GetAttribute<QNameAttribute>();
+			if (att == null)
+			{
+				return true;
+			}
+			else
+			{
+				return att.Active(property.serializedObject.targetObject);
+			}
+		}
+		public static void AddObject(this List<GUIContent> list, object obj)
+		{
+			if (obj != null)
+			{
+				if (obj is UnityEngine.GameObject)
+				{
+					var uObj = obj as UnityEngine.GameObject;
+					var texture = AssetPreview.GetAssetPreview(uObj);
+					list.Add(new GUIContent(uObj.name, texture, uObj.name));
+				}
+				else
+				{
+					list.Add(new GUIContent(obj.ToString()));
+				}
+			}
+			else
+			{
+				list.Add(new GUIContent("空"));
+			}
+		}
+#endif
+		public static Assembly[] GetAllAssemblies()
         {
             return AppDomain.CurrentDomain.GetAssemblies();
         }

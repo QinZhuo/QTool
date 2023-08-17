@@ -1,3 +1,4 @@
+using QTool.Reflection;
 using System;
 using System.Collections.Generic;
 #if UNITY_EDITOR
@@ -11,6 +12,7 @@ namespace QTool.FlowGraph
 	public class QFlowGraphWindow : QFileEditorWindow<QFlowGraphWindow>
 	{
 		#region 静态函数
+#if UNITY_EDITOR
 		[UnityEditor.Callbacks.OnOpenAsset(0)]
 		public static bool OnOpen(int instanceID, int line)
 		{
@@ -31,7 +33,8 @@ namespace QTool.FlowGraph
 			window.minSize = new Vector2(500, 300);
 			window.ViewOffset = Vector2.zero;
 		}
-		#endregion
+#endif
+	#endregion
 		public override string GetData(UnityEngine.Object file)
 		{
 			if (file != null)
@@ -41,10 +44,12 @@ namespace QTool.FlowGraph
 #endif
 				return (file as QFlowGraphAsset).Graph.SerializeString;
 			}
+#if UNITY_EDITOR
 			else if (serializedProperty != null)
 			{
 				return serializedProperty.stringValue;
 			}
+#endif
 			else
 			{
 				return "";

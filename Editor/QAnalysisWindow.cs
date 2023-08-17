@@ -100,7 +100,7 @@ namespace QTool
 				if (QAnalysisData.IsLoading)
 				{
 					GUI.enabled = true;
-					QGUI.ProgressBar("加载中..   " + QAnalysisData.LoadingInfo, QAnalysisData.LoadingRate,Color.green);
+					QEditorGUI.ProgressBar("加载中..   " + QAnalysisData.LoadingInfo, QAnalysisData.LoadingRate,Color.green);
 					
 				}
 			}

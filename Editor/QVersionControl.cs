@@ -632,7 +632,7 @@ crashlytics-build.properties
 					using (new GUILayout.HorizontalScope())
 					{
 						file.select = GUILayout.Toggle(file.select, "");
-						if (GUILayout.Button(file.viewString,QGUI.RichLabel))
+						if (GUILayout.Button(file.viewString,QEditorGUI.RichLabel))
 						{
 							file.select =! file.select;
 						}

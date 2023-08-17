@@ -52,7 +52,7 @@ namespace QTool.FlowGraph
 		public QList<QMemeberInfo> Members = new QList<QMemeberInfo>();
 
 		ListView listView = null;
-		Label lastClick = null;
+		long lastCkickTime = 0;
 		VisualElement CellView = null;
 		public override bool AutoSave => CellView == null || !CellView.visible;
 		#region 初始化UI
@@ -96,7 +96,7 @@ namespace QTool.FlowGraph
 							{
 								return;
 							}
-							if (lastClick == label)
+							if (eventData.timestamp- lastCkickTime<500)
 							{
 								CellView.Clear();
 								var pos = label.worldTransform.MultiplyPoint(label.transform.position);
@@ -126,11 +126,11 @@ namespace QTool.FlowGraph
 								{
 									foldout.value = true;
 								}
-								lastClick = null;
+								lastCkickTime = 0;
 							}
 							else
 							{
-								lastClick = label;
+								lastCkickTime = eventData.timestamp;
 							}
 						});
 					}

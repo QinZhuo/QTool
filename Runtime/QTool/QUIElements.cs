@@ -79,8 +79,10 @@ namespace QTool
 			root.Add(visual);
 			return visual;
 		}
-		public static ObjectField AddObject(this VisualElement root, string label,Type type, UnityEngine.Object defaultValue = null, Action<UnityEngine.Object> changeEvent = null)
+
+		public static VisualElement AddObject(this VisualElement root, string label,Type type, UnityEngine.Object defaultValue = null, Action<UnityEngine.Object> changeEvent = null)
 		{
+#if UNITY_EDITOR
 			var visual = new ObjectField(label);
 			visual.objectType = type;
 			visual.value = defaultValue;
@@ -91,6 +93,9 @@ namespace QTool
 					changeEvent(evt.newValue);
 				});
 			}
+#else
+			var visual = new Label(label+" "+defaultValue);
+#endif
 			root.Add(visual);
 			return visual;
 		}
@@ -144,13 +149,17 @@ namespace QTool
 			root.Add(visual);
 			return visual;
 		}
-		public static EnumFlagsField AddEnumFlags(this VisualElement root, string label, Enum defaultValue = null, Action<Enum> changeEvent = null)
+		public static VisualElement AddEnumFlags(this VisualElement root, string label, Enum defaultValue = null, Action<Enum> changeEvent = null)
 		{
+#if UNITY_EDITOR
 			var visual = new EnumFlagsField(label, defaultValue);
 			visual.RegisterCallback<ChangeEvent<Enum>>((evt) =>
 			{
 				changeEvent(evt.newValue);
 			});
+#else
+			var visual = new Label(label+" : "+ defaultValue);
+#endif
 			root.Add(visual);
 			return visual;
 		}
