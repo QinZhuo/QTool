@@ -338,8 +338,10 @@ namespace QTool.FlowGraph
 			visual.StartElement = GetDotView(start);
 			if (end != null)
 			{
+				var endPort = Graph.GetPort(end.Value);
 				visual.EndElement = GetDotView(end.Value);
-				visual.EndColor = GetColor(Graph.GetPort(end.Value));
+				visual.EndColor = GetColor(endPort);
+				visual.LineWidth = port.IsFlow && port.IsFlow ? 4 : 2;
 			}
 			ConnectViewList.Add(visual);
 			return visual;
