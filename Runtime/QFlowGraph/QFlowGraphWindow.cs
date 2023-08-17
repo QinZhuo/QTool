@@ -341,7 +341,7 @@ namespace QTool.FlowGraph
 				var endPort = Graph.GetPort(end.Value);
 				visual.EndElement = GetDotView(end.Value);
 				visual.EndColor = GetColor(endPort);
-				visual.LineWidth = port.IsFlow && port.IsFlow ? 4 : 2;
+				visual.LineWidth = port.IsFlow && endPort.IsFlow ? 4 : 2;
 			}
 			ConnectViewList.Add(visual);
 			return visual;
@@ -433,7 +433,9 @@ namespace QTool.FlowGraph
 						FreshConnectDotView(DragConnect.StartElement);
 						StartPortId = null;
 						DragConnect.EndElement = dot;
-						DragConnect.EndColor = GetColor(port);
+						var endPort = Graph.GetPort(portId);
+						DragConnect.EndColor = GetColor(endPort);
+						DragConnect.LineWidth = port.IsFlow && endPort.IsFlow ? 4 : 2;
 						DragConnect = null;
 					}
 				}
