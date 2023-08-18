@@ -14,9 +14,8 @@ namespace QTool.FlowGraph
 		public override void OnDeserializeOver()
 		{
 			base.OnDeserializeOver();
-			if (NodeList.Count == 0)
+			if (StartNode.Count == 0)
 			{
-				StartNode.Clear();
 				foreach (var node in NodeList)
 				{
 					node.Init(this);
