@@ -159,7 +159,7 @@ namespace QTool.FlowGraph
 			{
 				objList.ToQDataList(qdataList, typeInfo.Type);
 			}
-			Data = qdataList?.ToString();
+			ChangeData(qdataList?.ToString());
 			base.OnLostFocus();
 		}
 		protected override async void ParseData()

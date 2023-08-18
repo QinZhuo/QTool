@@ -31,7 +31,6 @@ namespace QTool.FlowGraph
 		{
 			var window = GetWindow<QFlowGraphWindow>();
 			window.minSize = new Vector2(500, 300);
-			window.ViewOffset = Vector2.zero;
 		}
 #endif
 	#endregion
@@ -59,7 +58,7 @@ namespace QTool.FlowGraph
 		public override void SaveData()
 		{
 			Graph.OnBeforeSerialize();
-			Data = Graph.SerializeString;
+			ChangeData(Graph.SerializeString);
 #if UNITY_EDITOR
 			if (serializedProperty != null)
 			{
@@ -68,7 +67,14 @@ namespace QTool.FlowGraph
 			}
 #endif
 		}
-
+		protected override void ChangeData(string newValue)
+		{
+			if (Data != newValue)
+			{
+				ViewOffset = Vector2.zero;
+			}
+			base.ChangeData(newValue);
+		}
 		private VisualElement ConnectCanvas { get; set; }
 		protected override async void ParseData()
 		{

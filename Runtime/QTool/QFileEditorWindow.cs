@@ -34,6 +34,7 @@ namespace QTool
 				}
 			}
 		}
+		
 		private static List<string> FilePathList = new List<string>();
 		private static DateTime LastWriteTime = default;
 
@@ -99,9 +100,9 @@ namespace QTool
 		public string Data
 		{
 			get => _Data;
-			set
+			private set
 			{
-				OnChangeData(value);
+				ChangeData(value);
 			}
 		}
 		public virtual bool AutoSave => true;
@@ -142,7 +143,7 @@ namespace QTool
 				IsUndo = false;
 			}
 		}
-		protected virtual void OnChangeData(string newValue)
+		protected virtual void ChangeData(string newValue)
 		{
 			if (!Equals(_Data, newValue))
 			{
