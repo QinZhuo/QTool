@@ -116,6 +116,13 @@ namespace QTool.FlowGraph
 			}
 		}
 		VisualElement Back = null;
+		enum Mode
+		{
+			无,
+			移动,
+			选中,
+		}
+		bool MoveOffset = false;
 		protected override void CreateGUI()
 		{
 			base.CreateGUI();
@@ -127,16 +134,10 @@ namespace QTool.FlowGraph
 			Back = viewRange.AddVisualElement().SetBackground();
 			Back.RegisterCallback<MouseDownEvent>(data =>
 			{
-				if (data.ctrlKey)
+				MoveOffset = true;
+				if (data.target == Back)
 				{
-
-				}
-				else
-				{
-					if (CurrentNode == null)
-					{
-						CurrentNode = Back;
-					}
+					ClearSetect();
 				}
 			});
 			Back.RegisterCallback<MouseMoveEvent>(data =>
@@ -148,13 +149,17 @@ namespace QTool.FlowGraph
 						DragConnect.End = data.mousePosition;
 					}
 				}
-				else if (CurrentNode != null)
+				else if (MoveOffset)
 				{
-					if (CurrentNode != Back)
+					if(SelectNodes.Count != 0)
 					{
-						CurrentNode.transform.position = data.mousePosition + DragOffset;
-						Vector2 pos = CurrentNode.transform.position;
-						Graph[CurrentNode.name].rect.position = pos - ViewOffset;
+						foreach (var node in SelectNodes)
+						{
+							Vector3 mouseDelta = data.mouseDelta; ;
+							node.transform.position += mouseDelta;
+							Vector2 pos = node.transform.position;
+							Graph[node.name].rect.position = pos - ViewOffset;
+						}
 					}
 					else
 					{
@@ -173,21 +178,19 @@ namespace QTool.FlowGraph
 			Back.AddMenu(data =>
 			{
 				var position = data.localMousePosition;
-				if (CurrentNode == null) 
+				foreach (var kv in QCommand.KeyDictionary)
 				{
-					foreach (var kv in QCommand.KeyDictionary)
+					data.menu.AppendAction(kv.fullName, action =>
 					{
-						data.menu.AppendAction(kv.fullName, action =>
-						{
-							var node = Graph.AddNode(kv.Key);
-							node.rect.position = position;
-							AddNodeView(Back, node);
-						});
-					}
+						var node = Graph.AddNode(kv.Key);
+						node.rect.position = position;
+						AddNodeView(Back, node);
+					});
 				}
 			});
 			Back.RegisterCallback<MouseUpEvent>(data =>
 			{
+				MoveOffset = false;
 				if (StartPortId != null)
 				{
 					StartPortId = null;
@@ -196,24 +199,36 @@ namespace QTool.FlowGraph
 					ConnectViewList.Remove(DragConnect);
 					DragConnect = null;
 				}
-				CurrentNode = null;
+			
 			});
 		}
 		protected override void OnLostFocus()
 		{
+			ClearSetect();
 			base.OnLostFocus();
-			CurrentNode = null;
 		}
-		private VisualElement CurrentNode { get; set; }
+		public void ClearSetect()
+		{
+			var list = SelectNodes.ToArray();
+			SelectNodes.Clear();
+			foreach (var nodeView in list)
+			{
+				UpdateNodeSelect(nodeView);
+			}
+		}
+		private List<VisualElement> SelectNodes = new List<VisualElement>();
 		private PortId? StartPortId { get; set; }
 		private QConnectElement DragConnect { get; set; }
 		private Vector2 ViewOffset { get; set; }
-		private Vector2 DragOffset { get; set; }
 		private List<VisualElement> NodeViewList = new List<VisualElement>();
 		private List<QConnectElement> ConnectViewList = new List<QConnectElement>();
 		private VisualElement AddNodeView(VisualElement root, QFlowNode node)
 		{
 			var nodeView = root.AddVisualElement();
+			var select = nodeView.AddVisualElement().SetBackground(Color.clear,-3);
+			select.name = "Select";
+			select.style.SetBorder(Color.green.Lerp(Color.black,0.3f), 2);
+			select.visible = false;
 			NodeViewList.Add(nodeView);
 			var color = node.commandKey.ToColor(0.3f, 0.4f);
 			nodeView.style.backgroundColor = color;
@@ -223,14 +238,15 @@ namespace QTool.FlowGraph
 			nodeView.transform.position = node.rect.position + ViewOffset;
 			nodeView.style.width = Mathf.Max(200, node.rect.width);
 			nodeView.style.height = new StyleLength(StyleKeyword.Auto);
+			
 			nodeView.RegisterCallback<MouseDownEvent>(data =>
 			{
-				CurrentNode = nodeView;
-				DragOffset = nodeView.transform.position - new Vector3(data.mousePosition.x, data.mousePosition.y);
+				SelectNodes.AddCheckExist(nodeView);
+				UpdateNodeSelect(nodeView);
 			});
 			nodeView.AddMenu(data =>
 			{
-				CurrentNode = null;
+				ClearSetect();
 				data.menu.AppendAction("运行", action =>
 				{
 					Graph.Run(node.Key);
@@ -251,6 +267,10 @@ namespace QTool.FlowGraph
 				AddPortView(nodeView, port);
 			}
 			return nodeView;
+		}
+		private void UpdateNodeSelect(VisualElement visual)
+		{
+			visual.Q<VisualElement>("Select").visible = SelectNodes.Contains(visual);
 		}
 		public void RemoveNodeView(VisualElement visual)
 		{

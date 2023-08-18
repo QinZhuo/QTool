@@ -203,11 +203,13 @@ namespace QTool
 			root.Add(visual);
 			return visual;
 		}
-		public static VisualElement SetBackground(this VisualElement root, Color color=default)
+		public static VisualElement SetBackground(this VisualElement root, Color color=default,float offset=0)
 		{
 			root.style.position = Position.Absolute;
-			root.style.height = new Length(100, LengthUnit.Percent);
-			root.style.width = new Length(100, LengthUnit.Percent);
+			root.style.left = offset;
+			root.style.top = offset;
+			root.style.right = offset;
+			root.style.bottom = offset;
 			root.style.backgroundColor = color;
 			return root;
 		}
