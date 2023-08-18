@@ -209,7 +209,7 @@ namespace QTool.Net
 					GetComponent<QNetManager>().StartHost();
 				});
 			}
-			StartHostButton.visible = ServerActive;
+			StartHostButton.visible = !ServerActive;
 
 #endif
 		}
