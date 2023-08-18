@@ -9,31 +9,19 @@ namespace QTool.FlowGraph
 	[Serializable]
     public class QFlowGraph: QSerializeObject<QFlowGraph>
 	{
-		
-	
+
+
 		public override void OnDeserializeOver()
 		{
 			base.OnDeserializeOver();
-			Init();
-		}
-		private void Init()
-		{
-			StartNode.Clear();
-			foreach (var node in NodeList)
+			if (NodeList.Count == 0)
 			{
-				node.Init(this);
+				StartNode.Clear();
+				foreach (var node in NodeList)
+				{
+					node.Init(this);
+				}
 			}
-		}
-		public QFlowGraph CreateInstance()
-		{
-			var graph= SerializeString.ParseQData<QFlowGraph>();
-			if (graph == null)
-			{
-				graph = new QFlowGraph();
-			}
-			graph.SerializeString = SerializeString;
-			graph.Init();
-			return graph;
 		}
         public override string ToString()
         {

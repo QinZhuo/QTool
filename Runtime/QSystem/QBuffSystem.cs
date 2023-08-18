@@ -24,7 +24,7 @@ namespace QTool
 			{
 				if (_EffctInfo.IsNull() && Effect != null)
 				{
-					var graph = Effect.Graph.CreateInstance();
+					var graph = Effect.Graph.QDataCopy();
 					_EffctInfo = "";
 					foreach (var kv in graph.StartNode)
 					{
@@ -58,7 +58,7 @@ namespace QTool
 				base.Init(key);
 				if (Data.Effect != null)
 				{
-					Graph = Data.Effect.Graph.CreateInstance();
+					Graph = Data.Effect.Graph.QDataCopy();
 					Graph.RegisterValue(this);
 				}
 				if (Data.TimeEvent > 0)

@@ -123,7 +123,7 @@ namespace QTool.FlowGraph
 			var key = asset.GetHashCode().ToString();
 			if (!This.Graph.Values.ContainsKey(key))
 			{
-				This.Graph.Values[key] = asset.Graph.CreateInstance();
+				This.Graph.Values[key] = asset.Graph.QDataCopy();
 			}
 			yield return (This.Graph.Values[key] as QFlowGraph).RunIEnumerator(startNode);
 		}

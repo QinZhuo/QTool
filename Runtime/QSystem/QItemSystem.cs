@@ -20,7 +20,7 @@ namespace QTool
 				base.Init(key);
 				if (Data.Effect != null)
 				{
-					Graph = Data.Effect.Graph.CreateInstance();
+					Graph = Data.Effect.Graph.QDataCopy();
 					Graph.RegisterValue(this);
 				}
 			}
