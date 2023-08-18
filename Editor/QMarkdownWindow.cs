@@ -48,7 +48,6 @@ namespace QTool
 		private TextField markdownText = null;
 		private ScrollView markdownView = null;
 		private long lastClick = 0;
-		private bool Collapse = false;
 		protected override void CreateGUI()
 		{
 			base.CreateGUI();
@@ -67,14 +66,14 @@ namespace QTool
 			{
 				if (data.timestamp - lastClick < 500)
 				{
-					if (!Collapse)
+					if (!QPlayerPrefs.Get<bool>(nameof(TwoPaneSplitView.CollapseChild)))
 					{
-						Collapse = true;
+						QPlayerPrefs.Set(nameof(TwoPaneSplitView.CollapseChild), true);
 						split.CollapseChild(0);
 					}
 					else
 					{
-						Collapse = false;
+						QPlayerPrefs.Set(nameof(TwoPaneSplitView.CollapseChild), false);
 						split.UnCollapse();
 					}
 				}
