@@ -54,7 +54,7 @@ namespace QTool.FlowGraph
 		ListView listView = null;
 		long lastCkickTime = 0;
 		VisualElement CellView = null;
-		public override bool AutoSave => CellView == null || !CellView.visible;
+		public override bool AutoSaveLoad => CellView == null || !CellView.visible;
 		#region 初始化UI
 		protected override void CreateGUI()
 		{

@@ -67,6 +67,7 @@ namespace QTool
 
 		protected virtual void OnFocus()
 		{
+			if (!AutoSaveLoad) return;
 			var path = FilePath;
 			if (QFileManager.ExistsFile(path))
 			{
@@ -105,11 +106,11 @@ namespace QTool
 				ChangeData(value);
 			}
 		}
-		public virtual bool AutoSave => true;
+		public virtual bool AutoSaveLoad { get; set; } = true;
 		protected virtual void OnLostFocus()
 		{
 			var path = FilePath;
-			if (AutoSave)
+			if (AutoSaveLoad)
 			{
 				SaveData();
 				if (!path.IsNull())
@@ -121,14 +122,18 @@ namespace QTool
 			}
 		}
 		protected static PopupField<string> PathPopup { get; private set; } = null;
+		private Vector2 MousePosition { get; set; }
 		protected virtual void CreateGUI()
 		{
 			var Toolbar = rootVisualElement.AddVisualElement();
 			Toolbar.style.flexDirection = FlexDirection.Row;
 			QPlayerPrefs.Get(typeof(T).Name + "_" + nameof(FilePathList), FilePathList);
-			PathPopup = Toolbar.AddPopup("", FilePathList, FilePath.Replace('/', '\\'), path => { OnLostFocus(); FilePath = path.Replace('\\', '/');  OnFocus(); });
+			PathPopup = Toolbar.AddPopup("", FilePathList, FilePath.Replace('/', '\\'), path => { OnLostFocus(); FilePath = path.Replace('\\', '/'); OnFocus(); });
 			Toolbar.AddButton("撤销", Undo);
-
+			rootVisualElement.RegisterCallback<MouseMoveEvent>(data =>
+			{
+				MousePosition = data.mousePosition;
+			});
 		}
 		protected abstract void ParseData();
 		private static Stack<string> UndoList = new Stack<string>();

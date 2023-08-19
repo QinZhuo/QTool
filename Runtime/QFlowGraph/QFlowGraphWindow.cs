@@ -150,6 +150,10 @@ namespace QTool.FlowGraph
 					ClearSetect();
 				}
 			});
+			Back.RegisterCallback<MouseEnterEvent>(data =>
+			{
+				AutoSaveLoad = true; 
+			});
 			Back.RegisterCallback<MouseMoveEvent>(data =>
 			{
 				if (StartPortId != null)
@@ -200,6 +204,7 @@ namespace QTool.FlowGraph
 			});
 			Back.RegisterCallback<MouseUpEvent>(data =>
 			{
+				AutoSaveLoad = true;
 				MoveOffset = false;
 				if (StartPortId != null)
 				{
@@ -253,7 +258,8 @@ namespace QTool.FlowGraph
 			{
 				SelectNodes.AddCheckExist(nodeView);
 				UpdateNodeSelect(nodeView);
-			});
+			}); 
+		
 			nodeView.AddMenu(data =>
 			{
 				ClearSetect();
@@ -342,6 +348,7 @@ namespace QTool.FlowGraph
 						visual.style.flexDirection = port.IsOutput ? FlexDirection.Row : FlexDirection.RowReverse;
 						AddDotView(visual, GetColor(port), port.GetPortId(index));
 						FreshPortConnect(port);
+						visual.RegisterCallback<MouseEnterEvent>(ValueMouseEnterEvent);
 					};
 				}
 				else
@@ -349,16 +356,22 @@ namespace QTool.FlowGraph
 					var dot = AddDotView(row,GetColor(port), port.GetPortId());
 					if (port.IsShowValue())
 					{
-						row.Add(port.ViewName, port.Value, port.ValueType, newValue => port.Value = newValue);
+						row.Add(port.ViewName, port.Value, port.ValueType, newValue => port.Value = newValue)
+							.RegisterCallback<MouseEnterEvent>(ValueMouseEnterEvent);
 					}
 					else
 					{
-						row.AddLabel(port.ViewName, port.IsOutput ? TextAnchor.MiddleRight : TextAnchor.MiddleLeft);
+						row.AddLabel(port.ViewName, port.IsOutput ? TextAnchor.MiddleRight : TextAnchor.MiddleLeft)
+							.RegisterCallback<MouseEnterEvent>(ValueMouseEnterEvent);
 					}
 				}
 
 			}
 			FreshPortConnect(port);
+		}
+		private void ValueMouseEnterEvent(MouseEnterEvent data)
+		{
+			AutoSaveLoad = false; 
 		}
 		public Color GetColor(QFlowPort port)
 		{
