@@ -54,7 +54,6 @@ namespace QTool.FlowGraph
 		ListView listView = null;
 		long lastCkickTime = 0;
 		VisualElement CellView = null;
-		public override bool AutoSaveLoad => CellView == null || !CellView.visible;
 		#region 初始化UI
 		protected override void CreateGUI()
 		{
@@ -120,6 +119,7 @@ namespace QTool.FlowGraph
 										label.text = newValue.ToQDataType(member.Type, false).Trim('\"');
 									}, member.MemeberInfo);
 								}
+								AutoSaveLoad = false;
 								CellView.style.display = DisplayStyle.Flex;
 								var foldout = CellView.Q<Foldout>();
 								if (foldout != null)
@@ -149,6 +149,7 @@ namespace QTool.FlowGraph
 			});
 			root.RegisterCallback<MouseDownEvent>(data =>
 			{
+				AutoSaveLoad = true;
 				CellView.style.display = DisplayStyle.None;
 			});
 		}

@@ -67,9 +67,9 @@ namespace QTool
 
 		protected virtual void OnFocus()
 		{
-			if (!AutoSaveLoad) return;
 			var path = FilePath;
-			if (QFileManager.ExistsFile(path))
+			if (!AutoSaveLoad) return;
+			if (QFileManager.ExistsFile(path)) 
 			{
 				var time = QFileManager.GetLastWriteTime(path);
 				if (time > LastWriteTime)
@@ -106,7 +106,7 @@ namespace QTool
 				ChangeData(value);
 			}
 		}
-		public virtual bool AutoSaveLoad { get; set; } = true;
+		public bool AutoSaveLoad { get; set; } = true;
 		protected virtual void OnLostFocus()
 		{
 			var path = FilePath;
