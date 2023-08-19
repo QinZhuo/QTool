@@ -150,7 +150,7 @@ namespace QTool.FlowGraph
 					ClearSetect();
 				}
 			});
-			Back.RegisterCallback<MouseEnterEvent>(data =>
+			Back.RegisterCallback<MouseDownEvent>(data =>
 			{
 				AutoSaveLoad = true; 
 			});
