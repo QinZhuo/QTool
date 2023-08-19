@@ -745,6 +745,7 @@ namespace QTool
 		public static void LookAt2D(this Transform transform,Vector2 point)
 		{
 			transform.LookAt(point, Vector3.back);
+			transform.eulerAngles = new Vector3(0, 0, -transform.eulerAngles.z);
 		}
 		public static Vector3 RayCast(this Ray ray)
 		{
