@@ -20,6 +20,7 @@ namespace QTool
 			{
 				if (value != FilePath)
 				{
+					AutoSaveLoad = true;
 					UndoList.Clear();
 					QPlayerPrefs.SetString(typeof(T).Name + "_" + nameof(FilePath), value);
 					LastWriteTime = default;
@@ -106,7 +107,7 @@ namespace QTool
 				ChangeData(value);
 			}
 		}
-		public bool AutoSaveLoad { get; set; } = true;
+		public static bool AutoSaveLoad { get; set; } = true;
 		protected virtual void OnLostFocus()
 		{
 			var path = FilePath;
