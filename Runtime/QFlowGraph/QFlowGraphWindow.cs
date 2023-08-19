@@ -126,12 +126,6 @@ namespace QTool.FlowGraph
 			}
 		}
 		VisualElement Back = null;
-		enum Mode
-		{
-			无,
-			移动,
-			选中,
-		}
 		bool MoveOffset = false;
 		protected override void CreateGUI()
 		{
@@ -221,6 +215,7 @@ namespace QTool.FlowGraph
 		}
 		protected override void OnLostFocus()
 		{
+			MoveOffset = false;
 			ClearSetect();
 			base.OnLostFocus();
 		}
@@ -258,6 +253,10 @@ namespace QTool.FlowGraph
 			
 			nodeView.RegisterCallback<MouseDownEvent>(data =>
 			{
+				if (!data.shiftKey)
+				{
+					ClearSetect();
+				}
 				SelectNodes.AddCheckExist(nodeView);
 				UpdateNodeSelect(nodeView);
 			}); 
