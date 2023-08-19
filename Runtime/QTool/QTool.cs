@@ -729,6 +729,23 @@ namespace QTool
 			}
 			return default;
 		}
+		public static T OverlapCircle<T>(this Vector2 point, Func<T, bool> CanCast = null, float radius=0.1f) where T: Component
+		{
+			var colliders = Physics2D.OverlapCircleAll(point, radius);
+			foreach (var collider in colliders)
+			{
+				var target = collider.GetComponent<T>();
+				if (target != null && (CanCast == null || CanCast(target)))
+				{
+					return target;
+				}
+			}
+			return default;
+		}
+		public static void LookAt2D(this Transform transform,Vector2 point)
+		{
+			transform.LookAt(point, Vector3.back);
+		}
 		public static Vector3 RayCast(this Ray ray)
 		{
 			if (Physics.Raycast(ray, out var hitInfo,100,-1, queryTriggerInteraction: QueryTriggerInteraction.Ignore))
