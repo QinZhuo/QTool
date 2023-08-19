@@ -204,7 +204,6 @@ namespace QTool.FlowGraph
 			});
 			Back.RegisterCallback<MouseUpEvent>(data =>
 			{
-				AutoSaveLoad = true;
 				MoveOffset = false;
 				if (StartPortId != null)
 				{
