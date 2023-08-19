@@ -744,7 +744,7 @@ namespace QTool
 		}
 		public static void LookAt2D(this Transform transform,Vector2 point)
 		{
-			transform.LookAt(point, Vector3.back);
+			transform.rotation = Quaternion.LookRotation(Vector3.forward, point);
 		}
 		public static Vector3 RayCast(this Ray ray)
 		{
