@@ -369,21 +369,27 @@ namespace QTool
 								{
 									obj = "";
 								}
-								var objView = root.AddVisualElement();
-								objView.style.flexDirection = FlexDirection.Row; ;
-								objView.AddLabel(name);
-								var typePopup= objView.AddPopup("", TypeList, obj.GetType(), (newType) =>
+								var dynamicObjectView = root.AddVisualElement();
+								dynamicObjectView.style.flexDirection = FlexDirection.Row; ;
+								dynamicObjectView.AddLabel(name);
+								var typePopup= dynamicObjectView.AddPopup("", TypeList, obj.GetType(), (newType) =>
 								{
 									obj = newType.CreateInstance();
-									root.Remove(objView);
-									root.Add(name, obj, type, changeEvent, customAttribute);
+									dynamicObjectView.Remove(dynamicObjectView.Q<VisualElement>(nameof(dynamicObjectView)));
+
+									if (QSerializeType.Get(newType).ObjType != QObjectType.DynamicObject)
+									{
+										var temp = dynamicObjectView.Add("", obj, newType, changeEvent);
+										temp.name = nameof(dynamicObjectView);
+									}
 								});
 								typePopup.style.maxWidth = 100;
 								if (QSerializeType.Get(typePopup.value).ObjType != QObjectType.DynamicObject)
 								{
-									objView.Add("", obj, typePopup.value, changeEvent);
+									var objView= dynamicObjectView.Add("", obj, typePopup.value, changeEvent);
+									objView.name = nameof(dynamicObjectView);
 								}
-								return objView;
+								return dynamicObjectView;
 							}
 						case QObjectType.UnityObject:
 							{
