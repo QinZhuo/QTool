@@ -56,6 +56,7 @@ namespace QTool
 		{
 			get
 			{
+				if (this == null) return null;
 				if (_Runtime == null)
 				{
 					Runtime = QRuntime<RuntimeT, DataT>.Get(gameObject.QName());
