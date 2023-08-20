@@ -48,7 +48,7 @@ namespace QTool
 		private TextField markdownText = null;
 		private ScrollView markdownView = null;
 		private long lastClick = 0;
-		protected override void CreateGUI()
+		protected override async void CreateGUI()
 		{
 			base.CreateGUI();
 			var root = rootVisualElement;
@@ -56,7 +56,7 @@ namespace QTool
 			var editorRange = new ScrollView();
 			markdownText = editorRange.AddText("", "", null, true);
 			markdownText.style.minHeight = 1000;
-			var split= root.Split(editorRange, markdownView);
+			var split = root.Split(editorRange, markdownView);
 			markdownText.RegisterCallback<ChangeEvent<string>>((e) => ChangeData(e.newValue));
 			editorRange.verticalScroller.valueChanged += (value) =>
 			{
@@ -82,6 +82,14 @@ namespace QTool
 					lastClick = data.timestamp;
 				}
 			});
+			await QTask.Wait(0.5f);
+			if (QPlayerPrefs.Get<bool>(nameof(TwoPaneSplitView.CollapseChild))){
+				split.CollapseChild(0);
+			}
+			else
+			{
+				split.UnCollapse();
+			}
 		}
 		protected override async void ChangeData(string newValue)
 		{ 
