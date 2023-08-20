@@ -39,14 +39,14 @@ namespace QTool.FlowGraph
 			if (file != null)
 			{
 #if UNITY_EDITOR
-				serializedProperty = new SerializedObject(file).FindProperty(nameof(QFlowGraphAsset.Graph)).FindPropertyRelative(nameof(QFlowGraph.SerializeString));
+				SerializedProperty = new SerializedObject(file).FindProperty(nameof(QFlowGraphAsset.Graph)).FindPropertyRelative(nameof(QFlowGraph.SerializeString));
 #endif
 				return (file as QFlowGraphAsset).Graph.SerializeString;
 			}
 #if UNITY_EDITOR
-			else if (serializedProperty != null)
+			else if (SerializedProperty != null)
 			{
-				return serializedProperty.stringValue;
+				return SerializedProperty.stringValue;
 			}
 #endif
 			else
@@ -62,10 +62,10 @@ namespace QTool.FlowGraph
 				Graph.OnBeforeSerialize();
 				ChangeData(Graph.SerializeString);
 #if UNITY_EDITOR
-				if (serializedProperty != null)
+				if (SerializedProperty != null)
 				{
-					serializedProperty.stringValue = Graph.ToQData();
-					serializedProperty.serializedObject.ApplyModifiedProperties();
+					SerializedProperty.stringValue = Graph.ToQData();
+					SerializedProperty.serializedObject.ApplyModifiedProperties();
 				}
 #endif
 			}
@@ -527,8 +527,7 @@ namespace QTool.FlowGraph
 				else
 				{
 					var graph = property.GetObject() as QFlowGraph;
-					QFlowGraphWindow.FilePath = "";
-					QFlowGraphWindow.serializedProperty = property.FindPropertyRelative(nameof(QFlowGraph.SerializeString));
+					QFlowGraphWindow.SerializedProperty = property.FindPropertyRelative(nameof(QFlowGraph.SerializeString));
 					QFlowGraphWindow.OpenWindow();
 				}
 			});

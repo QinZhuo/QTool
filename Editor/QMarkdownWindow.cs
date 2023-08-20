@@ -100,7 +100,7 @@ namespace QTool
 
 		public override string GetData(UnityEngine.Object file)
 		{
-			return (file as TextAsset).text;
+			return (file as TextAsset)?.text;
 		}
 
 		public override void SaveData()

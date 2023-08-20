@@ -62,17 +62,22 @@ namespace QTool
 			}
 		}
 #if UNITY_EDITOR
-		public static UnityEditor.SerializedProperty serializedProperty { get; set; }
+		public static UnityEditor.SerializedProperty SerializedProperty { get => _SerializedProperty; set { _SerializedProperty = value;FilePath = value.IsNull() ? null : nameof(SerializedProperty); } }
+		private static UnityEditor.SerializedProperty _SerializedProperty = null;
 #endif
 
 		protected virtual void OnFocus()
 		{
 			var path = FilePath;
 			if (!AutoSaveLoad) return;
-			if (QFileManager.ExistsFile(path)) 
+			if (path.IsNull())
 			{
-			//	var time = QFileManager.GetLastWriteTime(path);
-			//	if (time > LastWriteTime)
+				Data = "";
+			}
+			else if (QFileManager.ExistsFile(path))
+			{
+				//	var time = QFileManager.GetLastWriteTime(path);
+				//	if (time > LastWriteTime) 
 				{
 #if UNITY_EDITOR
 					var asset = UnityEditor.AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(path);
@@ -85,7 +90,7 @@ namespace QTool
 					{
 						Debug.LogError("读取[" + path + "]为空");
 					}
-			//		LastWriteTime = time;
+					//		LastWriteTime = time;
 #endif
 				}
 			}
@@ -116,9 +121,9 @@ namespace QTool
 			var path = FilePath;
 			if (AutoSaveLoad)
 			{
-				SaveData();
 				if (!path.IsNull())
 				{
+					SaveData();
 #if UNITY_EDITOR
 					UnityEditor.AssetDatabase.ImportAsset(path);
 #endif
