@@ -12,13 +12,21 @@ namespace QTool
 		public float angle = 30;
 		[QName("距离"), Range(0, 30)]
 		public float distance = 5;
+		public bool is2D = false;
 		private void OnValidate()
 		{
 			UpdateMesh();
 		}
-		public static Vector3 GetPos(float angle,float distance)
+		public Vector3 GetPos(float angle,float distance)
 		{
-			return new Vector3(Mathf.Sin(angle * Mathf.Deg2Rad), 0, Mathf.Cos(angle * Mathf.Deg2Rad))* distance;
+			if (is2D)
+			{
+				return new Vector3(Mathf.Sin(angle * Mathf.Deg2Rad), Mathf.Cos(angle * Mathf.Deg2Rad)) * distance;
+			}
+			else
+			{
+				return new Vector3(Mathf.Sin(angle * Mathf.Deg2Rad), 0, Mathf.Cos(angle * Mathf.Deg2Rad)) * distance;
+			}
 		}
 		public void UpdateMesh()
 		{
@@ -26,7 +34,7 @@ namespace QTool
 			var halfAngle = angle / 2;
 			for (float curAngle = -halfAngle; curAngle < halfAngle; curAngle+=5)
 			{
-				MeshData.AddTriangle(transform.position, GetPos(curAngle, distance), GetPos(Mathf.Min(curAngle + 10,halfAngle), distance), Color.red);
+				MeshData.AddTriangle(transform.position, transform.position + GetPos(curAngle, distance), transform.position + GetPos(Mathf.Min(curAngle + 10, halfAngle), distance), Color.red);
 			}
 			gameObject.GenerateMesh(MeshData);
 		}
