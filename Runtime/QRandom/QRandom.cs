@@ -122,7 +122,7 @@ namespace QTool
 					var dir = QRandom.DefaultRandom.Vector2();
 					var offset = dir.normalized * centerOffset + dir * (range - centerOffset);
 					var position = center + (Is2D ? offset : new Vector3(offset.x, 0, offset.y));
-					var other = Is2D ? ((Vector2)position).OverlapCircle<T>(radius) : new Ray(position + Vector3.up, Vector3.down).RayCast<T>(null, radius);
+					var other = Is2D ? ((Vector2)position).OverlapCircle<T>(radius) : new Ray(position + Vector3.up, Vector3.down).RayCast<T>(radius);
 					if (other == null)
 					{
 						newObject = prefab.CheckInstantiate();
