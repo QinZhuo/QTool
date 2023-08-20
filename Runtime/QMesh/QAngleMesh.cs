@@ -30,13 +30,31 @@ namespace QTool
 		}
 		public void UpdateMesh()
 		{
+		
+			List<Vector2> points = new List<Vector2>();
+			points.Add(transform.position);
 			MeshData.Clear();
 			var halfAngle = angle / 2;
 			for (float curAngle = -halfAngle; curAngle < halfAngle; curAngle+=5)
 			{
-				MeshData.AddTriangle(transform.position, transform.position + GetPos(curAngle, distance), transform.position + GetPos(Mathf.Min(curAngle + 10, halfAngle), distance), Color.red);
+				var start = transform.position + GetPos(curAngle, distance);
+				var end = transform.position + GetPos(Mathf.Min(curAngle + 10, halfAngle), distance);
+				MeshData.AddTriangle(transform.position, start, end, Color.red);
+				if (is2D)
+				{
+					points.AddCheckExist(start);
+					points.AddCheckExist(end);
+				}
 			}
 			gameObject.GenerateMesh(MeshData);
+			if (is2D)
+			{
+				var polygon = GetComponent<PolygonCollider2D>();
+				if (polygon != null)
+				{
+					polygon.points = points.ToArray();
+				}
+			}
 		}
 	}
 }
