@@ -51,7 +51,7 @@ namespace QTool.FlowGraph
 #endif
 			else
 			{
-				return "";
+				return new QFlowGraph().ToQData();
 			}
 		}
 		private QFlowGraph Graph { get; set; }
@@ -84,8 +84,6 @@ namespace QTool.FlowGraph
 		{
 			Graph = Data.ParseQData<QFlowGraph>();
 			if (Graph == null) return;
-
-
 			await QTask.Wait(() => Back != null);
 			Back.Clear();
 			ConnectCanvas.Clear();
@@ -527,6 +525,7 @@ namespace QTool.FlowGraph
 				else
 				{
 					var graph = property.GetObject() as QFlowGraph;
+					QFlowGraphWindow.FilePath = nameof(SerializedProperty); 
 					QFlowGraphWindow.SerializedProperty = property.FindPropertyRelative(nameof(QFlowGraph.SerializeString));
 					QFlowGraphWindow.OpenWindow();
 				}

@@ -62,8 +62,7 @@ namespace QTool
 			}
 		}
 #if UNITY_EDITOR
-		public static UnityEditor.SerializedProperty SerializedProperty { get => _SerializedProperty; set { _SerializedProperty = value;FilePath = value.IsNull() ? null : nameof(SerializedProperty); } }
-		private static UnityEditor.SerializedProperty _SerializedProperty = null;
+		public static UnityEditor.SerializedProperty SerializedProperty { get; set; }
 #endif
 
 		protected virtual void OnFocus()
@@ -137,7 +136,7 @@ namespace QTool
 			var Toolbar = rootVisualElement.AddVisualElement();
 			Toolbar.style.flexDirection = FlexDirection.Row;
 			QPlayerPrefs.Get(typeof(T).Name + "_" + nameof(FilePathList), FilePathList);
-			PathPopup = Toolbar.AddPopup("", FilePathList, FilePath.Replace('/', '\\'), path => { OnLostFocus(); FilePath = path.Replace('\\', '/'); OnFocus(); });
+			PathPopup = Toolbar.AddPopup("", FilePathList, FilePath.Replace('/', '\\'), path => { OnLostFocus(); FilePath = path.Replace('\\', '/'); if (!FilePath.ExistsFile()) Data = "";  OnFocus(); });
 			Toolbar.AddButton("撤销", Undo);
 			rootVisualElement.RegisterCallback<MouseMoveEvent>(data =>
 			{
