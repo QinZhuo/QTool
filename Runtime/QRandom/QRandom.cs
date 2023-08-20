@@ -97,75 +97,77 @@ namespace QTool
 		}
 	}
 
-	//[QCommandType("基础/程序生成")]
-	//public static class QRandomNode
-	//{
-	//	[QIgnore]
-	//	public static int MaxRandomTimes { get; set; } = 10;
-	//	[QIgnore]
-	//	public static IEnumerator RandomRangeCarete<T>(QFlowNode This, [QInputPort("场景"), QFlowPort] GameObject root, [QName("范围")] float range=10, [QName("中心偏移")] float centerOffset = 0, [QName("预制体")] GameObject prefab = null, [QName("创建数目")] int count = 1, [QFlowPort, QOutputPort, QName("物体")] GameObject newObject = default,float radius=0) where T:Component
-	//	{
-	//		var center = root == null ? Vector3.zero : root.transform.position;
-	//		if (radius <= 0)
-	//		{
-	//			radius = prefab.GetBounds().size.magnitude;
-	//			QDebug.Log(prefab + " 射线检测半径[" + radius + "]");
-	//		}
-	//		for (int i = 0; i < count; i++)
-	//		{
-	//			var creating = true;
-	//			var times = 0;
-	//			while (creating && times++ < MaxRandomTimes)
-	//			{
-	//				var dir = QRandom.DefaultRandom.Vector2();
-	//				var offset = dir.normalized * centerOffset + dir * (range - centerOffset);
-	//				var position = center + new Vector3(offset.x, 0, offset.y);
-	//				var other = new Ray(position + Vector3.up, Vector3.down).RayCast<T>(null, radius);
-	//				if (other == null)
-	//				{
-	//					newObject = prefab.CheckInstantiate();
-	//					newObject.transform.position = position;
-	//					if (This != null)
-	//					{
-	//						This[nameof(newObject)] = newObject;
-	//						yield return This.RunPortIEnumerator(nameof(newObject));
-	//					}
-	//					creating = false;
-	//				}
-	//			}
-	//		}
-	//	}
-	//	[QName("随机点生成物体")]
-	//	private static IEnumerator RandomPointCreate(QFlowNode This, [QInputPort("场景"), QFlowPort] GameObject root, [QName("位置点")] string pointKey, [QName("预制体")] GameObject prefab, [QName("创建数目")] int count = 1, [QFlowPort, QOutputPort, QName("物体")] GameObject newObject = default)
-	//	{
-	//		var pointList = new List<QPositionPoint>();
-	//		if (root == null)
-	//		{
-	//			pointList.AddRange(QPositionPoint.GetPoints(pointKey));
-	//			pointList.RemoveAll((point) => point.HasChild);
-	//		}
-	//		else
-	//		{
-	//			var keyPotnts= QPositionPoint.GetPoints(pointKey);
-	//			pointList.AddRange(root.GetComponentsInChildren<QPositionPoint>());
-	//			pointList.RemoveAll((point) => !keyPotnts.Contains(point) || point.HasChild);
-	//		}
-	//		pointList.Random();
-	//		if (pointList.Count < count)
-	//		{
-	//			QDebug.LogWarning("位置点[" + pointKey + "]不足 " + pointList.Count + "<" + count);
-	//		}
-	//		for (int i = 0; i < count && i < pointList.Count; i++)
-	//		{
-	//			newObject = prefab.CheckInstantiate(pointList[i].transform);
-	//			newObject.transform.rotation = pointList[i].transform.rotation;
-	//			if (This != null)
-	//			{
-	//				This[nameof(newObject)] = newObject;
-	//				yield return This.RunPortIEnumerator(nameof(newObject));
-	//			}
-	//		}
-	//	}
-	//}
+	[QCommandType("基础/程序生成")]
+	public static class QRandomNode
+	{
+		[QIgnore]
+		public static bool Is2D { get; set; } = false;
+		[QIgnore]
+		public static int MaxRandomTimes { get; set; } = 10;
+		[QIgnore]
+		public static IEnumerator RandomRangeCarete<T>(QFlowNode This, [QInputPort("场景"), QFlowPort] GameObject root, [QName("范围")] float range = 10, [QName("中心偏移")] float centerOffset = 0, [QName("预制体")] GameObject prefab = null, [QName("创建数目")] int count = 1, [QFlowPort, QOutputPort, QName("物体")] GameObject newObject = default, float radius = 0) where T : Component
+		{
+			var center = root == null ? Vector3.zero : root.transform.position;
+			if (radius <= 0)
+			{
+				radius = prefab.GetBounds().size.magnitude;
+				QDebug.Log(prefab + " 射线检测半径[" + radius + "]");
+			}
+			for (int i = 0; i < count; i++)
+			{
+				var creating = true;
+				var times = 0;
+				while (creating && times++ < MaxRandomTimes)
+				{
+					var dir = QRandom.DefaultRandom.Vector2();
+					var offset = dir.normalized * centerOffset + dir * (range - centerOffset);
+					var position = center + (Is2D ? offset : new Vector3(offset.x, 0, offset.y));
+					var other = Is2D ? ((Vector2)position).OverlapCircle<T>(radius) : new Ray(position + Vector3.up, Vector3.down).RayCast<T>(null, radius);
+					if (other == null)
+					{
+						newObject = prefab.CheckInstantiate();
+						newObject.transform.position = position;
+						if (This != null)
+						{
+							This[nameof(newObject)] = newObject;
+							yield return This.RunPortIEnumerator(nameof(newObject));
+						}
+						creating = false;
+					}
+				}
+			}
+		}
+		[QName("随机点生成物体")]
+		private static IEnumerator RandomPointCreate(QFlowNode This, [QInputPort("场景"), QFlowPort] GameObject root, [QName("位置点")] string pointKey, [QName("预制体")] GameObject prefab, [QName("创建数目")] int count = 1, [QFlowPort, QOutputPort, QName("物体")] GameObject newObject = default)
+		{
+			var pointList = new List<QPositionPoint>();
+			if (root == null)
+			{
+				pointList.AddRange(QPositionPoint.GetPoints(pointKey));
+				pointList.RemoveAll((point) => point.HasChild);
+			}
+			else
+			{
+				var keyPotnts= QPositionPoint.GetPoints(pointKey);
+				pointList.AddRange(root.GetComponentsInChildren<QPositionPoint>());
+				pointList.RemoveAll((point) => !keyPotnts.Contains(point) || point.HasChild);
+			}
+			pointList.Random();
+			if (pointList.Count < count)
+			{
+				QDebug.LogWarning("位置点[" + pointKey + "]不足 " + pointList.Count + "<" + count);
+			}
+			for (int i = 0; i < count && i < pointList.Count; i++)
+			{
+				newObject = prefab.CheckInstantiate(pointList[i].transform);
+				newObject.transform.rotation = pointList[i].transform.rotation;
+				if (This != null)
+				{
+					This[nameof(newObject)] = newObject;
+					yield return This.RunPortIEnumerator(nameof(newObject));
+				}
+			}
+		}
+	}
 
 }
