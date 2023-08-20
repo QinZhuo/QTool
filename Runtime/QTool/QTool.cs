@@ -744,8 +744,8 @@ namespace QTool
 		}
 		public static void LookAt2D(this Transform transform,Vector2 point)
 		{
-			transform.LookAt(new Vector3(point.x,point.y,transform.position.z-10), Vector3.forward);
-			transform.eulerAngles = new Vector3(0, 0, -transform.eulerAngles.z);
+			Vector3 relative = transform.InverseTransformPoint(point);
+			transform.Rotate(0, 0, -Mathf.Atan2(relative.x, relative.y) * Mathf.Rad2Deg);
 		}
 		public static Vector3 RayCast(this Ray ray)
 		{
