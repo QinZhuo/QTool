@@ -26,7 +26,10 @@ namespace QTool
 					//LastWriteTime = default;
 					QPlayerPrefs.Get(typeof(T).Name + "_" + nameof(FilePathList), FilePathList);
 					var select = value.Replace('/', '\\');
-					FilePathList.AddCheckExist(select);
+					if (select.ExistsFile())
+					{
+						FilePathList.AddCheckExist(select);
+					}
 					QPlayerPrefs.Set(typeof(T).Name + "_" + nameof(FilePathList), FilePathList);
 					if (PathPopup != null)
 					{
