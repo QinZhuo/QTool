@@ -23,7 +23,7 @@ namespace QTool
 					AutoSaveLoad = true;
 					UndoList.Clear();
 					QPlayerPrefs.SetString(typeof(T).Name + "_" + nameof(FilePath), value);
-					LastWriteTime = default;
+					//LastWriteTime = default;
 					QPlayerPrefs.Get(typeof(T).Name + "_" + nameof(FilePathList), FilePathList);
 					var select = value.Replace('/', '\\');
 					FilePathList.AddCheckExist(select);
@@ -37,7 +37,6 @@ namespace QTool
 		}
 		
 		private static List<string> FilePathList = new List<string>();
-		private static DateTime LastWriteTime = default;
 
 		public new GUIContent titleContent
 		{
@@ -72,8 +71,8 @@ namespace QTool
 			if (!AutoSaveLoad) return;
 			if (QFileManager.ExistsFile(path)) 
 			{
-				var time = QFileManager.GetLastWriteTime(path);
-				if (time > LastWriteTime)
+			//	var time = QFileManager.GetLastWriteTime(path);
+			//	if (time > LastWriteTime)
 				{
 #if UNITY_EDITOR
 					var asset = UnityEditor.AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(path);
@@ -82,7 +81,11 @@ namespace QTool
 					{
 						Data = GetData(asset);
 					}
-					LastWriteTime = time;
+					else
+					{
+						Debug.LogError("读取[" + path + "]为空");
+					}
+			//		LastWriteTime = time;
 #endif
 				}
 			}

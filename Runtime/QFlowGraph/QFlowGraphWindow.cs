@@ -84,6 +84,8 @@ namespace QTool.FlowGraph
 		{
 			Graph = Data.ParseQData<QFlowGraph>();
 			if (Graph == null) return;
+
+
 			await QTask.Wait(() => Back != null);
 			Back.Clear();
 			ConnectCanvas.Clear();
