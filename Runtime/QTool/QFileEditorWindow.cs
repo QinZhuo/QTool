@@ -24,7 +24,7 @@ namespace QTool
 					UndoList.Clear();
 					QPlayerPrefs.SetString(typeof(T).Name + "_" + nameof(FilePath), value);
 					//LastWriteTime = default;
-					QPlayerPrefs.Get(typeof(T).Name + "_" + nameof(FilePathList), FilePathList);
+					QPlayerPrefs.Get(typeof(T).Name + "_" + nameof(FilePathList), FilePathList); 
 					var select = value.Replace('/', '\\');
 					if (select.ExistsFile())
 					{
