@@ -138,10 +138,13 @@ namespace QTool.FlowGraph
 			Back = viewRange.AddVisualElement().SetBackground();
 			Back.RegisterCallback<MouseDownEvent>(data =>
 			{
-				MoveOffset = true;
-				if (data.target == Back)
+				if (data.button < 2)
 				{
-					ClearSetect();
+					MoveOffset = true;
+					if (data.target == Back)
+					{
+						ClearSetect();
+					}
 				}
 			});
 			Back.RegisterCallback<MouseDownEvent>(data =>
@@ -153,6 +156,7 @@ namespace QTool.FlowGraph
 			});
 			Back.RegisterCallback<MouseMoveEvent>(data =>
 			{
+				if (data.button > 1) return;
 				if (StartPortId != null)
 				{
 					if (DragConnect != null)
@@ -188,6 +192,7 @@ namespace QTool.FlowGraph
 			});
 			Back.AddMenu(data =>
 			{
+				MoveOffset = false;
 				var position = data.localMousePosition;
 				foreach (var kv in QCommand.KeyDictionary)
 				{
@@ -198,6 +203,19 @@ namespace QTool.FlowGraph
 						AddNodeView(Back, node);
 					});
 				}
+				if (!GUIUtility.systemCopyBuffer.IsNull())
+				{
+					data.menu.AppendSeparator();
+					data.menu.AppendAction("粘贴", action =>
+					{
+						var nodeList = new List<QFlowNode>();
+						GUIUtility.systemCopyBuffer.ParseQData(nodeList);
+						Graph.Parse(nodeList, data.mousePosition - ViewOffset);
+						OnLostFocus();
+						OnFocus();
+					});
+				}
+			
 			});
 			Back.RegisterCallback<MouseUpEvent>(data =>
 			{
@@ -216,7 +234,6 @@ namespace QTool.FlowGraph
 		protected override void OnLostFocus()
 		{
 			MoveOffset = false;
-			ClearSetect();
 			base.OnLostFocus();
 		}
 		public void ClearSetect()
@@ -253,25 +270,37 @@ namespace QTool.FlowGraph
 			
 			nodeView.RegisterCallback<MouseDownEvent>(data =>
 			{
-				if (!data.shiftKey)
+				if (data.button == 0 && !data.shiftKey)
 				{
 					ClearSetect();
 				}
 				SelectNodes.AddCheckExist(nodeView);
 				UpdateNodeSelect(nodeView);
-			}); 
+			});
 		
 			nodeView.AddMenu(data =>
 			{
-				ClearSetect();
+				MoveOffset = false;
 				data.menu.AppendAction("运行", action =>
 				{
 					Graph.Run(node.Key);
 				});
 				data.menu.AppendSeparator();
+				data.menu.AppendAction("复制", action =>
+				{
+					var nodeList = new List<QFlowNode>();
+					foreach (var node in SelectNodes.ToArray())
+					{
+						nodeList.AddCheckExist(Graph[node.name]);
+					}
+					GUIUtility.systemCopyBuffer = nodeList.ToQData();
+				});
 				data.menu.AppendAction("删除", action =>
 				{
-					RemoveNodeView(nodeView);
+					foreach (var node in SelectNodes.ToArray())
+					{
+						RemoveNodeView(node);
+					}
 				});
 			});
 			var label = nodeView.AddLabel(node.Name);
@@ -317,6 +346,7 @@ namespace QTool.FlowGraph
 			Graph.Remove(node);
 			Back.Remove(visual);
 			NodeViewList.Remove(visual);
+			SelectNodes.Remove(visual);
 
 		}
 		public void AddPortView(VisualElement root, QFlowPort port)
@@ -401,7 +431,11 @@ namespace QTool.FlowGraph
 		}
 		public void RemoveConnectView(PortId start, PortId end)
 		{
-			ConnectCanvas.Remove(GetConnectView(start, end));
+			var view = GetConnectView(start, end);
+			if (view != null)
+			{
+				ConnectCanvas.Remove(view);
+			}
 		}
 		public VisualElement GetDotView(PortId portId)
 		{
