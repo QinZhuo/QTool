@@ -73,7 +73,7 @@ namespace QTool
 				}
 			}
 		}
-		public QDictionary<string, QRuntimeValue<float>> RuntimeValues = new QDictionary<string, QRuntimeValue<float>>();
+		public QDictionary<string, QRuntimeValue<float>> RuntimeValues { get; private set; } = new QDictionary<string, QRuntimeValue<float>>();
 		public DataT Data => Runtime?.Data;
 		public virtual void Start()
 		{
