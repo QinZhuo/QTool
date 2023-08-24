@@ -73,16 +73,16 @@ namespace QTool
 				}
 			}
 		}
-		public QDictionary<string, QRuntimeValue<float>> RuntimeValues { get; private set; } = new QDictionary<string, QRuntimeValue<float>>();
+		public QDictionary<string, QRuntimeValue> RuntimeValues { get; private set; } = new QDictionary<string, QRuntimeValue>();
 		public DataT Data => Runtime?.Data;
 		public virtual void Start()
 		{
 			var runtime = Runtime;
 			runtime.ForeachMember(null, (member) =>
 			 {
-				 if (member.Type.Is(typeof(QRuntimeValue<float>)))
+				 if (member.Type.Is(typeof(QRuntimeValue)))
 				 {
-					 var runtimeValue = member.Get(runtime).As<QRuntimeValue<float>>();
+					 var runtimeValue = member.Get(runtime).As<QRuntimeValue>();
 					 runtimeValue.Name = member.QName;
 					 RuntimeValues[member.QName] = runtimeValue;
 				 }
