@@ -747,6 +747,15 @@ namespace QTool
 			Vector3 relative = transform.InverseTransformPoint(point);
 			transform.Rotate(0, 0, -Mathf.Atan2(relative.x, relative.y) * Mathf.Rad2Deg);
 		}
+		public static Vector2 Rotate(this Vector2 vector2,float angle)
+		{
+			var x = vector2.x;
+			var y = vector2.y;
+			var sin =Mathf.Sin(Mathf.PI * angle / 180);
+			var cos = Mathf.Cos(Mathf.PI * angle / 180);
+			return new Vector2(x * cos + y * sin, x * -sin + y * cos);
+		}
+
 		public static Vector3 RayCast(this Ray ray)
 		{
 			if (Physics.Raycast(ray, out var hitInfo,100,-1, queryTriggerInteraction: QueryTriggerInteraction.Ignore))
