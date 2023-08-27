@@ -483,7 +483,7 @@ namespace QTool.FlowGraph
 				}
 			}
         }
-		public PortId? GetConnectPortId(QFlowGraph graph,bool isFlow)
+		public PortId? GetConnectPortId(QFlowGraph graph,bool onlyFlowNode)
 		{
 			switch (ConnectList.Count)
 			{
@@ -491,7 +491,7 @@ namespace QTool.FlowGraph
 				case 1:
 					{
 						var connect = FirstConnect;
-						if (isFlow&&!graph.GetPort(connect).IsFlow)
+						if (onlyFlowNode&&!graph.GetPort(connect).IsFlow)
 						{
 							return null;
 						}
@@ -499,7 +499,7 @@ namespace QTool.FlowGraph
 					}
 				default:
 					{
-						if (isFlow)
+						if (onlyFlowNode)
 						{
 							foreach (var connect in ConnectList)
 							{
@@ -560,14 +560,14 @@ namespace QTool.FlowGraph
 		{
 			return name + " (" + ConnectType + ")["+Key+"]";
 		}
-		public string ToInfoString(int index=0)
+		public string ToInfoString(int index = 0)
 		{
 			if (HasConnect(index))
 			{
-				var node = GetFlowNode(index);
+				var node = GetConnectNode(index);
 				if (node == null)
 				{
-					node = GetValueNode(index);
+					node = GetConnectNode(index, false);
 				}
 				return node.ToInfoString();
 			}
@@ -751,23 +751,11 @@ namespace QTool.FlowGraph
 			return value is QFlow ? null : value;
 		}
 	
-		public QFlowNode GetFlowNode(int index = 0)
+		public QFlowNode GetConnectNode(int index = 0,bool onlyFlowNode=true)
 		{
 			if (HasConnect(index))
 			{
-				var connectPortKey = this[index].GetConnectPortId(Node.Graph, true);
-				if (connectPortKey != null)
-				{
-					return Node.Graph[connectPortKey.Value.node];
-				}
-			}
-			return null;
-		}
-		public QFlowNode GetValueNode(int index = 0)
-		{
-			if (HasConnect(index))
-			{
-				var connectPortKey = this[index].GetConnectPortId(Node.Graph, false);
+				var connectPortKey = this[index].GetConnectPortId(Node.Graph, onlyFlowNode);
 				if (connectPortKey != null)
 				{
 					return Node.Graph[connectPortKey.Value.node];
@@ -957,10 +945,10 @@ namespace QTool.FlowGraph
 			if (command?.method == null) return "";
 			if (NodeToInfoString == null)
 			{
-				var method= command.method.DeclaringType.GetStaticMethod(nameof(ToInfoString));
+				var method = command.method.DeclaringType.GetStaticMethod(nameof(ToInfoString));
 				if (method == null)
 				{
-					NodeToInfoString = (node) => "";
+					NodeToInfoString = (node) => node.Name;
 				}
 				else
 				{
@@ -1332,7 +1320,7 @@ namespace QTool.FlowGraph
 		{
 			if (Ports.ContainsKey(portKey))
             {
-				var node = Ports[portKey].GetFlowNode(index);
+				var node = Ports[portKey].GetConnectNode(index);
 				return Graph.RunIEnumerator(node?.Key);
             }
             else

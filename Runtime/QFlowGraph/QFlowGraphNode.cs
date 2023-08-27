@@ -237,7 +237,7 @@ namespace QTool.FlowGraph
 				default:
 					return node.Name;
 			}
-			info += node.Ports[QFlowKey.NextPort].GetFlowNode()?.ToInfoString();
+			info += node.Ports[QFlowKey.NextPort].GetConnectNode()?.ToInfoString();
 			return info;
 		}
 	}

@@ -11,7 +11,7 @@ namespace QTool.FlowGraph
 		[QName("修饰/取反")]
 		public static IEnumerator Inverse(QFlowNode This, [QOutputPort] QFlow next)
 		{
-			var nextNode = This.Ports[nameof(next)].GetFlowNode();
+			var nextNode = This.Ports[nameof(next)].GetConnectNode();
 			yield return This.RunPortIEnumerator(nameof(next));
 			if (nextNode.State == QNodeState.成功)
 			{
@@ -36,7 +36,7 @@ namespace QTool.FlowGraph
 			{
 				for (int i = 0; i < maxTimes; i++)
 				{
-					var nextNode = This.Ports[nameof(next)].GetFlowNode();
+					var nextNode = This.Ports[nameof(next)].GetConnectNode();
 					yield return This.RunPortIEnumerator(nameof(next));
 					switch (loopMode)
 					{
@@ -63,7 +63,7 @@ namespace QTool.FlowGraph
 			{
 				while (true)
 				{
-					var nextNode = This.Ports[nameof(next)].GetFlowNode();
+					var nextNode = This.Ports[nameof(next)].GetConnectNode();
 					yield return This.RunPortIEnumerator(nameof(next));
 					switch (loopMode)
 					{
@@ -96,7 +96,7 @@ namespace QTool.FlowGraph
 		{
 			for (int i = 0; i < nexts.Count; i++)
 			{
-				var nextNode= This.Ports[nameof(nexts)].GetFlowNode(i);
+				var nextNode= This.Ports[nameof(nexts)].GetConnectNode(i);
 				if (nextNode != null)
 				{
 					yield return This.RunPortIEnumerator(nameof(nexts), i);
@@ -113,7 +113,7 @@ namespace QTool.FlowGraph
 		{
 			for (int i = 0; i < nexts.Count; i++)
 			{
-				var nextNode = This.Ports[nameof(nexts)].GetFlowNode(i);
+				var nextNode = This.Ports[nameof(nexts)].GetConnectNode(i);
 				if (nextNode != null)
 				{
 					yield return This.RunPortIEnumerator(nameof(nexts), i);
@@ -132,7 +132,7 @@ namespace QTool.FlowGraph
 			
 			for (int i = 0; i < nexts.Count; i++)
 			{
-				var node= This.Ports[nameof(nexts)].GetFlowNode(i);
+				var node= This.Ports[nameof(nexts)].GetConnectNode(i);
 				if (node != null)
 				{
 					This.RunPort(nameof(nexts), i);
@@ -180,5 +180,29 @@ namespace QTool.FlowGraph
 			}
 		}
 		#endregion
+		[QIgnore]
+		public static string ToInfoString(QFlowNode node)
+		{
+			var info = "";
+			switch (node.command.method.Name)
+			{
+				case nameof(Sequence):
+				case nameof(Parallel):
+					var port = node.Ports["nexts"];
+					var list = port.Value.As<IList>();
+					for (int i = 0; i < list.Count; i++)
+					{
+						if (port.HasConnect(i))
+						{
+							info += port.GetConnectNode(i).ToInfoString();
+						}
+					}
+					break;
+				default:
+					return node.Name;
+			}
+			info += node.Ports[QFlowKey.NextPort].GetConnectNode()?.ToInfoString();
+			return info;
+		}
 	}
 }
