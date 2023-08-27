@@ -105,7 +105,7 @@ namespace QTool
 		[QIgnore]
 		public static int MaxRandomTimes { get; set; } = 10;
 		[QIgnore]
-		public static IEnumerator RandomRangeCarete<T>(QFlowNode This, [QInputPort("场景"), QFlowPort] GameObject root, [QName("范围")] float range = 10, [QName("中心偏移")] float centerOffset = 0, [QName("预制体")] GameObject prefab = null, [QName("创建数目")] int count = 1, float radius = 0, [QFlowPort, QOutputPort, QName("物体")] GameObject newObject = default) where T : Component
+		public static IEnumerator RandomRangeCarete<T>(QFlowNode This, [QInputPort("场景"), QFlowPort] GameObject root, [QName("范围")] float range = 10, [QName("中心偏移")] float centerOffset = 0, [QName("预制体")] GameObject prefab = null, [QName("创建数目")] int count = 1, float radius = 0) where T : Component
 		{
 			var center = root == null ? Vector3.zero : root.transform.position;
 			if (radius <= 0)
@@ -125,7 +125,7 @@ namespace QTool
 					var other = Is2D ? ((Vector2)position).OverlapCircle<T>(radius) : new Ray(position + Vector3.up, Vector3.down).RayCast<T>(radius);
 					if (other == null)
 					{
-						newObject = prefab.CheckInstantiate();
+						var newObject = prefab.CheckInstantiate();
 						newObject.transform.position = position;
 						if (This != null)
 						{

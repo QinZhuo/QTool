@@ -49,6 +49,7 @@ namespace QTool
 			}
 		}
 	}
+	
 	public abstract class QRuntimeObject<RuntimeT, DataT> : MonoBehaviour,IQPoolObject where RuntimeT : QRuntime<RuntimeT, DataT>, new() where DataT : QDataList<DataT>, new()
 	{
 		private RuntimeT _Runtime = null;
