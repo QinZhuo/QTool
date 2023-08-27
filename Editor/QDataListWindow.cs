@@ -60,13 +60,7 @@ namespace QTool.FlowGraph
 			base.CreateGUI();	
 			var root = rootVisualElement.AddScrollView();
 			root.style.height = new Length(100, LengthUnit.Percent);
-			CellView = rootVisualElement.AddVisualElement();
-			CellView.style.position = Position.Absolute;
-			CellView.style.display = DisplayStyle.None;
-			CellView.style.backgroundColor = Color.Lerp(Color.black, Color.white, 0.3f);
-			CellView.style.SetBorder(Color.black);
-			CellView.style.overflow = Overflow.Visible;
-			CellView.style.right = new Length(0, LengthUnit.Percent);
+		
 			listView = root.AddListView(qdataList, (visual, y) =>
 			{
 				visual.Clear();
@@ -151,6 +145,13 @@ namespace QTool.FlowGraph
 				AutoSaveLoad = true;
 				CellView.style.display = DisplayStyle.None;
 			});
+			CellView = rootVisualElement.AddVisualElement();
+			CellView.style.position = Position.Absolute;
+			CellView.style.display = DisplayStyle.None;
+			CellView.style.backgroundColor = Color.Lerp(Color.black, Color.white, 0.3f);
+			CellView.style.SetBorder(Color.black);
+			CellView.style.overflow = Overflow.Visible;
+			CellView.style.right = new Length(0, LengthUnit.Percent);
 		}
 		#endregion
 		protected override void OnLostFocus()

@@ -441,12 +441,12 @@ namespace QTool
 									listView = foldout.contentContainer.AddListView(list, (element, index) =>
 									  {
 										  element.Clear();
-										  element.Add(name + index, list[index], typeInfo.ElementType, (value) =>
+										  var child= element.Add(name + index, list[index], typeInfo.ElementType, (value) =>
 										  {
 											  list[index] = value;
 											  changeEvent?.Invoke(list);
 										  }, customAttribute);
-										  element.AddMenu((menu) =>
+										  child.AddMenu((menu) =>
 										  {
 											  menu.menu.AppendAction("新增", action =>
 											  {
