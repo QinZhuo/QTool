@@ -616,11 +616,11 @@ namespace QTool
 		{
 			try
 			{
-				return (T)obj;
+				return (T)obj.AsType(typeof(T));
 			}
 			catch (Exception e)
 			{
-				Debug.LogError("强制转换" + typeof(T) + "[" + obj + "]出错 " + e);
+				Debug.LogError("转换" + typeof(T) + "[" + obj + "]出错 " + e);
 			}
 			return default;
 		}
