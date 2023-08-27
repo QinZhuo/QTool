@@ -630,7 +630,7 @@ namespace QTool
 			{
 				if (obj == null) return null;
 				var objType = obj.GetType();
-				if (objType.IsAssignableFrom(type))
+				if (objType.Is(type))
 				{
 					return obj;
 				}
@@ -660,13 +660,13 @@ namespace QTool
 						return gameObj.GetComponent(type);
 					}
 				}
-				return default;
+				return obj;
 			}
 			catch (Exception e)
 			{
 				Debug.LogError("强制转换" + type + "[" + obj + "]出错 " + e);
 			}
-			return default;
+			return obj;
 		}
 		/// <summary>
 		/// 设置时间并演出
