@@ -766,18 +766,18 @@ namespace QTool
 		public static Bounds GetBounds(this Component com)
 		{
 			var bounds = new Bounds(com.transform.position, Vector3.zero);
-			Renderer[] meshs = com.GetComponentsInChildren<Renderer>();
-			foreach (var mesh in meshs)
+			Renderer[] renderers = com.GetComponentsInChildren<Renderer>();
+			foreach (var renderer in renderers)
 			{
-				if (mesh is MeshRenderer || mesh is SpriteRenderer || mesh is SkinnedMeshRenderer)
+				if (renderer is MeshRenderer || renderer is SpriteRenderer || renderer is SkinnedMeshRenderer)
 				{
 					if (bounds.extents == Vector3.zero)
 					{
-						bounds = mesh.bounds;
+						bounds = renderer.bounds;
 					}
 					else
 					{
-						bounds.Encapsulate(mesh.bounds);
+						bounds.Encapsulate(renderer.bounds);
 					}
 				}
 			}
