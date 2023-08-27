@@ -315,12 +315,6 @@ namespace QTool
 			if (gameObject == null) return "";
 			return gameObject.name.SplitStartString("(").TrimEnd();
 		}
-
-		class QKeyParseData : QDataList<QKeyParseData>
-		{
-			public override string Key { get; set; }
-			public float Float;
-		}
 		public static Vector3 ToVector3(this Vector3Int vector3Int)
 		{
 			return new Vector3(vector3Int.x, vector3Int.y, vector3Int.z);
@@ -329,11 +323,6 @@ namespace QTool
 		{
 			if (value == null) return 0;
 			var key = value.ToString();
-			if (QKeyParseData.ContainsKey(key))
-			{
-				Debug.LogError("获取[" + key + "]:" + QKeyParseData.Get(key).Float);
-				return QKeyParseData.Get(key).Float;
-			}
 			if (value is string str)
 			{
 				if (string.IsNullOrWhiteSpace(str)) return 0;
