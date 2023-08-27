@@ -719,7 +719,6 @@ namespace QTool
 			}
 		}
 #endif
-
 		public static QPopupData Get(object obj, string funcKey)
 		{
 			Type type = null;
