@@ -96,12 +96,11 @@ namespace QTool
 			return new Vector3(random.Range(-1, 1f), random.Range(-1, 1f), random.Range(-1, 1f));
 		}
 		public static int MaxRandomTimes { get; set; } = 10;
-		public static void RandomRangeCreate<T>(this GameObject root, float range = 10, float centerOffset = 0, GameObject prefab = null, Action<GameObject> callBack = null) where T : Component
+		public static void RandomRangeCreate<T>(this GameObject root, GameObject prefab = null, float range = 10, float centerOffset = 0, Action<GameObject> callBack = null) where T : Component
 		{
 			var center = root == null ? UnityEngine.Vector3.zero : root.transform.position;
 			var is2D = prefab.GetComponent<Collider2D>() != null;
 			var radius = prefab.GetBounds().size.magnitude;
-
 			var creating = true;
 			var times = 0;
 			while (creating && times++ < MaxRandomTimes)
