@@ -733,21 +733,22 @@ namespace QTool.FlowGraph
 		}
 		public object GetValue(int Index=0)
 		{
+			System.Object value = null;
 			if (IsList)
 			{
-				if(Value is IList list)
+				if (Value is IList list)
 				{
 					if (list.Count > Index)
 					{
-						return list[Index];
+						value = list[Index];
 					}
 				}
-				return null;
 			}
 			else
 			{
-				return Value;
+				value = Value;
 			}
+			return value is QFlow ? null : value;
 		}
 	
 		public QFlowNode GetFlowNode(int index = 0)
