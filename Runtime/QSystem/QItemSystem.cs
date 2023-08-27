@@ -33,7 +33,7 @@ namespace QTool
 			}
 			public void TriggerEvent(string key)
 			{
-				if (Graph != null&& Graph[key] != null)
+				if (Graph != null && Graph.GetNode(key) != null)
 				{
 					Graph.Run(key);
 				}

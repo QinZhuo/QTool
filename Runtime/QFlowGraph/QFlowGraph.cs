@@ -29,7 +29,7 @@ namespace QTool.FlowGraph
 		public string ToInfoString(string startKey)
 		{
 			var info = "";
-			var node = this[startKey];
+			var node = GetNode(startKey);
 			if (node?.command != null)
 			{
 				info = node.ToInfoString();
@@ -70,22 +70,20 @@ namespace QTool.FlowGraph
         {
             Values[key] = value;
         }
-        public QFlowNode this[string key]
+		public object this[string key] { get => Values[key];set => Values[key] = value; }
+		public QFlowNode GetNode(string key)
 		{
-			get
-			{
-				if (key.IsNull()) return null;
+			if (key.IsNull()) return null;
 
-				if (NodeList.ContainsKey(key))
-				{
-					return NodeList[key];
-				}
-				else if(StartNode.ContainsKey(key))
-				{
-					return StartNode[key];
-				}
-				return null;
+			if (NodeList.ContainsKey(key))
+			{
+				return NodeList[key];
 			}
+			else if (StartNode.ContainsKey(key))
+			{
+				return StartNode[key];
+			}
+			return null;
 		}
 		public void Connect(PortId start, PortId end)
 		{
@@ -106,7 +104,7 @@ namespace QTool.FlowGraph
 		public QFlowPort GetPort(PortId? portId)
 		{
 			if (portId == null) return null;
-			return this[portId.Value.node]?.Ports[portId.Value.port];
+			return GetNode(portId.Value.node)?.Ports[portId.Value.port];
 		}
 		public object GetPortValue(PortId? portId)
 		{
@@ -207,7 +205,7 @@ namespace QTool.FlowGraph
 				Debug.LogError("运行流程图[" + Name + "]出错 不能在非运行时运行流程图");
 				yield break;
 			}
-			var curNode = this[startNode]; 
+			var curNode = GetNode(startNode); 
 			if (curNode != null)
 			{
 				while (curNode != null)
@@ -218,7 +216,7 @@ namespace QTool.FlowGraph
 					{
 						if (port.Value.port == QFlowKey.FromPort)
 						{
-							curNode = this[port.Value.node];
+							curNode = GetNode(port.Value.node);
 						}
 						else
 						{
@@ -750,15 +748,15 @@ namespace QTool.FlowGraph
 			}
 			return value is QFlow ? null : value;
 		}
-	
-		public QFlowNode GetConnectNode(int index = 0,bool onlyFlowNode=true)
+
+		public QFlowNode GetConnectNode(int index = 0, bool onlyFlowNode = true)
 		{
 			if (HasConnect(index))
 			{
 				var connectPortKey = this[index].GetConnectPortId(Node.Graph, onlyFlowNode);
 				if (connectPortKey != null)
 				{
-					return Node.Graph[connectPortKey.Value.node];
+					return Node.Graph.GetNode(connectPortKey.Value.node);
 				}
 			}
 			return null;

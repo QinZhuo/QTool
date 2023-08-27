@@ -173,7 +173,7 @@ namespace QTool.FlowGraph
 							Vector3 mouseDelta = data.mouseDelta; ;
 							node.transform.position += mouseDelta;
 							Vector2 pos = node.transform.position;
-							Graph[node.name].rect.position = pos - ViewOffset;
+							Graph.GetNode(node.name).rect.position = pos - ViewOffset;
 						}
 					}
 					else
@@ -181,7 +181,7 @@ namespace QTool.FlowGraph
 						ViewOffset += data.mouseDelta;
 						foreach (var node in NodeViewList)
 						{
-							node.transform.position = Graph[node.name].rect.position + ViewOffset;
+							node.transform.position = Graph.GetNode(node.name).rect.position + ViewOffset;
 						}
 					}
 				}
@@ -291,7 +291,7 @@ namespace QTool.FlowGraph
 					var nodeList = new List<QFlowNode>();
 					foreach (var node in SelectNodes.ToArray())
 					{
-						nodeList.AddCheckExist(Graph[node.name]);
+						nodeList.AddCheckExist(Graph.GetNode(node.name));
 					}
 					GUIUtility.systemCopyBuffer = nodeList.ToQData();
 				});
@@ -320,7 +320,7 @@ namespace QTool.FlowGraph
 		}
 		public void RemoveNodeView(VisualElement visual)
 		{
-			var node = Graph[visual.name];
+			var node = Graph.GetNode(visual.name);
 			foreach (var port in node.Ports)
 			{
 				for (int i = 0; i < port.ConnectInfolist.Count; i++)

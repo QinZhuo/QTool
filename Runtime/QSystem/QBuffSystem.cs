@@ -38,7 +38,7 @@ namespace QTool
 		[QName("效果")]
 		public virtual QFlowGraphAsset Effect { get => QTool.LoadAndCreate<QFlowGraphAsset>(nameof(QFlowGraph) + "/" + typeof(T).Name + "/" + Key); set { } }
 	}
-	public abstract class QBuffData<T>:QEffectData<T> where T: QBuffData<T>,IKey<string>,new()
+	public abstract class QBuffData<T> : QEffectData<T> where T : QBuffData<T>, IKey<string>, new()
 	{
 		[QName("叠加方式")]
 		public QBuffMergeMode Megre { get; protected set; } = QBuffMergeMode.时间叠层;
@@ -75,7 +75,7 @@ namespace QTool
 			}
 			public void TriggerEvent(string key)
 			{
-				if (Graph != null && Graph[key] != null)
+				if (Graph != null && Graph.GetNode(key) != null)
 				{
 					Graph.Run(key);
 				}
