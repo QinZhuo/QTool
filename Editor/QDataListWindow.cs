@@ -60,7 +60,13 @@ namespace QTool.FlowGraph
 			base.CreateGUI();	
 			var root = rootVisualElement.AddScrollView();
 			root.style.height = new Length(100, LengthUnit.Percent);
-			
+			CellView = rootVisualElement.AddVisualElement();
+			CellView.style.position = Position.Absolute;
+			CellView.style.display = DisplayStyle.None;
+			CellView.style.backgroundColor = Color.Lerp(Color.black, Color.white, 0.3f);
+			CellView.style.SetBorder(Color.black);
+			CellView.style.overflow = Overflow.Visible;
+			CellView.style.right = new Length(0, LengthUnit.Percent);
 			listView = root.AddListView(qdataList, (visual, y) =>
 			{
 				visual.Clear();
@@ -94,9 +100,6 @@ namespace QTool.FlowGraph
 							if (eventData.timestamp- lastCkickTime<500)
 							{
 								CellView.Clear();
-								var pos = label.GetWorldPosition();
-								CellView.style.left = root.scrollOffset.x+pos.x;
-								CellView.style.top = root.scrollOffset.y +pos.y;
 								CellView.style.width = new StyleLength(label.style.width.value.value * 2);
 								VisualElement view = null;
 								if (typeInfo == null || member == null)
@@ -143,11 +146,6 @@ namespace QTool.FlowGraph
 				layout.style.flexDirection = FlexDirection.Row;
 				return layout;
 			});
-			CellView = root.AddVisualElement();
-			CellView.style.position = Position.Absolute;
-			CellView.style.display = DisplayStyle.None;
-			CellView.style.backgroundColor = Color.Lerp(Color.black, Color.white, 0.3f);
-			CellView.style.SetBorder(Color.black);
 			root.RegisterCallback<MouseDownEvent>(data =>
 			{
 				AutoSaveLoad = true;
