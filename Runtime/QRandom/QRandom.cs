@@ -96,28 +96,26 @@ namespace QTool
 			return new Vector3(random.Range(-1, 1f), random.Range(-1, 1f), random.Range(-1, 1f));
 		}
 		public static int MaxRandomTimes { get; set; } = 10;
-		public static void RandomRangeCreate<T>(this GameObject root, float range = 10, float centerOffset = 0, GameObject prefab = null, [QName("创建数目")] int count = 1, Action<GameObject> callBack = null) where T : Component
+		public static void RandomRangeCreate<T>(this GameObject root, float range = 10, float centerOffset = 0, GameObject prefab = null, Action<GameObject> callBack = null) where T : Component
 		{
 			var center = root == null ? UnityEngine.Vector3.zero : root.transform.position;
 			var is2D = prefab.GetComponent<Collider2D>() != null;
 			var radius = prefab.GetBounds().size.magnitude;
-			for (int i = 0; i < count; i++)
+
+			var creating = true;
+			var times = 0;
+			while (creating && times++ < MaxRandomTimes)
 			{
-				var creating = true;
-				var times = 0;
-				while (creating && times++ < MaxRandomTimes)
+				var dir = DefaultRandom.Vector2();
+				var offset = dir.normalized * centerOffset + dir * (range - centerOffset);
+				var position = center + (is2D ? offset : new Vector3(offset.x, 0, offset.y));
+				var other = is2D ? ((Vector2)position).OverlapCircle<T>(radius) : new Ray(position + UnityEngine.Vector3.up, UnityEngine.Vector3.down).RayCast<T>(radius);
+				if (other == null)
 				{
-					var dir = QRandom.DefaultRandom.Vector2();
-					var offset = dir.normalized * centerOffset + dir * (range - centerOffset);
-					var position = center + (is2D ? offset : new Vector3(offset.x, 0, offset.y));
-					var other = is2D ? ((Vector2)position).OverlapCircle<T>(radius) : new Ray(position + UnityEngine.Vector3.up, UnityEngine.Vector3.down).RayCast<T>(radius);
-					if (other == null)
-					{
-						var newObject = prefab.CheckInstantiate();
-						newObject.transform.position = position;
-						callBack?.Invoke(newObject);
-						creating = false;
-					}
+					var newObject = prefab.CheckInstantiate();
+					newObject.transform.position = position;
+					callBack?.Invoke(newObject);
+					creating = false;
 				}
 			}
 		}
