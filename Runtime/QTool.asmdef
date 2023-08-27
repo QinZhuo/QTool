@@ -8,7 +8,8 @@
         "GUID:6806a62c384838046a3c66c44f06d75f",
         "GUID:75469ad4d38634e559750d17036d5f7c",
         "GUID:df380645f10b7bc4b97d4f5eb6303d95",
-        "GUID:68bd7fdb68ef2684e982e8a9825b18a5"
+        "GUID:68bd7fdb68ef2684e982e8a9825b18a5",
+        "GUID:caccfbdb442cdc64fa722b4c5585521f"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
@@ -32,6 +33,11 @@
             "name": "com.rlabrecque.steamworks.net",
             "expression": "",
             "define": "Steamworks"
+        },
+        {
+            "name": "com.unity.2d.spriteshape",
+            "expression": "",
+            "define": "SpriteShap"
         }
     ],
     "noEngineReferences": false
