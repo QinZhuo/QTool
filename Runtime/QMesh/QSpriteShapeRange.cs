@@ -27,8 +27,6 @@ namespace QTool
 		{
 			var left = Vector2.left * width/2;
 			var right = Vector2.right * width/2;
-			var start = left + Vector2.up * distance;
-			var end = right + Vector2.up * distance;
 			var index = 0;
 			Controller.spline.Clear();
 			try
@@ -37,6 +35,8 @@ namespace QTool
 				{
 					case Shape.矩形:
 						{
+							var start = left + Vector2.up * distance;
+							var end = right + Vector2.up * distance;
 							Controller.spline.InsertPointAt(index++, left);
 							Controller.spline.InsertPointAt(index++, start);
 							Controller.spline.InsertPointAt(index++, end);
@@ -46,8 +46,8 @@ namespace QTool
 					case Shape.扇形:
 						{
 							Controller.spline.InsertPointAt(index++, Vector2.zero);
-							var endAngle = Vector2.Angle(start, end);
-							var dir = (Vector2.up * Mathf.Max(distance, width / 2)).Rotate(-endAngle / 2);
+							var endAngle = Mathf.Atan2(width/2, distance) / Mathf.PI * 360 *2;
+							var dir = (Vector2.up * distance).Rotate(-endAngle / 2);
 							for (float angle = 0; angle <= endAngle; angle += 5)
 							{
 								Controller.spline.InsertPointAt(index++, dir.Rotate(angle));
