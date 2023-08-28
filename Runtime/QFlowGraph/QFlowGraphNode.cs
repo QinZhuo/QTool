@@ -193,6 +193,10 @@ namespace QTool.FlowGraph
 		public static IEnumerator Trigger(QFlowNode This, [QName("起点"), QInputPort("起点")] Transform start, [QName("目标"), QInputPort("目标")] Transform target, [QName("预制体"),QPopup(nameof(Resources)+"/"+nameof(QTrigger))] string prefabKey, [QName("触发"), QFlowPort, QOutputPort] Transform triggerObject)
 		{
 			var prefab = Resources.Load<GameObject>(nameof(QTrigger) + "/" + prefabKey);
+			if (prefab == null)
+			{
+				Debug.LogError("不存在[" + nameof(Resources) + "/" + nameof(QTrigger) + "/" + prefabKey + "]触发器预制体");
+			}
 			var trigger = prefab.CheckInstantiate()?.GetComponent<QTrigger>();
 			if (start != null)
 			{
