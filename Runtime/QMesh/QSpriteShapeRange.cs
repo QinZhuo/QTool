@@ -10,6 +10,7 @@ namespace QTool
 	{
 		public SpriteShapeController Controller => _Controller ??= GetComponent<SpriteShapeController>();
 		private SpriteShapeController _Controller;
+		public SpriteShapeRenderer Renderer => Controller.spriteShapeRenderer;
 		[QName("形状")]
 		public Shape shape = Shape.矩形;
 		[QName("距离")]
@@ -22,11 +23,10 @@ namespace QTool
 			扇形,
 			圆形,
 		}
-
-		private void OnValidate()
+		public void FreshShape()
 		{
-			var left = Vector2.left * width/2;
-			var right = Vector2.right * width/2;
+			var left = Vector2.left * width / 2;
+			var right = Vector2.right * width / 2;
 			var index = 0;
 			Controller.spline.Clear();
 			try
@@ -46,7 +46,7 @@ namespace QTool
 					case Shape.扇形:
 						{
 							Controller.spline.InsertPointAt(index++, Vector2.zero);
-							var endAngle = Mathf.Atan2(width/2, distance) / Mathf.PI * 360 *2;
+							var endAngle = Mathf.Atan2(width / 2, distance) / Mathf.PI * 360 * 2;
 							var dir = (Vector2.up * distance).Rotate(-endAngle / 2);
 							for (float angle = 0; angle <= endAngle; angle += 5)
 							{
@@ -74,6 +74,10 @@ namespace QTool
 			{
 				QDebug.LogWarning(e);
 			}
+		}
+		private void OnValidate()
+		{
+			FreshShape();
 		}
 	}
 }
