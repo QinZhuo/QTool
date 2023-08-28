@@ -136,7 +136,7 @@ namespace QTool
 		public static PopupField<string> AddQPopupAttribute(this VisualElement root, QPopupAttribute att, object obj, Action<object> changeEvent = null)
 		{
 			var str = obj.ToKeyString();
-			var data = QPopupData.Get(obj?.GetType(), att.getListFuncs);
+			var data = QPopupData.Get(obj, att.getListFuncs);
 			return root.AddPopup("", data.List, str, (value) =>
 			{
 				changeEvent(value);
@@ -706,6 +706,7 @@ namespace QTool
 			if (getListFuncs.Length>0)
 			{
 				drawer.List.Clear();
+				drawer.List.Add("\t");
 				foreach (var getListFunc in getListFuncs)
 				{
 					if (getListFunc.StartsWith(nameof(Resources) + "/"))
