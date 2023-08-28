@@ -68,11 +68,11 @@ namespace QTool
 	[AttributeUsage(AttributeTargets.Field | AttributeTargets.Property | AttributeTargets.Parameter)]
 	public class QPopupAttribute : PropertyAttribute
 	{
-		public string funcKey;
-		public QPopupAttribute(string GetKeyListFunc = "")
+		public string[] getListFuncs = new string[0];
+		public QPopupAttribute(params string[] getListFunc)
 		{
 			order = 1;
-			this.funcKey = GetKeyListFunc;
+			this.getListFuncs = getListFunc;
 		}
 	}
 }
@@ -112,15 +112,15 @@ namespace QTool.Inspector
 	[AttributeUsage(AttributeTargets.Field)]
     public class QToolbarAttribute : QNameAttribute
     {
-        public string getList;
+        public string getListFunc;
         public int pageSize= 0;
-        public QToolbarAttribute( string getList="", string showControl = "",int pageSize =0) : base("", showControl)
+        public QToolbarAttribute( string getListFunc="", string showControl = "",int pageSize =0) : base("", showControl)
         {
-            this.getList = getList;
+            this.getListFunc = getListFunc;
 			this.pageSize = pageSize;
             if (name.IsNull())
             {
-                name = getList;
+                name = getListFunc;
             }
         }
     }
@@ -318,7 +318,7 @@ namespace QTool.Inspector
 	{
 		public override VisualElement CreatePropertyGUI(SerializedProperty property)
 		{
-			var popupData = QPopupData.Get(property, (attribute as QPopupAttribute).funcKey);
+			var popupData = QPopupData.Get(property, (attribute as QPopupAttribute).getListFuncs);
 			var value = property.propertyType == SerializedPropertyType.String ? property.stringValue : property.objectReferenceValue?.GetType()?.Name;
 			var visual = new PopupField<string>(property.QName(), popupData.List, value);
 			visual.RegisterCallback<ChangeEvent<string>>(data =>
@@ -366,7 +366,7 @@ namespace QTool.Inspector
 		public static void Draw(QToolbarAttribute toolbar, Rect position, SerializedProperty property, GUIContent label)
 		{
 			position.height = Height;
-			var listData = QPopupData.Get(property, toolbar.getList);
+			var listData = QPopupData.Get(property, toolbar.getListFunc);
 			if (listData.List.Count == 0)
 			{
 				GUI.Toolbar(position, 0, new string[] { "无" + toolbar.name });
@@ -418,7 +418,7 @@ namespace QTool.Inspector
 		public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
 		{
 			var toolbar = (attribute as QToolbarAttribute);
-			return property.IsShow() ? (toolbar.pageSize > 0 && QPopupData.Get(property, toolbar.getList).List.Count > toolbar.pageSize ? Height + 20 : Height) : 0;
+			return property.IsShow() ? (toolbar.pageSize > 0 && QPopupData.Get(property, toolbar.getListFunc).List.Count > toolbar.pageSize ? Height + 20 : Height) : 0;
 		}
 	}
 #endregion

@@ -117,8 +117,12 @@ namespace QTool
 	
 		public static PopupField<T> AddPopup<T>(this VisualElement root, string label, List<T> choices, T defaultValue, Action<T> changeEvent = null)
 		{
-			if (!choices.Contains(defaultValue))
+			if (defaultValue == null)
 			{
+				defaultValue = (T)typeof(T).CreateInstance();
+			}
+			if (!choices.Contains(defaultValue))
+			{ 
 				choices.Add(defaultValue);
 			}
 			var visual = new PopupField<T>(label, choices, defaultValue);
@@ -132,7 +136,7 @@ namespace QTool
 		public static PopupField<string> AddQPopupAttribute(this VisualElement root, QPopupAttribute att, object obj, Action<object> changeEvent = null)
 		{
 			var str = obj.ToKeyString();
-			var data = QPopupData.Get(obj?.GetType(), att.funcKey);
+			var data = QPopupData.Get(obj?.GetType(), att.getListFuncs);
 			return root.AddPopup("", data.List, str, (value) =>
 			{
 				changeEvent(value);
@@ -675,51 +679,8 @@ namespace QTool
 		static QDictionary<string, QPopupData> DrawerDic = new QDictionary<string, QPopupData>((key) => new QPopupData());
 
 		public List<string> List = new List<string>();
-		public int SelectIndex = 0;
-		public string SelectValue
-		{
-			get
-			{
-				if (SelectIndex >= 0 && SelectIndex < List.Count)
-				{
-					return List[SelectIndex] == "null" ? null : List[SelectIndex];
-				}
-				else
-				{
-					if (SelectIndex < 0)
-					{
-						SelectIndex = 0;
-					}
-					return default;
-				}
-			}
-		}
-
-		public void UpdateList(string key)
-		{
-			if (key == "null" || key.IsNull())
-			{
-				SelectIndex = 0;
-			}
-			else
-			{
-				SelectIndex = List.FindIndex((obj) => obj == key);
-			}
-		}
-#if UNITY_EDITOR
-		public static QPopupData Get(UnityEditor.SerializedProperty property, string funcKey)
-		{
-			if (property.propertyType == UnityEditor.SerializedPropertyType.ObjectReference)
-			{
-				return Get(QReflection.ParseType(property.type.SplitEndString("PPtr<$").TrimEnd('>')), funcKey);
-			}
-			else
-			{
-				return Get((object)property, funcKey);
-			}
-		}
-#endif
-		public static QPopupData Get(object obj, string funcKey)
+	
+		public static QPopupData Get(object obj, params string[] getListFuncs)
 		{
 			Type type = null;
 			if (obj is Type)
@@ -730,31 +691,39 @@ namespace QTool
 			{
 				type = obj?.GetType();
 			}
-			var drawerKey = funcKey;
+			var drawerKey = getListFuncs.ToOneString(" ");
 			if (drawerKey.IsNull())
 			{
 #if UNITY_EDITOR
 				if (obj is UnityEditor.SerializedProperty property)
 				{
-					drawerKey = property.propertyType + "_" + property.name;
+					type = QReflection.ParseType(property.type.SplitEndString("PPtr<$").TrimEnd('>'));
 				}
-				else
 #endif
-				{
-					drawerKey = type + "";
-				}
+				drawerKey = type?.ToString();
 			}
 			var drawer = DrawerDic[drawerKey];
-			if (!funcKey.IsNull())
+			if (getListFuncs.Length>0)
 			{
-				if (obj?.InvokeFunction(funcKey) is IList itemList)
+				drawer.List.Clear();
+				foreach (var getListFunc in getListFuncs)
 				{
-					if (drawer.List.Count != itemList.Count)
-					{
-						drawer.List.Clear();
-						foreach (var item in itemList)
+					if (getListFunc.StartsWith(nameof(Resources) + "/"))
+					{ 
+						var assets= Resources.LoadAll(getListFunc.SplitEndString(nameof(Resources)+"/"));
+						foreach (var asset in assets)
 						{
-							drawer.List.Add(item.ToKeyString());
+							drawer.List.Add(asset.name); 
+						}
+					}
+					else
+					{ 
+						if (obj?.InvokeFunction(getListFunc) is IList itemList)
+						{
+							foreach (var item in itemList)
+							{
+								drawer.List.Add(item.ToKeyString());
+							}
 						}
 					}
 				}
@@ -796,12 +765,8 @@ namespace QTool
 #endif
 				else
 				{
-					Debug.LogError("错误函数[" + funcKey + "]");
+					Debug.LogError("错误函数[" + getListFuncs.ToOneString(" ") + "]");
 				}
-			}
-			if (drawer.List.Count <= 0)
-			{
-				drawer.List.AddCheckExist("null");
 			}
 			return drawer;
 		}

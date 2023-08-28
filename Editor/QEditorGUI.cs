@@ -119,32 +119,6 @@ namespace QTool
 			}
 			return ir;
 		}
-		public static object Draw(this QPopupAttribute att, object obj)
-		{
-			var str = obj.ToKeyString();
-#if UNITY_EDITOR
-			using (new GUILayout.HorizontalScope())
-			{
-				var data = QPopupData.Get(obj?.GetType(), att.funcKey);
-				data.UpdateList(str);
-				if (data.SelectIndex < 0)
-				{
-					data.SelectIndex = 0;
-					str = data.SelectValue;
-				}
-				var newIndex = EditorGUILayout.Popup(data.SelectIndex, data.List.ToArray());
-				if (newIndex != data.SelectIndex)
-				{
-					data.SelectIndex = newIndex;
-					if (data.SelectIndex >= 0)
-					{
-						str = data.SelectValue;
-					}
-				}
-			}
-#endif
-			return str;
-		}
 		public static object Draw(this object obj, string name, Type type = null, ICustomAttributeProvider customAttribute = null, Func<int, object, string, Type, object> DrawElement = null, Action<int, int> IndexChange = null)
 		{
 			var hasName = !string.IsNullOrWhiteSpace(name);
@@ -211,15 +185,7 @@ namespace QTool
 				case TypeCode.Double:
 					obj = EditorGUILayout.DoubleField(name, (double)obj); break;
 				case TypeCode.String:
-					var enumView = customAttribute?.GetAttribute<QPopupAttribute>();
-					if (enumView != null)
-					{
-						obj = enumView.Draw(obj); break;
-					}
-					else
-					{
-						obj = EditorGUILayout.TextField(name, obj?.ToString()); break;
-					}
+					obj = EditorGUILayout.TextField(name, obj?.ToString()); break;
 				case TypeCode.Object:
 					switch (typeInfo.ObjType)
 					{

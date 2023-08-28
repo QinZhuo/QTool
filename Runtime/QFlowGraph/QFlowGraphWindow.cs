@@ -387,7 +387,7 @@ namespace QTool.FlowGraph
 					var dot = AddDotView(row,GetColor(port), port.GetPortId());
 					if (port.IsShowValue())
 					{
-						row.Add(port.ViewName, port.Value, port.ValueType, newValue => port.Value = newValue)
+						row.Add(port.ViewName, port.Value, port.ValueType, newValue => port.Value = newValue,port.parameterInfo)
 							.RegisterCallback<MouseEnterEvent>(ValueMouseEnterEvent);
 					}
 					else
