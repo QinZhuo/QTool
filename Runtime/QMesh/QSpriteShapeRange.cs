@@ -12,8 +12,8 @@ namespace QTool
 		private SpriteShapeController _Controller;
 		[QName("形状")]
 		public Shape shape = Shape.矩形;
-		[QName("长度")]
-		public float length = 2;
+		[QName("距离")]
+		public float distance = 2;
 		[QName("宽度")]
 		public float width = 1;
 		public enum Shape
@@ -25,10 +25,10 @@ namespace QTool
 
 		private void OnValidate()
 		{
-			var left = Vector2.left * width;
-			var right = Vector2.right * width;
-			var start = left + Vector2.up * length;
-			var end = right + Vector2.up * length;
+			var left = Vector2.left * width/2;
+			var right = Vector2.right * width/2;
+			var start = left + Vector2.up * distance;
+			var end = right + Vector2.up * distance;
 			var index = 0;
 			Controller.spline.Clear();
 			try
@@ -46,20 +46,19 @@ namespace QTool
 					case Shape.扇形:
 						{
 							Controller.spline.InsertPointAt(index++, Vector2.zero);
-							Controller.spline.InsertPointAt(index++, start);
 							var endAngle = Vector2.Angle(start, end);
-							for (float angle = 5; angle < endAngle; angle += 5)
+							var dir = (Vector2.up * Mathf.Max(distance, width / 2)).Rotate(-endAngle / 2);
+							for (float angle = 0; angle <= endAngle; angle += 5)
 							{
-								Controller.spline.InsertPointAt(index++, start.Rotate(angle));
+								Controller.spline.InsertPointAt(index++, dir.Rotate(angle));
 								Controller.spline.SetTangentMode(index - 1, ShapeTangentMode.Continuous);
 							}
-							Controller.spline.InsertPointAt(index++, end);
 							Controller.spline.InsertPointAt(index++, Vector2.zero);
 						}
 						break;
 					case Shape.圆形:
 						{
-							var dir = Vector2.up * Mathf.Max(length, width) / 2;
+							var dir = Vector2.up * Mathf.Max(distance, width / 2);
 							for (float angle = 0; angle < 360; angle += 5)
 							{
 								Controller.spline.InsertPointAt(index++, dir.Rotate(angle));
