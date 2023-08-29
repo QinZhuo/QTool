@@ -36,7 +36,11 @@ namespace QTool
                 return view;
             }
         }
-        public virtual void Clear()
+		private void OnTransformChildrenChanged()
+		{
+			objList.RemoveAll(obj => obj.transform.parent != transform);
+		}
+		public virtual void Clear()
         {
             for (int i = objList.Count - 1; i >= 0; i--)
             {
