@@ -9,7 +9,7 @@ namespace QTool
 	{
 		public Transform Start { get; set; }
 		public Transform Target { get; set; }
-		public QFlowGraph Graph { get; set; }
+		public QFlowNode Node { get; set; }
 		public abstract IEnumerator Run(Action<Transform> action);
 	}
 }
