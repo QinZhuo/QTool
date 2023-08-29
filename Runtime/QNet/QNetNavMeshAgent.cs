@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.AI;
 namespace QTool.Net
 {
-	[DisallowMultipleComponent,RequireComponent(typeof(CharacterController))]
+	[DisallowMultipleComponent]
 	public class QNetNavMeshAgent : QNetBehaviour
 	{
 		[QSyncVar(true)]
@@ -12,12 +12,26 @@ namespace QTool.Net
 			get => transform.position;
 			set => transform.position = value;
 		}
-		private CharacterController _Controller;
-		public CharacterController Controller => _Controller ??= GetComponent<CharacterController>();
-		public bool IsGrounded => Controller.isGrounded;
+		public CharacterController Controller;
+
+		public virtual bool IsGrounded => Controller==null|| Controller.isGrounded;
 		public CollisionFlags Move(Vector3 speed)
 		{
-			return Controller.Move(speed);
+			if (Controller == null)
+			{
+				transform.Translate(speed);
+				return CollisionFlags.None;
+			}
+			else
+			{
+				return Controller.Move(speed);
+			}
+		}
+		public NavMeshPath Path { get; private set; }
+		public bool FindPath(Vector3 target)
+		{
+			if (Path == null) Path = new NavMeshPath();
+			return NavMesh.CalculatePath(transform.position, target, NavMesh.AllAreas, Path);
 		}
 		public override void OnNetUpdate()
 		{
