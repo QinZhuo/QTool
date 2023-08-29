@@ -138,6 +138,11 @@ namespace QTool
 			Toolbar.style.flexDirection = FlexDirection.Row;
 			QPlayerPrefs.Get(typeof(T).Name + "_" + nameof(FilePathList), FilePathList);
 			FilePathList.RemoveAll(path => !path.Replace('/', '\\').ExistsFile());
+			while (FilePathList.Count > 10)
+			{
+				FilePathList.Dequeue();
+			}
+			QPlayerPrefs.Set(typeof(T).Name + "_" + nameof(FilePathList), FilePathList);
 			PathPopup = Toolbar.AddPopup("", FilePathList, FilePath.Replace('/', '\\'), path => { OnLostFocus(); FilePath = path.Replace('\\', '/'); if (!FilePath.ExistsFile()) Data = "";  OnFocus(); });
 			Toolbar.AddButton("撤销", Undo);
 		}
