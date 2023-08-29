@@ -32,7 +32,7 @@ namespace QTool.Net
 		{
 			if (Path == null)
 			{
-				NavMeshPath Path = new NavMeshPath();
+				Path = new NavMeshPath();
 			}
 			else if (Path.status == NavMeshPathStatus.PathComplete && target.Similar(Path.corners.StackPeek()) && transform.position.Similar(Path.corners.QueuePeek()))
 			{
