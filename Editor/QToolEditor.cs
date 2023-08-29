@@ -116,14 +116,14 @@ namespace QTool
 		{
 			Debug.LogError(nameof(QId) + "信息 \n" + QId.InstanceIdList.ToOneString());
 		}
-		[MenuItem("QTool/测试/QPool对象池信息")]
-		public static void QPoolInfo()
-		{
-			foreach (var pool in QPoolManager.Pools)
-			{
-				Debug.LogError(pool.Value);
-			}
-		}
+		//[MenuItem("QTool/测试/QPool对象池信息")]
+		//public static void QPoolInfo()
+		//{
+		//	foreach (var pool in QPoolManager.Pools)
+		//	{
+		//		Debug.LogError(pool.Value);
+		//	}
+		//}
 		[MenuItem("QTool/测试/运行测试包")]
 		private static void RunBuild()
 		{

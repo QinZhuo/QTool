@@ -36,45 +36,7 @@ namespace QTool.Asset
 	{
 		public static GameObject PoolGet(string key, Transform parent = null)
 		{
-			var pool = QPoolManager.GetPool(DirectoryPath + "_" + key, Load(key));
-			if (pool == null)
-			{
-				Debug.LogError("无法实例化预制体[" + key + "]");
-				return null;
-			}
-			try
-			{
-				var obj = pool.Get();
-				if (obj == null)
-				{
-					return null;
-				}
-				if (parent != null)
-				{
-					obj.transform.SetParent(parent, false);
-				}
-				obj.name = key;
-				return obj;
-			}
-			catch (Exception e)
-			{
-				Debug.LogError("尝试获取对象【"+key+"】出错 :" + e);
-				return null;
-			}
-		}
-		public static void PoolPush(string key, GameObject obj)
-		{
-			if (key.Contains(" "))
-			{
-				key = key.Substring(0, key.IndexOf(" "));
-			}
-			var pool= QPoolManager.GetPool<GameObject>(DirectoryPath + "_" + key) as GameObjectPool;
-			if (pool == null)
-			{
-				Debug.LogError("不存在对象池【" + DirectoryPath + "_" + key + "】");
-				return;
-			}
-			pool.Push(obj);
+			return QPoolManager.Get(DirectoryPath + "_" + key, Load(key), parent);
 		}
 	}
 }

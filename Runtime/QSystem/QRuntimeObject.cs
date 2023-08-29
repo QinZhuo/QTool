@@ -5,7 +5,7 @@ using QTool.Reflection;
 using System;
 namespace QTool
 {
-	public abstract class QRuntime<RuntimeT,DataT>:QPoolObject<RuntimeT> where RuntimeT:QRuntime<RuntimeT,DataT>,new() where DataT : QDataList<DataT>, new()
+	public abstract class QRuntime<RuntimeT, DataT> : IQPoolObject where RuntimeT : QRuntime<RuntimeT, DataT>, new() where DataT : QDataList<DataT>, new()
 	{
 		public string Key { get; protected set; }
 		public override string ToString()
@@ -16,13 +16,9 @@ namespace QTool
 		protected QRuntime() { }
 		public static RuntimeT Get(string key)
 		{
-			var t= Get();
+			var t = QPoolManager.Get(typeof(RuntimeT).FullName, () => new RuntimeT());
 			t.Init(key);
 			return t;
-		}
-		public override void OnDestroy()
-		{
-			
 		}
 		protected virtual void Init(string key)
 		{
@@ -48,6 +44,12 @@ namespace QTool
 				}
 			}
 		}
+
+		public virtual void OnDestroy()
+		{
+			Key = "";
+			Data = null;
+		}
 	}
 	
 	public abstract class QRuntimeObject<RuntimeT, DataT> : MonoBehaviour,IQPoolObject where RuntimeT : QRuntime<RuntimeT, DataT>, new() where DataT : QDataList<DataT>, new()
@@ -58,9 +60,10 @@ namespace QTool
 			get
 			{
 				if (this == null) return null;
-				if (_Runtime == null)
+				var name = gameObject.QName();
+				if (_Runtime == null && QDataList<DataT>.ContainsKey(name))
 				{
-					Runtime = QRuntime<RuntimeT, DataT>.Get(gameObject.QName());
+					Runtime = QRuntime<RuntimeT, DataT>.Get(name);
 				}
 				return _Runtime;
 			}
@@ -77,22 +80,30 @@ namespace QTool
 		public QDictionary<string, QRuntimeValue> RuntimeValues { get; private set; } = new QDictionary<string, QRuntimeValue>();
 		public DataT Data => Runtime?.Data;
 		public event Action<string> OnValueChange = null;
-		public virtual void Start()
+		public virtual void Awake()
+		{
+
+			InitRuntimeValues();
+		}
+		public void InitRuntimeValues()
 		{
 			var runtime = Runtime;
-			runtime.ForeachMember(null, (member) =>
-			 {
-				 if (member.Type.Is(typeof(QRuntimeValue)))
-				 {
-					 var runtimeValue = member.Get(runtime).As<QRuntimeValue>();
-					 runtimeValue.Name = member.QName;
-					 RuntimeValues[member.QName] = runtimeValue;
-					 runtimeValue.OnValueChange += (key, value) =>
-					 {
-						 OnValueChange?.Invoke(key);
-					 };
-				 }
-			 });
+			if (runtime != null)
+			{
+				runtime.ForeachMember(null, (member) =>
+				{
+					if (member.Type.Is(typeof(QRuntimeValue)))
+					{
+						var runtimeValue = member.Get(runtime).As<QRuntimeValue>();
+						runtimeValue.Name = member.QName;
+						RuntimeValues[member.QName] = runtimeValue;
+						runtimeValue.OnValueChange += (key, value) =>
+						{
+							OnValueChange?.Invoke(key);
+						};
+					}
+				});
+			}
 		}
 		public virtual void OnDestroy()
 		{

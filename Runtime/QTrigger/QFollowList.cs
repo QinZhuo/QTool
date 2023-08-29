@@ -10,7 +10,7 @@ namespace QTool
 		public QObjectList ObjectList => _ObjectList ??= GetComponent<QObjectList>();
 		public void Push(GameObject obj)
 		{
-			ObjectList.Push(obj);
+			ObjectList.Release(obj);
 		}
 		public void FreshPosition()
 		{

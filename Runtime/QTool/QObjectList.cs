@@ -6,12 +6,8 @@ namespace QTool
 {
     public class QObjectList : MonoBehaviour
     {
-		[UnityEngine.Serialization.FormerlySerializedAs("viewPrefab")]
+		[QName("预制体")]
         public GameObject prefab;
-		public GameObjectPool Pool
-        {
-            get=> QPoolManager.GetPool(nameof(QObjectList) + "_" + prefab.name, prefab);
-		}
         public List<GameObject> objList{ get; private set; }= new List<GameObject>();
 
         public virtual GameObject this[string name]
@@ -27,16 +23,8 @@ namespace QTool
                 var view = (trans != null && trans.gameObject.activeSelf) ? trans.gameObject : null;
                 if (view == null)
                 {
-                    if (trans != null)
-                    {
-                        view = Pool.Get(trans.gameObject);
-                    }
-                    else
-                    {
-                        view = Pool.Get();
-                    }
-
-                    view.transform.SetParent(transform, false);
+					view = QPoolManager.Get(prefab);
+					view.transform.SetParent(transform, false);
                     view.transform.localScale = Vector3.one;
                     view.transform.localRotation = Quaternion.identity;
                     view.transform.SetAsLastSibling();
@@ -53,7 +41,7 @@ namespace QTool
             for (int i = objList.Count - 1; i >= 0; i--)
             {
                 var view = objList[i];
-                Push(view);
+                Release(view);
             }
             OnClear?.Invoke();
         }
@@ -65,10 +53,10 @@ namespace QTool
                 return _count;
             }
         }
-        public void Push(GameObject view)
+        public void Release(GameObject view)
         {
             _count--;
-            Pool.Push(view);
+			view.gameObject.PoolRelease();
             objList.Remove(view);
             OnPush?.Invoke(view);
         }

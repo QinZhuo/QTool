@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using QTool;
 using QTool.Inspector;
+using UnityEngine.Pool;
+
 public class QPoolTest : MonoBehaviour
 {
 	[QToggle("使用对象池")]
@@ -17,7 +19,7 @@ public class QPoolTest : MonoBehaviour
 		Application.targetFrameRate = 60;
 		Pool= QPoolManager.GetPool("测试Pool", prefab);
 	}
-	public QObjectPool<GameObject> Pool;
+	public ObjectPool<GameObject> Pool;
 	private void FixedUpdate()
 	{
 		if (count >= 10)
@@ -26,7 +28,7 @@ public class QPoolTest : MonoBehaviour
 			{
 				if (usePool)
 				{
-					Pool.Push(item);
+					Pool.Release(item);
 				}
 				else
 				{

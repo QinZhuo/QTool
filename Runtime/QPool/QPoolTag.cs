@@ -6,7 +6,7 @@ namespace QTool
 	public class QPoolTag : MonoBehaviour
 	{
 		[QName("对象池"), QReadonly, SerializeField]
-		internal string poolKey = "";
+		internal string poolName = "";
 	}
 
 }

@@ -68,9 +68,11 @@ namespace QTool
 			}
 			public override void OnDestroy()
 			{
+				base.OnDestroy();
 				if (Graph != null)
 				{
 					Graph.UnRegisterValue(this);
+					Graph = null;
 				}
 			}
 			public void TriggerEvent(string key)
