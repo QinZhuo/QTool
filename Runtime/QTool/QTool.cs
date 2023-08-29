@@ -759,6 +759,19 @@ namespace QTool
 			float d = Vector3.Dot(planePoint - ray.origin, planeNormal) / Vector3.Dot(ray.direction, planeNormal);
 			return d * ray.direction + ray.origin;
 		}
+		public static Bounds MultiplyBounds(this Matrix4x4 mat, Bounds bounds)
+		{
+			var absAxisX = Abs(mat.MultiplyVector(Vector3.right));
+			var absAxisY = Abs(mat.MultiplyVector(Vector3.up));
+			var absAxisZ = Abs(mat.MultiplyVector(Vector3.forward));
+			var worldPosition = mat.MultiplyPoint(bounds.center);
+			var worldSize = absAxisX * bounds.size.x + absAxisY * bounds.size.y + absAxisZ * bounds.size.z;
+			return new Bounds(worldPosition, worldSize);
+		}
+		public static Vector3 Abs(this Vector3 v)
+		{
+			return new Vector3(Mathf.Abs(v.x), Mathf.Abs(v.y), Mathf.Abs(v.z));
+		}
 		public static Bounds GetBounds(this GameObject obj)
 		{
 			return obj.transform.GetBounds();
@@ -789,7 +802,39 @@ namespace QTool
 			return bounds;
 		}
 
-	
+		private static QDictionary<uint, Mesh> Collider2DMeshCache = new QDictionary<uint, Mesh>();
+		public static Mesh GetMesh(this Collider2D collider)
+		{
+			uint hash = collider.GetShapeHash();
+			if (!Collider2DMeshCache.ContainsKey(hash))
+			{
+				Collider2DMeshCache[hash] = collider.CreateMesh(false, false);
+			}
+			return Collider2DMeshCache[hash];
+		}
+		private static QDictionary<Sprite, Mesh> SpriteMeshCache = new QDictionary<Sprite, Mesh>();
+		public static Mesh GetMesh(this Sprite sprite)
+		{
+			if (!SpriteMeshCache.ContainsKey(sprite))
+			{
+				var mesh = new Mesh();
+				Vector3[] vert = new Vector3[sprite.vertices.Length];
+				for (int i = 0; i < sprite.vertices.Length; i++)
+				{
+					vert[i] = new Vector3(sprite.vertices[i].x, sprite.vertices[i].y, 0);
+				}
+				mesh.vertices = vert;
+				mesh.uv = sprite.uv;
+				int[] tri = new int[sprite.triangles.Length];
+				for (int i = 0; i < sprite.triangles.Length; i++)
+				{
+					tri[i] = sprite.triangles[i];
+				}
+				mesh.triangles = tri;
+				SpriteMeshCache[sprite] = mesh;
+			}
+			return SpriteMeshCache[sprite];
+		}
 		public static bool Similar(this float value, float other, float scale)
 		{
 			return Mathf.Abs(value - other) < scale;
