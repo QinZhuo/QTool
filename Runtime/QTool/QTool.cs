@@ -617,6 +617,10 @@ namespace QTool
 		{
 			try
 			{
+				if (Equals(obj, null))
+				{
+					return default;
+				}
 				return (T)obj.AsType(typeof(T));
 			}
 			catch (Exception e)
