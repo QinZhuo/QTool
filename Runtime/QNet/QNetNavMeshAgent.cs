@@ -34,7 +34,11 @@ namespace QTool.Net
 			{
 				target = MeshHit.position;
 			}
-			if (Path.status== NavMeshPathStatus.PathComplete&&target == Path.corners.StackPeek())
+			if (Path == null)
+			{
+				NavMeshPath Path = new NavMeshPath();
+			}
+			else if (Path.status == NavMeshPathStatus.PathComplete && target == Path.corners.StackPeek())
 			{
 				return true;
 			}
@@ -55,7 +59,6 @@ namespace QTool.Net
 				}
 			}
 		}
-		
 	}
 }
 
