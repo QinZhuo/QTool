@@ -27,18 +27,14 @@ namespace QTool.Net
 				return Controller.Move(speed);
 			}
 		}
-		public NavMeshPath Path { get; private set; } = new NavMeshPath();
+		public NavMeshPath Path { get; private set; }
 		public bool FindPath(Vector3 target)
 		{
-			if (NavMesh.SamplePosition(target, out var MeshHit, 3, NavMesh.AllAreas))
-			{
-				target = MeshHit.position;
-			}
 			if (Path == null)
 			{
 				NavMeshPath Path = new NavMeshPath();
 			}
-			else if (Path.status == NavMeshPathStatus.PathComplete && target == Path.corners.StackPeek())
+			else if (Path.status == NavMeshPathStatus.PathComplete && target.Similar(Path.corners.StackPeek()) && transform.position.Similar(Path.corners.QueuePeek()))
 			{
 				return true;
 			}
