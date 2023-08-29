@@ -300,21 +300,21 @@ namespace QTool.FlowGraph
 					{
 						var runtimeValue = member.Get(Runtime).As<QRuntimeValue<float>>();
 						runtimeValue.Name = member.QName;
-						runtimeValue.OnValue += SetValue;
+						runtimeValue.OnValueChange += SetValue;
 						runtimeValue.InvokeOnChange();
 					}
 					else if (member.Type.Is(typeof(QRuntimeValue<string>)))
 					{
 						var runtimeValue = member.Get(Runtime).As<QRuntimeValue<string>>();
 						runtimeValue.Name = member.QName;
-						runtimeValue.OnValue += SetValue;
+						runtimeValue.OnValueChange += SetValue;
 						runtimeValue.InvokeOnChange();
 					}
 					else if (member.Type.Is(typeof(QRuntimeValue<bool>)))
 					{
 						var runtimeValue = member.Get(Runtime).As<QRuntimeValue<bool>>();
 						runtimeValue.Name = member.QName;
-						runtimeValue.OnValue += SetValue;
+						runtimeValue.OnValueChange += SetValue;
 						runtimeValue.InvokeOnChange();
 					}
 					else
@@ -334,17 +334,17 @@ namespace QTool.FlowGraph
 					if (member.Type.Is(typeof(QRuntimeValue<float>)))
 					{
 						var runtimeValue = member.Get(Runtime).As<QRuntimeValue<float>>();
-						runtimeValue.OnValue -=SetValue;
+						runtimeValue.OnValueChange -=SetValue;
 					}
 					else if (member.Type.Is(typeof(QRuntimeValue<string>)))
 					{
 						var runtimeValue = member.Get(Runtime).As<QRuntimeValue<string>>();
-						runtimeValue.OnValue -= SetValue;
+						runtimeValue.OnValueChange -= SetValue;
 					}
 					else if (member.Type.Is(typeof(QRuntimeValue<bool>)))
 					{
 						var runtimeValue = member.Get(Runtime).As<QRuntimeValue<bool>>();
-						runtimeValue.OnValue -= SetValue;
+						runtimeValue.OnValueChange -= SetValue;
 					}
 				});
 			}

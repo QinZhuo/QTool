@@ -76,6 +76,7 @@ namespace QTool
 		}
 		public QDictionary<string, QRuntimeValue> RuntimeValues { get; private set; } = new QDictionary<string, QRuntimeValue>();
 		public DataT Data => Runtime?.Data;
+		public event Action<string> OnValueChange = null;
 		public virtual void Start()
 		{
 			var runtime = Runtime;
@@ -86,6 +87,10 @@ namespace QTool
 					 var runtimeValue = member.Get(runtime).As<QRuntimeValue>();
 					 runtimeValue.Name = member.QName;
 					 RuntimeValues[member.QName] = runtimeValue;
+					 runtimeValue.OnValueChange += (key, value) =>
+					 {
+						 OnValueChange?.Invoke(key);
+					 };
 				 }
 			 });
 		}

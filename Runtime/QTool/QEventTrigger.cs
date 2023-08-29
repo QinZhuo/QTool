@@ -359,21 +359,21 @@ namespace QTool
 						{
 							var runtimeValue = member.Get(runtime).As<QRuntimeValue<float>>();
 							runtimeValue.Name = member.QName;
-							runtimeValue.OnValue += gameObject.InvokeEvent;
+							runtimeValue.OnValueChange += gameObject.InvokeEvent;
 							runtimeValue.InvokeOnChange();
 						}
 						else if (member.Type.Is(typeof(QRuntimeValue<string>)) && trigger.stringEventList.ContainsKey(member.QName))
 						{
 							var runtimeValue = member.Get(runtime).As<QRuntimeValue<string>>();
 							runtimeValue.Name = member.QName;
-							runtimeValue.OnValue += gameObject.InvokeEvent;
+							runtimeValue.OnValueChange += gameObject.InvokeEvent;
 							runtimeValue.InvokeOnChange();
 						}
 						else if (member.Type.Is(typeof(QRuntimeValue<bool>)) && trigger.boolEventList.ContainsKey(member.QName))
 						{
 							var runtimeValue = member.Get(runtime).As<QRuntimeValue<bool>>();
 							runtimeValue.Name = member.QName;
-							runtimeValue.OnValue += gameObject.InvokeEvent;
+							runtimeValue.OnValueChange += gameObject.InvokeEvent;
 							runtimeValue.InvokeOnChange();
 						}
 						else
@@ -398,17 +398,17 @@ namespace QTool
 								|| trigger.floatEventList.ContainsKey("当前" + member.QName) || trigger.floatEventList.ContainsKey(member.QName + "比例")))
 						{
 							var runtimeValue = member.Get(runtime).As<QRuntimeValue<float>>();
-							runtimeValue.OnValue -= gameObject.InvokeEvent;
+							runtimeValue.OnValueChange -= gameObject.InvokeEvent;
 						}
 						else if (member.Type.Is(typeof(QRuntimeValue<string>)) && trigger.stringEventList.ContainsKey(member.QName))
 						{
 							var runtimeValue = member.Get(runtime).As<QRuntimeValue<string>>();
-							runtimeValue.OnValue -= gameObject.InvokeEvent;
+							runtimeValue.OnValueChange -= gameObject.InvokeEvent;
 						}
 						else if (member.Type.Is(typeof(QRuntimeValue<bool>)) && trigger.boolEventList.ContainsKey(member.QName))
 						{
 							var runtimeValue = member.Get(runtime).As<QRuntimeValue<bool>>();
-							runtimeValue.OnValue -= gameObject.InvokeEvent;
+							runtimeValue.OnValueChange -= gameObject.InvokeEvent;
 						}
 					});
 				}
