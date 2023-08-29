@@ -27,10 +27,17 @@ namespace QTool.Net
 				return Controller.Move(speed);
 			}
 		}
-		public NavMeshPath Path { get; private set; }
+		public NavMeshPath Path { get; private set; } = new NavMeshPath();
 		public bool FindPath(Vector3 target)
 		{
-			if (Path == null) Path = new NavMeshPath();
+			if (NavMesh.SamplePosition(target, out var MeshHit, 3, NavMesh.AllAreas))
+			{
+				target = MeshHit.position;
+			}
+			if (Path.status== NavMeshPathStatus.PathComplete&&target == Path.corners.StackPeek())
+			{
+				return true;
+			}
 			return NavMesh.CalculatePath(transform.position, target, NavMesh.AllAreas, Path);
 		}
 		public override void OnNetUpdate()
@@ -48,6 +55,7 @@ namespace QTool.Net
 				}
 			}
 		}
+		
 	}
 }
 

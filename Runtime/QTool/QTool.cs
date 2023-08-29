@@ -17,6 +17,7 @@ using System.Linq;
 using UnityEngine.Playables;
 using System.Net;
 using QTool.Inspector;
+using UnityEngine.AI;
 #if UNITY_EDITOR
 #if UNITY_2022_1_OR_NEWER
 using PrefabStageUtility = UnityEditor.SceneManagement.PrefabStageUtility;
@@ -801,7 +802,38 @@ namespace QTool
 			}
 			return bounds;
 		}
-
+		public static Vector3 GetPosition(this Vector3[] points, float moveLength)
+		{
+			if (points.Length < 2)
+			{
+				return points.Get(0);
+			}
+			var curLength = 0f;
+			for (int i = 0; i < points.Length - 1; i++)
+			{
+				var startLength = curLength;
+				var length = Vector3.Distance(points[i], points[i + 1]); ;
+				curLength += length;
+				if (moveLength <= curLength)
+				{
+					return points[i].Lerp(points[i + 1], (moveLength - startLength) / length);
+				}
+			}
+			return points.StackPeek();
+		}
+		public static float GetLength(this Vector3[] points)
+		{
+			if (points.Length < 2)
+			{
+				return 0;
+			}
+			var length = 0f;
+			for (int i = 0; i < points.Length - 1; i++)
+			{
+				length += Vector3.Distance(points[i], points[i + 1]); ;
+			}
+			return length;
+		}
 		private static QDictionary<uint, Mesh> Collider2DMeshCache = new QDictionary<uint, Mesh>();
 		public static Mesh GetMesh(this Collider2D collider)
 		{
