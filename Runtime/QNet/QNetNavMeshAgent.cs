@@ -30,6 +30,10 @@ namespace QTool.Net
 		public NavMeshPath Path { get; private set; }
 		public bool FindPath(Vector3 target)
 		{
+			if (NavMesh.SamplePosition(transform.position, out var MeshHit, 2, NavMesh.AllAreas))
+			{
+				target = MeshHit.position;
+			}
 			if (Path == null)
 			{
 				Path = new NavMeshPath();
