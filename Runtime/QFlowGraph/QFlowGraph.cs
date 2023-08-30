@@ -47,8 +47,12 @@ namespace QTool.FlowGraph
 
 		[QIgnore]
 		public QDictionary<string, QFlowNode> StartNode = new QDictionary<string, QFlowNode>();
-		public bool IsRunning => CoroutineList.Count > 0;
-        public T GetValue<T>(string key="")
+
+		[QIgnore]
+		public List<string> RunningNodeList { private set; get; } = new List<string>();
+		public bool IsRunning => RunningNodeList.Count > 0;
+
+		public T GetValue<T>(string key="")
         {
             var type = typeof(T);
 			if (key.IsNull())
@@ -210,7 +214,9 @@ namespace QTool.FlowGraph
 			{
 				while (curNode != null)
 				{
+					RunningNodeList.AddCheckExist(curNode.Key);
 					yield return curNode.RunIEnumerator();
+					RunningNodeList.Remove(curNode.Key);
 					var port = curNode.NextNodePort;
 					if (port != null)
 					{
@@ -252,6 +258,8 @@ namespace QTool.FlowGraph
         }
 		public void Stop()
 		{
+			RunningNodeList.Clear();
+			CoroutineList.Clear();
 			foreach (var coroutine in CoroutineList.ToArray())
 			{
 				StopCoroutine(coroutine);
