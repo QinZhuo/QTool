@@ -183,36 +183,29 @@ namespace QTool
 		}
 		public void Invoke(string eventName, string value)
 		{
-#if UNITY_EDITOR
 			Log(eventName, value);
-#endif
 			stringEventList.Get(eventName)?.eventAction?.Invoke(value);
         }
         public void Invoke(string eventName)
         {
-#if UNITY_EDITOR
 			Log(eventName);
-#endif
 			actionEventList.Get(eventName)?.eventAction?.Invoke();
         }
         public void Invoke(string eventName, bool value)
 		{
-#if UNITY_EDITOR
 			Log(eventName, value);
-#endif
 			boolEventList.Get(eventName)?.eventAction?.Invoke((bool)value);
         }
         public new void Invoke(string eventName, float value)
 		{
-#if UNITY_EDITOR
 			Log(eventName, value);
-#endif
 			floatEventList.Get(eventName)?.eventAction?.Invoke(value);
 		}
-#if UNITY_EDITOR
+
+		[System.Diagnostics.Conditional("DEVELOPMENT_BUILD"), System.Diagnostics.Conditional("UNITY_EDITOR")]
 		void Log(string eventName, object value=null)
 		{
-
+#if UNITY_EDITOR
 			if (UnityEditor.Selection.activeGameObject == gameObject)
 			{
 				if (value == null)
@@ -223,10 +216,9 @@ namespace QTool
 				{
 					QDebug.Log("[" + nameof(QEventTrigger) + "]" + eventName + "<"+value.GetType()+">(" + value + ")");
 				}
-				
 			}
-		}
 #endif
+		}
 	}
     public class EventTriggerBase<T> : IKey<string> where T : UnityEventBase
 	{
@@ -380,7 +372,6 @@ namespace QTool
 						{
 							return;
 						}
-						QDebug.Log("注册 " + gameObject.name + "." + member.QName + " " + member.Type + " 数据更改事件");
 					});
 				}
 			}
