@@ -42,17 +42,18 @@ namespace QTool
 		}
 		public static void Update()
 		{
+			List.RemoveAll(ie => RemoveList.Contains(ie));
+			RemoveList.Clear();
 			if (AddList.Count > 0)
 			{
 				List.AddRange(AddList);
 				AddList.Clear();
 			}
-			List.RemoveAll(ie => RemoveList.Contains(ie) || !UpdateIEnumerator(ie));
-			RemoveList.Clear();
+			List.RemoveAll(ie => !UpdateIEnumerator(ie));
 		}
 		public static void StopAll()
 		{
-			List.Clear();
+			RemoveList.AddRange(List);
 		}
 	}
 }
