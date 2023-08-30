@@ -980,7 +980,7 @@ namespace QTool.FlowGraph
         public ReturnType returnType { private set; get; }= ReturnType.Void;
         [QIgnore]
         public List<QFlowPort> OutParamPorts = new List<QFlowPort>();
-
+		public bool IsRunning => Graph.RunningNodeList.Contains(Key);
 		public string Name { get; set; }
 		public string Key { get;  set; } = QId.NewId();
 		public string ViewName { 

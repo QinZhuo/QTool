@@ -8,6 +8,7 @@ namespace QTool
 	{
 		private static List<IEnumerator> List { set; get; } = new List<IEnumerator>();
 		private static List<IEnumerator> AddList { set; get; } = new List<IEnumerator>();
+		private static List<IEnumerator> RemoveList { set; get; } = new List<IEnumerator>();
 		public static void Start(this IEnumerator enumerator)
 		{
 			if (UpdateIEnumerator(enumerator))
@@ -17,7 +18,7 @@ namespace QTool
 		}
 		public static void Stop(this IEnumerator enumerator)
 		{
-			List.Remove(enumerator);
+			RemoveList.Add(enumerator);
 		}
 		private static bool UpdateIEnumerator(IEnumerator enumerator)
 		{
@@ -46,7 +47,8 @@ namespace QTool
 				List.AddRange(AddList);
 				AddList.Clear();
 			}
-			List.RemoveAll((ie) => !UpdateIEnumerator(ie));
+			List.RemoveAll(ie => RemoveList.Contains(ie) || !UpdateIEnumerator(ie));
+			RemoveList.Clear();
 		}
 		public static void StopAll()
 		{
