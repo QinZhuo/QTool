@@ -80,7 +80,7 @@ namespace QTool.Net
 			}
 		}
 		public virtual void OnNetStart() { }
-		private void NetDestroy()
+		internal void NetDestroy()
 		{
 			OnNetDestroy();
 			QNetManager.Instance.OnSyncCheck -= OnSyncCheck;
@@ -102,16 +102,7 @@ namespace QTool.Net
 		
 		public new static void Destroy(UnityEngine.Object obj)
 		{
-			var gameObj = obj.GetGameObject();
-			if (gameObj != null)
-			{
-				var nets= gameObj.GetComponentsInChildren<QNetBehaviour>();
-				foreach (var net in nets)
-				{
-					net.NetDestroy();
-				}
-			}
-			GameObject.Destroy(obj);
+			QNetManager.Destroy(obj);
 		}
 
 		internal void OnSyncCheck(QNetSyncFlag flag)

@@ -462,8 +462,20 @@ namespace QTool.Net
 		}
 		internal event Action OnNetUpdate=null;
 		internal event Action<QNetSyncFlag> OnSyncCheck = null;
-#endregion
-
+		#endregion
+		public new static void Destroy(UnityEngine.Object obj)
+		{
+			var gameObj = obj.GetGameObject();
+			if (gameObj != null)
+			{
+				var nets = gameObj.GetComponentsInChildren<QNetBehaviour>();
+				foreach (var net in nets)
+				{
+					net.NetDestroy();
+				}
+			}
+			GameObject.Destroy(obj);
+		}
 		private void FixedUpdate()
 		{
 			ClientFixedUpdate();
