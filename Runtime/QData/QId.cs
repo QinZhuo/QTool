@@ -5,7 +5,7 @@ using System;
 namespace QTool
 {
     
-    [DisallowMultipleComponent,ExecuteInEditMode]
+    [ExecuteInEditMode]
     public class QId : MonoBehaviour
     {
 		#region 静态数据方法

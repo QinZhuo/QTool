@@ -57,7 +57,7 @@ namespace QTool
 			{
 				var result = GameObject.Instantiate(prefab);
 				result.name = prefab.name;
-				result.GetComponent<QPoolTag>(true).poolName = poolName;
+				result.GetComponent<QPoolInfo>(true).poolName = poolName;
 				return result;
 			}, obj =>
 			{
@@ -129,7 +129,7 @@ namespace QTool
 		}
 		public static void Release(GameObject gameObject)
         {
-			var tag= gameObject.GetComponent<QPoolTag>();
+			var tag= gameObject.GetComponent<QPoolInfo>();
 			if (tag == null)
 			{
 				GameObject.Destroy(gameObject);
