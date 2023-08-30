@@ -44,7 +44,7 @@ namespace QTool.Net
 		{
 			if (IsGrounded)
 			{
-				if (NavMesh.SamplePosition(transform.position, out var MeshHit, 0.3f, NavMesh.AllAreas))
+				if (NavMesh.SamplePosition(transform.position, out var MeshHit, 1, NavMesh.AllAreas))
 				{
 					var meshPosition = MeshHit.position;
 					meshPosition.y = transform.position.y;
