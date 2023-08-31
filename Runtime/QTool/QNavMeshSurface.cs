@@ -36,8 +36,7 @@ namespace QTool
 			bounds.Expand(0.1f);
 			CollectSources(transform, -1, CollectGeometry, 0, Markups, SourceList);
 			var setting = NavMesh.GetSettingsByID(0);
-			navMesh = new NavMeshData { position = transform.position, rotation = transform.rotation };
-			//navMesh = NavMeshBuilder.BuildNavMeshData(setting, SourceList, bounds, transform.position, transform.rotation);
+			navMesh = NavMeshBuilder.BuildNavMeshData(setting, SourceList, bounds, transform.position, transform.rotation);
 			navMeshInstance = NavMesh.AddNavMeshData(navMesh, transform.position, transform.rotation);
 			navMeshInstance.owner = this;
 			if (Application.isPlaying)
