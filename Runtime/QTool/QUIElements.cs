@@ -173,9 +173,6 @@ namespace QTool
 			label.name = text;
 			label.style.overflow = Overflow.Hidden;
 			label.style.unityTextAlign = textAlign;
-#if UNITY_2022_1_OR_NEWER
-			label.enableRichText = false;
-#endif
 			root.Add(label);
 			return label;
 		}
