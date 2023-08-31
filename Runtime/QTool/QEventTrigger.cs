@@ -340,6 +340,7 @@ namespace QTool
 				foreach (var member in typeInfo.Members)
 				{
 					if (member.QNameAttribute == null) continue;
+					QDebug.Log(gameObject + " 注册数据事件 " + obj + " " + member.QName);
 					if (member.Type.IsValueType)
 					{
 						if (member.Type == typeof(string))
