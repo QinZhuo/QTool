@@ -21,13 +21,14 @@ namespace QTool.Reflection
 		public Type Type { get; private set; }
 		public Action<object, object> Set { get; private set; }
 		public Func<object, object> Get { get; private set; }
-		public Attribute Attribute { get; set; }
+		public Attribute QNameAttribute { get; set; }
 		public MemberInfo MemeberInfo { get; private set; }
 		public bool IsPublic { get; private set; }
 		public bool IsUnityObject { get; private set; }
 		public QMemeberInfo(FieldInfo info)
 		{
 			MemeberInfo = info;
+			QNameAttribute = info.GetAttribute<QNameAttribute>();
 			QName = info.QName();
 			QOldName = info.QOldName();
 			Key = info.Name;
@@ -40,6 +41,7 @@ namespace QTool.Reflection
 		public QMemeberInfo(PropertyInfo info)
 		{
 			MemeberInfo = info;
+			QNameAttribute = info.GetAttribute<QNameAttribute>();
 			QName = info.QName();
 			QOldName = info.QOldName();
 			Key = info.Name;

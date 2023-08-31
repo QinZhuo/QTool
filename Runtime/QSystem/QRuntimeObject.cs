@@ -25,25 +25,7 @@ namespace QTool
 			Key = key;
 			Data = QDataList<DataT>.Get(key);
 		}
-		public void ForeachMember(Action<QMemeberInfo> dataMember, Action<QMemeberInfo> runtimeMember)
-		{
-			if (dataMember != null)
-			{
-				var dataInfo = QSerializeType.Get(typeof(DataT));
-				foreach (var member in dataInfo.Members)
-				{
-					dataMember(member);
-				}
-			}
-			if (runtimeMember != null)
-			{
-				var runtimeInfo = QSerializeType.Get(typeof(RuntimeT));
-				foreach (var member in runtimeInfo.Members)
-				{
-					runtimeMember(member);
-				}
-			}
-		}
+	
 
 		public virtual void OnDestroy()
 		{
@@ -71,9 +53,9 @@ namespace QTool
 			{
 				if (value != _Runtime)
 				{
-					_Runtime?.UnRegisterEvent(gameObject);
+					gameObject.UnRegisterEvent(_Runtime);
 					_Runtime = value;
-					_Runtime.RegisterEvent(gameObject);
+					gameObject.RegisterEvent(_Runtime);
 				}
 			}
 		}
@@ -82,7 +64,7 @@ namespace QTool
 		public event Action<string> OnValueChange = null;
 		public virtual void Awake()
 		{
-
+			gameObject.RegisterEvent(this);
 			InitRuntimeValues();
 		}
 		public void InitRuntimeValues()
@@ -90,7 +72,8 @@ namespace QTool
 			var runtime = Runtime;
 			if (runtime != null)
 			{
-				runtime.ForeachMember(null, (member) =>
+				var typeInfo = QSerializeType.Get(typeof(RuntimeT));
+				foreach (var member in typeInfo.Members)
 				{
 					if (member.Type.Is(typeof(QRuntimeValue)))
 					{
@@ -102,11 +85,12 @@ namespace QTool
 							OnValueChange?.Invoke(key);
 						};
 					}
-				});
+				}
 			}
 		}
 		public virtual void OnDestroy()
 		{
+			gameObject.UnRegisterEvent(this);
 			if (_Runtime != null)
 			{
 				Runtime = null;
