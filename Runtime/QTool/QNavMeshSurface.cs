@@ -21,10 +21,6 @@ namespace QTool
 		{
 			Clear();
 		}
-		private void OnValidate()
-		{
-			_ = UpdateNavMeshAsync();
-		}
 		private void OnTransformChildrenChanged()
 		{
 			_ = UpdateNavMeshAsync();
