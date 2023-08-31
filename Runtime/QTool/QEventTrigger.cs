@@ -402,15 +402,5 @@ namespace QTool
 				}
 			}
 		}
-		public static void RegisterEvent<RuntimeT, DataT>(this GameObject gameObject, QRuntime<RuntimeT, DataT> runtime) where RuntimeT : QRuntime<RuntimeT, DataT>, new() where DataT : QDataList<DataT>, new()
-		{
-			gameObject.RegisterEvent(runtime.Data);
-			gameObject.RegisterEvent(runtime);
-		}
-		public static void UnRegisterEvent<RuntimeT, DataT>(this GameObject gameObject, QRuntime<RuntimeT, DataT> runtime) where RuntimeT : QRuntime<RuntimeT, DataT>, new() where DataT : QDataList<DataT>, new()
-		{
-			gameObject.UnRegisterEvent(runtime.Data);
-			gameObject.UnRegisterEvent(runtime);
-		}
 	}
 }

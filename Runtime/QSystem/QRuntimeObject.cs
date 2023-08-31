@@ -55,6 +55,7 @@ namespace QTool
 				{
 					gameObject.UnRegisterEvent(_Runtime);
 					_Runtime = value;
+					gameObject.RegisterEvent(_Runtime?.Data);
 					gameObject.RegisterEvent(_Runtime);
 				}
 			}
