@@ -8,8 +8,8 @@ namespace QTool
 	[ExecuteInEditMode]
 	public class QNavMeshSurface : MonoBehaviour
 	{
-		private static List<NavMeshBuildSource> SourceList = new List<NavMeshBuildSource>();
-		private static List<NavMeshBuildMarkup> Markups = new List<NavMeshBuildMarkup>();
+		private List<NavMeshBuildSource> SourceList = new List<NavMeshBuildSource>();
+		private List<NavMeshBuildMarkup> Markups = new List<NavMeshBuildMarkup>();
 		private NavMeshDataInstance navMeshInstance = default;
 		private NavMeshData navMesh = null;
 		public NavMeshCollectGeometry CollectGeometry = NavMeshCollectGeometry.PhysicsColliders;
