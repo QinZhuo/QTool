@@ -340,14 +340,11 @@ namespace QTool
 				foreach (var member in typeInfo.Members)
 				{
 					if (member.QNameAttribute == null) continue;
-					if (member.Type.IsValueType)
+					if (member.Type == typeof(string))
 					{
-						if (member.Type == typeof(string))
-						{
-							var value = member.Get(obj);
-							QDebug.Log(gameObject + " 静态数据初始化 " + obj + " " + member.QName + " : " + obj);
-							gameObject.InvokeEvent(member.QName, value?.ToString());
-						}
+						var value = member.Get(obj);
+						QDebug.Log(gameObject + " 静态数据初始化 " + obj + " " + member.QName + " : " + obj);
+						gameObject.InvokeEvent(member.QName, value?.ToString());
 					}
 					else if (member.Type.Is(typeof(QRuntimeValue<float>)) && (trigger.floatEventList.ContainsKey(member.QName)
 								|| trigger.floatEventList.ContainsKey("当前" + member.QName) || trigger.floatEventList.ContainsKey(member.QName + "比例")))
