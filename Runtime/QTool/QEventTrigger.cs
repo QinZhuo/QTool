@@ -343,7 +343,7 @@ namespace QTool
 					if (member.Type == typeof(string))
 					{
 						var value = member.Get(obj);
-						QDebug.Log(gameObject + " 静态数据初始化 " + obj + " " + member.QName + " : " + obj);
+					//	QDebug.Log(gameObject + " 静态数据初始化 " + obj + " " + member.QName + " : " + obj);
 						gameObject.InvokeEvent(member.QName, value?.ToString());
 					}
 					else if (member.Type.Is(typeof(QRuntimeValue<float>)) && (trigger.floatEventList.ContainsKey(member.QName)
@@ -353,7 +353,7 @@ namespace QTool
 						runtimeValue.Name = member.QName;
 						runtimeValue.OnValueChange += gameObject.InvokeEvent;
 						runtimeValue.InvokeOnChange();
-						QDebug.Log(gameObject + " 注册" + member.Type.Name + "数据更改事件 " + obj + " " + member.QName);
+					//	QDebug.Log(gameObject + " 注册" + member.Type.Name + "数据更改事件 " + obj + " " + member.QName);
 					}
 					else if (member.Type.Is(typeof(QRuntimeValue<string>)) && trigger.stringEventList.ContainsKey(member.QName))
 					{
@@ -361,7 +361,7 @@ namespace QTool
 						runtimeValue.Name = member.QName;
 						runtimeValue.OnValueChange += gameObject.InvokeEvent;
 						runtimeValue.InvokeOnChange();
-						QDebug.Log(gameObject + " 注册" + member.Type.Name + "数据更改事件 " + obj + " " + member.QName);
+					//	QDebug.Log(gameObject + " 注册" + member.Type.Name + "数据更改事件 " + obj + " " + member.QName);
 					}
 					else if (member.Type.Is(typeof(QRuntimeValue<bool>)) && trigger.boolEventList.ContainsKey(member.QName))
 					{
@@ -369,7 +369,7 @@ namespace QTool
 						runtimeValue.Name = member.QName;
 						runtimeValue.OnValueChange += gameObject.InvokeEvent;
 						runtimeValue.InvokeOnChange();
-						QDebug.Log(gameObject + " 注册" + member.Type.Name + "数据更改事件 " + obj + " " + member.QName);
+					//	QDebug.Log(gameObject + " 注册" + member.Type.Name + "数据更改事件 " + obj + " " + member.QName);
 
 					}
 				}
