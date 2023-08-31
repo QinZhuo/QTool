@@ -778,6 +778,14 @@ namespace QTool.FlowGraph
 			}
 			return null;
 		}
+		public QFlowPort GetConnectPort(int index = 0, bool onlyFlow = true)
+		{
+			if (HasConnect(index))
+			{
+				return Node.Graph.GetPort(this[index].GetConnectPortId(Node.Graph, onlyFlow));
+			}
+			return null;
+		}
 		public object GetConnectValue(int index = 0)
 		{
 			if (HasConnect(index))
