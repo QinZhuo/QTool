@@ -423,7 +423,7 @@ namespace QTool
 			return target;
 		}
 
-		public static string ChildPath(this string rootPath,string childe)
+		public static string MergePath(this string rootPath,string childe)
 		{
 			if (childe.IsNull())
 			{

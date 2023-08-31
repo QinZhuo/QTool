@@ -290,15 +290,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bacc336a6d7b86e45b2cb1b342da1a06, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  curValue: "\u653B\u51FB\u6587\u672C"
-  value: "\u653B\u51FB\u6587\u672C"
-  language: 
-  translateResult: "\u73A9\u5BB6\u653B\u51FB\u4E86\u654C\u4EBA"
-  forceUpdate: 0
-  OnValueChange:
+  m_key: "\u653B\u51FB\u6587\u672C"
+  m_localization: 
+  OnKeyChange:
     m_PersistentCalls:
       m_Calls: []
-  OnTranslateChange:
+  OnLocalizationChange:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 574360975}
@@ -1718,7 +1715,7 @@ PrefabInstance:
       objectReference: {fileID: 1876963881}
     - target: {fileID: 1342849157534090733, guid: e3b8399edb6b7064e8f550458a54bdd3, type: 3}
       propertyPath: toggleTest
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1342849157534090733, guid: e3b8399edb6b7064e8f550458a54bdd3, type: 3}
       propertyPath: qIdObject._Object

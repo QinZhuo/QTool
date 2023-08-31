@@ -11,38 +11,10 @@ namespace QTool
 	/// </summary>
     public class QDataList: QList<string, QDataRow>
 	{
-		public static string ResourcesPathRoot => QFileManager.ResourcesPathRoot+"/" + nameof(QDataList) +"Asset";
-		public static string ModPath=>QFileManager.ModPathRoot + "/" + nameof(QDataList) + "Asset" ;
-		public static string GetResourcesDataPath(string name,string child=null)
-		{
-			return ResourcesPathRoot.ChildPath(name).ChildPath(child)+".txt";
-		}
-		public static string GetModPath(string name, string child = null)
-		{
-			return ModPath.ChildPath(name).ChildPath(child) + ".txt";
-		}
-		public static string GetAssetDataPath(string name)
-		{
-			return Application.dataPath + "/" + nameof(QDataList) + "Asset/" + name + ".txt";
-		}
-		public static QDataList GetResourcesData(string name, System.Func<QDataList> autoCreate = null)
-		{
-			QDebug.Begin("加载 QDataList<" + name + "> 数据 ");
-			var dataList= GetData(GetResourcesDataPath(name),autoCreate);
-			if (QToolSetting.Instance!=null&&QToolSetting.Instance.modeList.Contains(name))
-			{
-				QFileManager.LoadAll(GetModPath(name), (fileValue, loadPath) =>
-				{
-					dataList.Add(new QDataList(fileValue) { LoadPath = loadPath });
-				}, "{}");
-			}
-			QDebug.End("加载 QDataList<" + name + "> 数据 ", dataList.Count + " 条");
-			return dataList;
-		}
-		public static QDataList GetData(string path,System.Func<QDataList> autoCreate=null)
+	
+		public static QDataList LoadData(string path,System.Func<QDataList> autoCreate=null)
         {
 			QDataList data = null;
-			;
 			try
 			{
 				data = new QDataList();
@@ -72,7 +44,7 @@ namespace QTool
 		}
 	
      
-        public string LoadPath { get; private set; }
+        public string LoadPath { get; internal set; }
         public void Save(string path = null)
         {
             if (string.IsNullOrEmpty(path))
@@ -257,26 +229,56 @@ namespace QTool
 		}
 		public static async Task LoadAsync()
 		{
-			if (_list == null)
+			if (_List == null)
 			{
-				_list = new QList<string, T>();
-				await Data.ParseQDataListAsync(_list).Run();
+				_List = new QList<string, T>();
+				await LoadQDataList().ParseQDataListAsync(_List).Run();
 			}
 		}
-		static QDataList Data => QDataList.GetResourcesData(typeof(T).Name, () => new List<T> { new T { Key = "测试Key" }, }.ToQDataList());
-		static QList<string, T> _list = null;
+		private static QList<string, T> _List = null;
 		public static QList<string, T> List
 		{
 			get
 			{
-				if (_list == null)
+				if (_List == null)
 				{
-					_list = new QList<string, T>();
-					Data.ParseQDataList(_list);
+					FreshList();
 				}
-				return _list;
+				return _List;
 			}
 		}
+		#region 加载数据
+		public static string ResourcesPathRoot => QFileManager.ResourcesPathRoot + "/" + nameof(QDataList) + "Asset";
+		public static string ModPath => QFileManager.ModPathRoot + "/" + nameof(QDataList) + "Asset";
+		public static string GetResourcesDataPath(string name, string child = null)
+		{
+			return ResourcesPathRoot.MergePath(name).MergePath(child) + ".txt";
+		}
+		public static string GetModPath(string name, string child = null)
+		{
+			return ModPath.MergePath(name).MergePath(child) + ".txt";
+		}
+		public static QDataList LoadQDataList(string key = null)
+		{
+			var Key = typeof(T).Name.MergePath(key);
+			QDebug.Begin("加载 QDataList<" + Key + "> 数据 ");
+			var dataList = QDataList.LoadData(GetResourcesDataPath(Key), () => new List<T> { new T { Key = "测试Key" }, }.ToQDataList());
+			if (QToolSetting.Instance != null && QToolSetting.Instance.modeList.Contains(Key))
+			{
+				QFileManager.LoadAll(GetModPath(Key), (fileValue, loadPath) =>
+				{
+					dataList.Add(new QDataList(fileValue) { LoadPath = loadPath });
+				}, "{}");
+			}
+			QDebug.End("加载 QDataList<" + Key + "> 数据 ", dataList.Count + " 条");
+			return dataList;
+		}
+		public static void FreshList(string key = null)
+		{
+			_List = new QList<string, T>();
+			LoadQDataList(key).ParseQDataList(_List);
+		}
+		#endregion
 	}
 	/// <summary>
 	/// 轻量级数据库 通过对象访问 速度不会快很多 主要为了数据分块加载 如果对象格式发生更改会读取失败 

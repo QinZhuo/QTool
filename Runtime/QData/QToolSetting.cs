@@ -15,23 +15,12 @@ namespace QTool
 #if Steamworks
 		public uint SteamId=480;
 #endif
-
 		[QName("强制渲染比例"),Tooltip("只有挂载 "+nameof(QScreenAspect)+" 脚本的相机和UI会生效")]
 		public float targetAspect = 16f/9f;
-		[QName("支持Mod文件夹"),QPopup(nameof(GetModList))]
-		public List<string> modeList = new List<string> { nameof(QTranslate.QTranslateData) };
+		[QName("Mod文件夹")]
+		public List<string> modeList = new List<string> { nameof(QLocalizationData) };
 		[QName("游戏数据邮箱")]
 		public QMailAccount QAnalysisMail;
-		public static List<string> GetModList()
-		{
-			List<string> pathList = new List<string>();
-			(QDataList.ModPath+"/").CheckDirectoryPath();
-			QDataList.ModPath.ForeachDirectory((path) =>
-			{
-				pathList.Add(path.SplitEndString(QDataList.ModPath+"/"));
-			});
-			return pathList;
-		}
 #if UNITY_EDITOR
 		[QName("音频强制单声道")]
 		public bool forceToMono = true;

@@ -172,7 +172,7 @@ namespace QTool.FlowGraph
 				if (type != null)
 				{
 					typeInfo = QSerializeType.Get(type);
-					qdataList = QDataList.GetData(path);
+					qdataList = QDataList.LoadData(path);
 					qdataList.ParseQDataList(objList, type);
 					for (int i = 0; i < qdataList.TitleRow.Count; i++)
 					{
@@ -185,7 +185,7 @@ namespace QTool.FlowGraph
 				}
 				else
 				{
-					qdataList = QDataList.GetData(path);
+					qdataList = QDataList.LoadData(path);
 					typeInfo = null;
 				}
 				PlayerPrefs.SetString(nameof(QDataListWindow) + "_LastPath", path);

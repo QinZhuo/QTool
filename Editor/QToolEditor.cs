@@ -73,44 +73,44 @@ namespace QTool
 		[MenuItem("QTool/翻译/查看翻译语言信息")]
 		public static void LanguageTest()
 		{
-			Debug.LogError(global::QTool.QTranslate.QTranslateData.ToString());
-			GUIUtility.systemCopyBuffer = global::QTool.QTranslate.QTranslateData.ToString();
+			Debug.LogError(QLocalizationData.List.ToOneString());
+			GUIUtility.systemCopyBuffer = QLocalizationData.List.ToOneString();
 		}
-		[MenuItem("QTool/翻译/生成自动翻译文件")]
-		public static async void AutoTranslate() 
-		{
-			var newData = new QDataList();
-			newData.SetTitles(QTranslate.QTranslateData.TitleRow.ToArray());
-			QDictionary<string, string> keyCache = new QDictionary<string, string>();
+		//[MenuItem("QTool/翻译/生成自动翻译文件")]
+		//public static async void AutoTranslate() 
+		//{
+		//	var newData = new QDataList();
+		//	newData.SetTitles(QLocalization.QTranslateData.TitleRow.ToArray());
+		//	QDictionary<string, string> keyCache = new QDictionary<string, string>();
 			
-			for (int rowIndex = 0; rowIndex < QTranslate.QTranslateData.Count; rowIndex++)
-			{
-				var data = QTranslate.QTranslateData[rowIndex];
-				for (int i = 2; i < data.Count; i++)
-				{
-					keyCache.Clear();
-					var text =  data[1];
-					keyCache[ "%".GetHashCode().ToString()] = "%";
-					text = text.Replace("%", "[" + "%".GetHashCode() + "]");
-					text = text.ForeachBlockValue('{', '}', (key) => { var value = key.GetHashCode().ToString();keyCache[value] ="{"+ key+"}";   return "["+value+"]"; });
-					text = text.ForeachBlockValue('<', '>', (key) => { var value = key.GetHashCode().ToString(); keyCache[value] ="<" +key+">"; return "["+value+"]"; });
-					var key = QTranslate.QTranslateData.TitleRow[i];
+		//	for (int rowIndex = 0; rowIndex < QLocalization.QTranslateData.Count; rowIndex++)
+		//	{
+		//		var data = QLocalization.QTranslateData[rowIndex];
+		//		for (int i = 2; i < data.Count; i++)
+		//		{
+		//			keyCache.Clear();
+		//			var text =  data[1];
+		//			keyCache[ "%".GetHashCode().ToString()] = "%";
+		//			text = text.Replace("%", "[" + "%".GetHashCode() + "]");
+		//			text = text.ForeachBlockValue('{', '}', (key) => { var value = key.GetHashCode().ToString();keyCache[value] ="{"+ key+"}";   return "["+value+"]"; });
+		//			text = text.ForeachBlockValue('<', '>', (key) => { var value = key.GetHashCode().ToString(); keyCache[value] ="<" +key+">"; return "["+value+"]"; });
+		//			var key = QLocalization.QTranslateData.TitleRow[i];
 
-					if (!text.IsNull() && data[i].IsNull() && !QTranslate.QTranslateData.TitleRow[i].IsNull()&&!key.IsNull()&& QTranslate.TranslateKeys.ContainsKey(key))
-					{  
-						var language = QTranslate.GetTranslateKey(key);
-						var newLine = newData[data[0]];
-						newLine[1] = data[1];
-					    var translateText = "#" + await text.NetworkTranslateAsync(language.WebAPI);
-						translateText = translateText.ForeachBlockValue('[', ']', (key) => keyCache.ContainsKey(key)?keyCache[key]:key );
-						newLine[i] = translateText;
-						QDebug.Log("翻译" + language.Key + " " + rowIndex + "/" + QTranslate.QTranslateData.Count + " " + " [" + data[1] + "]=>[" + newLine[i] + "]");
-					}
-				}
-			}
-			Debug.LogError(newData.ToString());
-			newData.Save(QDataList.GetModPath( nameof(QTranslate.QTranslateData),nameof(AutoTranslate)));
-		}
+		//			if (!text.IsNull() && data[i].IsNull() && !QLocalization.QTranslateData.TitleRow[i].IsNull()&&!key.IsNull()&& QLocalization.TranslateKeys.ContainsKey(key))
+		//			{  
+		//				var language = QLocalization.GetTranslateKey(key);
+		//				var newLine = newData[data[0]];
+		//				newLine[1] = data[1];
+		//			    var translateText = "#" + await text.NetworkTranslateAsync(language.WebAPI);
+		//				translateText = translateText.ForeachBlockValue('[', ']', (key) => keyCache.ContainsKey(key)?keyCache[key]:key );
+		//				newLine[i] = translateText;
+		//				QDebug.Log("翻译" + language.Key + " " + rowIndex + "/" + QLocalization.QTranslateData.Count + " " + " [" + data[1] + "]=>[" + newLine[i] + "]");
+		//			}
+		//		}
+		//	}
+		//	Debug.LogError(newData.ToString());
+		//	newData.Save(QDataList.GetModPath( nameof(QLocalization.QTranslateData),nameof(AutoTranslate)));
+		//}
 		[MenuItem("QTool/测试/QId对象信息")]
 		public static void QIdObjectInfo()
 		{

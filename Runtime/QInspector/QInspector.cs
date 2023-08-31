@@ -320,6 +320,10 @@ namespace QTool.Inspector
 		{
 			var popupData = QPopupData.Get(property, (attribute as QPopupAttribute).getListFuncs);
 			var value = property.propertyType == SerializedPropertyType.String ? property.stringValue : property.objectReferenceValue?.GetType()?.Name;
+			if (!popupData.List.Contains(value))
+			{
+				popupData.List.Add(value);
+			}	
 			var visual = new PopupField<string>(property.QName(), popupData.List, value);
 			visual.RegisterCallback<ChangeEvent<string>>(data =>
 			{

@@ -70,17 +70,17 @@ namespace QTool.Test
            Debug.LogError( (TTestClass)Activator.CreateInstance(QReflection.ParseType(nameof(TTestClass))));
 
         }
-        [QName("切换语言")]
-        public void ChangeLangua()
-        {
-            QTranslate.ChangeGlobalLanguage(QTranslate.GlobalLanguage == "schinese" ? "english" : "schinese");
+		[QName("切换语言")]
+		public void ChangeLangua()
+		{
+			QLocalization.Language = QLocalization.Language == Application.systemLanguage ?  SystemLanguage.English : Application.systemLanguage;
+			Debug.LogError(QLocalization.Language);
 			for (int i = 0; i < 10; i++)
 			{
-				var testData = QTranslate.GetQDataList("测试翻译"+i);
-				testData["测试翻译" + i].SetValue(QTranslate.GlobalLanguage, "【翻译结果" + i + "】");
+				var testData = QLocalizationData.LoadQDataList(QLocalization.Language.ToString());
+				testData["测试翻译" + i].SetValue(nameof(QLocalizationData.Localization), "【翻译结果" + i + "】");
 				testData.Save();
 			}
-			
 		}
 		[QName("运算符测试")]
 		public void OperarterTest()

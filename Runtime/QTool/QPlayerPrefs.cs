@@ -5,7 +5,7 @@ namespace QTool
 {
 	public static class QPlayerPrefs
 	{
-		public static QDataList Data { get; private set; } = QDataList.GetData(QFileManager.SaveDataPathRoot + "/" + nameof(QPlayerPrefs)+QFileManager.SecretExtension,()=>new QDataList());
+		public static QDataList Data { get; private set; } = QDataList.LoadData(QFileManager.SaveDataPathRoot + "/" + nameof(QPlayerPrefs)+QFileManager.SecretExtension,()=>new QDataList());
 		public static bool HasKey(string key)
 		{
 			return Data.ContainsKey(key);
