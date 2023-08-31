@@ -428,7 +428,7 @@ namespace QTool
 		{
 			return ToSizeString((long)byteLength);
 		}
-		public static string ToColorText(this string text, string color)
+		public static string ColorText(this string text, string color)
 		{
 			if (!color.StartsWith("#"))
 			{
@@ -436,9 +436,9 @@ namespace QTool
 			}
 			return "<color=" + color + ">" + text + "</color>";
 		}
-		public static string ToColorText(this string text,Color color)
+		public static string ColorText(this string text,Color color)
 		{
-			return ToColorText(text, ColorUtility.ToHtmlStringRGB(color));
+			return ColorText(text, ColorUtility.ToHtmlStringRGB(color));
 		}
 		public static string ToSizeString(this int byteLength)
 		{
