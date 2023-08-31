@@ -15,7 +15,7 @@ namespace QTool
 		public NavMeshCollectGeometry CollectGeometry = NavMeshCollectGeometry.PhysicsColliders;
 		private void OnEnable()
 		{
-			_ = UpdateNavMeshAsync();
+			UpdateNavMesh();
 		}
 		private void OnDisable()
 		{
@@ -23,9 +23,9 @@ namespace QTool
 		}
 		private void OnTransformChildrenChanged()
 		{
-			_ = UpdateNavMeshAsync();
+			UpdateNavMesh();
 		}
-		public async Task UpdateNavMeshAsync()
+		public void UpdateNavMesh()
 		{
 			Clear();
 			if (!enabled)
@@ -39,14 +39,7 @@ namespace QTool
 			navMesh = NavMeshBuilder.BuildNavMeshData(setting, SourceList, bounds, transform.position, transform.rotation);
 			navMeshInstance = NavMesh.AddNavMeshData(navMesh, transform.position, transform.rotation);
 			navMeshInstance.owner = this;
-			if (Application.isPlaying)
-			{
-				await NavMeshBuilder.UpdateNavMeshDataAsync(navMesh, NavMesh.GetSettingsByID(0), SourceList, bounds);
-			}
-			else
-			{
-				NavMeshBuilder.UpdateNavMeshData(navMesh, NavMesh.GetSettingsByID(0), SourceList, bounds);
-			}
+			NavMeshBuilder.UpdateNavMeshData(navMesh, NavMesh.GetSettingsByID(0), SourceList, bounds);
 		}
 		public void Clear()
 		{
