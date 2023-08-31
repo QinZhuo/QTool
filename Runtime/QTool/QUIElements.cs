@@ -299,14 +299,14 @@ namespace QTool
 			}
 			if (TypeOverride.ContainsKey(type))
 			{
-				var visual = TypeOverride[type](name,obj, changeEvent);
+				var visual = TypeOverride[type](name, obj, changeEvent);
 				root.Add(visual);
 				return visual;
 			}
 			switch (typeInfo.Code)
 			{
 				case TypeCode.Boolean:
-					return root.AddToggle(name, (bool)obj, (value) => changeEvent(value)); 
+					return root.AddToggle(name, (bool)obj, (value) => changeEvent(value));
 				case TypeCode.Char:
 				case TypeCode.SByte:
 				case TypeCode.Byte:
@@ -341,7 +341,7 @@ namespace QTool
 						}
 						catch (Exception e)
 						{
-							Debug.LogWarning("错误[" + name + "][" + obj?.GetType() + "]["+obj+"] " + e);
+							Debug.LogWarning("错误[" + name + "][" + obj?.GetType() + "][" + obj + "] " + e);
 						}
 						return root.AddInt(name, intValue, (value) => { changeEvent(value); });
 
@@ -350,7 +350,7 @@ namespace QTool
 				case TypeCode.UInt64:
 					return root.AddInt(name, (int)obj, (value) => { changeEvent(value); });
 				case TypeCode.Single:
-					return root.AddFloat(name, (float)obj, (value) => { changeEvent(value); }); 
+					return root.AddFloat(name, (float)obj, (value) => { changeEvent(value); });
 				case TypeCode.Decimal:
 				case TypeCode.Double:
 					return root.AddDouble(name, (double)obj, (value) => { changeEvent(value); });
@@ -376,28 +376,28 @@ namespace QTool
 								var dynamicObjectView = root.AddVisualElement();
 								dynamicObjectView.style.flexDirection = FlexDirection.Row; ;
 								dynamicObjectView.AddLabel(name);
-								var typePopup= dynamicObjectView.AddPopup("", TypeList, obj.GetType(), (newType) =>
-								{
-									obj = newType.CreateInstance();
-									dynamicObjectView.Remove(dynamicObjectView.Q<VisualElement>(nameof(dynamicObjectView)));
+								var typePopup = dynamicObjectView.AddPopup("", TypeList, obj.GetType(), (newType) =>
+								 {
+									 obj = newType.CreateInstance();
+									 dynamicObjectView.Remove(dynamicObjectView.Q<VisualElement>(nameof(dynamicObjectView)));
 
-									if (QSerializeType.Get(newType).ObjType != QObjectType.DynamicObject)
-									{
-										var temp = dynamicObjectView.Add("", obj, newType, changeEvent);
-										temp.name = nameof(dynamicObjectView);
-									}
-								});
+									 if (QSerializeType.Get(newType).ObjType != QObjectType.DynamicObject)
+									 {
+										 var temp = dynamicObjectView.Add("", obj, newType, changeEvent);
+										 temp.name = nameof(dynamicObjectView);
+									 }
+								 });
 								typePopup.style.maxWidth = 100;
 								if (QSerializeType.Get(typePopup.value).ObjType != QObjectType.DynamicObject)
 								{
-									var objView= dynamicObjectView.Add("", obj, typePopup.value, changeEvent);
+									var objView = dynamicObjectView.Add("", obj, typePopup.value, changeEvent);
 									objView.name = nameof(dynamicObjectView);
 								}
 								return dynamicObjectView;
 							}
 						case QObjectType.UnityObject:
 							{
-								return root.AddObject(name,type, (UnityEngine.Object)obj, (value) => { changeEvent(value); });
+								return root.AddObject(name, type, (UnityEngine.Object)obj, (value) => { changeEvent(value); });
 							}
 						case QObjectType.Object:
 							{
@@ -445,11 +445,11 @@ namespace QTool
 									listView = foldout.contentContainer.AddListView(list, (element, index) =>
 									  {
 										  element.Clear();
-										  var child= element.Add(name + index, list[index], typeInfo.ElementType, (value) =>
-										  {
-											  list[index] = value;
-											  changeEvent?.Invoke(list);
-										  }, customAttribute);
+										  var child = element.Add(name + index, list[index], typeInfo.ElementType, (value) =>
+										   {
+											   list[index] = value;
+											   changeEvent?.Invoke(list);
+										   }, customAttribute);
 										  child.AddMenu((menu) =>
 										  {
 											  menu.menu.AppendAction("新增", action =>
@@ -466,8 +466,10 @@ namespace QTool
 											  });
 										  });
 									  });
-									listView.AddMenu((menu) => {
-										menu.menu.AppendAction("新增", action => {
+									listView.AddMenu((menu) =>
+									{
+										menu.menu.AppendAction("新增", action =>
+										{
 											list = list.CreateAt(QSerializeType.Get(typeInfo.ElementType));
 											listView.Rebuild();
 											changeEvent?.Invoke(list);
@@ -476,9 +478,10 @@ namespace QTool
 									listView.selectionType = SelectionType.None;
 									return foldout;
 								}
-							}break;
-						default:
+							}
 							break;
+						default:
+							return root.AddLabel("不支持类型[" + type + "]");
 					}
 					break;
 
@@ -486,9 +489,9 @@ namespace QTool
 				case TypeCode.Empty:
 				case TypeCode.DBNull:
 				default:
-					return root.AddLabel(name+"\t"+ obj?.ToString());
+					return root.AddLabel(name + "\t" + obj?.ToString());
 			}
-			return root.AddLabel(name);
+			return root.AddLabel(name + " " + obj);
 		}
 		public static void SetBorder(this IStyle style,Color color,float width=1,float radius=5)
 		{
