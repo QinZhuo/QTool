@@ -19,7 +19,14 @@ namespace QTool
 		}
 		private void Fresh()
 		{
-			m_Color = Key.ToColor();
+			if (List.ContainsKey(Key))
+			{
+				m_Color = List.Get(Key).color;
+			}
+			else
+			{
+				m_Color = Key.ToColor();
+			}
 			OnKeyChange.Invoke(m_Color);
 		}
 		private void OnValidate()
@@ -27,7 +34,7 @@ namespace QTool
 			Fresh();
 		}
 		public ColorEvent OnKeyChange = new ColorEvent();
+		public List<QKeyColorValue> List = new List<QKeyColorValue>();
 	}
-
 }
 
