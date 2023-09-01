@@ -8,7 +8,8 @@ namespace QTool
 	[ExecuteInEditMode]
 	public class QNavMeshSurface : MonoBehaviour
 	{
-	
+		private List<NavMeshBuildSource> SourceList = new List<NavMeshBuildSource>();
+		private List<NavMeshBuildMarkup> Markups = new List<NavMeshBuildMarkup>();
 		private NavMeshDataInstance navMeshInstance = default;
 		private NavMeshData navMesh = null;
 		public NavMeshCollectGeometry CollectGeometry = NavMeshCollectGeometry.PhysicsColliders;
@@ -30,9 +31,7 @@ namespace QTool
 			if (!enabled)
 			{
 				return;
-			}    
-			List<NavMeshBuildSource> SourceList = new List<NavMeshBuildSource>();
-			List<NavMeshBuildMarkup> Markups = new List<NavMeshBuildMarkup>();
+			}
 			var bounds = Matrix4x4.TRS(transform.position, transform.rotation, Vector3.one).inverse.MultiplyBounds(transform.GetBounds());
 			bounds.Expand(0.1f);
 			CollectSources(transform, -1, CollectGeometry, 0, Markups, SourceList);
@@ -51,12 +50,14 @@ namespace QTool
 		}
 		public void Clear()
 		{
-			//Markups.Clear();
-			//SourceList.Clear();
+			Markups.Clear();
+			SourceList.Clear();
 			navMeshInstance.Remove();
 		}
 		public void CollectSources(Transform root, int includedLayerMask, NavMeshCollectGeometry geometry, int defaultArea, List<NavMeshBuildMarkup> markups, List<NavMeshBuildSource> results)
 		{
+			markups.Clear();
+			results.Clear();
 			NavMeshBuilder.CollectSources(root, includedLayerMask, geometry, defaultArea, markups, results);
 			switch (CollectGeometry)
 			{

@@ -846,7 +846,7 @@ namespace QTool
 		public static Mesh GetMesh(this Collider2D collider)
 		{
 			uint hash = collider.GetShapeHash();
-			if (!Collider2DMeshCache.ContainsKey(hash))
+			if (!Collider2DMeshCache.ContainsKey(hash)|| Collider2DMeshCache[hash]==null)
 			{
 				Collider2DMeshCache[hash] = collider.CreateMesh(false, false);
 			}
@@ -855,7 +855,7 @@ namespace QTool
 		private static QDictionary<Sprite, Mesh> SpriteMeshCache = new QDictionary<Sprite, Mesh>();
 		public static Mesh GetMesh(this Sprite sprite)
 		{
-			if (!SpriteMeshCache.ContainsKey(sprite))
+			if (!SpriteMeshCache.ContainsKey(sprite) || SpriteMeshCache[sprite] == null)
 			{
 				var mesh = new Mesh();
 				Vector3[] vert = new Vector3[sprite.vertices.Length];
