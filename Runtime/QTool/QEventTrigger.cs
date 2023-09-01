@@ -334,7 +334,7 @@ namespace QTool
 		{
 			obj.GetParentTrigger()?.Invoke(eventName.Trim(), value);
 		}
-		public static void RegisterEvent<T>(this GameObject gameObject, T obj)
+		public static void RegisterEvent<T>(this GameObject gameObject, T obj, params string[] keys)
 		{
 			if (obj.IsNull()) return;
 			var trigger = gameObject?.GetTrigger();
@@ -344,6 +344,7 @@ namespace QTool
 				foreach (var member in typeInfo.Members)
 				{
 					if (member.QNameAttribute == null) continue;
+					if (keys.Length > 0 && keys.IndexOf(member.QName) < 0) continue;
 					if (member.Type == typeof(string) || member.Type.Is(typeof(System.Enum)))
 					{
 						//	QDebug.Log(gameObject + " 静态数据初始化 " + obj + " " + member.QName + " : " + obj);
@@ -378,7 +379,7 @@ namespace QTool
 				}
 			}
 		}
-		public static void UnRegisterEvent<T>(this GameObject gameObject, T obj)
+		public static void UnRegisterEvent<T>(this GameObject gameObject, T obj, params string[] keys)
 		{
 			if (obj.IsNull()) return;
 			var trigger = gameObject?.GetTrigger();
@@ -388,6 +389,7 @@ namespace QTool
 				foreach (var member in typeInfo.Members)
 				{
 					if (member.QNameAttribute == null) continue;
+					if (keys.Length > 0 && keys.IndexOf(member.QName) < 0) continue;
 					if (member.Type.Is(typeof(QRuntimeValue<float>)) && (trigger.floatEventList.ContainsKey(member.QName)
 								|| trigger.floatEventList.ContainsKey("当前" + member.QName) || trigger.floatEventList.ContainsKey(member.QName + "比例")))
 					{
