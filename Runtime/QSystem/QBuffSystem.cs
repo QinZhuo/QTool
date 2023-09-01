@@ -16,9 +16,9 @@ namespace QTool
 	public abstract class QEffectData<T> : QDataList<T> where T : QEffectData<T>, IKey<string>, new()
 	{
 		[QIgnore]
-		private string m_effectInfo = "";
+		protected string m_effectInfo = "";
 		[QName("效果说明")]
-		public string EffectInfo
+		public virtual string EffectInfo
 		{
 			get
 			{
