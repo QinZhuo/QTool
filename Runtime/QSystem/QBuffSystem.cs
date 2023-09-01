@@ -16,31 +16,32 @@ namespace QTool
 	public abstract class QEffectData<T> : QDataList<T> where T : QEffectData<T>, IKey<string>, new()
 	{
 		[QIgnore]
-		private string _EffctInfo = "";
+		private string m_effectInfo = "";
 		[QName("效果说明")]
 		public string EffectInfo
 		{
 			get
 			{
-				if (_EffctInfo.IsNull() && Effect != null)
+				if (m_effectInfo.IsNull() && Effect != null)
 				{
 					FreshEffectInfo();
 				}
-				return _EffctInfo;
+				return m_effectInfo;
 			}
-			protected set => _EffctInfo = value;
+			protected set => m_effectInfo = value;
 		}
 		[QName("效果")]
 		public virtual QFlowGraphAsset Effect { get => QTool.LoadAndCreate<QFlowGraphAsset>(nameof(QFlowGraph) + "/" + typeof(T).Name + "/" + Key); protected set { } }
 	
-		public void FreshEffectInfo()
+		public string FreshEffectInfo()
 		{
 			var graph = Effect.Graph.QDataCopy();
-			_EffctInfo = "";
+			m_effectInfo = "";
 			foreach (var kv in graph.StartNode)
 			{
-				_EffctInfo += graph.ToInfoString(kv.Key) + " ";
+				m_effectInfo += graph.ToInfoString(kv.Key) + " ";
 			}
+			return m_effectInfo;
 		}
 	}
 	public abstract class QBuffData<T> : QEffectData<T> where T : QBuffData<T>, IKey<string>, new()
