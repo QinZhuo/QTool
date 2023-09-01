@@ -901,7 +901,7 @@ namespace QTool.Reflection
 				method=typeInfo.Functions["get_"+funcName]?.MethodInfo;
 			}
 			if (method == null)
-			{
+			{ 
 				return objType.InvokeStaticFunction(funcName, param);
 			}
 			else

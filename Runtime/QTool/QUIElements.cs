@@ -136,6 +136,10 @@ namespace QTool
 		public static PopupField<string> AddQPopupAttribute(this VisualElement root, QPopupAttribute att, object obj, Action<object> changeEvent = null)
 		{
 			var str = obj.ToKeyString();
+			if (str.IsNull())
+			{
+				str = "\t";
+			}
 			var data = QPopupData.Get(obj, att.getListFuncs);
 			return root.AddPopup("", data.List, str, (value) =>
 			{
@@ -681,8 +685,7 @@ namespace QTool
 		public List<string> List = new List<string>();
 	
 		public static QPopupData Get(object obj, params string[] getListFuncs)
-		{
-			Type type = null;
+		{Type type = null;
 			if (obj is Type)
 			{
 				type = obj as Type;
@@ -691,6 +694,7 @@ namespace QTool
 			{
 				type = obj?.GetType();
 			}
+			
 			var drawerKey = getListFuncs.ToOneString(" ");
 			if (drawerKey.IsNull())
 			{
@@ -705,25 +709,28 @@ namespace QTool
 			var drawer = DrawerDic[drawerKey];
 			if (getListFuncs.Length>0)
 			{
-				drawer.List.Clear();
-				drawer.List.Add("\t");
-				foreach (var getListFunc in getListFuncs)
+				if (drawer.List.Count <= 1)
 				{
-					if (getListFunc.StartsWith(nameof(Resources) + "/"))
-					{ 
-						var assets= Resources.LoadAll(getListFunc.SplitEndString(nameof(Resources)+"/"));
-						foreach (var asset in assets)
+					drawer.List.Clear();
+					drawer.List.Add("\t");
+					foreach (var getListFunc in getListFuncs)
+					{
+						if (getListFunc.StartsWith(nameof(Resources) + "/"))
 						{
-							drawer.List.Add(asset.name); 
-						}
-					}
-					else
-					{ 
-						if (obj?.InvokeFunction(getListFunc) is IList itemList)
-						{
-							foreach (var item in itemList)
+							var assets = Resources.LoadAll(getListFunc.SplitEndString(nameof(Resources) + "/"));
+							foreach (var asset in assets)
 							{
-								drawer.List.Add(item.ToKeyString());
+								drawer.List.Add(asset.name);
+							}
+						}
+						else
+						{
+							if (obj?.InvokeFunction(getListFunc) is IList itemList)
+							{
+								foreach (var item in itemList)
+								{
+									drawer.List.Add(item.ToKeyString());
+								}
 							}
 						}
 					}
