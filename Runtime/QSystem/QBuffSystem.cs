@@ -24,12 +24,7 @@ namespace QTool
 			{
 				if (_EffctInfo.IsNull() && Effect != null)
 				{
-					var graph = Effect.Graph.QDataCopy();
-					_EffctInfo = "";
-					foreach (var kv in graph.StartNode)
-					{
-						_EffctInfo += graph.ToInfoString(kv.Key)+" ";
-					}
+					FreshEffectInfo();
 				}
 				return _EffctInfo;
 			}
@@ -37,6 +32,16 @@ namespace QTool
 		}
 		[QName("效果")]
 		public virtual QFlowGraphAsset Effect { get => QTool.LoadAndCreate<QFlowGraphAsset>(nameof(QFlowGraph) + "/" + typeof(T).Name + "/" + Key); protected set { } }
+	
+		public void FreshEffectInfo()
+		{
+			var graph = Effect.Graph.QDataCopy();
+			_EffctInfo = "";
+			foreach (var kv in graph.StartNode)
+			{
+				_EffctInfo += graph.ToInfoString(kv.Key) + " ";
+			}
+		}
 	}
 	public abstract class QBuffData<T> : QEffectData<T> where T : QBuffData<T>, IKey<string>, new()
 	{
