@@ -248,6 +248,10 @@ namespace QTool
 	{
 	}
 	[System.Serializable]
+	public class ColorEvent : UnityEvent<Color>
+	{
+	}
+	[System.Serializable]
 	public class GameObjectEvent : UnityEvent<GameObject>
 	{
 	}
@@ -340,11 +344,10 @@ namespace QTool
 				foreach (var member in typeInfo.Members)
 				{
 					if (member.QNameAttribute == null) continue;
-					if (member.Type == typeof(string))
+					if (member.Type == typeof(string) || member.Type.Is(typeof(System.Enum)))
 					{
-						var value = member.Get(obj);
-					//	QDebug.Log(gameObject + " 静态数据初始化 " + obj + " " + member.QName + " : " + obj);
-						gameObject.InvokeEvent(member.QName, value?.ToString());
+						//	QDebug.Log(gameObject + " 静态数据初始化 " + obj + " " + member.QName + " : " + obj);
+						gameObject.InvokeEvent(member.QName, member.Get(obj)?.ToString());
 					}
 					else if (member.Type.Is(typeof(QRuntimeValue<float>)) && (trigger.floatEventList.ContainsKey(member.QName)
 								|| trigger.floatEventList.ContainsKey("当前" + member.QName) || trigger.floatEventList.ContainsKey(member.QName + "比例")))
@@ -353,7 +356,7 @@ namespace QTool
 						runtimeValue.Name = member.QName;
 						runtimeValue.OnValueChange += gameObject.InvokeEvent;
 						runtimeValue.InvokeOnChange();
-					//	QDebug.Log(gameObject + " 注册" + member.Type.Name + "数据更改事件 " + obj + " " + member.QName);
+						//	QDebug.Log(gameObject + " 注册" + member.Type.Name + "数据更改事件 " + obj + " " + member.QName);
 					}
 					else if (member.Type.Is(typeof(QRuntimeValue<string>)) && trigger.stringEventList.ContainsKey(member.QName))
 					{
@@ -361,7 +364,7 @@ namespace QTool
 						runtimeValue.Name = member.QName;
 						runtimeValue.OnValueChange += gameObject.InvokeEvent;
 						runtimeValue.InvokeOnChange();
-					//	QDebug.Log(gameObject + " 注册" + member.Type.Name + "数据更改事件 " + obj + " " + member.QName);
+						//	QDebug.Log(gameObject + " 注册" + member.Type.Name + "数据更改事件 " + obj + " " + member.QName);
 					}
 					else if (member.Type.Is(typeof(QRuntimeValue<bool>)) && trigger.boolEventList.ContainsKey(member.QName))
 					{
@@ -369,7 +372,7 @@ namespace QTool
 						runtimeValue.Name = member.QName;
 						runtimeValue.OnValueChange += gameObject.InvokeEvent;
 						runtimeValue.InvokeOnChange();
-					//	QDebug.Log(gameObject + " 注册" + member.Type.Name + "数据更改事件 " + obj + " " + member.QName);
+						//	QDebug.Log(gameObject + " 注册" + member.Type.Name + "数据更改事件 " + obj + " " + member.QName);
 
 					}
 				}

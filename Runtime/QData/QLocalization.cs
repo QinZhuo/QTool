@@ -21,7 +21,7 @@ namespace QTool
 					this.m_key = value;
 					OnKeyChange?.Invoke(m_key);
 				}
-				CheckFresh();
+				Fresh();
 			}
 		}
 		#endregion
@@ -29,17 +29,17 @@ namespace QTool
 		public StringEvent OnLocalizationChange;
 		private void Awake()
 		{
-			OnLanguageChange += CheckFresh;
+			OnLanguageChange += Fresh;
 		}
 		private void Start()
 		{
-			CheckFresh();
+			Fresh();
 		}
 		private void OnDestroy()
 		{
-			OnLanguageChange -= CheckFresh;
+			OnLanguageChange -= Fresh;
 		}
-		private void CheckFresh()
+		private void Fresh()
 		{
 			try
 			{
