@@ -33,10 +33,10 @@ namespace QTool
 				}
 				return _EffctInfo;
 			}
-			set => _EffctInfo = value;
+			protected set => _EffctInfo = value;
 		}
 		[QName("效果")]
-		public virtual QFlowGraphAsset Effect { get => QTool.LoadAndCreate<QFlowGraphAsset>(nameof(QFlowGraph) + "/" + typeof(T).Name + "/" + Key); set { } }
+		public virtual QFlowGraphAsset Effect { get => QTool.LoadAndCreate<QFlowGraphAsset>(nameof(QFlowGraph) + "/" + typeof(T).Name + "/" + Key); protected set { } }
 	}
 	public abstract class QBuffData<T> : QEffectData<T> where T : QBuffData<T>, IKey<string>, new()
 	{
