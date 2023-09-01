@@ -96,7 +96,7 @@ namespace QTool.Net
 				}
 				if (player == transport.ClientId)
 				{
-					SendAction.TriggerEvent(key, value);
+					SendAction.InvokeEvent(key, value);
 				}
 			}
 		}
@@ -364,7 +364,7 @@ namespace QTool.Net
 									break;
 								case nameof(DefaultNetAction.SyncLoad): break;
 								default:
-									QEventManager.Trigger(actionData.Key + "_" + eventData.Key, eventData.Value);
+									QEventManager.InvokeEvent(actionData.Key + "_" + eventData.Key, eventData.Value);
 									break;
 							}
 						}
@@ -517,7 +517,7 @@ namespace QTool.Net
 				Values[kv.Key] = kv.Value;
 			}
 		}
-		public void TriggerEvent(string key, object value)
+		public void InvokeEvent(string key, object value)
 		{
 			Events.Add(new QKeyValue<string, object>(key, value));
 		}

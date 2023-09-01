@@ -23,18 +23,18 @@ namespace QTool
 			for (int level = 0; level < 3; level++)
 			{
 				await Task.Delay(100);
-				QAnalysis.Trigger("战斗/Level-" + level + "开始");
+				QAnalysis.InvokeEvent("战斗/Level-" + level + "开始");
 				for (int i = 0; i < 3; i++)
 				{
 					await Task.Delay(100);
-					QAnalysis.Trigger("战斗/Level-" + level + "_使用技能", "技能-" + i);
+					QAnalysis.InvokeEvent("战斗/Level-" + level + "_使用技能", "技能-" + i);
 					await Task.Delay(100);
-					QAnalysis.Trigger("战斗/Level-" + level + "_获得分数", 10+i);
+					QAnalysis.InvokeEvent("战斗/Level-" + level + "_获得分数", 10+i);
 					await Task.Delay(100);
-					QAnalysis.Trigger("战斗/Level-" + level + "_获得物品", "Item_" + i,i);
+					QAnalysis.InvokeEvent("战斗/Level-" + level + "_获得物品", "Item_" + i,i);
 					await Task.Delay(100);
 				}
-				QAnalysis.Trigger("战斗/Level-" + level+"结束",level<2);
+				QAnalysis.InvokeEvent("战斗/Level-" + level+"结束",level<2);
 				await Task.Delay(100);
 			}
 		}

@@ -33,7 +33,7 @@ namespace QTool
 					Graph = null;
 				}
 			}
-			public void TriggerEvent(string key)
+			public void InvokeEvent(string key)
 			{
 				if (Graph != null && Graph.GetNode(key) != null)
 				{
@@ -166,13 +166,13 @@ namespace QTool
 		{
 			if (item.Graph != null)
 			{
-				item.TriggerEvent(AddEventKey);
+				item.InvokeEvent(AddEventKey);
 				foreach (var node in item.Graph.StartNode)
 				{
 					var name = node.Value.Name;
 					if (name != AddEventKey && name != RemoveEventKey)
 					{
-						EventActions[name] += item.TriggerEvent;
+						EventActions[name] += item.InvokeEvent;
 					}
 				}
 			}
@@ -182,19 +182,19 @@ namespace QTool
 		{
 			if (item.Graph!=null)
 			{
-				item.TriggerEvent(RemoveEventKey);
+				item.InvokeEvent(RemoveEventKey);
 				foreach (var node in item.Graph.StartNode)
 				{
 					var name = node.Value.Name;
 					if (name != AddEventKey && name != RemoveEventKey)
 					{
-						EventActions[name] -= item.TriggerEvent;
+						EventActions[name] -= item.InvokeEvent;
 					}
 				}
 			}
 			OnRemoveItem?.Invoke(item);
 		}
-		public void TriggerEvent(string key)
+		public void InvokeEvent(string key)
 		{
 			if (EventActions.ContainsKey(key))
 			{

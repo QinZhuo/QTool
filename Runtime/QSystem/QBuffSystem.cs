@@ -83,7 +83,7 @@ namespace QTool
 					Graph = null;
 				}
 			}
-			public void TriggerEvent(string key)
+			public void InvokeEvent(string key)
 			{
 				if (Graph != null && Graph.GetNode(key) != null)
 				{
@@ -197,16 +197,16 @@ namespace QTool
 				{
 					if(!node.Value.Name.EndsWith("每层"))
 					{
-						EventActions[node.Value.Name] += buff.TriggerEvent;
+						EventActions[node.Value.Name] += buff.InvokeEvent;
 					}
 				}
 			}
-			buff.TriggerEvent(StartEventKey);
+			buff.InvokeEvent(StartEventKey);
 		}
 		private void StopBuff(QBuffData<BuffData>.Runtime buff)
 		{
 			OnStopBuff?.Invoke(buff);
-			buff.TriggerEvent(StopEventKey);
+			buff.InvokeEvent(StopEventKey);
 			Buffs.Remove(buff.Key);
 			if (buff.Graph != null)
 			{
@@ -214,7 +214,7 @@ namespace QTool
 				{
 					if (!node.Value.Name.EndsWith("每层"))
 					{
-						EventActions[node.Value.Name] -= buff.TriggerEvent;
+						EventActions[node.Value.Name] -= buff.InvokeEvent;
 					}
 				}
 			}
@@ -237,7 +237,7 @@ namespace QTool
 				{
 					if (buff.TimeEvent.Check(deltaTime))
 					{
-						buff.TriggerEvent(TimeEventKey);
+						buff.InvokeEvent(TimeEventKey);
 					}
 				}
 			}
@@ -256,14 +256,14 @@ namespace QTool
 			OnAddBuff?.Invoke(buff);
 			if (buff.Graph != null)
 			{
-				buff.TriggerEvent(AddEventKey);
+				buff.InvokeEvent(AddEventKey);
 				if (buff.Data.Megre.HasFlag(QBuffMergeMode.叠层))
 				{
 					foreach (var node in buff.Graph.StartNode)
 					{
 						if (node.Value.Name.EndsWith("每层"))
 						{
-							EventActions[node.Value.Name] += buff.TriggerEvent;
+							EventActions[node.Value.Name] += buff.InvokeEvent;
 						}
 					}
 				}
@@ -274,20 +274,20 @@ namespace QTool
 			OnRemoveBuff?.Invoke(buff);
 			if (buff.Graph != null)
 			{
-				buff.TriggerEvent(RemoveEventKey);
+				buff.InvokeEvent(RemoveEventKey);
 				if (buff.Data.Megre.HasFlag(QBuffMergeMode.叠层))
 				{
 					foreach (var node in buff.Graph.StartNode)
 					{
 						if (node.Value.Name.EndsWith("每层"))
 						{
-							EventActions[node.Value.Name] -= buff.TriggerEvent;
+							EventActions[node.Value.Name] -= buff.InvokeEvent;
 						}
 					}
 				}
 			}
 		}
-		public void TriggerEvent(string key)
+		public void InvokeEvent(string key)
 		{
 			if (EventActions.ContainsKey(key))
 			{
@@ -295,7 +295,7 @@ namespace QTool
 			}
 			if (!key.EndsWith("每层"))
 			{
-				TriggerEvent(key+"每层");
+				InvokeEvent(key+"每层");
 			}
 		}
 		

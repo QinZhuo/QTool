@@ -339,7 +339,7 @@ namespace QTool
 				versions[versions.Length - 1] = (int.Parse(versions[versions.Length - 1]) + 1).ToString();
 			}
 			PlayerSettings.bundleVersion = versions.ToOneString(".");
-			QEventManager.Trigger("游戏版本", PlayerSettings.bundleVersion);
+			QEventManager.InvokeEvent("游戏版本", PlayerSettings.bundleVersion);
 			QDebug.Log("打包完成 "+ report.summary.outputPath);
 		}
 

@@ -23,7 +23,7 @@ namespace QTool
 		/// 触发事件
 		/// </summary>
 		/// <param name="eventKey">事件名</param>
-		public static void Trigger(string eventKey)
+		public static void InvokeEvent(string eventKey)
         {
 			QDebug.Log("触发事件[" + eventKey+"]");
 			try
@@ -52,9 +52,9 @@ namespace QTool
 				Debug.LogError("触发事件[" + eventKey + "]出错：\n" + e);
 			}
         }
-        public static void Trigger<T>(string eventKey,T value)
+        public static void InvokeEvent<T>(string eventKey,T value)
         {
-            QEventManager<T>.Trigger(eventKey, value);
+            QEventManager<T>.InvokeEvent(eventKey, value);
         }
 		public static void RegisterKeyEvent(string eventKey, System.Action<string> action)
 		{
@@ -102,7 +102,7 @@ namespace QTool
         internal static QDictionary<string, System.Action<T>> EventList = new QDictionary<string, System.Action<T>>();
 
 		internal static QDictionary<string, System.Action<T>> OnceEventList = new QDictionary<string, System.Action<T>>();
-		public static void Trigger(string eventKey,T value)
+		public static void InvokeEvent(string eventKey,T value)
 		{
 			try
 			{

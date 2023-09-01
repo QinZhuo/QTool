@@ -168,10 +168,10 @@ namespace QTool.FlowGraph
 				taskList.Add(i);
 			}
 			QDebug.Log("全部完成节点开始：[" + taskList.ToOneString("|") + "]");
-			This.TriggerPortList.Clear();
+			This.RunningPortList.Clear();
 			while (taskList.Count > 0)
 			{
-				foreach (var port in This.TriggerPortList)
+				foreach (var port in This.RunningPortList)
 				{
 					if (port.port == nameof(branchs))
 					{
@@ -179,15 +179,15 @@ namespace QTool.FlowGraph
 						QDebug.Log("完成[" + port.index + "]剩余[" + taskList.ToOneString("|") + "]");
 					}
 				}
-				This.TriggerPortList.Clear();
+				This.RunningPortList.Clear();
 				yield return QFlowGraph.Step;
 			}
 			QDebug.Log("全部完成");
 		}
 		[QName("触发/触发事件")]
-		public static void TriggerEvent(string eventName)
+		public static void InvokeEvent(string eventName)
 		{
-			QEventManager.Trigger(eventName);
+			QEventManager.InvokeEvent(eventName);
 		}
 		[QName("触发/触发器")]
 		public static IEnumerator Trigger(QFlowNode This, [QName("起点"), QInputPort("起点")] Transform start, [QName("目标"), QInputPort("目标")] Transform target, [QName("预制体"),QPopup(nameof(Resources)+"/"+nameof(QTrigger))] string prefabKey, [QName("触发"), QFlowPort, QOutputPort] Transform triggerObject)

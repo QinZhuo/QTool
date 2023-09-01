@@ -66,8 +66,8 @@ namespace QTool
 			{
 				return;
 			}
-			Trigger(nameof(QAnalysisEventName.游戏_开始),new StartInfo().Start());
-			Trigger(nameof(QAnalysisEventName.系统地区), QTool.RealyCulture.EnglishName);
+			InvokeEvent(nameof(QAnalysisEventName.游戏_开始),new StartInfo().Start());
+			InvokeEvent(nameof(QAnalysisEventName.系统地区), QTool.RealyCulture.EnglishName);
 			errorInfoList.Clear();
 			Application.focusChanged += OnFocus;
 			Application.logMessageReceived += LogCallback;
@@ -76,7 +76,7 @@ namespace QTool
 		}
 		static void OnSceneLoaded(Scene scene, LoadSceneMode mode)
 		{
-			Trigger(nameof(QAnalysisEventName.游戏_场景),scene.name);
+			InvokeEvent(nameof(QAnalysisEventName.游戏_场景),scene.name);
 		}
 		static List<string> errorInfoList = new List<string>();
 		static void LogCallback(string condition, string stackTrace, LogType type)
@@ -91,7 +91,7 @@ namespace QTool
 					if (!errorInfoList.Contains(condition))
 					{
 						errorInfoList.Add(condition);
-						Trigger(nameof(QAnalysisEventName.游戏_错误), Application.platform+" "+Application.platform+"\n"+condition + '\n' + stackTrace.Replace("(at <00000000000000000000000000000000>:0)","").ToShortString(10000));
+						InvokeEvent(nameof(QAnalysisEventName.游戏_错误), Application.platform+" "+Application.platform+"\n"+condition + '\n' + stackTrace.Replace("(at <00000000000000000000000000000000>:0)","").ToShortString(10000));
 					}
 					break;
 			}
@@ -100,7 +100,7 @@ namespace QTool
 		{
 			if (!focus)
 			{
-				Trigger(nameof(QAnalysisEventName.游戏_暂离));
+				InvokeEvent(nameof(QAnalysisEventName.游戏_暂离));
 			}
 		}
 		static bool OnWantsQuit()
@@ -128,7 +128,7 @@ namespace QTool
 			{
 				return;
 			}
-			Trigger(nameof(QAnalysisEventName.游戏_结束));
+			InvokeEvent(nameof(QAnalysisEventName.游戏_结束));
 			Application.focusChanged -= OnFocus;
 			Application.logMessageReceived -= LogCallback;
 			await SendAndClear();
@@ -185,7 +185,7 @@ namespace QTool
 		static List<QAnalysisEvent> EventList = new List<QAnalysisEvent>();
 
 		[System.Diagnostics.Conditional("UNITY_STANDALONE")]
-		public static void Trigger(string eventKey,object value=null)
+		public static void InvokeEvent(string eventKey,object value=null)
 		{
 
 #if UNITY_EDITOR
@@ -220,9 +220,9 @@ namespace QTool
 			}
 		}
 		[System.Diagnostics.Conditional("UNITY_STANDALONE"),]
-		public static void Trigger(string eventKey,string key, object value)
+		public static void InvokeEvent(string eventKey,string key, object value)
 		{
-			Trigger(eventKey, new QKeyValue<string, object>(key, value));
+			InvokeEvent(eventKey, new QKeyValue<string, object>(key, value));
 		}
 	}
 	public class StartInfo

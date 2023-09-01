@@ -248,7 +248,7 @@ namespace QTool.FlowGraph
 									Run(targetPort.Node.Key);
 								}
 							}
-							targetPort.Node.TriggerPort(port.Value);
+							targetPort.Node.SetPortRunning(port.Value);
 							curNode = null;
 						}
 					}
@@ -1046,7 +1046,7 @@ namespace QTool.FlowGraph
         [QIgnore]
         public QCommandInfo command { get; private set; }
         [QIgnore]
-        public List<PortId> TriggerPortList { get; private set; } = new List<PortId>();
+        public List<PortId> RunningPortList { get; private set; } = new List<PortId>();
         public QFlowNode()
         {
         }
@@ -1331,9 +1331,9 @@ namespace QTool.FlowGraph
                 port.Value = commandParams[port.paramIndex];
             }
         }
-        internal void TriggerPort(PortId port)
+        internal void SetPortRunning(PortId port)
         {
-            TriggerPortList.AddCheckExist(port);
+            RunningPortList.AddCheckExist(port);
         }
         public void RunPort(string portKey,int index=0)
         {
