@@ -13,14 +13,19 @@ namespace QTool
 	public class QToolSetting : InstanceScriptable<QToolSetting>
 	{
 #if Steamworks
-		public uint SteamId=480;
+		public uint SteamId = 480;
 #endif
-		[QName("强制渲染比例"),Tooltip("只有挂载 "+nameof(QScreenAspect)+" 脚本的相机和UI会生效")]
-		public float targetAspect = 16f/9f;
+		[QName(nameof(QKeyColor) + "颜色")]
+		public List<QKeyColorValue> qKeyColorList = new List<QKeyColorValue>();
+		[QName("强制分辨率比例"), Tooltip("只有挂载 " + nameof(QScreenAspect) + " 脚本的相机和UI会生效")]
+		public float targetAspect = 16f / 9f;
 		[QName("Mod文件夹")]
 		public List<string> modeList = new List<string> { nameof(QLocalizationData) };
 		[QName("游戏数据邮箱")]
 		public QMailAccount QAnalysisMail;
+		[QName("QNet网络同步速度")]
+		[Range(5, 50)]
+		public int qNetFrameSpeed = 50;
 #if UNITY_EDITOR
 		[QName("音频强制单声道")]
 		public bool forceToMono = true;
@@ -48,15 +53,24 @@ namespace QTool
 			}
 		};
 		[QName("图片压缩质量")]
-		[Range(0,100)]
+		[Range(0, 100)]
 		public int compressionQuality = 50;
 #endif
-		[QName("QNet网络同步速度")]
-		[Range(5, 50)]
-		public int qNetFrameSpeed=50;
 		private void OnValidate()
 		{
 			QAnalysisMail?.Init();
 		}
+	}
+	[System.Serializable]
+	public class QKeyColorList : QList<string, QKeyColorValue>
+	{
+
+	}
+	[System.Serializable]
+	public struct QKeyColorValue : IKey<string>
+	{
+		public string Key { get => key; set => value = key; }
+		public string key;
+		public Color color;
 	}
 }

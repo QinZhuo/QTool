@@ -162,7 +162,11 @@ namespace QTool
 		public static Color ToColor(this string key, float s = 0.5f, float v = 1f)
         {
             if (string.IsNullOrWhiteSpace(key)) return Color.white;
-			if(ColorUtility.TryParseHtmlString(key,out var newColor))
+			if(QToolSetting.Instance.qKeyColorList.ContainsKey(key))
+			{
+				return QToolSetting.Instance.qKeyColorList.Get(key).color;
+			}
+			if (ColorUtility.TryParseHtmlString(key,out var newColor))
 			{
 				return newColor;
 			}
