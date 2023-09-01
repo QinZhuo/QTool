@@ -65,6 +65,14 @@ namespace QTool
 				obj.transform.localScale = prefab.transform.localScale;
 				obj.transform.position = prefab.transform.position;
 				obj.transform.rotation = prefab.transform.rotation;
+				var rect = prefab.transform.RectTransform();
+				if (rect != null)
+				{
+					var newRect = obj.transform.RectTransform();
+					newRect.anchorMin = rect.anchorMin;
+					newRect.anchorMax = rect.anchorMax;
+					newRect.anchoredPosition = rect.anchoredPosition;
+				}
 				obj.SetActive(true);
 			},
 			obj =>
