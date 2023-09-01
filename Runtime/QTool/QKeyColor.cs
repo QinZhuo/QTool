@@ -9,7 +9,7 @@ namespace QTool
 		private string m_Key;
 		[SerializeField]
 		private Color m_Color;
-		private string Key
+		public string Key
 		{
 			get => m_Key; set
 			{
