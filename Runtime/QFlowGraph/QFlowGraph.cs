@@ -596,9 +596,13 @@ namespace QTool.FlowGraph
 				}
 				return node.ToInfoString();
 			}
-			else
+			else if(!IsOutput)
 			{
 				return GetValue(index)?.ToString();
+			}
+			else
+			{
+				return "";
 			}
 		}
 		public void IndexChange(int a, int b)
