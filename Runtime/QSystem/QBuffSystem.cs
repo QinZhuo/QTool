@@ -137,6 +137,16 @@ namespace QTool
 			else
 			{
 				var buff = Buffs[key];
+				if (buff.Data.Megre.HasFlag(QBuffMergeMode.叠层))
+				{
+					buff.Time.OffsetValue = 0;
+					buff.Time.CurrentValue = 0;
+					buff.Count.OffsetValue += count;
+				}
+				else
+				{
+					buff.Count.OffsetValue = 1;
+				}
 				if (buff.Data.Megre.HasFlag(QBuffMergeMode.时间))
 				{
 					buff.Time.OffsetValue += time;
@@ -147,14 +157,6 @@ namespace QTool
 					var oldValue = buff.Time.OffsetValue;
 					buff.Time.OffsetValue = Mathf.Max(buff.Time.OffsetValue, time);
 					buff.Time.CurrentValue += buff.Time.OffsetValue - oldValue;
-				}
-				if(buff.Data.Megre.HasFlag(QBuffMergeMode.叠层))
-				{
-					buff.Count.OffsetValue += count;
-				}
-				else
-				{
-					buff.Count.OffsetValue = 1;
 				}
 				for (int i = 0; i < count; i++)
 				{
