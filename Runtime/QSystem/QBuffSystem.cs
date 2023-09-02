@@ -139,8 +139,6 @@ namespace QTool
 				var buff = Buffs[key];
 				if (buff.Data.Megre.HasFlag(QBuffMergeMode.叠层))
 				{
-					buff.Time.OffsetValue = 0;
-					buff.Time.CurrentValue = 0;
 					buff.Count.OffsetValue += count;
 				}
 				else

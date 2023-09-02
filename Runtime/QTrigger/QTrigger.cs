@@ -11,6 +11,7 @@ namespace QTool
 		public virtual Transform Target { get; set; }
 		public QFlowNode Node { get; set; }
 		public QFlowGraph Graph => Node?.Graph;
+		public abstract IEnumerator Init();
 		public abstract IEnumerator Run(Action<Transform> action);
 	}
 }
