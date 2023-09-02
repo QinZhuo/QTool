@@ -707,30 +707,27 @@ namespace QTool
 				drawerKey = type?.ToString();
 			}
 			var drawer = DrawerDic[drawerKey];
-			if (getListFuncs.Length>0)
+			if (getListFuncs.Length > 0)
 			{
-				if (drawer.List.Count <= 1)
+				drawer.List.Clear();
+				drawer.List.Add("\t");
+				foreach (var getListFunc in getListFuncs)
 				{
-					drawer.List.Clear();
-					drawer.List.Add("\t");
-					foreach (var getListFunc in getListFuncs)
+					if (getListFunc.StartsWith(nameof(Resources) + "/"))
 					{
-						if (getListFunc.StartsWith(nameof(Resources) + "/"))
+						var assets = Resources.LoadAll(getListFunc.SplitEndString(nameof(Resources) + "/"));
+						foreach (var asset in assets)
 						{
-							var assets = Resources.LoadAll(getListFunc.SplitEndString(nameof(Resources) + "/"));
-							foreach (var asset in assets)
-							{
-								drawer.List.Add(asset.name);
-							}
+							drawer.List.Add(asset.name);
 						}
-						else
+					}
+					else
+					{
+						if (obj.InvokeFunction(getListFunc) is IList itemList)
 						{
-							if (obj?.InvokeFunction(getListFunc) is IList itemList)
+							foreach (var item in itemList)
 							{
-								foreach (var item in itemList)
-								{
-									drawer.List.Add(item.ToKeyString());
-								}
+								drawer.List.Add(item.ToKeyString());
 							}
 						}
 					}

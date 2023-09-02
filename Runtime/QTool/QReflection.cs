@@ -884,7 +884,7 @@ namespace QTool.Reflection
 				return null;
 			}
 #if UNITY_EDITOR
-			if (obj is UnityEditor.SerializedProperty property)
+			if (obj is SerializedProperty property)
 			{
 				obj = property.serializedObject.targetObject;
 			}
