@@ -109,7 +109,7 @@ namespace QTool.FlowGraph
 									view = CellView.Add("", member.Get(obj), member.Type, (newValue) =>
 									{
 										member.Set(obj, newValue);
-										label.text = newValue.ToQDataType(member.Type, false).Trim('\"');
+										label.text = member.Get(obj).ToQDataType(member.Type, false).Trim('\"');
 									}, member.MemeberInfo);
 								}
 								AutoSaveLoad = false;
