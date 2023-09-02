@@ -26,6 +26,26 @@ namespace QTool.FlowGraph
         {
             return this.ToQData();
         }
+		[QIgnore]
+		public float ToFloat(string startKey = null)
+		{
+			var value = 0f;
+			if (startKey.IsNull())
+			{
+				foreach (var kv in StartNode)
+				{
+					value += ToFloat(kv.Key);
+				}
+			}
+			else
+			{
+				foreach (var kv in StartNode)
+				{
+					value += kv.Value.ToFloat();
+				}
+			}
+			return value;
+		}
 		public string ToInfoString(string startKey=null)
 		{
 			var info = "";
@@ -585,6 +605,26 @@ namespace QTool.FlowGraph
 		{
 			return name + " (" + ConnectType + ")["+Key+"]";
 		}
+		public float ToFloat(int index = 0)
+		{
+			if (HasConnect(index))
+			{
+				var node = GetConnectNode(index);
+				if (node == null)
+				{
+					node = GetConnectNode(index, false);
+				}
+				return node.ToFloat();
+			}
+			else if (!IsOutput)
+			{
+				return GetValue(index).ToComputeFloat();
+			}
+			else
+			{
+				return 0;
+			}
+		}
 		public string ToInfoString(int index = 0)
 		{
 			if (HasConnect(index))
@@ -994,7 +1034,26 @@ namespace QTool.FlowGraph
 			}
 			return NodeToInfoString(this);
 		}
-		[System.Flags]
+		private Func<QFlowNode, float> NodeToFloat { get; set; } = null;
+		[QIgnore]
+		public float ToFloat()
+		{
+			if (command?.method == null) return 0;
+			if (NodeToFloat == null)
+			{
+				var method = command.method.DeclaringType.GetStaticMethod(nameof(ToFloat));
+				if (method == null)
+				{
+					NodeToFloat = (node) => 0;
+				}
+				else
+				{
+					NodeToFloat = (node) => method.Invoke(null, new object[] { node }).ToComputeFloat();
+				}
+			}
+			return NodeToFloat(this);
+		}
+		[Flags]
         public enum ReturnType
         {
             Void,

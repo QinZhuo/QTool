@@ -25,7 +25,6 @@ namespace QTool
 				if (m_effectInfo.IsNull() && Effect != null)
 				{
 					m_effectInfo = Effect.Graph.ToInfoString();
-					return m_effectInfo;
 				}
 				return m_effectInfo;
 			}

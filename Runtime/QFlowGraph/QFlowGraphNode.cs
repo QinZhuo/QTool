@@ -245,10 +245,34 @@ namespace QTool.FlowGraph
 				case nameof(Divide):
 					return node.Ports["a"].ToInfoString() + "/" + node.Ports["b"].ToInfoString();
 				default:
-					return node.Name;
+					break;
 			}
 			info += node.Ports[QFlowKey.NextPort].GetConnectNode()?.ToInfoString();
 			return info;
+		}
+		[QIgnore]
+		public static float ToFloat(QFlowNode node)
+		{
+			var value = 0f;
+			switch (node.command.method.Name)
+			{
+				case nameof(Trigger):
+					return node.Ports["init"].ToFloat() + node.Ports["triggerObject"].ToFloat();
+				case nameof(GetValue):
+					return node["key"].ToComputeFloat();
+				case nameof(Add):
+					return node.Ports["a"].ToFloat() + node.Ports["b"].ToFloat();
+				case nameof(Subtract):
+					return node.Ports["a"].ToFloat() - node.Ports["b"].ToFloat();
+				case nameof(Multiply):
+					return node.Ports["a"].ToFloat() * node.Ports["b"].ToFloat();
+				case nameof(Divide):
+					return node.Ports["a"].ToFloat() / node.Ports["b"].ToFloat();
+				default:
+					break;
+			}
+			value += node.Ports[QFlowKey.NextPort].HasConnect() ? 0 : node.Ports[QFlowKey.NextPort].GetConnectNode().ToFloat();
+			return value;
 		}
 	}
 }

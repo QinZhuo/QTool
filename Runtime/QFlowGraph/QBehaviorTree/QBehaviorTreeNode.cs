@@ -203,5 +203,28 @@ namespace QTool.FlowGraph
 			}
 			return info;
 		}
+		[QIgnore]
+		public static float ToFloat(QFlowNode node)
+		{
+			var value = 0f;
+			switch (node.command.method.Name)
+			{
+				case nameof(Sequence):
+				case nameof(Parallel):
+					var port = node.Ports["nexts"];
+					var list = port.Value.As<IList>();
+					for (int i = 0; i < list.Count; i++)
+					{
+						if (port.HasConnect(i))
+						{
+							value += port.GetConnectNode(i).ToFloat();
+						}
+					}
+					break;
+				default:
+					break;
+			}
+			return value;
+		}
 	}
 }
