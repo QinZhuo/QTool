@@ -333,6 +333,7 @@ namespace QTool
 		{
 			EditorUtility.DisplayProgressBar("同步更新", "拉取远端更新中...", 0.2f);
 			var resultInfo =Pull(path);
+			AssetDatabase.Refresh();
 			if (CheckResult(resultInfo)&&commit)
 			{
 				EditorUtility.DisplayProgressBar("同步更新", "检测本地更改", 0.5f);
