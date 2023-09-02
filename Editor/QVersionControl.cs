@@ -333,7 +333,6 @@ namespace QTool
 		{
 			EditorUtility.DisplayProgressBar("同步更新", "拉取远端更新中...", 0.2f);
 			var resultInfo =Pull(path);
-			AssetDatabase.Refresh();
 			if (CheckResult(resultInfo)&&commit)
 			{
 				EditorUtility.DisplayProgressBar("同步更新", "检测本地更改", 0.5f);
@@ -355,14 +354,15 @@ namespace QTool
 				}
 
 			}
+			AssetDatabase.Refresh();
 			EditorUtility.ClearProgressBar();
 			if (!CheckResult(resultInfo) && EditorUtility.DisplayDialog("提交更新失败", resultInfo, "重试", "取消"))
 			{
 				PullAndCommitPush(path,commit);
 			}
 			EditorUtility.ClearProgressBar();
-			AssetDatabase.Refresh();
 			QPackageManager.FreshPackage();
+			AssetDatabase.Refresh();
 		}
 	
 		public static string Status(string path)
