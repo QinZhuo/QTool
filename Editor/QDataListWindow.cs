@@ -126,6 +126,22 @@ namespace QTool.FlowGraph
 								lastCkickTime = eventData.timestamp;
 							}
 						});
+						label.AddMenu(menu =>
+						{
+							menu.menu.AppendAction("清空" + title, action =>
+							{
+								if (typeInfo == null || member == null)
+								{
+									row[title] = "";
+									label.text = "";
+								}
+								else
+								{
+									member.Set(obj, null);
+									label.text = member.Get(obj).ToQDataType(member.Type, false).Trim('\"');
+								}
+							});
+						});
 					}
 				}
 				visual.AddMenu(menu =>
