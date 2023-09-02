@@ -889,7 +889,7 @@ namespace QTool.Reflection
 				obj = property.serializedObject.targetObject;
 			}
 #endif
-			Type objType = obj.GetType();
+			Type objType = obj == null ? typeof(object) : obj?.GetType();
 			if(obj is Type)
 			{
 				objType = obj as Type;
@@ -906,7 +906,7 @@ namespace QTool.Reflection
 			}
 			else
 			{
-				return method.Invoke( obj, param);
+				return method.Invoke(obj, param);
 			}
 		}
 		static List<Type> typeList = new List<Type>();
