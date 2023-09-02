@@ -13,8 +13,7 @@ namespace QTool.Net
 			set => transform.position = value;
 		}
 		public CharacterController Controller;
-
-		public virtual bool IsGrounded => Controller==null|| Controller.isGrounded;
+		public virtual bool IsGrounded => enabled && (Controller == null || Controller.isGrounded);
 		public CollisionFlags Move(Vector3 speed)
 		{
 			if (Controller == null)
