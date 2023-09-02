@@ -181,7 +181,7 @@ namespace QTool
 				QFileManager.Save(packagePath, text);
 			}
 		}
-		public static string Pull(string path,bool confim=true)
+		public static string Pull(string path)
 		{
 			if (EditorApplication.isPlaying)
 			{
@@ -258,10 +258,6 @@ namespace QTool
 			}
 			else
 			{
-				if (confim)
-				{
-					EditorUtility.DisplayDialog("拉取更新完成 ", "拉取更新成功", "确认");
-				}
 				return result;
 			}
 		}
