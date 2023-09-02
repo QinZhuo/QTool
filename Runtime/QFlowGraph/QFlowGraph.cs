@@ -26,13 +26,23 @@ namespace QTool.FlowGraph
         {
             return this.ToQData();
         }
-		public string ToInfoString(string startKey)
+		public string ToInfoString(string startKey=null)
 		{
 			var info = "";
-			var node = GetNode(startKey);
-			if (node?.command != null)
+			if (startKey.IsNull())
 			{
-				info = node.ToInfoString();
+				foreach (var kv in StartNode)
+				{
+					info += ToInfoString(kv.Key) + " ";
+				}
+			}
+			else
+			{
+				var node = GetNode(startKey);
+				if (node?.command != null)
+				{
+					info = node.ToInfoString();
+				}
 			}
 			return info;
 		}

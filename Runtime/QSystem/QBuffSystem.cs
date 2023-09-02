@@ -24,12 +24,7 @@ namespace QTool
 			{
 				if (m_effectInfo.IsNull() && Effect != null)
 				{
-					var graph = Effect.Graph;
-					m_effectInfo = "";
-					foreach (var kv in graph.StartNode)
-					{
-						m_effectInfo += graph.ToInfoString(kv.Key) + " ";
-					}
+					m_effectInfo = Effect.Graph.ToInfoString();
 					return m_effectInfo;
 				}
 				return m_effectInfo;
