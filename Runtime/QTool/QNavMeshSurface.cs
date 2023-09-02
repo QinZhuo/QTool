@@ -1,31 +1,41 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+#if Navigation
+using Unity.AI.Navigation;
+#endif
 using UnityEngine;
 using UnityEngine.AI;
+
 namespace QTool
 {
 	[ExecuteInEditMode]
 	public class QNavMeshSurface : MonoBehaviour
 	{
+		public LayerMask Layer = NavMesh.AllAreas;
+		public NavMeshCollectGeometry CollectGeometry = NavMeshCollectGeometry.PhysicsColliders;
+
 		private List<NavMeshBuildSource> SourceList = new List<NavMeshBuildSource>();
 		private List<NavMeshBuildMarkup> Markups = new List<NavMeshBuildMarkup>();
 		private NavMeshDataInstance navMeshInstance = default;
 		private NavMeshData navMesh = null;
-		public NavMeshCollectGeometry CollectGeometry = NavMeshCollectGeometry.PhysicsColliders;
 		private void OnEnable()
 		{
-			_ = UpdateNavMeshAsync();
+			UpdateNavMesh();
+		}
+		private void OnValidate()
+		{
+			UpdateNavMesh();
+		}
+		private void OnTransformChildrenChanged()
+		{
+			UpdateNavMesh();
 		}
 		private void OnDisable()
 		{
 			Clear();
 		}
-		private void OnTransformChildrenChanged()
-		{
-			_ = UpdateNavMeshAsync();
-		}
-		public async Task UpdateNavMeshAsync()
+		public void UpdateNavMesh()
 		{
 			Clear();
 			if (!enabled)
@@ -34,19 +44,12 @@ namespace QTool
 			}
 			var bounds = Matrix4x4.TRS(transform.position, transform.rotation, Vector3.one).inverse.MultiplyBounds(transform.GetBounds());
 			bounds.Expand(0.1f);
-			CollectSources(transform, -1, CollectGeometry, 0, Markups, SourceList);
+			CollectSources(transform, Layer, CollectGeometry, Markups, SourceList);
 			var setting = NavMesh.GetSettingsByID(0);
 			navMesh = NavMeshBuilder.BuildNavMeshData(setting, SourceList, bounds, transform.position, transform.rotation);
 			navMeshInstance = NavMesh.AddNavMeshData(navMesh, transform.position, transform.rotation);
 			navMeshInstance.owner = this;
-			if (Application.isPlaying)
-			{
-				await NavMeshBuilder.UpdateNavMeshDataAsync(navMesh, NavMesh.GetSettingsByID(0), SourceList, bounds);
-			}
-			else
-			{
-				NavMeshBuilder.UpdateNavMeshData(navMesh, NavMesh.GetSettingsByID(0), SourceList, bounds);
-			}
+			NavMeshBuilder.UpdateNavMeshData(navMesh, NavMesh.GetSettingsByID(0), SourceList, bounds);
 		}
 		public void Clear()
 		{
@@ -54,11 +57,51 @@ namespace QTool
 			SourceList.Clear();
 			navMeshInstance.Remove();
 		}
-		public void CollectSources(Transform root, int includedLayerMask, NavMeshCollectGeometry geometry, int defaultArea, List<NavMeshBuildMarkup> markups, List<NavMeshBuildSource> results)
+
+		private bool CanCollect(Component root, out int area, int includedLayerMask)
+		{
+			area = 0;
+			if (root is Renderer renderer)
+			{
+				if (!renderer.enabled)
+				{
+					return false;
+				}
+			}
+			else if (root is Behaviour behaviour)
+			{
+				if (!behaviour.enabled)
+				{
+					return false;
+				}
+			}
+			if (((0x1 << root.gameObject.layer) & includedLayerMask) == 0)
+			{
+				return false;
+			}
+#if Navigation
+			var modifier = root.GetComponent<NavMeshModifier>();
+			if (modifier != null)
+			{
+				if (modifier.overrideArea)
+				{
+					area = modifier.area;
+				}
+				if (modifier.ignoreFromBuild)
+				{
+					return false;
+				}
+			}
+#endif
+			return true;
+		}
+
+		public void CollectSources(Transform root, int includedLayerMask, NavMeshCollectGeometry geometry, List<NavMeshBuildMarkup> markups, List<NavMeshBuildSource> results)
 		{
 			markups.Clear();
 			results.Clear();
-			NavMeshBuilder.CollectSources(root, includedLayerMask, geometry, defaultArea, markups, results);
+			var sourceList = new List<NavMeshBuildSource>();
+			NavMeshBuilder.CollectSources(root, includedLayerMask, geometry, 0, markups, sourceList);
 			switch (CollectGeometry)
 			{
 				case NavMeshCollectGeometry.RenderMeshes:
@@ -68,11 +111,11 @@ namespace QTool
 						{
 							var src = new NavMeshBuildSource();
 							src.shape = NavMeshBuildSourceShape.Mesh;
-							src.area = defaultArea;
+							src.area = 0;
 							src.component = sprite;
 							src.sourceObject = sprite.sprite.GetMesh();
-							src.transform= Matrix4x4.TRS(sprite.transform.position, sprite.transform.rotation, sprite.transform.lossyScale);
-							results.Add(src);
+							src.transform = Matrix4x4.TRS(sprite.transform.position, sprite.transform.rotation, sprite.transform.lossyScale);
+							sourceList.Add(src);
 						}
 					}
 					break;
@@ -83,7 +126,7 @@ namespace QTool
 						{
 							var src = new NavMeshBuildSource();
 							src.shape = NavMeshBuildSourceShape.Mesh;
-							src.area = defaultArea;
+							src.area = 0;
 							src.component = collider;
 							src.sourceObject = collider.GetMesh();
 							if (collider.attachedRigidbody)
@@ -94,12 +137,21 @@ namespace QTool
 							{
 								src.transform = Matrix4x4.identity;
 							}
-							results.Add(src);
+							sourceList.Add(src);
 						}
 					}
 					break;
 				default:
 					break;
+			}
+			foreach (var source in sourceList)
+			{
+				if(CanCollect(source.component,out var newArea, includedLayerMask))
+				{
+					var newSource = source;
+					newSource.area = newArea;
+					results.Add(newSource);
+				}
 			}
 		}
 		private void OnDrawGizmosSelected()

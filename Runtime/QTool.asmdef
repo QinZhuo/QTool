@@ -9,7 +9,8 @@
         "GUID:75469ad4d38634e559750d17036d5f7c",
         "GUID:df380645f10b7bc4b97d4f5eb6303d95",
         "GUID:68bd7fdb68ef2684e982e8a9825b18a5",
-        "GUID:caccfbdb442cdc64fa722b4c5585521f"
+        "GUID:caccfbdb442cdc64fa722b4c5585521f",
+        "GUID:8c4dd21966739024fbd72155091d199e"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
@@ -38,6 +39,11 @@
             "name": "com.unity.2d.spriteshape",
             "expression": "",
             "define": "SpriteShap"
+        },
+        {
+            "name": "com.unity.ai.navigation",
+            "expression": "",
+            "define": "Navigation"
         }
     ],
     "noEngineReferences": false
