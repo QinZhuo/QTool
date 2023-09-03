@@ -33,10 +33,10 @@ namespace QTool
 		[QIgnore]
 		protected QFlowGraphAsset m_effect = null;
 		[QName("效果")]
-		protected virtual QFlowGraphAsset Effect
+		public virtual QFlowGraphAsset Effect
 		{
 			get { if (!Application.isPlaying) m_effect = null; return m_effect ??= QTool.LoadAndCreate<QFlowGraphAsset>(nameof(QFlowGraph) + "/" + typeof(T).Name + "/" + Key); }
-			set => m_effect = value;
+			protected set => m_effect = value;
 		}
 	}
 	public abstract class QBuffData<T> : QEffectData<T> where T : QBuffData<T>, IKey<string>, new()
