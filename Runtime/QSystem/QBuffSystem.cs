@@ -24,7 +24,7 @@ namespace QTool
 			{
 				if (m_effectInfo.IsNull() && Effect != null)
 				{
-					var graph = Effect.Graph.QDataCopy();
+					var graph = Effect.Graph;
 					graph.SetValue(this as T);
 					m_effectInfo = graph.ToInfoString();
 				}
