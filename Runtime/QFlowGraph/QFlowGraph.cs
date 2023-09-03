@@ -9,9 +9,9 @@ namespace QTool.FlowGraph
 	[Serializable]
     public class QFlowGraph: QSerializeObject<QFlowGraph>
 	{
-		public override void OnAfterQDeserialize()
+		public override void OnQDeserializeOver()
 		{
-			base.OnAfterQDeserialize();
+			base.OnQDeserializeOver();
 			if (StartNode.Count == 0)
 			{
 				foreach (var node in NodeList)
@@ -233,7 +233,7 @@ namespace QTool.FlowGraph
 		{
 			if (NodeList.Count == 0)
 			{
-				OnAfterQDeserialize();
+				OnQDeserializeOver();
 			}
 			StartCoroutine(RunIEnumerator(startNode));
 		}

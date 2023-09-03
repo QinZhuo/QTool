@@ -175,7 +175,6 @@ namespace QTool
                 case TypeCode.Object:
 					QSerializeType typeInfo = null;
 					var callback = target as IQSerializeCallback;
-					callback?.OnBeforeQSerialize();
 					var count = reader.ReadInt32();
                     var hasTarget = target != null;
                     typeInfo = QSerializeType.Get(type);
@@ -281,7 +280,7 @@ namespace QTool
                             Debug.LogError("反序列化类型[" + type + "]出错");
                             return null;
                     }
-					callback?.OnAfterQDeserialize();
+					callback?.OnQDeserializeOver();
 					return target;
                 #region 基础类型
 
