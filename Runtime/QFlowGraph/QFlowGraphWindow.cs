@@ -59,7 +59,7 @@ namespace QTool.FlowGraph
 		{
 			if (Graph != null)
 			{
-				Graph.OnBeforeSerialize();
+				Graph.OnBeforeQSerialize();
 				ChangeData(Graph.SerializeString);
 #if UNITY_EDITOR
 				if (SerializedProperty != null)

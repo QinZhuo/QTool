@@ -173,7 +173,9 @@ namespace QTool
             switch (typeCode)
             {
                 case TypeCode.Object:
-                    QSerializeType typeInfo = null;
+					QSerializeType typeInfo = null;
+					var callback = target as IQSerializeCallback;
+					callback?.OnBeforeQSerialize();
 					var count = reader.ReadInt32();
                     var hasTarget = target != null;
                     typeInfo = QSerializeType.Get(type);
@@ -279,10 +281,7 @@ namespace QTool
                             Debug.LogError("反序列化类型[" + type + "]出错");
                             return null;
                     }
-					if (typeInfo.HasCallback && target is IQSerializeCallback callback)
-					{
-						callback.OnDeserializeOver();
-					}
+					callback?.OnAfterQDeserialize();
 					return target;
                 #region 基础类型
 

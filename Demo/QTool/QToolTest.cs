@@ -97,7 +97,8 @@ namespace QTool.Test
         public void TestFunc()
         {
 			Debug.LogError(test1.ToQData().ToIdString());
-            QDebug.DebugRun("QData写入", () =>
+			Debug.LogError(test1.ToQData());
+			QDebug.DebugRun("QData写入", () =>
             {
                 for (int i = 0; i < testTimes; i++)
                 {
@@ -296,7 +297,8 @@ namespace QTool.Test
         public byte[] array = new byte[] { 123 };
         [XmlIgnore] 
         public byte[,,] arrayTest = new byte[1, 2, 2] { { { 1, 2 }, { 3, 4 } } };
-        public TestClass2 child; 
+		[QName]
+		public TTestClass child = null;
         [XmlIgnore]
         public object obj = new Vector3
         {
@@ -304,8 +306,12 @@ namespace QTool.Test
             y = 2,
             z = 3
         };
-       
-    }
+		public TTestClass()
+		{
+			child = this;
+		}
+
+	}
     [System.Serializable]
     public class TestClass2 :IQData
     {

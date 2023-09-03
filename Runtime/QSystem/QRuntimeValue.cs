@@ -76,9 +76,14 @@ namespace QTool
 			return Value?.ToString();
 		}
 
-		public virtual void OnDeserializeOver()
+		public virtual void OnAfterQDeserialize()
 		{
 			InvokeOnChange();
+		}
+
+		public virtual void OnBeforeQSerialize()
+		{
+			
 		}
 	}
 	public class QRuntimeValue: QRuntimeValue<float>
@@ -149,7 +154,7 @@ namespace QTool
 			_Value = (OriginValue + OffsetValue) * ScaleValue;
 			InvokeOnChange();
 		}
-		public override void OnDeserializeOver()
+		public override void OnAfterQDeserialize()
 		{
 			FreshValue();
 		}
