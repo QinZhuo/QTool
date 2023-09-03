@@ -251,13 +251,13 @@ namespace QTool.FlowGraph
 			return info;
 		}
 		[QIgnore]
-		public static float ToFloat(QFlowNode node)
+		public static float ToFloat(QFlowNode node, Func<float, QFlowNode> toFloatFunc = null)
 		{
 			var value = 0f;
 			switch (node.command.method.Name)
 			{
 				case nameof(Trigger):
-					return node.Ports["init"].ToFloat() + node.Ports["triggerObject"].ToFloat();
+					return node.Ports["init"].ToFloat(toFloatFunc) + node.Ports["triggerObject"].ToFloat();
 				case nameof(GetValue):
 					return node["key"].ToComputeFloat();
 				case nameof(Add):

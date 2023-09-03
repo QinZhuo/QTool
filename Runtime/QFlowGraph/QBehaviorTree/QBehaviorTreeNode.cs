@@ -1,4 +1,5 @@
 using QTool.Reflection;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -92,15 +93,15 @@ namespace QTool.FlowGraph
 		#region 复合节点
 
 		[QName("复合/选择")]
-		public static IEnumerator Selector(QFlowNode This,[QOutputPort]List<QFlow> nexts)
+		public static IEnumerator Selector(QFlowNode This, [QOutputPort] List<QFlow> nexts)
 		{
 			for (int i = 0; i < nexts.Count; i++)
 			{
-				var nextNode= This.Ports[nameof(nexts)].GetConnectNode(i);
+				var nextNode = This.Ports[nameof(nexts)].GetConnectNode(i);
 				if (nextNode != null)
 				{
 					yield return This.RunPortIEnumerator(nameof(nexts), i);
-					if(nextNode.State== QNodeState.成功)
+					if (nextNode.State == QNodeState.成功)
 					{
 						yield break;
 					}
@@ -129,10 +130,10 @@ namespace QTool.FlowGraph
 		public static IEnumerator Parallel(QFlowNode This, [QOutputPort] List<QFlow> nexts)
 		{
 			var nodes = new List<QFlowNode>();
-			
+
 			for (int i = 0; i < nexts.Count; i++)
 			{
-				var node= This.Ports[nameof(nexts)].GetConnectNode(i);
+				var node = This.Ports[nameof(nexts)].GetConnectNode(i);
 				if (node != null)
 				{
 					This.RunPort(nameof(nexts), i);
@@ -204,7 +205,7 @@ namespace QTool.FlowGraph
 			return info;
 		}
 		[QIgnore]
-		public static float ToFloat(QFlowNode node)
+		public static float ToFloat(QFlowNode node, Func<float, QFlowNode> toFloatFunc = null)
 		{
 			var value = 0f;
 			switch (node.command.method.Name)
@@ -217,7 +218,7 @@ namespace QTool.FlowGraph
 					{
 						if (port.HasConnect(i))
 						{
-							value += port.GetConnectNode(i).ToFloat();
+							value += port.GetConnectNode(i).ToFloat(toFloatFunc);
 						}
 					}
 					break;

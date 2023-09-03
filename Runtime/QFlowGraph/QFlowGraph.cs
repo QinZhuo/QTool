@@ -27,21 +27,21 @@ namespace QTool.FlowGraph
             return this.ToQData();
         }
 		[QIgnore]
-		public float ToFloat(string startKey = null)
+		public float ToFloat(string startKey = null, Func<float, QFlowNode> toFloatFunc = null)
 		{
 			var value = 0f;
 			if (startKey.IsNull())
 			{
 				foreach (var kv in StartNode)
 				{
-					value += ToFloat(kv.Key);
+					value += ToFloat(kv.Key,toFloatFunc);
 				}
 			}
 			else
 			{
 				foreach (var kv in StartNode)
 				{
-					value += kv.Value.ToFloat();
+					value += kv.Value.ToFloat(toFloatFunc);
 				}
 			}
 			return value;
@@ -605,7 +605,7 @@ namespace QTool.FlowGraph
 		{
 			return name + " (" + ConnectType + ")["+Key+"]";
 		}
-		public float ToFloat(int index = 0)
+		public float ToFloat(Func<float, QFlowNode> toFloatFunc = null, int index = 0)
 		{
 			if (HasConnect(index))
 			{
@@ -614,7 +614,7 @@ namespace QTool.FlowGraph
 				{
 					node = GetConnectNode(index, false);
 				}
-				return node.ToFloat();
+				return node.ToFloat(toFloatFunc);
 			}
 			else if (!IsOutput)
 			{
@@ -1036,7 +1036,7 @@ namespace QTool.FlowGraph
 		}
 		private Func<QFlowNode, float> NodeToFloat { get; set; } = null;
 		[QIgnore]
-		public float ToFloat()
+		public float ToFloat(Func<float, QFlowNode> toFloatFunc = null)
 		{
 			if (command?.method == null) return 0;
 			if (NodeToFloat == null)
@@ -1045,6 +1045,10 @@ namespace QTool.FlowGraph
 				if (method == null)
 				{
 					NodeToFloat = (node) => 0;
+				}
+				else if (toFloatFunc != null && method.GetParameters().Length > 1)
+				{
+					NodeToFloat = (node) => method.Invoke(null, new object[] { node, toFloatFunc }).ToComputeFloat();
 				}
 				else
 				{
