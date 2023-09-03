@@ -34,14 +34,15 @@ namespace QTool.FlowGraph
 			{
 				foreach (var kv in StartNode)
 				{
-					value += ToFloat(kv.Key,toFloatFunc);
+					value += ToFloat(kv.Key, toFloatFunc);
 				}
 			}
 			else
 			{
-				foreach (var kv in StartNode)
+				var node = GetNode(startKey);
+				if (node?.command != null)
 				{
-					value += kv.Value.ToFloat(toFloatFunc);
+					value += node.ToFloat(toFloatFunc);
 				}
 			}
 			return value;
