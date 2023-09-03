@@ -209,7 +209,7 @@ namespace QTool.FlowGraph
 		{
 			var value = 0f;
 			switch (node.command.method.Name)
-			{
+			{ 
 				case nameof(Sequence):
 				case nameof(Parallel):
 					var port = node.Ports["nexts"];
