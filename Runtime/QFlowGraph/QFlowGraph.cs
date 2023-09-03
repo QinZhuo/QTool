@@ -21,6 +21,13 @@ namespace QTool.FlowGraph
 					node.Init(this);
 				}
 			}
+			foreach (var node in NodeList)
+			{
+				foreach (var port in node.Ports)
+				{
+					port.m_value = null;
+				}
+			}
 		}
         public override string ToString()
         {
@@ -725,7 +732,8 @@ namespace QTool.FlowGraph
 		}
 
 		[QIgnore]
-        object _value;
+        internal object m_value;
+		
         [QIgnore]
         public object Value
         {
@@ -744,7 +752,7 @@ namespace QTool.FlowGraph
 				{
 					if (IsList)
 					{
-						if (_value is IList list)
+						if (m_value is IList list)
 						{
 							for (int i = 0; i < ConnectInfolist.Count; i++)
 							{
@@ -774,22 +782,22 @@ namespace QTool.FlowGraph
 						}
 					}
 				}
-				if (_value.IsNull())
+				if (m_value.IsNull())
 				{
-					_value = StringValue.ParseQDataType(ValueType, true, _value);
+					m_value = StringValue.ParseQDataType(ValueType, true, m_value);
 				}
-				return _value;
+				return m_value;
             }
 			set
 			{
 				if (ValueType == QFlow.Type || Node.command == null) return;
-				if (!IsList && Equals(_value, value)) return;
-				if (_value.IsNull() && value.IsNull()) return;
-				_value = value; 
+				if (!IsList && Equals(m_value, value)) return;
+				if (m_value.IsNull() && value.IsNull()) return;
+				m_value = value; 
                 StringValue = value.ToQDataType(ValueType);
                 if (NameAttribute != null)
                 {
-					var newName= _value?.ToString();
+					var newName= m_value?.ToString();
 					if (!newName.IsNull())
 					{
 						Node.Name = newName;
