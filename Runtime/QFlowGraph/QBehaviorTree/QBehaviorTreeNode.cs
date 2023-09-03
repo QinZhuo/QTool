@@ -205,7 +205,7 @@ namespace QTool.FlowGraph
 			return info;
 		}
 		[QIgnore]
-		public static float ToFloat(QFlowNode node, Func<float, QFlowNode> toFloatFunc = null)
+		public static float ToFloat(QFlowNode node, Func<QFlowNode, float> toFloatFunc = null)
 		{
 			var value = 0f;
 			switch (node.command.method.Name)

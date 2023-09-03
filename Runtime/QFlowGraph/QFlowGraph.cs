@@ -27,7 +27,7 @@ namespace QTool.FlowGraph
             return this.ToQData();
         }
 		[QIgnore]
-		public float ToFloat(string startKey = null, Func<float, QFlowNode> toFloatFunc = null)
+		public float ToFloat(string startKey = null, Func<QFlowNode, float> toFloatFunc = null)
 		{
 			var value = 0f;
 			if (startKey.IsNull())
@@ -605,7 +605,7 @@ namespace QTool.FlowGraph
 		{
 			return name + " (" + ConnectType + ")["+Key+"]";
 		}
-		public float ToFloat(Func<float, QFlowNode> toFloatFunc = null, int index = 0)
+		public float ToFloat(Func<QFlowNode, float> toFloatFunc = null, int index = 0)
 		{
 			if (HasConnect(index))
 			{
@@ -1036,7 +1036,7 @@ namespace QTool.FlowGraph
 		}
 		private Func<QFlowNode, float> NodeToFloat { get; set; } = null;
 		[QIgnore]
-		public float ToFloat(Func<float, QFlowNode> toFloatFunc = null)
+		public float ToFloat(Func<QFlowNode, float> toFloatFunc = null)
 		{
 			if (command?.method == null) return 0;
 			if (NodeToFloat == null)
