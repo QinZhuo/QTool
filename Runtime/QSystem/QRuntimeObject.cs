@@ -45,6 +45,7 @@ namespace QTool
 				var name = gameObject.QName();
 				if (_Runtime == null && QDataList<DataT>.ContainsKey(name))
 				{
+					QDebug.Log(this + " 自动初始化 " + nameof(Runtime) + " " + typeof(RuntimeT));
 					Runtime = QRuntime<RuntimeT, DataT>.Get(name);
 				}
 				return _Runtime;
@@ -54,9 +55,27 @@ namespace QTool
 				if (value != _Runtime)
 				{
 					gameObject.UnRegisterEvent(_Runtime);
+					RuntimeValues.Clear();
 					_Runtime = value;
 					gameObject.RegisterEvent(_Runtime?.Data);
 					gameObject.RegisterEvent(_Runtime);
+					if (_Runtime != null)
+					{
+						var typeInfo = QSerializeType.Get(typeof(RuntimeT));
+						foreach (var member in typeInfo.Members)
+						{
+							if (member.Type.Is(typeof(QRuntimeValue)))
+							{
+								var runtimeValue = member.Get(_Runtime).As<QRuntimeValue>();
+								runtimeValue.Name = member.QName;
+								RuntimeValues[member.QName] = runtimeValue;
+								runtimeValue.OnValueChange += (key, value) =>
+								{
+									OnValueChange?.Invoke(key);
+								};
+							}
+						}
+					}
 				}
 			}
 		}
@@ -66,28 +85,6 @@ namespace QTool
 		public virtual void Awake()
 		{
 			gameObject.RegisterEvent(this);
-			InitRuntimeValues();
-		}
-		public void InitRuntimeValues()
-		{
-			var runtime = Runtime;
-			if (runtime != null)
-			{
-				var typeInfo = QSerializeType.Get(typeof(RuntimeT));
-				foreach (var member in typeInfo.Members)
-				{
-					if (member.Type.Is(typeof(QRuntimeValue)))
-					{
-						var runtimeValue = member.Get(runtime).As<QRuntimeValue>();
-						runtimeValue.Name = member.QName;
-						RuntimeValues[member.QName] = runtimeValue;
-						runtimeValue.OnValueChange += (key, value) =>
-						{
-							OnValueChange?.Invoke(key);
-						};
-					}
-				}
-			}
 		}
 		public virtual void OnDestroy()
 		{
@@ -95,7 +92,6 @@ namespace QTool
 			if (_Runtime != null)
 			{
 				Runtime = null;
-				RuntimeValues.Clear();
 			}
 		}
 
