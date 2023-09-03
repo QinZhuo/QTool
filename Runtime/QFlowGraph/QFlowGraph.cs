@@ -1047,9 +1047,16 @@ namespace QTool.FlowGraph
 				{
 					NodeToFloat = (node) => 0;
 				}
-				else if (toFloatFunc != null && method.GetParameters().Length > 1)
+				else if(method.GetParameters().Length > 1)
 				{
-					NodeToFloat = (node) => method.Invoke(null, new object[] { node, toFloatFunc }).ToComputeFloat();
+					if (toFloatFunc != null)
+					{
+						NodeToFloat = toFloatFunc;
+					}
+					else
+					{
+						NodeToFloat = (node) => method.Invoke(null, new object[] { node, toFloatFunc }).ToComputeFloat();
+					}
 				}
 				else
 				{
