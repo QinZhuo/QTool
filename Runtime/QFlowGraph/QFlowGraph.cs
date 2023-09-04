@@ -1298,11 +1298,11 @@ namespace QTool.FlowGraph
 			{
 				if (NodeToFloat.GetParameters().Length > 1)
 				{
-					return NodeToFloat.Invoke(null, new object[] { this, toFloatFunc }).ToComputeFloat();
+					return (float)NodeToFloat.Invoke(null, new object[] { this, toFloatFunc });
 				}
 				else
 				{
-					return NodeToFloat.Invoke(null, new object[] { this }).ToComputeFloat();
+					return (float)NodeToFloat.Invoke(null, new object[] { this });
 				}
 			}
 			else if (toFloatFunc != null)
