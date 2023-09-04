@@ -1300,6 +1300,10 @@ namespace QTool.FlowGraph
 				{
 					return (float)NodeToFloat.Invoke(null, new object[] { this, toFloatFunc });
 				}
+				else if (toFloatFunc != null)
+				{
+					return toFloatFunc(this);
+				}
 				else
 				{
 					return (float)NodeToFloat.Invoke(null, new object[] { this });
