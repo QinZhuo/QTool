@@ -4,6 +4,8 @@ using UnityEngine;
 using System;
 using System.Threading.Tasks;
 using QTool.Reflection;
+using System.Reflection;
+
 namespace QTool.FlowGraph
 {
 	[Serializable]
@@ -1023,51 +1025,7 @@ namespace QTool.FlowGraph
         {
             return "(" + commandKey + ")";
 		}
-		private Func<QFlowNode, string> NodeToInfoString { get; set; }
-		public string ToInfoString()
-		{
-			if (command?.method == null) return "";
-			if (NodeToInfoString == null)
-			{
-				var method = command.method.DeclaringType.GetStaticMethod(nameof(ToInfoString));
-				if (method == null)
-				{
-					NodeToInfoString = (node) => node.Name;
-				}
-				else
-				{
-					NodeToInfoString = (node) => method.Invoke(null, new object[] { node })?.ToString();
-				}
-			}
-			return NodeToInfoString(this);
-		}
-		private Func<QFlowNode, float> NodeToFloat { get; set; } = null;
-		[QIgnore]
-		public float ToFloat(Func<QFlowNode, float> toFloatFunc = null)
-		{
-			if (command?.method == null) return 0;
-			if (NodeToFloat == null)
-			{
-				var method = command.method.DeclaringType.GetStaticMethod(nameof(ToFloat));
-				if (method == null)
-				{
-					NodeToFloat = (node) => 0;
-				}
-				else if(method.GetParameters().Length > 1)
-				{
-					NodeToFloat = (node) => method.Invoke(null, new object[] { node, toFloatFunc }).ToComputeFloat();
-				}
-				else if (toFloatFunc != null)
-				{
-					NodeToFloat = toFloatFunc;
-				}
-				else
-				{
-					NodeToFloat = (node) => method.Invoke(null, new object[] { node }).ToComputeFloat();
-				}
-			}
-			return NodeToFloat(this);
-		}
+	
 		[Flags]
         public enum ReturnType
         {
@@ -1133,7 +1091,11 @@ namespace QTool.FlowGraph
         }
         [QIgnore]
         public QCommandInfo command { get; private set; }
-        [QIgnore]
+		[QIgnore]
+		private MethodInfo NodeToInfoString { get; set; }
+		[QIgnore]
+		private MethodInfo NodeToFloat { get; set; }
+		[QIgnore]
         public List<PortId> RunningPortList { get; private set; } = new List<PortId>();
         public QFlowNode()
         {
@@ -1181,6 +1143,8 @@ namespace QTool.FlowGraph
         public bool Init(QFlowGraph graph)
         {
             this.Graph = graph;
+			NodeToInfoString = null;
+			NodeToFloat = null;
 			if (command != null) return true;
             command = QCommand.GetCommand(commandKey);
             if (command == null)
@@ -1192,6 +1156,8 @@ namespace QTool.FlowGraph
                 Debug.LogError("不存在命令【" + commandKey + "】");
                 return false; 
             }
+			NodeToInfoString = command.method.DeclaringType.GetStaticMethod(nameof(ToInfoString));
+			NodeToFloat = command.method.DeclaringType.GetStaticMethod(nameof(ToFloat));
 			if (Name.IsNull())
 			{
 				Name = command.name.SplitEndString("/");
@@ -1312,7 +1278,43 @@ namespace QTool.FlowGraph
             Ports.RemoveAll((port) => port.Node == null);
 			return true;
         }
-        internal PortId? NextNodePort
+
+
+		public string ToInfoString()
+		{
+			if (NodeToInfoString == null)
+			{
+				return Name;
+			}
+			else
+			{
+				return NodeToInfoString.Invoke(null, new object[] { this })?.ToString();
+			}
+		}
+
+		public float ToFloat(Func<QFlowNode, float> toFloatFunc = null)
+		{
+			if (NodeToFloat != null)
+			{
+				if (NodeToFloat.GetParameters().Length > 1)
+				{
+					return NodeToFloat.Invoke(null, new object[] { this, toFloatFunc }).ToComputeFloat();
+				}
+				else
+				{
+					return NodeToFloat.Invoke(null, new object[] { this }).ToComputeFloat();
+				}
+			}
+			else if (toFloatFunc != null)
+			{
+				return toFloatFunc(this);
+			}
+			else
+			{
+				return 0;
+			}
+		}
+		internal PortId? NextNodePort
         {
             get
             {
