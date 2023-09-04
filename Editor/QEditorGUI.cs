@@ -512,7 +512,7 @@ namespace QTool
 					}
 					if (iterator.IsShow())
 					{
-						EditorGUILayout.PropertyField(iterator, new GUIContent(iterator.QName()));
+						EditorGUILayout.PropertyField(iterator, new GUIContent(QReflection.QName(iterator)));
 					}
 					if ("m_Script".Equals(iterator.name))
 					{

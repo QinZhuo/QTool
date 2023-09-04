@@ -549,7 +549,7 @@ namespace QTool.FlowGraph
 		{
 			var root= new VisualElement();
 			root.style.flexDirection = FlexDirection.Row;
-			root.AddLabel(property.QName());
+			root.AddLabel(QReflection.QName(property));
 			root.AddButton("编辑", () =>
 			{
 				if (property.serializedObject.targetObject.IsPrefabInstance(out var prefab))

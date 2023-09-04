@@ -96,7 +96,7 @@ namespace QTool.Test
         [QName("序列化测试")]
         public void TestFunc()
         {
-			Debug.LogError(test1.ToQData().ToIdString());
+			Debug.LogError(test1.ToQData().ToKeyString());
 			Debug.LogError(test1.ToQData());
 			Debug.LogError(test1.QDataCopy().ToQData());
 			Debug.LogError(test1.ToQData(false));

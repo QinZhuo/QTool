@@ -49,8 +49,6 @@ namespace QTool
 
 		static Vector2 LeftScrollPosition = Vector2.zero;
 		static Vector2 RightScrollPosition = Vector2.zero;
-		static string ObjectFilter = default;
-		static string ObjectFilterTemp = default;
 	
 		static QDictionary<int, List<GameObject>> rootGameObjects = new QDictionary<int, List<GameObject>>((key) => new List<GameObject>());
 		

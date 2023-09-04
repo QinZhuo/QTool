@@ -529,33 +529,7 @@ namespace QTool.Reflection
 			MinSizeCache[type] = size;
 			return size;
 		}
-		public static string ToKeyString(this object obj)
-		{
-			if (obj is UnityEngine.Object uObj)
-			{
-				return uObj.name;
-			}
-			else if (obj is Color color)
-			{
-				return ColorUtility.ToHtmlStringRGB(color);
-			}
-			else if (obj is Color32 color32)
-			{
-				return ColorUtility.ToHtmlStringRGB(color32);
-			}
-			else if (obj is MemberInfo memberInfo)
-			{
-				return memberInfo.QName();
-			}
-			else if (obj is IKey<string> ikey)
-			{
-				return ikey.Key;
-			}
-			else
-			{
-				return obj?.ToString();
-			}
-		}
+		
 		public static string QName(this MemberInfo type)
         {
             var att = type.GetCustomAttribute<QNameAttribute>();

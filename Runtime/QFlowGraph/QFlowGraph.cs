@@ -1223,7 +1223,7 @@ namespace QTool.FlowGraph
 				{
 					attribute = paramInfo.IsOut ? (Attribute)QOutputPortAttribute.Normal :(Attribute) QInputPortAttribute.Normal;
 				}
-                var port = AddPort(paramInfo.Name, attribute, paramInfo.QName(), paramInfo.ParameterType.GetTrueType(), paramInfo.GetAttribute<QFlowPortAttribute>());
+                var port = AddPort(paramInfo.Name, attribute, QReflection.QName(paramInfo), paramInfo.ParameterType.GetTrueType(), paramInfo.GetAttribute<QFlowPortAttribute>());
                 port.paramIndex = i;
                 port.NameAttribute = paramInfo.GetAttribute<QNodeNameAttribute>();
 				port.parameterInfo = paramInfo;

@@ -146,7 +146,7 @@ namespace QTool.Builder
 			CanvasTransform.Clear();
 			foreach (var brushType in PrefabTypes)
 			{
-				CanvasTransform.Add(transform.GetChild(brushType.QName(), true));
+				CanvasTransform.Add(transform.GetChild(QReflection.QName(brushType), true));
 			}
 			if (!Application.IsPlaying(this))
 			{

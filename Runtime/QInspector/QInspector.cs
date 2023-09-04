@@ -251,7 +251,7 @@ namespace QTool.Inspector
 	{
 		public override VisualElement CreatePropertyGUI(SerializedProperty property)
 		{
-			return new PropertyField(property, property.QName());
+			return new PropertyField(property, QReflection.QName(property));
 		}
 	}
 	[CustomPropertyDrawer(typeof(QReadonlyAttribute))]
@@ -284,11 +284,11 @@ namespace QTool.Inspector
 		{
 			var id = property.FindPropertyRelative(nameof(QIdObject.id));
 			var obj = property.FindPropertyRelative("_"+nameof(QIdObject.Object));
-			var visual = new PropertyField(obj, property.QName() + "[" + id.stringValue.ToShortString(5) + "]");
+			var visual = new PropertyField(obj, QReflection.QName(property) + "[" + id.stringValue.ToShortString(5) + "]");
 			visual.RegisterCallback<ChangeEvent<UnityEngine.Object>>(data =>
 			{
 				id.stringValue = QIdTool.GetQId(data.newValue)?.ToString();
-				visual.Q<Label>().text = property.QName() + "[" + id.stringValue.ToShortString(5) + "]";
+				visual.Q<Label>().text = QReflection.QName(property) + "[" + id.stringValue.ToShortString(5) + "]";
 			});
 			return visual;
 		}
@@ -300,7 +300,7 @@ namespace QTool.Inspector
 		public override VisualElement CreatePropertyGUI(SerializedProperty property)
 		{
 			var button = new Button();
-			button.text = property.QName();
+			button.text = QReflection.QName(property);
 			button.style.height = 30;
 			var color = button.style.backgroundColor;
 			button.RegisterCallback<ClickEvent>(data =>
@@ -324,7 +324,7 @@ namespace QTool.Inspector
 			{
 				popupData.List.Add(value);
 			}	
-			var visual = new PopupField<string>(property.QName(), popupData.List, value);
+			var visual = new PopupField<string>(QReflection.QName(property), popupData.List, value);
 			visual.RegisterCallback<ChangeEvent<string>>(data =>
 			{
 				if (property.propertyType == SerializedPropertyType.String)

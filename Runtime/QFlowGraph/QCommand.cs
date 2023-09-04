@@ -117,13 +117,13 @@ namespace QTool
             {
 				if (methodInfo.GetAttribute<QIgnoreAttribute>() != null) return;
                 var typeKey = type.Name; 
-                var typeName = type.QName();
+                var typeName = QReflection.QName(type);
                 if (methodInfo.DeclaringType != typeof(object))
                 {
                     var info = new QCommandInfo(methodInfo);
                     KeyDictionary[typeKey + '/' + methodInfo.Name] = info;
 					NameDictionary[methodInfo.Name] = info;
-					NameDictionary[methodInfo.QName().SplitEndString("/")] = info;
+					NameDictionary[QReflection.QName(methodInfo).SplitEndString("/")] = info;
                 }
             }, BindingFlags.Public | BindingFlags.Static| BindingFlags.NonPublic);
             TypeList.AddCheckExist(type);
@@ -174,8 +174,8 @@ namespace QTool
         public QCommandInfo(MethodInfo method)
         {
             Key = method.DeclaringType.Name + "/" + method.Name;
-            name = method.QName();
-            fullName = method.DeclaringType.QName() + '/' + name;
+			name = QReflection.QName(method);
+			fullName = QReflection.QName(method.DeclaringType) + '/' + name;
             this.method = method;
             paramInfos = method.GetParameters();
 			if (method.ReturnType == typeof(void) || method.ReturnType == typeof(Task) || method.ReturnType == typeof(IEnumerator))
@@ -185,7 +185,7 @@ namespace QTool
             foreach (var paramInfo in paramInfos)
             {
                 paramNames.Add(paramInfo.Name);
-                paramViewNames.Add(paramInfo.QName());
+				paramViewNames.Add(QReflection.QName(paramInfo));
 				if (IsStringCommond)
 				{
 					if ((!paramInfo.HasDefaultValue&& !paramInfo.ParameterType.IsValueType&& paramInfo.ParameterType!=typeof(string) && paramInfo.ParameterType != typeof(object)) || paramInfo.IsOut)
@@ -247,7 +247,7 @@ namespace QTool
         }
         public override string ToString()
         {
-            return method.QName() + " " + paramViewNames.ToOneString(" ");
+            return QReflection.QName(method) + " " + paramViewNames.ToOneString(" ");
         }
     }
 

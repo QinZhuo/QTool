@@ -285,41 +285,8 @@ namespace QTool
 			T checkObj = default;
 			return Equals(obj, checkObj) || (obj is UnityEngine.Object uobj && uobj == null)||(obj is string str&& string.IsNullOrWhiteSpace(str));
 		}
-		public static string RemveChars(this string str,params char[] exceptchars)
-		{
-			if (str.IsNull()|| exceptchars==null) return str;
-			foreach (var c in exceptchars)
-			{
-				str = str.Replace(c.ToString(), "");
-			}
-			return str;
-		}
-		public static string ToIdString(this string str, int length = -1)
-		{
-			if (length > 0)
-			{
-				str = str.Substring(0, Math.Min(str.Length, length));
-			}
-			return str.RemveChars('{','}', '（','）','~','\n','\t','\r','、','|', '*', '“','”', '—','。', '…','=','#', ' ', ';', '；', '-', ',', '，', '<', '>', '【', '】', '[', ']', '{', '}', '!', '！', '?', '？', '.', '\'', '‘', '’', '\"', ':', '：');
-		}
-		public static string ToShortString(this object obj, int length =5000)
-		{
-			var str = obj?.ToString();
-			if (str!=null&&str.Length > length)
-			{
-				str = str.Substring(0, length)+"...";
-			}
-			return str;
-		}
-		public static string QName(this MonoBehaviour behaviour)
-		{
-			return behaviour.GetGameObject().QName();
-		}
-		public static string QName(this GameObject gameObject)
-		{
-			if (gameObject == null) return "";
-			return gameObject.name.SplitStartString("(").TrimEnd();
-		}
+	
+	
 		public static Vector3 ToVector3(this Vector3Int vector3Int)
 		{
 			return new Vector3(vector3Int.x, vector3Int.y, vector3Int.z);
