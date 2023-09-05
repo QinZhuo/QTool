@@ -323,7 +323,11 @@ namespace QTool.Inspector
 			if (!popupData.List.Contains(value))
 			{
 				popupData.List.Add(value);
-			}	
+			}
+			if (property.propertyType==SerializedPropertyType.ObjectReference &&value==null)
+			{
+				value = popupData.List.Get(0);
+			}
 			var visual = new PopupField<string>(QReflection.QName(property), popupData.List, value);
 			visual.RegisterCallback<ChangeEvent<string>>(data =>
 			{

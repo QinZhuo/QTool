@@ -529,6 +529,10 @@ namespace QTool.Net
 	}
 	public class WaitForNetTime : WaitForNetUpdate
 	{
+		public override void Reset()
+		{
+			base.Reset();
+		}
 		public WaitForNetTime(float time)
 		{
 			Wait = (int)(time / QNetManager.Instance.NetDeltaTime);
@@ -536,24 +540,23 @@ namespace QTool.Net
 	}
 	public class WaitForNetUpdate : CustomYieldInstruction
 	{
-		protected int Index { get; set; } = 0;
+		protected int Index { get; set; } = -1;
 		protected int Wait { get; set; } = 1;
-		public override void Reset()
-		{
-			base.Reset();
-			Index = QNetManager.Instance.ClientIndex;
-		}
 		public override bool keepWaiting
 		{
 			get
 			{
+				if (Index < 0)
+				{
+					Index = QNetManager.Instance.ClientIndex;
+				}
 				if (Index + Wait > QNetManager.Instance.ClientIndex)
 				{
 					return true;
 				}
 				else
 				{
-					Index = QNetManager.Instance.ClientIndex;
+					Index = -1;
 					return false;
 				}
 			}
