@@ -157,10 +157,7 @@ namespace QTool
 		[QName("时间/延迟")]
 		public static IEnumerator Deley(float time)
 		{
-			var t= new Net.WaitForNetTime(time);
-			yield return t;
-			yield return t;
-			yield return t;
+			yield return new WaitForSeconds(time);
 		}
 	}
 	public class QCommandInfo : IKey<string>
