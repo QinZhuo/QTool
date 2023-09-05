@@ -136,7 +136,7 @@ namespace QTool.FlowGraph
 			GetPort(start).DisConnect(end, start.index);
 		}
 		[QIgnore]
-		private List<IEnumerator> CoroutineList { set; get; } = new List<IEnumerator>();
+		public List<IEnumerator> CoroutineList { private set; get; } = new List<IEnumerator>();
         public ConnectInfo GetConnectInfo(PortId? portId)
         {
             if (portId == null) return null;
@@ -237,7 +237,7 @@ namespace QTool.FlowGraph
 			{
 				OnQDeserializeOver();
 			}
-			StartCoroutine(RunIEnumerator(startNode));
+			RunIEnumerator(startNode).Start(CoroutineList);
 		}
 		public IEnumerator RunIEnumerator(string startNode)
         {
@@ -304,11 +304,11 @@ namespace QTool.FlowGraph
 		public void Stop()
 		{
 			RunningNodeList.Clear();
-			CoroutineList.Clear();
 			foreach (var coroutine in CoroutineList.ToArray())
 			{
-				StopCoroutine(coroutine);
+				coroutine.Stop();
 			}
+			CoroutineList.Clear();
 		}
 		public void Clear()
 		{
@@ -318,16 +318,7 @@ namespace QTool.FlowGraph
 				Remove(node);
 			}
 		}
-		public void StartCoroutine(IEnumerator coroutine)
-		{
-			CoroutineList.Add(coroutine);
-			coroutine.Start();
-		}
-		public void StopCoroutine(IEnumerator coroutine)
-		{
-			CoroutineList.Remove(coroutine);
-			coroutine.Stop();
-		}
+	
 		public static IEnumerator Step { get; set; } = FixedUpdateStep();
 
 		static WaitForFixedUpdate wait= new WaitForFixedUpdate();
@@ -1431,7 +1422,7 @@ namespace QTool.FlowGraph
         }
         public void RunPort(string portKey,int index=0)
         {
-			Graph.StartCoroutine(RunPortIEnumerator(portKey, index));
+			RunPortIEnumerator(portKey, index).Start(Graph.CoroutineList);
         }
 		public QFlowNode GetPortConnectNode(string portKey, int index = 0)
 		{

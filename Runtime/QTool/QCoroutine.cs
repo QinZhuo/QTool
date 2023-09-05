@@ -11,12 +11,25 @@ namespace QTool
 		private static List<IEnumerator> List { set; get; } = new List<IEnumerator>();
 		private static List<IEnumerator> AddList { set; get; } = new List<IEnumerator>();
 		private static List<IEnumerator> RemoveList { set; get; } = new List<IEnumerator>();
+		public static bool IsRunning(this IEnumerator enumerator)
+		{
+			if(List.Contains(enumerator)|| AddList.Contains(enumerator))
+			{
+				return true;
+			}
+			return false;
+		}
 		public static void Start(this IEnumerator enumerator)
 		{
 			if (UpdateIEnumerator(enumerator))
 			{
 				AddList.Add(enumerator);
 			}
+		}
+		public static void Start(this IEnumerator enumerator,List<IEnumerator> coroutineList)
+		{
+			coroutineList.Add(enumerator);
+			enumerator.AddCallBack(() => coroutineList.Remove(enumerator)).Start();
 		}
 		public static IEnumerator AddCallBack(this IEnumerator enumerator,Action callBack)
 		{
