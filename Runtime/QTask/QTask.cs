@@ -207,40 +207,13 @@ namespace QTool
 			{
 			}
 
-			public async void OnCompleted(Action continuation)
+			public void OnCompleted(Action continuation)
 			{
-				while (target.MoveNext())
+				target.AddCallBack(() =>
 				{
-					if (target.Current is WaitForSeconds waitForSeconds)
-					{
-						var m_Seconds = (float)waitForSeconds.GetValue("m_Seconds");
-						if (await Wait(m_Seconds).IsCancel())
-						{ 
-							return;
-						}
-					}
-					else if(target.Current is WaitForSecondsRealtime waitRealtime)
-					{
-						if (await Wait(waitRealtime.waitTime, true).IsCancel())
-						{
-							return;
-						}
-					}
-					else
-					{
-						Debug.LogError("不支持 "+target.Current);
-						typeof(WaitForSeconds).ForeachMemeber((file) =>
-						{
-							Debug.LogError(file.Name);
-						}, (member) =>
-						{
-							Debug.LogError(member.Name);
-						});
-						await Step();
-					}
-				}
-				IsCompleted = true;
-				continuation?.Invoke();
+					IsCompleted = true;
+					continuation?.Invoke();
+				}).Start();
 			}
 		}
 		public static FrameAwaiter GetAwaiter(this int count)

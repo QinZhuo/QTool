@@ -36,7 +36,10 @@ namespace QTool
             {
                 value *= kv.Value;
             }
-            Time.timeScale = value;
+			if (Application.isPlaying)
+			{
+				Time.timeScale = value;
+			}
             OnScaleChange?.Invoke(value);
 			QDebug.Log("更改时间速度 " + Time.timeScale + " :\n" + timeScaleList.ToOneString());
 		}
