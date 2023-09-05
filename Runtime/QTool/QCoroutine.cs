@@ -115,4 +115,37 @@ namespace QTool
 			RemoveList.AddRange(List);
 		}
 	}
+	public class QCoroutineQueue<T>
+	{
+		private System.Func<T, IEnumerator> action;
+		public static Queue<T> Queue { get; private set; } = new Queue<T>();
+		public QCoroutineQueue(System.Func<T, IEnumerator> action)
+		{
+			this.action = action;
+		}
+		private void Run(T value)
+		{
+			action(value).AddCallBack(() =>
+			{
+				Queue.Dequeue();
+				if (Queue.Count > 0)
+				{
+					Run(Queue.Peek());
+				}
+			}).Start();
+		}
+		public IEnumerator Start(T value)
+		{
+			Queue.Enqueue(value);
+			if (Queue.Count == 1)
+			{
+				Run(value);
+				yield break;
+			}
+			while (Queue.Count > 0)
+			{
+				yield return null;
+			}
+		}
+	}
 }
