@@ -1433,6 +1433,17 @@ namespace QTool.FlowGraph
         {
 			Graph.StartCoroutine(RunPortIEnumerator(portKey, index));
         }
+		public QNodeState GetPortConnectState(string portKey, int index = 0)
+		{
+			if (Ports.ContainsKey(portKey))
+			{
+				return Ports[portKey].GetConnectNode(index).State;
+			}
+			else
+			{
+				return QNodeState.成功;
+			}
+		}
         public IEnumerator RunPortIEnumerator(string portKey, int index = 0)
 		{
 			if (Ports.ContainsKey(portKey))
