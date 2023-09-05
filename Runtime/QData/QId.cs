@@ -98,7 +98,7 @@ namespace QTool
 				{
 					if (Net.QNetManager.Instance != null && Application.IsPlaying(this))
 					{
-						Id = Net.QNetManager.Instance.IdIndex++.ToString() + "_" + Net.QNetManager.Instance.ClientIndex;
+						Id = Net.QNetManager.Instance.IdIndex++.ToString() + "_" + Net.QNetManager.ClientIndex;
 					}
 					else
 					{

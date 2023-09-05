@@ -30,7 +30,6 @@ namespace QTool.Net
 #endif
 			Physics.autoSyncTransforms = false;
 			Time.fixedDeltaTime = 1f / netFps;
-			FlowGraph.QFlowGraph.Step = new WaitForNetUpdate();
 			QTool.AddPlayerLoop(typeof(QNetManager), QNetPlayerLoop,"FixedUpdate");
 			QToolManager.Instance.OnUpdateEvent -= QCoroutine.Update;
 
@@ -126,8 +125,8 @@ namespace QTool.Net
 		QNetActionData LocalAction = new QNetActionData();
 		QNetActionData SendAction = new QNetActionData();
 		private int ServerSeed = 0;
-		public float NetDeltaTime => Time.fixedDeltaTime;
-		public float NetTime { get; private set; }
+		public static float NetDeltaTime => Time.fixedDeltaTime;
+		public static float NetTime { get; private set; }
 #region 服务器数据
 
 		const int GameDataArray=-101;
@@ -229,7 +228,7 @@ namespace QTool.Net
 
 #region 客户端数据
 		public QDictionary<int, QList<string, QNetActionData>> ClientGameData = new QDictionary<int, QList<string, QNetActionData>>();
-		public int ClientIndex { get; private set; } =0;
+		public static int ClientIndex { get; private set; } =0;
 		internal int IdIndex { get; set; } = 0;
 
 		private QNetSyncFlag SyncCheckFlag = new QNetSyncFlag();
@@ -529,13 +528,9 @@ namespace QTool.Net
 	}
 	public class WaitForNetTime : WaitForNetUpdate
 	{
-		public override void Reset()
-		{
-			base.Reset();
-		}
 		public WaitForNetTime(float time)
 		{
-			Wait = (int)(time / QNetManager.Instance.NetDeltaTime);
+			Wait = (int)(time / QNetManager.NetDeltaTime);
 		}
 	}
 	public class WaitForNetUpdate : CustomYieldInstruction
@@ -546,11 +541,12 @@ namespace QTool.Net
 		{
 			get
 			{
+				var curIndex = QNetManager.Instance == null ? (int)(Time.time / QNetManager.NetDeltaTime) : QNetManager.ClientIndex;
 				if (Index < 0)
 				{
-					Index = QNetManager.Instance.ClientIndex;
+					Index = curIndex;
 				}
-				if (Index + Wait > QNetManager.Instance.ClientIndex)
+				if (Index + Wait > curIndex)
 				{
 					return true;
 				}
