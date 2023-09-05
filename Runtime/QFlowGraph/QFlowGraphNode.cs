@@ -208,12 +208,18 @@ namespace QTool.FlowGraph
 				trigger.Target = target;
 				trigger.Node = This;
 				yield return trigger.Init();
-				yield return This.RunPortIEnumerator(nameof(init));
-				yield return trigger.Run((t) =>
+				if (This.State == QNodeState.成功)
 				{
-					This[nameof(triggerObject)] = t;
-					This.RunPort(nameof(triggerObject));
-				});
+					yield return This.RunPortIEnumerator(nameof(init));
+					if (This.State == QNodeState.成功)
+					{
+						yield return trigger.Run((t) =>
+						{
+							This[nameof(triggerObject)] = t;
+							This.RunPort(nameof(triggerObject));
+						});
+					}
+				}
 			}
 			if (trigger != null)
 			{
