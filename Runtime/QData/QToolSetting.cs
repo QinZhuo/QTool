@@ -23,9 +23,6 @@ namespace QTool
 		public List<string> modeList = new List<string> { nameof(QLocalizationData) };
 		[QName("游戏数据邮箱")]
 		public QMailAccount QAnalysisMail;
-		[QName("QNet网络同步速度")]
-		[Range(5, 50)]
-		public int qNetFrameSpeed = 50;
 #if UNITY_EDITOR
 		[QName("音频强制单声道")]
 		public bool forceToMono = true;

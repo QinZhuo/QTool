@@ -453,7 +453,7 @@ namespace QTool.Net
 		{
 			if (ClientGameData.ContainsKey(ClientIndex + 1))
 			{
-				QTime.ChangeScale(this, QToolSetting.Instance.qNetFrameSpeed);
+				QTime.ChangeScale(this, 50);
 			}
 			else
 			{
@@ -527,10 +527,17 @@ namespace QTool.Net
 			Events.Clear();
 		}
 	}
-
+	public class WaitForNetTime : WaitForNetUpdate
+	{
+		public WaitForNetTime(float time)
+		{
+			Wait = (int)(time / QNetManager.Instance.NetDeltaTime);
+		}
+	}
 	public class WaitForNetUpdate : CustomYieldInstruction
 	{
-		private int Index { get; set; } = 0;
+		protected int Index { get; set; } = 0;
+		protected int Wait { get; set; } = 1;
 		public override void Reset()
 		{
 			base.Reset();
@@ -540,7 +547,7 @@ namespace QTool.Net
 		{
 			get
 			{
-				if (Index >=QNetManager.Instance.ClientIndex)
+				if (Index + Wait > QNetManager.Instance.ClientIndex)
 				{
 					return true;
 				}
