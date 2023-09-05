@@ -526,15 +526,12 @@ namespace QTool.Net
 			Events.Clear();
 		}
 	}
-	public class WaitForNetTime : WaitForNetUpdate
+	public class WaitForNetTime : CustomYieldInstruction
 	{
 		public WaitForNetTime(float time)
 		{
 			Wait = (int)(time / QNetManager.NetDeltaTime);
 		}
-	}
-	public class WaitForNetUpdate : CustomYieldInstruction
-	{
 		protected int Index { get; set; } = -1;
 		protected int Wait { get; set; } = 1;
 		public override bool keepWaiting
