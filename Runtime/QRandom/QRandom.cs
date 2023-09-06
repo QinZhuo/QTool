@@ -95,28 +95,26 @@ namespace QTool
 		{
 			return new Vector3(random.Range(-1, 1f), random.Range(-1, 1f), random.Range(-1, 1f));
 		}
-		public static int MaxRandomTimes { get; set; } = 10;
-		public static void RandomRangeCreate<T>(this GameObject root, GameObject prefab = null, float range = 10, float centerOffset = 0, Action<GameObject> callBack = null) where T : Component
+		
+		public static int MaxRandomTimes { get; set; } = 100;
+		public static Vector3 RandomEmptyPosition<T>(this GameObject root, GameObject target = null, float range = 10, float centerOffset = 0) where T : Component
 		{
 			var center = root == null ? UnityEngine.Vector3.zero : root.transform.position;
-			var is2D = prefab.GetComponent<Collider2D>() != null;
-			var radius = prefab.GetBounds().size.magnitude;
-			var creating = true;
-			var times = 0;
-			while (creating && times++ < MaxRandomTimes)
+			var is2D = target.GetComponent<Collider2D>() != null;
+			var radius = target.GetBounds().size.magnitude;
+			Vector3 position = default;
+			for (int times = 0; times < MaxRandomTimes; times++)
 			{
 				var dir = DefaultRandom.Vector2();
 				var offset = dir.normalized * centerOffset + dir * (range - centerOffset);
-				var position = center + (is2D ? offset : new Vector3(offset.x, 0, offset.y));
-				var other = is2D ? ((Vector2)position).OverlapCircle<T>(radius) : new Ray(position + UnityEngine.Vector3.up, UnityEngine.Vector3.down).RayCast<T>(radius);
+				position = center + (is2D ? offset : new Vector3(offset.x, 0, offset.y));
+				var other = is2D ? ((Vector2)position).OverlapCircle<T>(radius, obj => obj.gameObject != root) : new Ray(position + UnityEngine.Vector3.up, UnityEngine.Vector3.down).RayCast<T>(radius, obj => obj.gameObject != root);
 				if (other == null)
 				{
-					var newObject = prefab.CheckInstantiate();
-					newObject.transform.position = position;
-					callBack?.Invoke(newObject);
-					creating = false;
+					return position;
 				}
 			}
+			return position;
 		}
 	}
 
