@@ -118,7 +118,8 @@ namespace QTool
 	public class QCoroutineQueue<T>
 	{
 		private System.Func<T, IEnumerator> action;
-		public static Queue<T> Queue { get; private set; } = new Queue<T>();
+		public Queue<T> Queue { get; private set; } = new Queue<T>();
+		public int Count => Queue.Count;
 		public QCoroutineQueue(System.Func<T, IEnumerator> action)
 		{
 			this.action = action;
