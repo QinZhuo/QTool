@@ -42,6 +42,7 @@ namespace QTool
 		}
 		private void OnDestroy()
 		{
+			QTask.StopAllWait();
 			OnDestroyEvent?.Invoke();
 			OnLateDestroyEvent?.Invoke();
 			Instance.OnUpdateEvent -= QCoroutine.Update;
