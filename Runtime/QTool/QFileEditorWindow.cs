@@ -101,7 +101,14 @@ namespace QTool
 			}
 			if (!Data.IsNull())
 			{
-				ParseData();
+				try
+				{
+					ParseData();
+				}
+				catch (Exception e)
+				{
+					Debug.LogError(e);
+				}
 			}
 		}
 		
@@ -155,7 +162,14 @@ namespace QTool
 			{
 				IsUndo = true;
 				Data = UndoList.Pop();
-				ParseData();
+				try
+				{
+					ParseData();
+				}
+				catch (Exception e)
+				{
+					Debug.LogError(e);
+				}
 				IsUndo = false;
 			}
 		}
