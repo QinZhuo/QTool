@@ -145,7 +145,6 @@ namespace QTool
 			if (Queue.Count == 1)
 			{
 				Run(value);
-				yield break;
 			}
 			while (Queue.Count > 0)
 			{
