@@ -129,11 +129,11 @@ namespace QTool.FlowGraph
 		}
 		public void Connect(PortId start, PortId end)
 		{
-			GetPort(start).Connect(end,start.index);
+			GetPort(start)?.Connect(end,start.index);
 		}
 		public void DisConnect(PortId start, PortId end)
 		{
-			GetPort(start).DisConnect(end, start.index);
+			GetPort(start)?.DisConnect(end, start.index);
 		}
 		[QIgnore]
 		public List<IEnumerator> CoroutineList { private set; get; } = new List<IEnumerator>();
@@ -151,7 +151,7 @@ namespace QTool.FlowGraph
 		public object GetPortValue(PortId? portId)
 		{
 			if (portId == null) return null;
-			return GetPort(portId).GetValue(portId.Value.index);
+			return GetPort(portId)?.GetValue(portId.Value.index);
 		}
 		public void Remove(QFlowNode node)
         {
@@ -535,7 +535,8 @@ namespace QTool.FlowGraph
 				case 1:
 					{
 						var connect = FirstConnect;
-						if (onlyFlowNode&&!graph.GetPort(connect).IsFlow)
+						var port = graph.GetPort(connect);
+						if (port == null || (onlyFlowNode && !port.IsFlow))
 						{
 							return null;
 						}
@@ -548,6 +549,7 @@ namespace QTool.FlowGraph
 							foreach (var connect in ConnectList)
 							{
 								var port = graph.GetPort(connect);
+								if (port == null) continue;
 								if (port.IsFlow)
 								{
 									return port.GetPortId(connect.index);
@@ -559,6 +561,7 @@ namespace QTool.FlowGraph
 							foreach (var connect in ConnectList)
 							{
 								var port = graph.GetPort(connect);
+								if (port == null) continue;
 								if (port.ConnectType != typeof(QFlow))
 								{
 									return port.GetPortId(connect.index);
@@ -975,7 +978,9 @@ namespace QTool.FlowGraph
 			{
 				foreach (var connect in this[index].ConnectList.ToArray())
 				{
-					if (!onlyFlow || Node.Graph.GetPort(connect).IsFlow)
+					var port = Node.Graph.GetPort(connect);
+					if (port == null) continue;
+					if (!onlyFlow || port.IsFlow)
 					{
 						DisConnect(connect, index);
 					}
