@@ -97,7 +97,7 @@ namespace QTool
 		}
 		
 		public static int MaxRandomTimes { get; set; } = 100;
-		public static Vector3 RandomEmptyPosition<T>(this GameObject root, GameObject target = null, float range = 10, float centerOffset = 0) where T : Component
+		public static Vector3 RandomPlacementPosition<T>(this GameObject root, GameObject target = null, float range = 10, float centerOffset = 0) where T : Component
 		{
 			var center = root == null ? UnityEngine.Vector3.zero : root.transform.position;
 			var is2D = target.GetComponent<Collider2D>() != null;
