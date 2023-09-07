@@ -278,8 +278,8 @@ namespace QTool.FlowGraph
 				default:
 					break;
 			}
-			var nextPort = node.Ports[QFlowKey.NextPort];
-			value += (nextPort != null && nextPort.HasConnect()) ? nextPort.GetConnectNode().ToFloat(toFloatFunc) : 0f;
+			var nextNode = node.Ports[QFlowKey.NextPort]?.GetConnectNode();
+			value += nextNode != null ? nextNode.ToFloat(toFloatFunc) : 0f;
 			return value;
 		}
 	}
