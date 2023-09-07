@@ -613,6 +613,7 @@ namespace QTool.FlowGraph
 				{
 					node = GetConnectNode(index, false);
 				}
+				if (node == null) return 0;
 				return node.ToFloat(toFloatFunc);
 			}
 			else if (!IsOutput)
