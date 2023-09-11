@@ -50,7 +50,7 @@ namespace QTool.FlowGraph
 		public QDataList qdataList;
 		public QList<object> objList = new QList<object>();
 		public QList<QMemeberInfo> Members = new QList<QMemeberInfo>();
-
+		private int DragIndex { get; set; } = -1;
 		ListView listView = null;
 		long lastCkickTime = 0;
 		VisualElement CellView = null;
@@ -144,6 +144,23 @@ namespace QTool.FlowGraph
 						});
 					}
 				}
+				visual.RegisterCallback<MouseDownEvent>(data =>
+				{
+					DragIndex = y;
+				});
+				visual.RegisterCallback<MouseUpEvent>(data =>
+				{
+					if (DragIndex > 0 && y > 0 && DragIndex != y)
+					{
+						if (typeInfo != null)
+						{
+							objList.Replace(DragIndex - 1, y - 1);
+						}
+						qdataList.Replace(DragIndex, y);
+						listView.Rebuild();
+					}
+					DragIndex = -1;
+				});
 				visual.AddMenu(menu =>
 				{
 					menu.menu.AppendAction("添加行", action => { AddAt(y); listView.Rebuild(); });
