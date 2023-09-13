@@ -242,14 +242,15 @@ namespace QTool
 			root.Add(visual);
 			return visual;
 		}
-#if UNITY_2021_1_OR_NEWER
+#if UNITY_2022_1_OR_NEWER
 		public static TreeView AddTreeView(this VisualElement root, Func<VisualElement> makeItem, Action<VisualElement, int> bindItem)
 		{
 			var visual = new TreeView(makeItem, bindItem);
 			root.Add(visual);
 			return visual;
 		}
-
+#endif
+#if UNITY_2021_1_OR_NEWER
 		public static GroupBox AddGroupBox(this VisualElement root,string name="")
 		{
 			var visual = new GroupBox();
