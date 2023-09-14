@@ -107,7 +107,7 @@ namespace QTool
 			{
 				var dir = DefaultRandom.Vector2();
 				var offset = dir.normalized * centerOffset + dir * (range - centerOffset);
-				position = center + (is2D ? offset : new Vector3(offset.x, 0, offset.y));
+				position = center + (is2D ? (Vector3)offset : new Vector3(offset.x, 0, offset.y));
 				var other = is2D ? ((Vector2)position).OverlapCircle<T>(radius, obj => obj.gameObject != root) : new Ray(position + UnityEngine.Vector3.up, UnityEngine.Vector3.down).RayCast<T>(radius, obj => obj.gameObject != root);
 				if (other == null)
 				{

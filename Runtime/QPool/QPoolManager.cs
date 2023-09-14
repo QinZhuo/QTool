@@ -5,9 +5,55 @@ using UnityEngine.SceneManagement;
 using QTool.Inspector;
 using QTool.Reflection;
 using System.Threading.Tasks;
+#if UNITY_2021_1_OR_NEWER
 using UnityEngine.Pool;
+#endif
 #if UNITY_EDITOR
 using UnityEditor;
+#endif
+#if !UNITY_2021_1_OR_NEWER
+public class ObjectPool<T> where T : class
+{
+	public Func<T> CreateFunc { get; }
+	public Action<T> ActionOnGet { get; }
+	public Action<T> OnRelease { get; }
+	public Action<T> ActionOnDestroy { get; }
+	public bool V1 { get; }
+	public int V2 { get; }
+	public int MaxSize { get; }
+	public Stack<T> Stack { get; } = new Stack<T>();
+
+	public void Release(T obj)
+	{
+		OnRelease?.Invoke(obj);
+		Stack.Push(obj);
+	}
+
+	public T Get()
+	{
+		if (Stack.Count > 0)
+		{
+			var obj= Stack.Pop();
+			ActionOnGet?.Invoke(obj);
+			return obj;
+		}
+		else
+		{
+
+			return CreateFunc();
+		}
+	}
+	public ObjectPool(Func<T> createFunc, Action<T> actionOnGet, Action<T> onRelease, Action<T> actionOnDestroy, bool v1, int v2, int maxSize)
+	{
+		CreateFunc = createFunc;
+		ActionOnGet = actionOnGet;
+		OnRelease = onRelease;
+		ActionOnDestroy = actionOnDestroy;
+		V1 = v1;
+		V2 = v2;
+		MaxSize = maxSize;
+	}
+}
 #endif
 namespace QTool
 {

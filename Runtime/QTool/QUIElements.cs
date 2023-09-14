@@ -260,6 +260,11 @@ namespace QTool
 			root.Add(visual);
 			return visual;
 		}
+#else
+		public static void Rebuild(this ListView root)
+		{
+			root.Refresh();
+		}
 #endif
 
 		public static void AddMenu(this VisualElement root, Action<ContextualMenuPopulateEvent> menuBuilder)

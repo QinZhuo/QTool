@@ -11,6 +11,7 @@ namespace QTool
 		{
 			generateVisualContent += data =>
 			{
+#if UNITY_2022_1_OR_NEWER
 				var painter = data.painter2D;
 				painter.lineJoin = LineJoin.Round;
 				painter.lineCap = LineCap.Round;
@@ -39,6 +40,7 @@ namespace QTool
 				}
 				painter.LineTo(End);
 				painter.Stroke();
+#endif
 			};
 		}
 		public Color StartColor

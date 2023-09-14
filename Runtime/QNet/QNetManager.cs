@@ -39,8 +39,8 @@ namespace QTool.Net
 		[System.Diagnostics.Conditional("DEVELOPMENT_BUILD"), System.Diagnostics.Conditional("UNITY_EDITOR")]
 		private void DebugUI()
 		{
-#if UNITY_2022_1_OR_NEWER
 			var info = "运行信息" + ClientIndex + "/" + ClientGameData.Count + " " + nameof(NetTime) + ":" + new TimeSpan((long)(TimeSpan.TicksPerSecond * NetTime)).ToString(@"hh\:mm\:ss") + " 延迟 " + transport.Ping + " ms";
+#if UNITY_2022_1_OR_NEWER
 			transport.DebugUI();
 			if (DebugInfoLabel == null)
 			{

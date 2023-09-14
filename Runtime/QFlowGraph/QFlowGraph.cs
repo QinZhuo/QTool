@@ -1227,7 +1227,7 @@ namespace QTool.FlowGraph
 				{
 					if (!port.StringValue.IsNull())
 					{
-						if (port.StringValue.Contains('/') && port.StringValue.Contains("."))
+						if (port.StringValue.Contains("/") && port.StringValue.Contains("."))
 						{
 							Name= port.StringValue.SplitEndString("/").SplitStartString(".");
 						}
