@@ -11,7 +11,7 @@ using UnityEngine.Pool;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
-#if !UNITY_2021_1_OR_NEWER
+#if !UNITY_2022_1_OR_NEWER
 public class ObjectPool<T> where T : class
 {
 	public Func<T> CreateFunc { get; }
