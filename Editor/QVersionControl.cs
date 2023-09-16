@@ -134,11 +134,8 @@ namespace QTool
 		}
 		static bool CheckInit(string path)
 		{
-			
-
 			if (!PlayerPrefs.HasKey(nameof(CheckInit)))
 			{
-			
 				var result = PathRun("config --global core.quotepath false", path);
 				var name =PathRun("config user.name", path);
 				var email = PathRun("config user.email", path);
@@ -146,8 +143,8 @@ namespace QTool
 				if (name.IsNull()||email.IsNull())
 				{
 					EditorUtility.ClearProgressBar();
-					var window =new QConfirmWindow();
-					window.name = "设置用户名邮箱";
+					var window =new EditorWindow();
+					window.titleContent = new GUIContent("设置用户名邮箱");
 					window.rootVisualElement.AddText("联系用户名", name, value => name = value);
 					window.rootVisualElement.AddText("联系邮箱", email, value => email = value);
 					window.rootVisualElement.AddButton("确定", () =>
@@ -160,9 +157,7 @@ namespace QTool
 				}
 				PlayerPrefs.SetInt(nameof(CheckInit), 1);
 			}
-			
 			return true;
-
 		}
 		public static string RootPath(string path)
 		{

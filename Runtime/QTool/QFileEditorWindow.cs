@@ -151,7 +151,7 @@ namespace QTool
 			Toolbar.style.flexDirection = FlexDirection.Row;
 			QPlayerPrefs.Get(typeof(T).Name + "_" + nameof(FilePathList), FilePathList);
 			FilePathList.RemoveAll(path => !path.Replace('/', '\\').ExistsFile());
-			while (FilePathList.Count > 10)
+			while (FilePathList.Count > 20)
 			{
 				FilePathList.Dequeue();
 			}
@@ -194,9 +194,4 @@ namespace QTool
 		}
 	}
 
-
-
-	public class QConfirmWindow : EditorWindow
-	{
-	}
 }
