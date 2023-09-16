@@ -229,7 +229,12 @@ namespace QTool.Net
 #region 客户端数据
 		public QDictionary<int, QList<string, QNetActionData>> ClientGameData = new QDictionary<int, QList<string, QNetActionData>>();
 		public static int ClientIndex { get; private set; } =0;
-		internal int IdIndex { get; set; } = 0;
+		private int IdIndex { get; set; } = 0;
+
+		public string NewId()
+		{
+			return QNetManager.Instance.IdIndex++ + "_" + QNetManager.ClientIndex;
+		}
 
 		private QNetSyncFlag SyncCheckFlag = new QNetSyncFlag();
 		internal static Dictionary<string, List<QNetBehaviour>> QNetSyncCheckList { get; private set; } = new Dictionary<string, List<QNetBehaviour>>();
