@@ -145,6 +145,7 @@ namespace QTool
 					EditorUtility.ClearProgressBar();
 					var window =new EditorWindow();
 					window.titleContent = new GUIContent("设置用户名邮箱");
+					window.rootVisualElement.Clear();
 					window.rootVisualElement.AddText("联系用户名", name, value => name = value);
 					window.rootVisualElement.AddText("联系邮箱", email, value => email = value);
 					window.rootVisualElement.AddButton("确定", () =>
