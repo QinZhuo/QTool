@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using QTool;
 using QTool.Inspector;
-
+#if UNITY_2021_1_OR_NEWER
+using UnityEngine.Pool;
+#endif
 public class QPoolTest : MonoBehaviour
 {
 	[QToggle("使用对象池")]

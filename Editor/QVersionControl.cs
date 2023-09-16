@@ -141,13 +141,21 @@ namespace QTool
 			
 				var result = PathRun("config --global core.quotepath false", path);
 				var name =PathRun("config user.name", path);
-				if (string.IsNullOrWhiteSpace(name))
+				var email = PathRun("config user.email", path);
+				Debug.LogError(name + "  " + email);
+				if (name.IsNull()||email.IsNull())
 				{
 					EditorUtility.ClearProgressBar();
-					if (!InputTextWindow.Show("设置Git用户名", out name))
+					var window =new QConfirmWindow();
+					window.name = "设置用户名邮箱";
+					window.rootVisualElement.AddText("联系用户名", name, value => name = value);
+					window.rootVisualElement.AddText("联系邮箱", email, value => email = value);
+					window.rootVisualElement.AddButton("确定", () =>
 					{
-						return false;
-					}
+						window.Close();
+					});
+					window.ShowModal();
+					PathRun("config --global user.email \"" + email + "\"", path);
 					PathRun("config --global user.name \"" + name + "\"", path);
 				}
 				PlayerPrefs.SetInt(nameof(CheckInit), 1);
@@ -535,49 +543,7 @@ crashlytics-build.properties
 			return "\""+ path+"\"";
 		}
 	}
-	public class InputTextWindow : EditorWindow
-	{
-		public static InputTextWindow Instance { private set; get; }
-	
-		public static bool Show(string name,out string text)
-		{
-			if (Instance == null)
-			{
-				Instance = GetWindow<InputTextWindow>();
-				Instance.minSize = new Vector2(200, 70);
-				Instance.maxSize = new Vector2(200, 70);
-			}
-			Instance.titleContent = new GUIContent(name);
-			text = "";
-			Instance.ShowModal();
-			text = Instance.text;
-			return Instance.confirm;
-		}
-		bool confirm;
-		string text;
-		private void OnGUI()
-		{
-			text = EditorGUILayout.TextField(text);
-			if (GUILayout.Button("确认"))
-			{
-				if (string.IsNullOrWhiteSpace(text))
-				{
-					EditorUtility.DisplayDialog(titleContent.text+"错误", titleContent.text+ "不能为空", "确认");
-				}
-				else
-				{
-					confirm = true;
-					Close();
-				}
-			}
 
-			if (GUILayout.Button("取消"))
-			{
-				text = "";
-				Close();
-			}
-		}
-	}
 	public class QVersionControlWindow : EditorWindow
 	{
 		public static QVersionControlWindow Instance { private set; get; }

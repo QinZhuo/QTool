@@ -4,12 +4,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
 using QTool.Reflection;
+using UnityEditor;
 #if UNITY_EDITOR
 using UnityEditor.UIElements;
 #endif
 namespace QTool
-{
-	public abstract class QFileEditorWindow<T>
+{	public abstract class QFileEditorWindow<T>
 #if UNITY_EDITOR
 	: UnityEditor.EditorWindow
 #endif
@@ -192,5 +192,11 @@ namespace QTool
 				_Data = newValue;
 			}
 		}
+	}
+
+
+
+	public class QConfirmWindow : EditorWindow
+	{
 	}
 }
