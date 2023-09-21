@@ -83,23 +83,33 @@ namespace QTool
 						Controller.spline.InsertPointAt(index++, start);
 						Controller.spline.InsertPointAt(index++, end);
 						Controller.spline.InsertPointAt(index++, right);
+						
 					}
 					break;
 				case Shape.扇形:
 					{
 						Controller.spline.InsertPointAt(index++, Vector2.zero);
-						Controller.spline.SetTangentMode(index - 1, ShapeTangentMode.Linear);
 						var endAngle = Mathf.Atan2(width / 2, distance) / Mathf.PI * 360 * 2;
 						var dir = (Vector2.up * distance).Rotate(-endAngle / 2);
 						Controller.spline.InsertPointAt(index++, dir);
-						Controller.spline.SetTangentMode(index - 1, ShapeTangentMode.Linear);
 						for (float angle = 5; angle <= endAngle; angle += 5)
 						{
 							Controller.spline.InsertPointAt(index++, dir.Rotate(angle));
-							Controller.spline.SetTangentMode(index - 1, ShapeTangentMode.Continuous);
 						}
 						Controller.spline.InsertPointAt(index++, dir.Rotate(endAngle));
-						Controller.spline.SetTangentMode(index - 1, ShapeTangentMode.Linear);
+						for (int i = 0; i < index; i++)
+						{
+							switch (i)
+							{
+								case 0:
+								case 1:
+									Controller.spline.SetTangentMode(i, ShapeTangentMode.Linear);
+									break;
+								default:
+									Controller.spline.SetTangentMode(i, i + 1 == index ? ShapeTangentMode.Linear : ShapeTangentMode.Continuous);
+									break;
+							}
+						}
 					}
 					break;
 				case Shape.圆形:
@@ -108,14 +118,16 @@ namespace QTool
 						for (float angle = 0; angle < 360; angle += 5)
 						{
 							Controller.spline.InsertPointAt(index++, dir.Rotate(angle));
-							Controller.spline.SetTangentMode(index - 1, ShapeTangentMode.Continuous);
+						}
+						for (int i = 0; i < index; i++)
+						{
+							Controller.spline.SetTangentMode(i, ShapeTangentMode.Continuous);
 						}
 					}
 					break;
 				default:
 					break;
 			}
-			Controller.RefreshSpriteShape();
 		}
 		private void OnValidate()
 		{
