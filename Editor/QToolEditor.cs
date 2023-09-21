@@ -57,16 +57,7 @@ namespace QTool
 				var qid = gameObj.GetComponent<QId>();
 				if (qid != null)
 				{
-					try
-					{
-						GUILayout.BeginArea(rect);
-						GUILayout.BeginHorizontal();
-						GUILayout.FlexibleSpace();
-						GUILayout.Label("[" + qid.Id.ToShortString(5) + "]");
-						GUILayout.EndHorizontal();
-						GUILayout.EndArea();
-					}
-					catch (Exception) { }
+					GUI.Label(rect.HorizontalRect(0.5f,1),"[" + qid.Id.ToShortString(5) + "]",QEditorGUI.RightLabel);
 				}
 			}
 		}

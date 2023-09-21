@@ -12,58 +12,12 @@ using UnityEditor.PackageManager;
 
 namespace QTool
 {
-	public class QPackageManager : IPackageManagerExtension
-	{
-		static UnityEditor.PackageManager.PackageInfo CurInfo;
-		static Button StaticButton = new Button(async ()=> {
-			if (CurInfo != null)
-			{
-				StaticButton.SetEnabled(false);
-				var task = Client.Add(CurInfo.packageId);
-				await task;
-				FreshPackage();
-				StaticButton.SetEnabled(true);
-			}
-		});
-		public VisualElement CreateExtensionUI()
-		{
-#if UNITY_2022_1_OR_NEWER
-			return null;
-#else
-			return StaticButton;
-#endif
-
-		}
-
-		public void OnPackageAddedOrUpdated(UnityEditor.PackageManager.PackageInfo packageInfo)
-		{
-		}
-
-		public void OnPackageRemoved(UnityEditor.PackageManager.PackageInfo packageInfo)
-		{
-		}
-
-		public void OnPackageSelectionChange(UnityEditor.PackageManager.PackageInfo packageInfo)
-		{	
-			if (packageInfo != null)
-			{
-				CurInfo = packageInfo;
-				StaticButton.text = "拉取最新Git包[" + packageInfo.displayName + "]";
-				StaticButton.visible = packageInfo.source == PackageSource.Git;
-			}
-		}
-		public static void FreshPackage()
-		{
-			Client.Resolve();
-		}
-	}
 
 	[InitializeOnLoad]
 	public static class QVersionControl
 	{
 		static QVersionControl()
 		{
-			PackageManagerExtensions.RegisterExtension(new QPackageManager());
 			Editor.finishedDefaultHeaderGUI += OnHeaderGUI;
 		}
 		private static void OnHeaderGUI(Editor editor)
@@ -365,7 +319,7 @@ namespace QTool
 				PullAndCommitPush(path,commit);
 			}
 			EditorUtility.ClearProgressBar();
-			QPackageManager.FreshPackage();
+			Client.Resolve();
 			AssetDatabase.Refresh();
 		}
 	

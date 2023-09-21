@@ -21,6 +21,11 @@ namespace QTool
 		{
 			richText = true
 		};
+		private static GUIStyle _RightLabel;
+		public static GUIStyle RightLabel => _RightLabel ??= new GUIStyle("label")
+		{
+			alignment = TextAnchor.UpperRight
+		};
 		public static Color SelectColor { get; private set; } = new Color32(15, 129, 190, 100);
 		public static Color BackColor { get; private set; } = new Color32(45, 45, 45, 255);
 		public static Color AlphaBackColor { get; private set; } = new Color32(0, 0, 0, 40);
