@@ -47,28 +47,19 @@ namespace QTool
 						Controller.AddPoint(Vector2.zero);
 						var endAngle = Mathf.Atan2(width / 2, distance) / Mathf.PI * 360 * 2;
 						var dir = (Vector2.up * distance).Rotate(-endAngle / 2);
-						Controller.AddPoint(dir);
-						float angle = 5;
-						for (; angle <= endAngle; angle += 5)
+						for (int i = 0; i <= 18; i++)
 						{
-							Controller.AddPoint(dir.Rotate(angle), ShapeTangentMode.Continuous);
-						}
-						var end = dir.Rotate(endAngle);
-						if (Vector2.Distance(dir.Rotate(angle), end) > 1f)
-						{
-							Controller.AddPoint(end);
-						}
-						else
-						{
-							Controller.spline.SetTangentMode(Controller.spline.GetPointCount() - 1, ShapeTangentMode.Linear);
+							var angle = endAngle / 18 * i;
+							Controller.AddPoint(dir.Rotate(angle), i == 0 || i == 18 ? ShapeTangentMode.Linear : ShapeTangentMode.Continuous);
 						}
 					}
 					break;
 				case Shape.圆形:
 					{
 						var dir = Vector2.up * Mathf.Max(distance, width / 2);
-						for (float angle = 0; angle < 360; angle += 5)
+						for (int i = 0; i < 36; i++)
 						{
+							var angle = 360f / 36 * i;
 							Controller.AddPoint(dir.Rotate(angle), ShapeTangentMode.Continuous);
 						}
 					}
@@ -90,8 +81,17 @@ namespace QTool
 			var index = spline.GetPointCount();
 			spline.InsertPointAt(index, point);
 			spline.SetTangentMode(index, tangentMode);
-			spline.SetLeftTangent(index, point.Rotate(-90).normalized * 0.1f);
-			spline.SetRightTangent(index, point.Rotate(90).normalized * 0.1f);
+			if (index > 0)
+			{
+				var left = (Vector2)spline.GetPosition(index - 1);
+				var right = (Vector2)spline.GetPosition(0);
+				var leftOffset = Vector2.Distance(left, point);
+				spline.SetLeftTangent(index, point.Rotate(-90).normalized * leftOffset * 0.5f);
+				spline.SetRightTangent(index - 1, left.Rotate(90).normalized * leftOffset * 0.5f);
+				var rightOffset = Vector2.Distance(left, point);
+				spline.SetRightTangent(index, point.Rotate(90).normalized * rightOffset * 0.5f);
+				spline.SetLeftTangent(0, right.Rotate(-90).normalized * rightOffset * 0.5f);
+			}
 		}
 	}
 }
