@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 #if SpriteShap
 using UnityEngine.U2D;
+using UnityEngine.UIElements;
+
 namespace QTool
 {
 	[RequireComponent(typeof(SpriteShapeController))]
@@ -46,14 +48,18 @@ namespace QTool
 					case Shape.扇形:
 						{
 							Controller.spline.InsertPointAt(index++, Vector2.zero);
+							Controller.spline.SetTangentMode(index - 1, ShapeTangentMode.Linear);
 							var endAngle = Mathf.Atan2(width / 2, distance) / Mathf.PI * 360 * 2;
 							var dir = (Vector2.up * distance).Rotate(-endAngle / 2);
-							for (float angle = 0; angle <= endAngle; angle += 5)
+							Controller.spline.InsertPointAt(index++, dir);
+							Controller.spline.SetTangentMode(index - 1, ShapeTangentMode.Linear);
+							for (float angle = 5; angle <= endAngle; angle += 5)
 							{
 								Controller.spline.InsertPointAt(index++, dir.Rotate(angle));
 								Controller.spline.SetTangentMode(index - 1, ShapeTangentMode.Continuous);
 							}
-							Controller.spline.InsertPointAt(index++, Vector2.zero);
+							Controller.spline.InsertPointAt(index++, dir.Rotate(endAngle));
+							Controller.spline.SetTangentMode(index - 1, ShapeTangentMode.Linear);
 						}
 						break;
 					case Shape.圆形:
