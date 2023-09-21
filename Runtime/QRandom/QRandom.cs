@@ -98,7 +98,7 @@ namespace QTool
 			return dir * random.Range(centerOffset, range);
 		}
 
-		public static int MaxRandomTimes { get; set; } = 100;
+		public static int MaxRandomTimes { get; set; } = 1000;
 		public static Vector3 RandomPlacePosition<T>(this T target, Func<Vector3> RandomPosition, Func<Vector3, bool> CanPlace = null) where T : Component
 		{
 			var is2D = target.GetComponent<Collider2D>() != null;
