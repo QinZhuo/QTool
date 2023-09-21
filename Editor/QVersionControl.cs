@@ -319,7 +319,7 @@ namespace QTool
 				PullAndCommitPush(path,commit);
 			}
 			EditorUtility.ClearProgressBar();
-			Client.Resolve();
+		//	Client.Resolve();
 			AssetDatabase.Refresh();
 		}
 	
