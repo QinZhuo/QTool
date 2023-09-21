@@ -86,11 +86,11 @@ namespace QTool
 				var left = (Vector2)spline.GetPosition(index - 1);
 				var right = (Vector2)spline.GetPosition(0);
 				var leftOffset = Vector2.Distance(left, point);
-				spline.SetLeftTangent(index, point.Rotate(-90).normalized * leftOffset * 0.3f);
-				spline.SetRightTangent(index - 1, left.Rotate(90).normalized * leftOffset * 0.3f);
+				spline.SetLeftTangent(index, point.Rotate(-90).normalized * leftOffset * 0.4f);
+				spline.SetRightTangent(index - 1, left.Rotate(90).normalized * leftOffset * 0.4f);
 				var rightOffset = Vector2.Distance(left, point);
-				spline.SetRightTangent(index, point.Rotate(90).normalized * rightOffset * 0.3f);
-				spline.SetLeftTangent(0, right.Rotate(-90).normalized * rightOffset * 0.3f);
+				spline.SetRightTangent(index, point.Rotate(90).normalized * rightOffset * 0.4f);
+				spline.SetLeftTangent(0, right.Rotate(-90).normalized * rightOffset * 0.4f);
 			}
 		}
 	}
