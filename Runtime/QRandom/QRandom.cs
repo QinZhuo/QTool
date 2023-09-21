@@ -87,29 +87,28 @@ namespace QTool
 			if (random == null) return UnityEngine.Random.Range(min, max);
 			return random.Next(min, max);
 		}
-		public static Vector2 Vector2(this System.Random random)
+		public static Vector2 Vector2(this System.Random random, float range = 1, float centerOffset = 0)
 		{
-			return new Vector2(random.Range(-1, 1f), random.Range(-1, 1f));
+			var dir = new Vector2(random.Range(-1, 1f), random.Range(-1, 1f)).normalized;
+			return dir * random.Range(centerOffset, range);
 		}
-		public static Vector3 Vector3(this System.Random random)
+		public static Vector3 Vector3(this System.Random random, float range = 1, float centerOffset = 0)
 		{
-			return new Vector3(random.Range(-1, 1f), random.Range(-1, 1f), random.Range(-1, 1f));
+			var dir = new Vector3(random.Range(-1, 1f), random.Range(-1, 1f), random.Range(-1, 1f)).normalized;
+			return dir * random.Range(centerOffset, range);
 		}
-		
+
 		public static int MaxRandomTimes { get; set; } = 100;
-		public static Vector3 RandomPlacementPosition<T>(this GameObject root, GameObject target = null, float range = 10, float centerOffset = 0) where T : Component
+		public static Vector3 RandomPlacePosition<T>(this T target, Func<Vector3> RandomPosition, Func<Vector3, bool> CanPlace = null) where T : Component
 		{
-			var center = root == null ? UnityEngine.Vector3.zero : root.transform.position;
 			var is2D = target.GetComponent<Collider2D>() != null;
 			var radius = target.GetBounds().size.magnitude;
 			Vector3 position = default;
 			for (int times = 0; times < MaxRandomTimes; times++)
 			{
-				var dir = DefaultRandom.Vector2();
-				var offset = dir.normalized * centerOffset + dir * (range - centerOffset);
-				position = center + (is2D ? (Vector3)offset : new Vector3(offset.x, 0, offset.y));
-				var other = is2D ? ((Vector2)position).OverlapCircle<T>(radius, obj => obj.gameObject != root) : new Ray(position + UnityEngine.Vector3.up, UnityEngine.Vector3.down).RayCast<T>(radius, obj => obj.gameObject != root);
-				if (other == null)
+				position = RandomPosition();
+				var other = is2D ? ((Vector2)position).OverlapCircle<T>(radius, obj => obj != target) : new Ray(position + UnityEngine.Vector3.up, UnityEngine.Vector3.down).RayCast<T>(radius, obj => obj != target);
+				if (other == null && (CanPlace == null || CanPlace(position)))
 				{
 					return position;
 				}
