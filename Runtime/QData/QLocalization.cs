@@ -4,7 +4,7 @@ namespace QTool
 	public class QLocalization : MonoBehaviour
 	{
 		#region 基础数据
-		[QName, SerializeField]
+		[QName,QPopup(nameof(QLocalizationData) +"."+nameof(QLocalizationData.List)), SerializeField]
 		private string m_key;
 		[QName("本地化"), SerializeField, QReadonly]
 		private string m_localization = "";

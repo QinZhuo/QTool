@@ -6,7 +6,7 @@ using System.Linq;
 namespace QTool
 {
 
-	public class QAudioManager : QToolManagerBase<QAudioManager>
+	public class QAudioManager : QToolManager<QAudioManager>
 	{
 		static QDictionary<string, QAudioSource> AudioSources = new QDictionary<string, QAudioSource>();
 		static QDictionary<string, AudioMixerGroup> AudioMixerGroups = new QDictionary<string, AudioMixerGroup>();

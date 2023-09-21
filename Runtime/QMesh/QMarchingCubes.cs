@@ -11,25 +11,24 @@ namespace QTool
 		}
 		public static void GenerateMeshData(this QVoxelData voxelData)
 		{
-			if (voxelData.MeshData.Changing||!voxelData.MeshData.Dirty) return;
+			if (voxelData.MeshData.Changing || !voxelData.MeshData.Dirty) return;
 			voxelData.MeshData.Clear();
 			voxelData.MeshData.Changing = true;
-#if UseComputeShader
-			if (SystemInfo.supportsComputeShaders&& gup)
-			{ 
+			if (SystemInfo.supportsComputeShaders && Shader != null)
+			{
 				GenerateGPU(voxelData);
 			}
 			else
-#endif
 			{
 				GenerateCPU(voxelData);
 			}
 			voxelData.MeshData.Changing = false;
 			voxelData.MeshData.GetMesh();
 		}
-		
-#region GUP
-		public static ComputeShader Shader;
+
+		#region GUP
+		private static ComputeShader _Shader = null;
+		public static ComputeShader Shader = _Shader ??= Resources.Load<ComputeShader>(nameof(QMarchingCubes));
 		static void GenerateGPU(QVoxelData voxelData)
 		{
 			if (Shader == null)

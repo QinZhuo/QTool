@@ -1,4 +1,3 @@
-#if UseComputeShader
 #pragma kernel CSMain
 static const int TriangleTable[256][16] =
 {
@@ -348,5 +347,4 @@ void CSMain(uint3 id : SV_DispatchThreadID)
 		TrianglesBuffer.Append(tri);
 	}
 }
-#endif
 
