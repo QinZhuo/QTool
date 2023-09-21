@@ -115,7 +115,7 @@ namespace QTool
         {
             type.ForeachFunction((methodInfo) =>
             {
-				if (methodInfo.GetAttribute<QIgnoreAttribute>() != null) return;
+				if (methodInfo.GetAttribute<QIgnoreAttribute>() != null ) return;
                 var typeKey = type.Name; 
                 var typeName = QReflection.QName(type);
                 if (methodInfo.DeclaringType != typeof(object))

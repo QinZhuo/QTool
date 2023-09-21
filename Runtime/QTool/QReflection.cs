@@ -1065,8 +1065,12 @@ namespace QTool.Reflection
             var methods= type.GetMethods(bindingFlags);
             foreach (var method in methods)
             {
-                methodeInfo?.Invoke(method);
-            }
+				if(method.Name.StartsWith("set_")|| method.Name.StartsWith("get_"))
+				{
+					continue;
+				}
+				methodeInfo?.Invoke(method);
+			}
         }
 
 		public static object GetValue(this object target, string path)

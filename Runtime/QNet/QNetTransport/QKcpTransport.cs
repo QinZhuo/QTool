@@ -169,7 +169,7 @@ namespace QTool.Net
 				});
 			}
 			IpText.visible = !ClientConnected;
-			StartClientButton.visible = !ClientConnected && !ServerActive;
+			StartClientButton.visible = !ClientConnected;
 
 #endif
 		}
