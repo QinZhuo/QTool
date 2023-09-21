@@ -59,7 +59,7 @@ namespace QTool
 					{
 						var max = Mathf.Max(distance, width / 2);
 						var dir = Vector2.up * max;
-						var count = Mathf.CeilToInt(max * 4);
+						var count = Mathf.CeilToInt(Mathf.Max( max * 8,4));
 						for (int i = 0; i < count; i++)
 						{
 							var angle = 360f / count * i;
