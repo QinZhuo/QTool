@@ -208,6 +208,11 @@ namespace QTool
 			root.Add(visual);
 			return visual;
 		}
+		public static T IgnoreClick<T>(this T root, bool value = true) where T : VisualElement
+		{
+			root.pickingMode = value ? PickingMode.Ignore : PickingMode.Position;
+			return root;
+		}
 		public static VisualElement SetBackground(this VisualElement root, Color color=default,float offset=0)
 		{
 			root.style.position = Position.Absolute;

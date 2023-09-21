@@ -41,9 +41,12 @@ namespace QTool
 			var useSize = Profiler.GetTotalAllocatedMemoryLong();
 			if (InfoLabel == null)
 			{
-				InfoLabel = QToolManager.Instance.RootVisualElement.AddLabel(Application.productName + " v" + Application.version, TextAnchor.MiddleRight);
+				InfoLabel = QToolManager.Instance.RootVisualElement.AddVisualElement().SetBackground().IgnoreClick().AddLabel(Application.productName + " v" + Application.version, TextAnchor.MiddleRight);
+				InfoLabel.style.color = Color.white;
+				InfoLabel.pickingMode = PickingMode.Ignore;
 				InfoLabel.style.position = Position.Absolute;
 				InfoLabel.style.width = new Length(100, LengthUnit.Percent);
+				InfoLabel.style.textShadow = new TextShadow { offset = Vector2.one, color = Color.black, blurRadius=1 };
 			}
 			InfoLabel.text = Application.productName + " v" + Application.version+"\t 内存：" + useSize.ToSizeString() + " / " + (useSize + Profiler.GetTotalReservedMemoryLong()).ToSizeString() + "\t 帧率：" + FPS.ToString()+" |";
 		}

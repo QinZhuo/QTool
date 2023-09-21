@@ -160,7 +160,7 @@ namespace QTool.Net
 			base.DebugUI();
 #if UNITY_2021_1_OR_NEWER
 
-			if (StartClientButton == null&& IpText==null)
+			if (StartClientButton == null && IpText == null)
 			{
 				IpText = QToolManager.Instance.RootVisualElement.AddText("主机Ip", ServerIp, newValue => ServerIp = newValue);
 				StartClientButton = QToolManager.Instance.RootVisualElement.AddButton("连接主机", () =>
@@ -169,7 +169,7 @@ namespace QTool.Net
 				});
 			}
 			IpText.visible = !ClientConnected;
-			StartClientButton.visible = !ClientConnected;
+			StartClientButton.visible = !ClientConnected && !ServerActive;
 
 #endif
 		}
