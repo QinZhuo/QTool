@@ -47,19 +47,22 @@ namespace QTool
 						Controller.AddPoint(Vector2.zero);
 						var endAngle = Mathf.Atan2(width / 2, distance) / Mathf.PI * 360 * 2;
 						var dir = (Vector2.up * distance).Rotate(-endAngle / 2);
-						for (int i = 0; i <= 18; i++)
+						var count = Mathf.CeilToInt(width * 2);
+						for (int i = 0; i <= count; i++)
 						{
-							var angle = endAngle / 18 * i;
-							Controller.AddPoint(dir.Rotate(angle), i == 0 || i == 18 ? ShapeTangentMode.Linear : ShapeTangentMode.Continuous);
+							var angle = endAngle / count * i;
+							Controller.AddPoint(dir.Rotate(angle), i == 0 || i == count ? ShapeTangentMode.Linear : ShapeTangentMode.Continuous);
 						}
 					}
 					break;
 				case Shape.圆形:
 					{
-						var dir = Vector2.up * Mathf.Max(distance, width / 2);
-						for (int i = 0; i < 36; i++)
+						var max = Mathf.Max(distance, width / 2);
+						var dir = Vector2.up * max;
+						var count = Mathf.CeilToInt(max * 4);
+						for (int i = 0; i < count; i++)
 						{
-							var angle = 360f / 36 * i;
+							var angle = 360f / count * i;
 							Controller.AddPoint(dir.Rotate(angle), ShapeTangentMode.Continuous);
 						}
 					}
@@ -90,7 +93,7 @@ namespace QTool
 				spline.SetRightTangent(index - 1, left.Rotate(90).normalized * leftOffset * 0.4f);
 				var rightOffset = Vector2.Distance(left, point);
 				spline.SetRightTangent(index, point.Rotate(90).normalized * rightOffset * 0.4f);
-				spline.SetLeftTangent(0, right.Rotate(-90).normalized * rightOffset * 0.4f);
+				spline.SetLeftTangent(0, right.Rotate(-90).normalized * rightOffset * 0.35f);
 			}
 		}
 	}
