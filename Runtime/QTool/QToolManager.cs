@@ -71,7 +71,7 @@ namespace QTool
 		}
 	}
 
-	public abstract class QToolManager<T>:MonoBehaviour where T : QToolManager<T>
+	public abstract class QToolManagerBase<T>:MonoBehaviour where T : QToolManagerBase<T>
     {
         private static T _instance;
         public static T Instance {
