@@ -264,6 +264,11 @@ namespace QTool
 		{
 			Debug.LogWarning("[" + nameof(QDebug) + "]  " + obj);
 		}
+		[System.Diagnostics.Conditional("DEVELOPMENT_BUILD"), System.Diagnostics.Conditional("UNITY_EDITOR")]
+		public static void LogError(object obj)
+		{
+			Debug.LogError("[" + nameof(QDebug) + "]  " + obj);
+		}
 		private static QDictionary<string, long> TimestampList= new QDictionary<string, long>();
 		[System.Diagnostics.Conditional("DEVELOPMENT_BUILD"), System.Diagnostics.Conditional("UNITY_EDITOR")]
 		public static void Begin(string key)
