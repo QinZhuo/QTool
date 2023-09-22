@@ -101,7 +101,8 @@ namespace QTool
 		public static int MaxRandomTimes { get; set; } = 1000;
 		public static Vector3 RandomPlacePosition<T>(this T target, Func<Vector3> RandomPosition, Func<Vector3, bool> CanPlace = null) where T : Component
 		{
-			var radius = target.GetBounds().size.magnitude / 2;
+			var size = target.GetBounds().size;
+			var radius = Mathf.Max(size.x,size.y,size.z);
 			var is2D = target.GetComponent<Collider2D>() != null;
 			Vector3 position = default;
 			for (int times = 0; times < MaxRandomTimes; times++)
