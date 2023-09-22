@@ -1060,11 +1060,7 @@ namespace QTool
 	{
 
 	}
-	[AttributeUsage(AttributeTargets.Class ,AllowMultiple = false,Inherited = false)]
-	public class QDynamicAttribute : Attribute
-	{
-
-	}
+	
 
 	public enum QObjectType
 	{
@@ -1111,7 +1107,7 @@ namespace QTool
 				{
 					ObjType = QObjectType.UnityObject;
 				}
-				else if( type==typeof(System.Object)||type.IsAbstract||type.IsInterface|| type.GetCustomAttribute<QDynamicAttribute>()!=null)
+				else if( type==typeof(object)||type.IsAbstract||type.IsInterface)
 				{
 					ObjType = QObjectType.DynamicObject;
 				}

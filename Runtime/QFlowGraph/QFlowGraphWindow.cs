@@ -1,11 +1,16 @@
+using Codice.Client.BaseCommands.Differences;
 using QTool.Reflection;
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
 using UnityEngine;
 using UnityEngine.UIElements;
+using static PlasticGui.LaunchDiffParameters;
+using static UnityEngine.Rendering.DebugUI;
 
 namespace QTool.FlowGraph
 {
@@ -370,17 +375,36 @@ namespace QTool.FlowGraph
 				var row = root.AddVisualElement(port.IsOutput ? FlexDirection.RowReverse : FlexDirection.Row);
 				if (port.IsList)
 				{
-					var foldout = row.Add(port.ViewName, port.Value, port.ValueType, newValue => port.Value = newValue);
-					row.Remove(foldout);
-					var listView = foldout.Q<ListView>();
-					row.Add(listView);
-					listView.bindItem += (visual, index) =>
+					var view = row.AddVisualElement();
+					VisualElement viewList = null;
+					void FreshList()
 					{
-						visual.style.flexDirection = port.IsOutput ? FlexDirection.Row : FlexDirection.RowReverse;
-						AddDotView(visual, GetColor(port), port.GetPortId(index));
-						FreshPortConnect(port);
-						visual.RegisterCallback<MouseEnterEvent>(ValueMouseEnterEvent);
-					};
+						view.Clear();
+						var index = 0;
+						foreach (var child in viewList.Children().ToArray())
+						{
+							var childRow = view.AddVisualElement(FlexDirection.Row);
+							childRow.Add(child);
+							child.style.flexDirection = port.IsOutput ? FlexDirection.Row : FlexDirection.RowReverse;
+							AddDotView(childRow, GetColor(port), port.GetPortId(index++));
+							FreshPortConnect(port);
+							child.RegisterCallback<MouseEnterEvent>(ValueMouseEnterEvent);
+						}
+						if (index == 0)
+						{
+							var list = port.Value as IList;
+							view.AddButton("新增 " + port.ViewName, () =>
+							{
+								list = list.CreateAt(QSerializeType.Get(port.ValueType));
+								port.Value = list;
+								root.Remove(row);
+								AddPortView(root, port);
+							});
+						}
+					}
+					viewList = row.Add(port.ViewName, port.Value, port.ValueType, newValue => { port.Value = newValue; FreshList(); });
+					row.Remove(viewList);
+					FreshList();
 				}
 				else
 				{

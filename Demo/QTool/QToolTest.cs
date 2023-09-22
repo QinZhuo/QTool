@@ -29,10 +29,10 @@ namespace QTool.Test
 		public QIdObject qIdObject;
         byte[] testBytes;
 		[QName("序列化测试数据来源", nameof(toggleTest))]
-        public TTestClass test1;
+        public QTestClass test1;
 		[QReadonly]
 		[QName("序列化测试结果", nameof(toggleTest))]
-		public TTestClass test2;
+		public QTestClass test2;
 		[QName("序列化测试次数", nameof(toggleTest))]
 		public int testTimes = 100;
 		[QName("命令", nameof(toggleTest)),TextArea(2,4)]
@@ -56,7 +56,7 @@ namespace QTool.Test
             {
                 for (int i = 0; i < 10000; i++)
                 {
-                    run.CreateInstance(nameof(TTestClass));
+                    run.CreateInstance(nameof(QTestClass));
                 }
             });
             var ar = new object[0];
@@ -64,10 +64,10 @@ namespace QTool.Test
             {
                 for (int i = 0; i < 10000; i++)
                 {
-                    Activator.CreateInstance(QReflection.ParseType(nameof(TTestClass)));
+                    Activator.CreateInstance(QReflection.ParseType(nameof(QTestClass)));
                 }
             });
-           Debug.LogError( (TTestClass)Activator.CreateInstance(QReflection.ParseType(nameof(TTestClass))));
+           Debug.LogError( (QTestClass)Activator.CreateInstance(QReflection.ParseType(nameof(QTestClass))));
 
         }
 		[QName("切换语言")]
@@ -100,7 +100,7 @@ namespace QTool.Test
 			Debug.LogError(test1.ToQData());
 			Debug.LogError(test1.QDataCopy().ToQData());
 			Debug.LogError(test1.ToQData(false));
-			Debug.LogError(test1.ToQData(false).ParseQData<TTestClass>(null,false).ToQData());
+			Debug.LogError(test1.ToQData(false).ParseQData<QTestClass>(null,false).ToQData());
 			QDebug.DebugRun("QData写入", () =>
             {
                 for (int i = 0; i < testTimes; i++)
@@ -112,14 +112,14 @@ namespace QTool.Test
 			{
 				for (int i = 0; i < testTimes; i++)
 				{
-					test2 = testBytes.GetString().ParseQData<TTestClass>(null, true);
+					test2 = testBytes.GetString().ParseQData<QTestClass>(null, true);
 				}
 			});
 			QDebug.DebugRun("QData读取 有Target", () =>
             {
                 for (int i = 0; i < testTimes; i++)
                 {
-					test2 = testBytes.GetString().ParseQData<TTestClass>(test2, true);
+					test2 = testBytes.GetString().ParseQData<QTestClass>(test2, true);
                 }
             });
 			QDebug.DebugRun("QData写入 无Name", () =>
@@ -134,14 +134,14 @@ namespace QTool.Test
 			{
 				for (int i = 0; i < testTimes; i++)
 				{
-					test2 = testBytes.GetString().ParseQData<TTestClass>(null,false);
+					test2 = testBytes.GetString().ParseQData<QTestClass>(null,false);
 				}
 			});
 			QDebug.DebugRun("QData读取 无Name 有Target", () =>
             {
                 for (int i = 0; i < testTimes; i++)
                 {
-					test2 = testBytes.GetString().ParseQData<TTestClass>(test2,false);
+					test2 = testBytes.GetString().ParseQData<QTestClass>(test2,false);
                 }
             });
 				
@@ -203,16 +203,16 @@ namespace QTool.Test
             Debug.LogError(data);
             Debug.LogError(data["setting"].GetValue<string>());
             Debug.LogError(test1.ToQData());
-            var tobj = test1.ToQData().ParseQData<TTestClass>();
+            var tobj = test1.ToQData().ParseQData<QTestClass>();
             Debug.LogError(tobj.ToQData());
 
             Debug.LogError(test1.ToQData(false));
-            tobj = test1.ToQData(false).ParseQData<TTestClass>(null,false);
+            tobj = test1.ToQData(false).ParseQData<QTestClass>(null,false);
             Debug.LogError(tobj.ToQData(false));
 
             Debug.LogError((new int[][] {new int[] { 1, 2 },new int[] { 3, 4 } }).ToQData().ParseQData<int[][]>().ToQData());
 
-			Debug.LogError(new List<TTestClass>() { new TTestClass { Key = "1" }, new TTestClass { Key = "2" } }.ToQDataList());
+			Debug.LogError(new List<QTestClass>() { new QTestClass { Key = "1" }, new QTestClass { Key = "2" } }.ToQDataList());
 			QFileManager.Save("saveTest.txt" , data.ToQData());
 			QPlayerPrefs.Set("test1", data.ToString());
 			Debug.LogError(QPlayerPrefs.GetString("test1"));
@@ -284,15 +284,14 @@ namespace QTool.Test
         防御 = 1 << 2,
         死亡 = 1 << 3,
     }
-	[QDynamic]
-    [System.Serializable]
-    public class TTestClass:IKey<string>
+    [Serializable]
+    public class QTestClass:IKey<string>
     {
 		public string Key { get; set; }
         public Rect rect;
         public TestEnum testEnume = TestEnum.攻击 | TestEnum.死亡;
 		[QName("List测试")]
-        public List<float> list;
+        public List<QTestClass2> list;
         public List<List<float>> list2Test = new List<List<float>> { new List<float>() { 1, 2, 3 } };
         [QName("名字测试1"),TextArea(2,4)]
         public string asdl;
@@ -300,8 +299,8 @@ namespace QTool.Test
         public byte[] array = new byte[] { 123 };
         [XmlIgnore] 
         public byte[,,] arrayTest = new byte[1, 2, 2] { { { 1, 2 }, { 3, 4 } } };
-		[QName]
-		public TTestClass child = null;
+		//[QName]
+		//public QTestClass child = null;
         [XmlIgnore]
         public object obj = new Vector3
         {
@@ -309,16 +308,15 @@ namespace QTool.Test
             y = 2,
             z = 3
         };
-		public TTestClass()
+		public QTestClass()
 		{
-			child = this ;
 		}
 
 	}
     [System.Serializable]
-    public class TestClass2 :IQData
+    public class QTestClass2 :IQData
     {
-        public List<float> list;
+        public List<Vector2> list;
         [QName("名字测试2")]
         public string asdl;
 

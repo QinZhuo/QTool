@@ -11,8 +11,9 @@ namespace QTool.Test
 		[QPopup(nameof(QDataListTestType) + "." + nameof(List))]
 		public string value = "";
 		public Vector3 v3;
-		public List<int> array;
+		public int[] array;
 		public TestEnum testEnum;
+		public List<QTestClass> ClassList;
 		public override string ToString()
 		{
 			return "[" + Key + "]:[" + value + "]";

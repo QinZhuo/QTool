@@ -201,6 +201,20 @@ namespace QTool
 			root.Add(visual);
 			return visual;
 		}
+#if UNITY_2022_1_OR_NEWER
+		public static TreeView AddTreeView(this VisualElement root, Action<VisualElement, int> bindItem, Func<VisualElement> makeItem=null)
+		{
+			var visual = new TreeView();
+			visual.bindItem = bindItem;
+			if (makeItem == null)
+			{
+				makeItem = () => new VisualElement();
+			}
+			visual.makeItem = makeItem;
+			root.Add(visual);
+			return visual;
+		}
+#endif
 		public static VisualElement AddVisualElement(this VisualElement root, FlexDirection flexDirection = FlexDirection.Column)
 		{
 			var visual = new VisualElement();
@@ -247,14 +261,7 @@ namespace QTool
 			root.Add(visual);
 			return visual;
 		}
-#if UNITY_2022_1_OR_NEWER
-		public static TreeView AddTreeView(this VisualElement root, Func<VisualElement> makeItem, Action<VisualElement, int> bindItem)
-		{
-			var visual = new TreeView(makeItem, bindItem);
-			root.Add(visual);
-			return visual;
-		}
-#endif
+
 #if UNITY_2021_1_OR_NEWER
 		public static GroupBox AddGroupBox(this VisualElement root,string name="")
 		{
@@ -453,41 +460,45 @@ namespace QTool
 										list = obj as IList;
 									}
 									var foldout = root.AddFoldout(name);
-									ListView listView = null;
-									listView = foldout.contentContainer.AddListView(list, (element, index) =>
-									  {
-										  element.Clear();
-										  var child = element.Add(name + index, list[index], typeInfo.ElementType, (value) =>
-										   {
-											   list[index] = value;
-											   changeEvent?.Invoke(list);
-										   }, customAttribute);
-										  child.AddMenu((menu) =>
-										  {
-											  menu.menu.AppendAction("新增", action =>
-											  {
-												  list = list.CreateAt(QSerializeType.Get(typeInfo.ElementType), index);
-												  listView.Rebuild();
-												  changeEvent?.Invoke(list);
-											  });
-											  menu.menu.AppendAction("删除", action =>
-											  {
-												  list = list.RemoveAt(QSerializeType.Get(typeInfo.ElementType), index);
-												  listView.Rebuild();
-												  changeEvent?.Invoke(list);
-											  });
-										  });
-									  });
-									listView.AddMenu((menu) =>
+									void FreshList()
 									{
-										menu.menu.AppendAction("新增", action =>
+										foldout.contentContainer.Clear();
+										object index = 0f;
+										for (int i = 0; i < list.Count; i++)
 										{
-											list = list.CreateAt(QSerializeType.Get(typeInfo.ElementType));
-											listView.Rebuild();
-											changeEvent?.Invoke(list);
+											index = i;
+											var child = foldout.contentContainer.Add(name + i, list[i], typeInfo.ElementType, (value) =>
+											{
+												list[(int)index] = value;
+												changeEvent?.Invoke(list);
+											}, customAttribute);
+											child.AddMenu((menu) =>
+											{
+												menu.menu.AppendAction("新增", action =>
+												{
+													list = list.CreateAt(typeInfo, (int)index);
+													FreshList();
+													changeEvent?.Invoke(list);
+												});
+												menu.menu.AppendAction("删除", action =>
+												{
+													list = list.RemoveAt(typeInfo, (int)index);
+													FreshList();
+													changeEvent?.Invoke(list);
+												});
+											});
+										}
+										foldout.AddMenu((menu) =>
+										{
+											menu.menu.AppendAction("新增", action =>
+											{
+												list = list.CreateAt(typeInfo);
+												FreshList();
+												changeEvent?.Invoke(list);
+											});
 										});
-									});
-									listView.selectionType = SelectionType.None;
+									}
+									FreshList();
 									return foldout;
 								}
 							}
