@@ -261,22 +261,25 @@ namespace QTool.FlowGraph
 		public static float ToFloat(QFlowNode node, Func<QFlowNode, float> toFloatFunc = null)
 		{
 			var value = 0f;
-			switch (node.command.method.Name)
+			if (node.Ports.Count > 0)
 			{
-				case nameof(Trigger):
-					return node.Ports["init"].ToFloat(toFloatFunc) + node.Ports["triggerObject"].ToFloat(toFloatFunc);
-				case nameof(GetValue):
-					return node["key"].ToComputeFloat();
-				case nameof(Add):
-					return node.Ports["a"].ToFloat(toFloatFunc) + node.Ports["b"].ToFloat(toFloatFunc);
-				case nameof(Subtract):
-					return node.Ports["a"].ToFloat(toFloatFunc) - node.Ports["b"].ToFloat(toFloatFunc);
-				case nameof(Multiply):
-					return node.Ports["a"].ToFloat(toFloatFunc) * node.Ports["b"].ToFloat(toFloatFunc);
-				case nameof(Divide):
-					return node.Ports["a"].ToFloat(toFloatFunc) / node.Ports["b"].ToFloat(toFloatFunc);
-				default:
-					break;
+				switch (node.command.method.Name)
+				{
+					case nameof(Trigger):
+						return node.Ports["init"].ToFloat(toFloatFunc) + node.Ports["triggerObject"].ToFloat(toFloatFunc);
+					case nameof(GetValue):
+						return node["key"].ToComputeFloat();
+					case nameof(Add):
+						return node.Ports["a"].ToFloat(toFloatFunc) + node.Ports["b"].ToFloat(toFloatFunc);
+					case nameof(Subtract):
+						return node.Ports["a"].ToFloat(toFloatFunc) - node.Ports["b"].ToFloat(toFloatFunc);
+					case nameof(Multiply):
+						return node.Ports["a"].ToFloat(toFloatFunc) * node.Ports["b"].ToFloat(toFloatFunc);
+					case nameof(Divide):
+						return node.Ports["a"].ToFloat(toFloatFunc) / node.Ports["b"].ToFloat(toFloatFunc);
+					default:
+						break;
+				}
 			}
 			var nextNode = node.Ports[QFlowKey.NextPort]?.GetConnectNode();
 			value += nextNode != null ? nextNode.ToFloat(toFloatFunc) : 0f;
