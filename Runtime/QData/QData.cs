@@ -432,7 +432,7 @@ namespace QTool
 									{
 										if (reader.NextIsSplit('}'))
 										{
-											return target;
+											break;
 										}
 										var str = reader.ReadCheckString();
 										var runtimeType = QReflection.ParseType(str);
