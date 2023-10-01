@@ -463,10 +463,9 @@ namespace QTool
 									void FreshList()
 									{
 										foldout.contentContainer.Clear();
-										object index = 0f;
 										for (int i = 0; i < list.Count; i++)
 										{
-											index = i;
+											object index = i;
 											var child = foldout.contentContainer.Add(name + i, list[i], typeInfo.ElementType, (value) =>
 											{
 												list[(int)index] = value;
