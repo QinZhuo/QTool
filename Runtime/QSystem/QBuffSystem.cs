@@ -137,7 +137,7 @@ namespace QTool
 				{
 					OnAdd(buff);
 				}
-			
+
 			}
 			else
 			{
@@ -167,7 +167,7 @@ namespace QTool
 				}
 			}
 		}
-		public void Remove(string key,int count=1)
+		public void Remove(string key, int count = 1)
 		{
 			if (Buffs.ContainsKey(key))
 			{
@@ -200,7 +200,7 @@ namespace QTool
 			{
 				foreach (var node in buff.Graph.StartNode)
 				{
-					if(!node.Value.Name.EndsWith("每层"))
+					if (!node.Value.Name.EndsWith("每层"))
 					{
 						EventActions[node.Value.Name] += buff.InvokeEvent;
 					}
@@ -230,7 +230,7 @@ namespace QTool
 			foreach (var kv in Buffs)
 			{
 				var buff = kv.Value;
-				if(buff.Data.Megre.HasFlag(QBuffMergeMode.时间))
+				if (buff.Data.Megre.HasFlag(QBuffMergeMode.时间))
 				{
 					buff.Time.CurrentValue -= deltaTime;
 					if (buff.Time.CurrentValue <= 0)
@@ -255,7 +255,7 @@ namespace QTool
 				DelayRemove.Clear();
 			}
 		}
-		
+
 		protected virtual void OnAdd(QBuffData<BuffData>.Runtime buff)
 		{
 			OnAddBuff?.Invoke(buff);
@@ -292,6 +292,20 @@ namespace QTool
 				}
 			}
 		}
+		public void SetValue<T>(string key, T value)
+		{
+			foreach (var buff in Buffs)
+			{
+				buff.Value.Graph.SetValue(key, value);
+			}
+		}
+		public void SetValue<T>(T value)
+		{
+			foreach (var buff in Buffs)
+			{
+				buff.Value.Graph.SetValue(value);
+			}
+		}
 		public void InvokeEvent(string key)
 		{
 			if (EventActions.ContainsKey(key))
@@ -300,9 +314,9 @@ namespace QTool
 			}
 			if (!key.EndsWith("每层"))
 			{
-				InvokeEvent(key+"每层");
+				InvokeEvent(key + "每层");
 			}
 		}
-		
+
 	}
 }

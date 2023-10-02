@@ -33,6 +33,7 @@ namespace QTool
 					Graph = null;
 				}
 			}
+		
 			public void InvokeEvent(string key)
 			{
 				if (Graph != null && Graph.GetNode(key) != null)
@@ -193,6 +194,20 @@ namespace QTool
 				}
 			}
 			OnRemoveItem?.Invoke(item);
+		}
+		public void SetValue<T>(string key, T value)
+		{
+			foreach (var buff in Items)
+			{
+				buff.Graph.SetValue(key, value);
+			}
+		}
+		public void SetValue<T>(T value)
+		{
+			foreach (var buff in Items)
+			{
+				buff.Graph.SetValue(value);
+			}
 		}
 		public void InvokeEvent(string key)
 		{
