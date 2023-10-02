@@ -81,7 +81,7 @@ namespace QTool
 		}
 		public QDictionary<string, QRuntimeValue> RuntimeValues { get; private set; } = new QDictionary<string, QRuntimeValue>();
 		public DataT Data => Runtime?.Data;
-		public event Action<string> OnValueChange = null;
+		public Action<string> OnValueChange = null;
 		public virtual void Awake()
 		{
 			gameObject.RegisterEvent(this);
