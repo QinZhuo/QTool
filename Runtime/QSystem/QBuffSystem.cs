@@ -92,9 +92,21 @@ namespace QTool
 		const string StartEventKey = "开始";
 		const string StopEventKey = "停止";
 		const string TimeEventKey = "时间";
+		/// <summary>
+		/// 添加Buff时执行
+		/// </summary>
 		public event Action<QBuffData<BuffData>.Runtime> OnAddBuff = null;
+		/// <summary>
+		/// 移除Buff时执行
+		/// </summary>
 		public event Action<QBuffData<BuffData>.Runtime> OnRemoveBuff = null;
+		/// <summary>
+		/// 初始化Buff时执行 多个叠层只会执行一次
+		/// </summary>
 		public event Action<QBuffData<BuffData>.Runtime> OnStartBuff = null;
+		/// <summary>
+		/// 结束Buff时执行 多个叠层只会执行一次
+		/// </summary>
 		public event Action<QBuffData<BuffData>.Runtime> OnStopBuff = null;
 		public QDictionary<string, QBuffData<BuffData>.Runtime> Buffs { get; private set; } = new QDictionary<string, QBuffData<BuffData>.Runtime>();
 		private QDictionary<string, Action<string>> EventActions { get; set; } = new QDictionary<string, Action<string>>();
