@@ -1008,7 +1008,9 @@ namespace QTool.FlowGraph
 		public const string NextPort = "#Next";
 		public const string ReturnPort = "return";
         public const string This = "This";
-    }
+		public const string Node = "Node";
+
+	}
 	public enum QNodeState
 	{
 		闲置,
@@ -1176,7 +1178,14 @@ namespace QTool.FlowGraph
             for (int i = 0; i < command.paramInfos.Length; i++)
             {
                 var paramInfo = command.paramInfos[i];
-				if (paramInfo.Name.Equals(QFlowKey.This)) continue;
+				switch (paramInfo.Name)
+				{
+					case QFlowKey.This:
+					case QFlowKey.Node:
+						continue;
+					default:
+						break;
+				}
 				Attribute attribute = paramInfo.GetAttribute<QOutputPortAttribute>() ;
 				if (attribute == null)
 				{
@@ -1390,14 +1399,16 @@ namespace QTool.FlowGraph
             for (int i = 0; i < command.paramInfos.Length; i++)
             {
                 var info = command.paramInfos[i];
-                if (info.Name == QFlowKey.This)
-                {
-                    commandParams[i] = this;
-                }
-                else
-                {
-                    commandParams[i] = this[info.Name];
-                }
+				switch (info.Name)
+				{
+					case QFlowKey.This:
+					case QFlowKey.Node:
+						commandParams[i] = this;
+						break;
+					default:
+						commandParams[i] = this[info.Name];
+						break;
+				}
             }
             return command.Invoke(commandParams);
         }
