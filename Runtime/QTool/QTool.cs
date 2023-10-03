@@ -596,25 +596,29 @@ namespace QTool
 			}
 			catch (Exception e)
 			{
-				Debug.LogError("转换" + typeof(T) + "[" + obj + "]出错 " + e);
+				QDebug.LogError("转换[" + obj + "]" + obj?.GetType() + " => " + typeof(T) + "出错 \n" + e);
+				return default;
 			}
-			return default;
 		}
 		public static object AsType(this object obj, Type type)
 		{
+			if (obj == null) return null;
+			var objType = obj.GetType();
 			try
 			{
-				if (obj == null) return null;
-				var objType = obj.GetType();
 				if (objType.Is(type))
 				{
 					return obj;
 				}
 				else
-				{   
-					if (type == typeof(object)||type.IsPrimitive)
+				{
+					if (type == typeof(object))
 					{
 						return obj;
+					}
+					else if (type.IsPrimitive)
+					{
+						return obj.ToQDataType(objType, false).ParseQDataType(type, false);
 					}
 					else if (type == typeof(string))
 					{
@@ -640,9 +644,9 @@ namespace QTool
 			}
 			catch (Exception e)
 			{
-				Debug.LogError("强制转换" + type + "[" + obj + "]出错 " + e);
+				QDebug.LogError("转换[" + obj + "]" + objType + " => " + type + "出错 \n" + e);
+				return obj;
 			}
-			return obj;
 		}
 		/// <summary>
 		/// 设置时间并演出
