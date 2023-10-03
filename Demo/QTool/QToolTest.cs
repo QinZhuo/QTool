@@ -277,10 +277,11 @@ namespace QTool.Test
 
 		IEnumerator RunTest()
 		{
-			while (true)
+		//	while (true)
 			{
 				yield return Child();
 				yield return null;
+			//	yield return null;
 			};
 		}
 		IEnumerator Child()

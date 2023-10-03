@@ -77,10 +77,7 @@ namespace QTool
 		/// <returns>true继续等待 false时结束等待</returns>
 		private static bool UpdateIEnumerator(IEnumerator enumerator)
 		{
-			if (enumerator.Current == null)
-			{
-				enumerator.MoveNext();
-			}
+			var start = enumerator.Current;
 			if (enumerator.Current is YieldInstruction ie)
 			{
 				if (UpdateIEnumerator(ie))
@@ -95,7 +92,15 @@ namespace QTool
 					return true;
 				}
 			}
-			return enumerator.MoveNext();
+			var result = enumerator.MoveNext();
+			if (enumerator.Current != null)
+			{
+				return UpdateIEnumerator(enumerator);
+			}
+			else
+			{
+				return result;
+			}
 		}
 		public static void Update()
 		{
