@@ -78,6 +78,7 @@ namespace QTool
 		private static bool UpdateIEnumerator(IEnumerator enumerator)
 		{
 			var start = enumerator.Current;
+			//Debug.LogError(start + " " + Time.time);
 			if (enumerator.Current is YieldInstruction ie)
 			{
 				if (UpdateIEnumerator(ie))
@@ -93,7 +94,7 @@ namespace QTool
 				}
 			}
 			var result = enumerator.MoveNext();
-			if (enumerator.Current != null)
+			if (enumerator.Current != null && start != enumerator.Current)
 			{
 				return UpdateIEnumerator(enumerator);
 			}
