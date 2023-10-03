@@ -15,27 +15,27 @@ using System.Runtime.ExceptionServices;
 
 namespace QTool.Test
 {
-	
-   
-    public class QToolTest : MonoBehaviour
-    {
+
+
+	public class QToolTest : MonoBehaviour
+	{
 		[QToggle("显示变量")]
 		public bool toggleTest;
-		[QName("QInspector测试",nameof(toggleTest))]
+		[QName("QInspector测试", nameof(toggleTest))]
 		[QPopup(nameof(enumTest))]
-        public string testValue ;
-		public static string[] enumTest=> new string[] { "enumTest1", "enumTest2" };
+		public string testValue;
+		public static string[] enumTest => new string[] { "enumTest1", "enumTest2" };
 		[QName("", nameof(toggleTest))]
 		public QIdObject qIdObject;
-        byte[] testBytes;
+		byte[] testBytes;
 		[QName("序列化测试数据来源", nameof(toggleTest))]
-        public QTestClass test1;
+		public QTestClass test1;
 		[QReadonly]
 		[QName("序列化测试结果", nameof(toggleTest))]
 		public QTestClass test2;
 		[QName("序列化测试次数", nameof(toggleTest))]
 		public int testTimes = 100;
-		[QName("命令", nameof(toggleTest)),TextArea(2,4)]
+		[QName("命令", nameof(toggleTest)), TextArea(2, 4)]
 		public string commandStr;
 		[QName("QDataList数据", nameof(toggleTest))]
 		[TextArea(5, 10)]
@@ -49,31 +49,31 @@ namespace QTool.Test
 			QDataList.PreLoadAll();
 		}
 		[QName("解析类型测试")]
-        public void CreateTest()
-        {
-            var run = Assembly.GetExecutingAssembly();
-            QDebug.DebugRun("系统创建", () =>
-            {
-                for (int i = 0; i < 10000; i++)
-                {
-                    run.CreateInstance(nameof(QTestClass));
-                }
-            });
-            var ar = new object[0];
+		public void CreateTest()
+		{
+			var run = Assembly.GetExecutingAssembly();
+			QDebug.DebugRun("系统创建", () =>
+			{
+				for (int i = 0; i < 10000; i++)
+				{
+					run.CreateInstance(nameof(QTestClass));
+				}
+			});
+			var ar = new object[0];
 			QDebug.DebugRun("QInstance创建", () =>
-            {
-                for (int i = 0; i < 10000; i++)
-                {
-                    Activator.CreateInstance(QReflection.ParseType(nameof(QTestClass)));
-                }
-            });
-           Debug.LogError( (QTestClass)Activator.CreateInstance(QReflection.ParseType(nameof(QTestClass))));
+			{
+				for (int i = 0; i < 10000; i++)
+				{
+					Activator.CreateInstance(QReflection.ParseType(nameof(QTestClass)));
+				}
+			});
+			Debug.LogError((QTestClass)Activator.CreateInstance(QReflection.ParseType(nameof(QTestClass))));
 
-        }
+		}
 		[QName("切换语言")]
 		public void ChangeLangua()
 		{
-			QLocalization.Language = QLocalization.Language == Application.systemLanguage ?  SystemLanguage.English : Application.systemLanguage;
+			QLocalization.Language = QLocalization.Language == Application.systemLanguage ? SystemLanguage.English : Application.systemLanguage;
 			Debug.LogError(QLocalization.Language);
 			for (int i = 0; i < 10; i++)
 			{
@@ -85,29 +85,29 @@ namespace QTool.Test
 		[QName("运算符测试")]
 		public void OperarterTest()
 		{
-			var a = UnityEngine.Random.Range(1,100);
+			var a = UnityEngine.Random.Range(1, 100);
 			var b = UnityEngine.Random.Range(1, 100);
 			QDebug.Log(a + " + " + b + " = " + a.OperaterAdd(b) + " " + (a + b));
 			Vector2 v2A = new Vector2(UnityEngine.Random.Range(1, 100), UnityEngine.Random.Range(1, 100));
 			Vector2 v2B = new Vector2(UnityEngine.Random.Range(1, 100), UnityEngine.Random.Range(1, 100));
 			QDebug.Log(v2A + " + " + v2B + " = " + v2A.OperaterAdd(v2B) + " " + (v2A + v2B));
 		}
-		
-        [QName("序列化测试")]
-        public void TestFunc()
-        {
+
+		[QName("序列化测试")]
+		public void TestFunc()
+		{
 			Debug.LogError(test1.ToQData().ToKeyString());
 			Debug.LogError(test1.ToQData());
 			Debug.LogError(test1.QDataCopy().ToQData());
 			Debug.LogError(test1.ToQData(false));
-			Debug.LogError(test1.ToQData(false).ParseQData<QTestClass>(null,false).ToQData());
+			Debug.LogError(test1.ToQData(false).ParseQData<QTestClass>(null, false).ToQData());
 			QDebug.DebugRun("QData写入", () =>
-            {
-                for (int i = 0; i < testTimes; i++)
-                {
-                    testBytes = test1.ToQData().GetBytes();
-                }
-            });
+			{
+				for (int i = 0; i < testTimes; i++)
+				{
+					testBytes = test1.ToQData().GetBytes();
+				}
+			});
 			QDebug.DebugRun("QData读取", () =>
 			{
 				for (int i = 0; i < testTimes; i++)
@@ -116,43 +116,43 @@ namespace QTool.Test
 				}
 			});
 			QDebug.DebugRun("QData读取 有Target", () =>
-            {
-                for (int i = 0; i < testTimes; i++)
-                {
+			{
+				for (int i = 0; i < testTimes; i++)
+				{
 					test2 = testBytes.GetString().ParseQData<QTestClass>(test2, true);
-                }
-            });
+				}
+			});
 			QDebug.DebugRun("QData写入 无Name", () =>
-            {
-                for (int i = 0; i < testTimes; i++)
-                {
-                    testBytes = test1.ToQData(false).GetBytes();
-                }
-            });
+			{
+				for (int i = 0; i < testTimes; i++)
+				{
+					testBytes = test1.ToQData(false).GetBytes();
+				}
+			});
 
 			QDebug.DebugRun("QData读取 无Name", () =>
 			{
 				for (int i = 0; i < testTimes; i++)
 				{
-					test2 = testBytes.GetString().ParseQData<QTestClass>(null,false);
+					test2 = testBytes.GetString().ParseQData<QTestClass>(null, false);
 				}
 			});
 			QDebug.DebugRun("QData读取 无Name 有Target", () =>
-            {
-                for (int i = 0; i < testTimes; i++)
-                {
-					test2 = testBytes.GetString().ParseQData<QTestClass>(test2,false);
-                }
-            });
-				
+			{
+				for (int i = 0; i < testTimes; i++)
+				{
+					test2 = testBytes.GetString().ParseQData<QTestClass>(test2, false);
+				}
+			});
+
 		}
-		
-        [QName("命令测试")]
-        public void CommandTest()
-        { 
-            QCommand.Invoke(commandStr);
-        }
-		
+
+		[QName("命令测试")]
+		public void CommandTest()
+		{
+			QCommand.Invoke(commandStr);
+		}
+
 
 		[QName("时间测试")]
 		public void TimeTest()
@@ -162,7 +162,7 @@ namespace QTool.Test
 		[QName("加密文件测试")]
 		public void SecretTest()
 		{
-			QFileManager.Save(nameof(QToolTest)+QFileManager.SecretExtension,nameof(SecretTest));
+			QFileManager.Save(nameof(QToolTest) + QFileManager.SecretExtension, nameof(SecretTest));
 			Debug.LogError(QFileManager.Load(nameof(QToolTest) + QFileManager.SecretExtension));
 		}
 		public void ScreenTest(bool value)
@@ -171,9 +171,9 @@ namespace QTool.Test
 		}
 		public Texture2D CaptureTexture2d;
 		[QName("截图测试")]
-		public  void RenderTest()
+		public void RenderTest()
 		{
-			CaptureTexture2d=QScreen.Capture();
+			CaptureTexture2d = QScreen.Capture();
 			//if (CaptureTexture2d == null || CaptureTexture2d.width != Screen.width || CaptureTexture2d.height != Screen.height)
 			//{
 			//	CaptureTexture2d = new Texture2D(Screen.width, Screen.height, TextureFormat.RGB24, false);
@@ -189,38 +189,38 @@ namespace QTool.Test
 			Debug.LogError(qdata + "  :   " + qdata.ParseQData<TestEnum>());
 		}
 		[QName("QDataList测试")]
-        public  void QDataListTest()
+		public void QDataListTest()
 		{
 			Debug.LogError(QDataListTestType.Get("T1")?.ToQData());
 
 			var data = new QDataList(QDataStr);
-            Debug.LogError(data.ToString());
-            data[2].SetValue("3", "2 3");
-            data[3][4] = "3\n4";
-            data["newLine"][4] = "n 4";
-            data["newLine"].SetValue("5", true);
-            data["setting"].SetValue( "off\nOn");
-            Debug.LogError(data);
-            Debug.LogError(data["setting"].GetValue<string>());
-            Debug.LogError(test1.ToQData());
-            var tobj = test1.ToQData().ParseQData<QTestClass>();
-            Debug.LogError(tobj.ToQData());
+			Debug.LogError(data.ToString());
+			data[2].SetValue("3", "2 3");
+			data[3][4] = "3\n4";
+			data["newLine"][4] = "n 4";
+			data["newLine"].SetValue("5", true);
+			data["setting"].SetValue("off\nOn");
+			Debug.LogError(data);
+			Debug.LogError(data["setting"].GetValue<string>());
+			Debug.LogError(test1.ToQData());
+			var tobj = test1.ToQData().ParseQData<QTestClass>();
+			Debug.LogError(tobj.ToQData());
 
-            Debug.LogError(test1.ToQData(false));
-            tobj = test1.ToQData(false).ParseQData<QTestClass>(null,false);
-            Debug.LogError(tobj.ToQData(false));
+			Debug.LogError(test1.ToQData(false));
+			tobj = test1.ToQData(false).ParseQData<QTestClass>(null, false);
+			Debug.LogError(tobj.ToQData(false));
 
-            Debug.LogError((new int[][] {new int[] { 1, 2 },new int[] { 3, 4 } }).ToQData().ParseQData<int[][]>().ToQData());
+			Debug.LogError((new int[][] { new int[] { 1, 2 }, new int[] { 3, 4 } }).ToQData().ParseQData<int[][]>().ToQData());
 
 			Debug.LogError(new List<QTestClass>() { new QTestClass { Key = "1" }, new QTestClass { Key = "2" } }.ToQDataList());
-			QFileManager.Save("saveTest.txt" , data.ToQData());
+			QFileManager.Save("saveTest.txt", data.ToQData());
 			QPlayerPrefs.Set("test1", data.ToString());
 			Debug.LogError(QPlayerPrefs.GetString("test1"));
 		}
 		[QName("ToComuteFloatTest")]
 		public void ToComuteFloatTest()
 		{
-			QDebug.Log("1.1"+"  :  "+"1.1".ToComputeFloat());
+			QDebug.Log("1.1" + "  :  " + "1.1".ToComputeFloat());
 			QDebug.Log("1.2" + "  :  " + "1.2".ToComputeFloat());
 			QDebug.Log("1.25" + "  :  " + "1.25".ToComputeFloat());
 			QDebug.Log("" + "  :  " + "".ToComputeFloat());
@@ -267,14 +267,51 @@ namespace QTool.Test
 
 				Debug.LogError("等待10秒完成");
 			}
-		
+
 		}
 		[QName("位置测试")]
 		public void RoundTest()
 		{
 			testObject.GridFixed(Vector3.one);
 		}
-	
+
+		IEnumerator RunTest()
+		{
+			while (true)
+			{
+				yield return Child();
+				yield return null;
+			};
+		}
+		IEnumerator Child()
+		{
+			Debug.Log("child ");
+			yield break;
+		}
+		IEnumerator c;
+		IEnumerator StopE()
+		{
+			var time = 1;
+			while (time <= 50)
+			{
+				yield return null;
+				Debug.LogError("stop" + time++);
+			}
+			c.Stop();
+			Debug.LogError("stop");
+		}
+		[QName("协程运行测试")]
+		public void Run()
+		{
+			c = RunTest();
+			c.Start();
+		}
+		[QName("协程停止测试")]
+		public void Stop()
+		{
+			StopE().Start();
+		}
+
 	}
     [Flags]
     public enum TestEnum

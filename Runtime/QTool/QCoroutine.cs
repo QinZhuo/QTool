@@ -41,6 +41,9 @@ namespace QTool
 			RemoveList.Add(enumerator);
 		}
 		static Dictionary<YieldInstruction, float> YieldInstructionList = new Dictionary<YieldInstruction, float>();
+		/// <summary>
+		/// 处理Unity内置的等待逻辑
+		/// </summary>
 		private static bool UpdateIEnumerator(YieldInstruction yieldInstruction)
 		{
 			if (yieldInstruction is WaitForSeconds waitForSeconds)
@@ -71,10 +74,9 @@ namespace QTool
 		/// 更新迭代
 		/// </summary>
 		/// <param name="enumerator">迭代器</param>
-		/// <returns>false时结束等待</returns>
+		/// <returns>true继续等待 false时结束等待</returns>
 		private static bool UpdateIEnumerator(IEnumerator enumerator)
 		{
-			var start = enumerator.Current;
 			if (enumerator.Current is YieldInstruction ie)
 			{
 				if (UpdateIEnumerator(ie))
@@ -89,15 +91,7 @@ namespace QTool
 					return true;
 				}
 			}
-			var result = enumerator.MoveNext();
-			if (start != enumerator.Current)
-			{
-				return UpdateIEnumerator(enumerator);
-			}
-			else
-			{
-				return result;
-			}
+			return enumerator.MoveNext();
 		}
 		public static void Update()
 		{
