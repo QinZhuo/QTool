@@ -47,6 +47,7 @@ namespace QTool
 	public interface IQTeam
 	{
 		public string Team { get; }
+		public UnityEngine.Transform transform { get; }
 	}
 	/// <summary>
 	/// 队伍
