@@ -85,9 +85,12 @@ namespace QTool
 				{
 					if (relactionType == QTeamRelaction.敌人)
 					{
-						foreach (var t in team.Value)
+						foreach (var obj in team.Value)
 						{
-							list.Add(t as T);
+							if(obj is T t)
+							{
+								list.Add(t);
+							}
 						}
 					}
 				}
@@ -95,9 +98,12 @@ namespace QTool
 				{
 					if (relactionType == QTeamRelaction.队友)
 					{
-						foreach (var t in team.Value)
+						foreach (var obj in team.Value)
 						{
-							list.Add(t as T);
+							if (obj is T t)
+							{
+								list.Add(t);
+							}
 						}
 					}
 				}
