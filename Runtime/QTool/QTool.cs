@@ -632,12 +632,12 @@ namespace QTool
 						}
 						else
 						{
-							return component.GetComponentInParent(type);
+							return component.GetComponent(type);
 						}
 					}
 					else if (obj is GameObject gameObj)
 					{
-						return gameObj.GetComponentInParent(type);
+						return gameObj.GetComponent(type);
 					}
 				}
 				return obj;
