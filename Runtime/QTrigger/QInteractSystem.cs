@@ -62,25 +62,5 @@ namespace QTool
 		}
 	}
 
-	public abstract class QTriggerSystem<T>:MonoBehaviour where T:MonoBehaviour
-	{
-		protected virtual void OnTriggerEnter(Collider other)
-		{
-			var trigger = other.GetComponent<T>();
-			if (trigger != null)
-			{
-				TriggerEnter(trigger);
-			}
-		}
-		protected virtual void OnTriggerExit(Collider other)
-		{
-			var trigger = other.GetComponent<T>();
-			if (trigger != null)
-			{
-				TriggerExit(trigger);
-			}
-		}
-		protected abstract void TriggerEnter(T trigger);
-		protected abstract void TriggerExit(T trigger);
-	}
+
 }
