@@ -49,37 +49,9 @@ namespace QTool
 		public string Team { get; }
 		public UnityEngine.Transform transform { get; }
 	}
-	/// <summary>
-	/// 队伍
-	/// </summary>
-	public static class QTeam<T> where T:IQTeam
+	public static class QTeam
 	{
-		public static QDictionary<string, List<T>> Teams = new QDictionary<string, List<T>>((key)=>new List<T>());
-		public static void GetRelactionList(string teamKey, List<T> list, QTeamRelaction relactionType = QTeamRelaction.敌人, float relactionValue = 0)
-		{
-			list.Clear();
-			foreach (var team in Teams)
-			{
-				var relation = QRelation.GetValue(team.Key, teamKey);
-				if (relation < relactionValue)
-				{
-					if (relactionType == QTeamRelaction.敌人)
-					{
-						list.AddRange(team.Value);
-					}
-				}
-				else
-				{
-					if(relactionType== QTeamRelaction.队友)
-					{
-						list.AddRange(team.Value);
-					}
-				}
-			}
-		}
-	}
-	public static class QTeamTool
-	{
+		public static QDictionary<string, List<IQTeam>> Teams = new QDictionary<string, List<IQTeam>>((key) => new List<IQTeam>());
 		public static QTeamRelaction GetRelaction<T>(this T a,T b) where T:IQTeam
 		{
 			if (QRelation.GetValue(a.Team, b.Team) >= 0)
@@ -93,15 +65,43 @@ namespace QTool
 		}
 		public static void QTeamAdd<T>(this T a) where T : IQTeam
 		{
-			QTeam<T>.Teams[a.Team].AddCheckExist(a);
+			Teams[a.Team].AddCheckExist(a);
 		}
 		public static void QTeamRemove<T>(this T a) where T : IQTeam
 		{
-			QTeam<T>.Teams[a.Team].Remove(a);
+			Teams[a.Team].Remove(a);
 		}
-		public static void GetRelactionList<T>(this T a, List<T> list, QTeamRelaction relactionType = QTeamRelaction.敌人, float relactionValue = 0) where T : IQTeam
+		public static void GetRelactionList<T>(this T a, List<T> list, QTeamRelaction relactionType = QTeamRelaction.敌人, float relactionValue = 0) where T : class, IQTeam
 		{
-			QTeam<T>.GetRelactionList(a.Team, list, relactionType, relactionValue);
+			GetRelactionList(a.Team, list, relactionType, relactionValue);
+		}
+		public static void GetRelactionList<T>(string teamKey, List<T> list, QTeamRelaction relactionType = QTeamRelaction.敌人, float relactionValue = 0) where T : class, IQTeam
+		{
+			list.Clear();
+			foreach (var team in Teams)
+			{
+				var relation = QRelation.GetValue(team.Key, teamKey);
+				if (relation < relactionValue)
+				{
+					if (relactionType == QTeamRelaction.敌人)
+					{
+						foreach (var t in team.Value)
+						{
+							list.Add(t as T);
+						}
+					}
+				}
+				else
+				{
+					if (relactionType == QTeamRelaction.队友)
+					{
+						foreach (var t in team.Value)
+						{
+							list.Add(t as T);
+						}
+					}
+				}
+			}
 		}
 	}
 }
