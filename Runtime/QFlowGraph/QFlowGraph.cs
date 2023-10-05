@@ -276,7 +276,7 @@ namespace QTool.FlowGraph
 							{
 								if (targetPort.FlowPort.onlyOneRunning)
 								{
-									if (targetPort.Node.State != QNodeState.运行中)
+									if (targetPort.Node.State != QNodeState.运行)
 									{
 										Run(targetPort.Node.Key);
 									}
@@ -1014,7 +1014,7 @@ namespace QTool.FlowGraph
 	public enum QNodeState
 	{
 		闲置,
-		运行中,
+		运行,
 		成功,
 		失败,
 	}
@@ -1477,7 +1477,7 @@ namespace QTool.FlowGraph
 				Debug.LogError("不存在命令【" + commandKey + "】");
 				yield break;
 			}
-			State = QNodeState.运行中;
+			State = QNodeState.运行;
 			object returnObj = null;
 			try
 			{
@@ -1516,7 +1516,7 @@ namespace QTool.FlowGraph
                 default:
                     break;
             }
-			if(State== QNodeState.运行中)
+			if(State== QNodeState.运行)
 			{
 				State = QNodeState.成功;
 			}

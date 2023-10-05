@@ -280,14 +280,15 @@ namespace QTool.Test
 		//	while (true)
 			{
 				yield return Child();
-				yield return null;
-			//	yield return null;
+				yield return Child();
+				yield return Child();
+				//	yield return null;
 			};
 		}
 		IEnumerator Child()
 		{
 			Debug.Log("child ");
-			yield break;
+			yield return null;
 		}
 		IEnumerator c;
 		IEnumerator StopE()
@@ -306,6 +307,7 @@ namespace QTool.Test
 		{
 			c = RunTest();
 			c.Start();
+			
 		}
 		[QName("协程停止测试")]
 		public void Stop()
