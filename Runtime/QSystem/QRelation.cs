@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace QTool
 {
@@ -108,6 +109,26 @@ namespace QTool
 					}
 				}
 			}
+		}
+		public static void SortByDistance(List<IQTeam> list, Vector3 center)
+		{
+			list.Sort((a, b) =>
+			{
+				var aDis = Vector2.Distance(a.transform.position, center);
+				var bDis = Vector2.Distance(b.transform.position, center);
+				if (aDis == bDis)
+				{
+					return 0;
+				}
+				else if (aDis > bDis)
+				{
+					return 1;
+				}
+				else
+				{
+					return -1;
+				}
+			});
 		}
 	}
 }
