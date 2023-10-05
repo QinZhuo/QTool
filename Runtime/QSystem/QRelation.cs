@@ -110,7 +110,7 @@ namespace QTool
 				}
 			}
 		}
-		public static void SortByDistance(List<IQTeam> list, Vector3 center)
+		public static void SortByDistance(this List<IQTeam> list, Vector3 center)
 		{
 			list.Sort((a, b) =>
 			{
