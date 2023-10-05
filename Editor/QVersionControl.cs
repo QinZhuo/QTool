@@ -216,6 +216,8 @@ namespace QTool
 			}
 			else
 			{
+				AssetDatabase.Refresh();
+				Client.Resolve();
 				return result;
 			}
 		}
@@ -319,7 +321,6 @@ namespace QTool
 				PullAndCommitPush(path,commit);
 			}
 			EditorUtility.ClearProgressBar();
-		//	Client.Resolve();
 			AssetDatabase.Refresh();
 		}
 	
