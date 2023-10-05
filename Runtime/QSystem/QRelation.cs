@@ -53,7 +53,7 @@ namespace QTool
 	public static class QTeam
 	{
 		public static QDictionary<string, List<IQTeam>> Teams = new QDictionary<string, List<IQTeam>>((key) => new List<IQTeam>());
-		public static QTeamRelaction GetRelaction<T>(this T a,T b) where T:IQTeam
+		public static QTeamRelaction GetRelaction<T>(this T a, T b) where T : IQTeam
 		{
 			if (QRelation.GetValue(a.Team, b.Team) >= 0)
 			{
@@ -88,7 +88,7 @@ namespace QTool
 					{
 						foreach (var obj in team.Value)
 						{
-							if(obj is T t)
+							if (obj is T t)
 							{
 								list.Add(t);
 							}
@@ -110,7 +110,7 @@ namespace QTool
 				}
 			}
 		}
-		public static void SortByDistance(this List<IQTeam> list, Vector3 center)
+		public static void SortByDistance<T>(this List<T> list, Vector3 center) where T : IQTeam
 		{
 			list.Sort((a, b) =>
 			{
