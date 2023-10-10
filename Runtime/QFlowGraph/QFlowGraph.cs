@@ -256,7 +256,7 @@ namespace QTool.FlowGraph
 					yield return curNode.RunIEnumerator();
 					if (RunningNodeList.Contains(curNode.Key))
 					{
-						RunningNodeList.Remove(curNode.Key);
+						RunningNodeList.RemoveAt(RunningNodeList.IndexOf(curNode.Key));
 					}
 					else
 					{

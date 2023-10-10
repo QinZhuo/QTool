@@ -277,17 +277,22 @@ namespace QTool.Test
 
 		IEnumerator RunTest()
 		{
-		//	while (true)
+			for (int i = 0; i < 1000; i++)
 			{
 				yield return Child();
-				yield return Child();
-				yield return Child();
+			}
+		//	while (true)
+			{
+				Debug.LogError("111");
+				//yield return Child();
+			//	yield return Child();
+			//	yield return Child();
 				//	yield return null;
-			};
+			}
 		}
 		IEnumerator Child()
 		{
-			Debug.Log("child ");
+			//Debug.Log("child ");
 			yield return null;
 		}
 		IEnumerator c;
@@ -306,6 +311,7 @@ namespace QTool.Test
 		public void Run()
 		{
 			c = RunTest();
+			RunTest().Start();
 			c.Start();
 			
 		}
