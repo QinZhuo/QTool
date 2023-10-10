@@ -99,6 +99,12 @@ namespace QTool
 		public void Reset(float value)
 		{
 			BaseValue = value;
+			Clear();
+		}
+		public void Clear()
+		{
+			OffsetValues.Clear();
+			ScaleValues.Clear();
 			FreshValue();
 		}
 
