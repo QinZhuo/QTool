@@ -142,15 +142,18 @@ namespace QTool
 			get => scale ? ScaleValues[key] : OffsetValues[key];
 			set
 			{
-				if (scale)
+				if (value != this[key, scale])
 				{
-					ScaleValues[key] += value;
+					if (scale)
+					{
+						ScaleValues[key] += value;
+					}
+					else
+					{
+						OffsetValues[key] += value;
+					}
+					FreshValue();
 				}
-				else
-				{
-					OffsetValues[key] += value;
-				}
-				FreshValue();
 			}
 		}
 		private QValue m_Value { get; set; } = 0;
