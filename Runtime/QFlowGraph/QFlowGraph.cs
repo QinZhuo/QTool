@@ -254,14 +254,7 @@ namespace QTool.FlowGraph
 				{
 					RunningNodeList.Add(curNode.Key);
 					yield return curNode.RunIEnumerator();
-					if (RunningNodeList.Contains(curNode.Key))
-					{
-						RunningNodeList.Remove(curNode.Key);
-					}
-					else
-					{
-						yield break;
-					}
+					RunningNodeList.Remove(curNode.Key);
 					var port = curNode.NextNodePort;
 					if (port != null)
 					{
