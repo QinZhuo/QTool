@@ -128,10 +128,10 @@ namespace QTool
 				var buff = QBuffData<BuffData>.Runtime.Get(key);
 				if (buff.Data.Megre.HasFlag(QBuffMergeMode.时间))
 				{
-					buff.Time.OffsetValue = time;
+					buff.Time.BaseValue = time;
 					buff.Time.CurrentValue = buff.Time.MaxValue;
 				}
-				buff.Count.OffsetValue = count;
+				buff.Count.BaseValue = count;
 				StartBuff(buff);
 				for (int i = 0; i < count; i++)
 				{
@@ -144,22 +144,22 @@ namespace QTool
 				var buff = Buffs[key];
 				if (buff.Data.Megre.HasFlag(QBuffMergeMode.叠层))
 				{
-					buff.Count.OffsetValue += count;
+					buff.Count.BaseValue += count;
 				}
 				else
 				{
-					buff.Count.OffsetValue = 1;
+					buff.Count.BaseValue = 1;
 				}
 				if (buff.Data.Megre.HasFlag(QBuffMergeMode.时间))
 				{
-					buff.Time.OffsetValue += time;
+					buff.Time.BaseValue += time;
 					buff.Time.CurrentValue += time;
 				}
 				else
 				{
-					var oldValue = buff.Time.OffsetValue;
-					buff.Time.OffsetValue = Mathf.Max(buff.Time.OffsetValue, time);
-					buff.Time.CurrentValue += buff.Time.OffsetValue - oldValue;
+					var oldValue = buff.Time.BaseValue;
+					buff.Time.BaseValue = Mathf.Max(buff.Time.BaseValue, time);
+					buff.Time.CurrentValue += buff.Time.BaseValue - oldValue;
 				}
 				for (int i = 0; i < count; i++)
 				{
@@ -174,8 +174,8 @@ namespace QTool
 				var buff = Buffs[key];
 				if (buff.Data.Megre.HasFlag(QBuffMergeMode.叠层))
 				{
-					buff.Count.OffsetValue -= count;
-					if (buff.Count.OffsetValue <= 0)
+					buff.Count.BaseValue -= count;
+					if (buff.Count.BaseValue <= 0)
 					{
 						StopBuff(buff);
 					}
@@ -183,7 +183,7 @@ namespace QTool
 				else
 				{
 					StopBuff(buff);
-					buff.Count.OffsetValue = 0;
+					buff.Count.BaseValue = 0;
 					count = 1;
 				}
 				for (int i = 0; i < count; i++)

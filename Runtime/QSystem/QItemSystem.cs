@@ -95,7 +95,7 @@ namespace QTool
 					}
 					else if (item.Data.MaxCount <= 0 || item.Count.IntValue + count <= item.Data.MaxCount)
 					{
-						item.Count.OffsetValue += count;
+						item.Count.BaseValue += count;
 						for (int i = 0; i < count; i++)
 						{
 							OnAdd(item);
@@ -111,14 +111,14 @@ namespace QTool
 							OnAdd(item);
 						}
 						count -= tCount;
-						item.Count.OffsetValue = item.Data.MaxCount;
+						item.Count.BaseValue = item.Data.MaxCount;
 					}
 				}
 			}
 			if (count >= 0)
 			{
 				var item = QItemData<ItemData>.Runtime.Get(key);
-				item.Count.OffsetValue = count;
+				item.Count.BaseValue = count;
 				Items.Add(item);
 				for (int i = 0; i < count; i++)
 				{
@@ -134,7 +134,7 @@ namespace QTool
 				{
 					if (item.Count.IntValue == count)
 					{
-						item.Count.OffsetValue -= count;
+						item.Count.BaseValue -= count;
 						for (int i = 0; i < count; i++)
 						{
 							OnRemove(item);
@@ -147,7 +147,7 @@ namespace QTool
 						{
 							OnRemove(item);
 						}
-						item.Count.OffsetValue -= count;
+						item.Count.BaseValue -= count;
 					}
 					else
 					{

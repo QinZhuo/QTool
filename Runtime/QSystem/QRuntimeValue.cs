@@ -93,48 +93,64 @@ namespace QTool
 		}
 		public QRuntimeValue(float value)
 		{
-			OriginValue = value;
+			BaseValue = value;
 			FreshValue();
 		}
 		public void Reset(float value)
 		{
-			OriginValue = value;
-			OffsetValue = 0;
-			ScaleValue = 1;
+			BaseValue = value;
 			FreshValue();
 		}
 
 		private QValue m_OriginValue { get; set; } = 0f;
 		[QName]
-		public QValue OriginValue
+		public QValue BaseValue
 		{
 			get => m_OriginValue; set { if (m_OriginValue != value) { m_OriginValue = value; FreshValue(); } }
 		}
-		private QValue m_OffsetValue = 0;
 		[QName]
-		public QValue OffsetValue {
-			get => m_OffsetValue;
-			set
+		private QDictionary<string, QValue> OffsetValues = new QDictionary<string, QValue>();
+		public float OffsetValue
+		{
+			get
 			{
-				if (m_OffsetValue != value)
+				var value = 0f;
+				foreach (var item in OffsetValues)
 				{
-					m_OffsetValue = value;
-					FreshValue();
+					value += item.Value;
 				}
+				return value;
 			}
 		}
-		private QValue m_ScaleValue = 1;
-		[QName,QOldName("PercentValue")]
-		public QValue ScaleValue
+		[QName]
+		private QDictionary<string, QValue> ScaleValues = new QDictionary<string, QValue>();
+		public float ScaleValue
 		{
-			get => m_ScaleValue;
+			get
+			{
+				var value = 1f;
+				foreach (var item in ScaleValues)
+				{
+					value += item.Value;
+				}
+				return value;
+			}
+		}
+
+		public float this[string key, bool scale = false]
+		{
+			get => scale ? ScaleValues[key] : OffsetValues[key];
 			set
 			{
-				if (m_ScaleValue != value)
+				if (scale)
 				{
-					m_ScaleValue = value;
-					FreshValue();
+					ScaleValues[key] += value;
 				}
+				else
+				{
+					OffsetValues[key] += value;
+				}
+				FreshValue();
 			}
 		}
 		private QValue m_Value { get; set; } = 0;
@@ -143,20 +159,13 @@ namespace QTool
 		{
 			get => m_Value; set
 			{
-				if (ScaleValue == 1)
-				{
-					OffsetValue = value - OriginValue;
-				}
-				else
-				{
-					throw new Exception(nameof(QRuntimeValue) + "." + nameof(ScaleValue) + "不为1 无法直接更改 " + nameof(Value) + " 可尝试更改 " + nameof(OffsetValue));
-				}
+				throw new Exception(nameof(QRuntimeValue) + "." + nameof(ScaleValues) + "不为1 无法直接更改 " + nameof(Value) + " 可尝试更改 " + nameof(OffsetValues));
 			}
 		}
 		public int IntValue => Mathf.RoundToInt(Value);
 		private void FreshValue()
 		{
-			m_Value = (OriginValue + OffsetValue) * ScaleValue;
+			m_Value = (BaseValue + OffsetValue) * ScaleValue;
 			InvokeOnChange();
 		}
 		public override void OnQDeserializeOver()
