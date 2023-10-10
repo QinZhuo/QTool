@@ -219,6 +219,10 @@ namespace QTool.FlowGraph
 							This.RunPort(nameof(triggerObject));
 						});
 					}
+					else
+					{
+						This.State = QNodeState.失败;
+					}
 				}
 				else
 				{
