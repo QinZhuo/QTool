@@ -220,6 +220,10 @@ namespace QTool.FlowGraph
 						});
 					}
 				}
+				else
+				{
+					This.State = QNodeState.失败;
+				}
 			}
 			if (trigger != null)
 			{
