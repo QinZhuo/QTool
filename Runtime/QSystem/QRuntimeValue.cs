@@ -168,7 +168,7 @@ namespace QTool
 		{
 			get => m_Value; set
 			{
-				throw new Exception(nameof(QRuntimeValue) + "." + nameof(ScaleValues) + "不为1 无法直接更改 " + nameof(Value) + " 可尝试更改 " + nameof(OffsetValues));
+				throw new Exception(nameof(QRuntimeValue) + " 不可直接更改 " + nameof(Value) + " 可尝试更改 " + nameof(BaseValue));
 			}
 		}
 		public int IntValue => Mathf.RoundToInt(Value);
