@@ -90,8 +90,16 @@ namespace QTool
 	{
 		public QRuntimeValue()
 		{
+			OffsetValues = new QDictionary<string, QValue>()
+			{
+				OnChange = key => FreshValue()
+			};
+			ScaleValues = new QDictionary<string, QValue>()
+			{
+				OnChange = key => FreshValue()
+			};
 		}
-		public QRuntimeValue(float value)
+		public QRuntimeValue(float value) : this()
 		{
 			BaseValue = value;
 			FreshValue();
@@ -115,7 +123,7 @@ namespace QTool
 			get => m_OriginValue; set { if (m_OriginValue != value) { m_OriginValue = value; FreshValue(); } }
 		}
 		[QName]
-		private QDictionary<string, QValue> OffsetValues = new QDictionary<string, QValue>();
+		public QDictionary<string, QValue> OffsetValues = null;
 		public float OffsetValue
 		{
 			get
@@ -129,7 +137,7 @@ namespace QTool
 			}
 		}
 		[QName]
-		private QDictionary<string, QValue> ScaleValues = new QDictionary<string, QValue>();
+		public QDictionary<string, QValue> ScaleValues = null;
 		public float ScaleValue
 		{
 			get
@@ -140,26 +148,6 @@ namespace QTool
 					value += item.Value;
 				}
 				return value;
-			}
-		}
-
-		public float this[string key, bool scale = false]
-		{
-			get => scale ? ScaleValues[key] : OffsetValues[key];
-			set
-			{
-				if (value != this[key, scale])
-				{
-					if (scale)
-					{
-						ScaleValues[key] += value;
-					}
-					else
-					{
-						OffsetValues[key] += value;
-					}
-					FreshValue();
-				}
 			}
 		}
 		private QValue m_Value { get; set; } = 0;
@@ -181,7 +169,6 @@ namespace QTool
 		{
 			FreshValue();
 		}
-
 	}
 
 	public class QRuntimeRangeValue : QRuntimeValue

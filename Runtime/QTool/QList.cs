@@ -263,14 +263,15 @@ namespace QTool
 				Add(key, value);
 			}
 		}
-		public Func<TKey, T> AutoCreate { protected set; get; }
+		protected Func<TKey, T> AutoCreate = null;
+		internal Action<TKey> OnChange = null;
 		public QDictionary()
 		{
 		}
 		public new void Add(TKey key, T value)
 		{
 			this.Set(key, value);
-			
+			OnChange?.Invoke(key);
 		}
 		public T Get(TKey key)
 		{
