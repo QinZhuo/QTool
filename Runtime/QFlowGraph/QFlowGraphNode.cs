@@ -211,8 +211,7 @@ namespace QTool.FlowGraph
 				if (This.State != QNodeState.失败)
 				{
 					yield return This.RunPortIEnumerator(nameof(init));
-					This.State = This.GetPortConnectState(nameof(init));
-					if (This.State != QNodeState.失败)
+					if (This.GetPortConnectState(nameof(init)) != QNodeState.失败)
 					{
 						yield return trigger.Run((t) =>
 						{
