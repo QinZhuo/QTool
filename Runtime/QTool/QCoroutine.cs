@@ -13,11 +13,34 @@ namespace QTool
 		private static List<IEnumerator> RemoveList { set; get; } = new List<IEnumerator>();
 		public static bool IsRunning(this IEnumerator enumerator)
 		{
-			if(List.Contains(enumerator)|| AddList.Contains(enumerator))
+			if (List.Contains(enumerator) || AddList.Contains(enumerator))
 			{
 				return true;
 			}
 			return false;
+		}
+		public static IEnumerator Wait(Func<bool> func)
+		{
+			while (!func())
+			{
+				yield return null;
+			}
+		}
+		public static IEnumerator WaitAllOver(IList<IEnumerator> enumerators)
+		{
+			yield return Wait(() =>
+			{
+				bool AllOver = true;
+				foreach (var item in enumerators)
+				{
+					if (item.IsRunning())
+					{
+						AllOver = false;
+						break;
+					}
+				}
+				return AllOver;
+			});
 		}
 		public static void Start(this IEnumerator enumerator)
 		{
