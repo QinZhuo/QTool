@@ -10,23 +10,21 @@ public class QKeyInfoTrigger : MonoBehaviour, IPointerEnterHandler, IPointerExit
 	public static QDictionary<string, string> KeyInfos = new QDictionary<string, string>();
 	public static Action<QKeyInfoTrigger> OnEnter;
 	public static Action<QKeyInfoTrigger> OnExit;
-	private string _Key;
-	public string Key
+	public string Key { get; set; }
+	public string Info
 	{
-		get => _Key; set
+		get
 		{
-			_Key = value;
-			if (KeyInfos.ContainsKey(_Key))
+			if (KeyInfos.ContainsKey(Key))
 			{
-				Info = KeyInfos[_Key].ForeachBlockValue('{', '}', key => KeyInfos.ContainsKey(key) ? KeyInfos[key] : key);
+				return KeyInfos[Key].ForeachBlockValue('{', '}', key => KeyInfos.ContainsKey(key) ? KeyInfos[key] : key);
 			}
 			else
 			{
-				Info = Key;
+				return Key;
 			}
 		}
 	}
-	public string Info { get; set; }
 	private void Awake()
 	{
 		Key = gameObject.QName();
