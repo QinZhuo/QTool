@@ -357,7 +357,7 @@ namespace QTool
 						var runtimeValue = member.Get(obj).As<QRuntimeValue<float>>();
 						runtimeValue.Name = member.QName;
 						runtimeValue.OnValueChange += gameObject.InvokeEvent;
-						var keyTrigger= KeyTriggers.Get(runtimeValue.Name);
+						var keyTrigger = KeyTriggers.Get(runtimeValue.Name);
 						if (keyTrigger != null)
 						{
 							runtimeValue.OnStringChange += keyTrigger.Set;
@@ -382,6 +382,10 @@ namespace QTool
 						//	QDebug.Log(gameObject + " 注册" + member.Type.Name + "数据更改事件 " + obj + " " + member.QName);
 
 					}
+				}
+				if (obj is IKey<string> KeyObject)
+				{
+					gameObject.GetComponent<QKeyValueTrigger>()?.Set(KeyObject.Key, KeyObject.ToString());
 				}
 			}
 		}
