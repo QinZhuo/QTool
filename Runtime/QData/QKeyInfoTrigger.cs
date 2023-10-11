@@ -7,45 +7,33 @@ using UnityEngine.EventSystems;
 
 public class QKeyInfoTrigger : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler,IKey<string>
 {
-	public static QDictionary<string, string> KeyInfos = new QDictionary<string, string>();
-	public static Action<QKeyInfoTrigger> OnEnter;
-	public static Action<QKeyInfoTrigger> OnExit;
+	public static event Func<string, string> KeyToInfo;
+	public static event Action<QKeyInfoTrigger> OnEnter;
+	public static event Action<QKeyInfoTrigger> OnExit;
 	public string Key { get; set; }
+	private string _Info;
 	public string Info
 	{
-		get
+		set => _Info = value; get
 		{
-			if (KeyInfos.ContainsKey(Key))
+			if (_Info.IsNull())
 			{
-				var info = "";
-				var infoKey = KeyInfos[Key];
-				if (KeyInfos.ContainsKey(infoKey))
+				if (KeyToInfo != null)
 				{
-					info += infoKey.ToLocationString(infoKey.ToColor()) + "\n" + KeyInfos[infoKey] + "\n\n";
+					return KeyToInfo(Key);
 				}
-				info.ForeachBlockValue('{', '}', key =>
-				{
-					if (KeyInfos.ContainsKey(key))
-					{
-						info += key.ToLocationString(key.ToColor()) + "\n" + KeyInfos[key] + "\n\n";
-					};
-					return key;
-				});
-				return info;
 			}
-			else
-			{
-				return "";
-			}
+			return _Info;
 		}
 	}
 	private void Awake()
 	{
 		Key = gameObject.QName();
 	}
-	public void Set(string key, float value = 0)
+	public void Set(string key, string info)
 	{
 		Key = key;
+		Info = info;
 	}
 	public void OnPointerEnter(PointerEventData eventData)
 	{

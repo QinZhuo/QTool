@@ -26,10 +26,6 @@ namespace QTool
 				{
 					m_effectInfo = Effect.Graph.QDataCopy().ToInfoString();
 				}
-				if (!QKeyInfoTrigger.KeyInfos.ContainsKey(Key))
-				{
-					QKeyInfoTrigger.KeyInfos[Key] = m_effectInfo;
-				}
 				return m_effectInfo;
 			}
 			protected set => m_effectInfo = value;
