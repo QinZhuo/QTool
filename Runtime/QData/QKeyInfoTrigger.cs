@@ -25,9 +25,9 @@ public class QKeyInfoTrigger : MonoBehaviour, IPointerEnterHandler, IPointerExit
 				}
 				info.ForeachBlockValue('{', '}', key =>
 				{
-					if (KeyInfos.ContainsKey(info))
+					if (KeyInfos.ContainsKey(key))
 					{
-						info += key.ToLocationString(key.ToColor()) + "\n" + KeyInfos[info] + "\n\n";
+						info += key.ToLocationString(key.ToColor()) + "\n" + KeyInfos[key] + "\n\n";
 					};
 					return key;
 				});
