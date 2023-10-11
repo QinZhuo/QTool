@@ -209,7 +209,7 @@ namespace QTool
 
 			public void OnCompleted(Action continuation)
 			{
-				target.AddCallBack(() =>
+				target.OnCallBack(() =>
 				{
 					IsCompleted = true;
 					continuation?.Invoke();

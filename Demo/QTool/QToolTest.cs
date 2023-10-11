@@ -295,7 +295,7 @@ namespace QTool.Test
 			//Debug.Log("child ");
 			yield return null;
 		}
-		IEnumerator c;
+		List<IEnumerator> Ielist = new List<IEnumerator>();
 		IEnumerator StopE()
 		{
 			var time = 1;
@@ -304,15 +304,22 @@ namespace QTool.Test
 				yield return null;
 				Debug.LogError("stop" + time++);
 			}
-			c.Stop();
+			foreach (var item in Ielist)
+			{
+				item.Stop();
+			}
 			Debug.LogError("stop");
 		}
 		[QName("协程运行测试")]
 		public void Run()
 		{
-			c = RunTest();
-			RunTest().Start();
-			c.Start();
+			Ielist.Add( RunTest());
+			Ielist.Add(RunTest());
+			foreach (var item in Ielist)
+			{
+				item.Start();
+			}
+			Ielist.WaitAllOver().OnCallBack(() => Debug.LogError("AllOver")).Start();
 			
 		}
 		[QName("协程停止测试")]

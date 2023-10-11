@@ -52,9 +52,9 @@ namespace QTool
 		public static void Start(this IEnumerator enumerator,List<IEnumerator> coroutineList)
 		{
 			coroutineList.Add(enumerator);
-			enumerator.AddCallBack(() => coroutineList.Remove(enumerator)).Start();
+			enumerator.OnCallBack(() => coroutineList.Remove(enumerator)).Start();
 		}
-		public static IEnumerator AddCallBack(this IEnumerator enumerator,Action callBack)
+		public static IEnumerator OnCallBack(this IEnumerator enumerator,Action callBack)
 		{
 			yield return enumerator;
 			callBack?.Invoke();
@@ -155,7 +155,7 @@ namespace QTool
 		}
 		private void Run(T value)
 		{
-			action(value).AddCallBack(() =>
+			action(value).OnCallBack(() =>
 			{
 				Queue.Dequeue();
 				if (Queue.Count > 0)
