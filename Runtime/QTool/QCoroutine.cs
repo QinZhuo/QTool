@@ -26,7 +26,7 @@ namespace QTool
 				yield return null;
 			}
 		}
-		public static IEnumerator WaitAllOver(IList<IEnumerator> enumerators)
+		public static IEnumerator WaitAllOver(this IList<IEnumerator> enumerators)
 		{
 			yield return Wait(() =>
 			{
