@@ -88,7 +88,7 @@ namespace QTool
 			
 		}
 	}
-	public class QRuntimeValue: QRuntimeValue<float>
+	public class QRuntimeValue : QRuntimeValue<float>
 	{
 		public QRuntimeValue()
 		{
@@ -174,7 +174,10 @@ namespace QTool
 		public override string ToString()
 		{
 			var info = BaseValue.ToString();
-			info += " + " + ScaleValues.ToOneString(" + ", kv => kv.Value + kv.Key.ToLocationString(kv.Key.ToColor()));
+			if (OffsetValues.Count > 0)
+			{
+				info += " + " + OffsetValues.ToOneString(" + ", kv => kv.Value + kv.Key.ToLocationString(kv.Key.ToColor()));
+			}
 			if (ScaleValues.Count > 0)
 			{
 				info = "(" + info + ")*(";
