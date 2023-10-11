@@ -360,7 +360,7 @@ namespace QTool
 						var keyTrigger = KeyTriggers.Get(runtimeValue.Name);
 						if (keyTrigger != null)
 						{
-							runtimeValue.OnStringChange += keyTrigger.Set;
+							runtimeValue.OnValueChange += keyTrigger.Set;
 						}
 						runtimeValue.InvokeOnChange();
 						//	QDebug.Log(gameObject + " 注册" + member.Type.Name + "数据更改事件 " + obj + " " + member.QName);
@@ -385,7 +385,7 @@ namespace QTool
 				}
 				if (obj is IKey<string> KeyObject)
 				{
-					gameObject.GetComponent<QKeyInfoTrigger>()?.Set(KeyObject.Key, KeyObject.ToString());
+					gameObject.GetComponent<QKeyInfoTrigger>()?.Set(KeyObject.Key);
 				}
 			}
 		}
@@ -409,7 +409,7 @@ namespace QTool
 						var keyTrigger = KeyTriggers.Get(runtimeValue.Name);
 						if (keyTrigger != null)
 						{
-							runtimeValue.OnStringChange -= keyTrigger.Set;
+							runtimeValue.OnValueChange -= keyTrigger.Set;
 						}
 					}
 					else if (member.Type.Is(typeof(QRuntimeValue<string>)) && trigger.stringEventList.ContainsKey(member.QName))
