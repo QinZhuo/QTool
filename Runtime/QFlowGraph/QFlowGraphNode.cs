@@ -224,10 +224,6 @@ namespace QTool.FlowGraph
 						This.State = QNodeState.失败;
 					}
 				}
-				else
-				{
-					This.State = QNodeState.失败;
-				}
 			}
 			if (trigger != null)
 			{
