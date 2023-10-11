@@ -1,7 +1,9 @@
+using Codice.Client.BaseCommands;
 using QTool;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting.YamlDotNet.Core.Tokens;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -17,11 +19,25 @@ public class QKeyInfoTrigger : MonoBehaviour, IPointerEnterHandler, IPointerExit
 		{
 			if (KeyInfos.ContainsKey(Key))
 			{
-				return KeyInfos[Key].ForeachBlockValue('{', '}', key => KeyInfos.ContainsKey(key) ? KeyInfos[key] : key);
+				var info = "";
+				var infoKey = KeyInfos[Key];
+				if (KeyInfos.ContainsKey(infoKey))
+				{
+					info += infoKey.ToLocationString(infoKey.ToColor()) + "\n" + KeyInfos[infoKey] + "\n\n";
+				}
+				info.ForeachBlockValue('{', '}', key =>
+				{
+					if (KeyInfos.ContainsKey(info))
+					{
+						info += key.ToLocationString(key.ToColor()) + "\n" + KeyInfos[info] + "\n\n";
+					};
+					return key;
+				});
+				return info;
 			}
 			else
 			{
-				return Key;
+				return "";
 			}
 		}
 	}
