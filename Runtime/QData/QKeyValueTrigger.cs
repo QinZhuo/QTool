@@ -7,9 +7,9 @@ using UnityEngine.EventSystems;
 
 public class QKeyValueTrigger : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
-	public static Action<string, QKeyValueTrigger> OnEnter;
-	public static Action<string, QKeyValueTrigger> OnExit;
-	public string Key { get;private set; }
+	public static Action<QKeyValueTrigger> OnEnter;
+	public static Action<QKeyValueTrigger> OnExit;
+	public string Key { get; private set; }
 	public string Value { get; private set; }
 	private void Awake()
 	{
@@ -17,15 +17,15 @@ public class QKeyValueTrigger : MonoBehaviour, IPointerEnterHandler, IPointerExi
 	}
 	public void OnPointerEnter(PointerEventData eventData)
 	{
-		OnEnter?.Invoke(Key, this);
+		OnEnter?.Invoke(this);
 	}
 
 	public void OnPointerExit(PointerEventData eventData)
 	{
-		OnExit?.Invoke(Key, this);
+		OnExit?.Invoke(this);
 	}
 	private void OnDisable()
 	{
-		OnExit?.Invoke(Key, this);
+		OnExit?.Invoke(this);
 	}
 }
