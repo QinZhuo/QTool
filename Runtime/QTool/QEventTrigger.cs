@@ -338,6 +338,7 @@ namespace QTool
 		{
 			if (obj.IsNull()) return;
 			var trigger = gameObject?.GetTrigger();
+			var KeyTriggers= gameObject.GetComponentsInChildren<QKeyValueTrigger>();
 			if (trigger != null)
 			{
 				var typeInfo = QSerializeType.Get(typeof(T));
@@ -356,6 +357,11 @@ namespace QTool
 						var runtimeValue = member.Get(obj).As<QRuntimeValue<float>>();
 						runtimeValue.Name = member.QName;
 						runtimeValue.OnValueChange += gameObject.InvokeEvent;
+						var keyTrigger= KeyTriggers.Get(runtimeValue.Name);
+						if (keyTrigger != null)
+						{
+							runtimeValue.OnStringChange += keyTrigger.Set;
+						}
 						runtimeValue.InvokeOnChange();
 						//	QDebug.Log(gameObject + " 注册" + member.Type.Name + "数据更改事件 " + obj + " " + member.QName);
 					}
@@ -383,6 +389,7 @@ namespace QTool
 		{
 			if (obj.IsNull()) return;
 			var trigger = gameObject?.GetTrigger();
+			var KeyTriggers = gameObject.GetComponentsInChildren<QKeyValueTrigger>();
 			if (trigger != null)
 			{
 				var typeInfo = QSerializeType.Get(typeof(T));
@@ -395,6 +402,11 @@ namespace QTool
 					{
 						var runtimeValue = member.Get(obj).As<QRuntimeValue<float>>();
 						runtimeValue.OnValueChange -= gameObject.InvokeEvent;
+						var keyTrigger = KeyTriggers.Get(runtimeValue.Name);
+						if (keyTrigger != null)
+						{
+							runtimeValue.OnStringChange -= keyTrigger.Set;
+						}
 					}
 					else if (member.Type.Is(typeof(QRuntimeValue<string>)) && trigger.stringEventList.ContainsKey(member.QName))
 					{

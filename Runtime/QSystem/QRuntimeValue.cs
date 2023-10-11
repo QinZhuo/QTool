@@ -63,13 +63,15 @@ namespace QTool
 			}
 		}
 		public event Action<string, T> OnValueChange = null;
+		public event Action<string, string> OnStringChange = null;
 		public virtual void InvokeOnChange()
 		{
 			InvokeOnChange(Name, Value);
 		}
-		protected void InvokeOnChange(string key,T value)
+		protected void InvokeOnChange(string key, T value)
 		{
-			OnValueChange?.Invoke(key,value);
+			OnValueChange?.Invoke(key, value);
+			OnStringChange?.Invoke(key, ToString());
 		}
 		public override string ToString()
 		{

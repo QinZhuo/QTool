@@ -5,15 +5,20 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class QKeyValueTrigger : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
+public class QKeyValueTrigger : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler,IKey<string>
 {
 	public static Action<QKeyValueTrigger> OnEnter;
 	public static Action<QKeyValueTrigger> OnExit;
-	public string Key { get; private set; }
-	public string Value { get; private set; }
+	public string Key { get; set; }
+	public string Value { get; set; }
 	private void Awake()
 	{
 		Key = gameObject.QName();
+	}
+	public void Set(string key,string value)
+	{
+		Key = key;
+		Value = value;
 	}
 	public void OnPointerEnter(PointerEventData eventData)
 	{
