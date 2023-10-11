@@ -338,7 +338,7 @@ namespace QTool
 		{
 			if (obj.IsNull()) return;
 			var trigger = gameObject?.GetTrigger();
-			var KeyTriggers= gameObject.GetComponentsInChildren<QKeyValueTrigger>();
+			var KeyTriggers= gameObject.GetComponentsInChildren<QKeyInfoTrigger>();
 			if (trigger != null)
 			{
 				var typeInfo = QSerializeType.Get(typeof(T));
@@ -385,7 +385,7 @@ namespace QTool
 				}
 				if (obj is IKey<string> KeyObject)
 				{
-					gameObject.GetComponent<QKeyValueTrigger>()?.Set(KeyObject.Key, KeyObject.ToString());
+					gameObject.GetComponent<QKeyInfoTrigger>()?.Set(KeyObject.Key, KeyObject.ToString());
 				}
 			}
 		}
@@ -393,7 +393,7 @@ namespace QTool
 		{
 			if (obj.IsNull()) return;
 			var trigger = gameObject?.GetTrigger();
-			var KeyTriggers = gameObject.GetComponentsInChildren<QKeyValueTrigger>();
+			var KeyTriggers = gameObject.GetComponentsInChildren<QKeyInfoTrigger>();
 			if (trigger != null)
 			{
 				var typeInfo = QSerializeType.Get(typeof(T));

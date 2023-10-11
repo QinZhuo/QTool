@@ -25,6 +25,7 @@ namespace QTool
 				if (m_effectInfo.IsNull() && Effect != null)
 				{
 					m_effectInfo = Effect.Graph.QDataCopy().ToInfoString();
+					QKeyInfoTrigger.KeyInfos[Key] = m_effectInfo;
 				}
 				return m_effectInfo;
 			}
@@ -37,10 +38,6 @@ namespace QTool
 		{
 			get { if (!Application.isPlaying) m_effect = null; return m_effect ??= QTool.LoadAndCreate<QFlowGraphAsset>(nameof(QFlowGraph) + "/" + typeof(T).Name + "/" + Key); }
 			protected set => m_effect = value;
-		}
-		public override string ToString()
-		{
-			return EffectInfo;
 		}
 	}
 	public abstract class QBuffData<T> : QEffectData<T> where T : QBuffData<T>, IKey<string>, new()
