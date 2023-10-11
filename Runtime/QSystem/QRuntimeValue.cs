@@ -169,6 +169,19 @@ namespace QTool
 		{
 			FreshValue();
 		}
+		public override string ToString()
+		{
+			var info = BaseValue.ToString();
+			info += " + " + ScaleValues.ToOneString(" + ", kv => kv.Value + kv.Key.ToLocationString(kv.Key.ToColor()));
+			if (ScaleValues.Count > 0)
+			{
+				info = "(" + info + ")*(";
+				info += ScaleValues.ToOneString(" + ", kv => kv.Value + kv.Key.ToLocationString(kv.Key.ToColor()));
+				info += ")";
+			}
+			info += " = " + Value;
+			return info;
+		}
 	}
 
 	public class QRuntimeRangeValue : QRuntimeValue
