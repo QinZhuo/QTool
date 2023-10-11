@@ -145,21 +145,15 @@ namespace QTool
 				if (buff.Data.Megre.HasFlag(QBuffMergeMode.叠层))
 				{
 					buff.Count.BaseValue += count;
-				}
-				else
-				{
-					buff.Count.BaseValue = 1;
-				}
-				if (buff.Data.Megre.HasFlag(QBuffMergeMode.时间))
-				{
-					buff.Time.BaseValue += time;
-					buff.Time.CurrentValue += time;
-				}
-				else
-				{
 					var oldValue = buff.Time.BaseValue;
 					buff.Time.BaseValue = Mathf.Max(buff.Time.BaseValue, time);
 					buff.Time.CurrentValue += buff.Time.BaseValue - oldValue;
+				}
+				else
+				{
+					buff.Time.BaseValue += time;
+					buff.Time.CurrentValue += time;
+					buff.Count.BaseValue = 1;
 				}
 				for (int i = 0; i < count; i++)
 				{
