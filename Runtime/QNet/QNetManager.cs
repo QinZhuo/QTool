@@ -11,7 +11,7 @@ using System.Collections;
 namespace QTool.Net
 {
 
-	public class QNetManager : InstanceBehaviour<QNetManager>
+	public class QNetManager : QInstanceBehaviour<QNetManager>
 	{
 		[QPopup,QName("传输方式")]
 		public QNetTransport transport;
@@ -316,7 +316,7 @@ namespace QTool.Net
 								case nameof(DefaultNetAction.ServerSeed):
 									{
 										Random = new System.Random((int)eventData.Value);
-										QRandom.DefaultRandom = Random;
+										QRandom.Instance = Random;
 									}
 									break;
 								default:

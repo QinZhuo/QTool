@@ -574,7 +574,7 @@ namespace QTool
 			{
 				activateHandler = (searchContext, root) =>
 				{
-					foreach (var SettingType in typeof(InstanceScriptable<>).GetAllTypes())
+					foreach (var SettingType in typeof(QInstanceScriptable<>).GetAllTypes())
 					{
 						root.AddLabel(QReflection.QName(SettingType));
 						root.Add(new InspectorElement(new UnityEditor.SerializedObject(SettingType.InvokeFunction(nameof(global::QTool.QToolSetting.Instance)) as ScriptableObject)));

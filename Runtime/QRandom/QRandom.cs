@@ -2,47 +2,61 @@ using QTool.FlowGraph;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
+using UnityEditor;
 using UnityEngine;
+using Random = System.Random;
 
 namespace QTool
 {
 
 	public static class QRandom
 	{
-		public static System.Random DefaultRandom = null;
-		public static Color Color(this System.Random random)
+		public static Random Instance { get; set; } = new Random();
+		public static Color Color(this Random random)
 		{
 			return UnityEngine.Color.HSVToRGB(random.Range(0, 1f), 0.5f, 1);
 		}
-		public static T RandomPop<T>(this IList<T> list)
+		public static T RandomPop<T>(this IList<T> list, Random random = null)
+		{
+			return RandomPop(random, list);
+		}
+		public static T RandomPop<T>(this Random random, IList<T> list)
 		{
 			if (list == null || list.Count == 0) return default;
-			var index = DefaultRandom.Range(0, list.Count);
+			var index = random.Range(0, list.Count);
 			var obj = list[index];
 			list.RemoveAt(index);
 			return obj;
 		}
-		public static T RandomGet<T>(this IList<T> list)
+		public static T RandomGet<T>(this IList<T> list, Random random = null)
+		{
+			return RandomGet(random,list);
+		}
+		public static T RandomGet<T>(this Random random, IList<T> list)
 		{
 			if (list == null || list.Count == 0) return default;
-			return list[DefaultRandom.Range(0, list.Count)];
+			return list[random.Range(0, list.Count)];
 		}
-
-		public static IList<T> Random<T>(this IList<T> list)
+		public static IList<T> RandomList<T>(this IList<T> list, Random random = null)
+		{
+			return RandomList(random, list);
+		}
+		public static IList<T> RandomList<T>(this Random random, IList<T> list)
 		{
 			for (int i = 0; i < list.Count; i++)
 			{
 				var cur = list[i];
 				list.Remove(cur);
-				list.Insert(DefaultRandom.Range(0, i + 1), cur);
+				list.Insert(random.Range(0, i + 1), cur);
 			}
 			return list;
 		}
-		public static void Split(this System.Random random, int sum, params Action<int>[] actions)
+		public static void Split(this Random random, int sum, params Action<int>[] actions)
 		{
 			if (actions.Length == 0) return;
 			List<Action<int>> actionList = new List<Action<int>>(actions);
-			actionList.Random();
+			random.RandomList(actionList);
 			for (int i = 0; i < actionList.Count - 1; i++)
 			{
 				var value = random.Range(0, sum + 1);
@@ -54,7 +68,7 @@ namespace QTool
 		/// <summary>
 		/// 正态分布随机数
 		/// </summary>
-		public static float NormalRange(this System.Random random, float min, float max)
+		public static float NormalRange(this Random random, float min, float max)
 		{
 			if (min == max) return min;
 			var mid = (min + max) / 2;
@@ -64,7 +78,7 @@ namespace QTool
 		/// <summary>
 		/// 正态分布随机数
 		/// </summary>
-		public static float Normal(this System.Random random)
+		public static float Normal(this Random random)
 		{
 			var u = 0f;
 			var v = 0f;
@@ -77,22 +91,22 @@ namespace QTool
 			} while (w == 0 || w >= 1);
 			return u * Mathf.Sqrt((-2 * Mathf.Log(w)) / w);
 		}
-		public static float Range(this System.Random random, float min, float max)
+		public static float Range(this Random random, float min, float max)
 		{
 			if (random == null) return UnityEngine.Random.Range(min, max);
 			return (float)random.NextDouble() * (max - min) + min;
 		}
-		public static int Range(this System.Random random, int min, int max)
+		public static int Range(this Random random, int min, int max)
 		{
 			if (random == null) return UnityEngine.Random.Range(min, max);
 			return random.Next(min, max);
 		}
-		public static Vector2 Vector2(this System.Random random, float range = 1, float centerOffset = 0)
+		public static Vector2 Vector2(this Random random, float range = 1, float centerOffset = 0)
 		{
 			var dir = new Vector2(random.Range(-1, 1f), random.Range(-1, 1f)).normalized;
 			return dir * random.Range(centerOffset, range);
 		}
-		public static Vector3 Vector3(this System.Random random, float range = 1, float centerOffset = 0)
+		public static Vector3 Vector3(this Random random, float range = 1, float centerOffset = 0)
 		{
 			var dir = new Vector3(random.Range(-1, 1f), random.Range(-1, 1f), random.Range(-1, 1f)).normalized;
 			return dir * random.Range(centerOffset, range);
@@ -137,7 +151,7 @@ namespace QTool
 				pointList.AddRange(root.GetComponentsInChildren<QPositionPoint>());
 				pointList.RemoveAll((point) => !keyPotnts.Contains(point) || point.HasChild);
 			}
-			pointList.Random();
+			QRandom.Instance.RandomList(pointList);
 			if (pointList.Count < count)
 			{
 				QDebug.LogWarning("位置点[" + pointKey + "]不足 " + pointList.Count + "<" + count);

@@ -58,7 +58,7 @@ public class ObjectPool<T> where T : class
 namespace QTool
 {
 	
-    public class QPoolManager:InstanceManager<QPoolManager>
+    public class QPoolManager:QInstanceManager<QPoolManager>
     {
 		public static ObjectPool<T> GetPool<T>(string poolName, Func<T> createFunc, Action<T> actionOnGet = null, Action<T> actionOnRelease = null, Action<T> actionOnDestroy = null, int maxSize = 10000) where T : class
 		{

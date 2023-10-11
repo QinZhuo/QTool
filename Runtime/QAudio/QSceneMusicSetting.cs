@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace QTool
 {
 
-	public class QSceneMusicSetting : InstanceBehaviour<QSceneMusicSetting>
+	public class QSceneMusicSetting : QInstanceBehaviour<QSceneMusicSetting>
 	{
 		public static bool UseSceneMusic { get; internal set; } = true;
 		[QName("背景乐"), SerializeField]

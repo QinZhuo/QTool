@@ -8,7 +8,7 @@ using UnityEngine.UIElements;
 
 namespace QTool
 {
-	public class QToolManager : InstanceManager<QToolManager>
+	public class QToolManager : QInstanceManager<QToolManager>
 	{
 		protected override void Awake()
 		{

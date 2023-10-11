@@ -9,10 +9,10 @@ namespace QTool
 	/// <summary>
 	/// C#对象单例
 	/// </summary>
-    public abstract class InstanceObject<T> where T : InstanceObject<T>
+    public abstract class QInstanceObject<T> where T : QInstanceObject<T>
     {
         public static readonly T Instance = Activator.CreateInstance<T>();
-        public InstanceObject()
+        public QInstanceObject()
         {
 
         }
@@ -20,7 +20,7 @@ namespace QTool
 	/// <summary>
 	/// SO文件单例 存储在Resouces文件夹下
 	/// </summary>
-    public abstract class InstanceScriptable<T> : ScriptableObject where T : InstanceScriptable<T>
+    public abstract class QInstanceScriptable<T> : ScriptableObject where T : QInstanceScriptable<T>
     {
         protected static T _instance;
         public static T Instance
@@ -44,7 +44,7 @@ namespace QTool
 	/// <summary>
 	/// 不会自动创建的单例
 	/// </summary>
-    public abstract class InstanceBehaviour<T> : MonoBehaviour where T : InstanceBehaviour<T>
+    public abstract class QInstanceBehaviour<T> : MonoBehaviour where T : QInstanceBehaviour<T>
     {
         public static T Instance
         {
@@ -66,7 +66,7 @@ namespace QTool
 	/// <summary>
 	/// 会自动创建对象的单例
 	/// </summary>
-	public abstract class InstanceManager<T> : MonoBehaviour where T : InstanceManager<T>
+	public abstract class QInstanceManager<T> : MonoBehaviour where T : QInstanceManager<T>
 	{
 		public static T Instance
 		{
@@ -80,7 +80,7 @@ namespace QTool
 #if UNITY_EDITOR
 						if (Inspector.QOnPlayModeAttribute.CurrentrState == Inspector.PlayModeState.ExitingPlayMode) return null;
 #endif
-						QDebug.Log("单例实例化 "+nameof(InstanceManager<T>) +"<" + typeof(T).Name + ">");
+						QDebug.Log("单例实例化 "+nameof(QInstanceManager<T>) +"<" + typeof(T).Name + ">");
 						var obj = new GameObject(typeof(T).Name);
 						_instance = obj.AddComponent<T>();
 						_instance.SetDirty();
