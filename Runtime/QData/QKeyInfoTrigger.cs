@@ -7,25 +7,10 @@ using UnityEngine.EventSystems;
 
 public class QKeyInfoTrigger : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler,IKey<string>
 {
-	public static event Func<string, string> KeyToInfo;
 	public static event Action<QKeyInfoTrigger> OnEnter;
 	public static event Action<QKeyInfoTrigger> OnExit;
 	public string Key { get; set; }
-	private string _Info;
-	public string Info
-	{
-		set => _Info = value; get
-		{
-			if (_Info.IsNull())
-			{
-				if (KeyToInfo != null)
-				{
-					return KeyToInfo(Key);
-				}
-			}
-			return _Info;
-		}
-	}
+	public string Info { get; set; }
 	private void Awake()
 	{
 		Key = gameObject.QName();
