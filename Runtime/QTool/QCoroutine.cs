@@ -49,10 +49,11 @@ namespace QTool
 				AddList.Add(enumerator);
 			}
 		}
-		public static void Start(this IEnumerator enumerator,List<IEnumerator> coroutineList)
+		public static void Start(this IEnumerator enumerator, List<IEnumerator> coroutineList)
 		{
-			coroutineList.Add(enumerator);
-			enumerator.OnCallBack(() => coroutineList.Remove(enumerator)).Start();
+			var ie = enumerator.OnCallBack(() => coroutineList.Remove(enumerator));
+			coroutineList.Add(ie);
+			ie.Start();
 		}
 		public static IEnumerator OnCallBack(this IEnumerator enumerator,Action callBack)
 		{

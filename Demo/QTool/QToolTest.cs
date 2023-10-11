@@ -313,12 +313,8 @@ namespace QTool.Test
 		[QName("协程运行测试")]
 		public void Run()
 		{
-			Ielist.Add( RunTest());
-			Ielist.Add(RunTest());
-			foreach (var item in Ielist)
-			{
-				item.Start();
-			}
+			RunTest().Start(Ielist);
+			RunTest().Start(Ielist);
 			Ielist.WaitAllOver().OnCallBack(() => Debug.LogError("AllOver")).Start();
 			
 		}
