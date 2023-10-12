@@ -106,6 +106,12 @@ namespace QTool
 			BaseValue = value;
 			FreshValue();
 		}
+		public QRuntimeValue(QRuntimeValue value) : this()
+		{
+			BaseRuntimeValue = value;
+			FreshValue();
+		}
+		public QRuntimeValue BaseRuntimeValue { get; private set; }
 		public void Reset(float value)
 		{
 			BaseValue = value;
@@ -118,11 +124,16 @@ namespace QTool
 			FreshValue();
 		}
 
-		private QValue m_OriginValue { get; set; } = 0f;
+		private QValue _BaseValue { get; set; } = 0f;
 		[QName]
 		public QValue BaseValue
 		{
-			get => m_OriginValue; set { if (m_OriginValue != value) { m_OriginValue = value; FreshValue(); } }
+			get => BaseRuntimeValue == null ? _BaseValue : BaseRuntimeValue.Value;
+			set
+			{
+				if (BaseRuntimeValue != null) { throw new Exception("无法更改" + nameof(BaseRuntimeValue)); }
+				if (_BaseValue != value) { _BaseValue = value; FreshValue(); }
+			}
 		}
 		[QName]
 		public QDictionary<string, QValue> OffsetValues = null;
@@ -173,7 +184,7 @@ namespace QTool
 		}
 		public override string ToString()
 		{
-			var info = BaseValue == 0 ? "" : BaseValue.ToString();
+			var info = BaseRuntimeValue == null ? (BaseValue == 0 ? "" : BaseValue.ToString()) : BaseRuntimeValue.ToString();
 			if (OffsetValues.Count > 0)
 			{
 				info += " " + OffsetValues.ToOneString(" ", kv => (kv.Value > 0 ? "+ " + kv.Value : "- " + -kv.Value) + " (" + kv.Key.ToLocationString(kv.Key.ToColor()) + ") ");
