@@ -46,7 +46,7 @@ namespace QTool
 			return Value.ToString();
 		}
 	}
-	public class QRuntimeValue<T>:IQSerializeCallback
+	public class QRuntimeValue<T> : IQSerializeCallback
 	{
 		public string Name { get; set; }
 		private T _Value = default;
@@ -55,7 +55,7 @@ namespace QTool
 			get => _Value;
 			set
 			{
-				if (!Equals(value,_Value))
+				if (!Equals(value, _Value))
 				{
 					_Value = value;
 					InvokeOnChange();
@@ -85,7 +85,7 @@ namespace QTool
 
 		public virtual void OnBeforeQSerialize()
 		{
-			
+
 		}
 	}
 	public class QRuntimeValue : QRuntimeValue<float>
@@ -137,11 +137,13 @@ namespace QTool
 		}
 		[QName]
 		public QDictionary<string, QValue> OffsetValues = null;
+		private List<string> buffer = new List<string>();
 		public float OffsetValue
 		{
 			get
 			{
 				var value = 0f;
+				OffsetValues.RemoveAll(kv => kv.Value == 0, buffer);
 				foreach (var item in OffsetValues)
 				{
 					value += item.Value;
@@ -156,6 +158,7 @@ namespace QTool
 			get
 			{
 				var value = 1f;
+				ScaleValues.RemoveAll(kv => kv.Value == 0, buffer);
 				foreach (var item in ScaleValues)
 				{
 					value += item.Value;
@@ -230,7 +233,7 @@ namespace QTool
 		{
 			base.InvokeOnChange();
 			InvokeOnChange("当前" + Name, CurrentValue);
-			InvokeOnChange(Name+"比例", (CurrentValue-MinValue)/MaxValue);
+			InvokeOnChange(Name + "比例", (CurrentValue - MinValue) / MaxValue);
 		}
 	}
 	public class QAverageValue
@@ -300,6 +303,6 @@ namespace QTool
 			return "总记[" + toString(AllSum) + "]平均[" + toString(Value) + "/s]";
 		}
 	}
-	
+
 }
 
