@@ -239,7 +239,7 @@ namespace QTool.FlowGraph
 				case nameof(Start):
 					if (node.Name != StartKey)
 					{
-						info += node.Name;
+						info += node.Name + "\n";
 					}
 					break;
 				case nameof(Trigger):
