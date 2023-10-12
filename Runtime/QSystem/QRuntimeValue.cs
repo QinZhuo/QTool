@@ -173,7 +173,7 @@ namespace QTool
 		}
 		public override string ToString()
 		{
-			var info = BaseValue.ToString();
+			var info = BaseValue == 0 ? "" : BaseValue.ToString();
 			if (OffsetValues.Count > 0)
 			{
 				info += " " + OffsetValues.ToOneString(" ", kv => (kv.Value > 0 ? "+ " + kv.Value : "- " + -kv.Value) + " (" + kv.Key.ToLocationString(kv.Key.ToColor()) + ") ");
@@ -184,7 +184,6 @@ namespace QTool
 				info += ScaleValues.ToOneString(" ", kv => (kv.Value > 0 ? "+ " + kv.Value : "- " + -kv.Value) + " (" + kv.Key.ToLocationString(kv.Key.ToColor()) + ") ");
 				info += ")";
 			}
-			info += " = " + Value;
 			return info;
 		}
 	}
