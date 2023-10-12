@@ -176,12 +176,12 @@ namespace QTool
 			var info = BaseValue.ToString();
 			if (OffsetValues.Count > 0)
 			{
-				info += " " + OffsetValues.ToOneString(" ", kv => (kv.Value > 0 ? "+ " : "- ") + kv.Value + " (" + kv.Key.ToLocationString(kv.Key.ToColor()) + ") ");
+				info += " " + OffsetValues.ToOneString(" ", kv => (kv.Value > 0 ? "+ " + kv.Value : "- " + -kv.Value) + " (" + kv.Key.ToLocationString(kv.Key.ToColor()) + ") ");
 			}
 			if (ScaleValues.Count > 0)
 			{
 				info = "(" + info + ") * (";
-				info += ScaleValues.ToOneString(" ", kv => (kv.Value > 0 ? "+ " : "- ") + kv.Value + " (" + kv.Key.ToLocationString(kv.Key.ToColor()) + ") ");
+				info += ScaleValues.ToOneString(" ", kv => (kv.Value > 0 ? "+ " + kv.Value : "- " + -kv.Value) + " (" + kv.Key.ToLocationString(kv.Key.ToColor()) + ") ");
 				info += ")";
 			}
 			info += " = " + Value;
