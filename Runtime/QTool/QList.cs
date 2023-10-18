@@ -502,7 +502,7 @@ namespace QTool
 		}
 		public static bool ContainsKey<T, KeyType>(this IList<T> array, KeyType key, Func<T, KeyType> keyGetter)
 		{
-			if (key == null)
+			if (key == null || array == null)
 			{
 				return false;
 			}
