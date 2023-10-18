@@ -192,11 +192,11 @@ namespace QTool.Reflection
 			var info = Members[keyOrViewName];
 			if (info == null)
 			{
-				info = Members.First(obj => Equals(keyOrViewName, obj.QName));
+				info = Members.FirstOrDefault(obj => Equals(keyOrViewName, obj.QName));
 			}
 			if (info == null)
 			{
-				info = Members.First(obj => Equals(keyOrViewName, obj.QOldName));
+				info = Members.FirstOrDefault(obj => Equals(keyOrViewName, obj.QOldName));
 			}
 			return info;
 		}

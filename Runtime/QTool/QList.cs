@@ -524,11 +524,11 @@ namespace QTool
 		}
 		public static T Get<T, KeyType>(this IList<T> array, KeyType key) where T : IKey<KeyType>
 		{
-			return array.First(item => Equals(item.Key, key));
+			return array.FirstOrDefault(item => Equals(item.Key, key));
 		}
 		public static T Get<T>(this IList<T> array, string key) where T : UnityEngine.Object
 		{
-			return array.First(item => Equals(item?.name, key));
+			return array.FirstOrDefault(item => Equals(item?.name, key));
 		}
 		public static T Get<T, KeyType>(this IDictionary<KeyType, T> array, KeyType key, Func<T, KeyType> keyGetter)
 		{
