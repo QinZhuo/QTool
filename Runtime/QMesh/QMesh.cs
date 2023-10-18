@@ -390,7 +390,7 @@ namespace QTool
 				}
 				foreach (var bone in skinedMesh.bones)
 				{
-					var newBone = childs.Get(bone.name, (trans) => trans.name);
+					var newBone = childs.Get(bone.name);
 					bones.Add(newBone);
 					bindppses.Add(bone.worldToLocalMatrix);
 				}

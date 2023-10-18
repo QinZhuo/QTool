@@ -6,6 +6,7 @@ using System.Xml.Serialization;
 using UnityEngine;
 using QTool.Inspector;
 using QTool.Reflection;
+using System.Linq;
 namespace QTool
 {
 
@@ -523,24 +524,11 @@ namespace QTool
 		}
 		public static T Get<T, KeyType>(this IList<T> array, KeyType key) where T : IKey<KeyType>
 		{
-			return array.Get(key, (item) => item.Key);
+			return array.First(item => Equals(item.Key, key));
 		}
-		public static T Get<T, KeyType>(this IList<T> array, KeyType key, Func<T, KeyType> keyGetter)
+		public static T Get<T>(this IList<T> array, string key) where T : UnityEngine.Object
 		{
-			if (key == null)
-			{
-				return default;
-			}
-			for (int i = 0; i < array.Count; i++)
-			{
-				var value = array[i];
-				if (value.IsNull()) continue;
-				if (key.Equals(keyGetter(value)))
-				{
-					return value;
-				}
-			}
-			return default;
+			return array.First(item => Equals(item?.name, key));
 		}
 		public static T Get<T, KeyType>(this IDictionary<KeyType, T> array, KeyType key, Func<T, KeyType> keyGetter)
 		{

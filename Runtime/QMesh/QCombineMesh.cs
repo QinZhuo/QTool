@@ -69,7 +69,7 @@ namespace QTool
 			foreach (var meshName in skinnedMeshKeys)
 			{
 				if (meshName.IsNull()) continue;
-				var mesh = renderers.Get(meshName, (mesh) => mesh.name);
+				var mesh = renderers.Get(meshName);
 				if (mesh == null)
 				{
 					Debug.LogError("找不到网格[" + meshName + "]");

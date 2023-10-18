@@ -5,6 +5,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Threading.Tasks;
 using UnityEngine;
+using System.Linq;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -191,14 +192,13 @@ namespace QTool.Reflection
 			var info = Members[keyOrViewName];
 			if (info == null)
 			{
-				info= Members.Get(keyOrViewName, (obj) => obj.QName);
+				info = Members.First(obj => Equals(keyOrViewName, obj.QName));
 			}
 			if (info == null)
 			{
-				info = Members.Get(keyOrViewName, (obj) => obj.QOldName);
+				info = Members.First(obj => Equals(keyOrViewName, obj.QOldName));
 			}
 			return info;
-			
 		}
         public bool IsArray {
             get

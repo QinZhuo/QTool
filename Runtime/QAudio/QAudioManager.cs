@@ -80,7 +80,7 @@ namespace QTool
 			var group = AudioMixerGroups[audioKey];
 			if (group == null)
 			{
-				group = QAudioSetting?.FindMatchingGroups(audioKey).Get(audioKey, (obj) => obj.name);
+				group = QAudioSetting?.FindMatchingGroups(audioKey).First(obj => Equals(obj.name, audioKey));
 				AudioMixerGroups[audioKey] = group;
 			}
 			return group;
