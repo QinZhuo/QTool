@@ -526,6 +526,7 @@ crashlytics-build.properties
 		public WindowType Type { get;private set; }
 		public static bool Show(List<QFileState> changedList, WindowType windowType)
 		{
+			if (changedList.Count == 0) return false;
 			if (Instance == null)
 			{
 				Instance = GetWindow<QVersionControlWindow>();
