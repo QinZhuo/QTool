@@ -358,6 +358,12 @@ namespace QTool
 			var path = Directory.GetCurrentDirectory();
 			PullAndCommitPush(path);
 		}
+		[MenuItem("QTool/Git/全局还原更新")]
+		public static void AllRevert()
+		{
+			var path = Directory.GetCurrentDirectory();
+			Revert(path);
+		}
 		[MenuItem("QTool/Git/以粘贴版信息初始化仓库")]
 		static  void AllInit()
 		{
