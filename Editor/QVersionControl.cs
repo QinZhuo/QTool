@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using UnityEditor.PackageManager.UI;
 using UnityEditor.PackageManager;
+using Codice.Client.BaseCommands.Changelist;
 
 namespace QTool
 {
@@ -26,11 +27,18 @@ namespace QTool
 				return;
 			var path = AssetDatabase.GetAssetPath(editor.target);
 			if (path.EndsWith("unity_builtin_extra")) return;
-			if (!(editor.target is AssetImporter||editor.target is DefaultAsset)) return;
+			if (!(editor.target is AssetImporter || editor.target is DefaultAsset)) return;
 			GUILayout.Space(10);
-			if (GUILayout.Button(new GUIContent("同步更改")))
+			using (new GUILayout.HorizontalScope())
 			{
-				PullAndCommitPush(path);
+				if (GUILayout.Button(new GUIContent("同步更改")))
+				{
+					PullAndCommitPush(path);
+				}
+				if (GUILayout.Button(new GUIContent("还原更改")))
+				{
+					Revert(path);
+				}
 			}
 			GUILayout.Space(10);
 		}
@@ -167,19 +175,19 @@ namespace QTool
 				
 				mergeErrorFile+="\n"+result.GetBlockValue(untrackedTip, "Please move or remove them before you merge.").Trim();
 		
-				commitList.Clear();
+				ChangeList.Clear();
 				foreach (var fileInfo in mergeErrorFile.Trim().Split('\n'))
 				{
 					if (fileInfo.EndsWith(".DS_Store")) continue;
-					commitList.Add(new QFileState(false,fileInfo));
+					ChangeList.Add(new QFileState(false,fileInfo));
 				}
 				EditorUtility.ClearProgressBar();
-				if (QVersionControlWindow.MergeError(commitList))
+				if (QVersionControlWindow.Show(ChangeList, QVersionControlWindow.WindowType.解决文件冲突))
 				{
 					var version =GetCurrentVersion(path);
 					var useStash = false;
 					var files = "";
-					foreach (var info in commitList)
+					foreach (var info in ChangeList)
 					{
 						if (!info.select)
 						{
@@ -197,7 +205,7 @@ namespace QTool
 					var pullResult =Pull(path);
 					if (useStash)
 					{
-						foreach (var info in commitList)
+						foreach (var info in ChangeList)
 						{
 							if (info.select)
 							{
@@ -221,6 +229,26 @@ namespace QTool
 				return result;
 			}
 		}
+		static void Revert(string path)
+		{
+			FreshCommitList(path);
+			if (QVersionControlWindow.Show(ChangeList, QVersionControlWindow.WindowType.还原本地更改))
+			{
+				var version = GetCurrentVersion(path);
+				var files = "";
+				foreach (var info in ChangeList)
+				{
+					if (info.select)
+					{
+						Debug.LogError("放弃本地更改 " + info + " " + (Checkout(info.path, path)));
+					}
+					else
+					{
+						files += info + " ";
+					}
+				}
+			}
+		}
 		static bool CheckResult(string path)
 		{
 			if (path.Contains("error") || path.Contains("fatal"))
@@ -234,47 +262,43 @@ namespace QTool
 			return PathRun(nameof(Push).ToLower() + " origin master", path);
 		}
 
-		static List<QFileState> commitList = new List<QFileState>();
-		static  void AddCommitList(string path)
+		static List<QFileState> ChangeList = new List<QFileState>();
+		static void FreshCommitList(string path)
 		{
-			var statusInfo =Status(path);
+			ChangeList.Clear();
+			var statusInfo = Status(path);
 			if (statusInfo.StartsWith("fatal")) return;
 			var lines = statusInfo.Trim().Split('\n');
 			foreach (var info in lines)
 			{
-				if (info.IsNull()|| info.EndsWith(".DS_Store")) continue;
-				commitList.Add(new QFileState(true,info));
+				if (info.IsNull() || info.EndsWith(".DS_Store")) continue;
+				ChangeList.Add(new QFileState(true, info));
 			}
 		}
 		static string Commit(string path)
 		{
-			
-			commitList.Clear();
-			AddCommitList(path);
-			if (commitList.Count == 0) return "";
+			FreshCommitList(path);
+			if (ChangeList.Count == 0) return "";
 			EditorUtility.ClearProgressBar();
-			var commitInfo = QVersionControlWindow.Commit(commitList);
-			if (string.IsNullOrWhiteSpace(commitInfo) || commitList.Count == 0) return "";
-			commitList.RemoveAll((obj) => !obj.select);
-			for (int i = 0; i < commitList.Count; i++)
+			if (QVersionControlWindow.Show(ChangeList, QVersionControlWindow.WindowType.提交本地更改))
 			{
-				var info = commitList[i];
-				if (!info.select) continue;
-				EditorUtility.DisplayProgressBar("提交更改", "提交 " + info.path +" "+(i+1)+"/"+commitList.Count, i*1f/commitList.Count);
-				switch (info.state)
+				for (int i = 0; i < ChangeList.Count; i++)
 				{
-					case "??":
-						Add(info.path,path);
-						break;
-					default:
-						break;
+					var info = ChangeList[i];
+					if (!info.select) continue;
+					EditorUtility.DisplayProgressBar("提交更改", "提交 " + info.path + " " + (i + 1) + "/" + ChangeList.Count, i * 1f / ChangeList.Count);
+					switch (info.state)
+					{
+						case "??":
+							Add(info.path, path);
+							break;
+						default:
+							break;
+					}
+					QDebug.Log(info.state + "  " + info);
 				}
-				QDebug.Log(info.state + "  " + info);
-			}
-			EditorUtility.ClearProgressBar();
-			if (commitList.Count > 0)
-			{
-				return PathRun(nameof(Commit).ToLower() + " " + commitList.ToOneString(" ") + " -m \"" + commitInfo + '\"', path);
+				EditorUtility.ClearProgressBar();
+				return PathRun(nameof(Commit).ToLower() + " " + ChangeList.ToOneString(" ") + " -m \"" + QVersionControlWindow.Instance.CommitInfo + '\"', path);
 			}
 			else
 			{
@@ -497,98 +521,97 @@ crashlytics-build.properties
 
 	public class QVersionControlWindow : EditorWindow
 	{
+	
 		public static QVersionControlWindow Instance { private set; get; }
-		public static string Commit(List<QFileState> commitList)
+		public WindowType Type { get;private set; }
+		public static bool Show(List<QFileState> changedList, WindowType windowType)
 		{
 			if (Instance == null)
 			{
 				Instance = GetWindow<QVersionControlWindow>();
 				Instance.minSize = new Vector2(200, 130);
 			}
-			Instance.titleContent = new GUIContent("提交本地更改");
+			Instance.Type = windowType;
+			Instance.titleContent = new GUIContent(windowType.ToString());
 			Instance.fileList.Clear();
-			Instance.fileList.AddRange(commitList);
-			Instance.commitInfo = "";
+			Instance.fileList.AddRange(changedList);
 			Instance.confirm = false;
 			Instance.ShowModal();
-			return Instance.confirm?Instance.commitInfo:"";
-		}
-		public static bool MergeError(List<QFileState> mergeErrorList)
-		{
-			if (Instance == null)
-			{
-				Instance = GetWindow<QVersionControlWindow>();
-				Instance.minSize = new Vector2(200, 130);
-			}
-			Instance.titleContent = new GUIContent("解决文件冲突");
-			Instance.fileList.Clear();
-			Instance.fileList.AddRange(mergeErrorList);
-			Instance.commitInfo = "";
-			Instance.confirm = false;
-			Instance.ShowModal();
-			return Instance.confirm;
+			Instance.fileList.RemoveAll((obj) => !obj.select);
+			return Instance.confirm && Instance.fileList.Count != 0;
 		}
 		public List<QFileState> fileList = new List<QFileState>();
-		public string commitInfo { get; private set; }
+		public string CommitInfo { get; private set; }
 		bool confirm;
 		Vector2 scrollPos = Vector2.zero;
-		bool InitOver = false;
-		private void OnEnable()
-		{
-			InitOver = false;
-		}
 		private void OnGUI()
 		{
-			using (var scroll=new GUILayout.ScrollViewScope(scrollPos))
+			using (var scroll = new GUILayout.ScrollViewScope(scrollPos))
 			{
 				foreach (var file in fileList)
 				{
 					using (new GUILayout.HorizontalScope())
 					{
 						file.select = GUILayout.Toggle(file.select, "");
-						if (GUILayout.Button(file.viewString,QEditorGUI.RichLabel))
+						if (GUILayout.Button(file.viewString, QEditorGUI.RichLabel))
 						{
-							file.select =! file.select;
+							file.select = !file.select;
 						}
 					}
 				}
-				scrollPos=scroll.scrollPosition ;
+				scrollPos = scroll.scrollPosition;
 			}
-		
-			if(titleContent.text.Contains("提交")){
-				commitInfo = EditorGUILayout.TextField(commitInfo);
-				if (GUILayout.Button("提交选中文件"))
-				{
-					if (string.IsNullOrWhiteSpace(commitInfo))
-					{
-						EditorUtility.DisplayDialog("提交信息错误", "提交信息不能为空", "确认");
-					}
-					else
-					{
-						confirm = true;
-						Close();
-					}
-				}
-			}
-			else
+			switch (Type)
 			{
-				if (GUILayout.Button("保留选中文件"))
-				{
-					confirm = true;
-					Close();
-				}
+				case WindowType.提交本地更改:
+					{
+						CommitInfo = EditorGUILayout.TextField(CommitInfo);
+						if (GUILayout.Button("提交选中文件"))
+						{
+							if (string.IsNullOrWhiteSpace(CommitInfo))
+							{
+								EditorUtility.DisplayDialog("提交信息错误", "提交信息不能为空", "确认");
+							}
+							else
+							{
+								confirm = true;
+								Close();
+							}
+						}
+					}
+					break;
+				case WindowType.解决文件冲突:
+					{
+						if (GUILayout.Button("保留选中文件"))
+						{
+							confirm = true;
+							Close();
+						}
+					}
+					break;
+				case WindowType.还原本地更改:
+					{
+						if (GUILayout.Button("还原"))
+						{
+							confirm = true;
+							Close();
+						}
+					}
+					break;
+				default:
+					break;
 			}
-			
 			if (GUILayout.Button("取消"))
 			{
-				commitInfo = "";
+				CommitInfo = "";
 				Close();
 			}
-			if (!InitOver)
-			{
-				Repaint();
-				InitOver = true;
-			}
+		}
+		public enum WindowType
+		{
+			提交本地更改,
+			解决文件冲突,
+			还原本地更改,
 		}
 	}
 }
