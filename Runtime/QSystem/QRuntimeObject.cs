@@ -5,9 +5,9 @@ using QTool.Reflection;
 using System;
 namespace QTool
 {
-	public abstract class QRuntime<RuntimeT, DataT> : IQPoolObject where RuntimeT : QRuntime<RuntimeT, DataT>, new() where DataT : QDataList<DataT>, new()
+	public abstract class QRuntime<RuntimeT, DataT> : IKey<string>, IQPoolObject where RuntimeT : QRuntime<RuntimeT, DataT>, new() where DataT : QDataList<DataT>, new()
 	{
-		public string Key { get; protected set; }
+		public virtual string Key { get; set; }
 		public override string ToString()
 		{
 			return Key;
@@ -25,7 +25,7 @@ namespace QTool
 			Key = key;
 			Data = QDataList<DataT>.Get(key);
 		}
-	
+
 
 		public virtual void OnDestroy()
 		{
@@ -34,7 +34,7 @@ namespace QTool
 		}
 	}
 	
-	public abstract class QRuntimeObject<RuntimeT, DataT> : MonoBehaviour,IQPoolObject where RuntimeT : QRuntime<RuntimeT, DataT>, new() where DataT : QDataList<DataT>, new()
+	public abstract class QRuntimeObject<RuntimeT, DataT> : MonoBehaviour,IKey<string>,IQPoolObject where RuntimeT : QRuntime<RuntimeT, DataT>, new() where DataT : QDataList<DataT>, new()
 	{
 		private RuntimeT _Runtime = null;
 		public RuntimeT Runtime
@@ -81,6 +81,7 @@ namespace QTool
 		}
 		public QDictionary<string, QRuntimeValue> RuntimeValues { get; private set; } = new QDictionary<string, QRuntimeValue>();
 		public DataT Data => Runtime?.Data;
+		public virtual string Key { get => Runtime.Key; set => Runtime.Key = value; }
 		public Action<string> OnValueChange = null;
 		public virtual void Awake()
 		{
