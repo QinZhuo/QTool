@@ -377,6 +377,10 @@ namespace QTool.FlowGraph
 					VisualElement viewList = null;
 					void FreshList()
 					{
+						if (port.Value is IList list && viewList.childCount == list.Count)
+						{
+							return;
+						}
 						view.Clear();
 						var index = 0;
 						foreach (var child in viewList.Children().ToArray())
@@ -390,7 +394,7 @@ namespace QTool.FlowGraph
 						}
 						if (index == 0)
 						{
-							var list = port.Value as IList;
+							list = port.Value as IList;
 							view.AddButton("新增 " + port.ViewName, () =>
 							{
 								list = list.CreateAt(QSerializeType.Get(port.ValueType));
@@ -400,26 +404,16 @@ namespace QTool.FlowGraph
 							});
 						}
 					}
-					viewList = row.Add(port.ViewName, port.Value, port.ValueType, newValue =>
-					{
-						if (newValue is IList newlist && port.Value is IList list && newlist.Count != list.Count)
-						{
-							port.Value = newValue; FreshList();
-						}
-						else
-						{
-							port.Value = newValue;
-						}
-					});
+					viewList = row.Add(port.ViewName, port.Value, port.ValueType, newValue => { port.Value = newValue; FreshList(); });
 					row.Remove(viewList);
 					FreshList();
 				}
 				else
 				{
-					var dot = AddDotView(row, GetColor(port), port.GetPortId());
+					var dot = AddDotView(row,GetColor(port), port.GetPortId());
 					if (port.IsShowValue())
 					{
-						row.Add(port.ViewName, port.Value, port.ValueType, newValue => port.Value = newValue, port.parameterInfo)
+						row.Add(port.ViewName, port.Value, port.ValueType, newValue => port.Value = newValue,port.parameterInfo)
 							.RegisterCallback<MouseEnterEvent>(ValueMouseEnterEvent);
 					}
 					else
