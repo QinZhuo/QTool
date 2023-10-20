@@ -400,16 +400,16 @@ namespace QTool.FlowGraph
 							});
 						}
 					}
-					viewList = row.Add(port.ViewName, port.Value, port.ValueType, newValue => { if (newValue != port.Value) { port.Value = newValue; FreshList(); } });
+					viewList = row.Add(port.ViewName, port.Value, port.ValueType, newValue => { if (newValue is IList newlist && port.Value is IList list && newlist.Count == list.Count) return; port.Value = newValue; FreshList(); });
 					row.Remove(viewList);
 					FreshList();
 				}
 				else
 				{
-					var dot = AddDotView(row,GetColor(port), port.GetPortId());
+					var dot = AddDotView(row, GetColor(port), port.GetPortId());
 					if (port.IsShowValue())
 					{
-						row.Add(port.ViewName, port.Value, port.ValueType, newValue => port.Value = newValue,port.parameterInfo)
+						row.Add(port.ViewName, port.Value, port.ValueType, newValue => port.Value = newValue, port.parameterInfo)
 							.RegisterCallback<MouseEnterEvent>(ValueMouseEnterEvent);
 					}
 					else
