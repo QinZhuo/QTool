@@ -346,24 +346,25 @@ namespace QTool
 		{
 			return PathRun(nameof(Status).ToLower() + " -s "+"\""+Path.GetFullPath( path)+"\"", path);
 		}
-		[MenuItem("QTool/Git/全局拉取更新")]
-		public static void AllPull()
-		{
-			var path = Directory.GetCurrentDirectory();
-			PullAndCommitPush(path,false);
-		}
-		[MenuItem("QTool/Git/全局同步更新")]
-		public static void AllPush()
-		{
-			var path = Directory.GetCurrentDirectory();
-			PullAndCommitPush(path);
-		}
-		[MenuItem("QTool/Git/全局还原更新")]
+		[MenuItem("QTool/Git/全局还原")]
 		public static void AllRevert()
 		{
 			var path = Directory.GetCurrentDirectory();
 			Revert(path);
 		}
+		[MenuItem("QTool/Git/全局更新")]
+		public static void AllPull()
+		{
+			var path = Directory.GetCurrentDirectory();
+			PullAndCommitPush(path,false);
+		}
+		[MenuItem("QTool/Git/全局同步")]
+		public static void AllPush()
+		{
+			var path = Directory.GetCurrentDirectory();
+			PullAndCommitPush(path);
+		}
+		
 		[MenuItem("QTool/Git/以粘贴版信息初始化仓库")]
 		static  void AllInit()
 		{
