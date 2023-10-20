@@ -45,10 +45,10 @@ namespace QTool
 		队友 = 0,
 		敌人 = 1,
 	}
-	public interface IQTeam
+	public interface IQTeam : IKey<string>
 	{
 		public string Team { get; }
-		public UnityEngine.Transform transform { get; }
+		public Transform transform { get; }
 	}
 	public static class QTeam
 	{
