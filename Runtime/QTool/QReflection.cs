@@ -436,14 +436,6 @@ namespace QTool.Reflection
 					return a.ToComputeFloat() <= b.ToComputeFloat();
 			}
 		}
-		public static T ConvertTo<T>(this object obj)
-		{
-			return (T)ConvertToType(obj, typeof(T));
-		}
-		public static object ConvertToType(this object obj,Type type)
-		{
-			return Expression.Lambda<Func<object>>(Expression.Convert(Expression.Convert(Expression.Constant(obj), type),typeof(object))).Compile()();
-		}
 		public static bool OperaterEqual(this object a, object b)
 		{
 			
@@ -964,6 +956,7 @@ namespace QTool.Reflection
         }
 		public static bool Is(this Type type,Type checkType)
 		{
+			if (type == null) return false;
 			return checkType.IsAssignableFrom(type);
 			#region 复杂检测
 			//if (type==checkType)
@@ -985,7 +978,7 @@ namespace QTool.Reflection
 			#endregion
 		}
 		static Dictionary<string, Type> TypeBuffer = new Dictionary<string, Type>();
-        public static Type ParseType(string typeString)
+        public static Type ParseType(this string typeString)
         {
 			if (typeString.IsNull()) return null;
 			if (TypeBuffer.ContainsKey(typeString))
