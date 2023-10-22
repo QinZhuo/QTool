@@ -540,6 +540,10 @@ crashlytics-build.properties
 			Instance.confirm = false;
 			Instance.ShowModal();
 			Instance.fileList.RemoveAll((obj) => !obj.select);
+			if (Instance.CommitInfo.IsNull())
+			{
+				Instance.CommitInfo = Instance.fileList.ToOneString(" ", file => file.viewString).ToShortString(30);
+			}
 			return Instance.confirm && Instance.fileList.Count != 0;
 		}
 		public List<QFileState> fileList = new List<QFileState>();
@@ -570,15 +574,8 @@ crashlytics-build.properties
 						CommitInfo = EditorGUILayout.TextField(CommitInfo);
 						if (GUILayout.Button("提交选中文件"))
 						{
-							if (string.IsNullOrWhiteSpace(CommitInfo))
-							{
-								EditorUtility.DisplayDialog("提交信息错误", "提交信息不能为空", "确认");
-							}
-							else
-							{
-								confirm = true;
-								Close();
-							}
+							confirm = true;
+							Close();
 						}
 					}
 					break;

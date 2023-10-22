@@ -165,6 +165,7 @@ namespace QTool
 		public event Action<QItemData<ItemData>.Runtime> OnRemoveItem = null;
 		protected virtual void OnAdd(QItemData<ItemData>.Runtime item)
 		{
+			OnAddItem?.Invoke(item);
 			if (item.Graph != null)
 			{
 				item.InvokeEvent(AddEventKey);
@@ -177,10 +178,10 @@ namespace QTool
 					}
 				}
 			}
-			OnAddItem?.Invoke(item);
 		}
 		protected virtual void OnRemove(QItemData<ItemData>.Runtime item)
 		{
+			OnRemoveItem?.Invoke(item);
 			if (item.Graph!=null)
 			{
 				item.InvokeEvent(RemoveEventKey);
@@ -193,7 +194,6 @@ namespace QTool
 					}
 				}
 			}
-			OnRemoveItem?.Invoke(item);
 		}
 		public void SetValue<T>(string key, T value)
 		{
