@@ -438,6 +438,10 @@ namespace QTool.FlowGraph
 			this.autoGetValue = autoGetValue;
 			CheckNull = checkNull;
 		}
+		public QInputPortAttribute(bool checkNull)
+		{
+			CheckNull = checkNull;
+		}
 	}
 	/// <summary>
 	///  指定参数端口为输出端口
