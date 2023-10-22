@@ -954,28 +954,25 @@ namespace QTool.Reflection
                 throw new Exception("通过" + type + "(" + param.ToOneString(",") + ")创建对象" + type + "出错", e);
             }
         }
-		public static bool Is(this Type type,Type checkType)
+		public static bool Is(this Type type, Type checkType)
 		{
 			if (type == null) return false;
-			return checkType.IsAssignableFrom(type);
-			#region 复杂检测
-			//if (type==checkType)
-			//{
-			//	return true;
-			//}
-			//else if (type.BaseType == null || type.BaseType.IsAbstract)
-			//{
-			//	return false;
-			//}
-			//else if (type.IsGenericType && !type.IsGenericTypeDefinition)
-			//{
-			//	return type.GetGenericTypeDefinition().Is(checkType);
-			//}
-			//else
-			//{ 
-			//	return type.BaseType.Is(checkType);
-			//}
-			#endregion
+			if (checkType.IsAssignableFrom(type)) return true;
+			if (checkType.IsGenericTypeDefinition)
+			{
+				if (type.IsGenericType && !type.IsGenericTypeDefinition)
+				{
+					if (type.GetGenericTypeDefinition().Is(checkType))
+					{
+						return true;
+					}
+				}
+				else if (type.BaseType != null)
+				{
+					return type.BaseType.Is(checkType);
+				}
+			}
+			return false;
 		}
 		static Dictionary<string, Type> TypeBuffer = new Dictionary<string, Type>();
         public static Type ParseType(this string typeString)

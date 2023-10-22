@@ -16,7 +16,7 @@ namespace QTool
 {
 	public static class QUIElements
 	{
-		public static TwoPaneSplitView Split(this VisualElement root, VisualElement left,VisualElement right,float pos=300, TwoPaneSplitViewOrientation dreciton= TwoPaneSplitViewOrientation.Horizontal)
+		public static TwoPaneSplitView Split(this VisualElement root, VisualElement left, VisualElement right, float pos = 300, TwoPaneSplitViewOrientation dreciton = TwoPaneSplitViewOrientation.Horizontal)
 		{
 			var split = new TwoPaneSplitView();
 			split.fixedPaneInitialDimension = pos;
@@ -26,7 +26,7 @@ namespace QTool
 			root.Add(split);
 			return split;
 		}
-		public static Toggle AddToggle(this VisualElement root, string text,bool value, Action<bool> changeEvent = null)
+		public static Toggle AddToggle(this VisualElement root, string text, bool value, Action<bool> changeEvent = null)
 		{
 			var visual = new Toggle();
 			visual.name = text;
@@ -47,9 +47,9 @@ namespace QTool
 			root.Add(visual);
 			return visual;
 		}
-		public static EnumField AddEnum(this VisualElement root, string label, Enum defaultValue , Action<Enum> changeEvent = null)
+		public static EnumField AddEnum(this VisualElement root, string label, Enum defaultValue, Action<Enum> changeEvent = null)
 		{
-			var visual = new EnumField(label,defaultValue);
+			var visual = new EnumField(label, defaultValue);
 			visual.RegisterCallback<ChangeEvent<Enum>>((evt) =>
 			{
 				changeEvent(evt.newValue);
@@ -80,7 +80,7 @@ namespace QTool
 			return visual;
 		}
 
-		public static VisualElement AddObject(this VisualElement root, string label,Type type, UnityEngine.Object defaultValue = null, Action<UnityEngine.Object> changeEvent = null)
+		public static VisualElement AddObject(this VisualElement root, string label, Type type, UnityEngine.Object defaultValue = null, Action<UnityEngine.Object> changeEvent = null)
 		{
 #if UNITY_EDITOR
 			var visual = new ObjectField(label);
@@ -114,7 +114,7 @@ namespace QTool
 			root.Add(visual);
 			return visual;
 		}
-	
+
 		public static PopupField<T> AddPopup<T>(this VisualElement root, string label, List<T> choices, T defaultValue, Action<T> changeEvent = null)
 		{
 			if (defaultValue == null)
@@ -122,7 +122,7 @@ namespace QTool
 				defaultValue = (T)typeof(T).CreateInstance();
 			}
 			if (!choices.Contains(defaultValue))
-			{ 
+			{
 				choices.Add(defaultValue);
 			}
 			var visual = new PopupField<T>(label, choices, defaultValue);
@@ -171,7 +171,7 @@ namespace QTool
 			root.Add(visual);
 			return visual;
 		}
-		public static Label AddLabel(this VisualElement root, string text, TextAnchor textAlign= TextAnchor.MiddleLeft)
+		public static Label AddLabel(this VisualElement root, string text, TextAnchor textAlign = TextAnchor.MiddleLeft)
 		{
 			var label = new Label(text);
 			label.name = text;
@@ -180,7 +180,7 @@ namespace QTool
 			root.Add(label);
 			return label;
 		}
-		public static Foldout AddFoldout(this VisualElement root,string text="",bool value=false)
+		public static Foldout AddFoldout(this VisualElement root, string text = "", bool value = false)
 		{
 			var visual = new Foldout();
 			visual.text = text;
@@ -188,7 +188,7 @@ namespace QTool
 			root.Add(visual);
 			return visual;
 		}
-		public static ListView AddListView(this VisualElement root, IList itemsSource, Action<VisualElement, int> bindItem=null, Func<VisualElement> makeItem=null)
+		public static ListView AddListView(this VisualElement root, IList itemsSource, Action<VisualElement, int> bindItem = null, Func<VisualElement> makeItem = null)
 		{
 			var visual = new ListView();
 			visual.itemsSource = itemsSource;
@@ -202,7 +202,7 @@ namespace QTool
 			return visual;
 		}
 #if UNITY_2022_1_OR_NEWER
-		public static TreeView AddTreeView(this VisualElement root, Action<VisualElement, int> bindItem, Func<VisualElement> makeItem=null)
+		public static TreeView AddTreeView(this VisualElement root, Action<VisualElement, int> bindItem, Func<VisualElement> makeItem = null)
 		{
 			var visual = new TreeView();
 			visual.bindItem = bindItem;
@@ -227,7 +227,7 @@ namespace QTool
 			root.pickingMode = value ? PickingMode.Ignore : PickingMode.Position;
 			return root;
 		}
-		public static VisualElement SetBackground(this VisualElement root, Color color=default,float offset=0)
+		public static VisualElement SetBackground(this VisualElement root, Color color = default, float offset = 0)
 		{
 			root.style.position = Position.Absolute;
 			root.style.left = offset;
@@ -250,7 +250,7 @@ namespace QTool
 		{
 			return root.worldTransform.MultiplyPoint(root.transform.position);
 		}
-		public static void SetWorldPosition(this VisualElement root,Vector2 worldPosition)
+		public static void SetWorldPosition(this VisualElement root, Vector2 worldPosition)
 		{
 			root.style.position = Position.Absolute;
 			root.transform.position = worldPosition - root.worldBound.position;
@@ -263,7 +263,7 @@ namespace QTool
 		}
 
 #if UNITY_2021_1_OR_NEWER
-		public static GroupBox AddGroupBox(this VisualElement root,string name="")
+		public static GroupBox AddGroupBox(this VisualElement root, string name = "")
 		{
 			var visual = new GroupBox();
 			visual.name = name;
@@ -283,7 +283,7 @@ namespace QTool
 		{
 			root.AddManipulator(new ContextualMenuManipulator(menuBuilder));
 		}
-		public static List<Type> TypeList = new List<Type>() { typeof(UnityEngine.Object),typeof(string) };
+		public static List<Type> TypeList = new List<Type>() { typeof(UnityEngine.Object), typeof(string) };
 		public static QDictionary<Type, Func<string, object, Action<object>, VisualElement>> TypeOverride = new QDictionary<Type, Func<string, object, Action<object>, VisualElement>>()
 		{
 			{
@@ -515,7 +515,7 @@ namespace QTool
 			}
 			return root.AddLabel(name + " " + obj);
 		}
-		public static void SetBorder(this IStyle style,Color color,float width=1,float radius=5)
+		public static void SetBorder(this IStyle style, Color color, float width = 1, float radius = 5)
 		{
 			style.borderTopWidth = width;
 			style.borderBottomWidth = width;
@@ -530,7 +530,7 @@ namespace QTool
 			style.borderBottomLeftRadius = radius;
 			style.borderBottomRightRadius = radius;
 		}
-		public static VisualElement AddQCommandInfo(this VisualElement root, QCommandInfo commandInfo,Action callBack)
+		public static VisualElement AddQCommandInfo(this VisualElement root, QCommandInfo commandInfo, Action callBack)
 		{
 			root = root.AddVisualElement();
 			root.style.flexDirection = FlexDirection.Row;
@@ -547,7 +547,7 @@ namespace QTool
 					 commandInfo.TempValues[commandInfo.paramInfos.IndexOf(info)] = value;
 				 });
 			}
-			root.AddButton("运行", () => { commandInfo.Invoke(commandInfo.TempValues.ToArray());callBack(); });
+			root.AddButton("运行", () => { commandInfo.Invoke(commandInfo.TempValues.ToArray()); callBack(); });
 			return root;
 		}
 		public static VisualElement ToolTip(this VisualElement root, string text)
@@ -555,7 +555,7 @@ namespace QTool
 			root.tooltip = text;
 			return root;
 		}
-		public static void Add(this VisualElement root, QInspectorType inspectorType,object target)
+		public static void Add(this VisualElement root, QInspectorType inspectorType, object target)
 		{
 			foreach (var butInfo in inspectorType.buttonFunc)
 			{
@@ -582,7 +582,7 @@ namespace QTool
 				}
 			};
 		}
-	
+
 		public static PropertyField Add(this VisualElement root, UnityEditor.SerializedProperty serializedProperty)
 		{
 			var visual = new PropertyField(serializedProperty, QReflection.QName(serializedProperty));
@@ -634,7 +634,7 @@ namespace QTool
 			return path;
 		}
 #endif
-		
+
 		public static VisualElement AddMarkdown(this VisualElement root, string markdown)
 		{
 			root.Clear();
@@ -682,7 +682,7 @@ namespace QTool
 						}
 						break;
 					default:
-						if (line.IsNull()||line.Length >= 3 && line.Replace("*", "").Replace("-", "").Replace("_", "").IsNull())
+						if (line.IsNull() || line.Length >= 3 && line.Replace("*", "").Replace("-", "").Replace("_", "").IsNull())
 						{
 							CheckNewLine();
 						}
@@ -697,16 +697,17 @@ namespace QTool
 			return root;
 		}
 
-		
+
 	}
 	public class QPopupData
 	{
 		static QDictionary<string, QPopupData> DrawerDic = new QDictionary<string, QPopupData>((key) => new QPopupData());
 
 		public List<string> List = new List<string>();
-	
+
 		public static QPopupData Get(object obj, params string[] getListFuncs)
-		{Type type = null;
+		{
+			Type type = null;
 			if (obj is Type)
 			{
 				type = obj as Type;
@@ -715,7 +716,7 @@ namespace QTool
 			{
 				type = obj?.GetType();
 			}
-			
+
 			var drawerKey = getListFuncs.ToOneString(" ");
 			if (drawerKey.IsNull())
 			{
@@ -745,9 +746,9 @@ namespace QTool
 					else
 					{
 						var funcKey = getListFunc;
-						if (!funcKey.Contains(".") && QReflection.ParseType(funcKey).Is(typeof(QDataList<>)))
+						if (!funcKey.EndsWith(".List") && QReflection.ParseType(funcKey).Is(typeof(QDataList<>)))
 						{
-							funcKey += "." + nameof(List);
+							funcKey += ".List";
 						}
 						if (obj.InvokeFunction(funcKey) is IList itemList)
 						{
