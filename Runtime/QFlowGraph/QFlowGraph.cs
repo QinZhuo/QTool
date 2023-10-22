@@ -432,9 +432,11 @@ namespace QTool.FlowGraph
 			}
 		}
 		public string autoGetValue= "";
-		public QInputPortAttribute(string autoGetValue ="")
+		public bool CheckNull = false;
+		public QInputPortAttribute(string autoGetValue ="", bool checkNull = false)
 		{
 			this.autoGetValue = autoGetValue;
+			CheckNull = checkNull;
 		}
 	}
 	/// <summary>
@@ -1393,12 +1395,12 @@ namespace QTool.FlowGraph
         }
         object[] commandParams;
         static Func<object,object> TaskReturnValueGet;
-        object InvokeCommand()
-        {
-            _nextFlowPort = null;
-            for (int i = 0; i < command.paramInfos.Length; i++)
-            {
-                var info = command.paramInfos[i];
+		object InvokeCommand()
+		{
+			_nextFlowPort = null;
+			for (int i = 0; i < command.paramInfos.Length; i++)
+			{
+				var info = command.paramInfos[i];
 				switch (info.Name)
 				{
 					case QFlowKey.This:
@@ -1406,12 +1408,21 @@ namespace QTool.FlowGraph
 						commandParams[i] = this;
 						break;
 					default:
-						commandParams[i] = this[info.Name];
+						var port = Ports[info.Name];
+						if (port != null)
+						{
+							commandParams[i] = port.Value;
+							if (!port.IsOutput && port.InputPort.CheckNull && commandParams[i].IsNull())
+							{
+								QDebug.LogError(Name + " " + info.Name + " 为空");
+								return null;
+							}
+						}
 						break;
-				}
-            }
-            return command.Invoke(commandParams);
-        }
+				} 
+			}
+			return command.Invoke(commandParams);
+		}
         internal void Run()
         {
             var returnObj = InvokeCommand();
