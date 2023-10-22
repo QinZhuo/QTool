@@ -542,7 +542,7 @@ crashlytics-build.properties
 			Instance.fileList.RemoveAll((obj) => !obj.select);
 			if (Instance.CommitInfo.IsNull())
 			{
-				Instance.CommitInfo = Instance.fileList.ToOneString(" ", file => file.viewString).ToShortString(30);
+				Instance.CommitInfo = Instance.fileList.ToOneString(" ", file => file.viewString.ForeachBlockValue('<','>',(key)=>"")).ToShortString(30);
 			}
 			return Instance.confirm && Instance.fileList.Count != 0;
 		}
