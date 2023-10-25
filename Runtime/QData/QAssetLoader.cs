@@ -11,11 +11,19 @@ namespace QTool
 		public UnityEvent<TObj> OnLoad;
 		public void InvokeLoad(string key)
 		{
-			OnLoad?.Invoke(Load(key));
+			var obj = Load(key);
+			if (obj != null)
+			{
+				OnLoad?.Invoke(obj);
+			}
 		}
 		public async void InvokeLoadAsync(string key)
 		{
-			OnLoad?.Invoke(await LoadAsync(key));
+			var obj = await LoadAsync(key);
+			if (obj != null)
+			{
+				OnLoad?.Invoke(obj);
+			}
 		}
 		public static string DirectoryPath
 		{
