@@ -427,7 +427,7 @@ namespace QTool.Builder
 			this.brushKey = gameObject?.name;
 		}
 	}
-	public abstract class QBuilderBrefab<T> : Asset.QPrefabLoader<T> where T : QBuilderBrefab<T>
+	public abstract class QBuilderBrefab<T> : QPrefabLoader<T> where T : QBuilderBrefab<T>
 	{
 
 	}

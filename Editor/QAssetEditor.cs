@@ -13,7 +13,7 @@ using UnityEngine.Networking;
 using UnityEditor.AddressableAssets.Settings;
 using UnityEditor.AddressableAssets;
 #endif
-namespace QTool.Asset {
+namespace QTool {
 	public static class AddressableToolEditor
 	{
 

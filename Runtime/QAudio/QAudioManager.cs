@@ -121,7 +121,7 @@ namespace QTool
 			}
 			return AudioSources[audioKey];
 		}
-		private class QAudioSourcePrefab:Asset.QAssetLoader<QAudioSourcePrefab,GameObject>
+		private class QAudioSourcePrefab:QAssetLoader<QAudioSourcePrefab,GameObject>
 		{
 			
 		}
