@@ -185,8 +185,16 @@ namespace QTool
 					{
 						if (!info.select)
 						{
-							Debug.LogError("放弃本地更改 " + info + " " +(Checkout(info.path, path)));
-						}else
+							if ("A".Equals(info.state))
+							{
+								File.Delete(info.path);
+							}
+							else
+							{
+								Debug.LogError("放弃本地更改 " + info + " " + (Checkout(info.path, path)));
+							}
+						}
+						else
 						{
 							files += info + " ";
 							useStash = true;
