@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using QTool.Asset;
 using UnityEngine.UI;
 using QTool;
 using QTool.Inspector;
