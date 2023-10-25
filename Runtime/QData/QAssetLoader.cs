@@ -2,12 +2,21 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
-
+using UnityEngine.Events;
 
 namespace QTool.Asset
 {
-	public abstract class QAssetLoader<TPath, TObj> where TObj : UnityEngine.Object
+	public abstract class QAssetLoader<TPath, TObj> : MonoBehaviour where TObj : UnityEngine.Object
 	{
+		public UnityEvent<TObj> OnLoad;
+		public void InvokeLoad(string key)
+		{
+			OnLoad?.Invoke(Load(key));
+		}
+		public async void InvokeLoadAsync(string key)
+		{
+			OnLoad?.Invoke(await LoadAsync(key));
+		}
 		public static string DirectoryPath
 		{
 			get
