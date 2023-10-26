@@ -360,7 +360,7 @@ namespace QTool
 			var path = Directory.GetCurrentDirectory();
 			Revert(path);
 		}
-		[MenuItem("QTool/Git/全局更新")]
+		[MenuItem("QTool/Git/全局拉取")]
 		public static void AllPull()
 		{
 			var path = Directory.GetCurrentDirectory();
