@@ -546,18 +546,18 @@ crashlytics-build.properties
 			Instance.titleContent = new GUIContent(windowType.ToString());
 			Instance.fileList.Clear();
 			Instance.fileList.AddRange(changedList);
-			Instance.confirm = false;
+			Instance.Confirm = false;
 			Instance.ShowModal();
 			Instance.fileList.RemoveAll((obj) => !obj.select);
 			if (Instance.CommitInfo.IsNull())
 			{
-				Instance.CommitInfo = Instance.fileList.ToOneString(" ", file => file.viewString.ForeachBlockValue('<','>',(key)=>"")).ToShortString(200);
+				Instance.CommitInfo = Instance.fileList.ToOneString(" ", file => file.viewString.ForeachBlockValue('<', '>', (key) => "")).ToShortString(200);
 			}
-			return Instance.confirm && Instance.fileList.Count != 0;
+			return Instance.Confirm && (windowType == WindowType.解决文件冲突 || Instance.fileList.Count != 0);
 		}
 		public List<QFileState> fileList = new List<QFileState>();
 		public string CommitInfo { get; private set; }
-		bool confirm;
+		private bool Confirm { get; set; }
 		Vector2 scrollPos = Vector2.zero;
 		private void OnGUI()
 		{
@@ -583,7 +583,7 @@ crashlytics-build.properties
 						CommitInfo = EditorGUILayout.TextField(CommitInfo);
 						if (GUILayout.Button("提交选中文件"))
 						{
-							confirm = true;
+							Confirm = true;
 							Close();
 						}
 					}
@@ -592,7 +592,7 @@ crashlytics-build.properties
 					{
 						if (GUILayout.Button("保留选中文件"))
 						{
-							confirm = true;
+							Confirm = true;
 							Close();
 						}
 					}
@@ -601,7 +601,7 @@ crashlytics-build.properties
 					{
 						if (GUILayout.Button("还原"))
 						{
-							confirm = true;
+							Confirm = true;
 							Close();
 						}
 					}
