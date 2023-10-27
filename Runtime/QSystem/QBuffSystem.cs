@@ -8,20 +8,6 @@ namespace QTool
 {
 	public abstract class QEffectData<T> : QDataList<T> where T : QEffectData<T>, IKey<string>, new()
 	{
-		[QName]
-		public override string Key
-		{
-			get => base.Key; set
-			{
-#if UNITY_EDITOR
-				if (!Application.isPlaying && value != base.Key && !base.Key.IsNull() && !base.Key.IsNull())
-				{
-					UnityEditor.AssetDatabase.RenameAsset(GetAssetPath(base.Key), GetAssetPath(value));
-				}
-#endif
-				base.Key = value;
-			}
-		}
 		private string GetAssetPath(string key)
 		{
 			return "Assets/Resources/" + nameof(QFlowGraph) + "/" + typeof(T).Name + "/" + key + ".asset";
