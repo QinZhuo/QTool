@@ -93,12 +93,12 @@ namespace QTool
 		}
 		public static float Range(this Random random, float min, float max)
 		{
-			if (random == null) return UnityEngine.Random.Range(min, max);
+			if (random == null) random = Instance;
 			return (float)random.NextDouble() * (max - min) + min;
 		}
 		public static int Range(this Random random, int min, int max)
 		{
-			if (random == null) return UnityEngine.Random.Range(min, max);
+			if (random == null) random = Instance;
 			return random.Next(min, max);
 		}
 		public static Vector2 Vector2(this Random random, float range = 1, float centerOffset = 0)
