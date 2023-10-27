@@ -315,7 +315,7 @@ namespace QTool.Test
 		{
 			RunTest().Start(Ielist);
 			RunTest().Start(Ielist);
-			Ielist.WaitAllOver().OnCallBack(() => Debug.LogError("AllOver")).Start();
+			Ielist.WaitCountZero().OnCallBack(() => Debug.LogError("AllOver")).Start();
 			
 		}
 		[QName("协程停止测试")]

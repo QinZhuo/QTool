@@ -26,21 +26,9 @@ namespace QTool
 				yield return null;
 			}
 		}
-		public static IEnumerator WaitAllOver(this IList<IEnumerator> enumerators)
+		public static IEnumerator WaitCountZero<T>(this IList<T> List)
 		{
-			yield return Wait(() =>
-			{
-				bool AllOver = true;
-				foreach (var item in enumerators)
-				{
-					if (item.IsRunning())
-					{
-						AllOver = false;
-						break;
-					}
-				}
-				return AllOver;
-			});
+			yield return Wait(() => List.Count == 0);
 		}
 		public static IEnumerator Start(this IEnumerator enumerator)
 		{
