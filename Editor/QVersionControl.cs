@@ -187,6 +187,7 @@ namespace QTool
 						{
 							if ("A".Equals(info.state))
 							{
+								Debug.LogError("删除" + info.path);
 								File.Delete(info.path);
 							}
 							else
