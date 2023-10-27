@@ -140,13 +140,6 @@ namespace QTool
 		public int Count => Queue.Count;
 		public bool IsRunning => Count > 0;
 		public T Current => IsRunning ? Queue.Peek() : default;
-		public void Dequeue(T value)
-		{
-			if (value.Equals(Current))
-			{
-				Queue.Dequeue();
-			}
-		}
 		public QCoroutineQueue(Func<T, IEnumerator> action)
 		{
 			this.action = action;
@@ -155,7 +148,11 @@ namespace QTool
 		{
 			action(value).OnCallBack(() =>
 			{
-				Dequeue(value);
+				Debug.LogError(" 结束 " + value);
+				if (value.Equals(Current))
+				{
+					Queue.Dequeue();
+				}
 				if (Queue.Count > 0)
 				{
 					Run(Queue.Peek());
