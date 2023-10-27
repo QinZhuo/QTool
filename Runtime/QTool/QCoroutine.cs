@@ -146,9 +146,10 @@ namespace QTool
 		}
 		private void Run(T value)
 		{
+			QDebug.LogError(" 开始 " + value);
 			action(value).OnCallBack(() =>
 			{
-				Debug.LogError(" 结束 " + value);
+				QDebug.LogError(" 结束 " + value);
 				if (value.Equals(Current))
 				{
 					Queue.Dequeue();
