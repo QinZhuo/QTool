@@ -185,15 +185,7 @@ namespace QTool
 					{
 						if (!info.select)
 						{
-							if ("A".Equals(info.state))
-							{
-								Debug.LogError("删除" + info.path);
-								File.Delete(info.path);
-							}
-							else
-							{
-								Debug.LogError("放弃本地更改 " + info + " " + (Checkout(info.path, path)));
-							}
+							Debug.LogError("放弃本地更改 " + info + " " + (Checkout(info.path, path)));
 						}
 						else
 						{
