@@ -12,6 +12,10 @@ namespace QTool
 		public void InvokeLoad(string key)
 		{
 			var obj = Load(key);
+			if (obj == null)
+			{
+				obj = Load(DirectoryPath);
+			}
 			if (obj != null)
 			{
 				OnLoad?.Invoke(obj);
@@ -20,6 +24,10 @@ namespace QTool
 		public async void InvokeLoadAsync(string key)
 		{
 			var obj = await LoadAsync(key);
+			if (obj == null)
+			{
+				obj = await LoadAsync(DirectoryPath);
+			}
 			if (obj != null)
 			{
 				OnLoad?.Invoke(obj);
@@ -46,7 +54,7 @@ namespace QTool
 		{
 			if (key.IsNull()) return null;
 			key = key.Replace('\\', '/');
-			return await Resources.LoadAsync<TObj>(DirectoryPath + "/" + key) as TObj;
+			return await Resources.LoadAsync<TObj>(DirectoryPath + "/" + key) as TObj; 
 		}
 	}
 	public abstract class QPrefabLoader<TPath> : QAssetLoader<TPath, GameObject> where TPath : QPrefabLoader<TPath>
