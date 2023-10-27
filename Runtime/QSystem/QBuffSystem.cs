@@ -35,7 +35,7 @@ namespace QTool
 	public abstract class QBuffData<T> : QEffectData<T> where T : QBuffData<T>, IKey<string>, new()
 	{
 		[QName("最大层数")]
-		public int MaxCount { get; protected set; } = 1;
+		public int MaxCount { get; protected set; } = -1;
 		[QName("时间事件")]
 		public float TimeEvent { get; protected set; } = 0;
 		public class Runtime : QRuntime<Runtime, T>
