@@ -7,6 +7,7 @@ namespace QTool
 {
 	public abstract class QRuntime<RuntimeT, DataT> : IKey<string>, IQPoolObject where RuntimeT : QRuntime<RuntimeT, DataT>, new() where DataT : QDataList<DataT>, new()
 	{
+		[QName]
 		public virtual string Key { get; set; }
 		public override string ToString()
 		{
