@@ -44,7 +44,12 @@ namespace QTool.Net
 			transport.DebugUI();
 			if (DebugInfoLabel == null)
 			{
-				DebugInfoLabel = QToolManager.Instance.RootVisualElement.AddLabel(nameof(DebugInfoLabel));
+				DebugInfoLabel = QToolManager.Instance.RootVisualElement.AddVisualElement().SetBackground().IgnoreClick().AddLabel(nameof(DebugInfoLabel));
+				DebugInfoLabel.style.color = Color.white;
+				DebugInfoLabel.pickingMode = UnityEngine.UIElements.PickingMode.Ignore;
+				DebugInfoLabel.style.position = UnityEngine.UIElements.Position.Absolute;
+				DebugInfoLabel.style.width = new UnityEngine.UIElements.Length(100, UnityEngine.UIElements.LengthUnit.Percent);
+				DebugInfoLabel.style.textShadow = new UnityEngine.UIElements.TextShadow { offset = Vector2.one, color = Color.black, blurRadius = 1 };
 			}
 			DebugInfoLabel.text = info;
 #else
