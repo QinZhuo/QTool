@@ -112,9 +112,9 @@ namespace QTool.Net
 			base.ClientDisconnect();
 		}
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
-		private Vector2 ScrollPosition = Vector2.zero;
 		protected UnityEngine.UIElements.ListView RoomListView = null;
-		private async void FreshRoomList()
+		protected UnityEngine.UIElements.Button FreshButton = null;
+		private async void FreshList()
 		{
 			await QSteam.FreshLobbys();
 #if UNITY_2021_1_OR_NEWER
@@ -127,51 +127,18 @@ namespace QTool.Net
 #if UNITY_2021_1_OR_NEWER
 			if (RoomListView == null)
 			{
+				FreshButton= QToolManager.Instance.RootVisualElement.AddButton("刷新列表", FreshList);
 				RoomListView = QToolManager.Instance.RootVisualElement.AddListView(QSteam.LobbyList, (visual,index) =>
 				{
 					var lobby = QSteam.LobbyList[index];
 					visual.AddButton("加入 "+lobby.ToString(), () => GetComponent<QNetManager>().StartClient(lobby.SteamID.ToString()));
 				});
 				RoomListView.fixedItemHeight = 40;
-				FreshRoomList();
+				FreshList();
 			}
+			FreshButton.visible = !ClientConnected;
 			RoomListView.visible = !ClientConnected;
 #endif
-			//if (ServerActive)
-			//{
-			//	QGUI.LabelField("房间",QSteam.CurrentLobby.ToString());
-			//}
-			//else
-			//{
-			//	if (QGUI.Button("创建房间",200))
-			//	{
-			//		GetComponent<QNetManager>().StartHost();
-			//	}
-			//}
-			//if (!ClientConnected)
-			//{
-			//	if (QSteam.CurrentLobby.IsNull())
-			//	{
-			//		if (QSteam.LobbyList.Count > 0)
-			//		{
-			//			using (var scroll = new GUILayout.ScrollViewScope(ScrollPosition, true, false, GUILayout.Width(200)))
-			//			{
-			//				foreach (var lobby in QSteam.LobbyList)
-			//				{
-			//					if (GUILayout.Button(lobby.ToString(), GUILayout.Width(175), GUILayout.Height(40)))
-			//					{
-			//						GetComponent<QNetManager>().StartClient(lobby.SteamID.ToString());
-			//					}
-			//				}
-			//				ScrollPosition = scroll.scrollPosition;
-			//			}
-			//		}
-			//		if (GUILayout.Button("刷新房间", GUILayout.Width(200), GUILayout.Height(30)))
-			//		{
-			//			_ = QSteam.FreshLobbys();
-			//		}
-			//	}
-			//}
 		}
 #endif
 	}
