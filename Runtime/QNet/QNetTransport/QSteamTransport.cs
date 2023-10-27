@@ -22,7 +22,6 @@ namespace QTool.Net
 			base.Awake();
 			var id = QSteam.Id;
 			SteamNetworkingUtils.InitRelayNetworkAccess();
-			_ = QSteam.FreshLobbys();
 		}
 		public override void ServerStart()
 		{
@@ -114,8 +113,30 @@ namespace QTool.Net
 		}
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
 		private Vector2 ScrollPosition = Vector2.zero;
+		protected UnityEngine.UIElements.ListView RoomListView = null;
+		private async void FreshRoomList()
+		{
+			await QSteam.FreshLobbys();
+#if UNITY_2021_1_OR_NEWER
+			RoomListView.Rebuild();
+#endif
+		}
 		public override void DebugUI()
 		{
+			base.DebugUI();
+#if UNITY_2021_1_OR_NEWER
+			if (RoomListView == null)
+			{
+				RoomListView = QToolManager.Instance.RootVisualElement.AddListView(QSteam.LobbyList, (visual,index) =>
+				{
+					var lobby = QSteam.LobbyList[index];
+					visual.AddButton("加入 "+lobby.ToString(), () => GetComponent<QNetManager>().StartClient(lobby.SteamID.ToString()));
+				});
+				RoomListView.fixedItemHeight = 40;
+				FreshRoomList();
+			}
+			RoomListView.visible = !ClientConnected;
+#endif
 			//if (ServerActive)
 			//{
 			//	QGUI.LabelField("房间",QSteam.CurrentLobby.ToString());

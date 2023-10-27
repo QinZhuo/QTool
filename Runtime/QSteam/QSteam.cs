@@ -356,7 +356,7 @@ namespace QTool
 			var matchList = await SteamMatchmaking.RequestLobbyList().GetResult<LobbyMatchList_t>();
 			if (!Application.isPlaying) return null;
             LobbyList.Clear();
-			QDebug.Log(nameof(QSteam) + " 刷新房间结束");
+		
             for (int i = 0; i < matchList.m_nLobbiesMatching; i++)
             {
                 var id = SteamMatchmaking.GetLobbyByIndex(i);
@@ -365,7 +365,8 @@ namespace QTool
                 LobbyList.Add(lobby);
 				QDebug.Log(nameof(QSteam) + " 房间信息 "+lobby);
 			}
-            return LobbyList;
+			QDebug.Log(nameof(QSteam) + " 刷新房间结束 " + LobbyList.Count);
+			return LobbyList;
         }
 		public struct QLobbyMember:IKey<CSteamID>
 		{
