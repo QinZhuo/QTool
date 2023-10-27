@@ -340,18 +340,17 @@ namespace QTool
             }
 			QDebug.Log(nameof(QSteam)+" 房间信息更新 " + lobby.ToDetailString());
 		}
-        public static async Task<List<QLobby>> FreshLobbys(string key,string value)
-        {
-			QDebug.Log(nameof(QSteam)+ " 过滤房间列表[" + key + ":" + value + "]");
-            SteamMatchmaking.AddRequestLobbyListStringFilter(key, value, ELobbyComparison.k_ELobbyComparisonEqual);
-            return await FreshLobbys();
-        }
+		public static void AddLobbyFilter(string key, string value, ELobbyComparison comparison = ELobbyComparison.k_ELobbyComparisonEqual)
+		{
+			QDebug.Log(nameof(QSteam) + " 过滤房间列表[" + key + ":" + value + "]");
+			SteamMatchmaking.AddRequestLobbyListStringFilter(key, value, comparison);
+		}
         public static async Task<List<QLobby>> FreshLobbys()
 		{
-			SteamMatchmaking.AddRequestLobbyListStringFilter(nameof(Application.productName), Application.productName, ELobbyComparison.k_ELobbyComparisonEqual);
+			AddLobbyFilter(nameof(Application.productName), Application.productName, ELobbyComparison.k_ELobbyComparisonEqual);
 			if (!Application.isEditor)
 			{
-				SteamMatchmaking.AddRequestLobbyListStringFilter(nameof(Application.version), Application.version, ELobbyComparison.k_ELobbyComparisonEqual);
+				AddLobbyFilter(nameof(Application.version), Application.version, ELobbyComparison.k_ELobbyComparisonEqual);
 			}
 			var matchList = await SteamMatchmaking.RequestLobbyList().GetResult<LobbyMatchList_t>();
 			if (!Application.isPlaying) return null;
