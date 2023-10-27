@@ -347,7 +347,7 @@ namespace QTool
 		}
         public static async Task<List<QLobby>> FreshLobbys()
 		{
-			AddLobbyFilter(nameof(Application.productName), Application.productName, ELobbyComparison.k_ELobbyComparisonEqual);
+			AddLobbyFilter(nameof(Application.productName), Application.productName, ELobbyComparison.k_ELobbyComparisonEqual); 
 			if (!Application.isEditor)
 			{
 				AddLobbyFilter(nameof(Application.version), Application.version, ELobbyComparison.k_ELobbyComparisonEqual);
@@ -375,6 +375,10 @@ namespace QTool
 			public T GetData<T>(string key)
 			{
 				return SteamID.GetLobbyMemberData<T>(key);
+			}
+			public override string ToString()
+			{
+				return SteamID.GetName() + " " + SteamID;
 			}
 		}
 		public struct QLobby
@@ -429,7 +433,8 @@ namespace QTool
 			public string ToDetailString()
 			{
 				var dataStr= ToString();
-				dataStr += Data.ToOneString(" ");
+				dataStr += Data.ToOneString(" ") + "\n";
+				dataStr += Members.ToOneString(" ");
 				return dataStr;
 			}
 		}
