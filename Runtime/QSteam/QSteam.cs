@@ -159,7 +159,7 @@ namespace QTool
 		{
 			GCHandle pinnedArray = GCHandle.Alloc(data, GCHandleType.Pinned);
 			IntPtr pData = pinnedArray.AddrOfPinnedObject();
-			EResult res = SteamNetworkingSockets.SendMessageToConnection(conn, pData, (uint)data.Length, Constants.k_nSteamNetworkingSend_Reliable, out long _);
+			EResult res = SteamNetworkingSockets.SendMessageToConnection(conn, pData, (uint)data.Length, Constants.k_nSteamNetworkingSend_ReliableNoNagle, out long _);
 			if (res != EResult.k_EResultOK)
 			{
 				Debug.LogWarning(nameof(QSteam)+ " 向[" + conn + "]发送消息失败 "+res);
