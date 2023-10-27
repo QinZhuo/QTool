@@ -344,6 +344,7 @@ namespace QTool.Net
 			try
 			{
 				await QSteam.JoinLobby(new CSteamID(UInt64.Parse(host)));
+				await QTask.Wait(1, true);
 				SteamNetworkingIdentity netId = new SteamNetworkingIdentity();
 				netId.SetSteamID(QSteam.CurrentLobby.Owner);
 				HostConnection = SteamNetworkingSockets.ConnectP2P(ref netId, 0, 0, new SteamNetworkingConfigValue_t[0]);
