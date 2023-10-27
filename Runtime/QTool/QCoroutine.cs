@@ -42,18 +42,19 @@ namespace QTool
 				return AllOver;
 			});
 		}
-		public static void Start(this IEnumerator enumerator)
+		public static IEnumerator Start(this IEnumerator enumerator)
 		{
 			if (UpdateIEnumerator(enumerator))
 			{
 				AddList.Add(enumerator);
 			}
+			return enumerator;
 		}
-		public static void Start(this IEnumerator enumerator, List<IEnumerator> coroutineList)
+		public static IEnumerator Start(this IEnumerator enumerator, List<IEnumerator> coroutineList)
 		{
 			var ie = enumerator.OnCallBack(() => coroutineList.Remove(enumerator));
 			coroutineList.Add(ie);
-			ie.Start();
+			return ie.Start();
 		}
 		public static IEnumerator OnCallBack(this IEnumerator enumerator,Action callBack)
 		{
