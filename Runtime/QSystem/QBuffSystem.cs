@@ -6,13 +6,6 @@ using QTool.FlowGraph;
 
 namespace QTool
 {
-	public enum QBuffMergeMode
-	{
-		唯一 = 0,
-		时间 = 1 << 1,
-		叠层 = 1 << 2,
-		时间叠层 = 时间 | 叠层,
-	}
 	public abstract class QEffectData<T> : QDataList<T> where T : QEffectData<T>, IKey<string>, new()
 	{
 		[QIgnore]
@@ -41,8 +34,8 @@ namespace QTool
 	}
 	public abstract class QBuffData<T> : QEffectData<T> where T : QBuffData<T>, IKey<string>, new()
 	{
-		[QName("叠加方式")]
-		public QBuffMergeMode Megre { get; protected set; } = QBuffMergeMode.时间叠层;
+		[QName("最大层数")]
+		public int MaxCount { get; protected set; } = 1;
 		[QName("时间事件")]
 		public float TimeEvent { get; protected set; } = 0;
 		public class Runtime : QRuntime<Runtime, T>
@@ -126,11 +119,8 @@ namespace QTool
 			if (!Buffs.ContainsKey(key))
 			{
 				var buff = QBuffData<BuffData>.Runtime.Get(key);
-				if (buff.Data.Megre.HasFlag(QBuffMergeMode.时间))
-				{
-					buff.Time.BaseValue = time;
-					buff.Time.CurrentValue = buff.Time.MaxValue;
-				}
+				buff.Time.BaseValue = time;
+				buff.Time.CurrentValue = buff.Time.MaxValue;
 				buff.Count.BaseValue = count;
 				StartBuff(buff);
 				for (int i = 0; i < count; i++)
@@ -142,18 +132,25 @@ namespace QTool
 			else
 			{
 				var buff = Buffs[key];
-				if (buff.Data.Megre.HasFlag(QBuffMergeMode.叠层))
-				{
-					buff.Count.BaseValue += count;
-					var oldValue = buff.Time.BaseValue;
-					buff.Time.BaseValue = Mathf.Max(buff.Time.BaseValue, time);
-					buff.Time.CurrentValue += buff.Time.BaseValue - oldValue;
-				}
-				else
+				if (buff.Data.MaxCount == 1)
 				{
 					buff.Time.BaseValue += time;
 					buff.Time.CurrentValue += time;
 					buff.Count.BaseValue = 1;
+				}
+				else
+				{
+					if (buff.Data.MaxCount > 0)
+					{
+						buff.Count.BaseValue = Mathf.Min(buff.Count.BaseValue + count, buff.Data.MaxCount);
+					}
+					else
+					{
+						buff.Count.BaseValue += count;
+					}
+					var oldValue = buff.Time.BaseValue;
+					buff.Time.BaseValue = Mathf.Max(buff.Time.BaseValue, time);
+					buff.Time.CurrentValue += buff.Time.BaseValue - oldValue;
 				}
 				for (int i = 0; i < count; i++)
 				{
@@ -166,19 +163,19 @@ namespace QTool
 			if (Buffs.ContainsKey(key))
 			{
 				var buff = Buffs[key];
-				if (buff.Data.Megre.HasFlag(QBuffMergeMode.叠层))
+				if (buff.Data.MaxCount == 1)
+				{
+					StopBuff(buff);
+					buff.Count.BaseValue = 0;
+					count = 1;
+				}
+				else
 				{
 					buff.Count.BaseValue -= count;
 					if (buff.Count.BaseValue <= 0)
 					{
 						StopBuff(buff);
 					}
-				}
-				else
-				{
-					StopBuff(buff);
-					buff.Count.BaseValue = 0;
-					count = 1;
 				}
 				for (int i = 0; i < count; i++)
 				{
@@ -224,7 +221,7 @@ namespace QTool
 			foreach (var kv in Buffs)
 			{
 				var buff = kv.Value;
-				if (buff.Data.Megre.HasFlag(QBuffMergeMode.时间))
+				if (buff.Time.Value > 0)
 				{
 					buff.Time.CurrentValue -= deltaTime;
 					if (buff.Time.CurrentValue <= 0)
@@ -256,7 +253,7 @@ namespace QTool
 			if (buff.Graph != null)
 			{
 				buff.InvokeEvent(AddEventKey);
-				if (buff.Data.Megre.HasFlag(QBuffMergeMode.叠层))
+				if (buff.Data.MaxCount != 1)
 				{
 					foreach (var node in buff.Graph.StartNode)
 					{
@@ -274,7 +271,7 @@ namespace QTool
 			if (buff.Graph != null)
 			{
 				buff.InvokeEvent(RemoveEventKey);
-				if (buff.Data.Megre.HasFlag(QBuffMergeMode.叠层))
+				if (buff.Data.MaxCount != 1)
 				{
 					foreach (var node in buff.Graph.StartNode)
 					{
