@@ -206,11 +206,15 @@ namespace QTool.Net
 					SteamNetworkingSockets.CloseConnection(param.m_hConn, 0, "主机无法自连接", false);
 					return;
 				}
-				else if (!QSteam.CurrentLobby.Members.ContainsKey(clientSteamID))
+				else
 				{
-					Debug.LogError(nameof(QSteamServer) + " 非房间内玩家[" + clientSteamID.GetName() + "]无法连接");
-					SteamNetworkingSockets.CloseConnection(param.m_hConn, 0, "非房间内玩家", false);
-					return;
+					QSteam.UpdateLobby();
+					if (!QSteam.CurrentLobby.Members.ContainsKey(clientSteamID))
+					{
+						Debug.LogError(nameof(QSteamServer) + " 非房间内玩家[" + clientSteamID.GetName() + "][" + clientSteamID + "]无法连接");
+						SteamNetworkingSockets.CloseConnection(param.m_hConn, 0, "非房间内玩家", false);
+						return;
+					}
 				}
 				QDebug.Log(nameof(QSteamServer) + "[" + clientSteamID.GetName() + "]尝试连接");
 				EResult res;
@@ -344,7 +348,6 @@ namespace QTool.Net
 			try
 			{
 				await QSteam.JoinLobby(new CSteamID(UInt64.Parse(host)));
-				await QTask.Wait(1, true);
 				SteamNetworkingIdentity netId = new SteamNetworkingIdentity();
 				netId.SetSteamID(QSteam.CurrentLobby.Owner);
 				HostConnection = SteamNetworkingSockets.ConnectP2P(ref netId, 0, 0, new SteamNetworkingConfigValue_t[0]);

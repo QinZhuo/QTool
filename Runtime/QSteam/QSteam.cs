@@ -314,6 +314,13 @@ namespace QTool
 				Debug.LogError(nameof(QSteam) + " 创建房间出错" + create.m_eResult);
 			}
 		}
+		public static void UpdateLobby()
+		{
+			if (!_CurrentLobby.IsNull())
+			{
+				UpdateLobby(_CurrentLobby.SteamID, ref _CurrentLobby);
+			}
+		}
         public static void UpdateLobby(CSteamID id, ref QLobby lobby)
         {
             lobby.SteamID = id;
