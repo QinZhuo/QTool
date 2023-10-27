@@ -40,7 +40,8 @@ namespace QTool
 		}
 		public static IEnumerator Start(this IEnumerator enumerator, List<IEnumerator> coroutineList)
 		{
-			var ie = enumerator.OnCallBack(() => coroutineList.Remove(enumerator));
+			IEnumerator ie = null;
+			ie = enumerator.OnCallBack(() => coroutineList.Remove(ie));
 			coroutineList.Add(ie);
 			return ie.Start();
 		}
