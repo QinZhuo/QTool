@@ -155,7 +155,7 @@ namespace QTool
 		}
 #endregion
 #region 网络通信
-		public static EResult Send(this HSteamNetConnection conn, byte[] data)
+		public static EResult SendMessage(this HSteamNetConnection conn, byte[] data)
 		{
 			GCHandle pinnedArray = GCHandle.Alloc(data, GCHandleType.Pinned);
 			IntPtr pData = pinnedArray.AddrOfPinnedObject();

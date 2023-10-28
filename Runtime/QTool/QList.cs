@@ -251,9 +251,9 @@ namespace QTool
 			AutoCreate = () => new QKeyValue<TKey, T>();
 		}
 	}
-	public class QDictionary<TKey, T> : Dictionary<TKey, T>
+	public class QDictionary<TKey, TValue> : Dictionary<TKey, TValue>
 	{
-		public new T this[TKey key]
+		public new TValue this[TKey key]
 		{
 			get
 			{
@@ -264,12 +264,12 @@ namespace QTool
 				Add(key, value);
 			}
 		}
-		protected Func<TKey, T> AutoCreate = null;
+		protected Func<TKey, TValue> AutoCreate = null;
 		internal Action<TKey> OnChange = null;
 		public QDictionary()
 		{
 		}
-		public new void Add(TKey key, T value)
+		public new void Add(TKey key, TValue value)
 		{
 			this.Set(key, value);
 			OnChange?.Invoke(key);
@@ -280,7 +280,7 @@ namespace QTool
 			OnChange?.Invoke(key);
 		}
 
-		public T Get(TKey key)
+		public TValue Get(TKey key)
 		{
 			if (key == null) return default;
 			if (!ContainsKey(key))
@@ -296,9 +296,58 @@ namespace QTool
 			}
 			return base[key];
 		}
-		public QDictionary(Func<TKey, T> AutoCreate)
+		public QDictionary(Func<TKey, TValue> AutoCreate)
 		{
 			this.AutoCreate = AutoCreate;
+		}
+	}
+	public class QConnectQDictionary<TKey,TValue>:IEnumerable
+	{
+		public QDictionary<TKey, TValue> KeyToValue = new QDictionary<TKey, TValue>();
+		public QDictionary<TValue, TKey> ValueToKey = new QDictionary<TValue, TKey>();
+		public int Count => KeyToValue.Count;
+		public IEnumerator GetEnumerator() => KeyToValue.GetEnumerator();
+		public bool Contains(TKey key) => KeyToValue.ContainsKey(key);
+		public bool Contains(TValue value) => ValueToKey.ContainsKey(value);
+		public TValue this[TKey key]
+		{
+			get
+			{
+				return KeyToValue[key];
+			}
+		}
+		public TKey this[TValue value]
+		{
+			get
+			{
+				return ValueToKey[value];
+			}
+		}
+		
+		public void Add(TKey key,TValue value)
+		{
+			Remove(key);
+			KeyToValue[key] = value;
+			ValueToKey[value] = key;
+		}
+		public void Add(TValue value, TKey key)
+		{
+			Add(key, value);
+		}
+		public void Remove(TKey key)
+		{
+			if (KeyToValue.ContainsKey(key))
+			{
+				ValueToKey.Remove(KeyToValue[key]);
+				KeyToValue.Remove(key);
+			}
+		}
+		public void Remove(TValue value)
+		{
+			if (ValueToKey.ContainsKey(value))
+			{
+				Remove(ValueToKey[value]);
+			}
 		}
 	}
 
