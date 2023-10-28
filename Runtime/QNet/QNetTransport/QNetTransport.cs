@@ -27,7 +27,7 @@ namespace QTool.Net
 		/// <summary>
 		/// 服务器接收消息时事件
 		/// </summary>
-		public Action<int, ArraySegment<byte>> OnServerDataReceived;
+		public Action<int, byte[]> OnServerDataReceived;
 		/// <summary>
 		/// 服务器错误事件
 		/// </summary>
@@ -158,7 +158,7 @@ namespace QTool.Net
 		{
 			if (ServerActive)
 			{
-				OnServerDataReceived(0, new ArraySegment<byte>(segment));
+				OnServerDataReceived(0, segment);
 			}
 			else
 			{

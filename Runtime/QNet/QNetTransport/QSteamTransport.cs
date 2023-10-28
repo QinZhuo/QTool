@@ -17,6 +17,7 @@ namespace QTool.Net
 		public const int MAX_MESSAGES = 256;
 		QSteamServer Server { get; set; }
 		public int maxConnections = 10;
+		public bool UseP2P = true;
 		protected override void Awake()
 		{
 			base.Awake();
@@ -27,7 +28,7 @@ namespace QTool.Net
 		{
 			if (!ServerActive)
 			{
-				Server = new QSteamServer();
+				Server = new QSteamServer(UseP2P);
 				Server.OnConnected += OnServerConnected;
 				Server.OnDisconnected += OnServerDisconnected;
 				Server.OnReceivedData += OnServerDataReceived;
@@ -86,7 +87,7 @@ namespace QTool.Net
 		}
 		protected override void ClientConnect(string address)
 		{
-			Client = new QSteamClient();
+			Client = new QSteamClient(UseP2P);
 			Client.OnConnected += OnClientConnected;
 			Client.OnDisconnected += OnClientDisconnected;
 			Client.OnReceivedData += OnClientDataReceived;
@@ -142,24 +143,63 @@ namespace QTool.Net
 		}
 #endif
 	}
+	public abstract class QSteamNetBase
+	{
+		public bool UseP2P { get; protected set; }
+		protected Callback<P2PSessionRequest_t> OnP2PRequest = null;
+		protected Callback<P2PSessionConnectFail_t> OnP2PFail = null;
+		public enum P2PMessage:byte
+		{
+			Connect,
+			Accept,
+			DisConnect
+		}
+		public QSteamNetBase(bool UseP2P)
+		{
+			this.UseP2P = UseP2P;
+			OnP2PRequest = Callback<P2PSessionRequest_t>.Create(OnP2PConnect);
+			OnP2PFail = Callback<P2PSessionConnectFail_t>.Create(OnP2PConnectFail);
+		}
+		protected virtual void OnP2PConnect(P2PSessionRequest_t result)
+		{
+			SteamNetworking.AcceptP2PSessionWithUser(result.m_steamIDRemote);
+		}
+		protected virtual void OnP2PConnectFail(P2PSessionConnectFail_t result)
+		{
+			SteamNetworking.CloseP2PSessionWithUser(result.m_steamIDRemote);
+			switch (result.m_eP2PSessionError)
+			{
+				case 1:
+					Debug.LogError("Connection failed: The target user is not running the same game.");
+					break;
+				case 2:
+					Debug.LogError("Connection failed: The local user doesn't own the app that is running.");
+					break;
+				case 3:
+					Debug.LogError("Connection failed: Target user isn't connected to Steam.");
+					break;
+				case 4:
+					Debug.LogError("Connection failed: The connection timed out because the target user didn't respond.");
+					break;
+				default:
+					Debug.LogError("Connection failed: Unknown error.");
+					break;
+			}
+		}
 
-	public class QSteamServer
+	}
+	public class QSteamServer: QSteamNetBase
 	{
 		internal event Action<int> OnConnected;
-		internal event Action<int, ArraySegment<byte>> OnReceivedData;
+		internal event Action<int, byte[]> OnReceivedData;
 		internal event Action<int> OnDisconnected;
 		internal event Action<int, Exception> OnError;
-		public Dictionary<HSteamNetConnection, CSteamID> ConnectClients = new Dictionary<HSteamNetConnection, CSteamID>();
 
-		private HSteamListenSocket listenSocket;
-
-		private Callback<SteamNetConnectionStatusChangedCallback_t> c_onConnectionChange = null;
-		public bool UseP2P { get; private set; }
-		internal QSteamServer(bool UseP2P = false)
+		#region CS
+		internal QSteamServer(bool UseP2P):base(UseP2P)
 		{
 			QSteam.CreateLobby();
-			this.UseP2P = UseP2P;
-			if (UseP2P)
+			if (this.UseP2P)
 			{
 				try
 				{
@@ -176,6 +216,9 @@ namespace QTool.Net
 				listenSocket = SteamNetworkingSockets.CreateListenSocketP2P(0, 0, new SteamNetworkingConfigValue_t[0]);
 			}
 		}
+		public Dictionary<HSteamNetConnection, CSteamID> ConnectClients = new Dictionary<HSteamNetConnection, CSteamID>();
+		private HSteamListenSocket listenSocket;
+		private Callback<SteamNetConnectionStatusChangedCallback_t> c_onConnectionChange = null;
 
 		private void OnConnectionStatusChanged(SteamNetConnectionStatusChangedCallback_t param)
 		{
@@ -227,7 +270,7 @@ namespace QTool.Net
 				QDebug.Log(nameof(QSteamServer) + " " + clientSteamID.GetName() + " 连接状态更改 " + param.m_info.m_eState);
 			}
 		}
-
+		#endregion
 		private void InternalDisconnect(HSteamNetConnection socket)
 		{
 			if (ConnectClients.ContainsKey(socket))
@@ -241,17 +284,24 @@ namespace QTool.Net
 
 		public void Disconnect(int connectionId)
 		{
-			var connection = new HSteamNetConnection((uint)connectionId);
-			if (ConnectClients.ContainsKey(connection))
+			if (UseP2P)
 			{
-				QDebug.Log(nameof(QSteamServer) + " 断开[" + ConnectClients[connection].GetName() + "]连接");
-				SteamNetworkingSockets.CloseConnection(connection, 0, "服务器主动断开连接", false);
-				ConnectClients.Remove(connection);
-				OnDisconnected(connectionId);
+
 			}
 			else
 			{
-				QDebug.LogWarning(nameof(QSteamServer) + "尝试断开未知连接[" + connectionId + "]");
+				var connection = new HSteamNetConnection((uint)connectionId);
+				if (ConnectClients.ContainsKey(connection))
+				{
+					QDebug.Log(nameof(QSteamServer) + " 断开[" + ConnectClients[connection].GetName() + "]连接");
+					SteamNetworkingSockets.CloseConnection(connection, 0, "服务器主动断开连接", false);
+					ConnectClients.Remove(connection);
+					OnDisconnected(connectionId);
+				}
+				else
+				{
+					QDebug.LogWarning(nameof(QSteamServer) + "尝试断开未知连接[" + connectionId + "]");
+				}
 			}
 		}
 
@@ -274,6 +324,22 @@ namespace QTool.Net
 				{
 					var buffer = new byte[size];
 					SteamNetworking.ReadP2PPacket(buffer, size, out _, out var steamid);
+					if (buffer.Length == 1)
+					{
+						switch ((P2PMessage)buffer[0])
+						{
+							case P2PMessage.Connect:
+								OnConnected?.Invoke((int)steamid.m_SteamID);
+								Send((int)steamid.m_SteamID, new byte[] { (byte)P2PMessage.Accept });
+								return;
+							case P2PMessage.DisConnect:
+								OnDisconnected?.Invoke((int)steamid.m_SteamID);
+								return;
+							default:
+								break;
+						}
+					}
+					OnReceivedData((int)steamid.m_SteamID, buffer);
 				}
 			}
 			else
@@ -286,7 +352,7 @@ namespace QTool.Net
 					{
 						for (int i = 0; i < messageCount; i++)
 						{
-							OnReceivedData((int)conn.m_HSteamNetConnection, new ArraySegment<byte>(ptrs[i].ToBytes()));
+							OnReceivedData((int)conn.m_HSteamNetConnection, ptrs[i].ToBytes());
 						}
 					}
 				}
@@ -341,25 +407,35 @@ namespace QTool.Net
 			}
 		}
 	}
-	public class QSteamClient
+	public class QSteamClient: QSteamNetBase
 	{
 		public bool Connected { get; private set; }
-
-
+		private Callback<SteamNetConnectionStatusChangedCallback_t> c_onConnectionChange = null;
+		private HSteamNetConnection HostConnection;
+		private CSteamID hostId;
 		internal event Action<ArraySegment<byte>> OnReceivedData;
 		internal event Action OnConnected;
 		internal event Action OnDisconnected;
-		private Callback<SteamNetConnectionStatusChangedCallback_t> c_onConnectionChange = null;
-		private HSteamNetConnection HostConnection;
+		public QSteamClient(bool UseP2P) : base(UseP2P)
+		{
+		}
 		internal async void Connect(string host)
 		{
-			c_onConnectionChange = Callback<SteamNetConnectionStatusChangedCallback_t>.Create(OnConnectionStatusChanged);
 			try
 			{
-				await QSteam.JoinLobby(new CSteamID(UInt64.Parse(host)));
-				SteamNetworkingIdentity netId = new SteamNetworkingIdentity();
-				netId.SetSteamID(QSteam.CurrentLobby.Owner);
-				HostConnection = SteamNetworkingSockets.ConnectP2P(ref netId, 0, 0, new SteamNetworkingConfigValue_t[0]);
+				hostId = new CSteamID(ulong.Parse(host));
+				await QSteam.JoinLobby(hostId);
+				if (UseP2P)
+				{
+					Send(new byte[] { (byte)P2PMessage.Connect });
+				}
+				else
+				{
+					c_onConnectionChange = Callback<SteamNetConnectionStatusChangedCallback_t>.Create(OnConnectionStatusChanged);
+					SteamNetworkingIdentity netId = new SteamNetworkingIdentity();
+					netId.SetSteamID(QSteam.CurrentLobby.Owner);
+					HostConnection = SteamNetworkingSockets.ConnectP2P(ref netId, 0, 0, new SteamNetworkingConfigValue_t[0]);
+				}
 				QDebug.Log(nameof(QSteamClient) + " 尝试连接 " + QSteam.CurrentLobby.Owner.GetName());
 
 			}
@@ -398,20 +474,32 @@ namespace QTool.Net
 		{
 			QSteam.LeaveLobby();
 			Dispose();
-			if (HostConnection.m_HSteamNetConnection != 0)
+			if (UseP2P)
 			{
-				QDebug.Log(nameof(QSteamClient) + " 主动断开连接");
-				SteamNetworkingSockets.CloseConnection(HostConnection, 0, " 客户端主动断开连接 ", false);
-				HostConnection.m_HSteamNetConnection = 0;
+				Send(new byte[] { (byte)P2PMessage.DisConnect });
+				hostId = default;
 			}
+			else
+			{
+				if (HostConnection.m_HSteamNetConnection != 0)
+				{
+					QDebug.Log(nameof(QSteamClient) + " 主动断开连接");
+					SteamNetworkingSockets.CloseConnection(HostConnection, 0, " 客户端主动断开连接 ", false);
+					HostConnection.m_HSteamNetConnection = 0;
+				}
+			}
+		
 		}
 
 		protected void Dispose()
 		{
-			if (c_onConnectionChange != null)
+			if (!UseP2P)
 			{
-				c_onConnectionChange.Dispose();
-				c_onConnectionChange = null;
+				if (c_onConnectionChange != null)
+				{
+					c_onConnectionChange.Dispose();
+					c_onConnectionChange = null;
+				}
 			}
 		}
 
@@ -425,29 +513,51 @@ namespace QTool.Net
 
 		public void ReceiveData()
 		{
-			IntPtr[] ptrs = new IntPtr[QSteamTransport.MAX_MESSAGES];
-			int messageCount = 0;
-			while ((messageCount = SteamNetworkingSockets.ReceiveMessagesOnConnection(HostConnection, ptrs, QSteamTransport.MAX_MESSAGES)) > 0)
+			if (UseP2P)
 			{
-				for (int i = 0; i < messageCount; i++)
+				if (SteamNetworking.IsP2PPacketAvailable(out uint size))
 				{
-					OnReceivedData?.Invoke(new ArraySegment<byte>(ptrs[i].ToBytes()));
+					var buffer = new byte[size];
+					SteamNetworking.ReadP2PPacket(buffer, size, out _, out var steamid);
+					if (buffer.Length == 1 && (P2PMessage)buffer[0] == P2PMessage.Accept)
+					{
+						OnConnected?.Invoke();
+					}
+					OnReceivedData(buffer);
+				}
+			}
+			else
+			{
+				IntPtr[] ptrs = new IntPtr[QSteamTransport.MAX_MESSAGES];
+				int messageCount = 0;
+				while ((messageCount = SteamNetworkingSockets.ReceiveMessagesOnConnection(HostConnection, ptrs, QSteamTransport.MAX_MESSAGES)) > 0)
+				{
+					for (int i = 0; i < messageCount; i++)
+					{
+						OnReceivedData(new ArraySegment<byte>(ptrs[i].ToBytes()));
+					}
 				}
 			}
 		}
 
 		public void Send(byte[] data)
 		{
-			EResult res = HostConnection.SendMessage(data);
-
-			if (res == EResult.k_EResultNoConnection || res == EResult.k_EResultInvalidParam)
+			if (UseP2P)
 			{
-				Debug.LogError(nameof(QSteamClient) + " 服务器连接丢失");
-				InternalDisconnect();
+				SteamNetworking.SendP2PPacket(hostId, data, (uint)data.Length, EP2PSend.k_EP2PSendReliable);
 			}
-			else if (res != EResult.k_EResultOK)
+			else
 			{
-				Debug.LogError(nameof(QSteamClient) + " 发送消息失败 " + res);
+				var res = HostConnection.SendMessage(data);
+				if (res == EResult.k_EResultNoConnection || res == EResult.k_EResultInvalidParam)
+				{
+					Debug.LogError(nameof(QSteamClient) + " 服务器连接丢失");
+					InternalDisconnect();
+				}
+				else if (res != EResult.k_EResultOK)
+				{
+					Debug.LogError(nameof(QSteamClient) + " 发送消息失败 " + res);
+				}
 			}
 		}
 
@@ -457,7 +567,10 @@ namespace QTool.Net
 		}
 		public void FlushData()
 		{
-			SteamNetworkingSockets.FlushMessagesOnConnection(HostConnection);
+			if (!UseP2P)
+			{
+				SteamNetworkingSockets.FlushMessagesOnConnection(HostConnection);
+			}
 		}
 
 	}

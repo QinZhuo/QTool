@@ -63,7 +63,7 @@ namespace QTool.Net
             Server = NonAlloc
                 ? new KcpServerNonAlloc(
                       (connectionId) => OnServerConnected.Invoke(connectionId),
-                      (connectionId, message, channel) => OnServerDataReceived.Invoke(connectionId, message),
+                      (connectionId, message, channel) => OnServerDataReceived.Invoke(connectionId, message.ToArray()),
                       (connectionId) => OnServerDisconnected.Invoke(connectionId),
                       (connectionId, error, reason) => OnServerError.Invoke(connectionId, new Exception(reason)),
                       true,
@@ -78,7 +78,7 @@ namespace QTool.Net
                       MaximizeSendReceiveBuffersToOSLimit)
                 : new KcpServer(
                       (connectionId) => OnServerConnected.Invoke(connectionId),
-                      (connectionId, message, channel) => OnServerDataReceived.Invoke(connectionId, message),
+                      (connectionId, message, channel) => OnServerDataReceived.Invoke(connectionId, message.ToArray()),
                       (connectionId) => OnServerDisconnected.Invoke(connectionId),
                       (connectionId, error, reason) => OnServerError.Invoke(connectionId, new Exception(reason)),
                       true,

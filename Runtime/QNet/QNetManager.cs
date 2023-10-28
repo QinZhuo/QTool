@@ -220,7 +220,7 @@ namespace QTool.Net
 					writer.WriteObject(ServerIndex);
 					writer.WriteObject(ServerActionData);
 					var data = writer.ToArray();
-					foreach (var player in ServerConnects)
+					foreach (var player in ServerConnects.ToArray())
 					{
 						transport.CheckServerSend(player, data);
 					}
