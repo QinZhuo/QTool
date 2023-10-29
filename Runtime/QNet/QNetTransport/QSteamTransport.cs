@@ -328,6 +328,7 @@ namespace QTool.Net
 					Debug.LogError(steamid.GetName() + " 消息 "+size);
 					if (buffer.Length == 1)
 					{
+						Debug.LogError((P2PMessage)buffer[0]);
 						switch ((P2PMessage)buffer[0])
 						{
 							case P2PMessage.Connect:
@@ -522,9 +523,14 @@ namespace QTool.Net
 					var buffer = new byte[size];
 					SteamNetworking.ReadP2PPacket(buffer, size, out _, out var steamid);
 					Debug.LogError(steamid.GetName() + " 消息 " + size);
-					if (buffer.Length == 1 && (P2PMessage)buffer[0] == P2PMessage.Accept)
+					if (buffer.Length == 1)
 					{
-						OnConnected?.Invoke();
+						Debug.LogError((P2PMessage)buffer[0]);
+						if ((P2PMessage)buffer[0] == P2PMessage.Accept)
+						{
+							OnConnected?.Invoke();
+							return;
+						}
 					}
 					OnReceivedData(buffer);
 				}
@@ -533,7 +539,7 @@ namespace QTool.Net
 			{
 				IntPtr[] ptrs = new IntPtr[QSteamTransport.MAX_MESSAGES];
 				int messageCount = 0;
-				while ((messageCount = SteamNetworkingSockets.ReceiveMessagesOnConnection(HostConnection, ptrs, QSteamTransport.MAX_MESSAGES)) > 0)
+				if ((messageCount = SteamNetworkingSockets.ReceiveMessagesOnConnection(HostConnection, ptrs, QSteamTransport.MAX_MESSAGES)) > 0)
 				{
 					for (int i = 0; i < messageCount; i++)
 					{
