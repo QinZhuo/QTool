@@ -365,6 +365,7 @@ namespace QTool.Net
 		{
 			if (UseP2P)
 			{
+				Debug.LogError("发送" + connectionId + " " + new CSteamID((uint)connectionId).GetName() + " " + data.Length);
 				SteamNetworking.SendP2PPacket(new CSteamID((uint)connectionId), data, (uint)data.Length,EP2PSend.k_EP2PSendReliable);
 			}
 			else
