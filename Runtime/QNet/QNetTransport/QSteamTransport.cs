@@ -162,7 +162,7 @@ namespace QTool.Net
 		}
 		protected virtual void OnP2PConnect(P2PSessionRequest_t result)
 		{
-			Debug.LogError(result.m_steamIDRemote.GetName() + " 尝试连接 ");
+			Debug.LogError(result.m_steamIDRemote.GetName() + " 连接 ");
 			SteamNetworking.AcceptP2PSessionWithUser(result.m_steamIDRemote);
 		}
 		protected virtual void OnP2PConnectFail(P2PSessionConnectFail_t result)
@@ -325,6 +325,7 @@ namespace QTool.Net
 				{
 					var buffer = new byte[size];
 					SteamNetworking.ReadP2PPacket(buffer, size, out _, out var steamid);
+					Debug.LogError(steamid.GetName() + " 消息 "+size);
 					if (buffer.Length == 1)
 					{
 						switch ((P2PMessage)buffer[0])
@@ -520,6 +521,7 @@ namespace QTool.Net
 				{
 					var buffer = new byte[size];
 					SteamNetworking.ReadP2PPacket(buffer, size, out _, out var steamid);
+					Debug.LogError(steamid.GetName() + " 消息 " + size);
 					if (buffer.Length == 1 && (P2PMessage)buffer[0] == P2PMessage.Accept)
 					{
 						OnConnected?.Invoke();
