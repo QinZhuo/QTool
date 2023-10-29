@@ -21,24 +21,31 @@ namespace QTool.Net
 		protected override void Awake()
 		{
 			base.Awake();
-			SteamNetworkingUtils.InitRelayNetworkAccess();
 		}
 		public override async void ServerStart()
 		{
-			if (!ServerActive)
+			try
 			{
-				Server = new QSteamServer(UseP2P);
-				Server.OnConnected += OnServerConnected;
-				Server.OnDisconnected += OnServerDisconnected;
-				Server.OnReceivedData += OnServerDataReceived;
-				Server.OnError += OnServerError;
+				if (!ServerActive)
+				{
+					SteamNetworkingUtils.InitRelayNetworkAccess();
+					Server = new QSteamServer(UseP2P);
+					Server.OnConnected += OnServerConnected;
+					Server.OnDisconnected += OnServerDisconnected;
+					Server.OnReceivedData += OnServerDataReceived;
+					Server.OnError += OnServerError;
+				}
+				else
+				{
+					Debug.LogError("服务器已正在运行");
+				}
+				await QTask.Wait(() => !QSteam.CurrentLobby.IsNull());
+				base.ServerStart();
 			}
-			else
+			catch (Exception e)
 			{
-				Debug.LogError("服务器已正在运行");
+				throw new Exception("启动Steam服务器失败", e);
 			}
-			await QTask.Wait(() => !QSteam.CurrentLobby.IsNull());
-			base.ServerStart();
 		}
 		protected override void ServerSend(ulong connectionId, byte[] segment)
 		{
