@@ -21,6 +21,7 @@ namespace QTool.Net
 		protected override void Awake()
 		{
 			base.Awake();
+			SteamNetworkingUtils.InitRelayNetworkAccess();
 		}
 		public override async void ServerStart()
 		{
@@ -28,7 +29,6 @@ namespace QTool.Net
 			{
 				if (!ServerActive)
 				{
-					SteamNetworkingUtils.InitRelayNetworkAccess();
 					Server = new QSteamServer(UseP2P);
 					Server.OnConnected += OnServerConnected;
 					Server.OnDisconnected += OnServerDisconnected;
