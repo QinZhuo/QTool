@@ -425,8 +425,8 @@ namespace QTool.Net
 		{
 			try
 			{
-				hostId = new CSteamID(ulong.Parse(host));
-				await QSteam.JoinLobby(hostId);
+				await QSteam.JoinLobby(new CSteamID(ulong.Parse(host)));
+				hostId = new CSteamID(QSteam.CurrentLobby.Owner.m_SteamID);
 				if (UseP2P)
 				{
 					Send(new byte[] { (byte)P2PMessage.Connect });
