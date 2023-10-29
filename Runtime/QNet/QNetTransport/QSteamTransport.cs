@@ -287,7 +287,7 @@ namespace QTool.Net
 		{
 			if (UseP2P)
 			{
-
+				SteamNetworking.CloseP2PSessionWithUser(new CSteamID((uint)connectionId));
 			}
 			else
 			{
@@ -325,10 +325,9 @@ namespace QTool.Net
 				{
 					var buffer = new byte[size];
 					SteamNetworking.ReadP2PPacket(buffer, size, out _, out var steamid);
-					Debug.LogError(steamid.GetName() + " 消息 "+size);
 					if (buffer.Length == 1)
 					{
-						Debug.LogError((P2PMessage)buffer[0]);
+						Debug.LogError(steamid.GetName()+" "+(P2PMessage)buffer[0]);
 						switch ((P2PMessage)buffer[0])
 						{
 							case P2PMessage.Connect:
