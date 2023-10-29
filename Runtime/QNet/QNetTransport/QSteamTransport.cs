@@ -21,12 +21,12 @@ namespace QTool.Net
 		protected override void Awake()
 		{
 			base.Awake();
-			SteamNetworkingUtils.InitRelayNetworkAccess();
 		}
 		public override async void ServerStart()
 		{
 			try
 			{
+				SteamNetworkingUtils.InitRelayNetworkAccess();
 				if (!ServerActive)
 				{
 					Server = new QSteamServer(UseP2P);
@@ -94,11 +94,20 @@ namespace QTool.Net
 		}
 		protected override void ClientConnect(string address)
 		{
-			Client = new QSteamClient(UseP2P);
-			Client.OnConnected += OnClientConnected;
-			Client.OnDisconnected += OnClientDisconnected;
-			Client.OnReceivedData += OnClientDataReceived;
-			Client.Connect(address);
+			try
+			{
+				SteamNetworkingUtils.InitRelayNetworkAccess();
+				Client = new QSteamClient(UseP2P);
+				Client.OnConnected += OnClientConnected;
+				Client.OnDisconnected += OnClientDisconnected;
+				Client.OnReceivedData += OnClientDataReceived;
+				Client.Connect(address);
+			}
+			catch (Exception e)
+			{
+				throw new Exception("连接Steam服务器出错", e);
+			}
+			
 		}
 		protected override void ClientSend(byte[] segment)
 		{
