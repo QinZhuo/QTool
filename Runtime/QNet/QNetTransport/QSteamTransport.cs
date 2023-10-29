@@ -221,7 +221,12 @@ namespace QTool.Net
 		{
 			if (QSteam.CurrentLobby.Members.ContainsKey(result.m_steamIDRemote))
 			{
+				QDebug.Log("接受玩家[" + result.m_steamIDRemote.GetName() + "]P2P连接");
 				base.OnP2PConnect(result);
+			}
+			else
+			{
+				QDebug.LogError(result.m_steamIDRemote.GetName() + " P2P连接失败 房间内不存在该玩家 " + QSteam.CurrentLobby);
 			}
 		}
 		public Dictionary<HSteamNetConnection, CSteamID> ConnectClients = new Dictionary<HSteamNetConnection, CSteamID>();
