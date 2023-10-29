@@ -162,7 +162,7 @@ namespace QTool.Net
 		}
 		protected virtual void OnP2PConnect(P2PSessionRequest_t result)
 		{
-			Debug.LogError(result.m_steamIDRemote.GetName() + " 连接 ");
+			QDebug.Log("接受玩家[" + result.m_steamIDRemote.GetName() + "]P2P连接");
 			SteamNetworking.AcceptP2PSessionWithUser(result.m_steamIDRemote);
 		}
 		protected virtual void OnP2PConnectFail(P2PSessionConnectFail_t result)
@@ -221,7 +221,6 @@ namespace QTool.Net
 		{
 			if (QSteam.CurrentLobby.Members.ContainsKey(result.m_steamIDRemote))
 			{
-				QDebug.Log("接受玩家[" + result.m_steamIDRemote.GetName() + "]P2P连接");
 				base.OnP2PConnect(result);
 			}
 			else
