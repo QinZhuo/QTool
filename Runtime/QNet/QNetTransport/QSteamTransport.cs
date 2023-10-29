@@ -40,7 +40,7 @@ namespace QTool.Net
 			}
 			base.ServerStart();
 		}
-		protected override void ServerSend(int connectionId, byte[] segment)
+		protected override void ServerSend(ulong connectionId, byte[] segment)
 		{
 			if (ServerActive)
 			{
@@ -56,7 +56,7 @@ namespace QTool.Net
 		{
 			Server?.ReceiveData();
 		}
-		public override void ServerDisconnect(int connectionId)
+		public override void ServerDisconnect(ulong connectionId)
 		{
 			if (ServerActive)
 			{
@@ -191,10 +191,10 @@ namespace QTool.Net
 	}
 	public class QSteamServer: QSteamNetBase
 	{
-		internal event Action<int> OnConnected;
-		internal event Action<int, byte[]> OnReceivedData;
-		internal event Action<int> OnDisconnected;
-		internal event Action<int, Exception> OnError;
+		internal event Action<ulong> OnConnected;
+		internal event Action<ulong, byte[]> OnReceivedData;
+		internal event Action<ulong> OnDisconnected;
+		internal event Action<ulong, Exception> OnError;
 
 		#region CS
 		internal QSteamServer(bool UseP2P):base(UseP2P)
@@ -258,7 +258,7 @@ namespace QTool.Net
 			{
 				var steamId = param.m_info.m_identityRemote.GetSteamID();
 				ConnectClients.Add(param.m_hConn, steamId);
-				OnConnected.Invoke((int)param.m_hConn.m_HSteamNetConnection);
+				OnConnected.Invoke(param.m_hConn.m_HSteamNetConnection);
 				QDebug.Log(nameof(QSteamServer) + "[" + (int)param.m_hConn.m_HSteamNetConnection + "][" + clientSteamID + "][" + steamId + "]客户端连接成功");
 			}
 			else if (param.m_info.m_eState == ESteamNetworkingConnectionState.k_ESteamNetworkingConnectionState_ClosedByPeer || param.m_info.m_eState == ESteamNetworkingConnectionState.k_ESteamNetworkingConnectionState_ProblemDetectedLocally)
@@ -276,18 +276,18 @@ namespace QTool.Net
 		{
 			if (ConnectClients.ContainsKey(socket))
 			{
-				OnDisconnected.Invoke((int)socket.m_HSteamNetConnection);
+				OnDisconnected.Invoke(socket.m_HSteamNetConnection);
 				SteamNetworkingSockets.CloseConnection(socket, 0, "正常断开连接", false);
-				QDebug.Log(nameof(QSteamServer) + " 玩家 [" + new CSteamID(ConnectClients[socket].m_SteamID).GetName() + "] 断开连接.");
+				QDebug.Log(nameof(QSteamServer) + " 玩家 [" + ConnectClients[socket].GetName() + "] 断开连接.");
 				ConnectClients.Remove(socket);
 			}
 		}
 
-		public void Disconnect(int connectionId)
+		public void Disconnect(ulong connectionId)
 		{
 			if (UseP2P)
 			{
-				SteamNetworking.CloseP2PSessionWithUser(new CSteamID((uint)connectionId));
+				SteamNetworking.CloseP2PSessionWithUser(connectionId.ToSteamId());
 			}
 			else
 			{
@@ -331,17 +331,17 @@ namespace QTool.Net
 						switch ((P2PMessage)buffer[0])
 						{
 							case P2PMessage.Connect:
-								OnConnected?.Invoke((int)steamid.m_SteamID);
-								Send((int)steamid.m_SteamID, new byte[] { (byte)P2PMessage.Accept });
+								//OnConnected?.Invoke((int)steamid.m_SteamID);
+								Send(steamid.m_SteamID, new byte[] { (byte)P2PMessage.Accept });
 								return;
 							case P2PMessage.DisConnect:
-								OnDisconnected?.Invoke((int)steamid.m_SteamID);
+								OnDisconnected?.Invoke(steamid.m_SteamID);
 								return;
 							default:
 								break;
 						}
 					}
-					OnReceivedData((int)steamid.m_SteamID, buffer);
+					OnReceivedData(steamid.m_SteamID, buffer);
 				}
 			}
 			else
@@ -354,19 +354,20 @@ namespace QTool.Net
 					{
 						for (int i = 0; i < messageCount; i++)
 						{
-							OnReceivedData((int)conn.m_HSteamNetConnection, ptrs[i].ToBytes());
+							OnReceivedData(conn.m_HSteamNetConnection, ptrs[i].ToBytes());
 						}
 					}
 				}
 			}
 		}
 
-		public void Send(int connectionId, byte[] data)
+		public void Send(ulong connectionId, byte[] data)
 		{
 			if (UseP2P)
 			{
-				Debug.LogError("发送" + connectionId + " " + new CSteamID((uint)connectionId).GetName() + " " + data.Length);
-				SteamNetworking.SendP2PPacket(new CSteamID((uint)connectionId), data, (uint)data.Length,EP2PSend.k_EP2PSendReliable);
+				
+				Debug.LogError("发送" + connectionId + " " + connectionId.ToSteamId().GetName() + " " + data.Length);
+				SteamNetworking.SendP2PPacket(connectionId.ToSteamId(), data, (uint)data.Length,EP2PSend.k_EP2PSendReliable);
 			}
 			else
 			{
@@ -426,8 +427,8 @@ namespace QTool.Net
 		{
 			try
 			{
-				await QSteam.JoinLobby(new CSteamID(ulong.Parse(host)));
-				hostId = new CSteamID(QSteam.CurrentLobby.Owner.m_SteamID);
+				await QSteam.JoinLobby(ulong.Parse(host).ToSteamId());
+				hostId = QSteam.CurrentLobby.Owner;
 				if (UseP2P)
 				{
 					Send(new byte[] { (byte)P2PMessage.Connect });

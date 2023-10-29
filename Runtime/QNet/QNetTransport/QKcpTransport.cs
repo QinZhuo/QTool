@@ -62,10 +62,10 @@ namespace QTool.Net
 
             Server = NonAlloc
                 ? new KcpServerNonAlloc(
-                      (connectionId) => OnServerConnected.Invoke(connectionId),
-                      (connectionId, message, channel) => OnServerDataReceived.Invoke(connectionId, message.ToArray()),
-                      (connectionId) => OnServerDisconnected.Invoke(connectionId),
-                      (connectionId, error, reason) => OnServerError.Invoke(connectionId, new Exception(reason)),
+                      (connectionId) => OnServerConnected.Invoke((ulong)connectionId),
+                      (connectionId, message, channel) => OnServerDataReceived.Invoke((ulong)connectionId, message.ToArray()),
+                      (connectionId) => OnServerDisconnected.Invoke((ulong)connectionId),
+                      (connectionId, error, reason) => OnServerError.Invoke((ulong)connectionId, new Exception(reason)),
                       true,
                       NoDelay,
                       Interval,
@@ -77,10 +77,10 @@ namespace QTool.Net
                       MaxRetransmit,
                       MaximizeSendReceiveBuffersToOSLimit)
                 : new KcpServer(
-                      (connectionId) => OnServerConnected.Invoke(connectionId),
-                      (connectionId, message, channel) => OnServerDataReceived.Invoke(connectionId, message.ToArray()),
-                      (connectionId) => OnServerDisconnected.Invoke(connectionId),
-                      (connectionId, error, reason) => OnServerError.Invoke(connectionId, new Exception(reason)),
+                      (connectionId) => OnServerConnected.Invoke((ulong)connectionId),
+                      (connectionId, message, channel) => OnServerDataReceived.Invoke((ulong)connectionId, message.ToArray()),
+                      (connectionId) => OnServerDisconnected.Invoke((ulong)connectionId),
+                      (connectionId, error, reason) => OnServerError.Invoke((ulong)connectionId, new Exception(reason)),
                       true,
                       NoDelay,
                       Interval,
@@ -135,12 +135,12 @@ namespace QTool.Net
 			Server.Start(Port);
 			base.ServerStart();
 		}
-        protected override void ServerSend(int connectionId,byte[] segment)
+        protected override void ServerSend(ulong connectionId,byte[] segment)
 		{
 			var data = new ArraySegment<byte>(segment);
-			Server.Send(connectionId, data, KcpChannel.Reliable);
+			Server.Send((int)connectionId, data, KcpChannel.Reliable);
         }
-        public override void ServerDisconnect(int connectionId) =>  Server.Disconnect(connectionId);
+        public override void ServerDisconnect(ulong connectionId) =>  Server.Disconnect((int)connectionId);
 		public override void ServerStop()
 		{
 			Server.Stop();

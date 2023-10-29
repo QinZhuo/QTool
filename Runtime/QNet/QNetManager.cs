@@ -205,12 +205,12 @@ namespace QTool.Net
 			StartServer();
 			StartClient();
 		}
-		public QDictionary<int, string> ServerPlayers = new QDictionary<int, string>();
+		public QDictionary<ulong, string> ServerPlayers = new QDictionary<ulong ,string>();
 		public QDictionary<int, QList<string, QNetActionData>> ServerGameData = new QDictionary<int, QList<string, QNetActionData>>((key)=>new QList<string, QNetActionData>(()=>new QNetActionData()));
 		public int ServerIndex { get; private set; } = 0;
 		public QList<string, QNetActionData> ServerActionData => ServerGameData[ServerIndex];
 
-		List<int> ServerConnects = new List<int>();
+		List<ulong> ServerConnects = new List<ulong>();
 		private void ServerUpdate()
 		{
 			if (transport.ServerActive)

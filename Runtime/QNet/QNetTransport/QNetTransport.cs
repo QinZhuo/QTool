@@ -23,19 +23,19 @@ namespace QTool.Net
 		/// <summary>
 		/// 客户端连入服务器事件
 		/// </summary>
-		public Action<int> OnServerConnected;
+		public Action<ulong> OnServerConnected;
 		/// <summary>
 		/// 服务器接收消息时事件
 		/// </summary>
-		public Action<int, byte[]> OnServerDataReceived;
+		public Action<ulong, byte[]> OnServerDataReceived;
 		/// <summary>
 		/// 服务器错误事件
 		/// </summary>
-		public Action<int, Exception> OnServerError;
+		public Action<ulong, Exception> OnServerError;
 		/// <summary>
 		/// 服务器断开客户端连接事件
 		/// </summary>
-		public Action<int> OnServerDisconnected;
+		public Action<ulong> OnServerDisconnected;
 		/// <summary>
 		/// 服务器是否启动
 		/// </summary>
@@ -52,7 +52,7 @@ namespace QTool.Net
 		/// </summary>
 		/// <param name="connectionId">连接Id</param>
 		/// <param name="segment">消息</param>
-		public void CheckServerSend(int connectionId, byte[] segment)
+		public void CheckServerSend(ulong connectionId, byte[] segment)
 		{
 			if (connectionId==0)
 			{
@@ -68,7 +68,7 @@ namespace QTool.Net
 		/// </summary>
 		/// <param name="connectionId">连接Id</param>
 		/// <param name="segment">消息</param>
-		protected abstract void ServerSend(int connectionId, byte[] segment);
+		protected abstract void ServerSend(ulong connectionId, byte[] segment);
 		/// <summary>
 		/// 服务器发送逻辑更新
 		/// </summary>
@@ -81,7 +81,7 @@ namespace QTool.Net
 		/// 服务器断开客户端连接
 		/// </summary>
 		/// <param name="connectionId">客户端连接Id</param>
-		public abstract void ServerDisconnect(int connectionId);
+		public abstract void ServerDisconnect(ulong connectionId);
 		/// <summary>
 		/// 停止服务器
 		/// </summary>

@@ -10,7 +10,7 @@ namespace QTool.Net
 		protected override void ClientConnect(string address) { }
 		public override void ClientReceiveUpdate() { }
 		protected override void ClientSend(byte[] segment) { }
-		public override void ServerDisconnect(int connectionId) { }
-		protected override void ServerSend(int connectionId, byte[] segment) { }
+		public override void ServerDisconnect(ulong connectionId) { }
+		protected override void ServerSend(ulong connectionId, byte[] segment) { }
 	}
 }
