@@ -162,6 +162,7 @@ namespace QTool.Net
 		}
 		protected virtual void OnP2PConnect(P2PSessionRequest_t result)
 		{
+			Debug.LogError(result.m_steamIDRemote.GetName() + " 尝试连接 ");
 			SteamNetworking.AcceptP2PSessionWithUser(result.m_steamIDRemote);
 		}
 		protected virtual void OnP2PConnectFail(P2PSessionConnectFail_t result)
