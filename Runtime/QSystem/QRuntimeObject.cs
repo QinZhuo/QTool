@@ -46,7 +46,6 @@ namespace QTool
 				var name = gameObject.QName();
 				if (_Runtime == null && QDataList<DataT>.ContainsKey(name))
 				{
-					QDebug.Log(this + " 自动初始化 " + nameof(Runtime) + " " + typeof(RuntimeT));
 					Runtime = QRuntime<RuntimeT, DataT>.Get(name);
 				}
 				return _Runtime;
