@@ -217,6 +217,13 @@ namespace QTool.Net
 				listenSocket = SteamNetworkingSockets.CreateListenSocketP2P(0, 0, new SteamNetworkingConfigValue_t[0]);
 			}
 		}
+		protected override void OnP2PConnect(P2PSessionRequest_t result)
+		{
+			if (QSteam.CurrentLobby.Members.ContainsKey(result.m_steamIDRemote))
+			{
+				base.OnP2PConnect(result);
+			}
+		}
 		public Dictionary<HSteamNetConnection, CSteamID> ConnectClients = new Dictionary<HSteamNetConnection, CSteamID>();
 		private HSteamListenSocket listenSocket;
 		private Callback<SteamNetConnectionStatusChangedCallback_t> c_onConnectionChange = null;
@@ -327,12 +334,12 @@ namespace QTool.Net
 					SteamNetworking.ReadP2PPacket(buffer, size, out _, out var steamid);
 					if (buffer.Length == 1)
 					{
-						Debug.LogError(steamid.GetName()+" "+(P2PMessage)buffer[0]);
+						QDebug.Log(steamid.GetName()+" "+(P2PMessage)buffer[0]);
 						switch ((P2PMessage)buffer[0])
 						{
 							case P2PMessage.Connect:
-								//OnConnected?.Invoke((int)steamid.m_SteamID);
 								Send(steamid.m_SteamID, new byte[] { (byte)P2PMessage.Accept });
+								OnConnected?.Invoke(steamid.m_SteamID);
 								return;
 							case P2PMessage.DisConnect:
 								OnDisconnected?.Invoke(steamid.m_SteamID);
@@ -365,8 +372,6 @@ namespace QTool.Net
 		{
 			if (UseP2P)
 			{
-				
-				Debug.LogError("发送" + connectionId + " " + connectionId.ToSteamId().GetName() + " " + data.Length);
 				SteamNetworking.SendP2PPacket(connectionId.ToSteamId(), data, (uint)data.Length,EP2PSend.k_EP2PSendReliable);
 			}
 			else
@@ -422,6 +427,13 @@ namespace QTool.Net
 		internal event Action OnDisconnected;
 		public QSteamClient(bool UseP2P) : base(UseP2P)
 		{
+		}
+		protected override void OnP2PConnect(P2PSessionRequest_t result)
+		{
+			if (hostId == result.m_steamIDRemote)
+			{
+				base.OnP2PConnect(result);
+			}
 		}
 		internal async void Connect(string host)
 		{
@@ -523,10 +535,9 @@ namespace QTool.Net
 				{
 					var buffer = new byte[size];
 					SteamNetworking.ReadP2PPacket(buffer, size, out _, out var steamid);
-					Debug.LogError(steamid.GetName() + " 消息 " + size);
 					if (buffer.Length == 1)
 					{
-						Debug.LogError((P2PMessage)buffer[0]);
+						QDebug.Log(steamid.GetName() + " " + (P2PMessage)buffer[0]);
 						if ((P2PMessage)buffer[0] == P2PMessage.Accept)
 						{
 							OnConnected?.Invoke();
