@@ -73,10 +73,12 @@ namespace QTool
 			var oldValue = value;
 			value = TranslateKey(value);
 			value = value.ForeachBlockValue('{', '}', (key) => TranslateKey(key));
+#if UNITY_EDITOR
 			if (oldValue == value && !QLocalizationData.ContainsKey(oldValue))
 			{
 				QDebug.LogWarning("缺少翻译[" + value + "][" + Language + "]");
 			}
+#endif
 			return value;
 		}
 		public static QDictionary<string, string> KeyReplace = new QDictionary<string, string>();
