@@ -22,7 +22,7 @@ namespace QTool.Net
 		{
 			base.Awake();
 		}
-		public override async void ServerStart()
+		public override void ServerStart()
 		{
 			try
 			{
@@ -34,13 +34,12 @@ namespace QTool.Net
 					Server.OnDisconnected += OnServerDisconnected;
 					Server.OnReceivedData += OnServerDataReceived;
 					Server.OnError += OnServerError;
+					base.ServerStart();
 				}
 				else
 				{
 					Debug.LogError("服务器已正在运行");
 				}
-				await QTask.Wait(() => !QSteam.CurrentLobby.IsNull());
-				base.ServerStart();
 			}
 			catch (Exception e)
 			{
