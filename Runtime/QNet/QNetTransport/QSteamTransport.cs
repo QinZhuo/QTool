@@ -21,10 +21,9 @@ namespace QTool.Net
 		protected override void Awake()
 		{
 			base.Awake();
-			var id = QSteam.Id;
 			SteamNetworkingUtils.InitRelayNetworkAccess();
 		}
-		public override void ServerStart()
+		public override async void ServerStart()
 		{
 			if (!ServerActive)
 			{
@@ -38,6 +37,7 @@ namespace QTool.Net
 			{
 				Debug.LogError("服务器已正在运行");
 			}
+			await QTask.Wait(() => !QSteam.CurrentLobby.IsNull());
 			base.ServerStart();
 		}
 		protected override void ServerSend(ulong connectionId, byte[] segment)
