@@ -196,6 +196,10 @@ namespace QTool
 	public class QPoolManager<T> where T : class
 	{
 		public static QDictionary<string, ObjectPool<T>> Pools = new QDictionary<string, ObjectPool<T>>();
+		static QPoolManager()
+		{
+			QEventManager.Register(QToolEvent.游戏退出, Pools.Clear);
+		}
 	}
   
 	public interface IQPoolObject
