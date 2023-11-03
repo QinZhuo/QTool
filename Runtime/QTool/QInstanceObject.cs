@@ -65,7 +65,7 @@ namespace QTool
 					_instance = FindObjectOfType<T>(true);
 					if (_instance == null && QTool.IsPlaying)
 					{
-						QDebug.Log("单例实例化 " + nameof(QInstanceManager<T>) + "<" + typeof(T).Name + ">"+QTool.IsPlaying+":"+!QTool.QToolDestory);
+						QDebug.Log("单例实例化 " + nameof(QInstanceManager<T>) + "<" + typeof(T).Name + ">");
 						var obj = new GameObject(typeof(T).Name);
 						_instance = obj.AddComponent<T>();
 						_instance.SetDirty();
