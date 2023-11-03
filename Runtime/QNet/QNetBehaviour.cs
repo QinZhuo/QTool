@@ -10,8 +10,8 @@ namespace QTool.Net
 	public abstract class QNetBehaviour : MonoBehaviour
 	{
 		public System.Random Random => QNetManager.Instance.Random;
-		public static float NetDeltaTime => QNetManager.NetDeltaTime;
-		public static float NetTime => QNetManager.NetTime;
+		public static float NetDeltaTime => QNetManager.Instance.NetDeltaTime;
+		public static float NetTime => QNetManager.Instance.NetTime;
 		public string PlayerId { get; internal set; } = null;
 		public bool IsPlayer => !PlayerId.IsNull();
 		public bool IsLoaclPlayer => PlayerId == QNetManager.Instance.transport.ClientId;

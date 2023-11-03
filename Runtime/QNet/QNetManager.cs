@@ -130,8 +130,8 @@ namespace QTool.Net
 		QNetActionData LocalAction = new QNetActionData();
 		QNetActionData SendAction = new QNetActionData();
 		private int ServerSeed = 0;
-		public static float NetDeltaTime => Time.fixedDeltaTime;
-		public static float NetTime { get; private set; }
+		public float NetDeltaTime => Time.fixedDeltaTime;
+		public float NetTime { get; private set; }
 #region 服务器数据
 
 		const int GameDataArray=-101;
@@ -233,12 +233,12 @@ namespace QTool.Net
 
 #region 客户端数据
 		public QDictionary<int, QList<string, QNetActionData>> ClientGameData = new QDictionary<int, QList<string, QNetActionData>>();
-		public static int ClientIndex { get; private set; } =0;
+		public int ClientIndex { get; private set; } =0;
 		private int IdIndex { get; set; } = 0;
 
 		public string NewId()
 		{
-			return QNetManager.Instance.IdIndex++ + "_" + QNetManager.ClientIndex;
+			return QNetManager.Instance.IdIndex++ + "_" + QNetManager.Instance.ClientIndex;
 		}
 
 		private QNetSyncFlag SyncCheckFlag = new QNetSyncFlag();
@@ -540,7 +540,7 @@ namespace QTool.Net
 	{
 		public WaitForNetTime(float time)
 		{
-			Wait = (int)(time / QNetManager.NetDeltaTime);
+			Wait = (int)(time / QNetManager.Instance.NetDeltaTime);
 		}
 		protected int Index { get; set; } = -1;
 		protected int Wait { get; set; } = 1;
@@ -548,7 +548,7 @@ namespace QTool.Net
 		{
 			get
 			{
-				var curIndex = QNetManager.Instance == null ? (int)(Time.time / QNetManager.NetDeltaTime) : QNetManager.ClientIndex;
+				var curIndex = QNetManager.Instance == null ? (int)(Time.time / QNetManager.Instance.NetDeltaTime) : QNetManager.Instance.ClientIndex;
 				if (Index < 0)
 				{
 					Index = curIndex;
