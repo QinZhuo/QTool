@@ -24,6 +24,10 @@ namespace QTool
         internal static QDictionary<string, System.Action> EventList = new QDictionary<string, System.Action>();
 		internal static QDictionary<string, System.Action> OnceEventList = new QDictionary<string, System.Action>();
 		internal static QDictionary<string, System.Action<string>> KeyEventList = new QDictionary<string ,System.Action<string>>();
+		static QEventManager()
+		{
+			QEventManager.Register(QToolEvent.游戏退出完成, EventList.Clear, OnceEventList.Clear, KeyEventList.Clear);
+		}
 		public static void InvokeEvent(System.Enum value)
 		{
 			InvokeEvent(value.ToString());
@@ -144,6 +148,10 @@ namespace QTool
         internal static QDictionary<string, System.Action<T>> EventList = new QDictionary<string, System.Action<T>>();
 
 		internal static QDictionary<string, System.Action<T>> OnceEventList = new QDictionary<string, System.Action<T>>();
+		static QEventManager()
+		{
+			QEventManager.Register(QToolEvent.游戏退出完成, EventList.Clear, OnceEventList.Clear);
+		}
 		public static void InvokeEvent(string eventKey,T value)
 		{
 			try
