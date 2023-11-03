@@ -23,13 +23,11 @@ namespace QTool.Inspector
 		{
 			typeInfo = QInspectorType.Get(target.GetType());
 			typeInfo.InvokeQInspectorState(target,QInspectorState.OnEnable);
-			EditorApplication.playModeStateChanged += OnPlayMode;
 		}
 
 		protected virtual void OnDestroy()
 		{
 			typeInfo.InvokeQInspectorState(target,QInspectorState.OnDisable);
-			EditorApplication.playModeStateChanged -= OnPlayMode;
 		}
 		public override VisualElement CreateInspectorGUI()
 		{
@@ -75,19 +73,6 @@ namespace QTool.Inspector
 				}
 			}
 		}
-	
-		void OnPlayMode(PlayModeStateChange state)
-		{
-			QOnPlayModeAttribute.CurrentrState = (PlayModeState)(byte)state;
-			foreach (var kv in typeInfo.playMode)
-			{
-				if ((byte)kv.Key.state == (byte)state)
-				{
-					kv.Value.Invoke(target);
-				}
-			}
-		}
-
 	}
 
 }

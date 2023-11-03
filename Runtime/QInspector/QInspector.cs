@@ -155,39 +155,6 @@ namespace QTool.Inspector
 		OnEnable,
 		OnDisable,
 	}
-    public enum PlayModeState
-    {
-        //
-        // 摘要:
-        //     Occurs during the next update of the Editor application if it is in edit mode
-        //     and was previously in play mode.
-        EnteredEditMode = 0,
-        //
-        // 摘要:
-        //     Occurs when exiting edit mode, before the Editor is in play mode.
-        ExitingEditMode = 1,
-        //
-        // 摘要:
-        //     Occurs during the next update of the Editor application if it is in play mode
-        //     and was previously in edit mode.
-        EnteredPlayMode = 2,
-        //
-        // 摘要:
-        //     Occurs when exiting play mode, before the Editor is in edit mode.
-        ExitingPlayMode = 3
-    }
-    [AttributeUsage(AttributeTargets.Method)]
-    public class QOnPlayModeAttribute : Attribute
-    {
-		public static PlayModeState CurrentrState { set; get; } = PlayModeState.EnteredPlayMode;
-		public PlayModeState state;
-        public QOnPlayModeAttribute(PlayModeState state)
-        {
-            this.state = state;
-        }
-
-    }
-  
  
 
 	public class QInspectorType : QTypeInfo<QInspectorType>
@@ -195,7 +162,6 @@ namespace QTool.Inspector
 		public QDictionary<QOnInspectorAttribute, QFunctionInfo> inspectorState = new QDictionary<QOnInspectorAttribute, QFunctionInfo>();
 		public QDictionary<QOnSceneInputAttribute, QFunctionInfo> mouseEventFunc = new QDictionary<QOnSceneInputAttribute, QFunctionInfo>();
 		public QDictionary<QFunctionInfo, QNameAttribute> buttonFunc = new QDictionary<QFunctionInfo, QNameAttribute>();
-		public QDictionary<QOnPlayModeAttribute, QFunctionInfo> playMode = new QDictionary<QOnPlayModeAttribute, QFunctionInfo>();
 		protected override void Init(Type type)
 		{
 			base.Init(type);
@@ -220,10 +186,6 @@ namespace QTool.Inspector
 				foreach (var att in funcInfo.MethodInfo.GetCustomAttributes<QOnInspectorAttribute>())
 				{
 					inspectorState[att] = funcInfo;
-				}
-				foreach (var att in funcInfo.MethodInfo.GetCustomAttributes<QOnPlayModeAttribute>())
-				{
-					playMode[att] = funcInfo;
 				}
 			}
 		}
