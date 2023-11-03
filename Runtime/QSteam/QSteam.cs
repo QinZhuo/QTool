@@ -18,7 +18,8 @@ namespace QTool
     {
 		public static CSteamID Id => SteamUser.GetSteamID();
 		public static string Name => SteamFriends.GetPersonaName();
-		static QSteam()
+		[RuntimeInitializeOnLoadMethod]
+		private static void Init()
 		{
 			if (!Packsize.Test())
 			{
@@ -54,7 +55,7 @@ namespace QTool
 			}
 			SteamClient.SetWarningMessageHook(SteamAPIDebugTextHook);
 			QToolManager.Instance.OnUpdateEvent += SteamAPI.RunCallbacks;
-			QEventManager.Register(QToolEvent.游戏退出完成, LeaveLobby, SteamAPI.Shutdown);
+			QEventManager.RegisterOnce(QToolEvent.游戏退出完成, LeaveLobby, SteamAPI.Shutdown);
 			_=FreshPingLocation();
 			QDebug.Log(nameof(QSteam) + " 初始化成功 [" + Name + "]["+Id+"]");
 		}
