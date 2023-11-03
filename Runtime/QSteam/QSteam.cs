@@ -18,7 +18,8 @@ namespace QTool
     {
 		public static CSteamID Id => SteamUser.GetSteamID();
 		public static string Name => SteamFriends.GetPersonaName();
-		static QSteam()
+		[RuntimeInitializeOnLoadMethod]
+		public static void Init()
 		{
 			if (!Packsize.Test())
 			{
