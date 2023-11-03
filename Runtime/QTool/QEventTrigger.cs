@@ -6,8 +6,13 @@ using QTool.Reflection;
 using QTool.FlowGraph;
 namespace QTool
 {
-	
-    public static class QEventManager
+
+	public enum QToolEvent
+	{
+		游戏退出,
+		游戏退出完成,
+	}
+	public static class QEventManager
     {
         ///// <summary>
         ///// 当任意事件触发时调用
@@ -19,6 +24,10 @@ namespace QTool
         internal static QDictionary<string, System.Action> EventList = new QDictionary<string, System.Action>();
 		internal static QDictionary<string, System.Action> OnceEventList = new QDictionary<string, System.Action>();
 		internal static QDictionary<string, System.Action<string>> KeyEventList = new QDictionary<string ,System.Action<string>>();
+		public static void InvokeEvent(System.Enum value)
+		{
+			InvokeEvent(value.ToString());
+		}
 		/// <summary>
 		/// 触发事件
 		/// </summary>
@@ -56,21 +65,54 @@ namespace QTool
         {
             QEventManager<T>.InvokeEvent(eventKey, value);
         }
+		public static void RegisterKeyEvent(System.Enum eventKey, System.Action<string> action)
+		{
+			RegisterKeyEvent(eventKey.ToString(), action);
+		}
 		public static void RegisterKeyEvent(string eventKey, System.Action<string> action)
 		{
 			KeyEventList[eventKey] += action;
+		}
+		public static void UnRegisterKeyEvent(System.Enum eventKey, System.Action<string> action)
+		{
+			UnRegisterKeyEvent(eventKey.ToString(), action);
 		}
 		public static void UnRegisterKeyEvent(string eventKey, System.Action<string> action)
 		{
 			KeyEventList[eventKey] -= action;
 		}
+		public static void Register(System.Enum eventKey,params System.Action[] action)
+		{
+			var key = eventKey.ToString();
+			foreach (var item in action)
+			{
+				Register(key, item);
+			}
+		}
 		public static void Register(string eventKey, System.Action action)
         {
 			EventList[eventKey] += action;
 		}
+	
+		public static void RegisterOnce(System.Enum eventKey, params System.Action[] action)
+		{
+			var key = eventKey.ToString();
+			foreach (var item in action)
+			{
+				RegisterOnce(key, item);
+			}
+		}
 		public static void RegisterOnce(string eventKey, System.Action action)
 		{
 			OnceEventList[eventKey] += action;
+		}
+		public static void UnRegister(System.Enum eventKey, params System.Action[] action)
+		{
+			var key = eventKey.ToString();
+			foreach (var item in action)
+			{
+				UnRegister(key, item);
+			}
 		}
 		public static void UnRegister(string eventKey, System.Action action)
         {

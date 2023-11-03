@@ -27,8 +27,6 @@ namespace QTool
 #endif
 		}
 		public event Action OnUpdateEvent = null;
-		public event Action OnDestroyEvent = null;
-		public event Action OnLateDestroyEvent = null;
 		public event Action OnGUIEvent = null;
 		public event Action OnPostRenderEvent = null;
 		public int FrameIndex { get; private set; } = 0;
@@ -43,12 +41,11 @@ namespace QTool
 		private void OnDestroy()
 		{
 			QTask.StopAllWait();
-			OnDestroyEvent?.Invoke();
-			OnLateDestroyEvent?.Invoke();
+			QEventManager.InvokeEvent(QToolEvent.游戏退出);
+			QEventManager.InvokeEvent(QToolEvent.游戏退出完成);
 			Instance.OnUpdateEvent -= QCoroutine.Update;
 		}
-	
-	
+
 		private void OnGUI()
 		{
 			OnGUIEvent?.Invoke();

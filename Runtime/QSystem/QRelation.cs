@@ -52,7 +52,12 @@ namespace QTool
 	}
 	public static class QTeam
 	{
+		static QTeam()
+		{
+			QEventManager.Register(QToolEvent.游戏退出,Teams.Clear);
+		}
 		public static QDictionary<string, List<IQTeam>> Teams = new QDictionary<string, List<IQTeam>>((key) => new List<IQTeam>());
+		
 		public static QTeamRelaction GetRelaction<T>(this T a, T b) where T : IQTeam
 		{
 			if (QRelation.GetValue(a.Team, b.Team) >= 0)

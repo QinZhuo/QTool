@@ -6,17 +6,6 @@ using System;
 namespace QTool
 {
 	/// <summary>
-	/// C#对象单例
-	/// </summary>
-    public abstract class QInstanceObject<T> where T : QInstanceObject<T>
-    {
-        public static readonly T Instance = Activator.CreateInstance<T>();
-        public QInstanceObject()
-        {
-
-        }
-    }
-	/// <summary>
 	/// SO文件单例 存储在Resouces文件夹下
 	/// </summary>
     public abstract class QInstanceScriptable<T> : ScriptableObject where T : QInstanceScriptable<T>

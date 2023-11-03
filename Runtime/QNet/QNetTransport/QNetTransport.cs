@@ -9,7 +9,11 @@ namespace QTool.Net
 		protected virtual void Awake()
 		{
 			OnClientConnected += () => ClientConnected = true;
-			QToolManager.Instance.OnDestroyEvent += Shutdown;
+			QEventManager.RegisterOnce(QToolEvent.游戏退出, Shutdown);
+		}
+		protected virtual void OnDestroy()
+		{
+			
 		}
 		/// <summary>
 		/// 关闭所有网络连接
