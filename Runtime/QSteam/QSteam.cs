@@ -206,17 +206,17 @@ namespace QTool
 		public static void SetLobbyMemberData<T>(string key, T value)
         {
 			var data = value.ToQData();
-			QDebug.Log(Name + "." + key + " = " + data);
+			QDebug.Log(_CurrentLobby.SteamID+"."+Name + "." + key + " = " + data);
             SteamMatchmaking.SetLobbyMemberData(_CurrentLobby.SteamID, key, data);
         }
 		public static T GetLobbyMemberData<T>(string key, T value=default)
 		{
 			return Id.GetLobbyMemberData(key, value);
 		}
-		public static T GetLobbyMemberData<T>(this CSteamID steamID,string key, T value=default)
+		public static T GetLobbyMemberData<T>(this CSteamID steamID, string key, T value = default)
 		{
 			var data = SteamMatchmaking.GetLobbyMemberData(_CurrentLobby.SteamID, steamID, key);
-			QDebug.Log(steamID.GetName() + "." + key + ":" + data);
+			QDebug.Log(_CurrentLobby.SteamID + "." + steamID.GetName() + "." + key + ":" + data);
 			return data.ParseQData(value);
 		}
 		public static bool ChatSend(string text)
