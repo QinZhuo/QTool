@@ -209,6 +209,10 @@ namespace QTool
 			QDebug.Log(Name + "." + key + " = " + data);
             SteamMatchmaking.SetLobbyMemberData(_CurrentLobby.SteamID, key, data);
         }
+		public static T GetLobbyMemberData<T>(string key, T value=default)
+		{
+			return Id.GetLobbyMemberData(key, value);
+		}
 		public static T GetLobbyMemberData<T>(this CSteamID steamID,string key, T value=default)
 		{
 			return SteamMatchmaking.GetLobbyMemberData(_CurrentLobby.SteamID, steamID, key).ParseQData(value);
