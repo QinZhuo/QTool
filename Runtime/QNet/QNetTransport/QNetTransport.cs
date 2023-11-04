@@ -4,10 +4,13 @@ using System.Collections.Generic;
 using UnityEngine;
 namespace QTool.Net
 {
+	[RequireComponent(typeof(QNetManager))]
 	public abstract class QNetTransport : MonoBehaviour
 	{
+		public QNetManager Manager { get; private set; }
 		protected virtual void Awake()
 		{
+			Manager = GetComponent<QNetManager>();
 			OnClientConnected += () => ClientConnected = true;
 			QEventManager.RegisterOnce(QToolEvent.游戏退出, Shutdown);
 		}

@@ -21,6 +21,17 @@ namespace QTool.Net
 		protected override void Awake()
 		{
 			base.Awake();
+			if (!QSteam.CurrentLobby.IsNull())
+			{
+				if(QSteam.CurrentLobby.Owner == QSteam.Id)
+				{
+					Manager.StartHost();
+				}
+				else
+				{
+					Manager.StartClient(QSteam.CurrentLobby.SteamID.ToString());
+				}
+			}
 		}
 		public override void ServerStart()
 		{
@@ -147,7 +158,7 @@ namespace QTool.Net
 				RoomListView = QToolManager.Instance.RootVisualElement.AddListView(QSteam.LobbyList, (visual,index) =>
 				{
 					var lobby = QSteam.LobbyList[index];
-					visual.AddButton("加入 "+lobby.ToString(), () => GetComponent<QNetManager>().StartClient(lobby.SteamID.ToString()));
+					visual.AddButton("加入 "+lobby.ToString(), () => Manager.StartClient(lobby.SteamID.ToString()));
 				});
 				RoomListView.fixedItemHeight = 40;
 				FreshList();
