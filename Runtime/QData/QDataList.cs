@@ -263,13 +263,13 @@ namespace QTool
 			var Key = typeof(T).Name.MergePath(key);
 			QDebug.Begin("加载 QDataList<" + Key + "> 数据 ");
 			var dataList = QDataList.LoadData(GetResourcesDataPath(Key), () => new List<T> { new T { Key = "测试Key" }, }.ToQDataList());
-			if (QToolSetting.Instance != null && QToolSetting.Instance.modeList.Contains(Key))
-			{
-				QFileManager.LoadAll(GetModPath(Key), (fileValue, loadPath) =>
-				{
-					dataList.Add(new QDataList(fileValue) { LoadPath = loadPath });
-				}, "{}");
-			}
+			//if (QToolSetting.Instance != null && QToolSetting.Instance.modeList.Contains(Key))
+			//{
+			//	QFileManager.LoadAll(GetModPath(Key), (fileValue, loadPath) =>
+			//	{
+			//		dataList.Add(new QDataList(fileValue) { LoadPath = loadPath });
+			//	}, "{}");
+			//}
 			QDebug.End("加载 QDataList<" + Key + "> 数据 ", dataList.Count + " 条");
 			return dataList;
 		}

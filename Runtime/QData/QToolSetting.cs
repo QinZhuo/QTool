@@ -19,8 +19,6 @@ namespace QTool
 		public List<QKeyColorValue> qKeyColorList = new List<QKeyColorValue>();
 		[QName("强制分辨率比例"), Tooltip("只有挂载 " + nameof(QScreenAspect) + " 脚本的相机和UI会生效")]
 		public float targetAspect = 16f / 9f;
-		[QName("Mod文件夹")]
-		public List<string> modeList = new List<string> { nameof(QLocalizationData) };
 		[QName("游戏数据邮箱")]
 		public QMailAccount QAnalysisMail;
 #if UNITY_EDITOR
