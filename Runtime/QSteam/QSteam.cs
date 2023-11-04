@@ -300,6 +300,7 @@ namespace QTool
         public static async void CreateLobby(int maxMembers = 10,ELobbyType eLobbyType = ELobbyType.k_ELobbyTypePublic)
         {
 			var create = await SteamMatchmaking.CreateLobby(eLobbyType, maxMembers).GetResult<LobbyCreated_t>();
+		
 			if (create.m_ulSteamIDLobby != 0)
 			{
 				QDebug.Log(nameof(QSteam) + " 创建房间成功[" + create.m_ulSteamIDLobby + "]");
@@ -426,6 +427,10 @@ namespace QTool
 						Debug.LogError("设置大厅数据出错[" + SteamID + "]" + key+ ":" + value);
 					}
 				}
+			}
+			public void SetType(ELobbyType type)
+			{
+				SteamMatchmaking.SetLobbyType(SteamID, type);
 			}
 			public override string ToString()
 			{
