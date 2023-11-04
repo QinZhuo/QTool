@@ -215,7 +215,9 @@ namespace QTool
 		}
 		public static T GetLobbyMemberData<T>(this CSteamID steamID,string key, T value=default)
 		{
-			return SteamMatchmaking.GetLobbyMemberData(_CurrentLobby.SteamID, steamID, key).ParseQData(value);
+			var data = SteamMatchmaking.GetLobbyMemberData(_CurrentLobby.SteamID, steamID, key);
+			QDebug.Log(steamID.GetName() + "." + key + ":" + data);
+			return data.ParseQData(value);
 		}
 		public static bool ChatSend(string text)
         {
