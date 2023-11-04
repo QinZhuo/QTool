@@ -401,6 +401,10 @@ namespace QTool
 						//	QDebug.Log(gameObject + " 静态数据初始化 " + obj + " " + member.QName + " : " + obj);
 						gameObject.InvokeEvent(member.QName, member.Get(obj)?.ToString());
 					}
+					else if (member.Type == typeof(int) || member.Type == typeof(float))
+					{
+						gameObject.InvokeEvent(member.QName, member.Get(obj).As<float>());
+					}
 					else if (member.Type.Is(typeof(QRuntimeValue<float>)) && (trigger.floatEventList.ContainsKey(member.QName)
 								|| trigger.floatEventList.ContainsKey("当前" + member.QName) || trigger.floatEventList.ContainsKey(member.QName + "比例")))
 					{
