@@ -1,9 +1,7 @@
-using System.Collections;
+using QTool.Reflection;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
-using QTool.Reflection;
-using QTool.FlowGraph;
 namespace QTool
 {
 
@@ -437,6 +435,14 @@ namespace QTool
 
 					}
 				}
+				foreach (var func in typeInfo.Functions)
+				{
+					var name = func.QName();
+					if (trigger.actionEventList.ContainsKey(name))
+					{
+						trigger.actionEventList.Get(name).eventAction.AddListener(() => func.Invoke(obj));
+					}
+				}
 			}
 		}
 		public static void UnRegisterEvent<T>(this GameObject gameObject, T obj, params string[] keys)
@@ -471,6 +477,14 @@ namespace QTool
 					{
 						var runtimeValue = member.Get(obj).As<QRuntimeValue<bool>>();
 						runtimeValue.OnValueChange -= gameObject.InvokeEvent;
+					}
+				}
+				foreach (var func in typeInfo.Functions)
+				{
+					var name = func.QName();
+					if (trigger.actionEventList.ContainsKey(name))
+					{
+						trigger.actionEventList.Get(name).eventAction.RemoveAllListeners();
 					}
 				}
 			}

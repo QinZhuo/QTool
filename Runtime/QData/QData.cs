@@ -1086,7 +1086,6 @@ namespace QTool
 		public bool HasCallback { private set; get; }
 		protected override void Init(Type type)
 		{
-			Functions = null;
 			base.Init(type);
 			if (Code == TypeCode.Object)
 			{
