@@ -223,9 +223,9 @@ namespace QTool.Net
 		internal event Action<ulong, Exception> OnError;
 
 		#region CS
-		internal QSteamServer(bool UseP2P):base(UseP2P)
+		internal QSteamServer(bool UseP2P) : base(UseP2P)
 		{
-			QSteam.CreateLobby();
+			_ = QSteam.CreateLobby();
 			if (this.UseP2P)
 			{
 				try

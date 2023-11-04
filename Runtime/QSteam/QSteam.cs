@@ -206,8 +206,8 @@ namespace QTool
 		public static void SetLobbyMemberData<T>(string key, T value)
         {
 			var data = value.ToQData();
-			QDebug.Log(_CurrentLobby.SteamID+"."+Name + "." + key + " = " + data);
-            SteamMatchmaking.SetLobbyMemberData(_CurrentLobby.SteamID, key, data);
+			QDebug.Log(CurrentLobby.SteamID+"."+Name + "." + key + " = " + data);
+            SteamMatchmaking.SetLobbyMemberData(CurrentLobby.SteamID, key, data);
         }
 		public static T GetLobbyMemberData<T>(string key, T value=default)
 		{
@@ -215,8 +215,8 @@ namespace QTool
 		}
 		public static T GetLobbyMemberData<T>(this CSteamID steamID, string key, T value = default)
 		{
-			var data = SteamMatchmaking.GetLobbyMemberData(_CurrentLobby.SteamID, steamID, key);
-			QDebug.Log(_CurrentLobby.SteamID + "." + steamID.GetName() + "." + key + ":" + data);
+			var data = SteamMatchmaking.GetLobbyMemberData(CurrentLobby.SteamID, steamID, key);
+			QDebug.Log(CurrentLobby.SteamID + "." + steamID.GetName() + "." + key + ":" + data);
 			return data.ParseQData(value);
 		}
 		public static bool ChatSend(string text)
@@ -303,8 +303,9 @@ namespace QTool
 			QDebug.Log("加入房间[" + join.m_ulSteamIDLobby + "]");
             return true;
         }
-        public static async void CreateLobby(int maxMembers = 10,ELobbyType eLobbyType = ELobbyType.k_ELobbyTypePublic)
+        public static async Task CreateLobby(int maxMembers = 10,ELobbyType eLobbyType = ELobbyType.k_ELobbyTypePublic)
         {
+			if (!CurrentLobby.IsNull() && CurrentLobby.Owner == Id) return;
 			var create = await SteamMatchmaking.CreateLobby(eLobbyType, maxMembers).GetResult<LobbyCreated_t>();
 		
 			if (create.m_ulSteamIDLobby != 0)
