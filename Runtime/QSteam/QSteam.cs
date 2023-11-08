@@ -18,8 +18,6 @@ namespace QTool
     {
 		public static CSteamID Id => SteamUser.GetSteamID();
 		public static string Name => SteamFriends.GetPersonaName();
-		public static ESteamNetworkingAvailability NetworkStatus { get; private set; }
-		public static Callback<SteamRelayNetworkStatus_t> OnNetworkStatusChange = null;
 		static QSteam()
 		{
 			if (!Packsize.Test())
@@ -54,7 +52,6 @@ namespace QTool
 #endif
 				return;
 			}
-			OnNetworkStatusChange = Callback<SteamRelayNetworkStatus_t>.Create(status => { QDebug.Log(nameof(QSteam) + nameof(NetworkStatus) + " : " + status.ToQData()); NetworkStatus = status.m_eAvailAnyRelay; });
 			SteamClient.SetWarningMessageHook(SteamAPIDebugTextHook);
 			QToolManager.Instance.OnUpdateEvent += SteamAPI.RunCallbacks;
 			QEventManager.RegisterOnce(QToolEvent.游戏退出完成, LeaveLobby, SteamAPI.Shutdown);
@@ -202,9 +199,14 @@ namespace QTool
 			var data = value.ToQData();
 			QDebug.Log(CurrentLobby.SteamID+"."+Name + "." + key + " = " + data);
             SteamMatchmaking.SetLobbyMemberData(CurrentLobby.SteamID, key, data);
-        }
-		public static T GetLobbyMemberData<T>(string key, T defaultValue=default)
+			QPlayerPrefs.Set(nameof(QLobby) + "." + key, value);
+		}
+		public static T GetLobbyMemberData<T>(string key, T defaultValue = default)
 		{
+			if (CurrentLobby.IsNull())
+			{
+				return QPlayerPrefs.Get<T>(nameof(QLobby) + "." + key);
+			}
 			return Id.GetLobbyMemberData(key, defaultValue);
 		}
 		public static T GetLobbyMemberData<T>(this CSteamID steamID, string key, T defaultValue = default)
@@ -301,7 +303,6 @@ namespace QTool
         {
 			if (!CurrentLobby.IsNull() && CurrentLobby.Owner == Id) return;
 			var create = await SteamMatchmaking.CreateLobby(eLobbyType, maxMembers).GetResult<LobbyCreated_t>();
-		
 			if (create.m_ulSteamIDLobby != 0)
 			{
 				QDebug.Log(nameof(QSteam) + " 创建房间成功[" + create.m_ulSteamIDLobby + "]");
