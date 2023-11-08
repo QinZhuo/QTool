@@ -18,8 +18,7 @@ namespace QTool
     {
 		public static CSteamID Id => SteamUser.GetSteamID();
 		public static string Name => SteamFriends.GetPersonaName();
-		public static SteamRelayNetworkStatus_t NetworkStatus { get; private set; }
-		public static Callback<SteamRelayNetworkStatus_t> OnNetworkStatusChange = null;
+		public static ESteamNetworkingAvailability NetworkStatus => SteamNetworkingUtils.GetRelayNetworkStatus(out var status);
 		static QSteam()
 		{
 			if (!Packsize.Test())
@@ -54,7 +53,6 @@ namespace QTool
 #endif
 				return;
 			}
-			OnNetworkStatusChange = Callback<SteamRelayNetworkStatus_t>.Create(status => { QDebug.Log(nameof(QSteam) + nameof(NetworkStatus) + " : " + status); NetworkStatus = status; });
 			SteamClient.SetWarningMessageHook(SteamAPIDebugTextHook);
 			QToolManager.Instance.OnUpdateEvent += SteamAPI.RunCallbacks;
 			QEventManager.RegisterOnce(QToolEvent.游戏退出完成, LeaveLobby, SteamAPI.Shutdown);
@@ -203,15 +201,15 @@ namespace QTool
 			QDebug.Log(CurrentLobby.SteamID+"."+Name + "." + key + " = " + data);
             SteamMatchmaking.SetLobbyMemberData(CurrentLobby.SteamID, key, data);
         }
-		public static T GetLobbyMemberData<T>(string key, T value=default)
+		public static T GetLobbyMemberData<T>(string key, T defaultValue=default)
 		{
-			return Id.GetLobbyMemberData(key, value);
+			return Id.GetLobbyMemberData(key, defaultValue);
 		}
-		public static T GetLobbyMemberData<T>(this CSteamID steamID, string key, T value = default)
+		public static T GetLobbyMemberData<T>(this CSteamID steamID, string key, T defaultValue = default)
 		{
 			var data = SteamMatchmaking.GetLobbyMemberData(CurrentLobby.SteamID, steamID, key);
 			QDebug.Log(CurrentLobby.SteamID + "." + steamID.GetName() + "." + key + ":" + data);
-			return data.ParseQData(value);
+			return data.IsNull() ? defaultValue : data.ParseQData(defaultValue);
 		}
 		public static bool ChatSend(string text)
         {
