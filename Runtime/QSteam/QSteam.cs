@@ -54,7 +54,7 @@ namespace QTool
 #endif
 				return;
 			}
-			OnNetworkStatusChange.Register(status => { QDebug.Log(nameof(QSteam) + nameof(NetworkStatus) + " : " + status); NetworkStatus = status; });
+			OnNetworkStatusChange = Callback<SteamRelayNetworkStatus_t>.Create(status => { QDebug.Log(nameof(QSteam) + nameof(NetworkStatus) + " : " + status); NetworkStatus = status; });
 			SteamClient.SetWarningMessageHook(SteamAPIDebugTextHook);
 			QToolManager.Instance.OnUpdateEvent += SteamAPI.RunCallbacks;
 			QEventManager.RegisterOnce(QToolEvent.游戏退出完成, LeaveLobby, SteamAPI.Shutdown);
