@@ -18,6 +18,8 @@ namespace QTool
     {
 		public static CSteamID Id => SteamUser.GetSteamID();
 		public static string Name => SteamFriends.GetPersonaName();
+		public static SteamRelayNetworkStatus_t NetworkStatus { get; private set; }
+		public static Callback<SteamRelayNetworkStatus_t> OnNetworkStatusChange = null;
 		static QSteam()
 		{
 			if (!Packsize.Test())
@@ -52,20 +54,12 @@ namespace QTool
 #endif
 				return;
 			}
+			OnNetworkStatusChange.Register(status => { QDebug.Log(nameof(QSteam) + nameof(NetworkStatus) + " : " + status); NetworkStatus = status; });
 			SteamClient.SetWarningMessageHook(SteamAPIDebugTextHook);
 			QToolManager.Instance.OnUpdateEvent += SteamAPI.RunCallbacks;
 			QEventManager.RegisterOnce(QToolEvent.游戏退出完成, LeaveLobby, SteamAPI.Shutdown);
-			_=FreshPingLocation();
+			SteamNetworkingUtils.InitRelayNetworkAccess();
 			QDebug.Log(nameof(QSteam) + " 初始化成功 [" + Name + "]["+Id+"]");
-		}
-		private static async Task<SteamNetworkPingLocation_t> FreshPingLocation()
-		{
-			if (!SteamNetworkingUtils.CheckPingDataUpToDate(5))
-			{
-				await QTask.Wait(5, true);
-			}
-			SteamNetworkingUtils.GetLocalPingLocation(out var pingLocation);
-			return pingLocation;
 		}
 		[AOT.MonoPInvokeCallback(typeof(SteamAPIWarningMessageHook_t))]
 		private static void SteamAPIDebugTextHook(int nSeverity, System.Text.StringBuilder pchDebugText)
@@ -250,6 +244,7 @@ namespace QTool
                 }
             }
         }
+	
 		public static Callback<LobbyDataUpdate_t> OnUpdateLobby = null;
         public static void LeaveLobby()
         {
@@ -259,7 +254,7 @@ namespace QTool
 			OnUpdateLobby?.Unregister();
             _CurrentLobby = default;
         }
-        static async void SetCurRoom(ulong id)
+        static void SetCurRoom(ulong id)
         {
             UpdateLobby((CSteamID)id, ref _CurrentLobby);
             OnUpdateLobby = Callback<LobbyDataUpdate_t>.Create((info) =>
@@ -268,7 +263,6 @@ namespace QTool
             }); 
             _=StartChatReceive();
             chatId = 0;
-			SetLobbyMemberData(nameof(QLobbyMember.PingLocation), await FreshPingLocation());
 		}
         public static async Task<bool> FastJoin()
         {
@@ -337,7 +331,6 @@ namespace QTool
             for (int t = 0; t < lobby.Members.Length; t++)
             {
                 lobby.Members[t].SteamID = SteamMatchmaking.GetLobbyMemberByIndex(id, t);
-				lobby.Members[t].PingLocation= lobby.Members[t].SteamID.GetLobbyMemberData(nameof(QLobbyMember.PingLocation), lobby.Members[t].PingLocation);
 			}
 			lobby.Data = new QDictionary<string, string>();
 			var count = SteamMatchmaking.GetLobbyDataCount(id);
@@ -385,7 +378,6 @@ namespace QTool
 		{
 			public CSteamID Key { get => SteamID; set => SteamID = value; }
 			public CSteamID SteamID { get; internal set; }
-			public SteamNetworkPingLocation_t PingLocation { get; internal set; }
 			public T GetData<T>(string key)
 			{
 				return SteamID.GetLobbyMemberData<T>(key);
@@ -402,7 +394,6 @@ namespace QTool
 			public QLobbyMember[] Members { get; internal set; }
 			public int MemberLimit { get; internal set; }
 			public QDictionary<string,string> Data { get; internal set; }
-			public SteamNetworkPingLocation_t PingLocation =>Members==null?default:Members.Get(Owner).PingLocation;
 			public string this[string key]
 			{
 				get

@@ -105,17 +105,6 @@ namespace QTool.Net
 		/// </summary>
 		public abstract string ClientId { get; }
 		public virtual int Ping => 0;
-		QTimer PingTimer = new QTimer(1);
-		public virtual void FreshPing()
-		{
-		}
-		public void FixedUpdate()
-		{
-			if (ClientConnected&&!ServerActive&&PingTimer.Check(Time.deltaTime))
-			{
-				FreshPing();
-			}
-		}
 		/// <summary>
 		/// 客户端连接成功事件
 		/// </summary>

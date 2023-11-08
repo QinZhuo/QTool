@@ -18,10 +18,6 @@ namespace QTool
 		}
 		public static T ParseQData<T>(this string qdataStr, T target = default, bool hasName = true)
 		{
-			//if (typeof(T) == typeof(string))
-			//{
-			//	return (T)(object)qdataStr;
-			//}
 			return (T)ParseQDataType(qdataStr, typeof(T), hasName, target);
 		}
 		public static T QDataGet<T>(this string qdataStr, int index)

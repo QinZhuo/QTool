@@ -99,18 +99,9 @@ namespace QTool.Net
             ReliableMaxMessageSize = KcpConnection.ReliableMaxMessageSize(ReceiveWindowSize);
         }
 		public override string ClientId => SystemInfo.deviceName + (Debug.isDebugBuild ? "_" + System.Diagnostics.Process.GetCurrentProcess().Id : "");
-		public override int Ping => UnityPing==null||!UnityPing.isDone?0:UnityPing.time;
-		private Ping UnityPing = null;
-		private string pingAddress="";
-		public override void FreshPing()
-		{
-			UnityPing?.DestroyPing();
-			UnityPing = new Ping(pingAddress);
-		}
+	
 		protected override void ClientConnect(string address)
         {
-			pingAddress = address;
-			FreshPing();
 			Client.Connect(address, Port, NoDelay, Interval, FastResend, CongestionWindow, SendWindowSize, ReceiveWindowSize, Timeout, MaxRetransmit, MaximizeSendReceiveBuffersToOSLimit);
 		}
         protected override void ClientSend(byte[] segment)

@@ -37,7 +37,6 @@ namespace QTool.Net
 		{
 			try
 			{
-				SteamNetworkingUtils.InitRelayNetworkAccess();
 				if (!ServerActive)
 				{
 					Server = new QSteamServer(UseP2P);
@@ -92,16 +91,7 @@ namespace QTool.Net
 		}
 
 		public override string ClientId => QSteam.Id.ToString();
-		public override int Ping => SteamPing;
 		private QSteamClient Client { get; set; }
-		private int SteamPing { get; set; }
-		public override void FreshPing()
-		{
-			if (!QSteam.CurrentLobby.PingLocation.IsNull())
-			{
-				SteamPing = QSteam.Ping(QSteam.CurrentLobby.PingLocation);
-			}
-		}
 		protected override void ClientConnect(string address)
 		{
 			try
