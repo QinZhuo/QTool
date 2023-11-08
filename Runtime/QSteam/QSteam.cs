@@ -18,7 +18,8 @@ namespace QTool
     {
 		public static CSteamID Id => SteamUser.GetSteamID();
 		public static string Name => SteamFriends.GetPersonaName();
-		public static ESteamNetworkingAvailability NetworkStatus => SteamNetworkingUtils.GetRelayNetworkStatus(out var status);
+		public static ESteamNetworkingAvailability NetworkStatus { get; private set; }
+		public static Callback<SteamRelayNetworkStatus_t> OnNetworkStatusChange = null;
 		static QSteam()
 		{
 			if (!Packsize.Test())
@@ -53,6 +54,7 @@ namespace QTool
 #endif
 				return;
 			}
+			OnNetworkStatusChange = Callback<SteamRelayNetworkStatus_t>.Create(status => { QDebug.Log(nameof(QSteam) + nameof(NetworkStatus) + " : " + status.ToQData()); NetworkStatus = status.m_eAvail; });
 			SteamClient.SetWarningMessageHook(SteamAPIDebugTextHook);
 			QToolManager.Instance.OnUpdateEvent += SteamAPI.RunCallbacks;
 			QEventManager.RegisterOnce(QToolEvent.游戏退出完成, LeaveLobby, SteamAPI.Shutdown);
