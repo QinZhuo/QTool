@@ -78,7 +78,7 @@ namespace QTool
 			{
 				QDebug.LogWarning("缺少翻译[" + value + "][" + Language + "]");
 			}
-#endif
+#endif 
 			return value;
 		}
 		public static QDictionary<string, string> KeyReplace = new QDictionary<string, string>();
