@@ -194,18 +194,32 @@ namespace QTool
 		public static QLobby CurrentLobby => _CurrentLobby;
  
         private static int chatId = 0;
+		private static QDictionary<string, string> LocalMemberData = new QDictionary<string, string>();
 		public static void SetLobbyMemberData<T>(string key, T value)
         {
 			var data = value.ToQData();
 			QDebug.Log(CurrentLobby.SteamID+"."+Name + "." + key + " = " + data);
-            SteamMatchmaking.SetLobbyMemberData(CurrentLobby.SteamID, key, data);
-			QPlayerPrefs.Set(nameof(QLobby) + "." + key, value);
+			if (CurrentLobby.IsNull())
+			{
+				LocalMemberData[key] = data;
+			}
+			else
+			{
+				SteamMatchmaking.SetLobbyMemberData(CurrentLobby.SteamID, key, data);
+			}
 		}
 		public static T GetLobbyMemberData<T>(string key, T defaultValue = default)
 		{
 			if (CurrentLobby.IsNull())
 			{
-				return QPlayerPrefs.Get<T>(nameof(QLobby) + "." + key);
+				if (LocalMemberData.ContainsKey(key))
+				{
+					return LocalMemberData[key].ParseQData(defaultValue);
+				}
+				else
+				{
+					return defaultValue;
+				}
 			}
 			return Id.GetLobbyMemberData(key, defaultValue);
 		}
@@ -283,7 +297,11 @@ namespace QTool
 						continue;
 					}
                 }
-            }
+			}
+			else
+			{
+				return await CreateLobby();
+			}
 			return false;
 		}
         public static async Task<bool> JoinLobby(CSteamID id)
@@ -299,9 +317,9 @@ namespace QTool
 			QDebug.Log("加入房间[" + join.m_ulSteamIDLobby + "]");
             return true;
         }
-        public static async Task CreateLobby(int maxMembers = 10,ELobbyType eLobbyType = ELobbyType.k_ELobbyTypePublic)
+        public static async Task<bool> CreateLobby(int maxMembers = 10,ELobbyType eLobbyType = ELobbyType.k_ELobbyTypePublic)
         {
-			if (!CurrentLobby.IsNull() && CurrentLobby.Owner == Id) return;
+			if (!CurrentLobby.IsNull() && CurrentLobby.Owner == Id) return true;
 			var create = await SteamMatchmaking.CreateLobby(eLobbyType, maxMembers).GetResult<LobbyCreated_t>();
 			if (create.m_ulSteamIDLobby != 0)
 			{
@@ -310,10 +328,20 @@ namespace QTool
 				_CurrentLobby[nameof(Name)] = Name;
 				_CurrentLobby[nameof(Application.productName)] = Application.productName;
 				_CurrentLobby[nameof(Application.version)] = Application.version;
+				if (LocalMemberData.Count > 0)
+				{
+					foreach (var kv in LocalMemberData)
+					{
+						SteamMatchmaking.SetLobbyMemberData(CurrentLobby.SteamID, kv.Key, kv.Value);
+					}
+					LocalMemberData.Clear();
+				}
+				return true;
 			}
 			else
 			{
 				Debug.LogError(nameof(QSteam) + " 创建房间出错" + create.m_eResult);
+				return false;
 			}
 		}
 		public static void UpdateLobby()
