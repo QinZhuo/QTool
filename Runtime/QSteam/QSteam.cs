@@ -273,6 +273,10 @@ namespace QTool
         static void SetCurRoom(ulong id)
         {
             UpdateLobby((CSteamID)id, ref _CurrentLobby);
+			if (OnUpdateLobby != null)
+			{
+				OnUpdateLobby.Unregister();
+			}
             OnUpdateLobby = Callback<LobbyDataUpdate_t>.Create((info) =>
             {
                 UpdateLobby((CSteamID)info.m_ulSteamIDLobby, ref _CurrentLobby);
