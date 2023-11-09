@@ -134,7 +134,7 @@ namespace QTool
 			}
 		}
 		private static RenderTexture GameTexture = null;
-		[System.Diagnostics.Conditional("DEVELOPMENT_BUILD"), System.Diagnostics.Conditional("UNITY_EDITOR")]
+		[System.Diagnostics.Conditional("UNITY_EDITOR")]
 		private static void OpenPanel()
 		{
 			if (DebugPanel != null && DebugPanel.visible) return;
@@ -254,12 +254,12 @@ namespace QTool
 			Log("【" + key + "】运行时间 " + stopwatch.Elapsed + " 内存使用 " + (GC.GetTotalMemory(false) - lastMemery).ToSizeString() + " 垃圾回收次数 " + (GC.CollectionCount(0) - lastCount));
 			stopwatch.Stop();
 		}
-		[System.Diagnostics.Conditional("DEVELOPMENT_BUILD"), System.Diagnostics.Conditional("UNITY_EDITOR")]
+		[System.Diagnostics.Conditional("UNITY_EDITOR")]
 		public static void Log(object obj)
 		{
 			Debug.Log("[" + nameof(QDebug) + "]  " + obj);
 		}
-		[System.Diagnostics.Conditional("DEVELOPMENT_BUILD"), System.Diagnostics.Conditional("UNITY_EDITOR")]
+		[System.Diagnostics.Conditional("UNITY_EDITOR")]
 		public static void LogWarning(object obj)
 		{
 			Debug.LogWarning("[" + nameof(QDebug) + "]  " + obj);

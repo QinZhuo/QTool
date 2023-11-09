@@ -250,7 +250,7 @@ namespace QTool
 			floatEventList.Get(eventName)?.eventAction?.Invoke(value);
 		}
 
-		[System.Diagnostics.Conditional("DEVELOPMENT_BUILD"), System.Diagnostics.Conditional("UNITY_EDITOR")]
+		[System.Diagnostics.Conditional("UNITY_EDITOR")]
 		void Log(string eventName, object value=null)
 		{
 #if UNITY_EDITOR
