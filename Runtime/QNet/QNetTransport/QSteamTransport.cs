@@ -21,9 +21,9 @@ namespace QTool.Net
 		protected override void Awake()
 		{
 			base.Awake();
-			if (!QSteam.CurrentLobby.IsNull())
+			if (!QSteam.CurrentLobby.IsNull() || QSteam.LocalMemberData.Count > 0)
 			{
-				if(QSteam.CurrentLobby.Owner == QSteam.Id)
+				if (QSteam.CurrentLobby.IsNull() || QSteam.CurrentLobby.Owner == QSteam.Id)
 				{
 					Manager.StartHost();
 				}

@@ -194,7 +194,7 @@ namespace QTool
 		public static QLobby CurrentLobby => _CurrentLobby;
  
         private static int chatId = 0;
-		private static QDictionary<string, string> LocalMemberData = new QDictionary<string, string>();
+		public static QDictionary<string, string> LocalMemberData { get; private set; } = new QDictionary<string, string>();
 		public static void SetLobbyMemberData<T>(string key, T value)
         {
 			var data = value.ToQData();
