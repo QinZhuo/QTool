@@ -166,7 +166,12 @@ namespace QTool
 		}
 		public static GameObject Get(GameObject prefab, Vector3 position = default, Quaternion rotation = default)
 		{
-			var obj = GetPool(prefab.name, prefab).Get();
+			var pool = GetPool(prefab.name, prefab);
+			var obj = pool.Get();
+			while (obj == null)
+			{
+				obj = pool.Get();
+			}
 			if (position != default)
 			{
 				obj.transform.position = position;
