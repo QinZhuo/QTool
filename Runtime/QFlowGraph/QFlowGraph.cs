@@ -59,10 +59,7 @@ namespace QTool.FlowGraph
 			var info = "";
 			if (StartKeys.Length == 0)
 			{
-				foreach (var kv in StartNode)
-				{
-					info += ToInfoString(kv.Key) + "\n";
-				}
+				info += StartNode.ToOneString("\n", kv => ToInfoString(kv.Key));
 			}
 			else
 			{
@@ -70,7 +67,7 @@ namespace QTool.FlowGraph
 				{
 					var node = GetNode(key);
 					if (node?.command != null)
-					{ 
+					{
 						return node.ToInfoString();
 					}
 					return "";
