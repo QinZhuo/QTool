@@ -70,7 +70,7 @@ namespace QTool.FlowGraph
 				{
 					var node = GetNode(key);
 					if (node?.command != null)
-					{
+					{ 
 						return node.ToInfoString();
 					}
 					return "";
