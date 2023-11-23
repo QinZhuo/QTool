@@ -9,12 +9,8 @@ public class QKeyInfoTrigger : MonoBehaviour, IPointerEnterHandler, IPointerExit
 {
 	public static event Action<QKeyInfoTrigger> OnEnter;
 	public static event Action<QKeyInfoTrigger> OnExit;
-	public string Key { get; set; }
+	public string Key { get => name; set => name = value; }
 	public string Info { get; set; }
-	private void Awake()
-	{
-		Key = gameObject.QName();
-	}
 	public void Set(string key, string info)
 	{
 		Key = key;
