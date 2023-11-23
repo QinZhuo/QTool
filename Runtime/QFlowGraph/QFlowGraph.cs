@@ -61,12 +61,12 @@ namespace QTool.FlowGraph
 			{
 				foreach (var kv in StartNode)
 				{
-					info += ToInfoString(kv.Key) + " ";
+					info += ToInfoString(kv.Key) + "\n";
 				}
 			}
 			else
 			{
-				info = StartKeys.ToOneString(" ", (key) =>
+				info = StartKeys.ToOneString("\n", (key) =>
 				{
 					var node = GetNode(key);
 					if (node?.command != null)
