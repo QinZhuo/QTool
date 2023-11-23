@@ -9,6 +9,10 @@ namespace QTool
 	public abstract class QAssetLoader<TPath, TObj> : MonoBehaviour where TObj : UnityEngine.Object
 	{
 		public UnityEvent<TObj> OnLoad;
+		public void Start()
+		{
+			InvokeLoad(name);
+		}
 		public void InvokeLoad(string key)
 		{
 			var obj = Load(key);
