@@ -40,8 +40,6 @@ namespace QTool
 	{
 		[QName("最大层数")]
 		public int MaxCount { get; protected set; } = -1;
-		[QName("时间事件")]
-		public float TimeEvent { get; protected set; } = 0;
 		public class Runtime : QRuntime<Runtime, T>
 		{
 			[QName("层数")]
@@ -50,7 +48,6 @@ namespace QTool
 			[QName("时间")]
 			public QRuntimeRangeValue Time { get; private set; } = new QRuntimeRangeValue();
 			public QFlowGraph Graph { get; private set; }
-			public QTimer TimeEvent { get; private set; }
 			protected override void Init(string key)
 			{
 				base.Init(key);
@@ -58,10 +55,6 @@ namespace QTool
 				{
 					Graph = Data.Effect.Graph.QDataCopy();
 					Graph.RegisterValue(this);
-				}
-				if (Data.TimeEvent > 0)
-				{
-					TimeEvent = new QTimer(Data.TimeEvent);
 				}
 			}
 			public override void OnDestroy()
@@ -88,7 +81,6 @@ namespace QTool
 		const string RemoveEventKey = "移除";
 		const string StartEventKey = "开始";
 		const string StopEventKey = "停止";
-		const string TimeEventKey = "时间";
 		/// <summary>
 		/// 添加Buff时执行
 		/// </summary>
@@ -231,13 +223,6 @@ namespace QTool
 					if (buff.Time.CurrentValue <= 0)
 					{
 						DelayRemove.Add(buff.Key);
-					}
-				}
-				if (buff.TimeEvent != null)
-				{
-					if (buff.TimeEvent.Check(deltaTime))
-					{
-						buff.InvokeEvent(TimeEventKey);
 					}
 				}
 			}

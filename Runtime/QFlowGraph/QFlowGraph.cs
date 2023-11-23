@@ -54,10 +54,10 @@ namespace QTool.FlowGraph
 			}
 			return value;
 		}
-		public string ToInfoString(string startKey=null)
+		public string ToInfoString(params string[] StartKeys)
 		{
 			var info = "";
-			if (startKey.IsNull())
+			if (StartKeys.Length == 0)
 			{
 				foreach (var kv in StartNode)
 				{
@@ -66,11 +66,15 @@ namespace QTool.FlowGraph
 			}
 			else
 			{
-				var node = GetNode(startKey);
-				if (node?.command != null)
+				info = StartKeys.ToOneString(" ", (key) =>
 				{
-					info = node.ToInfoString();
-				}
+					var node = GetNode(key);
+					if (node?.command != null)
+					{
+						return node.ToInfoString();
+					}
+					return "";
+				});
 			}
 			return info;
 		}

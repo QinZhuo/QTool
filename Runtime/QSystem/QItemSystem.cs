@@ -8,7 +8,7 @@ namespace QTool
 {
 	public abstract class QItemData<T>: QEffectData<T> where T: QItemData<T>,IKey<string>,new()
 	{
-		[QName("最大层数"),QOldName("最大叠层")]
+		[QName("最大层数")]
 		public int MaxCount { get; protected set; } = -1;
 		public class Runtime : QRuntime<Runtime, T>
 		{
