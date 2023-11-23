@@ -107,6 +107,7 @@ namespace QTool
 				return result;
 			}, obj =>
 			{
+				if (obj == null) return;
 				obj.transform.SetParent(null, true);
 				obj.transform.localScale = prefab.transform.localScale;
 				obj.transform.position = prefab.transform.position;
