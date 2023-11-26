@@ -71,10 +71,6 @@ namespace QTool
 		{
 			return ('{' + key + '}');
 		}
-		public static string ToLocationString(this string key, Color color)
-		{
-			return ('{' + key + '}').ToColorString(color);
-		}
 		public static string ToShortString(this object obj, int length = 5000)
 		{
 			var str = obj?.ToString();
@@ -98,7 +94,7 @@ namespace QTool
 		}
 		public static string ToColorString(this string text, Color color)
 		{
-			return ToColorString(text, ColorUtility.ToHtmlStringRGB(color));
+			return text.ToLocationString().ToColorString(ColorUtility.ToHtmlStringRGB(color));
 		}
 
 		public static string ToSizeString(this int byteLength)
