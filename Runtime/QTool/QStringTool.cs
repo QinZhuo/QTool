@@ -92,11 +92,14 @@ namespace QTool
 			}
 			return "<color=" + color + ">" + text + "</color>";
 		}
+		public static string ToColorString(this string text)
+		{
+			return text.ToColorString(text.ToColor());
+		}
 		public static string ToColorString(this string text, Color color)
 		{
 			return text.ToLocationString().ToColorString(ColorUtility.ToHtmlStringRGB(color));
 		}
-
 		public static string ToSizeString(this int byteLength)
 		{
 			return ToSizeString((long)byteLength);
