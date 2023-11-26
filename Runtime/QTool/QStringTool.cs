@@ -24,7 +24,7 @@ namespace QTool
 			{
 				if (obj is GameObject gameObject)
 				{
-					return gameObject.name.SplitStartString("(").TrimEnd();
+					return gameObject.name.SplitStartString("(").SplitStartString("_").TrimEnd();
 				}
 				else if (obj is Component component)
 				{
