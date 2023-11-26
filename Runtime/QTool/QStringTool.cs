@@ -92,9 +92,10 @@ namespace QTool
 			}
 			return "<color=" + color + ">" + text + "</color>";
 		}
-		public static string ToColorString(this string text)
+		public static string ToColorString(this object obj)
 		{
-			return text.ToColorString(text.ToColor());
+			var str = obj.ToString();
+			return str.ToColorString(str.ToColor());
 		}
 		public static string ToColorString(this string text, Color color)
 		{
