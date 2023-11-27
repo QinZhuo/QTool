@@ -15,7 +15,6 @@ namespace QTool
 		}
 		public void InvokeLoad(string key)
 		{
-			name = key;
 			var obj = Load(key);
 			if (obj == null)
 			{
@@ -28,7 +27,6 @@ namespace QTool
 		}
 		public async void InvokeLoadAsync(string key)
 		{
-			name = key;
 			var obj = await LoadAsync(key);
 			if (obj == null)
 			{
