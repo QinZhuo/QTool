@@ -47,9 +47,7 @@ namespace QTool
 			if (!SteamAPI.Init())
 			{
 				Debug.LogError(nameof(QSteam) + " 初始化失败");
-#if !UNITY_EDITOR
 				QTool.Quit();
-#endif
 				return;
 			}
 			SteamClient.SetWarningMessageHook(SteamAPIDebugTextHook);
