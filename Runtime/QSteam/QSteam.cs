@@ -50,7 +50,7 @@ namespace QTool
 				QTool.Quit();
 				return;
 			}
-			SteamClient.SetWarningMessageHook(SteamAPIDebugTextHook);
+			SteamClient.SetWarningMessageHook(SteamAPIDebugTextHook); 
 			QToolManager.Instance.OnUpdateEvent += SteamAPI.RunCallbacks;
 			QEventManager.RegisterOnce(QToolEvent.游戏退出完成, LeaveLobby, SteamAPI.Shutdown);
 			SteamNetworkingUtils.InitRelayNetworkAccess();
