@@ -79,8 +79,8 @@ namespace QTool
 	{
 		const string AddEventKey = "添加";
 		const string RemoveEventKey = "移除";
-		const string StartEventKey = "开始";
-		const string StopEventKey = "停止";
+		const string BeginEventKey = "开始";
+		const string EndEventKey = "结束";
 		/// <summary>
 		/// 添加Buff时执行
 		/// </summary>
@@ -92,11 +92,11 @@ namespace QTool
 		/// <summary>
 		/// 初始化Buff时执行 多个叠层只会执行一次
 		/// </summary>
-		public event Action<QBuffData<BuffData>.Runtime> OnStartBuff = null;
+		public event Action<QBuffData<BuffData>.Runtime> OnBeginBuff = null;
 		/// <summary>
 		/// 结束Buff时执行 多个叠层只会执行一次
 		/// </summary>
-		public event Action<QBuffData<BuffData>.Runtime> OnStopBuff = null;
+		public event Action<QBuffData<BuffData>.Runtime> OnEndBuff = null;
 		public QDictionary<string, QBuffData<BuffData>.Runtime> Buffs { get; private set; } = new QDictionary<string, QBuffData<BuffData>.Runtime>();
 		private QDictionary<string, Action<string>> EventActions { get; set; } = new QDictionary<string, Action<string>>();
 		public int this[string key]
@@ -118,7 +118,7 @@ namespace QTool
 				buff.Time.BaseValue = time;
 				buff.Time.CurrentValue = buff.Time.MaxValue;
 				buff.Count.BaseValue = count;
-				StartBuff(buff);
+				BeginBuff(buff);
 				for (int i = 0; i < count; i++)
 				{
 					OnAdd(buff);
@@ -161,7 +161,7 @@ namespace QTool
 				var buff = Buffs[key];
 				if (buff.Data.MaxCount == 1)
 				{
-					StopBuff(buff);
+					EndBuff(buff);
 					buff.Count.BaseValue = 0;
 					count = 1;
 				}
@@ -170,7 +170,7 @@ namespace QTool
 					buff.Count.BaseValue -= count;
 					if (buff.Count.BaseValue <= 0)
 					{
-						StopBuff(buff);
+						EndBuff(buff);
 					}
 				}
 				for (int i = 0; i < count; i++)
@@ -179,9 +179,9 @@ namespace QTool
 				}
 			}
 		}
-		private void StartBuff(QBuffData<BuffData>.Runtime buff)
+		private void BeginBuff(QBuffData<BuffData>.Runtime buff)
 		{
-			OnStartBuff?.Invoke(buff);
+			OnBeginBuff?.Invoke(buff);
 			Buffs.Add(buff.Key, buff);
 			if (buff.Graph != null)
 			{
@@ -193,12 +193,12 @@ namespace QTool
 					}
 				}
 			}
-			buff.InvokeEvent(StartEventKey);
+			buff.InvokeEvent(BeginEventKey);
 		}
-		private void StopBuff(QBuffData<BuffData>.Runtime buff)
+		private void EndBuff(QBuffData<BuffData>.Runtime buff)
 		{
-			OnStopBuff?.Invoke(buff);
-			buff.InvokeEvent(StopEventKey);
+			OnEndBuff?.Invoke(buff);
+			buff.InvokeEvent(EndEventKey);
 			Buffs.Remove(buff.Key);
 			if (buff.Graph != null)
 			{
