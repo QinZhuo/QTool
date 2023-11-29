@@ -215,7 +215,7 @@ namespace QTool
 		}
 		public IEnumerator InvokeEventIEnumerator(string key)
 		{
-			if (EventActions.ContainsKey(key))
+			if (EventActions.ContainsKey(key) && EventActions[key] != null)
 			{
 				foreach (Func<string, IEnumerator> func in EventActions[key].GetInvocationList())
 				{

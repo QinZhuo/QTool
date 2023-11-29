@@ -300,7 +300,7 @@ namespace QTool
 			{
 				yield return InvokeEventIEnumerator(key + "每层");
 			}
-			if (EventActions.ContainsKey(key))
+			if (EventActions.ContainsKey(key) && EventActions[key] != null)
 			{
 				foreach (Func<string, IEnumerator> func in EventActions[key].GetInvocationList())
 				{
