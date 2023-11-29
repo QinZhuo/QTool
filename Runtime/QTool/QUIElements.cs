@@ -550,9 +550,9 @@ namespace QTool
 			root.AddButton("运行", () => { commandInfo.Invoke(commandInfo.TempValues.ToArray()); callBack(); });
 			return root;
 		}
-		public static VisualElement ToolTip(this VisualElement root, string text)
+		public static VisualElement Tooltip(this VisualElement root, string text)
 		{
-			root.tooltip = text;
+			root.tooltip = text.Replace('\n', ' ');
 			return root;
 		}
 		public static void Add(this VisualElement root, QInspectorType inspectorType, object target)
@@ -662,14 +662,14 @@ namespace QTool
 						{
 							CheckNewLine();
 							var size = Mathf.Lerp(25, 10, (key.Length - 1) / 5f);
-							root.AddLabel(text).ToolTip(line).style.fontSize = size;
+							root.AddLabel(text).Tooltip(line).style.fontSize = size;
 							newline = false;
 							CheckNewLine();
 						}
 						break;
 					case ">":
 						{
-							var label = root.AddLabel("||  " + text).ToolTip(line);
+							var label = root.AddLabel("||  " + text).Tooltip(line);
 							label.style.fontSize = 15;
 							label.style.color = Color.HSVToRGB(1, 0, 0.8f);
 							newline = false;
@@ -677,7 +677,7 @@ namespace QTool
 						break;
 					case "-":
 						{
-							root.AddLabel("◆ " + text).ToolTip(line);
+							root.AddLabel("◆ " + text).Tooltip(line);
 							newline = false;
 						}
 						break;

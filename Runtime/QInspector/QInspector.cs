@@ -20,6 +20,7 @@ namespace QTool
     {
 		public string name;
 		public string visibleControl;
+		public string tooltip;
         public QNameAttribute()
         {
             order = 0;

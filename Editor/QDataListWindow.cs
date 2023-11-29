@@ -81,7 +81,7 @@ namespace QTool.FlowGraph
 					else
 					{
 						var label = visual.AddLabel(value, TextAnchor.MiddleCenter);
-						label.ToolTip(value);
+						label.Tooltip(value);
 						label.style.width = 180;
 						label.style.marginLeft = 10;
 						label.style.marginRight = 10;
