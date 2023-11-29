@@ -552,7 +552,7 @@ namespace QTool
 		}
 		public static VisualElement Tooltip(this VisualElement root, string text)
 		{
-			root.tooltip = text.Replace('\n', ' '); 
+			root.tooltip = text.Replace("\n", " "); 
 			return root;
 		}
 		public static void Add(this VisualElement root, QInspectorType inspectorType, object target)
