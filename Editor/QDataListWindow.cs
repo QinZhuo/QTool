@@ -111,6 +111,7 @@ namespace QTool.FlowGraph
 									{
 										member.Set(obj, newValue);
 										label.text = member.Get(obj).ToQDataType(member.Type, false).Trim('\"');
+										label.Tooltip(label.text);
 									}, member.MemeberInfo);
 								}
 								AutoSaveLoad = false;
