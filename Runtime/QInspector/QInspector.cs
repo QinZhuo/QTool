@@ -18,8 +18,8 @@ namespace QTool
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Class | AttributeTargets.Method|AttributeTargets.Interface | AttributeTargets.Parameter|AttributeTargets.Property)]
     public class QNameAttribute : PropertyAttribute
     {
-        public string name; 
-        public string visibleControl = "";
+		public string name;
+		public string visibleControl;
         public QNameAttribute()
         {
             order = 0;
