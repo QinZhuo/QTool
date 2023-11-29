@@ -211,11 +211,17 @@ namespace QTool
 		}
 		public void InvokeEvent(string key)
 		{
+			InvokeEventIEnumerator(key).Start();
+		}
+		public IEnumerator InvokeEventIEnumerator(string key)
+		{
 			if (EventActions.ContainsKey(key))
 			{
-				EventActions[key]?.Invoke(key);
+				foreach (Func<string, IEnumerator> func in EventActions[key].GetInvocationList())
+				{
+					yield return func(key);
+				}
 			}
 		}
-		
 	}
 }

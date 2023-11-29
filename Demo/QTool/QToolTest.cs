@@ -274,6 +274,16 @@ namespace QTool.Test
 		{
 			testObject.GridFixed(Vector3.one);
 		}
+		[QName]
+		public void FuncTest()
+		{
+			Func<string> test=()=>"123";
+			test += () => "345";
+			foreach (Func<string> item in test.GetInvocationList())
+			{
+				Debug.LogError(item());
+			}
+		}
 
 		IEnumerator RunTest()
 		{

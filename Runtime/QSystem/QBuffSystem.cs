@@ -68,9 +68,13 @@ namespace QTool
 			}
 			public void InvokeEvent(string key)
 			{
+				InvokeEventIEnumerator(key).Start();
+			}
+			public IEnumerator InvokeEventIEnumerator(string key)
+			{
 				if (Graph != null && Graph.GetNode(key) != null)
 				{
-					Graph.Run(key);
+					yield return Graph.RunIEnumerator(key);
 				}
 			}
 		}
@@ -98,7 +102,7 @@ namespace QTool
 		/// </summary>
 		public event Action<QBuffData<BuffData>.Runtime> OnEndBuff = null;
 		public QDictionary<string, QBuffData<BuffData>.Runtime> Buffs { get; private set; } = new QDictionary<string, QBuffData<BuffData>.Runtime>();
-		private QDictionary<string, Action<string>> EventActions { get; set; } = new QDictionary<string, Action<string>>();
+		private QDictionary<string, Func<string, IEnumerator>> EventActions { get; set; } = new QDictionary<string, Func<string, IEnumerator>>();
 		public int this[string key]
 		{
 			get
@@ -189,7 +193,7 @@ namespace QTool
 				{
 					if (!node.Value.Name.EndsWith("每层"))
 					{
-						EventActions[node.Value.Name] += buff.InvokeEvent;
+						EventActions[node.Value.Name] += buff.InvokeEventIEnumerator;
 					}
 				}
 			}
@@ -206,7 +210,7 @@ namespace QTool
 				{
 					if (!node.Value.Name.EndsWith("每层"))
 					{
-						EventActions[node.Value.Name] -= buff.InvokeEvent;
+						EventActions[node.Value.Name] -= buff.InvokeEventIEnumerator;
 					}
 				}
 			}
@@ -248,7 +252,7 @@ namespace QTool
 					{
 						if (node.Value.Name.EndsWith("每层"))
 						{
-							EventActions[node.Value.Name] += buff.InvokeEvent;
+							EventActions[node.Value.Name] += buff.InvokeEventIEnumerator;
 						}
 					}
 				}
@@ -266,7 +270,7 @@ namespace QTool
 					{
 						if (node.Value.Name.EndsWith("每层"))
 						{
-							EventActions[node.Value.Name] -= buff.InvokeEvent;
+							EventActions[node.Value.Name] -= buff.InvokeEventIEnumerator;
 						}
 					}
 				}
@@ -288,13 +292,20 @@ namespace QTool
 		}
 		public void InvokeEvent(string key)
 		{
-			if (EventActions.ContainsKey(key))
-			{
-				EventActions[key]?.Invoke(key);
-			}
+			InvokeEventIEnumerator(key).Start();
+		}
+		public IEnumerator InvokeEventIEnumerator(string key)
+		{
 			if (!key.EndsWith("每层"))
 			{
-				InvokeEvent(key + "每层");
+				yield return InvokeEventIEnumerator(key + "每层");
+			}
+			if (EventActions.ContainsKey(key))
+			{
+				foreach (Func<string, IEnumerator> func in EventActions[key].GetInvocationList())
+				{
+					yield return func(key);
+				}
 			}
 		}
 
