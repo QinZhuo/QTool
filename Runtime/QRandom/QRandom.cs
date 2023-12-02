@@ -38,6 +38,30 @@ namespace QTool
 			if (list == null || list.Count == 0) return default;
 			return list[random.Range(0, list.Count)];
 		}
+		public static T RandomGet<T>(this IList<T> list, Func<T, float> toFloat, Random random)
+		{
+			return random.RandomGet(list, toFloat);
+		}
+		public static T RandomGet<T>(this Random random, IList<T> list, Func<T, float> toFloat)
+		{
+			if (list == null || list.Count == 0) return default;
+			var sum = 0f;
+			foreach (var item in list)
+			{
+				sum += toFloat(item);
+			}
+			var value = random.Range(0, sum);
+			foreach (var item in list)
+			{
+				var range = toFloat(item);
+				if (value <= range)
+				{
+					return item;
+				}
+				value -= range;
+			}
+			return default;
+		}
 		public static IList<T> RandomList<T>(this IList<T> list, Random random = null)
 		{
 			return RandomList(random, list);
