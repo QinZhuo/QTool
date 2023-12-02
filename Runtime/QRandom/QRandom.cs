@@ -38,7 +38,7 @@ namespace QTool
 			if (list == null || list.Count == 0) return default;
 			return list[random.Range(0, list.Count)];
 		}
-		public static T RandomGet<T>(this IList<T> list, Func<T, float> toFloat, Random random)
+		public static T RandomGet<T>(this IList<T> list, Func<T, float> toFloat, Random random = null)
 		{
 			return random.RandomGet(list, toFloat);
 		}
