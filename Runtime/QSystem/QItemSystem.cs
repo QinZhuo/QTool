@@ -223,7 +223,7 @@ namespace QTool
 				foreach (Func<string, IEnumerator> func in EventActions[key].GetInvocationList())
 				{
 					yield return func(key);
-				}
+				} 
 			}
 		}
 	}
