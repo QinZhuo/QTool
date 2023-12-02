@@ -54,7 +54,7 @@ namespace QTool
 			foreach (var item in list)
 			{
 				var range = toFloat(item);
-				if (value <= range)
+				if (value < range)
 				{
 					return item;
 				}
