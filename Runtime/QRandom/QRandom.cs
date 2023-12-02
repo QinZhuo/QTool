@@ -52,19 +52,6 @@ namespace QTool
 			}
 			return list;
 		}
-		public static void Split(this Random random, int sum, params Action<int>[] actions)
-		{
-			if (actions.Length == 0) return;
-			List<Action<int>> actionList = new List<Action<int>>(actions);
-			random.RandomList(actionList);
-			for (int i = 0; i < actionList.Count - 1; i++)
-			{
-				var value = random.Range(0, sum + 1);
-				actionList[i](value);
-				sum -= value;
-			}
-			actionList[actionList.Count - 1](sum);
-		}
 		/// <summary>
 		/// 正态分布随机数
 		/// </summary>
@@ -85,8 +72,8 @@ namespace QTool
 			var w = 0f;
 			do
 			{
-				u = random.Range(-1, 1);
-				v = random.Range(-1, 1);
+				u = random.Range(-1f, 1f);
+				v = random.Range(-1f, 1f);
 				w = u * u + v * v;
 			} while (w == 0 || w >= 1);
 			return u * Mathf.Sqrt((-2 * Mathf.Log(w)) / w);

@@ -170,6 +170,14 @@ namespace QTool.Test
 			QScreen.SetResolution(900, 600, value);
 		}
 		public Texture2D CaptureTexture2d;
+		[QName]
+		public void QRandomTest()
+		{
+			for (int i = 0; i < 10; i++)
+			{
+				Debug.LogError(QRandom.Instance.Normal());
+			}
+		}
 		[QName("截图测试")]
 		public void RenderTest()
 		{
