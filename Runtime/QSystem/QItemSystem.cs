@@ -33,12 +33,15 @@ namespace QTool
 					Graph = null;
 				}
 			}
-		
 			public void InvokeEvent(string key)
+			{
+				InvokeEventIEnumerator(key).Start();
+			}
+			public IEnumerator InvokeEventIEnumerator(string key)
 			{
 				if (Graph != null && Graph.GetNode(key) != null)
 				{
-					Graph.Run(key);
+					yield return Graph.RunIEnumerator(key);
 				}
 			}
 		}
@@ -48,7 +51,7 @@ namespace QTool
 		const string AddEventKey = "添加";
 		const string RemoveEventKey = "移除";
 		public List<QItemData<ItemData>.Runtime> Items { get; private set; } = new List<QItemData<ItemData>.Runtime>();
-		private QDictionary<string, Action<string>> EventActions { get; set; } = new QDictionary<string, Action<string>>();
+		private QDictionary<string, Func<string, IEnumerator>> EventActions { get; set; } = new QDictionary<string, Func<string, IEnumerator>>();
 		public int this[string key]
 		{
 			get
@@ -174,7 +177,7 @@ namespace QTool
 					var name = node.Value.Name;
 					if (name != AddEventKey && name != RemoveEventKey)
 					{
-						EventActions[name] += item.InvokeEvent;
+						EventActions[name] += item.InvokeEventIEnumerator;
 					}
 				}
 			}
@@ -190,7 +193,7 @@ namespace QTool
 					var name = node.Value.Name;
 					if (name != AddEventKey && name != RemoveEventKey)
 					{
-						EventActions[name] -= item.InvokeEvent;
+						EventActions[name] -= item.InvokeEventIEnumerator;
 					}
 				}
 			}
