@@ -308,6 +308,13 @@ namespace QTool
 				}
 			}
 		}
+		public void Clear()
+		{
+			foreach (var buff in Buffs.ToList())
+			{
+				Remove(buff.Key, buff.Count.IntValue);
+			}
+		}
 
 	}
 }
