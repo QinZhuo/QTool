@@ -17,6 +17,15 @@ namespace QTool
 		{
 			return UnityEngine.Color.HSVToRGB(random.Range(0, 1f), 0.5f, 1);
 		}
+		public static Func<T, float> GetToFloat<T>(this IList<T> list, Func<T, int> toRateIndex, params float[] rates)
+		{
+			var Counts = new QDictionary<int, int>();
+			foreach (var item in list)
+			{
+				Counts[toRateIndex(item)]++;
+			}
+			return item => { var index = toRateIndex(item); return Counts[index] == 0 ? 0 : rates[index] / Counts[index]; };
+		}
 		public static T RandomPop<T>(this IList<T> list, Func<T, float> toFloat = null, Random random = null)
 		{
 			return RandomPop(random, list, toFloat);
