@@ -17,11 +17,11 @@ namespace QTool
 		{
 			return UnityEngine.Color.HSVToRGB(random.Range(0, 1f), 0.5f, 1);
 		}
-		public static T RandomPop<T>(this IList<T> list, Func<T, float> toRateIndex = null, params int[] rate)
+		public static T RandomPop<T>(this IList<T> list, Func<T, float> toRateIndex = null, params float[] rate)
 		{
 			return Instance.RandomPop(list, toRateIndex, rate);
 		}
-		public static T RandomPop<T>(this Random random, IList<T> list, Func<T, float> toRateIndex = null, params int[] rate)
+		public static T RandomPop<T>(this Random random, IList<T> list, Func<T, float> toRateIndex = null, params float[] rate)
 		{
 			if (list == null || list.Count == 0) return default;
 			var index = random.RandomIndex(list, toRateIndex, rate);
@@ -29,20 +29,20 @@ namespace QTool
 			list.RemoveAt(index);
 			return obj;
 		}
-		public static T RandomGet<T>(this IList<T> list, Func<T, float> toRateIndex = null, params int[] rate)
+		public static T RandomGet<T>(this IList<T> list, Func<T, float> toRateIndex = null, params float[] rate)
 		{
 			return Instance.RandomGet(list, toRateIndex, rate);
 		}
-		public static T RandomGet<T>(this Random random, IList<T> list, Func<T, float> toRateIndex = null, params int[] rate)
+		public static T RandomGet<T>(this Random random, IList<T> list, Func<T, float> toRateIndex = null, params float[] rate)
 		{
 			if (list == null || list.Count == 0) return default;
 			return list[random.RandomIndex(list, toRateIndex, rate)];
 		}
-		public static int RandomIndex<T>(this IList<T> list, Func<T, float> toRateIndex = null, params int[] rate)
+		public static int RandomIndex<T>(this IList<T> list, Func<T, float> toRateIndex = null, params float[] rate)
 		{
 			return Instance.RandomIndex(list, toRateIndex, rate);
 		}
-		public static int RandomIndex<T>(this Random random, IList<T> list, Func<T, float> toRateIndex = null, params int[] rate)
+		public static int RandomIndex<T>(this Random random, IList<T> list, Func<T, float> toRateIndex = null, params float[] rate)
 		{
 			if (toRateIndex == null)
 			{
