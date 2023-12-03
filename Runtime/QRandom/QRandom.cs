@@ -31,7 +31,7 @@ namespace QTool
 		}
 		public static T RandomGet<T>(this IList<T> list, Func<T, float> toRateIndex = null, params float[] rate)
 		{
-			return Instance.RandomGet(list, toRateIndex, rate);
+			return Instance.RandomGet(list, toRateIndex, rate); 
 		}
 		public static T RandomGet<T>(this Random random, IList<T> list, Func<T, float> toRateIndex = null, params float[] rate)
 		{
