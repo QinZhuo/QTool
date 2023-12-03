@@ -167,8 +167,8 @@ namespace QTool
 			{
 				case nameof(Log):
 				case nameof(LogWarning):
-				case nameof(LogError):
-					info = node.Ports["obj"].ToInfoString();
+				case nameof(LogError):  
+					info = node.Ports["obj"].ToInfoString(); 
 					break;
 				default:
 					break;
