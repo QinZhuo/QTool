@@ -159,6 +159,23 @@ namespace QTool
 		{
 			yield return new WaitForSeconds(time);
 		}
+		[QIgnore]
+		public static string ToInfoString(QFlowNode node)
+		{
+			var info = "";
+			switch (node.command.method.Name)
+			{
+				case nameof(Log):
+				case nameof(LogWarning):
+				case nameof(LogError):
+					info = node.Ports["obj"].ToInfoString();
+					break;
+				default:
+					break;
+			}
+			info += node.Ports[QFlowKey.NextPort].GetConnectNode()?.ToInfoString();
+			return info;
+		}
 	}
 	public class QCommandInfo : IKey<string>
     {
