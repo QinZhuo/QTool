@@ -17,78 +17,103 @@ namespace QTool
 		{
 			return UnityEngine.Color.HSVToRGB(random.Range(0, 1f), 0.5f, 1);
 		}
-		public static Func<T, float> GetToFloat<T>(this IList<T> list, Func<T, int> toRateIndex, params float[] rates)
+		public static T RandomPop<T>(this IList<T> list, Func<T, float> toRateIndex = null, params int[] rate)
 		{
-			var Counts = new QDictionary<int, int>();
-			foreach (var item in list)
-			{
-				Counts[toRateIndex(item)]++;
-			}
-			return item => { var index = toRateIndex(item); return Counts[index] == 0 ? 0 : rates[index] / Counts[index]; };
+			return Instance.RandomPop(list, toRateIndex, rate);
 		}
-		public static T RandomPop<T>(this IList<T> list, Func<T, float> toFloat = null, Random random = null)
-		{
-			return RandomPop(random, list, toFloat);
-		}
-		public static T RandomPop<T>(this Random random, IList<T> list, Func<T, float> toFloat = null)
+		public static T RandomPop<T>(this Random random, IList<T> list, Func<T, float> toRateIndex = null, params int[] rate)
 		{
 			if (list == null || list.Count == 0) return default;
-			var index = random.RandomIndex(list, toFloat);
+			var index = random.RandomIndex(list, toRateIndex, rate);
 			var obj = list[index];
 			list.RemoveAt(index);
 			return obj;
 		}
-		public static T RandomGet<T>(this IList<T> list, Func<T, float> toFloat = null, Random random = null)
+		public static T RandomGet<T>(this IList<T> list, Func<T, float> toRateIndex = null, params int[] rate)
 		{
-			return RandomGet(random,list,toFloat);
+			return Instance.RandomGet(list, toRateIndex, rate);
 		}
-		public static T RandomGet<T>(this Random random, IList<T> list, Func<T, float> toFloat = null)
+		public static T RandomGet<T>(this Random random, IList<T> list, Func<T, float> toRateIndex = null, params int[] rate)
 		{
 			if (list == null || list.Count == 0) return default;
-			return list[random.RandomIndex(list, toFloat)];
+			return list[random.RandomIndex(list, toRateIndex, rate)];
 		}
-		public static int RandomIndex<T>(this IList<T> list, Func<T, float> toFloat = null, int start = 0, int end = -1, Random random = null)
+		public static int RandomIndex<T>(this IList<T> list, Func<T, float> toRateIndex = null, params int[] rate)
 		{
-			return random.RandomIndex(list, toFloat, start, end);
+			return Instance.RandomIndex(list, toRateIndex, rate);
 		}
-		public static int RandomIndex<T>(this Random random, IList<T> list, Func<T, float> toFloat = null, int start = 0, int end = -1)
+		public static int RandomIndex<T>(this Random random, IList<T> list, Func<T, float> toRateIndex = null, params int[] rate)
 		{
-			if (end < 0) { end = list.Count; }
-			if (toFloat == null)
+			if (toRateIndex == null)
 			{
-				return random.Range(start, end);
+				return random.Range(0, list.Count);
 			}
 			else
 			{
 				var sum = 0f;
-				for (int i = start; i < end; i++)
+				if (rate.Length > 0)
 				{
-					sum += toFloat(list[i]);
-				}
-				var value = random.Range(0, sum);
-				for (int i = start; i < end; i++)
-				{
-					var curValue = toFloat(list[i]);
-					if (value < curValue)
+					var Counts = new QDictionary<int, int>();
+					foreach (var item in list)
 					{
-						return i;
+						Counts[(int)toRateIndex(item)]++;
 					}
-					value -= curValue;
+					for (int i = 0; i < rate.Length; i++)
+					{
+						if (Counts[i] > 0)
+						{
+							sum += rate[i];
+						}
+					}
+					var value = random.Range(0, sum);
+					if (rate.Length > 0)
+					{
+						for (int i = 0; i < list.Count; i++)
+						{
+							var index = (int)toRateIndex(list[i]);
+							if (Counts[index] > 0)
+							{
+								var curValue = rate[index] / Counts[index];
+								if (value < curValue)
+								{
+									return i;
+								}
+								value -= curValue;
+							}
+						}
+					}
+				}
+				else
+				{
+					foreach (var item in list)
+					{
+						sum += toRateIndex(item);
+					}
+					var value = random.Range(0, sum);
+					for (int i = 0; i < list.Count; i++)
+					{
+						var curValue = toRateIndex(list[i]);
+						if (value < curValue)
+						{
+							return i;
+						}
+						value -= curValue;
+					}
 				}
 			}
 			return -1;
 		}
-		public static IList<T> RandomList<T>(this IList<T> list, Func<T, float> toFloat = null, Random random = null)
+		public static IList<T> RandomList<T>(this IList<T> list, Random random = null)
 		{
-			return RandomList(random, list, toFloat);
+			return RandomList(random, list);
 		}
-		public static IList<T> RandomList<T>(this Random random, IList<T> list, Func<T, float> toFloat = null)
+		public static IList<T> RandomList<T>(this Random random, IList<T> list)
 		{
 			for (int i = 0; i < list.Count; i++)
 			{
 				var cur = list[i];
 				list.Remove(cur);
-				list.Insert(random.RandomIndex(list, toFloat, 0, i + 1), cur);
+				list.Insert(random.Range(0, i + 1), cur);
 			}
 			return list;
 		}
@@ -143,7 +168,7 @@ namespace QTool
 		public static Vector3 RandomPlacePosition<T>(this T target, Func<Vector3> RandomPosition, Func<Vector3, bool> CanPlace = null) where T : Component
 		{
 			var size = target.GetBounds().size;
-			var radius = Mathf.Max(size.x,size.y,size.z);
+			var radius = Mathf.Max(size.x, size.y, size.z);
 			var is2D = target.GetComponent<Collider2D>() != null;
 			Vector3 position = default;
 			for (int times = 0; times < MaxRandomTimes; times++)
