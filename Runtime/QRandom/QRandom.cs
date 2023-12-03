@@ -17,62 +17,69 @@ namespace QTool
 		{
 			return UnityEngine.Color.HSVToRGB(random.Range(0, 1f), 0.5f, 1);
 		}
-		public static T RandomPop<T>(this IList<T> list, Random random = null)
+		public static T RandomPop<T>(this IList<T> list, Func<T, float> toFloat = null, Random random = null)
 		{
-			return RandomPop(random, list);
+			return RandomPop(random, list, toFloat);
 		}
-		public static T RandomPop<T>(this Random random, IList<T> list)
+		public static T RandomPop<T>(this Random random, IList<T> list, Func<T, float> toFloat = null)
 		{
 			if (list == null || list.Count == 0) return default;
-			var index = random.Range(0, list.Count);
+			var index = random.RandomIndex(list, toFloat);
 			var obj = list[index];
 			list.RemoveAt(index);
 			return obj;
 		}
-		public static T RandomGet<T>(this IList<T> list, Random random = null)
+		public static T RandomGet<T>(this IList<T> list, Func<T, float> toFloat = null, Random random = null)
 		{
-			return RandomGet(random,list);
+			return RandomGet(random,list,toFloat);
 		}
-		public static T RandomGet<T>(this Random random, IList<T> list)
+		public static T RandomGet<T>(this Random random, IList<T> list, Func<T, float> toFloat = null)
 		{
 			if (list == null || list.Count == 0) return default;
-			return list[random.Range(0, list.Count)];
+			return list[random.RandomIndex(list, toFloat)];
 		}
-		public static T RandomGet<T>(this IList<T> list, Func<T, float> toFloat, Random random = null)
+		public static int RandomIndex<T>(this IList<T> list, Func<T, float> toFloat = null, int start = 0, int end = -1, Random random = null)
 		{
-			return random.RandomGet(list, toFloat);
+			return random.RandomIndex(list, toFloat, start, end);
 		}
-		public static T RandomGet<T>(this Random random, IList<T> list, Func<T, float> toFloat)
+		public static int RandomIndex<T>(this Random random, IList<T> list, Func<T, float> toFloat = null, int start = 0, int end = -1)
 		{
-			if (list == null || list.Count == 0) return default;
-			var sum = 0f;
-			foreach (var item in list)
+			if (end < 0) { end = list.Count; }
+			if (toFloat == null)
 			{
-				sum += toFloat(item);
+				return random.Range(start, end);
 			}
-			var value = random.Range(0, sum);
-			foreach (var item in list)
+			else
 			{
-				var range = toFloat(item);
-				if (value < range)
+				var sum = 0f;
+				for (int i = start; i < end; i++)
 				{
-					return item;
+					sum += toFloat(list[i]);
 				}
-				value -= range;
+				var value = random.Range(0, sum);
+				for (int i = start; i < end; i++)
+				{
+					var curValue = toFloat(list[i]);
+					if (value < curValue)
+					{
+						return i;
+					}
+					value -= curValue;
+				}
 			}
-			return default;
+			return -1;
 		}
-		public static IList<T> RandomList<T>(this IList<T> list, Random random = null)
+		public static IList<T> RandomList<T>(this IList<T> list, Func<T, float> toFloat = null, Random random = null)
 		{
-			return RandomList(random, list);
+			return RandomList(random, list, toFloat);
 		}
-		public static IList<T> RandomList<T>(this Random random, IList<T> list)
+		public static IList<T> RandomList<T>(this Random random, IList<T> list, Func<T, float> toFloat = null)
 		{
 			for (int i = 0; i < list.Count; i++)
 			{
 				var cur = list[i];
 				list.Remove(cur);
-				list.Insert(random.Range(0, i + 1), cur);
+				list.Insert(random.RandomIndex(list, toFloat, 0, i + 1), cur);
 			}
 			return list;
 		}
