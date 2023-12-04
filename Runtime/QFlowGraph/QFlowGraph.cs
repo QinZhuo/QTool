@@ -59,11 +59,11 @@ namespace QTool.FlowGraph
 			var info = "";
 			if (StartKeys.Length == 0)
 			{
-				info += StartNode.ToOneString(" ", kv => ToInfoString(kv.Key));
+				info += StartNode.ToOneString("\n", kv => ToInfoString(kv.Key));
 			}
 			else
 			{
-				info = StartKeys.ToOneString(" ", (key) =>
+				info = StartKeys.ToOneString("\n", (key) =>
 				{
 					var node = GetNode(key);
 					if (node?.command != null)
