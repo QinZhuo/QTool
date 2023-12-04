@@ -6,7 +6,7 @@ namespace QTool
 {
     
     [ExecuteInEditMode]
-    public class QId : MonoBehaviour
+    public class QId : MonoBehaviour 
     {
 		#region 静态数据方法
 		public static QDictionary<string, QId> InstanceIdList = new QDictionary<string, QId>();
