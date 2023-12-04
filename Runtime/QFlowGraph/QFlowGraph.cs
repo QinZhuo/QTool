@@ -1153,15 +1153,15 @@ namespace QTool.FlowGraph
 			NodeToFloat = null;
 			if (command != null) return true;
             command = QCommand.GetCommand(commandKey);
-            if (command == null)
-            {
-                foreach (var port in Ports)
-                {
-                    port.Init(this);
-                }
-                Debug.LogError("不存在命令【" + commandKey + "】");
-                return false; 
-            }
+			if (command == null)
+			{
+				foreach (var port in Ports)
+				{
+					port.Init(this);
+				}
+				Debug.LogWarning(graph.Name + " 不存在命令【" + commandKey + "】");
+				return false;
+			}
 			NodeToInfoString = command.method.DeclaringType.GetStaticMethod(nameof(ToInfoString));
 			NodeToFloat = command.method.DeclaringType.GetStaticMethod(nameof(ToFloat));
 			if (Name.IsNull())
