@@ -11,10 +11,10 @@ namespace QTool
 		{
 			get
 			{
-#if ENABLE_INPUT_SYSTEM
+#if InputSystem
 				return UnityEngine.InputSystem.Pointer.current !=null&&UnityEngine.InputSystem.Pointer.current.press.isPressed;
 #else
-				return Input.GetKey(KeyCode.Mouse0);
+				return Input.GetKey(KeyCode.Mouse0); 
 #endif
 			}
 		}
@@ -22,7 +22,7 @@ namespace QTool
 		{
 			get
 			{
-#if ENABLE_INPUT_SYSTEM
+#if InputSystem
 				return UnityEngine.InputSystem.Pointer.current==null?Vector2.zero:UnityEngine.InputSystem.Pointer.current.position.ReadValue();
 #else
 				return Input.mousePosition;
@@ -33,7 +33,7 @@ namespace QTool
 		{
 			get
 			{
-#if ENABLE_INPUT_SYSTEM
+#if InputSystem
 				return UnityEngine.InputSystem.Pointer.current == null ? Vector2.zero : UnityEngine.InputSystem.Pointer.current.delta.ReadValue();
 #else
 				return new Vector2(Input.GetAxisRaw("Mouse X"), Input.GetAxisRaw("Mouse Y"));
@@ -44,7 +44,7 @@ namespace QTool
 		{
 			get
 			{
-#if ENABLE_INPUT_SYSTEM
+#if InputSystem
 				var keyboard = UnityEngine.InputSystem.Keyboard.current;
 				return keyboard == null?Vector2.zero: new Vector2(
 					keyboard.dKey.isPressed ? 1 : (keyboard.aKey.isPressed ? -1 : 0),
@@ -60,7 +60,7 @@ namespace QTool
 		{
 			get
 			{
-#if ENABLE_INPUT_SYSTEM
+#if InputSystem
 				return UnityEngine.InputSystem.Keyboard.current != null && UnityEngine.InputSystem.Keyboard.current.spaceKey.isPressed;
 #else
 				return Input.GetKey(KeyCode.Space);
@@ -72,7 +72,7 @@ namespace QTool
 			get
 			{
 
-#if ENABLE_INPUT_SYSTEM
+#if InputSystem
 				return UnityEngine.InputSystem.Keyboard.current != null && UnityEngine.InputSystem.Keyboard.current.fKey.isPressed;
 #else
 				return Input.GetKey(KeyCode.F);
@@ -84,7 +84,7 @@ namespace QTool
 			get
 			{
 
-#if ENABLE_INPUT_SYSTEM
+#if InputSystem
 				return UnityEngine.InputSystem.Keyboard.current != null && UnityEngine.InputSystem.Keyboard.current.rKey.isPressed;
 #else
 				return Input.GetKey(KeyCode.R);
@@ -96,7 +96,7 @@ namespace QTool
 			get
 			{
 				
-#if ENABLE_INPUT_SYSTEM
+#if InputSystem
 				return UnityEngine.InputSystem.Keyboard.current != null && UnityEngine.InputSystem.Keyboard.current.shiftKey.isPressed;
 #else
 				return Input.GetKey(KeyCode.LeftShift)||Input.GetKey(KeyCode.RightShift);
@@ -108,7 +108,7 @@ namespace QTool
 			get
 			{
 				
-#if ENABLE_INPUT_SYSTEM
+#if InputSystem
 				return UnityEngine.InputSystem.Keyboard.current != null && UnityEngine.InputSystem.Keyboard.current.ctrlKey.isPressed;
 #else
 				return Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl);
@@ -121,7 +121,7 @@ namespace QTool
 			{
 
 			
-#if ENABLE_INPUT_SYSTEM
+#if InputSystem
 				return UnityEngine.InputSystem.Keyboard.current != null && UnityEngine.InputSystem.Keyboard.current.enterKey.isPressed;
 #else	
 				return Input.GetKey(KeyCode.KeypadEnter);
@@ -133,10 +133,10 @@ namespace QTool
 			get
 			{
 				
-#if ENABLE_INPUT_SYSTEM
+#if InputSystem
 				return UnityEngine.InputSystem.Keyboard.current != null && UnityEngine.InputSystem.Keyboard.current.escapeKey.isPressed;
 #else
-				return Input.GetKey(KeyCode.Escape);
+				return Input.GetKey(KeyCode.Escape); 
 #endif
 			}
 		}

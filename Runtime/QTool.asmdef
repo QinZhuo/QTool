@@ -44,6 +44,11 @@
             "name": "com.unity.ai.navigation",
             "expression": "",
             "define": "Navigation"
+        },
+        {
+            "name": "com.unity.inputsystem",
+            "expression": "",
+            "define": "InputSystem"
         }
     ],
     "noEngineReferences": false
