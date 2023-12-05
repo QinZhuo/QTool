@@ -464,7 +464,10 @@ crashlytics-build.properties
 
 # Temporary auto-generated Android Assets
 /[Aa]ssets/[Ss]treamingAssets/aa.meta
-/[Aa]ssets/[Ss]treamingAssets/aa/*");
+/[Aa]ssets/[Ss]treamingAssets/aa/*
+
+/ProjectSettings/ProjectVersion.txt
+");
 		}
 #endregion
 
