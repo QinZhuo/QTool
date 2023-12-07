@@ -474,9 +474,20 @@ namespace QTool
 					buffer.Add(kv.Key);
 				}
 			}
-			foreach (var key in buffer)
+			if (dic is QDictionary<TKey, TValue> QDic)
 			{
-				dic.Remove(key);
+				foreach (var key in buffer)
+				{
+					QDic.Remove(key);
+				}
+				
+			}
+			else
+			{
+				foreach (var key in buffer)
+				{
+					dic.Remove(key);
+				}
 			}
 		}
 		public static void Add<TKey, TValue>(this IDictionary<TKey, TValue> dic, TValue value) where TValue : IKey<TKey>
