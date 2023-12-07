@@ -454,7 +454,7 @@ namespace QTool
 		}
 		public static bool Contains<T>(this IList<T> array, T obj)
 		{
-			return array.IndexOf(obj) < 0;
+			return array.IndexOf(obj) >= 0;
 		}
 		public static bool ContainsKey<T, KeyType>(this IList<T> array, KeyType key) where T : IKey<KeyType>
 		{
