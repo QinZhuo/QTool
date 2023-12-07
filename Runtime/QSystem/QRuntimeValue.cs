@@ -112,15 +112,15 @@ namespace QTool
 			FreshValue();
 		}
 		public QRuntimeValue BaseRuntimeValue { get; private set; }
-		public void Reset(float value)
+		public void Reset(float value,params string[] ignoreKey)
 		{
 			BaseValue = value;
-			Clear();
+			Clear(ignoreKey);
 		}
-		public void Clear()
+		public void Clear(params string[] ignoreKey)
 		{
-			OffsetValues.Clear();
-			ScaleValues.Clear();
+			OffsetValues.RemoveAll(kv => !ignoreKey.Contains(kv.Key), buffer);
+			ScaleValues.RemoveAll(kv => !ignoreKey.Contains(kv.Key), buffer);
 			FreshValue();
 		}
 
