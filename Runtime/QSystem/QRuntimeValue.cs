@@ -121,7 +121,7 @@ namespace QTool
 		{
 			OffsetValues.RemoveAll(kv => !ignoreKey.Contains(kv.Key), buffer);
 			ScaleValues.RemoveAll(kv => !ignoreKey.Contains(kv.Key), buffer);
-			FreshValue(); 
+			FreshValue();  
 		}
 
 		private QValue _BaseValue { get; set; } = 0f;
