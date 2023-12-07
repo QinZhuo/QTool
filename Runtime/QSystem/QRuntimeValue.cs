@@ -143,7 +143,6 @@ namespace QTool
 			get
 			{
 				var value = 0f;
-				OffsetValues.RemoveAll(kv => kv.Value == 0, buffer);
 				foreach (var item in OffsetValues)
 				{
 					value += item.Value;
@@ -158,7 +157,6 @@ namespace QTool
 			get
 			{
 				var value = 1f;
-				ScaleValues.RemoveAll(kv => kv.Value == 0, buffer);
 				foreach (var item in ScaleValues)
 				{
 					value += item.Value;

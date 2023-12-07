@@ -480,7 +480,6 @@ namespace QTool
 				{
 					QDic.Remove(key);
 				}
-				
 			}
 			else
 			{
