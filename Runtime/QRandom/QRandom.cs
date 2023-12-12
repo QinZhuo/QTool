@@ -192,7 +192,7 @@ namespace QTool
 		private static void PercentRun(QFlowNode This, int percent = 50, [QOutputPort] QFlow True = default, [QOutputPort] QFlow False = default)
 		{
 			var value = QRandom.Instance.Range(0, 100);
-			if (value > percent)
+			if (value < percent)
 			{
 				This.SetNetFlowPort(nameof(True));
 			}
