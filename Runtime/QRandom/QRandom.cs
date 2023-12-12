@@ -185,14 +185,14 @@ namespace QTool
 		}
 	}
 
-	[QCommandType("基础/程序生成")]
+	[QCommandType("基础/随机")]
 	public static class QRandomNode
 	{
 		[QName("百分比概率")]
 		private static void PercentRun(QFlowNode This, int percent = 50, [QOutputPort] QFlow True = default, [QOutputPort] QFlow False = default)
 		{
 			var value = QRandom.Instance.Range(0, 100);
-			if (value < percent)
+			if (value <	 percent)
 			{
 				This.SetNetFlowPort(nameof(True));
 			}
