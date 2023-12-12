@@ -248,7 +248,8 @@ namespace QTool.FlowGraph
 				Debug.LogError("运行流程图[" + Name + "]出错 不能在非运行时运行流程图");
 				yield break;
 			}
-			var curNode = GetNode(startNode); 
+			var curNode = GetNode(startNode);
+			curNode.Start = curNode;
 			if (curNode != null)
 			{
 				while (curNode != null)
@@ -268,7 +269,9 @@ namespace QTool.FlowGraph
 					{
 						if (port.Value.port == QFlowKey.FromPort)
 						{
-							curNode = GetNode(port.Value.node);
+							var nextNode = GetNode(port.Value.node);
+							nextNode.Start = curNode.Start;
+							curNode = nextNode;
 						}
 						else
 						{
@@ -1041,6 +1044,8 @@ namespace QTool.FlowGraph
             TaskDelayVoid,
             TaskDelayValue
         }
+		[QIgnore]
+		public QFlowNode Start { get; internal set; }
 		[QIgnore]
 		public QNodeState State { get; set; } = QNodeState.闲置;
         [QIgnore]
