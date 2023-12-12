@@ -188,6 +188,19 @@ namespace QTool
 	[QCommandType("基础/程序生成")]
 	public static class QRandomNode
 	{
+		[QName("百分比概率")]
+		private static void PercentRun(QFlowNode This, int percent = 50, [QOutputPort] QFlow True = default, [QOutputPort] QFlow False = default)
+		{
+			var value = QRandom.Instance.Range(0, 100);
+			if (value > percent)
+			{
+				This.SetNetFlowPort(nameof(True));
+			}
+			else
+			{
+				This.SetNetFlowPort(nameof(False));
+			}
+		}
 		[QName("随机点生成物体")]
 		private static IEnumerator RandomPointCreate(QFlowNode This, [QInputPort("场景"), QFlowPort] GameObject root, [QName("位置点")] string pointKey, [QName("预制体")] GameObject prefab, [QName("创建数目")] int count = 1, [QFlowPort, QOutputPort, QName("物体")] GameObject newObject = default)
 		{
