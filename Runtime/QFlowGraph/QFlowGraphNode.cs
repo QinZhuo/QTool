@@ -257,7 +257,8 @@ namespace QTool.FlowGraph
 					{
 						info = "每" + node.Ports["times"].ToInfoString() + "次" + node.Name + "\n";
 					}
-					break;
+					info += node.Ports["Run"].GetConnectNode()?.ToInfoString();
+					return info;
 				case nameof(Trigger):
 					return node.Ports["init"].ToInfoString() + " " + node.Ports["triggerObject"].ToInfoString();
 				case nameof(GetValue):
