@@ -642,21 +642,16 @@ namespace QTool.FlowGraph
 		{
 			if (HasConnect(index))
 			{
-				var node = GetConnectNode(index);
-				if (node != null)
+				var port = GetConnectPort(index,true);
+				if (port == null)
 				{
-					return node.ToInfoString();
+					port = GetConnectPort(index, false);
 				}
-				else
+				if ((port.IsFlow && port.IsFlow) || (port.IsOutput && port.OutputPort.autoRunNode))
 				{
-					var port = GetConnectPort(index, false);
-					if (port.IsOutput && port.OutputPort.autoRunNode)
-					{
-						return port.Node.ToInfoString();
-					}
-					return port.name;
+					return port.Node.ToInfoString();
 				}
-				
+				return port.name;
 			}
 			else if (!IsOutput)
 			{
