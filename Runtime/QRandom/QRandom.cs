@@ -232,6 +232,22 @@ namespace QTool
 				}
 			}
 		}
+		[QIgnore]
+		public static string ToInfoString(QFlowNode node)
+		{
+			var info = "";
+			switch (node.command.method.Name)
+			{
+				case nameof(PercentRun):
+					{
+						return node.Ports["percent"].ToInfoString() + "%概率" + node.Ports["True"].ToInfoString();
+					}
+				default:
+					break;
+			}
+			info += node.Ports[QFlowKey.NextPort].GetConnectNode()?.ToInfoString();
+			return info;
+		}
 	}
 
 }
