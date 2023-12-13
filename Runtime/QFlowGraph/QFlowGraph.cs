@@ -626,9 +626,12 @@ namespace QTool.FlowGraph
 				{
 					port = GetConnectPort(index, false);
 				}
-				if ((port.IsFlow && IsFlow) || (port.IsOutput && port.OutputPort.autoRunNode))
+				if (port != null)
 				{
-					return port.Node.ToFloat(toFloatFunc);
+					if ((port.IsFlow && IsFlow) || (port.IsOutput && port.OutputPort.autoRunNode))
+					{
+						return port.Node.ToFloat(toFloatFunc);
+					}
 				}
 				return 0;
 			}
@@ -650,9 +653,12 @@ namespace QTool.FlowGraph
 				{
 					port = GetConnectPort(index, false);
 				}
-				if ((port.IsFlow && IsFlow) || (port.IsOutput && port.OutputPort.autoRunNode))
+				if (port != null)
 				{
-					return port.Node.ToInfoString();
+					if ((port.IsFlow && IsFlow) || (port.IsOutput && port.OutputPort.autoRunNode))
+					{
+						return port.Node.ToInfoString();
+					}
 				}
 				return port.name;
 			}
