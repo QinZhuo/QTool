@@ -120,11 +120,13 @@ namespace QTool.FlowGraph
 		[QName("起点/计数起点")]
 		public static void CountStart(QFlowNode This, [QNodeName] string startKey = "起点", [QName("次数")] int times = 3, [QOutputPort] QFlow Run = default)
 		{
-			var count = This[nameof(times)].As<int>();
-			if (count % times == 0)
+			var count = 0;
+			count = This[nameof(count)].As<int>();
+			if (++count % times == 0)
 			{
 				This.SetNetFlowPort(nameof(Run));
 			}
+			This[nameof(count)] = count;
 		}
 		[QName("流程图/引用子图")]
 		public static IEnumerator GraphAsset(QFlowNode This, [QNodeName, QName("流程图")] QFlowGraphAsset asset, string startNode = StartKey)
