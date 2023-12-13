@@ -643,19 +643,28 @@ namespace QTool.FlowGraph
 			if (HasConnect(index))
 			{
 				var node = GetConnectNode(index);
-				if (node == null)
+				if (node != null)
 				{
-					node = GetConnectNode(index, false);
+					return node.ToInfoString();
 				}
-				return node.ToInfoString();
+				else
+				{
+					var port = GetConnectPort(index, false);
+					if (port.IsOutput && port.OutputPort.autoRunNode)
+					{
+						return port.Node.ToInfoString();
+					}
+					return port.name;
+				}
+				
 			}
-			else if(!IsOutput)
+			else if (!IsOutput)
 			{
 				return GetValue(index)?.ToString();
 			}
 			else
 			{
-				return ""; 
+				return name;
 			}
 		}
 		public void IndexChange(int a, int b)
