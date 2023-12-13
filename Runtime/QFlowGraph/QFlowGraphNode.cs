@@ -216,9 +216,9 @@ namespace QTool.FlowGraph
 			}
 			if (trigger != null)
 			{
+				trigger.Node = This;
 				trigger.Start = start;
 				trigger.Target = target;
-				trigger.Node = This;
 				yield return trigger.Init();
 				if (This.State != QNodeState.失败)
 				{
