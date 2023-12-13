@@ -647,7 +647,7 @@ namespace QTool.FlowGraph
 				{
 					port = GetConnectPort(index, false);
 				}
-				if ((port.IsFlow && port.IsFlow) || (port.IsOutput && port.OutputPort.autoRunNode))
+				if ((port.IsOutput && port.OutputPort.autoRunNode))
 				{
 					return port.Node.ToInfoString();
 				}
