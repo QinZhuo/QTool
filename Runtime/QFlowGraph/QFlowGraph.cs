@@ -662,7 +662,7 @@ namespace QTool.FlowGraph
 			}
 			else
 			{
-				return name;
+				return "";
 			}
 		}
 		public void IndexChange(int a, int b)
