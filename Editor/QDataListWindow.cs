@@ -73,14 +73,14 @@ namespace QTool.FlowGraph
 					var obj = objList[y - 1];
 					if (y == 0)
 					{
-						var label = visual.AddLabel(value, TextAnchor.MiddleCenter);
+						var label = visual.AddLabel(value?.Replace("\\n", " "), TextAnchor.MiddleCenter);
 						label.style.width = 180;
 						label.style.marginLeft = 10;
 						label.style.marginRight = 10;
 					}
 					else
 					{
-						var label = visual.AddLabel(value, TextAnchor.MiddleCenter);
+						var label = visual.AddLabel(value?.Replace("\\n", " "), TextAnchor.MiddleCenter);
 						label.Tooltip(value);
 						label.style.width = 180;
 						label.style.marginLeft = 10;
@@ -102,7 +102,7 @@ namespace QTool.FlowGraph
 									view = CellView.Add("", value, typeof(string), (newValue) =>
 									{
 										row[title] = (string)newValue;
-										label.text = (string)newValue;
+										label.text = ((string)newValue)?.Replace("\\n", " ");
 									});
 								}
 								else
@@ -110,7 +110,7 @@ namespace QTool.FlowGraph
 									view = CellView.Add("", member.Get(obj), member.Type, (newValue) =>
 									{
 										member.Set(obj, newValue);
-										label.text = member.Get(obj).ToQDataType(member.Type, false).Trim('\"');
+										label.text = member.Get(obj).ToQDataType(member.Type, false)?.Replace("\\n", " ").Trim('\"');
 										label.Tooltip(label.text);
 									}, member.MemeberInfo);
 								}
@@ -140,7 +140,7 @@ namespace QTool.FlowGraph
 								else
 								{
 									member.Set(obj, null);
-									label.text = member.Get(obj).ToQDataType(member.Type, false).Trim('\"');
+									label.text = member.Get(obj).ToQDataType(member.Type, false)?.Replace("\\n", " ").Trim('\"');
 								}
 							});
 						});
