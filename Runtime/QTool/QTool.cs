@@ -32,8 +32,7 @@ namespace QTool
 
     public static class QTool
     {
-		internal static bool QToolDestory = false;
-		public static bool IsPlaying => Application.isPlaying && !QToolDestory;
+		public static bool IsPlaying => Application.isPlaying && !QToolManager.Destoryed;
 		public static bool IsBuilding { set; get; }
 		public static CultureInfo RealyCulture= CultureInfo.CurrentCulture;
 		private static string _LocalIp = null;
@@ -51,7 +50,6 @@ namespace QTool
 			CultureInfo.CurrentCulture = new CultureInfo("en-US");
 			CultureInfo.DefaultThreadCurrentCulture = new CultureInfo("en-US");
 			QLocalization.KeyReplace["版本号"] = Application.version;
-			QEventManager.RegisterOnce(QToolEvent.游戏退出完成, () => QToolDestory = true);
 		}
 		public static void Quit()
 		{

@@ -10,6 +10,7 @@ namespace QTool
 {
 	public class QToolManager : QInstanceManager<QToolManager>
 	{
+		public static bool Destoryed { get; private set; } = false;
 		protected override void Awake()
 		{
 			if (!Application.isPlaying)
@@ -43,6 +44,7 @@ namespace QTool
 			QTask.StopAllWait();
 			QEventManager.InvokeEvent(QToolEvent.游戏退出);
 			QEventManager.InvokeEvent(QToolEvent.游戏退出完成);
+			Destoryed = false;
 			Instance.OnUpdateEvent -= QCoroutine.Update;
 		}
 
