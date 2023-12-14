@@ -311,6 +311,17 @@ namespace QTool.FlowGraph
 						return node.Ports["a"].ToFloat(toFloatFunc) * node.Ports["b"].ToFloat(toFloatFunc);
 					case nameof(Divide):
 						return node.Ports["a"].ToFloat(toFloatFunc) / node.Ports["b"].ToFloat(toFloatFunc);
+					case nameof(AsyncBranch):
+						var port = node.Ports["branchs"];
+						var list = port.Value.As<IList>();
+						for (int i = 0; i < list.Count; i++)
+						{
+							if (port.HasConnect(i))
+							{
+								value += port.GetConnectNode(i).ToFloat(toFloatFunc);
+							}
+						}
+						break;
 					default:
 						break;
 				}
