@@ -41,7 +41,7 @@ namespace QTool
 		}
 		private void OnDestroy()
 		{
-			Destoryed = false;
+			Destoryed = true;
 			QTask.StopAllWait();
 			QEventManager.InvokeEvent(QToolEvent.游戏退出);
 			QEventManager.InvokeEvent(QToolEvent.游戏退出完成);
