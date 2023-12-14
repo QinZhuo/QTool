@@ -42,8 +42,9 @@ namespace QTool
 	}
 	public enum QTeamRelaction
 	{
-		队友 = 0,
-		敌人 = 1,
+		自己 = 1 << 1,
+		队友 = 1 << 2,
+		敌人 = 1 << 3,
 	}
 	public interface IQTeam : IKey<string>
 	{
@@ -57,9 +58,13 @@ namespace QTool
 			QEventManager.Register(QToolEvent.游戏退出,Teams.Clear);
 		}
 		public static QDictionary<string, List<IQTeam>> Teams = new QDictionary<string, List<IQTeam>>((key) => new List<IQTeam>());
-		
+
 		public static QTeamRelaction GetRelaction<T>(this T a, T b) where T : IQTeam
 		{
+			if (a.Equals(b))
+			{
+				return QTeamRelaction.自己;
+			}
 			if (QRelation.GetValue(a.Team, b.Team) >= 0)
 			{
 				return QTeamRelaction.队友;
@@ -79,42 +84,19 @@ namespace QTool
 		}
 		public static void GetRelactionList<T>(this T a, List<T> list, QTeamRelaction relactionType = QTeamRelaction.敌人, float relactionValue = 0) where T : class, IQTeam
 		{
-			GetRelactionList(a.Team, list, relactionType, relactionValue);
-		}
-		public static void GetRelactionList<T>(string teamKey, List<T> list, QTeamRelaction relactionType = QTeamRelaction.敌人, float relactionValue = 0) where T : class, IQTeam
-		{
 			list.Clear();
 			foreach (var team in Teams)
 			{
-				var relation = QRelation.GetValue(team.Key, teamKey);
-				if (relation < relactionValue)
+				if (team is T b)
 				{
-					if (relactionType == QTeamRelaction.敌人)
+					if (relactionType.HasFlag(a.GetRelaction(b)))
 					{
-						foreach (var obj in team.Value)
-						{
-							if (obj is T t)
-							{
-								list.Add(t);
-							}
-						}
-					}
-				}
-				else
-				{
-					if (relactionType == QTeamRelaction.队友)
-					{
-						foreach (var obj in team.Value)
-						{
-							if (obj is T t)
-							{
-								list.Add(t);
-							}
-						}
+						list.Add(b);
 					}
 				}
 			}
 		}
+	
 		public static void SortByDistance<T>(this List<T> list, Vector3 center) where T : IQTeam
 		{
 			list.Sort((a, b) =>
