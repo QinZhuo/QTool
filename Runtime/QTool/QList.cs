@@ -272,13 +272,21 @@ namespace QTool
 		public new void Add(TKey key, TValue value)
 		{
 			this.Set(key, value);
-			OnChange?.Invoke(key);
+			if (OnChange != null)
+			{
+				if (this[key].IsNull())
+				{
+					base.Remove(key);
+				}
+				OnChange(key);
+			}
 		}
 		public new void Remove(TKey key)
 		{
-			base.Remove(key); 
+			base.Remove(key);
 			OnChange?.Invoke(key);
 		}
+	
 
 		public TValue Get(TKey key)
 		{
