@@ -41,10 +41,10 @@ namespace QTool
 		}
 		private void OnDestroy()
 		{
+			Destoryed = false;
 			QTask.StopAllWait();
 			QEventManager.InvokeEvent(QToolEvent.游戏退出);
 			QEventManager.InvokeEvent(QToolEvent.游戏退出完成);
-			Destoryed = false;
 			Instance.OnUpdateEvent -= QCoroutine.Update;
 		}
 
