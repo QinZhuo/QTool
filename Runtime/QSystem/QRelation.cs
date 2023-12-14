@@ -40,8 +40,9 @@ namespace QTool
 			return GetValue(a, b) >= 0 ? QTeamRelaction.队友 : QTeamRelaction.敌人;
 		}
 	}
+	[System.Flags] 
 	public enum QTeamRelaction
-	{
+	{  
 		自己 = 1 << 1,
 		队友 = 1 << 2,
 		敌人 = 1 << 3,
