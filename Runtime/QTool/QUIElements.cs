@@ -458,6 +458,7 @@ namespace QTool
 									{
 										obj = typeInfo.ArrayRank == 0 ? type.CreateInstance() : type.CreateInstance(null, 0);
 										list = obj as IList;
+										changeEvent?.Invoke(list);
 									}
 									var foldout = root.AddFoldout(name);
 									void FreshList()

@@ -400,7 +400,7 @@ namespace QTool.FlowGraph
 							});
 						}
 					}
-					viewList = row.Add(port.ViewName, port.Value, port.ValueType, newValue => { port.Value = newValue; if (port.Value is IList list && list.Count == viewList.childCount) { FreshList(); } });
+					viewList = row.Add(port.ViewName, port.Value, port.ValueType, newValue => { port.Value = newValue; if (port.Value is IList list && list.Count == viewList?.childCount) { FreshList(); } });
 					row.Remove(viewList);
 					FreshList();
 				}
