@@ -202,7 +202,7 @@ namespace QTool.FlowGraph
 			QEventManager.InvokeEvent(eventName);
 		}
 		[QName("触发/触发器")]
-		public static IEnumerator Trigger(QFlowNode This, [QName("起点"), QInputPort("起点")] Transform start, [QName("目标"), QInputPort("目标")] Transform target, [QName("预制体"), QPopup(nameof(Resources) + "/" + nameof(QTrigger))] string prefabKey, [QName("初始化"), QOutputPort] QFlow init, [QName("触发"), QFlowPort, QOutputPort] Transform triggerObject)
+		public static IEnumerator Trigger(QFlowNode This, [QName("起点"), QInputPort("起点")] Transform start, [QName("目标"), QInputPort("目标")] Transform target, [QName("预制体"), QPopup(nameof(Resources) + "/" + nameof(QTrigger))] string prefabKey, [QName("初始化"), QOutputPort] Transform init, [QName("触发"), QFlowPort, QOutputPort] Transform triggerObject)
 		{
 			var prefab = Resources.Load<GameObject>(nameof(QTrigger) + "/" + prefabKey);
 			if (prefab == null)
@@ -222,6 +222,7 @@ namespace QTool.FlowGraph
 				yield return trigger.Init();
 				if (This.State != QNodeState.失败)
 				{
+					This[nameof(init)] = trigger.transform;
 					yield return This.RunPortIEnumerator(nameof(init));
 					if (This.GetPortConnectState(nameof(init)) != QNodeState.失败)
 					{
