@@ -161,7 +161,7 @@ namespace QTool.FlowGraph
 		{
 			for (int i = 0; i < branchs.Count; i++)
 			{
-				if (i == 0)
+				if (i == branchs.Count - 1)
 				{
 					This.SetNetFlowPort(nameof(branchs), i);
 				}
