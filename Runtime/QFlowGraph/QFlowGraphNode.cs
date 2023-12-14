@@ -274,10 +274,21 @@ namespace QTool.FlowGraph
 					return node.Ports["a"].ToInfoString() + "x" + node.Ports["b"].ToInfoString();
 				case nameof(Divide):
 					return node.Ports["a"].ToInfoString() + "/" + node.Ports["b"].ToInfoString();
+				case nameof(AsyncBranch):
+					var port = node.Ports["branchs"];
+					var list = port.Value.As<IList>();
+					for (int i = 0; i < list.Count; i++)
+					{
+						if (port.HasConnect(i))
+						{
+							info += port.GetConnectNode(i).ToInfoString();
+						}
+					}
+					break;
 				default:
 					break;
 			}
-			info += node.Ports[QFlowKey.NextPort].GetConnectNode()?.ToInfoString();
+			info += node.Ports[QFlowKey.NextPort]?.GetConnectNode()?.ToInfoString();
 			return info;
 		}
 		[QIgnore]

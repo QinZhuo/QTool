@@ -93,14 +93,14 @@ namespace QTool.FlowGraph
 		#region 复合节点
 
 		[QName("复合/选择")]
-		public static IEnumerator Selector(QFlowNode This, [QOutputPort] List<QFlow> nexts)
+		public static IEnumerator Selector(QFlowNode This, [QOutputPort] List<QFlow> branchs)
 		{
-			for (int i = 0; i < nexts.Count; i++)
+			for (int i = 0; i < branchs.Count; i++)
 			{
-				var nextNode = This.Ports[nameof(nexts)].GetConnectNode(i);
+				var nextNode = This.Ports[nameof(branchs)].GetConnectNode(i);
 				if (nextNode != null)
 				{
-					yield return This.RunPortIEnumerator(nameof(nexts), i);
+					yield return This.RunPortIEnumerator(nameof(branchs), i);
 					if (nextNode.State == QNodeState.成功)
 					{
 						yield break;
@@ -110,14 +110,14 @@ namespace QTool.FlowGraph
 			This.State = QNodeState.失败;
 		}
 		[QName("复合/顺序")]
-		public static IEnumerator Sequence(QFlowNode This, [QOutputPort] List<QFlow> nexts)
+		public static IEnumerator Sequence(QFlowNode This, [QOutputPort] List<QFlow> branchs)
 		{
-			for (int i = 0; i < nexts.Count; i++)
+			for (int i = 0; i < branchs.Count; i++)
 			{
-				var nextNode = This.Ports[nameof(nexts)].GetConnectNode(i);
+				var nextNode = This.Ports[nameof(branchs)].GetConnectNode(i);
 				if (nextNode != null)
 				{
-					yield return This.RunPortIEnumerator(nameof(nexts), i);
+					yield return This.RunPortIEnumerator(nameof(branchs), i);
 					if (nextNode.State == QNodeState.失败)
 					{
 						This.State = QNodeState.失败;
@@ -127,16 +127,16 @@ namespace QTool.FlowGraph
 			}
 		}
 		[QName("复合/并行")]
-		public static IEnumerator Parallel(QFlowNode This, [QOutputPort] List<QFlow> nexts)
+		public static IEnumerator Parallel(QFlowNode This, [QOutputPort] List<QFlow> branchs)
 		{
 			var nodes = new List<QFlowNode>();
 
-			for (int i = 0; i < nexts.Count; i++)
+			for (int i = 0; i < branchs.Count; i++)
 			{
-				var node = This.Ports[nameof(nexts)].GetConnectNode(i);
+				var node = This.Ports[nameof(branchs)].GetConnectNode(i);
 				if (node != null)
 				{
-					This.RunPort(nameof(nexts), i);
+					This.RunPort(nameof(branchs), i);
 					nodes.Add(node);
 				}
 			}
@@ -212,7 +212,7 @@ namespace QTool.FlowGraph
 			{ 
 				case nameof(Sequence):
 				case nameof(Parallel):
-					var port = node.Ports["nexts"];
+					var port = node.Ports["branchs"];
 					var list = port.Value.As<IList>();
 					for (int i = 0; i < list.Count; i++)
 					{
