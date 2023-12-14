@@ -282,7 +282,7 @@ namespace QTool.FlowGraph
 						if (port.HasConnect(i))
 						{
 							info += port.GetConnectNode(i).ToInfoString();
-						}
+						} 
 					}
 					break;
 				default:
