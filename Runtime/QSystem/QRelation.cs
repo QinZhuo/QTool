@@ -88,11 +88,24 @@ namespace QTool
 			list.Clear();
 			foreach (var team in Teams)
 			{
-				if (team is T b)
+				if(relactionType.HasFlag( QRelation.GetRelaction(a.Team, team.Key)))
 				{
-					if (relactionType.HasFlag(a.GetRelaction(b)))
+					foreach (var item in team.Value)
 					{
-						list.Add(b);
+						if (item is T b)
+						{
+							if (a == b)
+							{
+								if (relactionType.HasFlag(QTeamRelaction.自己))
+								{
+									list.Add(a);
+								}
+							}
+							else
+							{
+								list.Add(b);
+							}
+						}
 					}
 				}
 			}
