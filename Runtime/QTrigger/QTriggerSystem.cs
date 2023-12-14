@@ -45,7 +45,7 @@ namespace QTool
 	public abstract class QTrigger : MonoBehaviour
 	{
 		public virtual Transform Start { get; set; }
-		public QTeamRelaction Relaction{ get; set; }
+		public virtual QTeamRelaction Relaction { get; set; }
 		public QFlowNode Node { get; set; }
 		public QFlowGraph Graph => Node?.Graph;
 		public abstract IEnumerator Init();
