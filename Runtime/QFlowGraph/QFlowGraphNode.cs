@@ -212,7 +212,7 @@ namespace QTool.FlowGraph
 			while (!eventOver)
 			{
 				yield return null;
-			}
+			} 
 		}
 		[QName("触发/触发器")]
 		public static IEnumerator Trigger(QFlowNode This, [QName("起点"), QInputPort("起点")] Transform start, [QName("预制体"), QPopup(nameof(Resources) + "/" + nameof(QTrigger))] string prefabKey, QTeamRelaction relaction, [QName("初始化"),QFlowPort, QOutputPort] Transform init, [QName("触发"), QFlowPort, QOutputPort] Transform triggerObject)
