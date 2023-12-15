@@ -13,4 +13,4 @@ MonoBehaviour:
   m_Name: QFlowGraph
   m_EditorClassIdentifier: 
   Graph:
-    SerializeString: "{\"Name\":\"QFlowGraph\",\"ViewPos\":{\"x\":0,\"y\":0},\"NodeList\":[{\"Key\":\"fb302f6660c84feaadae2abe2ea318cd\",\"rect\":{\"x\":63.99998,\"y\":51.2,\"width\":320,\"height\":80},\"Ports\":[{\"Key\":\"#From\",\"name\":\"#From\",\"ConnectInfolist\":[{\"ConnectList\":[]}],\"StringValue\":\"\"},\n{\"Key\":\"branchs\",\"name\":\"branchs\",\"ConnectInfolist\":[],\"StringValue\":\"[]\"}],\"commandKey\":\"QFlowGraphNode/AsyncBranch\",\"Name\":\"\u5F02\u6B65\u5206\u652F\"}],\"Values\":{}}"
+    SerializeString: "{\"Name\":\"QFlowGraph\",\"ViewPos\":{\"x\":0,\"y\":0},\"NodeList\":[{\"Key\":\"fb302f6660c84feaadae2abe2ea318cd\",\"rect\":{\"x\":63.99998,\"y\":51.2,\"width\":320,\"height\":80},\"Ports\":[{\"Key\":\"#From\",\"name\":\"#From\",\"ConnectInfolist\":[{\"ConnectList\":[]}],\"StringValue\":\"\"},\n{\"Key\":\"branchs\",\"name\":\"branchs\",\"ConnectInfolist\":[{\"ConnectList\":[]},\n{\"ConnectList\":[]}],\"StringValue\":\"[{},\\n{}]\"}],\"commandKey\":\"QFlowGraphNode/AsyncBranch\",\"Name\":\"\u5F02\u6B65\u5206\u652F\"}],\"Values\":{}}"
