@@ -72,10 +72,7 @@ namespace QTool
 			}
 			public IEnumerator InvokeEventIEnumerator(string key)
 			{
-				if (Graph != null && Graph.GetNode(key) != null)
-				{
-					yield return Graph.InvokeEventIEnumerator(key);
-				}
+				yield return Graph?.InvokeEventIEnumerator(key);
 			}
 		}
 	}

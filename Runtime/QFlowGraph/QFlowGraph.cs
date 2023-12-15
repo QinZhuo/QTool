@@ -251,9 +251,9 @@ namespace QTool.FlowGraph
 			}
 			OnEvent?.Invoke(startNode);
 			var curNode = GetNode(startNode);
-			curNode.Start = curNode;
 			if (curNode != null)
 			{
+				curNode.Start = curNode;
 				while (curNode != null)
 				{
 					RunningNodeList.Add(curNode.Key);
@@ -301,10 +301,6 @@ namespace QTool.FlowGraph
 						curNode = null;
 					}
 				}
-			}
-			else
-			{
-				Debug.LogError("不存在开始节点 [" + startNode + "]");
 			}
         }
 		public void Stop()
