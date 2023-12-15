@@ -232,15 +232,16 @@ namespace QTool.FlowGraph
 		}
 		
 	
-		public void Run(string startNode= QFlowGraphNode.StartKey)
+		public void InvokeEvent(string startNode= QFlowGraphNode.StartKey)
 		{
 			if (NodeList.Count == 0)
 			{
 				OnQDeserializeOver();
 			}
-			RunIEnumerator(startNode).Start(CoroutineList);
+			InvokeEventIEnumerator(startNode).Start(CoroutineList);
 		}
-		public IEnumerator RunIEnumerator(string startNode)
+		public Action<string> OnEvent = null;
+		public IEnumerator InvokeEventIEnumerator(string startNode)
         {
 			if (startNode.IsNull()) yield break;
 			if (!Application.isPlaying)
@@ -248,6 +249,7 @@ namespace QTool.FlowGraph
 				Debug.LogError("运行流程图[" + Name + "]出错 不能在非运行时运行流程图");
 				yield break;
 			}
+			OnEvent?.Invoke(startNode);
 			var curNode = GetNode(startNode);
 			curNode.Start = curNode;
 			if (curNode != null)
@@ -282,12 +284,12 @@ namespace QTool.FlowGraph
 								{
 									if (targetPort.Node.State != QNodeState.运行)
 									{
-										Run(targetPort.Node.Key);
+										InvokeEvent(targetPort.Node.Key);
 									}
 								}
 								else
 								{
-									Run(targetPort.Node.Key);
+									InvokeEvent(targetPort.Node.Key);
 								}
 							}
 							targetPort.Node.SetPortRunning(port.Value);
@@ -1496,7 +1498,7 @@ namespace QTool.FlowGraph
 			if (Ports.ContainsKey(portKey))
             {
 				var node = Ports[portKey].GetConnectNode(index);
-				return Graph.RunIEnumerator(node?.Key);
+				return Graph.InvokeEventIEnumerator(node?.Key);
             }
             else
             {

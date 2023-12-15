@@ -286,7 +286,7 @@ namespace QTool.FlowGraph
 				MoveOffset = false;
 				data.menu.AppendAction("运行", action =>
 				{
-					Graph.Run(node.Key);
+					Graph.InvokeEvent(node.Key);
 				});
 				data.menu.AppendSeparator();
 				data.menu.AppendAction("复制", action =>

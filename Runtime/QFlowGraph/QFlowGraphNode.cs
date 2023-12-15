@@ -137,7 +137,7 @@ namespace QTool.FlowGraph
 			{
 				This.Graph.Values[key] = asset.Graph.QDataCopy();
 			}
-			yield return (This.Graph.Values[key] as QFlowGraph).RunIEnumerator(startNode);
+			yield return (This.Graph.Values[key] as QFlowGraph).InvokeEventIEnumerator(startNode);
 		}
 		[QName("流程图/停止"), QEndNode]
 		public static void Stop(QFlowNode This)
@@ -197,22 +197,42 @@ namespace QTool.FlowGraph
 			QDebug.Log("全部完成");
 		}
 		[QName("触发/触发事件")]
-		public static void InvokeEvent(string eventName)
+		public static void InvokeEvent(QFlowNode This,string eventName,[QName("全局")]bool global=false)
 		{
-			QEventManager.InvokeEvent(eventName);
+			if (global)
+			{
+				QEventManager.InvokeEvent(eventName);
+			}
+			else
+			{
+				This.Graph.InvokeEvent(eventName);
+			}
 		}
 		[QName("触发/等待事件")]
-		public static IEnumerator WaitEvent(string eventName)
+		public static IEnumerator WaitEvent(QFlowNode This, string eventName, [QName("全局")] bool global = false)
 		{
 			bool eventOver = false;
-			QEventManager.RegisterOnce(eventName, () =>
+			if (global)
 			{
-				eventOver = true;
-			});
+				QEventManager.RegisterOnce(eventName, () =>
+				{
+					eventOver = true;
+				});
+			}
+			else
+			{
+				Action<string> action = null;
+				action = key =>
+				{
+					eventOver = true;
+					This.Graph.OnEvent -= action;
+				};
+				This.Graph.OnEvent += action;
+			}
 			while (!eventOver)
 			{
 				yield return null;
-			} 
+			}
 		}
 		[QName("触发/触发器")]
 		public static IEnumerator Trigger(QFlowNode This, [QName("起点"), QInputPort("起点")] Transform start, [QName("预制体"), QPopup(nameof(Resources) + "/" + nameof(QTrigger))] string prefabKey, QTeamRelaction relaction, [QName("初始化"),QFlowPort, QOutputPort] Transform init, [QName("触发"), QFlowPort, QOutputPort] Transform triggerObject)

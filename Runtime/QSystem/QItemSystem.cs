@@ -41,7 +41,7 @@ namespace QTool
 			{
 				if (Graph != null && Graph.GetNode(key) != null)
 				{
-					yield return Graph.RunIEnumerator(key);
+					yield return Graph.InvokeEventIEnumerator(key);
 				}
 			}
 		}
