@@ -261,7 +261,7 @@ namespace QTool.FlowGraph
 						yield return trigger.Run((t) =>
 						{
 							This[nameof(triggerObject)] = t;
-							return This.RunPortIEnumerator(nameof(triggerObject));
+							This.RunPort(nameof(triggerObject));
 						});
 					}
 					else
