@@ -1314,7 +1314,10 @@ namespace QTool.FlowGraph
 
 		public void Stop()
 		{
-			State = QNodeState.失败;
+			if(State== QNodeState.运行)
+			{
+				State = QNodeState.失败;
+			}
 		}
 		public string ToInfoString()
 		{
