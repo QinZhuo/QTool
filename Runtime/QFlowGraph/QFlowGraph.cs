@@ -305,6 +305,7 @@ namespace QTool.FlowGraph
         }
 		public void Stop()
 		{
+			OnEvent = null;
 			foreach (var key in RunningNodeList)
 			{
 				NodeList[key]?.Stop();

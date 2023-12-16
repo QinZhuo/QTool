@@ -49,7 +49,7 @@ namespace QTool
 		public QFlowNode Node { get; set; }
 		public QFlowGraph Graph => Node?.Graph;
 		public abstract IEnumerator Init();
-		public abstract IEnumerator Run(Action<Transform> action);
+		public abstract IEnumerator Run(Func<Transform,IEnumerator> action);
 	}
 }
 
