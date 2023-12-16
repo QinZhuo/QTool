@@ -229,7 +229,7 @@ namespace QTool.FlowGraph
 				};
 				This.Graph.OnEvent += action;
 			}
-			while (!eventOver)
+			while (!eventOver && This.State == QNodeState.运行)
 			{
 				yield return null;
 			}

@@ -305,6 +305,10 @@ namespace QTool.FlowGraph
         }
 		public void Stop()
 		{
+			foreach (var key in RunningNodeList)
+			{
+				NodeList[key]?.Stop();
+			}
 			RunningNodeList.Clear();
 			foreach (var coroutine in CoroutineList.ToArray())
 			{
@@ -1308,7 +1312,10 @@ namespace QTool.FlowGraph
 			return true;
         }
 
-
+		public void Stop()
+		{
+			State = QNodeState.失败;
+		}
 		public string ToInfoString()
 		{
 			if (NodeToInfoString == null)
