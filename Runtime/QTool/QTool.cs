@@ -994,6 +994,9 @@ namespace QTool
 			RedirectStandardOutput = true,
 			RedirectStandardError = true,
 			UseShellExecute = false,
+			StandardErrorEncoding = Encoding.UTF8,
+			StandardOutputEncoding = Encoding.UTF8,
+			StandardInputEncoding = Encoding.UTF8,
 		};
 		static QDictionary<string, bool> Cmd = new QDictionary<string, bool>();
 		public static  string ProcessCommand(string fileName,string Arguments,string workPah,bool openWindow=false)
