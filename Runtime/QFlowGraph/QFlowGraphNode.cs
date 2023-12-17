@@ -213,24 +213,34 @@ namespace QTool.FlowGraph
 		{
 			if (global)
 			{
-				QEventManager.RegisterOnce(eventName, () =>
+				Action action = null;
+				action = () =>
+				  {
+					  This.State = QNodeState.成功;
+				  };
+				while (This.State == QNodeState.运行)
 				{
-					This.State = QNodeState.成功;
-				});
+					yield return null;
+				}
+				QEventManager.Register(eventName, action);
 			}
 			else
 			{
 				Action<string> action = null;
 				action = key =>
 				{
-					This.State = QNodeState.成功;
-					This.Graph.OnEvent -= action;
+					if (key == eventName)
+					{
+						This.State = QNodeState.成功;
+						This.Graph.OnEvent -= action;
+					}
 				};
 				This.Graph.OnEvent += action;
-			}
-			while (This.State == QNodeState.运行)
-			{
-				yield return null;
+				while (This.State == QNodeState.运行)
+				{
+					yield return null;
+				}
+				This.Graph.OnEvent -= action;
 			}
 		}
 		[QName("触发/触发器")]
