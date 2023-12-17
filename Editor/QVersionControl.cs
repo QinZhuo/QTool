@@ -490,8 +490,10 @@ crashlytics-build.properties
 					end = end.Trim().Trim('\"');
 					path = end.Trim();
 					select = true;
-
-
+					if (state == "R")
+					{
+						path = path.SplitEndString("->").Trim();
+					}
 				}
 				else
 				{
