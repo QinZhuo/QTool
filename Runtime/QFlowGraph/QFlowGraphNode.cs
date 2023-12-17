@@ -211,14 +211,15 @@ namespace QTool.FlowGraph
 		[QName("触发/等待事件")]
 		public static IEnumerator WaitEvent(QFlowNode This, string eventName, [QName("全局")] bool global = false)
 		{
+			var eventOver = false;
 			if (global)
 			{
 				Action action = null;
 				action = () =>
-				  {
-					  This.State = QNodeState.成功;
-				  };
-				while (This.State == QNodeState.运行)
+				{
+					eventOver = true;
+				};
+				while (!eventOver && This.State != QNodeState.失败)
 				{
 					yield return null;
 				}
@@ -231,12 +232,11 @@ namespace QTool.FlowGraph
 				{
 					if (key == eventName)
 					{
-						This.State = QNodeState.成功;
-						This.Graph.OnEvent -= action;
+						eventOver = true;
 					}
 				};
 				This.Graph.OnEvent += action;
-				while (This.State == QNodeState.运行)
+				while (!eventOver && This.State != QNodeState.失败)
 				{
 					yield return null;
 				}
