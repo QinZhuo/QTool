@@ -60,6 +60,30 @@ namespace QTool
 				}
 			}
 		}
+		private static string command = "";
+		[MenuItem("QTool/终端命令")]
+		public static void ProcessCommand()
+		{
+			EditorUtility.ClearProgressBar();
+			var window = new EditorWindow();
+			window.titleContent = new GUIContent("终端命令");
+			window.rootVisualElement.Clear();
+			window.rootVisualElement.AddText("命令", command, value => command = value);
+			window.rootVisualElement.AddButton("确定", () =>
+			{
+				window.Close();
+			}); 
+			window.rootVisualElement.AddButton("取消", () =>
+			{
+				command = "";
+				window.Close();
+			});
+			window.ShowModal();
+			if(command.SplitTowString(" ",out var start,out var end))
+			{
+				QTool.ProcessCommand(start, end, Application.dataPath);
+			}
+		}
 		[MenuItem("QTool/翻译/查看翻译语言信息")]
 		public static void LanguageTest()
 		{

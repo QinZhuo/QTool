@@ -999,7 +999,7 @@ namespace QTool
 			StandardInputEncoding = Encoding.UTF8,
 		};
 		static QDictionary<string, bool> Cmd = new QDictionary<string, bool>();
-		public static  string ProcessCommand(string fileName,string Arguments,string workPah,bool openWindow=false)
+		public static string ProcessCommand(string fileName,string Arguments,string workPah,bool openWindow=false)
 		{
 			if (Cmd[fileName])
 			{
