@@ -61,6 +61,7 @@ namespace QTool
 			}
 		}
 		private static string command = "";
+		private static bool commandPath = true;
 		[MenuItem("QTool/终端命令")]
 		public static void ProcessCommand()
 		{
@@ -69,6 +70,7 @@ namespace QTool
 			window.titleContent = new GUIContent("终端命令");
 			window.rootVisualElement.Clear();
 			window.rootVisualElement.AddText("命令", command, value => command = value);
+			window.rootVisualElement.AddToggle("包含运行路径", commandPath, value => commandPath = value);
 			window.rootVisualElement.AddButton("确定", () =>
 			{
 				window.Close();
@@ -81,7 +83,7 @@ namespace QTool
 			window.ShowModal();
 			if(command.SplitTowString(" ",out var start,out var end))
 			{
-				QTool.ProcessCommand(start, end, Application.dataPath);
+				QTool.ProcessCommand(start, end, commandPath? Application.dataPath:"");
 			}
 		}
 		[MenuItem("QTool/翻译/查看翻译语言信息")]
