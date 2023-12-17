@@ -290,11 +290,6 @@ namespace QTool.Reflection
 						});
 					}
 				}
-				if (ElementType == null)
-				{
-					Debug.LogError(nameof(ElementType) + " null " + Type);
-				}
-
 				if (Functions != null)
 				{
 					type.ForeachFunction((info) =>
