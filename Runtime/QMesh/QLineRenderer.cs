@@ -26,7 +26,7 @@ namespace QTool
 
 		private void LateUpdate()
 		{
-			if (EndTarget == null)
+			if (EndTarget != null)
 			{
 				lineRenderer.SetPositions(new Vector3[] { transform.position, EndTarget.position });
 			}
