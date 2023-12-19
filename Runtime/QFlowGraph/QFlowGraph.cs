@@ -651,7 +651,7 @@ namespace QTool.FlowGraph
 		{
 			if (HasConnect(index))
 			{
-				var port = GetConnectPort(index,true);
+				var port = GetConnectPort(index, true);
 				if (port == null)
 				{
 					port = GetConnectPort(index, false);
@@ -663,7 +663,7 @@ namespace QTool.FlowGraph
 						return port.Node.ToInfoString();
 					}
 				}
-				return port.name;
+				return GetValue(index)?.ToString();
 			}
 			else if (!IsOutput)
 			{
