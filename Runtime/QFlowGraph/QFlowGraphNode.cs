@@ -318,13 +318,16 @@ namespace QTool.FlowGraph
 					return node.Ports["a"].ToInfoString() + "/" + node.Ports["b"].ToInfoString();
 				case nameof(AsyncBranch):
 					var port = node.Ports["branchs"];
-					var list = port.Value.As<IList>();
-					for (int i = 0; i < list.Count; i++)
+					var list = port?.Value.As<IList>();
+					if (list != null)
 					{
-						if (port.HasConnect(i))
+						for (int i = 0; i < list.Count; i++)
 						{
-							info += port.GetConnectNode(i).ToInfoString();
-						} 
+							if (port.HasConnect(i))
+							{
+								info += port.GetConnectNode(i).ToInfoString();
+							}
+						}
 					}
 					break;
 				default:
@@ -355,12 +358,15 @@ namespace QTool.FlowGraph
 						return node.Ports["a"].ToFloat(toFloatFunc) / node.Ports["b"].ToFloat(toFloatFunc);
 					case nameof(AsyncBranch):
 						var port = node.Ports["branchs"];
-						var list = port.Value.As<IList>();
-						for (int i = 0; i < list.Count; i++)
+						var list = port?.Value.As<IList>();
+						if (list != null)
 						{
-							if (port.HasConnect(i))
+							for (int i = 0; i < list.Count; i++)
 							{
-								value += port.GetConnectNode(i).ToFloat(toFloatFunc);
+								if (port.HasConnect(i))
+								{
+									value += port.GetConnectNode(i).ToFloat(toFloatFunc);
+								}
 							}
 						}
 						break;
