@@ -290,25 +290,25 @@ namespace QTool
             }
         }
 	
-		public static Callback<LobbyDataUpdate_t> OnUpdateLobby = null;
+		private static Callback<LobbyDataUpdate_t> OnLobbyDataUpdate = null;
         public static void LeaveLobby()
         {
 			if (CurrentLobby.IsNull()) return;
             SteamMatchmaking.LeaveLobby(_CurrentLobby.SteamID);
 			QDebug.Log(nameof(QSteam)+" 离开房间[" + _CurrentLobby.SteamID + "]");
-			OnUpdateLobby?.Unregister();
+			OnLobbyDataUpdate?.Unregister();
             _CurrentLobby = default;
         }
         static void SetCurRoom(ulong id)
         {
-            UpdateLobby((CSteamID)id, ref _CurrentLobby);
-			if (OnUpdateLobby != null)
+            LobbyUpdate((CSteamID)id, ref _CurrentLobby);
+			if (OnLobbyDataUpdate != null)
 			{
-				OnUpdateLobby.Unregister();
+				OnLobbyDataUpdate.Unregister();
 			}
-            OnUpdateLobby = Callback<LobbyDataUpdate_t>.Create((info) =>
+            OnLobbyDataUpdate = Callback<LobbyDataUpdate_t>.Create((info) =>
             {
-                UpdateLobby((CSteamID)info.m_ulSteamIDLobby, ref _CurrentLobby);
+                LobbyUpdate((CSteamID)info.m_ulSteamIDLobby, ref _CurrentLobby);
             }); 
             _=StartChatReceive();
             chatId = 0;
@@ -381,10 +381,11 @@ namespace QTool
 		{
 			if (!_CurrentLobby.IsNull())
 			{
-				UpdateLobby(_CurrentLobby.SteamID, ref _CurrentLobby);
+				LobbyUpdate(_CurrentLobby.SteamID, ref _CurrentLobby);
 			}
 		}
-        public static void UpdateLobby(CSteamID id, ref QLobby lobby)
+		public static Action OnLobbyUpdate = null;
+		public static void LobbyUpdate(CSteamID id, ref QLobby lobby)
         {
             lobby.SteamID = id;
             lobby.Owner = SteamMatchmaking.GetLobbyOwner(id);
@@ -408,6 +409,7 @@ namespace QTool
                 }
             }
 			QDebug.Log(nameof(QSteam)+" 房间信息更新 " + lobby.ToDetailString());
+			OnLobbyUpdate?.Invoke();
 		}
 		public static void AddLobbyFilter(string key, string value, ELobbyComparison comparison = ELobbyComparison.k_ELobbyComparisonEqual)
 		{
@@ -429,7 +431,7 @@ namespace QTool
             {
                 var id = SteamMatchmaking.GetLobbyByIndex(i);
                 var lobby = new QLobby();
-                UpdateLobby(id, ref lobby);
+                LobbyUpdate(id, ref lobby);
                 LobbyList.Add(lobby);
 				QDebug.Log(nameof(QSteam) + " 房间信息 "+lobby);
 			}
