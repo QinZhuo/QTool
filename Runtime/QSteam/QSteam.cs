@@ -226,6 +226,13 @@ namespace QTool
 			var data = SteamMatchmaking.GetLobbyMemberData(CurrentLobby.SteamID, steamID, key);
 			QDebug.Log(CurrentLobby.SteamID + "." + steamID.GetName() + "." + key + ":" + data);
 			return data.IsNull() ? defaultValue : data.ParseQData(defaultValue);
+		} 
+		/// <summary>
+		/// 调用邀请好友面板
+		/// </summary>
+		public static void InviteDialog()
+		{
+			SteamFriends.ActivateGameOverlayInviteDialog(CurrentLobby.SteamID);
 		}
 		public static bool ChatSend(string text)
         {
