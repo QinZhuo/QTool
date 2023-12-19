@@ -18,6 +18,7 @@ namespace QTool
     {
 		public static CSteamID Id => SteamUser.GetSteamID();
 		public static string Name => SteamFriends.GetPersonaName();
+		public static Texture2D AvatarImage => Id.GetImage();
 		static QSteam()
 		{
 			if (!Packsize.Test())
@@ -68,6 +69,29 @@ namespace QTool
 		public static CSteamID ToSteamId(this ulong userId)
 		{
 			return (CSteamID)userId;
+		}
+		public static Texture2D GetImage(this CSteamID player)
+		{
+			return SteamFriends.GetSmallFriendAvatar(player).GetImage();
+		}
+		private static QDictionary<int, Texture2D> ImageCache = new QDictionary<int, Texture2D>();
+		public static Texture2D GetImage(this int image)
+		{
+			if (image < 0) return null;
+			if (ImageCache.ContainsKey(image)) return ImageCache[image];
+			if(SteamUtils.GetImageSize(image, out var width, out var height))
+			{
+				var data = new byte[4 * width * height];
+				if (SteamUtils.GetImageRGBA(image, data, data.Length))
+				{
+					var texture = new Texture2D((int)width, (int)height);
+					texture.LoadRawTextureData(data);
+					texture.Apply();
+					ImageCache[image] = texture;
+					return texture;
+				}
+			}
+			return null;
 		}
 		public static string GetName(this CSteamID userId)
 		{
