@@ -84,7 +84,7 @@ namespace QTool
 				var data = new byte[4 * width * height];
 				if (SteamUtils.GetImageRGBA(image, data, data.Length))
 				{
-					var texture = new Texture2D((int)width, (int)height);
+					var texture = new Texture2D((int)width, (int)height, TextureFormat.BGRA32, false);
 					texture.LoadRawTextureData(data);
 					texture.Apply();
 					ImageCache[image] = texture;
