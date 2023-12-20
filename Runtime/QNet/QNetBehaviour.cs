@@ -24,29 +24,13 @@ namespace QTool.Net
 			}
 			return QNetManager.Instance.PlayerValue(PlayerId, key, value);
 		}
-		public void PlayerAction<T>(string key, T value, Action<T> action=null)
+		public void PlayerAction<T>(string key, T value)
 		{
 			if (!IsPlayer)
 			{
 				throw new System.Exception(this + " 非玩家对象");
 			}
-			QNetManager.Instance.PlayerAction(PlayerId, key, value, action);
-		}
-		public void PlayerRegisterAction<T>(string key, Action<T> action)
-		{
-			if (!IsPlayer)
-			{
-				throw new System.Exception(this + " 非玩家对象");
-			}
-			QNetManager.Instance.PlayerRegisterAction(PlayerId, key, action);
-		}
-		public void PlayerUnRegisterAction<T>(string key, Action<T> action)
-		{
-			if (!IsPlayer)
-			{
-				throw new System.Exception(this + " 非玩家对象");
-			}
-			QNetManager.Instance.PlayerUnRegisterAction(PlayerId, key, action);
+			QNetManager.Instance.PlayerAction(PlayerId, key, value);
 		}
 		internal QNetTypeInfo TypeInfo { get; set; }
 		public virtual void Awake()
@@ -67,18 +51,28 @@ namespace QTool.Net
 		}
 		private void NetStart()
 		{
-			OnNetStart();
 			QNetManager.Instance.OnNetUpdate -= NetStart;
 			QNetManager.Instance.OnSyncCheck += OnSyncCheck;
-
 			if (TypeInfo.Members.Count > 0)
 			{
 				var qid = GetComponent<QId>().Id;
-				if (!QNetManager.QNetSyncCheckList.ContainsKey(qid))
+				if (!QNetManager.Instance.QNetSyncCheckList.ContainsKey(qid))
 				{
-					QNetManager.QNetSyncCheckList.Add(qid, new List<QNetBehaviour>());
+					QNetManager.Instance.QNetSyncCheckList.Add(qid, new List<QNetBehaviour>());
 				}
-				QNetManager.QNetSyncCheckList[qid].AddCheckExist(this);
+				QNetManager.Instance.QNetSyncCheckList[qid].AddCheckExist(this);
+			}
+			if (IsPlayer && TypeInfo.Functions.Count > 0)
+			{
+				QNetManager.Instance.Players[PlayerId].Action += InvokeAction;
+			}
+			OnNetStart();
+		}
+		internal void InvokeAction(string key, object obj)
+		{
+			if (TypeInfo.Functions.ContainsKey(key))
+			{
+				TypeInfo.Functions[key]?.Invoke(this, obj);
 			}
 		}
 		public virtual void OnNetStart() { }
@@ -88,17 +82,24 @@ namespace QTool.Net
 			if (IsDestoryed) return;
 			IsDestoryed = true;
 			OnNetDestroy();
-			QNetManager.Instance.OnSyncCheck -= OnSyncCheck;
-			if (TypeInfo.Members.Count > 0)
+			if (QNetManager.Instance != null)
 			{
-				var qid = GetComponent<QId>().Id;
-				if (QNetManager.QNetSyncCheckList.ContainsKey(qid))
+				QNetManager.Instance.OnSyncCheck -= OnSyncCheck;
+				if (TypeInfo.Members.Count > 0)
 				{
-					QNetManager.QNetSyncCheckList[qid].Remove(this);
-					if (QNetManager.QNetSyncCheckList[qid].Count == 0)
+					var qid = GetComponent<QId>().Id;
+					if (QNetManager.Instance.QNetSyncCheckList.ContainsKey(qid))
 					{
-						QNetManager.QNetSyncCheckList.Remove(qid);
+						QNetManager.Instance.QNetSyncCheckList[qid].Remove(this);
+						if (QNetManager.Instance.QNetSyncCheckList[qid].Count == 0)
+						{
+							QNetManager.Instance.QNetSyncCheckList.Remove(qid);
+						}
 					}
+				}
+				if (IsPlayer && TypeInfo.Functions.Count > 0)
+				{
+					QNetManager.Instance.Players[PlayerId].Action -= InvokeAction;
 				}
 			}
 		}
@@ -132,7 +133,16 @@ namespace QTool.Net
 			}
 		}
 	}
-
+	/// <summary>
+	/// 标记函数为玩家动作 本地玩家使用PlayerAction远程调用所有客户端
+	/// </summary>
+	[AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
+	public class QPlayerActionAttribute : Attribute
+	{
+		public QPlayerActionAttribute()
+		{
+		}
+	}
 	/// <summary>
 	/// 标记变量在同步检测出错时进行同步更新 如果SyncCheck为True则会对该变量进行同步检测
 	/// </summary>
@@ -150,7 +160,6 @@ namespace QTool.Net
 		public List<QMemeberInfo> CheckList { get; private set; } = new List<QMemeberInfo>();
 		protected override void Init(Type type)
 		{
-			Functions = null;
 			base.Init(type);
 			if (!TypeMembers.ContainsKey(type))
 			{
@@ -169,11 +178,25 @@ namespace QTool.Net
 								}
 								else
 								{
-									Debug.LogError("只有值类型才能通过" + nameof(System.Object.GetHashCode) + "()进行同步检测");
+									QDebug.LogError(Type+"."+memberInfo.QName+"同步检测出错 只有值类型才能通过" + nameof(System.Object.GetHashCode) + "()进行同步检测");
 								}
 							}
 							return false;
 						}
+					}
+					return true;
+				});
+				Functions.RemoveAll(function =>
+				{
+					var playerAction = function.MethodInfo.GetAttribute<QPlayerActionAttribute>();
+					if (playerAction != null)
+					{
+						if (function.MethodInfo.GetParameters().Length!= 1)
+						{
+							QDebug.LogError("函数"+Type+"."+function.Name+"() 无法作为玩家动作函数 玩家动作函数参数只能为一个");
+							return true;
+						}
+						return false;
 					}
 					return true;
 				});

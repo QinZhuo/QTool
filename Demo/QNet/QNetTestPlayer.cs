@@ -10,17 +10,10 @@ public class QNetTestPlayer : QNetBehaviour
 	public int Score = 0;
 	public QNetNavMeshAgent agent;
 	QTimer shootTimer = new QTimer(0.4f,true);
-
 	public override void OnNetStart()
 	{
-		PlayerAction("颜色", Random.Color(),(data) =>
-		{
-			var render = GetComponentInChildren<MeshRenderer>();
-			render.material?.SetColor("_Color", data);
-		});
 		Players.AddCheckExist(this);
 	}
-
 	public override void OnNetUpdate()
 	{
 		if (agent != null)

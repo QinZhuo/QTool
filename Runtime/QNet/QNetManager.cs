@@ -90,43 +90,28 @@ namespace QTool.Net
 			}
 			return default;
 		}
-		public void PlayerAction<T>(string player, string key, T value,Action<T> action=null)
+		public void PlayerAction(string player, string key, object value)
 		{
 			if (transport.ClientConnected)
 			{
-				if (action != null)
-				{
-					QEventManager.RegisterOnce(player + "_" + key, (object obj)=>action?.Invoke((T)obj));
-				}
 				if (player == transport.ClientId)
 				{
 					SendAction.InvokeEvent(key, value);
 				}
 			}
 		}
-		public void PlayerRegisterAction<T>(string player, string key, Action<T> action = null)
-		{
-			if (transport.ClientConnected)
-			{
-				if (action != null)
-				{
-					QEventManager.Register(player + "_" + key, (object obj) => action?.Invoke((T)obj));
-				}
-			}
-		}
-		public void PlayerUnRegisterAction<T>(string player, string key, Action<T> action = null)
-		{
-			if (transport.ClientConnected)
-			{
-				if (action != null)
-				{
-					QEventManager.UnRegister(player + "_" + key, (object obj) => action?.Invoke((T)obj));
-				}
-			}
-		}
+
+		
 		QDictionary<string, Action<object>> NetEvent = new QDictionary<string, Action<object>>();
 		public GameObject playerPrefab;
-		internal QDictionary<string, GameObject> PlayerObjects = new QDictionary<string, GameObject>();
+		public class PlayerInfo:IKey<string>
+		{
+			public string Key { get; set; }
+			public GameObject gameObject { internal set; get; }
+
+			internal Action<string, object> Action = null;
+		}
+		public QList<string, PlayerInfo> Players = new QList<string, PlayerInfo>(() => new PlayerInfo());
 		QNetActionData LocalAction = new QNetActionData();
 		QNetActionData SendAction = new QNetActionData();
 		private int ServerSeed = 0;
@@ -242,7 +227,7 @@ namespace QTool.Net
 		}
 
 		private QNetSyncFlag SyncCheckFlag = new QNetSyncFlag();
-		internal static Dictionary<string, List<QNetBehaviour>> QNetSyncCheckList { get; private set; } = new Dictionary<string, List<QNetBehaviour>>();
+		internal Dictionary<string, List<QNetBehaviour>> QNetSyncCheckList { get; private set; } = new Dictionary<string, List<QNetBehaviour>>();
 		public QList<string, QNetActionData> ClientActionData = new QList<string, QNetActionData>(()=>new QNetActionData());
 		public void StartClient(string ip="127.0.0.1")
 		{
@@ -331,17 +316,18 @@ namespace QTool.Net
 					}
 					foreach (var actionData in ClientGameData[ClientIndex])
 					{
+						var player = Players[actionData.Key];
 						foreach (var eventData in actionData.Events)
 						{
 							switch (eventData.Key)
 							{
 								case nameof(DefaultNetAction.PlayerConnected):
-									if (!PlayerObjects.ContainsKey(actionData.Key))
+									if (player.gameObject==null)
 									{
 										if (playerPrefab != null)
 										{
-											var obj = GameObject.Instantiate(playerPrefab);
-											PlayerObjects[actionData.Key] = obj;
+											var obj = Instantiate(playerPrefab);
+											player.gameObject = obj;
 											QDebug.Log("创建玩家[" + actionData.Key + "]对象[" + obj + "]");
 											foreach (var qNet in obj.GetComponents<QNetBehaviour>())
 											{
@@ -373,7 +359,7 @@ namespace QTool.Net
 									break;
 								case nameof(DefaultNetAction.SyncLoad): break;
 								default:
-									QEventManager.InvokeEvent(actionData.Key + "_" + eventData.Key, eventData.Value);
+									player.Action?.Invoke(eventData.Key, eventData.Value);
 									break;
 							}
 						}
