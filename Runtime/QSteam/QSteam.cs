@@ -20,6 +20,11 @@ namespace QTool
 		public static string Name => SteamFriends.GetPersonaName();
 		public static Texture2D AvatarImage => Id.GetImage();
 		public static bool IsRoomOwner => CurrentLobby.Owner == Id;
+		private static Callback<GameLobbyJoinRequested_t> OnJoinRequested = null;
+		private static Callback<LobbyDataUpdate_t> OnLobbyDataUpdate = null;
+		private static Callback<LobbyChatUpdate_t> OnLobbyChatUpdate = null;
+
+		public static Action OnLobbyUpdate = null;
 		static QSteam()
 		{
 			if (!Packsize.Test())
@@ -52,17 +57,28 @@ namespace QTool
 				QTool.Quit();
 				return;
 			}
-			SteamClient.SetWarningMessageHook(SteamAPIDebugTextHook); 
+			SteamClient.SetWarningMessageHook(SteamAPIDebugTextHook);
 			QToolManager.Instance.OnUpdateEvent += SteamAPI.RunCallbacks;
+
 			OnJoinRequested = Callback<GameLobbyJoinRequested_t>.Create(info =>
 			{
 				QDebug.LogError("【" + info.m_steamIDFriend.GetName() + "】邀请加入房间");
 				_ = JoinLobby(info.m_steamIDLobby);
 			});
-			QEventManager.RegisterOnce(QToolEvent.游戏退出完成, LeaveLobby, SteamAPI.Shutdown);
+			OnLobbyDataUpdate = Callback<LobbyDataUpdate_t>.Create(info =>
+			{
+				LobbyUpdate((CSteamID)info.m_ulSteamIDLobby, ref _CurrentLobby);
+			});
+			OnLobbyChatUpdate = Callback<LobbyChatUpdate_t>.Create(info =>
+			{
+				LobbyUpdate((CSteamID)info.m_ulSteamIDLobby, ref _CurrentLobby);
+			});
+			QEventManager.RegisterOnce(QToolEvent.游戏退出完成, LeaveLobby, SteamAPI.Shutdown,
+				OnJoinRequested.Unregister, OnLobbyDataUpdate.Unregister, OnLobbyChatUpdate.Unregister);
 			SteamNetworkingUtils.InitRelayNetworkAccess();
-			QDebug.Log(nameof(QSteam) + " 初始化成功 [" + Name + "]["+Id+"]");
+			QDebug.Log(nameof(QSteam) + " 初始化成功 [" + Name + "][" + Id + "]");
 		}
+	
 		[AOT.MonoPInvokeCallback(typeof(SteamAPIWarningMessageHook_t))]
 		private static void SteamAPIDebugTextHook(int nSeverity, System.Text.StringBuilder pchDebugText)
 		{
@@ -296,28 +312,19 @@ namespace QTool
             }
         }
 
-		private static Callback<GameLobbyJoinRequested_t> OnJoinRequested = null;
-		private static Callback<LobbyDataUpdate_t> OnLobbyDataUpdate = null;
-        public static void LeaveLobby()
+
+		public static void LeaveLobby()
         {
 			if (CurrentLobby.IsNull()) return;
             SteamMatchmaking.LeaveLobby(_CurrentLobby.SteamID);
 			QDebug.Log(nameof(QSteam)+" 离开房间[" + _CurrentLobby.SteamID + "]");
-			OnLobbyDataUpdate?.Unregister();
             _CurrentLobby = default;
         }
         static void SetCurRoom(ulong id)
         {
             LobbyUpdate((CSteamID)id, ref _CurrentLobby);
-			if (OnLobbyDataUpdate != null)
-			{
-				OnLobbyDataUpdate.Unregister();
-			}
-            OnLobbyDataUpdate = Callback<LobbyDataUpdate_t>.Create((info) =>
-            {
-                LobbyUpdate((CSteamID)info.m_ulSteamIDLobby, ref _CurrentLobby);
-            });
-            _=StartChatReceive();
+			
+			_ =StartChatReceive();
             chatId = 0;
 		}
         public static async Task<bool> FastJoin()
@@ -391,7 +398,6 @@ namespace QTool
 				LobbyUpdate(_CurrentLobby.SteamID, ref _CurrentLobby);
 			}
 		}
-		public static Action OnLobbyUpdate = null;
 		public static void LobbyUpdate(CSteamID id, ref QLobby lobby)
         {
             lobby.SteamID = id;
