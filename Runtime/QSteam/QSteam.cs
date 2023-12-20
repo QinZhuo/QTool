@@ -64,6 +64,7 @@ namespace QTool
 			CommandLine = commandLine;
 			OnJoinRequested = Callback<GameLobbyJoinRequested_t>.Create(info =>
 			{
+				QDebug.LogError(info.m_steamIDFriend.GetName() + " 邀请");
 				_ = JoinLobby(info.m_steamIDLobby);
 			});
 			OnLobbyDataUpdate = Callback<LobbyDataUpdate_t>.Create(info =>
@@ -359,8 +360,9 @@ namespace QTool
             {
 				QDebug.LogError("加入房间失败[" + id + "]");
                 return false;
-            }
-            SetCurRoom(join.m_ulSteamIDLobby);
+			}
+			QDebug.LogError("加入房间成功");
+			SetCurRoom(join.m_ulSteamIDLobby);
 			QDebug.Log("加入房间[" + join.m_ulSteamIDLobby + "]");
             return true;
         }
@@ -421,6 +423,7 @@ namespace QTool
                     continue;
                 }
 			}
+
 			OnLobbyUpdate?.Invoke();
 			QDebug.Log(nameof(QSteam)+" 房间信息更新 " + lobby.ToDetailString());
 		}
