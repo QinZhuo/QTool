@@ -20,7 +20,7 @@ namespace QTool
 		public static CSteamID Id => SteamUser.GetSteamID();
 		public static string Name => SteamFriends.GetPersonaName();
 		public static Texture2D AvatarImage => Id.GetImage();
-		public static bool IsRoomOwner => CurrentLobby.Owner == Id;
+		public static bool IsRoomOwner => CurrentLobby.IsNull() || CurrentLobby.Owner == Id;
 		private static Callback<GameLobbyJoinRequested_t> OnJoinRequested = null;
 		private static Callback<LobbyDataUpdate_t> OnLobbyDataUpdate = null;
 		private static Callback<LobbyChatUpdate_t> OnLobbyChatUpdate = null;
