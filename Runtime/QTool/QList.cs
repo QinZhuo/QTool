@@ -571,7 +571,7 @@ namespace QTool
 				return default;
 			}
 		}
-		public static bool ContainsKey<T, KeyType>(this IList<T> array, KeyType key, Func<T, KeyType> keyGetter)
+		public static bool ContainsKey<T, TKey>(this IList<T> array, TKey key, Func<T, TKey> keyGetter)
 		{
 			if (key == null || array == null)
 			{
@@ -593,7 +593,7 @@ namespace QTool
 			if (index < 0 || index >= array.Count) return default;
 			return array[index];
 		}
-		public static T Get<T, KeyType>(this IList<T> array, KeyType key) where T : IKey<KeyType>
+		public static T Get<T, TKey>(this IList<T> array, TKey key) where T : IKey<TKey>
 		{
 			return array.FirstOrDefault(item => Equals(item.Key, key));
 		}
@@ -601,7 +601,7 @@ namespace QTool
 		{
 			return array.FirstOrDefault(item => Equals(item?.name, key));
 		}
-		public static T Get<T, KeyType>(this IDictionary<KeyType, T> array, KeyType key, Func<T, KeyType> keyGetter)
+		public static TValue Get<TKey,TValue>(this IDictionary<TKey, TValue> array, TKey key, Func<TValue, TKey> keyGetter)
 		{
 			if (key == null)
 			{
@@ -617,7 +617,7 @@ namespace QTool
 			}
 			return default;
 		}
-		public static List<T> GetList<T, KeyType>(this IList<T> array, KeyType key, List<T> tempList = null) where T : IKey<KeyType>
+		public static List<T> GetList<T, TKey>(this IList<T> array, TKey key, List<T> tempList = null) where T : IKey<TKey>
 		{
 			var list = tempList == null ? new List<T>() : tempList;
 			for (int i = 0; i < array.Count; i++)
