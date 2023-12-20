@@ -12,7 +12,7 @@ namespace QTool.Net
 		{
 			Manager = GetComponent<QNetManager>();
 			OnClientConnected += () => ClientConnected = true;
-			QEventManager.RegisterOnce(QToolEvent.游戏退出, Shutdown);
+			QEventManager.RegisterOnce(QToolEvent.游戏退出, Shutdown); 
 		}
 		protected virtual void OnDestroy()
 		{
