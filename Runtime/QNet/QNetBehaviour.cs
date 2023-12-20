@@ -73,13 +73,24 @@ namespace QTool.Net
 			if (TypeInfo.Functions.ContainsKey(key))
 			{
 				var func = TypeInfo.Functions[key];
-				if (func.ParamInfos.Length == 0)
+				switch (func.ParamInfos.Length)
 				{
-					func.Invoke(this);
-				}
-				else
-				{
-					func.Invoke(this, obj);
+					case 0:
+						func.Invoke(this);
+						break;
+					case 1:
+						func.Invoke(this,obj);
+						break;
+					default:
+						if (obj is object[] objs)
+						{
+							func.Invoke(this, objs);
+						}
+						else
+						{
+							Debug.LogError(TypeInfo.Type + "." + func.Name + "()为多参数函数 调用时需要传入 object[]");
+						}
+						break;
 				}
 			}
 		}
@@ -186,7 +197,7 @@ namespace QTool.Net
 								}
 								else
 								{
-									QDebug.LogError(Type+"."+memberInfo.QName+"同步检测出错 只有值类型才能通过" + nameof(System.Object.GetHashCode) + "()进行同步检测");
+									QDebug.LogError(Type + "." + memberInfo.QName + "同步检测出错 只有值类型才能通过" + nameof(System.Object.GetHashCode) + "()进行同步检测");
 								}
 							}
 							return false;
@@ -197,19 +208,9 @@ namespace QTool.Net
 				Functions.RemoveAll(function =>
 				{
 					var playerAction = function.MethodInfo.GetAttribute<QPlayerActionAttribute>();
-					if (playerAction != null)
-					{
-						if (function.MethodInfo.GetParameters().Length > 1)
-						{
-							QDebug.LogError("函数" + Type + "." + function.Name + "() 无法作为玩家动作函数 玩家动作函数参数数目必须小于等于一");
-							return true;
-						}
-						return false;
-					}
-					return true;
+					return playerAction == null;
 				});
 			}
-			
 		}
 	}
 
