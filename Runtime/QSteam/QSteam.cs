@@ -275,7 +275,7 @@ namespace QTool
         {
             var chatLobbyId = _CurrentLobby.SteamID;
             if (chatLobbyId.IsValid()) return;
-            var buffer = new byte[ReceiveBufferSize];
+            var buffer = new byte[ReceiveBufferSize]; 
             while (chatLobbyId == _CurrentLobby.SteamID && Application.isPlaying)
             {
                 await Task.Yield();
