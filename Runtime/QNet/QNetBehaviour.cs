@@ -20,15 +20,15 @@ namespace QTool.Net
 		{
 			if (!IsPlayer)
 			{
-				throw new System.Exception(this + " 非玩家对象");
+				throw new Exception(this + " 非玩家对象");
 			}
 			return QNetManager.Instance.PlayerValue(PlayerId, key, value);
 		}
-		public void PlayerAction<T>(string key, params object[] value)
+		public void PlayerAction(string key, params object[] value)
 		{
 			if (!IsPlayer)
 			{
-				throw new System.Exception(this + " 非玩家对象");
+				throw new Exception(this + " 非玩家对象");
 			}
 			QNetManager.Instance.PlayerAction(PlayerId, key, value);
 		}
