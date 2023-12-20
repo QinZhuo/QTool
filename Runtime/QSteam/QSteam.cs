@@ -64,7 +64,6 @@ namespace QTool
 			CommandLine = commandLine;
 			OnJoinRequested = Callback<GameLobbyJoinRequested_t>.Create(info =>
 			{
-				QDebug.LogError("【" + info.m_steamIDFriend.GetName() + "】邀请加入房间");
 				_ = JoinLobby(info.m_steamIDLobby);
 			});
 			OnLobbyDataUpdate = Callback<LobbyDataUpdate_t>.Create(info =>
@@ -325,7 +324,6 @@ namespace QTool
         static void SetCurRoom(ulong id)
         {
             LobbyUpdate((CSteamID)id, ref _CurrentLobby);
-			
 			_ =StartChatReceive();
             chatId = 0;
 		}
@@ -422,9 +420,9 @@ namespace QTool
                     Debug.LogError(nameof(QSteam)+" 获取房间["+id+"]信息出错 " + t);
                     continue;
                 }
-            }
-			QDebug.Log(nameof(QSteam)+" 房间信息更新 " + lobby.ToDetailString());
+			}
 			OnLobbyUpdate?.Invoke();
+			QDebug.Log(nameof(QSteam)+" 房间信息更新 " + lobby.ToDetailString());
 		}
 		public static void AddLobbyFilter(string key, string value, ELobbyComparison comparison = ELobbyComparison.k_ELobbyComparisonEqual)
 		{
