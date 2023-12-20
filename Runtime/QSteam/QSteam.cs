@@ -15,7 +15,8 @@ namespace QTool
 
 
 	public static class QSteam
-    {
+	{
+		public static string CommandLine { get; private set; }
 		public static CSteamID Id => SteamUser.GetSteamID();
 		public static string Name => SteamFriends.GetPersonaName();
 		public static Texture2D AvatarImage => Id.GetImage();
@@ -59,7 +60,8 @@ namespace QTool
 			}
 			SteamClient.SetWarningMessageHook(SteamAPIDebugTextHook);
 			QToolManager.Instance.OnUpdateEvent += SteamAPI.RunCallbacks;
-
+			SteamApps.GetLaunchCommandLine(out var commandLine, 1024);
+			CommandLine = commandLine;
 			OnJoinRequested = Callback<GameLobbyJoinRequested_t>.Create(info =>
 			{
 				QDebug.LogError("【" + info.m_steamIDFriend.GetName() + "】邀请加入房间");
