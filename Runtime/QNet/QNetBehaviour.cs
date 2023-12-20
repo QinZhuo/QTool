@@ -156,9 +156,9 @@ namespace QTool.Net
 	/// 标记函数为玩家动作 本地玩家使用PlayerAction远程调用所有客户端
 	/// </summary>
 	[AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
-	public class QPlayerActionAttribute : Attribute
+	public class QSyncActionAttribute : Attribute
 	{
-		public QPlayerActionAttribute()
+		public QSyncActionAttribute()
 		{
 		}
 	}
@@ -207,7 +207,7 @@ namespace QTool.Net
 				});
 				Functions.RemoveAll(function =>
 				{
-					var playerAction = function.MethodInfo.GetAttribute<QPlayerActionAttribute>();
+					var playerAction = function.MethodInfo.GetAttribute<QSyncActionAttribute>();
 					return playerAction == null;
 				});
 			}
