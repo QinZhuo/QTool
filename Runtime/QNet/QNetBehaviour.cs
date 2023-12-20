@@ -60,7 +60,7 @@ namespace QTool.Net
 		{
 			NetDestroy();
 			if (QNetManager.Instance != null)
-			{
+			{ 
 				QNetManager.Instance.OnNetUpdate -= NetStart;
 				QNetManager.Instance.OnNetUpdate -= OnNetUpdate;
 			}
