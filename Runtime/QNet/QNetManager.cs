@@ -90,14 +90,11 @@ namespace QTool.Net
 			}
 			return default;
 		}
-		public void PlayerAction(string player, string key, params object[] value)
+		public void PlayerAction(string key, params object[] value)
 		{
 			if (transport.ClientConnected)
 			{
-				if (player == transport.ClientId)
-				{
-					SendAction.InvokeEvent(key, value);
-				}
+				SendAction.InvokeEvent(key, value);
 			}
 		}
 
@@ -233,7 +230,7 @@ namespace QTool.Net
 		{
 			transport.OnClientConnected += () =>
 			{
-				PlayerAction(transport.ClientId, nameof(DefaultNetAction.PlayerConnected), transport.ClientId);
+				PlayerAction(nameof(DefaultNetAction.PlayerConnected), transport.ClientId);
 			};
 			transport.OnClientDataReceived += (data) =>
 			{
@@ -437,7 +434,7 @@ namespace QTool.Net
 						SyncCheckFlag.Index = ClientIndex;
 						SyncCheckFlag.Value = 0;
 						OnSyncCheck?.Invoke(SyncCheckFlag);
-						PlayerAction(transport.ClientId, nameof(DefaultNetAction.SyncCheck), SyncCheckFlag);
+						PlayerAction(nameof(DefaultNetAction.SyncCheck), SyncCheckFlag);
 					}
 					ClientIndex++;
 					NetTime += NetDeltaTime;

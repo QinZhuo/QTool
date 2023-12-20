@@ -26,11 +26,14 @@ namespace QTool.Net
 		}
 		public void PlayerAction(string key, params object[] value)
 		{
-			if (!IsPlayer)
+			if (IsLoaclPlayer)
 			{
-				throw new Exception(this + " 非玩家对象");
+				QNetManager.Instance.PlayerAction(key, value);
 			}
-			QNetManager.Instance.PlayerAction(PlayerId, key, value);
+			else
+			{
+				throw new Exception(this + " 非本地玩家对象");
+			}
 		}
 		internal QNetTypeInfo TypeInfo { get; set; }
 		public virtual void Awake()
