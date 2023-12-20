@@ -15,6 +15,7 @@ namespace QTool.Net
 		public string PlayerId { get; internal set; } = null;
 		public bool IsPlayer => !PlayerId.IsNull();
 		public bool IsLoaclPlayer => PlayerId == QNetManager.Instance.transport.ClientId;
+		public bool IsDestoryed { get; internal set; }
 		public T PlayerValue<T>(string key, T value)
 		{
 			if (!IsPlayer)
@@ -57,6 +58,7 @@ namespace QTool.Net
 		
 		public virtual void OnDestroy()
 		{
+			NetDestroy();
 			if (QNetManager.Instance != null)
 			{
 				QNetManager.Instance.OnNetUpdate -= NetStart;
@@ -80,8 +82,11 @@ namespace QTool.Net
 			}
 		}
 		public virtual void OnNetStart() { }
+
 		internal void NetDestroy()
 		{
+			if (IsDestoryed) return;
+			IsDestoryed = true;
 			OnNetDestroy();
 			QNetManager.Instance.OnSyncCheck -= OnSyncCheck;
 			if (TypeInfo.Members.Count > 0)
