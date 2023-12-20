@@ -446,7 +446,7 @@ namespace QTool
                 var lobby = new QLobby();
                 LobbyUpdate(id, ref lobby);
                 LobbyList.Add(lobby);
-				QDebug.Log(nameof(QSteam) + " 房间信息 "+lobby); 
+				QDebug.Log(nameof(QSteam) + " 房间信息 " + lobby);
 			}
 			QDebug.Log(nameof(QSteam) + " 刷新房间结束 " + LobbyList.Count);
 			return LobbyList;
