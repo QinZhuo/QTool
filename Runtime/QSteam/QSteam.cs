@@ -411,7 +411,7 @@ namespace QTool
 			lobby.Data = new QDictionary<string, string>();
 			var count = SteamMatchmaking.GetLobbyDataCount(id);
 
-			for (int t = 0; t < count; ++t)
+			for (int t = 0; t < count; ++t) 
             {
 				bool lobbyDataRet = SteamMatchmaking.GetLobbyDataByIndex(id, t, out var key, Constants.k_nMaxLobbyKeyLength,out var value, Constants.k_cubChatMetadataMax);
 				lobby.Data[key] = value;
