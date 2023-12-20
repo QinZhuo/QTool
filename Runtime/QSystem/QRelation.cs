@@ -85,11 +85,14 @@ namespace QTool
 		}
 		public static void QTeamAdd<T>(this T a) where T : IQTeam
 		{
-			Teams[a.Team].AddCheckExist(a);
+			if ((a?.Team).IsNull())
+			{
+				Teams[a.Team]?.AddCheckExist(a);
+			}
 		}
 		public static void QTeamRemove<T>(this T a) where T : IQTeam
 		{
-			if (a != null)
+			if ((a?.Team).IsNull())
 			{
 				Teams[a.Team].Remove(a);
 			}
