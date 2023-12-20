@@ -24,7 +24,7 @@ namespace QTool.Net
 			}
 			return QNetManager.Instance.PlayerValue(PlayerId, key, value);
 		}
-		public void PlayerAction<T>(string key, T value)
+		public void PlayerAction<T>(string key, params object[] value)
 		{
 			if (!IsPlayer)
 			{
@@ -68,30 +68,11 @@ namespace QTool.Net
 			}
 			OnNetStart();
 		}
-		internal void InvokeAction(string key, object obj)
+		internal void InvokeAction(string key, params object[] value)
 		{
 			if (TypeInfo.Functions.ContainsKey(key))
 			{
-				var func = TypeInfo.Functions[key];
-				switch (func.ParamInfos.Length)
-				{
-					case 0:
-						func.Invoke(this);
-						break;
-					case 1:
-						func.Invoke(this,obj);
-						break;
-					default:
-						if (obj is object[] objs)
-						{
-							func.Invoke(this, objs);
-						}
-						else
-						{
-							Debug.LogError(TypeInfo.Type + "." + func.Name + "()为多参数函数 调用时需要传入 object[]");
-						}
-						break;
-				}
+				TypeInfo.Functions[key].Invoke(this, value);
 			}
 		}
 		public virtual void OnNetStart() { }

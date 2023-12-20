@@ -90,7 +90,7 @@ namespace QTool.Net
 			}
 			return default;
 		}
-		public void PlayerAction(string player, string key, object value)
+		public void PlayerAction(string player, string key, params object[] value)
 		{
 			if (transport.ClientConnected)
 			{
@@ -109,7 +109,7 @@ namespace QTool.Net
 			public string Key { get; set; }
 			public GameObject gameObject { internal set; get; }
 
-			internal Action<string, object> Action = null;
+			internal Action<string, object[]> Action = null;
 		}
 		public QList<string, PlayerInfo> Players = new QList<string, PlayerInfo>(() => new PlayerInfo());
 		QNetActionData LocalAction = new QNetActionData();
@@ -125,7 +125,7 @@ namespace QTool.Net
 		public void StartServer()
 		{
 			ServerSeed = UnityEngine.Random.Range(0,int.MaxValue);
-			ServerActionData[nameof(QNetManager)].Events.Add(new QKeyValue<string, object>(nameof(ServerSeed), ServerSeed));
+			ServerActionData[nameof(QNetManager)].InvokeEvent(nameof(ServerSeed), ServerSeed);
 			transport.OnServerConnected = (id) =>
 			{
 				QDebug.Log("[" + id + "]连接主机");
@@ -158,7 +158,7 @@ namespace QTool.Net
 					{
 						case nameof(DefaultNetAction.PlayerConnected):
 							{
-								var player = eventData.Value?.ToString();
+								var player = eventData.Value[0]?.ToString();
 								ServerPlayers[connectId] = player;
 								QDebug.Log("["+ServerIndex + "] 添加玩家[" + connectId + "][" + player+"]");
 							}
@@ -292,7 +292,7 @@ namespace QTool.Net
 							{
 								case nameof(DefaultNetAction.SyncLoad):
 									{
-										if (eventData.Value is byte[] loadData)
+										if (eventData.Value[0] is byte[] loadData)
 										{
 											loadEventData = loadData;
 										}
@@ -305,7 +305,7 @@ namespace QTool.Net
 									break;
 								case nameof(DefaultNetAction.ServerSeed):
 									{
-										Random = new System.Random((int)eventData.Value);
+										Random = new System.Random((int)eventData.Value[0]);
 										QRandom.Instance = Random;
 									}
 									break;
@@ -345,7 +345,7 @@ namespace QTool.Net
 									{
 										if (actionData.Key != transport.ClientId)
 										{
-											var flag = (QNetSyncFlag)eventData.Value;
+											var flag = (QNetSyncFlag)eventData.Value[0];
 											if (flag.Index == SyncCheckFlag.Index)
 											{
 												if (flag.Value != SyncCheckFlag.Value)
@@ -428,7 +428,7 @@ namespace QTool.Net
 										writer.Write(QIdData.ToArray());
 									}
 								}
-								ServerActionData[nameof(QNetManager)].Events.Add(new QKeyValue<string, object>(nameof(DefaultNetAction.SyncLoad), writer.ToArray()));
+								ServerActionData[nameof(QNetManager)].InvokeEvent(nameof(DefaultNetAction.SyncLoad), writer.ToArray());
 							}
 						}
 					}
@@ -499,7 +499,7 @@ namespace QTool.Net
 	{
 		public string Key { get; set; }
 		public QDictionary<string, object> Values = new QDictionary<string, object>();
-		public List<QKeyValue<string, object>> Events = new List<QKeyValue<string, object>>();
+		public List<QKeyValue<string, object[]>> Events = new List<QKeyValue<string, object[]>>();
 		public bool Active => Values.Count + Events.Count > 0;
 		public override string ToString()
 		{
@@ -512,9 +512,9 @@ namespace QTool.Net
 				Values[kv.Key] = kv.Value;
 			}
 		}
-		public void InvokeEvent(string key, object value)
+		public void InvokeEvent(string key,params object[] value)
 		{
-			Events.Add(new QKeyValue<string, object>(key, value));
+			Events.Add(new QKeyValue<string, object[]>(key, value));
 		}
 		public void Clear()
 		{
