@@ -53,6 +53,11 @@ namespace QTool
 			}
 			SteamClient.SetWarningMessageHook(SteamAPIDebugTextHook); 
 			QToolManager.Instance.OnUpdateEvent += SteamAPI.RunCallbacks;
+			OnJoinRequested = Callback<GameLobbyJoinRequested_t>.Create(info =>
+			{
+				QDebug.LogError("【" + info.m_steamIDFriend.GetName() + "】邀请加入房间");
+				_ = JoinLobby(info.m_steamIDLobby);
+			});
 			QEventManager.RegisterOnce(QToolEvent.游戏退出完成, LeaveLobby, SteamAPI.Shutdown);
 			SteamNetworkingUtils.InitRelayNetworkAccess();
 			QDebug.Log(nameof(QSteam) + " 初始化成功 [" + Name + "]["+Id+"]");
@@ -289,7 +294,8 @@ namespace QTool
                 }
             }
         }
-	
+
+		private static Callback<GameLobbyJoinRequested_t> OnJoinRequested = null;
 		private static Callback<LobbyDataUpdate_t> OnLobbyDataUpdate = null;
         public static void LeaveLobby()
         {
@@ -309,7 +315,8 @@ namespace QTool
             OnLobbyDataUpdate = Callback<LobbyDataUpdate_t>.Create((info) =>
             {
                 LobbyUpdate((CSteamID)info.m_ulSteamIDLobby, ref _CurrentLobby);
-            }); 
+            });
+			
             _=StartChatReceive();
             chatId = 0;
 		}
