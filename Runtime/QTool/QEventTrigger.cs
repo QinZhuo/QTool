@@ -7,6 +7,7 @@ namespace QTool
 
 	public enum QToolEvent
 	{
+	    卸载场景,
 		游戏退出,
 		游戏退出完成,
 	}

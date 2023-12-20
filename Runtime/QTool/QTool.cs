@@ -49,6 +49,10 @@ namespace QTool
 			QDebug.Log("系统语言环境"+RealyCulture);
 			CultureInfo.CurrentCulture = new CultureInfo("en-US");
 			CultureInfo.DefaultThreadCurrentCulture = new CultureInfo("en-US");
+			SceneManager.sceneUnloaded += scene =>
+			{
+				QEventManager.InvokeEvent(QToolEvent.卸载场景);
+			};
 			QLocalization.KeyReplace["版本号"] = Application.version;
 		}
 		public static void Quit()

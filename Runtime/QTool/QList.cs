@@ -377,7 +377,7 @@ namespace QTool
 	public static class QListTool
 	{
 		
-		public static int RemoveNull<T>(this List<T> array)
+		public static int ClearNull<T>(this List<T> array)
 		{
 			return array.RemoveAll(obj => obj.IsNull());
 		}

@@ -56,7 +56,15 @@ namespace QTool
 	{
 		static QTeam()
 		{
-			QEventManager.Register(QToolEvent.游戏退出,Teams.Clear);
+			QEventManager.Register(QToolEvent.卸载场景, ClearNull);
+			QEventManager.Register(QToolEvent.游戏退出, Teams.Clear);
+		}
+		private static void ClearNull()
+		{
+			foreach (var team in Teams)
+			{
+				team.Value.ClearNull();
+			}
 		}
 		public static QDictionary<string, List<IQTeam>> Teams = new QDictionary<string, List<IQTeam>>((key) => new List<IQTeam>());
 
@@ -81,7 +89,10 @@ namespace QTool
 		}
 		public static void QTeamRemove<T>(this T a) where T : IQTeam
 		{
-			Teams[a.Team].Remove(a);
+			if (a != null)
+			{
+				Teams[a.Team].Remove(a);
+			}
 		}
 		public static void GetRelactionList<T>(this T a, List<T> list, QTeamRelaction relactionType = QTeamRelaction.敌人, float relactionValue = 0) where T : class, IQTeam
 		{
