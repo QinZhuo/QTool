@@ -72,7 +72,15 @@ namespace QTool.Net
 		{
 			if (TypeInfo.Functions.ContainsKey(key))
 			{
-				TypeInfo.Functions[key]?.Invoke(this, obj);
+				var func = TypeInfo.Functions[key];
+				if (func.ParamInfos.Length == 0)
+				{
+					func.Invoke(this);
+				}
+				else
+				{
+					func.Invoke(this, obj);
+				}
 			}
 		}
 		public virtual void OnNetStart() { }
@@ -191,9 +199,9 @@ namespace QTool.Net
 					var playerAction = function.MethodInfo.GetAttribute<QPlayerActionAttribute>();
 					if (playerAction != null)
 					{
-						if (function.MethodInfo.GetParameters().Length!= 1)
+						if (function.MethodInfo.GetParameters().Length > 1)
 						{
-							QDebug.LogError("函数"+Type+"."+function.Name+"() 无法作为玩家动作函数 玩家动作函数参数只能为一个");
+							QDebug.LogError("函数" + Type + "." + function.Name + "() 无法作为玩家动作函数 玩家动作函数参数数目必须小于等于一");
 							return true;
 						}
 						return false;
