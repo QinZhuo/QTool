@@ -16,7 +16,6 @@ namespace QTool
 
 	public static class QSteam
 	{
-		public static string CommandLine { get; private set; }
 		public static CSteamID Id => SteamUser.GetSteamID();
 		public static string Name => SteamFriends.GetPersonaName();
 		public static Texture2D AvatarImage => Id.GetImage();
@@ -60,8 +59,6 @@ namespace QTool
 			}
 			SteamClient.SetWarningMessageHook(SteamAPIDebugTextHook);
 			QToolManager.Instance.OnUpdateEvent += SteamAPI.RunCallbacks;
-			SteamApps.GetLaunchCommandLine(out var commandLine, 1024);
-			CommandLine = commandLine;
 			OnJoinRequested = Callback<GameLobbyJoinRequested_t>.Create(info =>
 			{
 				QDebug.LogError(info.m_steamIDFriend.GetName() + " 邀请");
@@ -79,6 +76,26 @@ namespace QTool
 				OnJoinRequested.Unregister, OnLobbyDataUpdate.Unregister, OnLobbyChatUpdate.Unregister);
 			SteamNetworkingUtils.InitRelayNetworkAccess();
 			QDebug.Log(nameof(QSteam) + " 初始化成功 [" + Name + "][" + Id + "]");
+			var commands = Environment.GetCommandLineArgs();
+			for (int i = 0; i < commands.Length-1; i++)
+			{
+				switch (commands[i])
+				{
+					case "+connect_lobby":
+						{
+							if (ulong.TryParse(commands[i + 1], out ulong lobbyID))
+							{
+								if (lobbyID > 0)
+								{
+									_ = JoinLobby(lobbyID.ToSteamId());
+								}
+							}
+						}
+						break;
+					default:
+						break;
+				}
+			}
 		}
 	
 		[AOT.MonoPInvokeCallback(typeof(SteamAPIWarningMessageHook_t))]
