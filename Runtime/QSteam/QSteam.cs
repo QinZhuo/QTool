@@ -61,7 +61,6 @@ namespace QTool
 			QToolManager.Instance.OnUpdateEvent += SteamAPI.RunCallbacks;
 			OnJoinRequested = Callback<GameLobbyJoinRequested_t>.Create(info =>
 			{
-				QDebug.LogError(info.m_steamIDFriend.GetName() + " 邀请");
 				_ = JoinLobby(info.m_steamIDLobby);
 			});
 			OnLobbyDataUpdate = Callback<LobbyDataUpdate_t>.Create(info =>
@@ -378,7 +377,6 @@ namespace QTool
 				QDebug.LogError("加入房间失败[" + id + "]");
                 return false;
 			}
-			QDebug.LogError("加入房间成功");
 			SetCurRoom(join.m_ulSteamIDLobby);
 			QDebug.Log("加入房间[" + join.m_ulSteamIDLobby + "]");
             return true;
