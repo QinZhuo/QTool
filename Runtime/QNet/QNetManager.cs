@@ -32,7 +32,7 @@ namespace QTool.Net
 			Time.fixedDeltaTime = 1f / netFps;
 			QTool.AddPlayerLoop(typeof(QNetManager), QNetPlayerLoop,"FixedUpdate");
 			QToolManager.Instance.OnUpdateEvent -= QCoroutine.Update;
-
+			QId.GetNewIdFunc = GetNetId;
 		}
 		
 		UnityEngine.UIElements.Label DebugInfoLabel = null;
@@ -72,6 +72,7 @@ namespace QTool.Net
 			QTool.RemovePlayerLoop(typeof(QNetManager), "FixedUpdate");
 			ServerUpdateTimer?.Clear();
 			QCoroutine.StopAll();
+			QId.GetNewIdFunc = QTool.GetGuid;
 		}
 		public bool NetActive => Application.isPlaying&&( transport.ServerActive || transport.ClientConnected);
 		public T PlayerValue<T>(string player,string key, T localValue)
@@ -218,9 +219,9 @@ namespace QTool.Net
 		public int ClientIndex { get; private set; } =0;
 		private int IdIndex { get; set; } = 0;
 
-		public string NewId()
+		public string GetNetId()
 		{
-			return QNetManager.Instance.IdIndex++ + "_" + QNetManager.Instance.ClientIndex;
+			return Instance.IdIndex++ + "_" + Instance.ClientIndex;
 		}
 
 		private QNetSyncFlag SyncCheckFlag = new QNetSyncFlag();

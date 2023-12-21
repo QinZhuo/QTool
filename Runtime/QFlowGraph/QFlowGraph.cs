@@ -187,7 +187,7 @@ namespace QTool.FlowGraph
             {
                 offsetPos = new Vector2(Mathf.Min(offsetPos.x, node.rect.x), Mathf.Min(offsetPos.y, node.rect.y));
                 lastKeys.Add(node.Key);
-                node.Key = QId.NewId();
+                node.Key = QTool.GetGuid();
                 keys.Add(node.Key);
             }
 
@@ -1072,7 +1072,7 @@ namespace QTool.FlowGraph
         public List<QFlowPort> OutParamPorts = new List<QFlowPort>();
 		public bool IsRunning => Graph.RunningNodeList.Contains(Key);
 		public string Name { get; set; }
-		public string Key { get;  set; } = QId.NewId();
+		public string Key { get;  set; } = QTool.GetGuid();
 		public string ViewName { 
             get
             {

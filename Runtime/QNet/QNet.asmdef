@@ -1,0 +1,17 @@
+{
+    "name": "QNet",
+    "rootNamespace": "",
+    "references": [
+        "GUID:8c4295a259d9a934784fb95a11fa9e58",
+        "GUID:6806a62c384838046a3c66c44f06d75f"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

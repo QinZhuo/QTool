@@ -1,0 +1,21 @@
+{
+    "name": "Unity.QNet.CodeGen",
+    "rootNamespace": "",
+    "references": [
+        "GUID:8c4295a259d9a934784fb95a11fa9e58"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": true,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "Unity.Burst.Cecil.dll",
+        "Unity.Burst.Cecil.Rocks.dll"
+    ],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

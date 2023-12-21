@@ -269,7 +269,7 @@ namespace QTool
 	
 		public QAnalysisEvent(string playerId, string eventKey,object eventValue=null)
 		{
-			eventId = QId.NewId();
+			eventId = QTool.GetGuid();
 			this.playerId = playerId;
 			this.eventKey = eventKey;
 			this.eventValue = eventValue;

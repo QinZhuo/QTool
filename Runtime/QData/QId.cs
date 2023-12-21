@@ -10,10 +10,7 @@ namespace QTool
     {
 		#region 静态数据方法
 		public static QDictionary<string, QId> InstanceIdList = new QDictionary<string, QId>();
-		public static string NewId()
-		{
-			return Guid.NewGuid().ToString("N");
-		}
+		public static Func<string> GetNewIdFunc = QTool.GetGuid;
 		public static void InitSceneId()
 		{
 			var ids = GameObject.FindObjectsOfType<QId>(true);
@@ -96,14 +93,7 @@ namespace QTool
 			{
 				if (Id.IsNull() || (InstanceIdList[Id] != null && InstanceIdList[Id] != this))
 				{
-					if (Net.QNetManager.Instance != null && Application.IsPlaying(this))
-					{
-						Id = Net.QNetManager.Instance.NewId();
-					}
-					else
-					{
-						Id = NewId();
-					}
+					Id = GetNewIdFunc();
 				}
 				InstanceIdList[Id] = this;
 				gameObject.SetDirty();

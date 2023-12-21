@@ -1,11 +1,10 @@
 {
-    "name": "QToolRuntime",
+    "name": "QTool",
     "rootNamespace": "",
     "references": [
         "GUID:15fc0a57446b3144c949da3e2b9737a9",
         "GUID:b46779583a009f04ba9f5f31d0e7e6ac",
         "GUID:c0acee75ea694134d829ba483c76ee27",
-        "GUID:6806a62c384838046a3c66c44f06d75f",
         "GUID:75469ad4d38634e559750d17036d5f7c",
         "GUID:df380645f10b7bc4b97d4f5eb6303d95",
         "GUID:68bd7fdb68ef2684e982e8a9825b18a5",

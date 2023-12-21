@@ -40,7 +40,7 @@ public class QNetTestPlayer : QNetBehaviour
 	}
 	private void OnGUI()
 	{
-		if (Players.IndexOf(this) == 0)
+		if (Players.IndexOf(this) == 0) 
 		{
 			GUILayout.BeginArea(new Rect(Screen.width / 2-100, 0, Screen.width / 2, 100));
 			GUILayout.Label(Players.ToOneString());

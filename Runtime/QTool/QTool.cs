@@ -66,6 +66,10 @@ namespace QTool
 		public static string Version => Application.version; 
 		public static bool IsTestVersion => Application.version.StartsWith("0.");
         static QDictionary<string, Color> KeyColor = new QDictionary<string, Color>();
+		public static string GetGuid()
+		{
+			return Guid.NewGuid().ToString("N");
+		}
 		public static void RunURLWeb(string url)
 		{
 			QDebug.Log(nameof(RunURLWeb) + url);
