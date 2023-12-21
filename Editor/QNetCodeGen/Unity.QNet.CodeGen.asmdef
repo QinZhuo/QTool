@@ -2,7 +2,8 @@
     "name": "Unity.QNet.CodeGen",
     "rootNamespace": "",
     "references": [
-        "GUID:8c4295a259d9a934784fb95a11fa9e58"
+        "GUID:8c4295a259d9a934784fb95a11fa9e58",
+        "GUID:d5fe26ed92a53554abb210fd7d459026"
     ],
     "includePlatforms": [
         "Editor"
