@@ -32,23 +32,6 @@ namespace QTool.Net
 				QNetManager.PlayerAction(key, Params);
 			}
 		}
-		//private List<object> Params = new List<object>();
-		//public void _AddActionParam<T>(T type)
-		//{
-		//	Params.Add(type);
-		//}
-		//public void _InvokeAction(string key)
-		//{
-		//	if (IsLoaclPlayer)
-		//	{
-		//		QNetManager.PlayerAction(key, Params.ToArray());
-		//		Params.Clear();
-		//	}
-		//	else
-		//	{
-		//		throw new Exception(this + " 非本地玩家对象");
-		//	}
-		//}
 		internal QNetTypeInfo TypeInfo { get; set; }
 		public virtual void Awake()
 		{
@@ -127,20 +110,45 @@ namespace QTool.Net
 		{
 			QNetManager.Destroy(obj);
 		}
-
+		private static int GetFlag(object obj, Type type)
+		{
+			var typeInfo = QSerializeType.Get(type);
+			switch (typeInfo.Code)
+			{
+				case TypeCode.Object:
+					{
+						switch (typeInfo.ObjType)
+						{
+							case QObjectType.Object:
+								{
+									var flag = 0;
+									foreach (var member in typeInfo.Members)
+									{
+										flag ^= GetFlag(member.Get(obj), member.Type);
+									}
+									return flag;
+								}
+							default:
+								break;
+						}
+					}
+					break;
+				case TypeCode.Single:
+				case TypeCode.Double:
+					return ((int)(float)obj).GetHashCode();
+				default:
+					return obj.GetHashCode();
+			}
+			return 0;
+		}
 		internal void OnSyncCheck(QNetSyncFlag flag)
 		{
-#if DEBUG
-			if (flag.Index % 10000 == 0)
-			{
-				QDebug.LogWarning(" Check " + flag + "  +  " + this);
-			}
-#endif
 			foreach (var check in TypeInfo.CheckList)
 			{
-				flag.Check(check.Get(this).GetHashCode());
+				flag.Check(GetFlag(check.Get(this), check.Type));
 			}
 		}
+		
 		internal void OnSyncSave(QBinaryWriter writer)
 		{
 			foreach (var member in TypeInfo.Members)
@@ -178,10 +186,12 @@ namespace QTool.Net
 			this.SyncCheck = SyncCheck;
 		}
 	}
+
 	public class QNetTypeInfo : QTypeInfo<QNetTypeInfo>
 	{
 		public const string QSyncAction_ = nameof(QSyncAction_);
 		public List<QMemeberInfo> CheckList { get; private set; } = new List<QMemeberInfo>();
+	
 		protected override void Init(Type type)
 		{
 			base.Init(type);
@@ -196,14 +206,7 @@ namespace QTool.Net
 						{
 							if (syncVar.SyncCheck)
 							{
-								if (memberInfo.Type.IsValueType)
-								{
-									CheckList.Add(memberInfo);
-								}
-								else
-								{
-									QDebug.LogError(Type + "." + memberInfo.QName + "同步检测出错 只有值类型才能通过" + nameof(System.Object.GetHashCode) + "()进行同步检测");
-								}
+								CheckList.Add(memberInfo);
 							}
 							return false;
 						}
