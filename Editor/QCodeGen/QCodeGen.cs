@@ -234,9 +234,9 @@ namespace QTool.CodeGen
 			readonly AssemblyNameReference fixedCoreLib;
 			public QReflectionImporter(ModuleDefinition module) : base(module)
 			{
-				fixedCoreLib = module.AssemblyReferences.FirstOrDefault(a => a.Name == "mscorlib" || a.Name == "netstandard" || a.Name == SystemPrivateCoreLib);
+				fixedCoreLib = module.AssemblyReferences.FirstOrDefault(a => a.Name == "mscorlib" || a.Name == "netstandard");
 			}
-			public override AssemblyNameReference ImportReference(System.Reflection.AssemblyName name) 
+			public override AssemblyNameReference ImportReference(System.Reflection.AssemblyName name)
 			{
 				if (name.Name == SystemPrivateCoreLib && fixedCoreLib != null)
 					return fixedCoreLib;
