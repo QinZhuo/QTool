@@ -231,16 +231,23 @@ namespace QTool.CodeGen
 		public class QReflectionImporter : DefaultReflectionImporter
 		{
 			const string SystemPrivateCoreLib = "System.Private.CoreLib";
-			readonly AssemblyNameReference fixedCoreLib;
 			public QReflectionImporter(ModuleDefinition module) : base(module)
 			{
-				fixedCoreLib = module.AssemblyReferences.FirstOrDefault(a => a.Name == "mscorlib" || a.Name == "netstandard");
 			}
 			public override AssemblyNameReference ImportReference(System.Reflection.AssemblyName name)
 			{
-				if (name.Name == SystemPrivateCoreLib && fixedCoreLib != null)
-					return fixedCoreLib;
-
+				if (name.Name == SystemPrivateCoreLib)
+				{
+					var list = module.AssemblyReferences.Where(a => a.Name == "mscorlib" || a.Name == "netstandard").OrderBy(x => x.Name).ThenByDescending(x => x.Version).ToList();
+					if (list.Count > 0)
+					{
+						return list[0];
+					}
+					else
+					{
+						throw new Exception("QCodeGen not found" + SystemPrivateCoreLib);
+					}
+				}
 				return base.ImportReference(name);
 			}
 		}
