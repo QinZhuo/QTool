@@ -31,10 +31,6 @@ namespace QTool.Net
 			{
 				QNetManager.PlayerAction(key, Params);
 			}
-			else
-			{
-				throw new Exception(this + " 非本地玩家对象");
-			}
 		}
 		//private List<object> Params = new List<object>();
 		//public void _AddActionParam<T>(T type)
