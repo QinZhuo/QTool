@@ -355,21 +355,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 311946879}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dfb5948a9e4c41f46b6e0d4179aa287a, type: 3}
+  m_Script: {fileID: 11500000, guid: b19dc15acb1b1b840ab0c97e4081d94d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Port: 7777
-  NoDelay: 1
-  Interval: 10
-  Timeout: 10000
-  FastResend: 2
-  CongestionWindow: 0
-  SendWindowSize: 4096
-  ReceiveWindowSize: 4096
-  MaxRetransmit: 40
-  NonAlloc: 1
-  MaximizeSendReceiveBuffersToOSLimit: 1
-  ReliableMaxMessageSize: 298449
+  maxConnections: 10
+  UseP2P: 1
 --- !u!1 &419214158
 GameObject:
   m_ObjectHideFlags: 0
@@ -1598,11 +1588,11 @@ RectTransform:
   - {fileID: 490543089}
   m_Father: {fileID: 1419638302}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 1, y: 1}
-  m_AnchorMax: {x: 1, y: 1}
+  m_AnchorMin: {x: 1, y: 0}
+  m_AnchorMax: {x: 1, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 160, y: 30}
-  m_Pivot: {x: 1, y: 1}
+  m_Pivot: {x: 1, y: 0}
 --- !u!114 &1974606633
 MonoBehaviour:
   m_ObjectHideFlags: 0

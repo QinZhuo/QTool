@@ -303,8 +303,10 @@ namespace QTool.Net
 									break;
 								case nameof(DefaultNetAction.ServerSeed):
 									{
-										Random = new System.Random((int)eventData.Value[0]);
+										var seed = (int)eventData.Value[0];
+										Random = new System.Random(seed);
 										QRandom.Instance = Random;
+										QDebug.LogError("随机种子[" + seed + "]");
 									}
 									break;
 								default:
