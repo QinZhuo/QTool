@@ -124,8 +124,8 @@ namespace QTool.CodeGen
 		{
 			var newName = method.GetNameWithParams(newMethodStart);
 			var newMethod = new MethodDefinition(newName, method.Attributes, method.ReturnType);
-			newMethod.IsPublic = true;
-			newMethod.IsFamily = false;  
+			newMethod.IsPublic = false;
+			newMethod.IsFamily = true;
 			foreach (var pd in method.Parameters)
 			{
 				newMethod.Parameters.Add(new ParameterDefinition(pd.Name, ParameterAttributes.None, pd.ParameterType));
