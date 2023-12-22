@@ -16,13 +16,13 @@ namespace QTool.CodeGen
 	{
 		public const string QNet = nameof(QNet);
 		public const string QSyncAction_ = nameof(QSyncAction_);
-		public const string IgnoreDefine = "ILPP_IGNORE";
+		public const string IgnoreDefine = "IGNORE_COCDEGEN";
 		public const string GenNamespace = "QTool.Net";
 		public const string GenClass = nameof(GenClass);
-		public static List<DiagnosticMessage> Logs = new List<DiagnosticMessage>();
+		public static List<DiagnosticMessage> Logs = new List<DiagnosticMessage>(); 
 		public static AssemblyDefinition Assembly;
 
-		public static void Log(object obj, DiagnosticType type = DiagnosticType.Warning)
+		public static void Log(object obj, DiagnosticType type = DiagnosticType.Warning) 
 		{
 			Logs.Add(new DiagnosticMessage { DiagnosticType = type, MessageData = nameof(QNetCodeGen) + "  " + obj?.ToString() });
 		}
@@ -66,6 +66,7 @@ namespace QTool.CodeGen
 		{
 			var readerParameters = new ReaderParameters
 			{
+				ReadingMode= ReadingMode.Immediate,
 				SymbolStream = pdbStream,
 				SymbolReaderProvider = new DefaultSymbolReaderProvider(),
 				AssemblyResolver = asmResolver,
@@ -100,7 +101,7 @@ namespace QTool.CodeGen
 				}
 				if (modified)
 				{
-					Log("Add_" + Assembly.Name);
+					//Log("Add_" + Assembly.Name);
 			//		Assembly.MainModule.Types.Add(GeneratedCodeClass);
 				}
 			}
@@ -118,7 +119,7 @@ namespace QTool.CodeGen
 		{
 			LogError = Assembly.GetMethodByCount(typeof(UnityEngine.Debug), nameof(UnityEngine.Debug.LogError), 1);
 			PlayerAction = Assembly.GetMethodByCount(typeof(QNetBehaviour), nameof(QNetBehaviour._InvokeAction), 1);
-			AddParam = Assembly.GetMethodByCount(typeof(QNetBehaviour), nameof(QNetBehaviour._AddActionParam), 1).Resolve();
+			AddParam = Assembly.GetMethodByCount(typeof(QNetBehaviour), nameof(QNetBehaviour._AddActionParam)).Resolve();
 		}
 		bool WeaveType(TypeDefinition type)
 		{
@@ -188,7 +189,7 @@ namespace QTool.CodeGen
 				worker.This();
 				worker.Param(i);
 				var add = AddParam.MakeGeneric(Assembly.MainModule, method.Parameters[i].ParameterType);
-				worker.Call(add);
+				worker.Call(add); 
 			}
 			worker.This();
 			worker.String(action.Name);

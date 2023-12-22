@@ -122,7 +122,7 @@ namespace QTool.Test
 					test2 = testBytes.GetString().ParseQData<QTestClass>(test2, true);
 				}
 			});
-			QDebug.DebugRun("QData写入 无Name", () =>
+			QDebug.DebugRun("QData写入 无Name", () => 
 			{
 				for (int i = 0; i < testTimes; i++)
 				{

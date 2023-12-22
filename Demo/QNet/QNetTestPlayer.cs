@@ -37,7 +37,7 @@ public class QNetTestPlayer : QNetBehaviour
 		{
 			QNetActionTest("射击");
 			var bullet = Instantiate(bulletPrefab, transform.position, transform.rotation);
-			bullet.GetComponent<QNetTestBullet>().Player = this;
+			bullet.GetComponent<QNetTestBullet>().Player = this; 
 		}
 	}
 	public override string ToString()
