@@ -234,7 +234,7 @@ namespace QTool.CodeGen
 			{
 				fixedCoreLib = module.AssemblyReferences.FirstOrDefault(a => a.Name == "mscorlib" || a.Name == "netstandard" || a.Name == SystemPrivateCoreLib);
 			}
-			public override AssemblyNameReference ImportReference(System.Reflection.AssemblyName name)
+			public override AssemblyNameReference ImportReference(System.Reflection.AssemblyName name) 
 			{
 				if (name.Name == SystemPrivateCoreLib && fixedCoreLib != null)
 					return fixedCoreLib;

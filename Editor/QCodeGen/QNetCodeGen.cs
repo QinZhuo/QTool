@@ -54,7 +54,7 @@ namespace QTool.CodeGen
 					assembly.Write(peOut, writerParameters);
 					var inMemory = new InMemoryAssembly(peOut.ToArray(), pdbOut.ToArray());
 					return new ILPostProcessResult(inMemory, Logs);
-				}
+				} 
 			}
 			return new ILPostProcessResult(compiledAssembly.InMemoryAssembly, Logs);
 		}
@@ -95,7 +95,6 @@ namespace QTool.CodeGen
 			}
 			return modified;
 		}
-		const int PlayerActionMaxParamCount= 4;
 		MethodReference LogError = null;
 		MethodReference PlayerAction = null;
 		MethodDefinition AddParam = null;
@@ -106,7 +105,7 @@ namespace QTool.CodeGen
 			AddParam = Assembly.GetMethodByCount(typeof(QNetBehaviour), nameof(QNetBehaviour._AddActionParam), 1).Resolve();
 		}
 		bool WeaveType(TypeDefinition type)
-		{
+		{  
 			if (!type.IsClass)
 				return false;
 			if (!type.IsDerivedFrom<QNetBehaviour>())
@@ -166,14 +165,8 @@ namespace QTool.CodeGen
 		}
 		void WeaveQSyncAction(MethodDefinition method)
 		{
-
 			var action = method.ReplaceMethod(QSyncAction_);
-			if (method.Parameters.Count > PlayerActionMaxParamCount)
-			{
-				Log(method.Name+"() paramCount mast less "+ PlayerActionMaxParamCount, DiagnosticType.Error);
-				return;
-			}
-			ILProcessor worker = method.Body.GetILProcessor();
+			ILProcessor worker = method.Body.GetILProcessor(); 
 			for (int i = 0; i < method.Parameters.Count; i++)
 			{
 				worker.This();
