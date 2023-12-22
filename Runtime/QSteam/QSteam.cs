@@ -413,6 +413,10 @@ namespace QTool
 			{
 				LobbyUpdate(CurrentLobby.SteamID, ref CurrentLobby);
 			}
+			else
+			{
+				OnLobbyUpdate?.Invoke();
+			}
 		}
 		public static void LobbyUpdate(CSteamID id, ref QLobby lobby)
         {
@@ -488,6 +492,7 @@ namespace QTool
 			public QLobbyMember[] Members { get; internal set; }
 			public int MemberLimit { get; internal set; }
 			public QDictionary<string,string> Data { get; internal set; }
+			public static QDictionary<string, string> LocalData { get; internal set; }
 			public string this[string key]
 			{
 				get
@@ -508,7 +513,7 @@ namespace QTool
 					}
 					else
 					{
-						return QPlayerPrefs.Get<string>(nameof(QLobby) + "_" + key);
+						return LocalData[key];
 					}
 					return "";
 				}
@@ -527,7 +532,8 @@ namespace QTool
 					}
 					else
 					{
-						QPlayerPrefs.Set(nameof(QLobby) + "_" + key, value);
+						LocalData[key] = value;
+						UpdateLobby();
 					}
 				}
 			}
