@@ -195,8 +195,8 @@ namespace QTool.CodeGen
 			worker.String(action.Name);
 			worker.Call(PlayerAction);
 
-			worker.String(action.Name);
-			worker.Call(LogError);
+			//worker.String(action.Name);
+			//worker.Call(LogError);
 			worker.Return();
 		}
 		public const string ProcessedFunctionName = "Weaved";
