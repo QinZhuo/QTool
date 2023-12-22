@@ -32,6 +32,26 @@ namespace QTool.Net
 					Manager.StartClient(QSteam.CurrentLobby.SteamID.ToString());
 				}
 			}
+			QSteam.OnLobbyUpdate += UpdateLobby;
+		}
+		protected override void OnDestroy()
+		{
+			base.OnDestroy();
+			QSteam.OnLobbyUpdate -= UpdateLobby;
+		}
+		private void UpdateLobby()
+		{
+			if (QSteam.CurrentLobby.IsNull()) return;
+			if (ServerActive)
+			{
+				foreach (var client in Server.ConnectClients.ToArray())
+				{
+					if (!QSteam.CurrentLobby.Members.ContainsKey(client.Value))
+					{
+						Server.Disconnect(client.Value.m_SteamID);
+					}
+				}
+			}
 		}
 		public override void ServerStart()
 		{
@@ -178,8 +198,12 @@ namespace QTool.Net
 		}
 		protected virtual void OnP2PConnect(P2PSessionRequest_t result)
 		{
-			QDebug.Log("接受玩家[" + result.m_steamIDRemote.GetName() + "]P2P连接");
-			SteamNetworking.AcceptP2PSessionWithUser(result.m_steamIDRemote);
+			if (QSteam.CurrentLobby.IsNull()) return;
+			if (QSteam.CurrentLobby.Members.ContainsKey(result.m_steamIDRemote))
+			{
+				QDebug.Log("接受玩家[" + result.m_steamIDRemote.GetName() + "]P2P连接");
+				SteamNetworking.AcceptP2PSessionWithUser(result.m_steamIDRemote);
+			}
 		}
 		protected virtual void OnP2PConnectFail(P2PSessionConnectFail_t result)
 		{
