@@ -3,7 +3,8 @@
     "rootNamespace": "",
     "references": [
         "GUID:8c4295a259d9a934784fb95a11fa9e58",
-        "GUID:6806a62c384838046a3c66c44f06d75f"
+        "GUID:6806a62c384838046a3c66c44f06d75f",
+        "GUID:68bd7fdb68ef2684e982e8a9825b18a5"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
@@ -12,6 +13,12 @@
     "precompiledReferences": [],
     "autoReferenced": true,
     "defineConstraints": [],
-    "versionDefines": [],
+    "versionDefines": [
+        {
+            "name": "com.rlabrecque.steamworks.net",
+            "expression": "",
+            "define": "Steamworks"
+        }
+    ],
     "noEngineReferences": false
 }
