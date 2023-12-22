@@ -18,6 +18,14 @@ namespace QTool.CodeGen
 		{
 			return Assembly.MainModule.ImportReference(type);
 		}
+		public static MethodReference MakeGeneric(this MethodReference generic, ModuleDefinition module, TypeReference variableReference)
+		{
+			GenericInstanceMethod instance = new GenericInstanceMethod(generic);
+			instance.GenericArguments.Add(variableReference);
+
+			MethodReference readFunc = module.ImportReference(instance);
+			return readFunc;
+		}
 		public static MethodReference GetMethodByCount(this AssemblyDefinition assembly, Type type, string methodName, int paramCount = -1)
 		{
 			foreach (MethodDefinition methodRef in assembly.Import(type).Resolve().Methods)

@@ -16,9 +16,9 @@ public class QNetTestPlayer : QNetBehaviour
 	}
 
 	[QSyncAction]
-	public void QNetActionTest()
+	public void QNetActionTest(string info)
 	{
-		Debug.LogError("shoot");
+		Debug.LogError(info);
 	}
 	public override void OnNetUpdate()
 	{
@@ -35,7 +35,7 @@ public class QNetTestPlayer : QNetBehaviour
 		shootTimer.Check(NetDeltaTime, false);
 		if (PlayerValue("射击", QInput.PointerPress) && shootTimer.Check())
 		{
-			QNetActionTest();
+			QNetActionTest("射击");
 			var bullet = Instantiate(bulletPrefab, transform.position, transform.rotation);
 			bullet.GetComponent<QNetTestBullet>().Player = this;
 		}

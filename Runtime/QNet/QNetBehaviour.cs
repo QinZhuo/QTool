@@ -25,31 +25,17 @@ namespace QTool.Net
 			}
 			return QNetManager.Instance.PlayerValue(PlayerId, key, value);
 		}
-		public void PlayerAction(string key)
+		private List<object> Params = new List<object>();
+		public void _AddActionParam<T>(T type)
 		{
-			PrivatePlayerAction(key);
+			Params.Add(type);
 		}
-		public void PlayerAction(string key, object param)
-		{
-			PrivatePlayerAction(key, param);
-		}
-		public void PlayerAction(string key, object param1, object param2)
-		{
-			PrivatePlayerAction(key, param1, param2);
-		}
-		public void PlayerAction(string key, object param1, object param2, object param3)
-		{
-			PrivatePlayerAction(key, param1, param2, param3);
-		}
-		public void PlayerAction(string key, object param1, object param2, object param3, object param4)
-		{
-			PrivatePlayerAction(key, param1, param2, param3, param4);
-		}
-		private void PrivatePlayerAction(string key, params object[] value)
+		public void _InvokeAction(string key)
 		{
 			if (IsLoaclPlayer)
 			{
-				QNetManager.PlayerAction(key, value);
+				QNetManager.PlayerAction(key, Params.ToArray());
+				Params.Clear();
 			}
 			else
 			{

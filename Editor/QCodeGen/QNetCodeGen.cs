@@ -96,15 +96,14 @@ namespace QTool.CodeGen
 			return modified;
 		}
 		const int PlayerActionMaxParamCount= 4;
-		MethodReference LogErrorRef = null;
-		MethodReference[] PlayerActionRef = new MethodReference[PlayerActionMaxParamCount+1];
+		MethodReference LogError = null;
+		MethodReference PlayerAction = null;
+		MethodDefinition AddParam = null;
 		public void InitMethod()
 		{
-			LogErrorRef = Assembly.GetMethodByCount(typeof(UnityEngine.Debug), nameof(UnityEngine.Debug.LogError), 1);
-			for (int i = 0; i <= PlayerActionMaxParamCount; i++)
-			{
-				PlayerActionRef[i] = Assembly.GetMethodByCount(typeof(QNetBehaviour), nameof(QNetBehaviour.PlayerAction), i + 1);
-			}
+			LogError = Assembly.GetMethodByCount(typeof(UnityEngine.Debug), nameof(UnityEngine.Debug.LogError), 1);
+			PlayerAction = Assembly.GetMethodByCount(typeof(QNetBehaviour), nameof(QNetBehaviour._InvokeAction), 1);
+			AddParam = Assembly.GetMethodByCount(typeof(QNetBehaviour), nameof(QNetBehaviour._AddActionParam), 1).Resolve();
 		}
 		bool WeaveType(TypeDefinition type)
 		{
@@ -175,13 +174,16 @@ namespace QTool.CodeGen
 				return;
 			}
 			ILProcessor worker = method.Body.GetILProcessor();
+			for (int i = 0; i < method.Parameters.Count; i++)
+			{
+				worker.This();
+				worker.Param(i);
+				var add = AddParam.MakeGeneric(Assembly.MainModule, method.Parameters[i].ParameterType);
+				worker.Call(add);
+			}
 			worker.This();
 			worker.String(action.Name);
-			for (int i = 0; i < method.Parameters.Count; i++) 
-			{
-				worker.Param(i);
-			}
-			worker.Call(PlayerActionRef[method.Parameters.Count]); 
+			worker.Call(PlayerAction); 
 			worker.Return();
 		}
 		public const string ProcessedFunctionName = "Weaved";
