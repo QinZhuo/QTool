@@ -60,11 +60,6 @@ namespace QTool.Net
 		public virtual void OnDestroy()
 		{
 			NetDestroy();
-			if (QNetManager.Instance != null)
-			{ 
-				QNetManager.Instance.OnNetUpdate -= NetStart;
-				QNetManager.Instance.OnNetUpdate -= OnNetUpdate;
-			}
 		}
 		private void NetStart()
 		{
@@ -97,6 +92,11 @@ namespace QTool.Net
 		internal void NetDestroy()
 		{
 			if (IsDestoryed) return;
+			if (QNetManager.Instance != null)
+			{
+				QNetManager.Instance.OnNetUpdate -= NetStart;
+				QNetManager.Instance.OnNetUpdate -= OnNetUpdate;
+			}
 			IsDestoryed = true;
 			OnNetDestroy();
 			if (QNetManager.Instance != null)
@@ -130,6 +130,12 @@ namespace QTool.Net
 
 		internal void OnSyncCheck(QNetSyncFlag flag)
 		{
+#if DEBUG
+			if (flag.Index % 10000 == 0)
+			{
+				QDebug.LogWarning(" Check " + flag + "  +  " + this);
+			}
+#endif
 			foreach (var check in TypeInfo.CheckList)
 			{
 				flag.Check(check.Get(this).GetHashCode());
