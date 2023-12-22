@@ -492,7 +492,7 @@ namespace QTool
 			public QLobbyMember[] Members { get; internal set; }
 			public int MemberLimit { get; internal set; }
 			public QDictionary<string,string> Data { get; internal set; }
-			public static QDictionary<string, string> LocalData { get; internal set; }
+			public static QDictionary<string, string> LocalData { get; internal set; } = new QDictionary<string, string>();
 			public string this[string key]
 			{
 				get
