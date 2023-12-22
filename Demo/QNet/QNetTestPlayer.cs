@@ -27,7 +27,7 @@ public class QNetTestPlayer : QNetBehaviour
 			agent.Move(PlayerValue("位置", new Vector3(QInput.MoveDirection.x, 0, QInput.MoveDirection.y)) * NetDeltaTime * 3);
 		}
 		else
-		{
+		{ 
 			transform.position += PlayerValue("位置", new Vector3(QInput.MoveDirection.x, 0, QInput.MoveDirection.y)) * NetDeltaTime * 3;
 		}
 		var pos = PlayerValue("目标", QTool.QTool.RayCastPlane(Camera.main.ScreenPointToRay(QInput.PointerPosition), Vector3.up, transform.position));
