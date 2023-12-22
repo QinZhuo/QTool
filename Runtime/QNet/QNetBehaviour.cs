@@ -9,6 +9,7 @@ namespace QTool.Net
 	[RequireComponent(typeof(QId))]
 	public abstract class QNetBehaviour : MonoBehaviour
 	{
+		public const string QSyncAction_ = nameof(QSyncAction_);
 		public System.Random Random => QNetManager.Instance.Random;
 		public static float NetDeltaTime => QNetManager.Instance.NetDeltaTime;
 		public static float NetTime => QNetManager.Instance.NetTime;
@@ -24,11 +25,31 @@ namespace QTool.Net
 			}
 			return QNetManager.Instance.PlayerValue(PlayerId, key, value);
 		}
-		public void PlayerAction(string key, params object[] value)
+		public void PlayerAction(string key)
+		{
+			PrivatePlayerAction(key);
+		}
+		public void PlayerAction(string key, object param)
+		{
+			PrivatePlayerAction(key, param);
+		}
+		public void PlayerAction(string key, object param1, object param2)
+		{
+			PrivatePlayerAction(key, param1, param2);
+		}
+		public void PlayerAction(string key, object param1, object param2, object param3)
+		{
+			PrivatePlayerAction(key, param1, param2, param3);
+		}
+		public void PlayerAction(string key, object param1, object param2, object param3, object param4)
+		{
+			PrivatePlayerAction(key, param1, param2, param3, param4);
+		}
+		private void PrivatePlayerAction(string key, params object[] value)
 		{
 			if (IsLoaclPlayer)
 			{
-				QNetManager.Instance.PlayerAction(key, value);
+				QNetManager.PlayerAction(key, value);
 			}
 			else
 			{
@@ -191,8 +212,7 @@ namespace QTool.Net
 				});
 				Functions.RemoveAll(function =>
 				{
-					var playerAction = function.MethodInfo.GetAttribute<QSyncActionAttribute>();
-					return playerAction == null;
+					return !function.Name.StartsWith(QNetBehaviour.QSyncAction_);
 				});
 			}
 		}

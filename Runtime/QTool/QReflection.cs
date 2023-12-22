@@ -83,6 +83,7 @@ namespace QTool.Reflection
 	{
 		public string Key { get => Name; set => Name = value; }
 		public string Name { get; private set; }
+		public string NameWithParams { get; private set; }
 		public ParameterInfo[] ParamInfos { get; private set; }
 		public Type ReturnType {
 			get
@@ -322,8 +323,9 @@ namespace QTool.Reflection
         }
     }
 
-    #endregion
-    public static class QReflection
+	#endregion
+	
+	public static class QReflection
 	{
 		
 		static Type GetOperaterType(object a,object b)
@@ -520,7 +522,7 @@ namespace QTool.Reflection
 			MinSizeCache[type] = size;
 			return size;
 		}
-		
+	
 		public static string QName(this MemberInfo type)
         {
             var att = type.GetCustomAttribute<QNameAttribute>();
@@ -1003,21 +1005,30 @@ namespace QTool.Reflection
 					}
 					for (int i = 0; i < assemblyArrayLength; ++i)
 					{
-						foreach (var eType in assemblyArray[i].GetTypes())
+						try
 						{
-							if (eType.Name.Equals(typeString))
+							foreach (var eType in assemblyArray[i].GetTypes())
 							{
-								type = eType;
-								if (type != null)
+								if (eType.Name.Equals(typeString))
 								{
-									if (!TypeBuffer.ContainsKey(typeString))
+									type = eType;
+									if (type != null)
 									{
-										TypeBuffer.Add(typeString, type);
+										if (!TypeBuffer.ContainsKey(typeString))
+										{
+											TypeBuffer.Add(typeString, type);
+										}
+										return type;
 									}
-									return type;
 								}
 							}
 						}
+						catch (Exception e)
+						{
+
+							throw new Exception("[" + assemblyArray[i].FullName + "]", e);
+						}
+						
 					}
 				}
 

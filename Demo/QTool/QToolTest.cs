@@ -193,7 +193,7 @@ namespace QTool.Test
 		[QName("多值枚举序列化测试")]
 		public void EnumTest()
 		{
-			var qdata = (TestEnum.攻击 | TestEnum.防御).ToQData();
+			var qdata = (TestEnum.攻击 | TestEnum.防御).ToQData(); 
 			Debug.LogError(qdata + "  :   " + qdata.ParseQData<TestEnum>());
 		}
 		[QName("QDataList测试")]

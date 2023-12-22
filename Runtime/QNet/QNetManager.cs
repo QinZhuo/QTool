@@ -91,11 +91,11 @@ namespace QTool.Net
 			}
 			return default;
 		}
-		public void PlayerAction(string key, params object[] value)
+		internal static void PlayerAction(string key, params object[] value)
 		{
-			if (transport.ClientConnected)
+			if (Instance.transport.ClientConnected)
 			{
-				SendAction.InvokeEvent(key, value);
+				Instance.SendAction.InvokeEvent(key, value);
 			}
 		}
 

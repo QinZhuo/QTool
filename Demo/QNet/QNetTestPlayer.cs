@@ -14,10 +14,16 @@ public class QNetTestPlayer : QNetBehaviour
 	{
 		Players.AddCheckExist(this);
 	}
+
+	[QSyncAction]
+	public void QNetActionTest()
+	{
+		Debug.LogError("shoot");
+	}
 	public override void OnNetUpdate()
 	{
 		if (agent != null)
-		{
+		{  
 			agent.Move(PlayerValue("位置", new Vector3(QInput.MoveDirection.x, 0, QInput.MoveDirection.y)) * NetDeltaTime * 3);
 		}
 		else
@@ -27,12 +33,12 @@ public class QNetTestPlayer : QNetBehaviour
 		var pos = PlayerValue("目标", QTool.QTool.RayCastPlane(Camera.main.ScreenPointToRay(QInput.PointerPosition), Vector3.up, transform.position));
 		transform.LookAt(pos);
 		shootTimer.Check(NetDeltaTime, false);
-		if (PlayerValue("射击",QInput.PointerPress)&&shootTimer.Check())
+		if (PlayerValue("射击", QInput.PointerPress) && shootTimer.Check())
 		{
-			var bullet= Instantiate(bulletPrefab, transform.position, transform.rotation);
+			QNetActionTest();
+			var bullet = Instantiate(bulletPrefab, transform.position, transform.rotation);
 			bullet.GetComponent<QNetTestBullet>().Player = this;
 		}
-
 	}
 	public override string ToString()
 	{

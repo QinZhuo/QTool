@@ -11,12 +11,11 @@ public class QNetTestEnemyCreator : QNetBehaviour
 	{
 		
 	}
-
 	public override void OnNetUpdate()
 	{
 		if (waitTime.Check(NetDeltaTime* QNetTestPlayer.Players.Count))
 		{
-			var dir = Random.Vector2();
+			var dir = Random.Vector2(); 
 			Instantiate(prefab, new Vector3(dir.x,0,dir.y) * 20, Quaternion.identity);
 		}	
 	}
