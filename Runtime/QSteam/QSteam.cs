@@ -63,14 +63,14 @@ namespace QTool
 			{
 				_ = JoinLobby(info.m_steamIDLobby);
 			});
-			OnLobbyDataUpdate = Callback<LobbyDataUpdate_t>.Create(info =>
+			OnLobbyDataUpdate = Callback<LobbyDataUpdate_t>.Create((Callback<LobbyDataUpdate_t>.DispatchDelegate)(info =>
 			{
-				LobbyUpdate((CSteamID)info.m_ulSteamIDLobby, ref _CurrentLobby);
-			});
-			OnLobbyChatUpdate = Callback<LobbyChatUpdate_t>.Create(info =>
+				QSteam.LobbyUpdate((CSteamID)(CSteamID)info.m_ulSteamIDLobby, ref QSteam.CurrentLobby);
+			}));
+			OnLobbyChatUpdate = Callback<LobbyChatUpdate_t>.Create((Callback<LobbyChatUpdate_t>.DispatchDelegate)(info =>
 			{
-				LobbyUpdate((CSteamID)info.m_ulSteamIDLobby, ref _CurrentLobby);
-			});
+				QSteam.LobbyUpdate((CSteamID)(CSteamID)info.m_ulSteamIDLobby, ref QSteam.CurrentLobby);
+			}));
 			QEventManager.RegisterOnce(QToolEvent.游戏退出完成, LeaveLobby, SteamAPI.Shutdown,
 				OnJoinRequested.Unregister, OnLobbyDataUpdate.Unregister, OnLobbyChatUpdate.Unregister);
 			SteamNetworkingUtils.InitRelayNetworkAccess();
@@ -252,8 +252,7 @@ namespace QTool
         }
         public static List<QLobby> LobbyList { get; private set; } = new List<QLobby>();
 
-		private static QLobby _CurrentLobby = default;
-		public static QLobby CurrentLobby => _CurrentLobby;
+		public static QLobby CurrentLobby = default;
  
         private static int chatId = 0;
 		public static QDictionary<string, string> LocalMemberData { get; private set; } = new QDictionary<string, string>();
@@ -301,19 +300,19 @@ namespace QTool
 		public static bool ChatSend(string text)
         {
             byte[] bytes = System.Text.Encoding.UTF8.GetBytes(text);
-            return SteamMatchmaking.SendLobbyChatMsg(_CurrentLobby.SteamID, bytes, bytes.Length + 1);
+            return SteamMatchmaking.SendLobbyChatMsg(CurrentLobby.SteamID, bytes, bytes.Length + 1);
         }
         public static event Action<string, CSteamID> OnChatReceive;
         public const int ReceiveBufferSize = 4096;
         public static async Task StartChatReceive()
         {
-            var chatLobbyId = _CurrentLobby.SteamID;
+            var chatLobbyId = CurrentLobby.SteamID;
             if (chatLobbyId.IsValid()) return;
             var buffer = new byte[ReceiveBufferSize]; 
-            while (chatLobbyId == _CurrentLobby.SteamID && Application.isPlaying)
+            while (chatLobbyId == CurrentLobby.SteamID && Application.isPlaying)
             {
                 await Task.Yield();
-                var length = SteamMatchmaking.GetLobbyChatEntry(_CurrentLobby.SteamID, chatId, out var id, buffer, buffer.Length, out var type);
+                var length = SteamMatchmaking.GetLobbyChatEntry(CurrentLobby.SteamID, chatId, out var id, buffer, buffer.Length, out var type);
                 if (length > 0)
                 {
                     chatId++;
@@ -334,13 +333,13 @@ namespace QTool
 		public static void LeaveLobby()
         {
 			if (CurrentLobby.IsNull()) return;
-            SteamMatchmaking.LeaveLobby(_CurrentLobby.SteamID);
-			QDebug.Log(nameof(QSteam)+" 离开房间[" + _CurrentLobby.SteamID + "]");
-            _CurrentLobby = default;
+            SteamMatchmaking.LeaveLobby(CurrentLobby.SteamID);
+			QDebug.Log(nameof(QSteam)+" 离开房间[" + CurrentLobby.SteamID + "]");
+            CurrentLobby = default;
         }
         static void SetCurRoom(ulong id)
         {
-            LobbyUpdate((CSteamID)id, ref _CurrentLobby);
+            LobbyUpdate((CSteamID)id, ref CurrentLobby);
 			_ =StartChatReceive();
             chatId = 0;
 		}
@@ -389,9 +388,9 @@ namespace QTool
 			{
 				QDebug.Log(nameof(QSteam) + " 创建房间成功[" + create.m_ulSteamIDLobby + "]");
 				SetCurRoom(create.m_ulSteamIDLobby);
-				_CurrentLobby[nameof(Name)] = Name;
-				_CurrentLobby[nameof(Application.productName)] = Application.productName;
-				_CurrentLobby[nameof(Application.version)] = Application.version;
+				CurrentLobby[nameof(Name)] = Name;
+				CurrentLobby[nameof(Application.productName)] = Application.productName;
+				CurrentLobby[nameof(Application.version)] = Application.version;
 				if (LocalMemberData.Count > 0)
 				{
 					foreach (var kv in LocalMemberData)
@@ -410,9 +409,9 @@ namespace QTool
 		}
 		public static void UpdateLobby()
 		{
-			if (!_CurrentLobby.IsNull())
+			if (!CurrentLobby.IsNull())
 			{
-				LobbyUpdate(_CurrentLobby.SteamID, ref _CurrentLobby);
+				LobbyUpdate(CurrentLobby.SteamID, ref CurrentLobby);
 			}
 		}
 		public static void LobbyUpdate(CSteamID id, ref QLobby lobby)
