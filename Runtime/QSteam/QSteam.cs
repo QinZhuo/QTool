@@ -506,17 +506,28 @@ namespace QTool
 							}
 						}
 					}
+					else
+					{
+						return QPlayerPrefs.Get<string>(nameof(QLobby) + "_" + key);
+					}
 					return "";
 				}
 				set
 				{
-					if (SteamMatchmaking.SetLobbyData(SteamID, key, value))
+					if (Data != null)
 					{
-						QDebug.Log("房间." + key + " = " + value);
+						if (SteamMatchmaking.SetLobbyData(SteamID, key, value))
+						{
+							QDebug.Log("房间." + key + " = " + value);
+						}
+						else
+						{
+							Debug.LogError("设置大厅数据出错[" + SteamID + "]" + key + ":" + value);
+						}
 					}
 					else
 					{
-						Debug.LogError("设置大厅数据出错[" + SteamID + "]" + key+ ":" + value);
+						QPlayerPrefs.Set(nameof(QLobby) + "_" + key, value);
 					}
 				}
 			}
