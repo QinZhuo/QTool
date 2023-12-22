@@ -16,6 +16,8 @@ namespace QTool.CodeGen
 	{
 		public const string QNet = nameof(QNet);
 		public const string QSyncAction_ = nameof(QSyncAction_);
+		public const string GenNamespace = "QTool.Net";
+		public const string GenClass = nameof(GenClass);
 		public static List<DiagnosticMessage> Logs = new List<DiagnosticMessage>();
 		public static AssemblyDefinition Assembly;
 
@@ -54,7 +56,7 @@ namespace QTool.CodeGen
 					assembly.Write(peOut, writerParameters);
 					var inMemory = new InMemoryAssembly(peOut.ToArray(), pdbOut.ToArray());
 					return new ILPostProcessResult(inMemory, Logs);
-				} 
+				}
 			}
 			return new ILPostProcessResult(compiledAssembly.InMemoryAssembly, Logs);
 		}
@@ -79,14 +81,26 @@ namespace QTool.CodeGen
 			var modified = false;
 			try
 			{
+				//if (Assembly.MainModule.ContainsClass(GenNamespace, GenClass))
+				//{
+				//	return false;
+				//}
+				//var GeneratedCodeClass = new TypeDefinition(GenNamespace, GenClass,
+				//TypeAttributes.BeforeFieldInit | TypeAttributes.Class | TypeAttributes.AnsiClass | TypeAttributes.Public | TypeAttributes.AutoClass | TypeAttributes.Abstract | TypeAttributes.Sealed,
+				//Assembly.Import(typeof(object)));
 				InitMethod();
 				foreach (TypeDefinition type in Assembly.MainModule.GetAllTypes())
-				{  
-					if (type.IsClass && type.BaseType.CanBeResolved())  
+				{
+					if (type.IsClass && type.BaseType.CanBeResolved())
 					{
-						modified |= WeaveType(type);  
-					}   
-				}   
+						modified |= WeaveType(type);
+					}  
+				}
+				if (modified)
+				{
+					Log("Add_" + Assembly.Name);
+			//		Assembly.MainModule.Types.Add(GeneratedCodeClass);
+				}
 			}
 			catch (Exception e)
 			{
@@ -105,7 +119,7 @@ namespace QTool.CodeGen
 			AddParam = Assembly.GetMethodByCount(typeof(QNetBehaviour), nameof(QNetBehaviour._AddActionParam), 1).Resolve();
 		}
 		bool WeaveType(TypeDefinition type)
-		{  
+		{
 			if (!type.IsClass)
 				return false;
 			if (!type.IsDerivedFrom<QNetBehaviour>())
@@ -161,12 +175,12 @@ namespace QTool.CodeGen
 					}
 				}
 			}
-			return true;  
+			return true;
 		}
 		void WeaveQSyncAction(MethodDefinition method)
 		{
 			var action = method.ReplaceMethod(QSyncAction_);
-			ILProcessor worker = method.Body.GetILProcessor(); 
+			ILProcessor worker = method.Body.GetILProcessor();
 			for (int i = 0; i < method.Parameters.Count; i++)
 			{
 				worker.This();
@@ -176,7 +190,7 @@ namespace QTool.CodeGen
 			}
 			worker.This();
 			worker.String(action.Name);
-			worker.Call(PlayerAction); 
+			worker.Call(PlayerAction);
 			worker.Return();
 		}
 		public const string ProcessedFunctionName = "Weaved";
@@ -195,10 +209,10 @@ namespace QTool.CodeGen
 				ILProcessor worker = versionMethod.Body.GetILProcessor();
 				worker.Emit(OpCodes.Ldc_I4_1);
 				worker.Emit(OpCodes.Ret); 
-				td.Methods.Add(versionMethod); 
+				td.Methods.Add(versionMethod);
 			}
 		}
-	
+
 
 	}
 
