@@ -3,13 +3,13 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection.Emit;
 using UnityEngine;
 namespace QTool.Net
 {
 	[RequireComponent(typeof(QId))]
 	public abstract class QNetBehaviour : MonoBehaviour
 	{
-		public const string QSyncAction_ = nameof(QSyncAction_);
 		public System.Random Random => QNetManager.Instance.Random;
 		public static float NetDeltaTime => QNetManager.Instance.NetDeltaTime;
 		public static float NetTime => QNetManager.Instance.NetTime;
@@ -25,23 +25,34 @@ namespace QTool.Net
 			}
 			return QNetManager.Instance.PlayerValue(PlayerId, key, value);
 		}
-		private List<object> Params = new List<object>();
-		public void _AddActionParam<T>(T type)
-		{
-			Params.Add(type);
-		}
-		public void _InvokeAction(string key)
+		public void PlayerAction(string key,params object[] Params)
 		{
 			if (IsLoaclPlayer)
 			{
-				QNetManager.PlayerAction(key, Params.ToArray());
-				Params.Clear();
+				QNetManager.PlayerAction(key, Params);
 			}
 			else
 			{
 				throw new Exception(this + " 非本地玩家对象");
 			}
 		}
+		//private List<object> Params = new List<object>();
+		//public void _AddActionParam<T>(T type)
+		//{
+		//	Params.Add(type);
+		//}
+		//public void _InvokeAction(string key)
+		//{
+		//	if (IsLoaclPlayer)
+		//	{
+		//		QNetManager.PlayerAction(key, Params.ToArray());
+		//		Params.Clear();
+		//	}
+		//	else
+		//	{
+		//		throw new Exception(this + " 非本地玩家对象");
+		//	}
+		//}
 		internal QNetTypeInfo TypeInfo { get; set; }
 		public virtual void Awake()
 		{
@@ -167,6 +178,7 @@ namespace QTool.Net
 	}
 	public class QNetTypeInfo : QTypeInfo<QNetTypeInfo>
 	{
+		public const string QSyncAction_ = nameof(QSyncAction_);
 		public List<QMemeberInfo> CheckList { get; private set; } = new List<QMemeberInfo>();
 		protected override void Init(Type type)
 		{
@@ -198,7 +210,7 @@ namespace QTool.Net
 				});
 				Functions.RemoveAll(function =>
 				{
-					return !function.Name.StartsWith(QNetBehaviour.QSyncAction_);
+					return function.MethodInfo.GetAttribute<QSyncActionAttribute>() == null;
 				});
 			}
 		}

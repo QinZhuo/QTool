@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using UnityEngine;
 using System.Linq;
+using System.Runtime.CompilerServices;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -85,6 +86,7 @@ namespace QTool.Reflection
 		public string Name { get; private set; }
 		public string NameWithParams { get; private set; }
 		public ParameterInfo[] ParamInfos { get; private set; }
+		public Type[] ParamTypes { get; private set; }
 		public Type ReturnType {
 			get
 			{
@@ -118,6 +120,11 @@ namespace QTool.Reflection
 			this.MethodInfo = info;
 			Key = info.Name;
 			ParamInfos = info.GetParameters();
+			ParamTypes = new Type[ParamInfos.Length];
+			for (int i = 0; i < ParamInfos.Length; i++)
+			{
+				ParamTypes[i] = ParamInfos[i].ParameterType;
+			}
 		}
 		public override string ToString()
 		{
@@ -327,7 +334,7 @@ namespace QTool.Reflection
 	
 	public static class QReflection
 	{
-		
+
 		static Type GetOperaterType(object a,object b)
 		{
 			Type type = a!=null ? a.GetType() : b?.GetType();
