@@ -16,6 +16,7 @@ namespace QTool.CodeGen
 	{
 		public const string QNet = nameof(QNet);
 		public const string QSyncAction_ = nameof(QSyncAction_);
+		public const string IgnoreDefine = "ILPP_IGNORE";
 		public const string GenNamespace = "QTool.Net";
 		public const string GenClass = nameof(GenClass);
 		public static List<DiagnosticMessage> Logs = new List<DiagnosticMessage>();
@@ -30,7 +31,8 @@ namespace QTool.CodeGen
 		{
 			bool relevant = compiledAssembly.Name == QNet ||
 							 compiledAssembly.References.Any(filePath => Path.GetFileNameWithoutExtension(filePath) == QNet);
-			return relevant;
+			bool ignore = compiledAssembly.HasDefine(IgnoreDefine);
+			return relevant && !ignore;
 		}
 		public override ILPostProcessResult Process(ICompiledAssembly compiledAssembly)
 		{

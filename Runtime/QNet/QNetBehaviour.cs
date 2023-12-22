@@ -14,7 +14,7 @@ namespace QTool.Net
 		public static float NetDeltaTime => QNetManager.Instance.NetDeltaTime;
 		public static float NetTime => QNetManager.Instance.NetTime;
 		public string PlayerId { get; internal set; } = null;
-		public bool IsPlayer => !PlayerId.IsNull();
+		public bool IsPlayer => !PlayerId.IsNull(); 
 		public bool IsLoaclPlayer => PlayerId == QNetManager.Instance.transport.ClientId;
 		public bool IsDestoryed { get; internal set; }
 		public T PlayerValue<T>(string key, T value)

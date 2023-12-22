@@ -15,7 +15,9 @@
         "Unity.Burst.Cecil.Rocks.dll"
     ],
     "autoReferenced": false,
-    "defineConstraints": [],
+    "defineConstraints": [
+        "ILPP_IGNORE"
+    ],
     "versionDefines": [],
     "noEngineReferences": false
 }

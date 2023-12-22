@@ -12,7 +12,10 @@ namespace QTool.CodeGen
 {
 	public static class QCodeGenTool
 	{
-		
+		public static bool HasDefine(this ICompiledAssembly assembly, string define) =>
+		   assembly.Defines != null &&
+		   assembly.Defines.Contains(define);
+
 		public static TypeReference Import(this AssemblyDefinition Assembly, Type type)
 		{
 			return Assembly.MainModule.ImportReference(type);
