@@ -447,7 +447,10 @@ namespace QTool.Net
 			QSteam.LeaveLobby();
 			if (UseP2P)
 			{
-
+				foreach (var clinet in ConnectClients.ToArray())
+				{
+					Disconnect(clinet.Value.m_SteamID);
+				}
 			}
 			else
 			{
@@ -537,6 +540,7 @@ namespace QTool.Net
 			if (UseP2P)
 			{
 				Send(new byte[] { (byte)P2PMessage.DisConnect });
+				SteamNetworking.CloseP2PSessionWithUser(hostId);
 				hostId = default;
 			}
 			else
