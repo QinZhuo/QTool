@@ -268,7 +268,7 @@ namespace QTool.CodeGen
 		}
 
 		public AssemblyDefinition Resolve(AssemblyNameReference name) =>
-			Resolve(name, new ReaderParameters(ReadingMode.Immediate));
+			Resolve(name, new ReaderParameters(ReadingMode.Deferred));
 		public AssemblyDefinition Resolve(AssemblyNameReference name, ReaderParameters parameters)
 		{  
 			if (name.Name == compiledAssembly.Name)

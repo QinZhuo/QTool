@@ -68,7 +68,7 @@ namespace QTool.CodeGen
 			{
 				ReadingMode= ReadingMode.Immediate,
 				SymbolStream = pdbStream,
-				SymbolReaderProvider = new DefaultSymbolReaderProvider(),
+				SymbolReaderProvider = new DefaultSymbolReaderProvider(), 
 				AssemblyResolver = asmResolver,
 				ReadWrite = true,
 				ReadSymbols = true,
@@ -194,6 +194,9 @@ namespace QTool.CodeGen
 			worker.This();
 			worker.String(action.Name);
 			worker.Call(PlayerAction);
+
+			worker.String(action.Name);
+			worker.Call(LogError);
 			worker.Return();
 		}
 		public const string ProcessedFunctionName = "Weaved";
