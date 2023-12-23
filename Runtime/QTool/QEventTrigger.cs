@@ -244,7 +244,8 @@ namespace QTool
 		{
 			Log(eventName, value);
 			boolEventList.Get(eventName)?.eventAction?.Invoke((bool)value);
-        }
+			boolEventList.Get("!"+eventName)?.eventAction?.Invoke(!(bool)value);
+		}
         public new void Invoke(string eventName, float value)
 		{
 			Log(eventName, value);
