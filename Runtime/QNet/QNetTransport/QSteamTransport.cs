@@ -21,7 +21,7 @@ namespace QTool.Net
 		protected override void Awake()
 		{
 			base.Awake();
-			if (!QLobby.Current.IsNull() || QSteam.MemeberData.Count > 0)
+			if (!QLobby.CurrentLobby.IsNull() || QSteam.MemeberData.Count > 0)
 			{
 				if (QSteam.IsLobbyOwner)
 				{
@@ -29,7 +29,7 @@ namespace QTool.Net
 				}
 				else
 				{
-					Manager.StartClient(QLobby.Current.Key.ToString());
+					Manager.StartClient(QLobby.CurrentLobby.Key.ToString());
 				}
 			}
 			QLobby.OnUpdate += UpdateLobby;
@@ -41,12 +41,12 @@ namespace QTool.Net
 		}
 		private void UpdateLobby()
 		{
-			if (QLobby.Current.IsNull()) return;
+			if (QLobby.CurrentLobby.IsNull()) return;
 			if (ServerActive)
 			{
 				foreach (var client in Server.ConnectClients.ToArray())
 				{
-					if (!QLobby.Current.Members.ContainsKey(client.Value.m_SteamID))
+					if (!QLobby.CurrentLobby.Members.ContainsKey(client.Value.m_SteamID))
 					{
 						Server.Disconnect(client.Value.m_SteamID);
 					}
@@ -165,9 +165,9 @@ namespace QTool.Net
 			if (RoomListView == null)
 			{
 				FreshButton= QToolManager.Instance.RootVisualElement.AddButton("刷新列表", FreshList);
-				RoomListView = QToolManager.Instance.RootVisualElement.AddListView(QLobby.List, (visual,index) =>
+				RoomListView = QToolManager.Instance.RootVisualElement.AddListView(QLobby.LobbyList, (visual,index) =>
 				{
-					var lobby = QLobby.List[index];
+					var lobby = QLobby.LobbyList[index];
 					visual.AddButton("加入 "+lobby.ToString(), () => Manager.StartClient(lobby.Key.ToString()));
 				});
 				RoomListView.fixedItemHeight = 40;
@@ -255,13 +255,13 @@ namespace QTool.Net
 		}
 		protected override void OnP2PConnect(P2PSessionRequest_t result)
 		{
-			if (QLobby.Current.Members.ContainsKey(result.m_steamIDRemote.m_SteamID))
+			if (QLobby.CurrentLobby.Members.ContainsKey(result.m_steamIDRemote.m_SteamID))
 			{
 				base.OnP2PConnect(result);
 			}
 			else
 			{
-				QDebug.LogError(result.m_steamIDRemote.GetName() + " P2P连接失败 房间内不存在该玩家 " + QLobby.Current);
+				QDebug.LogError(result.m_steamIDRemote.GetName() + " P2P连接失败 房间内不存在该玩家 " + QLobby.CurrentLobby);
 			}
 		}
 		public Dictionary<HSteamNetConnection, CSteamID> ConnectClients = new Dictionary<HSteamNetConnection, CSteamID>();
@@ -281,7 +281,7 @@ namespace QTool.Net
 				}
 				else
 				{
-					if (!QLobby.Current.Members.ContainsKey(clientSteamID.m_SteamID))
+					if (!QLobby.CurrentLobby.Members.ContainsKey(clientSteamID.m_SteamID))
 					{
 						Debug.LogError(nameof(QSteamServer) + " 非房间内玩家[" + clientSteamID.GetName() + "][" + clientSteamID + "]无法连接");
 						SteamNetworkingSockets.CloseConnection(param.m_hConn, 0, "非房间内玩家", false);
@@ -482,7 +482,7 @@ namespace QTool.Net
 			try
 			{
 				await QSteam.JoinLobby(ulong.Parse(host).ToSteamId());
-				hostId = QLobby.Current.Owner.ToSteamId();
+				hostId = QLobby.CurrentLobby.Owner.ToSteamId();
 				if (UseP2P)
 				{
 					Send(new byte[] { (byte)P2PMessage.Connect });

@@ -9,10 +9,17 @@ namespace QTool
 		public ulong Key { get; set; }
 		public string Name => Data[nameof(QSteam.Name)];
 		public ulong Owner { get; set; }
-		public QList<ulong, QLobbyMember> Members { get; private set; } = new QList<ulong, QLobbyMember>();
+		public QList<ulong, QLobbyMember> Members { get; private set; } = new QList<ulong, QLobbyMember>(() => new QLobbyMember());
 		public int MemberLimit { get; set; }
 		public QDictionary<string, string> Data { get;private set; } = new QDictionary<string, string>();
 
+		public QLobbyMember this[ulong playerId]
+		{
+			get
+			{
+				return Members[playerId];
+			}
+		}
 		public bool IsNull()
 		{
 			return Key == 0;
@@ -46,38 +53,39 @@ namespace QTool
 		}
 
 		#region 静态
-		public static QList<ulong, QLobby> List { get; private set; } = new QList<ulong, QLobby>();
 
-		public static QLobby Current = new QLobby();
+		public static QLobby CurrentLobby = new QLobby();
+		public static QList<ulong, QLobby> LobbyList { get; private set; } = new QList<ulong, QLobby>();
 		public static void Leave()
 		{
-			Current = new QLobby();
+			CurrentLobby = new QLobby();
 		}
 
 		public static Action OnUpdate = null;
 		#endregion
+		public class QLobbyMember : IKey<ulong>
+		{
+			public ulong Key { get; set; }
+			public string Name { get; set; }
+			public QDictionary<string, string> Data { get; private set; } = new QDictionary<string, string>();
+			public T GetData<T>(string key, T defaultValue = default)
+			{
+				if (Data.ContainsKey(key))
+				{
+					return Data[key].ParseQData(defaultValue);
+				}
+				else
+				{
+					return defaultValue;
+				}
+			}
+			public override string ToString()
+			{
+				return Key.ToString();
+			}
+		}
 	}
 
-	public class QLobbyMember : IKey<ulong>
-	{
-		public ulong Key { get; set; }
-		public string Name { get; set; }
-		public QDictionary<string, string> Data { get; private set; } = new QDictionary<string, string>();
-		public T GetData<T>(string key, T defaultValue = default)
-		{
-			if (Data.ContainsKey(key))
-			{
-				return Data[key].ParseQData(defaultValue);
-			}
-			else
-			{
-				return defaultValue;
-			}
-		}
-		public override string ToString()
-		{
-			return Key.ToString();
-		}
-	}
+
 
 }

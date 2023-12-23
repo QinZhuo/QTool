@@ -18,8 +18,8 @@ namespace QTool
 	{
 		public static CSteamID Id => SteamUser.GetSteamID();
 		public static string Name => SteamFriends.GetPersonaName();
-		public static QDictionary<string, string> MemeberData => QLobby.Current.Members[Id.m_SteamID].Data;
-		public static bool IsLobbyOwner =>QLobby.Current.IsNull() || QLobby.Current.Owner == Id.m_SteamID;
+		public static QDictionary<string, string> MemeberData => QLobby.CurrentLobby.Members[Id.m_SteamID].Data;
+		public static bool IsLobbyOwner =>QLobby.CurrentLobby.IsNull() || QLobby.CurrentLobby.Owner == Id.m_SteamID;
 		public static Texture2D AvatarImage => Id.GetImage();
 		private static Callback<GameLobbyJoinRequested_t> OnJoinRequested = null;
 		private static Callback<LobbyDataUpdate_t> OnLobbyDataUpdate = null;
@@ -258,13 +258,13 @@ namespace QTool
 		public static void SetLobbyData<T>(string key, T value)
 		{
 			var str = value.ToQData().Trim('"');
-			if (QLobby.Current.IsNull())
+			if (QLobby.CurrentLobby.IsNull())
 			{
-				QLobby.Current.Data[key] = str;
+				QLobby.CurrentLobby.Data[key] = str;
 			}
 			else
 			{
-				if (SteamMatchmaking.SetLobbyData(QLobby.Current.Key.ToSteamId(), key, str))
+				if (SteamMatchmaking.SetLobbyData(QLobby.CurrentLobby.Key.ToSteamId(), key, str))
 				{
 					QDebug.Log("房间." + key + " = " + str);
 				}
@@ -279,10 +279,10 @@ namespace QTool
 		{
 			var data = value.ToQData().Trim('"');
 			MemeberData[key] = data;
-			QDebug.Log(QLobby.Current.Key + "." + Name + "." + key + " = " + data);
-			if (!QLobby.Current.IsNull())
+			QDebug.Log(QLobby.CurrentLobby.Key + "." + Name + "." + key + " = " + data);
+			if (!QLobby.CurrentLobby.IsNull())
 			{
-				SteamMatchmaking.SetLobbyMemberData(QLobby.Current.Key.ToSteamId(), nameof(QLobbyMember.Data), MemeberData.ToQData());
+				SteamMatchmaking.SetLobbyMemberData(QLobby.CurrentLobby.Key.ToSteamId(), nameof(QLobby.Data), MemeberData.ToQData());
 			}
 		}
 
@@ -291,24 +291,24 @@ namespace QTool
 		/// </summary>
 		public static void InviteDialog()
 		{
-			SteamFriends.ActivateGameOverlayInviteDialog(QLobby.Current.Key.ToSteamId());
+			SteamFriends.ActivateGameOverlayInviteDialog(QLobby.CurrentLobby.Key.ToSteamId());
 		}
 		public static bool ChatSend(string text)
 		{
 			byte[] bytes = System.Text.Encoding.UTF8.GetBytes(text);
-			return SteamMatchmaking.SendLobbyChatMsg(QLobby.Current.Key.ToSteamId(), bytes, bytes.Length + 1);
+			return SteamMatchmaking.SendLobbyChatMsg(QLobby.CurrentLobby.Key.ToSteamId(), bytes, bytes.Length + 1);
 		}
         public static event Action<string, CSteamID> OnChatReceive;
         public const int ReceiveBufferSize = 4096;
         public static async Task StartChatReceive()
         {
-            var chatLobbyId =QLobby.Current.Key.ToSteamId();
+            var chatLobbyId =QLobby.CurrentLobby.Key.ToSteamId();
             if (chatLobbyId.IsValid()) return;
             var buffer = new byte[ReceiveBufferSize]; 
-            while (chatLobbyId == QLobby.Current.Key.ToSteamId() && Application.isPlaying)
+            while (chatLobbyId == QLobby.CurrentLobby.Key.ToSteamId() && Application.isPlaying)
             {
                 await Task.Yield();
-                var length = SteamMatchmaking.GetLobbyChatEntry(QLobby.Current.Key.ToSteamId(), chatId, out var id, buffer, buffer.Length, out var type);
+                var length = SteamMatchmaking.GetLobbyChatEntry(QLobby.CurrentLobby.Key.ToSteamId(), chatId, out var id, buffer, buffer.Length, out var type);
                 if (length > 0)
                 {
                     chatId++;
@@ -328,26 +328,26 @@ namespace QTool
 	
 		public static void LeaveLobby()
         {
-			if (QLobby.Current.IsNull()) return;
-            SteamMatchmaking.LeaveLobby(QLobby.Current.Key.ToSteamId());
-			QDebug.Log(nameof(QSteam)+" 离开房间[" + QLobby.Current.Key + "]");
+			if (QLobby.CurrentLobby.IsNull()) return;
+            SteamMatchmaking.LeaveLobby(QLobby.CurrentLobby.Key.ToSteamId());
+			QDebug.Log(nameof(QSteam)+" 离开房间[" + QLobby.CurrentLobby.Key + "]");
 			QLobby.Leave();
         }
 	
         public static async Task<bool> FastJoin()
         {
             await FreshLobbys();
-            if (QLobby.List.Count > 0)
+            if (QLobby.LobbyList.Count > 0)
             {
-                for (int i = 0; i < QLobby.List.Count; i++)
+                for (int i = 0; i < QLobby.LobbyList.Count; i++)
                 {
-                    if (await JoinLobby(QLobby.List[i].Key.ToSteamId()))
+                    if (await JoinLobby(QLobby.LobbyList[i].Key.ToSteamId()))
                     {
 						return true;
 					}
 					else
 					{
-						Debug.LogError("加入房间 " + QLobby.List[i].Key.ToSteamId() + "失败");
+						Debug.LogError("加入房间 " + QLobby.LobbyList[i].Key.ToSteamId() + "失败");
 						continue;
 					}
                 }
@@ -360,7 +360,7 @@ namespace QTool
 		}
 		public static async Task<bool> JoinLobby(CSteamID lobbyId)
 		{
-			if (lobbyId.m_SteamID != QLobby.Current.Key)
+			if (lobbyId.m_SteamID != QLobby.CurrentLobby.Key)
 			{
 				var join = await SteamMatchmaking.JoinLobby(lobbyId).GetResult<LobbyEnter_t>();
 				var m_LobbyEnterResponse = (EChatRoomEnterResponse)join.m_EChatRoomEnterResponse;
@@ -369,18 +369,18 @@ namespace QTool
 					QDebug.LogError("加入房间失败[" + lobbyId + "]");
 					return false;
 				}
-				QLobby.Current.FreshData();
+				QLobby.CurrentLobby.FreshData();
 			}
 			return true;
 		}
         public static async Task<bool> CreateLobby(int maxMembers = 10,ELobbyType eLobbyType = ELobbyType.k_ELobbyTypePublic)
         {
-			if (!QLobby.Current.IsNull() && QLobby.Current.Owner == Id.m_SteamID) return true;
+			if (!QLobby.CurrentLobby.IsNull() && QLobby.CurrentLobby.Owner == Id.m_SteamID) return true;
 			var create = await SteamMatchmaking.CreateLobby(eLobbyType, maxMembers).GetResult<LobbyCreated_t>();
 			if (create.m_ulSteamIDLobby != 0)
 			{
 				QDebug.Log(nameof(QSteam) + " 创建房间成功[" + create.m_ulSteamIDLobby + "]");
-				await JoinLobby(QLobby.Current.Key.ToSteamId());
+				await JoinLobby(QLobby.CurrentLobby.Key.ToSteamId());
 				SetLobbyData(nameof(Name), Name);
 				SetLobbyData(nameof(Application.productName), Application.productName);
 				SetLobbyData(nameof(Application.version), Application.version);
@@ -394,22 +394,22 @@ namespace QTool
 		}
 		public static void UpdateCurrentLobby(CSteamID currentlobbyId)
 		{
-			if (QLobby.Current.Key != currentlobbyId.m_SteamID)
+			if (QLobby.CurrentLobby.Key != currentlobbyId.m_SteamID)
 			{
-				if (QLobby.Current.IsNull())
+				if (QLobby.CurrentLobby.IsNull())
 				{
-					foreach (var kv in QLobby.Current.Data)
+					foreach (var kv in QLobby.CurrentLobby.Data)
 					{
 						SteamMatchmaking.SetLobbyData(currentlobbyId, kv.Key, kv.Value);
 					}
 				}
-				SteamMatchmaking.SetLobbyMemberData(currentlobbyId, nameof(QLobbyMember.Data),MemeberData.ToQData());
-				QLobby.Current.Key = currentlobbyId.m_SteamID;
+				SteamMatchmaking.SetLobbyMemberData(currentlobbyId, nameof(QLobby.Data),MemeberData.ToQData());
+				QLobby.CurrentLobby.Key = currentlobbyId.m_SteamID;
 				_ = StartChatReceive();
 				chatId = 0;
 				QDebug.Log("加入房间[" + currentlobbyId + "]");
 			}
-			QLobby.Current.FreshData();
+			QLobby.CurrentLobby.FreshData();
 			QLobby.OnUpdate?.Invoke();
 		}
 		public static void FreshData(this QLobby lobby)
@@ -425,7 +425,7 @@ namespace QTool
 				var memeberId = SteamMatchmaking.GetLobbyMemberByIndex(lobbyId, t);
 				var memeber = lobby.Members[memeberId.m_SteamID];
 				memeber.Name = memeberId.GetName();
-				if (lobby == QLobby.Current)
+				if (lobby == QLobby.CurrentLobby)
 				{
 					SteamMatchmaking.GetLobbyMemberData(lobbyId, memeberId, nameof(memeber.Data)).ParseQData(memeber.Data);
 				}
@@ -459,16 +459,16 @@ namespace QTool
 			}
 			var matchList = await SteamMatchmaking.RequestLobbyList().GetResult<LobbyMatchList_t>();
 			if (!Application.isPlaying) return null;
-            QLobby.List.Clear();
+            QLobby.LobbyList.Clear();
 		
             for (int i = 0; i < matchList.m_nLobbiesMatching; i++)
             {
-				var lobby = QLobby.List[SteamMatchmaking.GetLobbyByIndex(i).m_SteamID];
+				var lobby = QLobby.LobbyList[SteamMatchmaking.GetLobbyByIndex(i).m_SteamID];
 				lobby.FreshData();
 				QDebug.Log(nameof(QSteam) + " 房间信息 " + lobby);
 			}
-			QDebug.Log(nameof(QSteam) + " 刷新房间结束 " + QLobby.List.Count);
-			return QLobby.List;
+			QDebug.Log(nameof(QSteam) + " 刷新房间结束 " + QLobby.LobbyList.Count);
+			return QLobby.LobbyList;
         }
 		
 #endregion
