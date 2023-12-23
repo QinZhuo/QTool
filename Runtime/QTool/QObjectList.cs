@@ -80,7 +80,7 @@ namespace QTool
 				for (int i = 0; i < TestCount; i++)
 				{
 					var obj = prefab.CheckInstantiate(transform);
-					obj.hideFlags = HideFlags.HideInInspector | HideFlags.DontSave;
+					obj.hideFlags = HideFlags.HideAndDontSave;
 					obj.name = prefab.name + "测试";
 				}
 			}
