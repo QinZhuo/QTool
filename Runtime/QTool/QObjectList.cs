@@ -73,8 +73,8 @@ namespace QTool
 		{
 			if(transform is RectTransform rectTransform)
 			{
-				Gizmos.color = name.ToColor().Lerp(Color.clear, 0.7f);
-				Gizmos.DrawCube(transform.position, rectTransform.sizeDelta);
+				Gizmos.color = name.ToColor().Lerp(Color.clear, 0.8f);
+				Gizmos.DrawCube(transform.position, rectTransform.Size());
 			}
 		}
 		[QName("测试数目")]
