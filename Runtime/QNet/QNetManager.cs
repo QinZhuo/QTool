@@ -13,6 +13,7 @@ namespace QTool.Net
 
 	public class QNetManager : QInstanceBehaviour<QNetManager>
 	{
+		const ulong ManagerId = 0;
 		[QPopup,QName("传输方式")]
 		public QNetTransport transport;
 		[QName("网络帧率"),SerializeField,Tooltip("每秒进行多少次网络帧同时更改物理帧率 两者保持同步")]
@@ -75,16 +76,16 @@ namespace QTool.Net
 			QId.GetNewIdFunc = QTool.GetGuid;
 		}
 		public bool NetActive => Application.isPlaying&&( transport.ServerActive || transport.ClientConnected);
-		public T PlayerValue<T>(string player,string key, T localValue)
+		public T PlayerValue<T>(ulong playerId,string key, T localValue)
 		{
 			if (transport.ClientConnected)
 			{
-				if (player==transport.ClientId&&(!LocalAction.Values.ContainsKey(key)|| !LocalAction.Values[key].Equals( localValue)))
+				if (playerId==transport.PlayerId&&(!LocalAction.Values.ContainsKey(key)|| !LocalAction.Values[key].Equals( localValue)))
 				{
 					SendAction.Values[key] = localValue;
 					LocalAction.Values[key] = localValue;
 				}
-				if (ClientActionData.ContainsKey(player)&& ClientActionData[player].Values.ContainsKey(key)&& ClientActionData[player].Values[key] is T value)
+				if (ClientActionData.ContainsKey(playerId)&& ClientActionData[playerId].Values.ContainsKey(key)&& ClientActionData[playerId].Values[key] is T value)
 				{
 					return value;
 				}
@@ -102,14 +103,14 @@ namespace QTool.Net
 		
 		QDictionary<string, Action<object>> NetEvent = new QDictionary<string, Action<object>>();
 		public GameObject playerPrefab;
-		public class PlayerInfo:IKey<string>
+		public class PlayerInfo:IKey<ulong>
 		{
-			public string Key { get; set; }
+			public ulong Key { get; set; }
 			public GameObject gameObject { internal set; get; }
 
 			internal Action<string, object[]> Action = null;
 		}
-		public QList<string, PlayerInfo> Players = new QList<string, PlayerInfo>(() => new PlayerInfo());
+		public QList<ulong, PlayerInfo> Players = new QList<ulong, PlayerInfo>(() => new PlayerInfo());
 		QNetActionData LocalAction = new QNetActionData();
 		QNetActionData SendAction = new QNetActionData();
 		private int ServerSeed = 0;
@@ -123,7 +124,7 @@ namespace QTool.Net
 		public void StartServer()
 		{
 			ServerSeed = UnityEngine.Random.Range(0,int.MaxValue);
-			ServerActionData[nameof(QNetManager)].InvokeEvent(nameof(ServerSeed), ServerSeed);
+			ServerActionData[ManagerId].InvokeEvent(nameof(ServerSeed), ServerSeed);
 			transport.OnServerConnected = (id) =>
 			{
 				QDebug.Log("[" + id + "]连接主机");
@@ -156,16 +157,16 @@ namespace QTool.Net
 					{
 						case nameof(DefaultNetAction.PlayerConnected):
 							{
-								var player = eventData.Value[0]?.ToString();
-								ServerPlayers[connectId] = player;
-								QDebug.Log("["+ServerIndex + "] 添加玩家[" + connectId + "][" + player+"]");
+								var playerId = (ulong)eventData.Value[0];
+								ServerPlayerIds[connectId] = playerId;
+								QDebug.Log("["+ServerIndex + "] 添加玩家[" + connectId + "][" + playerId+"]");
 							}
 							break;
 						default:
 							break;
 					}
 				}
-				var playerKey = ServerPlayers[connectId];
+				var playerKey = ServerPlayerIds[connectId];
 				ServerActionData[playerKey].MergeValues(netAction);
 				ServerActionData[playerKey].Events.AddRange(netAction.Events);
 
@@ -188,10 +189,10 @@ namespace QTool.Net
 			StartServer();
 			StartClient();
 		}
-		public QDictionary<ulong, string> ServerPlayers = new QDictionary<ulong ,string>();
-		public QDictionary<int, QList<string, QNetActionData>> ServerGameData = new QDictionary<int, QList<string, QNetActionData>>((key)=>new QList<string, QNetActionData>(()=>new QNetActionData()));
+		public QDictionary<ulong, ulong> ServerPlayerIds = new QDictionary<ulong ,ulong>();
+		public QDictionary<int, QList<ulong, QNetActionData>> ServerGameData = new QDictionary<int, QList<ulong, QNetActionData>>((key) => new QList<ulong, QNetActionData>(() => new QNetActionData()));
 		public int ServerIndex { get; private set; } = 0;
-		public QList<string, QNetActionData> ServerActionData => ServerGameData[ServerIndex];
+		public QList<ulong, QNetActionData> ServerActionData => ServerGameData[ServerIndex];
 
 		List<ulong> ServerConnects = new List<ulong>();
 		private void ServerUpdate()
@@ -215,7 +216,7 @@ namespace QTool.Net
 #endregion
 
 #region 客户端数据
-		public QDictionary<int, QList<string, QNetActionData>> ClientGameData = new QDictionary<int, QList<string, QNetActionData>>();
+		public QDictionary<int, QList<ulong, QNetActionData>> ClientGameData = new QDictionary<int, QList<ulong, QNetActionData>>();
 		public int ClientIndex { get; private set; } =0;
 		private int IdIndex { get; set; } = 0;
 
@@ -226,12 +227,12 @@ namespace QTool.Net
 
 		private QNetSyncFlag SyncCheckFlag = new QNetSyncFlag();
 		internal Dictionary<string, List<QNetBehaviour>> QNetSyncCheckList { get; private set; } = new Dictionary<string, List<QNetBehaviour>>();
-		public QList<string, QNetActionData> ClientActionData = new QList<string, QNetActionData>(()=>new QNetActionData());
+		public QList<ulong, QNetActionData> ClientActionData = new QList<ulong, QNetActionData>(()=>new QNetActionData());
 		public void StartClient(string ip="127.0.0.1")
 		{
 			transport.OnClientConnected += () =>
 			{
-				PlayerAction(nameof(DefaultNetAction.PlayerConnected), transport.ClientId);
+				PlayerAction(nameof(DefaultNetAction.PlayerConnected), transport.PlayerId);
 			};
 			transport.OnClientDataReceived += (data) =>
 			{
@@ -264,7 +265,7 @@ namespace QTool.Net
 			}
 			else
 			{
-				var GameData = reader.ReadObject<QList<string, QNetActionData>>(); ;
+				var GameData = reader.ReadObject<QList<ulong, QNetActionData>>(); ;
 				ClientGameData[index] = GameData;
 			}
 		
@@ -282,9 +283,9 @@ namespace QTool.Net
 				if (ClientGameData.ContainsKey(ClientIndex))
 				{
 					byte[] loadEventData = null;
-					if (ClientGameData[ClientIndex].ContainsKey(nameof(QNetManager)))
+					if (ClientGameData[ClientIndex].ContainsKey(ManagerId))
 					{
-						foreach (var eventData in ClientGameData[ClientIndex][nameof(QNetManager)].Events)
+						foreach (var eventData in ClientGameData[ClientIndex][ManagerId].Events)
 						{
 							switch (eventData.Key)
 							{
@@ -343,7 +344,7 @@ namespace QTool.Net
 									break;
 								case nameof(DefaultNetAction.SyncCheck):
 									{
-										if (actionData.Key != transport.ClientId)
+										if (actionData.Key != transport.PlayerId)
 										{
 											var flag = (QNetSyncFlag)eventData.Value[0];
 											if (flag.Index == SyncCheckFlag.Index)
@@ -428,7 +429,7 @@ namespace QTool.Net
 										writer.Write(QIdData.ToArray());
 									}
 								}
-								ServerActionData[nameof(QNetManager)].InvokeEvent(nameof(DefaultNetAction.SyncLoad), writer.ToArray());
+								ServerActionData[ManagerId].InvokeEvent(nameof(DefaultNetAction.SyncLoad), writer.ToArray());
 							}
 						}
 					}
@@ -494,9 +495,9 @@ namespace QTool.Net
 		}
 	}
 	
-	public class QNetActionData : IKey<string>
+	public class QNetActionData : IKey<ulong>
 	{
-		public string Key { get; set; }
+		public ulong Key { get; set; }
 		public QDictionary<string, object> Values = new QDictionary<string, object>();
 		public List<QKeyValue<string, object[]>> Events = new List<QKeyValue<string, object[]>>();
 		public bool Active => Values.Count + Events.Count > 0;

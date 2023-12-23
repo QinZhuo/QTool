@@ -98,7 +98,7 @@ namespace QTool.Net
         {
             ReliableMaxMessageSize = KcpConnection.ReliableMaxMessageSize(ReceiveWindowSize);
         }
-		public override string ClientId => SystemInfo.deviceName + (Debug.isDebugBuild ? "_" + System.Diagnostics.Process.GetCurrentProcess().Id : "");
+		public override ulong PlayerId => (ulong)(SystemInfo.graphicsDeviceID + (Debug.isDebugBuild ? System.Diagnostics.Process.GetCurrentProcess().Id : 0));
 	
 		protected override void ClientConnect(string address)
         {

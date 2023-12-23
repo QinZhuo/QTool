@@ -13,9 +13,9 @@ namespace QTool.Net
 		public System.Random Random => QNetManager.Instance.Random;
 		public static float NetDeltaTime => QNetManager.Instance.NetDeltaTime;
 		public static float NetTime => QNetManager.Instance.NetTime;
-		public string PlayerId { get; internal set; } = null;
+		public ulong PlayerId { get; internal set; } = 0;
 		public bool IsPlayer => !PlayerId.IsNull(); 
-		public bool IsLoaclPlayer => PlayerId == QNetManager.Instance.transport.ClientId;
+		public bool IsLoaclPlayer => PlayerId == QNetManager.Instance.transport.PlayerId;
 		public bool IsDestoryed { get; internal set; }
 		public T PlayerValue<T>(string key, T value)
 		{

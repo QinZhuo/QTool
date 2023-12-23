@@ -110,7 +110,7 @@ namespace QTool.Net
 			base.ServerStop();
 		}
 
-		public override string ClientId => QSteam.Id.ToString();
+		public override ulong PlayerId => QSteam.Id.m_SteamID;
 		private QSteamClient Client { get; set; }
 		protected override void ClientConnect(string address)
 		{

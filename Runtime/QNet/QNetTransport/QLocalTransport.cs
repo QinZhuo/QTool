@@ -6,7 +6,7 @@ namespace QTool.Net
 {
 	public class QLocalTransport : QNetTransport
 	{
-		public override string ClientId => SystemInfo.deviceName;
+		public override ulong PlayerId => (ulong)SystemInfo.graphicsDeviceID;
 		protected override void ClientConnect(string address) { }
 		public override void ClientReceiveUpdate() { }
 		protected override void ClientSend(byte[] segment) { }
