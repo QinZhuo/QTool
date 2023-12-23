@@ -79,11 +79,12 @@ namespace QTool
 		}
 		[QName("测试数目")]
 		public int TestCount = 4;
-
+		private int lastCount = 0;
 		private void Update()
 		{
-			if (!Application.isPlaying && prefab != null)
+			if (!Application.isPlaying && prefab != null&&lastCount!=TestCount)
 			{
+				lastCount = TestCount;
 				transform.ClearChild(child => child.name == prefab.name + "测试");
 				for (int i = 0; i < TestCount; i++)
 				{
