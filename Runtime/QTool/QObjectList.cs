@@ -7,15 +7,23 @@ namespace QTool
 	[ExecuteInEditMode]
 	public class QObjectList : MonoBehaviour
 	{
-		[QName("预制体")]
-		public GameObject prefab;
+		[QName("预制体"),SerializeField]
+		private GameObject prefab;
 		public List<GameObject> objList { get; private set; } = new List<GameObject>();
 
+		public virtual GameObject this[string name,GameObject prefab]
+		{
+			get
+			{
+				this.prefab = prefab;
+				return this[name];
+			}
+		}
 		public virtual GameObject this[string name]
 		{
 			get
 			{
-				if (string.IsNullOrWhiteSpace(name))
+				if (name.IsNull())
 				{
 					Debug.LogError(this + "索引为空[" + name + "]");
 					return null;
@@ -61,9 +69,9 @@ namespace QTool
 		public void Release(GameObject view)
 		{
 			_count--;
-			view.gameObject.PoolRelease();
 			objList.Remove(view);
 			OnPush?.Invoke(view);
+			view.gameObject.PoolRelease();
 		}
 		public event System.Action<GameObject> OnPush;
 		public event System.Action<GameObject> OnCreate;
