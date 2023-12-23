@@ -49,7 +49,7 @@ namespace QTool
 		{
 			objList.RemoveAll(obj => obj.transform.parent != transform);
 		}
-		public virtual void Clear()
+		public virtual void Clear() 
 		{
 			for (int i = objList.Count - 1; i >= 0; i--)
 			{
