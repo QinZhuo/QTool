@@ -987,12 +987,15 @@ namespace QTool
 				GameObject.Destroy(obj);
 			}
 		}
-		public static void ClearChild(this Transform transform)
+		public static void ClearChild(this Transform transform, Func<Transform, bool> check = null)
 		{
 			for (int i = transform.childCount - 1; i >= 0; i--)
 			{
-				var child = transform.GetChild(i).gameObject;
-				child.CheckDestory();
+				var child = transform.GetChild(i);
+				if (check == null || check(child))
+				{
+					child.gameObject.CheckDestory();
+				}
 			}
 		}
 
