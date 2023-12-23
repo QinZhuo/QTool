@@ -85,7 +85,7 @@ namespace QTool
 			if (!Application.isPlaying && prefab != null&&lastCount!=TestCount)
 			{
 				lastCount = TestCount;
-				transform.ClearChild(child => child.name == prefab.name + "测试");
+				OnDestroy();
 				for (int i = 0; i < TestCount; i++)
 				{
 					var obj = prefab.CheckInstantiate(transform);
@@ -93,6 +93,10 @@ namespace QTool
 					obj.name = prefab.name + "测试";
 				}
 			}
+		}
+		private void OnDestroy()
+		{
+			transform.ClearChild(child => child.name == prefab.name + "测试");
 		}
 #endif
 	}
