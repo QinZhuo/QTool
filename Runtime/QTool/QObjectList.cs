@@ -7,8 +7,8 @@ namespace QTool
 	[ExecuteInEditMode]
 	public class QObjectList : MonoBehaviour
 	{
-		[QName("预制体"),SerializeField]
-		private GameObject prefab;
+		[QName("预制体")]
+		public GameObject prefab;
 		public List<GameObject> objList { get; private set; } = new List<GameObject>();
 
 		public virtual GameObject this[string name,GameObject prefab]
