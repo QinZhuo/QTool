@@ -494,7 +494,6 @@ namespace QTool.Net
 		}
 	}
 	
-
 	public class QNetActionData : IKey<string>
 	{
 		public string Key { get; set; }
