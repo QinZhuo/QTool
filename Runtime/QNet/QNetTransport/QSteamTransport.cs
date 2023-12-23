@@ -10,6 +10,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
+using QTool.Steam;
 namespace QTool.Net
 {
 	public class QSteamTransport : QNetTransport

@@ -10,10 +10,8 @@ using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace QTool
+namespace QTool.Steam
 {
-
-
 	public static class QSteam
 	{
 		public static CSteamID Id => SteamUser.GetSteamID();
@@ -255,16 +253,16 @@ namespace QTool
             CallBack.Dispose();
             return returnValue;
         }
-		public static void SetLobbyData<T>(string key, T value)
+		public static void SetData<T>(this QLobby lobby, string key, T value)
 		{
 			var str = value.ToQData().Trim('"');
-			if (QLobby.CurrentLobby.IsNull())
+			if (lobby.IsNull())
 			{
-				QLobby.CurrentLobby.Data[key] = str;
+				lobby.Data[key] = str;
 			}
 			else
 			{
-				if (SteamMatchmaking.SetLobbyData(QLobby.CurrentLobby.Key.ToSteamId(), key, str))
+				if (SteamMatchmaking.SetLobbyData(lobby.Key.ToSteamId(), key, str))
 				{
 					QDebug.Log("房间." + key + " = " + str);
 				}
@@ -381,9 +379,9 @@ namespace QTool
 			{
 				QDebug.Log(nameof(QSteam) + " 创建房间成功[" + create.m_ulSteamIDLobby + "]");
 				await JoinLobby(QLobby.CurrentLobby.Key.ToSteamId());
-				SetLobbyData(nameof(Name), Name);
-				SetLobbyData(nameof(Application.productName), Application.productName);
-				SetLobbyData(nameof(Application.version), Application.version);
+				QLobby.CurrentLobby.SetData(nameof(Name), Name);
+				QLobby.CurrentLobby.SetData(nameof(Application.productName), Application.productName);
+				QLobby.CurrentLobby.SetData(nameof(Application.version), Application.version);
 				return true;
 			}
 			else

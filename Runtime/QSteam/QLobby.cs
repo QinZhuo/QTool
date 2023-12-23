@@ -7,7 +7,7 @@ namespace QTool
 	public class QLobby:IKey<ulong>
 	{
 		public ulong Key { get; set; }
-		public string Name => Data[nameof(QSteam.Name)];
+		public string Name => Data[nameof(Name)];
 		public ulong Owner { get; set; }
 		public QList<ulong, QLobbyMember> Members { get; private set; } = new QList<ulong, QLobbyMember>(() => new QLobbyMember());
 		public int MemberLimit { get; set; }
