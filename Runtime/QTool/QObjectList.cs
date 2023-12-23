@@ -49,7 +49,7 @@ namespace QTool
 		{
 			objList.RemoveAll(obj => obj.transform.parent != transform);
 		}
-		public virtual void Clear() 
+		public virtual void Clear()
 		{
 			for (int i = objList.Count - 1; i >= 0; i--)
 			{
@@ -94,12 +94,10 @@ namespace QTool
 		}
 		[QName("测试数目")]
 		public int TestCount = 4;
-		private int lastCount = 0;
 		private void Update()
 		{
-			if (!Application.isPlaying && prefab != null&&lastCount!=TestCount)
+			if (!Application.isPlaying && prefab != null)
 			{
-				lastCount = TestCount;
 				OnDestroy();
 				for (int i = 0; i < TestCount; i++)
 				{
