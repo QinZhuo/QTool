@@ -13,7 +13,7 @@ namespace QTool.Net
 
 	public class QNetManager : QInstanceBehaviour<QNetManager>
 	{
-		const ulong ManagerId = 0;
+		const ulong ManagerId = ulong.MaxValue;
 		[QPopup,QName("传输方式")]
 		public QNetTransport transport;
 		[QName("网络帧率"),SerializeField,Tooltip("每秒进行多少次网络帧同时更改物理帧率 两者保持同步")]
