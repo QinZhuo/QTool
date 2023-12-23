@@ -79,10 +79,17 @@ namespace QTool
 #if UNITY_EDITOR
 		private void OnDrawGizmos()
 		{
-			if(transform is RectTransform rectTransform)
+			if (transform is RectTransform rectTransform)
 			{
-				Gizmos.color = name.ToColor().Lerp(Color.clear, 0.8f);
-				Gizmos.DrawCube(transform.position, rectTransform.Size());
+				Gizmos.color = name.ToColor().Lerp(Color.clear, 0.7f);
+				if (UnityEditor.Selection.activeGameObject != gameObject)
+				{
+					Gizmos.DrawCube(transform.position, rectTransform.Size());
+				}
+				else
+				{
+					Gizmos.DrawWireCube(transform.position, rectTransform.Size());
+				}
 			}
 		}
 		[QName("测试数目")]
