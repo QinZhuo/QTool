@@ -6,10 +6,10 @@ namespace QTool
 {
 	public class QLobby:IKey<ulong>
 	{
-		public ulong Key { get; set; }
-		public string Name => Data[nameof(Name)];
-		public ulong Owner { get; set; }
-		public QList<ulong, QLobbyMember> Members { get; private set; } = new QList<ulong, QLobbyMember>(() => new QLobbyMember());
+		public ulong Key { get; set; }   
+		public string Name => Data[nameof(Name)];  
+		public ulong Owner { get; set; }  
+		public QList<ulong, QLobbyMember> Members { get; private set; } = new QList<ulong, QLobbyMember>(() => new QLobbyMember());  
 		public int MemberLimit { get; set; }
 		public QDictionary<string, string> Data { get;private set; } = new QDictionary<string, string>();
 
@@ -55,7 +55,7 @@ namespace QTool
 		#region 静态
 
 		public static QLobby CurrentLobby = new QLobby();
-		public static QList<ulong, QLobby> LobbyList { get; private set; } = new QList<ulong, QLobby>();
+		public static QList<ulong, QLobby> LobbyList { get; private set; } = new QList<ulong, QLobby>(() => new QLobby());
 		public static void Leave()
 		{
 			CurrentLobby = new QLobby();

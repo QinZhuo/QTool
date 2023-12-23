@@ -69,6 +69,14 @@ namespace QTool
 		public event System.Action<GameObject> OnCreate;
 		public event System.Action OnClear;
 #if UNITY_EDITOR
+		private void OnDrawGizmos()
+		{
+			if(transform is RectTransform rectTransform)
+			{
+				Gizmos.color = name.ToColor().Lerp(Color.clear, 0.7f);
+				Gizmos.DrawCube(transform.position, rectTransform.sizeDelta);
+			}
+		}
 		[QName("测试数目")]
 		public int TestCount = 4;
 
