@@ -84,11 +84,11 @@ namespace QTool
 				Gizmos.color = name.ToColor().Lerp(Color.clear, 0.7f);
 				if (UnityEditor.Selection.activeGameObject != gameObject)
 				{
-					Gizmos.DrawCube(transform.position, rectTransform.Size());
+					Gizmos.DrawCube(rectTransform.Center(), rectTransform.Size());
 				}
 				else
 				{
-					Gizmos.DrawWireCube(transform.position, rectTransform.Size());
+					Gizmos.DrawWireCube(rectTransform.Center(), rectTransform.Size());
 				}
 			}
 		}

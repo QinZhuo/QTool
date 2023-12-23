@@ -56,7 +56,11 @@ namespace QTool
         {
             return transform as RectTransform;
         }
-        public static Vector2 UpRight(this RectTransform rectTransform)
+		public static Vector2 Center(this RectTransform rectTransform)
+		{
+			return rectTransform.DownLeft() + rectTransform.Size() /2;
+		}
+		public static Vector2 UpRight(this RectTransform rectTransform)
         {
             return new Vector2(rectTransform.position.x, rectTransform.position.y) + rectTransform.UpRightRectOffset();
         }
@@ -152,7 +156,7 @@ namespace QTool
 			return comp;
 		}
 
-
+	
 		public static float Up(this RectTransform rectTransform)
 		{
 			return rectTransform.transform.position.y + rectTransform.UpRightRectOffset().y;
