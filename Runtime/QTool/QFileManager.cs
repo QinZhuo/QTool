@@ -92,15 +92,15 @@ namespace QTool
         {
             return ExistsDirectory(rootPath) ? Directory.GetFiles(rootPath).Length / 2 : 0;
         }
-		public static string FileName(this string path,bool withoutExtension=false)
+		public static string FileName(this string path,bool withExtension=false)
 		{
-			if (withoutExtension)
+			if (withExtension)
 			{
-				return Path.GetFileNameWithoutExtension(path);
+				return Path.GetFileName(path);
 			}
 			else
 			{
-				return Path.GetFileName(path);
+				return Path.GetFileNameWithoutExtension(path);
 			}
 		}
 		public static string FileExtension(this string path)
@@ -708,9 +708,34 @@ namespace QTool
         }
 	}
 
+#if UNITY_EDITOR
+	public static class QEditorPath
+	{
+		public static List<string> PrefabPath = new List<string>();
+		[UnityEditor.InitializeOnLoadMethod]
+		public static void Init()
+		{
+			QPlayerPrefs.Get(nameof(PrefabPath), PrefabPath);
+		}
+		public static void Save()
+		{
+			PrefabPath.RemoveAll(path => PrefabPath.IndexOf(path) > 10);
+			QPlayerPrefs.Set(nameof(PrefabPath), PrefabPath);
+		}
+		public static void Insert(string path, int index = 0)
+		{
+			if (index > 0)
+			{
+				if (PrefabPath.Contains(path)) return;
+			}
+			PrefabPath.Remove(path);
+			PrefabPath.Insert(index, path);
+			Save();
+		}
 
-
-#region WindowsData
+	}
+#endif
+	#region WindowsData
 
 	[StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
 	public class FileDialog

@@ -5,9 +5,10 @@ using UnityEditor.SceneManagement;
 using UnityEngine;
 using QTool;
 using System.IO;
+
 public static class QPrefabStage
 {
-	public static List<string> PrefabPath = new List<string>();
+	
 	public static PrefabStage CurrrentStage = null;
 	public static bool IsPrefabMode => CurrrentStage != null;
 	[InitializeOnLoadMethod]
@@ -16,14 +17,10 @@ public static class QPrefabStage
 		PrefabStage.prefabStageOpened += OnPrefabStageOpened;
 		PrefabStage.prefabStageClosing += OnPrefabStageClosing;
 		SceneView.duringSceneGui += SceneGUI;
-		QPlayerPrefs.Get(nameof(PrefabPath), PrefabPath);
 	}
 	private static void OnPrefabStageOpened(PrefabStage prefabStage)
 	{
-		PrefabPath.Remove(prefabStage.assetPath);
-		PrefabPath.Insert(0, prefabStage.assetPath);
-		PrefabPath.RemoveAll(path => PrefabPath.IndexOf(path) > 8);
-		QPlayerPrefs.Set(nameof(PrefabPath), PrefabPath);
+		QEditorPath.Insert(prefabStage.assetPath);
 		CurrrentStage = prefabStage;
 	}
 	private static void OnPrefabStageClosing(PrefabStage prefabStage)
@@ -34,16 +31,20 @@ public static class QPrefabStage
 	private static void SceneGUI(SceneView sceneView)
 	{
 		Handles.BeginGUI();
+		GUILayout.FlexibleSpace();
 		using (new GUILayout.HorizontalScope())
 		{
-			if (PrefabPath.Count > 0)
+			if (QEditorPath.PrefabPath.Count > 0)
 			{
 				if (IsPrefabMode)
 				{
-					foreach (var path in PrefabPath.ToArray())
+					foreach (var path in QEditorPath.PrefabPath.ToArray())
 					{
-						if (path == CurrrentStage.assetPath) continue;
-						if(GUILayout.Button(path.FileName(true)))
+						if (path == CurrrentStage.assetPath)
+						{
+							GUILayout.Button("【" + path.FileName() + "】", GUILayout.Height(18));
+						}
+						else if (GUILayout.Button(path.FileName(), GUILayout.Height(18)))
 						{
 							PrefabStageUtility.OpenPrefab(path);
 						}
@@ -51,9 +52,9 @@ public static class QPrefabStage
 				}
 				else
 				{
-					if(GUILayout.Button(PrefabPath.QueuePeek().FileName(true),GUILayout.Width(100)))
+					if (GUILayout.Button(""+ QEditorPath.PrefabPath.QueuePeek().FileName().ToShortString(10), GUILayout.Width(130), GUILayout.Height(18)))
 					{
-						PrefabStageUtility.OpenPrefab(PrefabPath.QueuePeek());
+						PrefabStageUtility.OpenPrefab(QEditorPath.PrefabPath.QueuePeek());
 					}
 				}
 			}

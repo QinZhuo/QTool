@@ -80,6 +80,10 @@ namespace QTool
 		private void OnEnable()
 		{
 			UnityEditor.SceneManagement.PrefabStage.prefabStageClosing += OnPrefabStageClosing;
+			if (prefab != null)
+			{
+				QEditorPath.Insert(UnityEditor.AssetDatabase.GetAssetPath(prefab), 1);
+			}
 		}
 		private void OnDisable()
 		{
