@@ -390,8 +390,17 @@ namespace QTool.Steam
 				return false;
 			}
 		}
+		public static bool CheckLobby(this CSteamID steamID)
+		{
+			return SteamMatchmaking.GetLobbyData(steamID, nameof(Application.productName)) == Application.productName &&
+			   (Application.isEditor || SteamMatchmaking.GetLobbyData(steamID, nameof(Application.version)) == Application.version);
+		}
 		public static void UpdateCurrentLobby(CSteamID currentlobbyId)
 		{
+			if (!currentlobbyId.CheckLobby())
+			{
+				return;
+			}
 			if (QLobby.CurrentLobby.Key != currentlobbyId.m_SteamID)
 			{
 				if (QLobby.CurrentLobby.IsNull())
