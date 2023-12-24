@@ -9,16 +9,9 @@ namespace QTool
 	{
 		[QName("预制体")]
 		public GameObject prefab;
-		public List<GameObject> objList { get; private set; } = new List<GameObject>();
-
-		public virtual GameObject this[string name,GameObject prefab]
-		{
-			get
-			{
-				this.prefab = prefab;
-				return this[name];
-			}
-		}
+		public List<GameObject> List { get; private set; } = new List<GameObject>();
+		public int Count => List.Count;
+		
 		public virtual GameObject this[string name]
 		{
 			get
@@ -37,44 +30,38 @@ namespace QTool
 					view.transform.localScale = Vector3.one;
 					view.transform.localRotation = Quaternion.identity;
 					view.transform.SetAsLastSibling();
-					objList.Add(view);
+					List.Add(view);
 					view.name = name;
-					_count++;
 					OnCreate?.Invoke(view);
+					var poolObj = view.GetComponent<QPoolObject>();
+					UnityEngine.Events.UnityAction action = null;
+					action = () =>
+					 {
+						 List.Remove(view);
+						 OnRelease?.Invoke(view);
+						 poolObj.OnRelease.RemoveListener(action);
+					 };
+					poolObj.OnRelease.AddListener(action);
 				}
 				return view;
 			}
 		}
-		private void OnTransformChildrenChanged()
+		public GameObject Get(string name, GameObject prefab)
 		{
-			objList.RemoveAll(obj => obj.transform.parent != transform);
+			this.prefab = prefab;
+			return this[name];
 		}
 		public virtual void Clear()
 		{
-			for (int i = objList.Count - 1; i >= 0; i--)
+			for (int i = List.Count - 1; i >= 0; i--)
 			{
-				var view = objList[i];
-				Release(view);
+				var view = List[i];
+				view.PoolRelease();
 			}
 			OnClear?.Invoke();
 		}
-		private int _count = 0;
-		public int Count
-		{
-			get
-			{
-				return _count;
-			}
-		}
-		public void Release(GameObject view)
-		{
-			_count--;
-			objList.Remove(view);
-			OnPush?.Invoke(view);
-			view.gameObject.PoolRelease();
-		}
-		public event System.Action<GameObject> OnPush;
 		public event System.Action<GameObject> OnCreate;
+		public event System.Action<GameObject> OnRelease;
 		public event System.Action OnClear;
 #if UNITY_EDITOR
 		private void OnEnable()

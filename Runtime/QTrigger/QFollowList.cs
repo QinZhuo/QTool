@@ -8,13 +8,9 @@ namespace QTool
 	{
 		private QObjectList _ObjectList;
 		public QObjectList ObjectList => _ObjectList ??= GetComponent<QObjectList>();
-		public void Push(GameObject obj)
-		{
-			ObjectList.Release(obj);
-		}
 		public void FreshPosition()
 		{
-			foreach (var obj in ObjectList.objList)
+			foreach (var obj in ObjectList.List)
 			{
 				obj.GetComponent<QFollowUI>()?.FreshPosition();
 			}

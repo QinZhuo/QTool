@@ -46,7 +46,7 @@ namespace QTool
 		{
 			var ui = this[qInteractObject.transform];
 			ui.gameObject.InvokeEvent("隐藏");
-			Push(ui.gameObject);
+			ui.gameObject.PoolRelease();
 		}
 		QFollowUI LastUI= null;
 		public void Fresh(QInteractTrigger qInteractObject)

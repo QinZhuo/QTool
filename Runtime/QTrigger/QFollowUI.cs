@@ -74,7 +74,7 @@ namespace QTool
 		{
 			if (QFollowList != null)
 			{
-				QFollowList.Push(gameObject);
+				gameObject.PoolRelease();
 				QFollowList = null;
 			}
 		}
