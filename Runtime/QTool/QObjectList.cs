@@ -112,10 +112,10 @@ namespace QTool
 		{
 			if (!Application.isPlaying && prefab != null && TestCount != lastCount)
 			{
+				lastCount = TestCount;
 				OnDestroy();
 				for (int i = 0; i < TestCount; i++)
 				{
-					lastCount = 0;
 					var obj = prefab.CheckInstantiate(transform);
 					obj.hideFlags = HideFlags.HideAndDontSave;
 					obj.name = prefab.name + "测试";
