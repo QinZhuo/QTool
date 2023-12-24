@@ -50,6 +50,7 @@ namespace QTool
 		public QFlowGraph Graph => Node?.Graph;
 		public abstract IEnumerator Init();
 		public abstract IEnumerator Run(Action<Transform> action);
+		public abstract void Cancel();
 	}
 }
 

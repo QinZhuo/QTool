@@ -276,8 +276,13 @@ namespace QTool.FlowGraph
 					}
 					else
 					{
+						trigger.Cancel();
 						This.State = QNodeState.失败;
 					}
+				}
+				else
+				{
+					trigger.Cancel();
 				}
 			}
 			if (trigger != null)
