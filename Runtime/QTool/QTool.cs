@@ -1081,6 +1081,11 @@ namespace QTool
 		public static List<Task> PreLoadList = new List<Task>();
 		public static async Task LoadSceneAsync(this string sceneName)
 		{
+			if (IsLoading)
+			{
+				Debug.LogError("加载场景[" + sceneName + "]失败 正在加载新场景");
+				return;
+			}
 			IsLoading = true;
 			await PreLoadList.ToArray().WaitAllOver();
 			PreLoadList.Clear();
