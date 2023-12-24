@@ -77,6 +77,14 @@ namespace QTool
 		public event System.Action<GameObject> OnCreate;
 		public event System.Action OnClear;
 #if UNITY_EDITOR
+		private void OnEnable()
+		{
+			UnityEditor.SceneManagement.PrefabStage.prefabStageClosing += OnPrefabStageClosing;
+		}
+		private void OnDisable()
+		{
+			UnityEditor.SceneManagement.PrefabStage.prefabStageClosing -= OnPrefabStageClosing;
+		}
 		private void OnDrawGizmos()
 		{
 			if (transform is RectTransform rectTransform)
@@ -94,13 +102,20 @@ namespace QTool
 		}
 		[QName("测试数目")]
 		public int TestCount = 4;
+		private int lastCount = 0;
+		private void OnPrefabStageClosing(UnityEditor.SceneManagement.PrefabStage prefabStage)
+		{
+			lastCount = 0;
+		}
+
 		private void Update()
 		{
-			if (!Application.isPlaying && prefab != null)
+			if (!Application.isPlaying && prefab != null && TestCount != lastCount)
 			{
 				OnDestroy();
 				for (int i = 0; i < TestCount; i++)
 				{
+					lastCount = 0;
 					var obj = prefab.CheckInstantiate(transform);
 					obj.hideFlags = HideFlags.HideAndDontSave;
 					obj.name = prefab.name + "测试";
