@@ -13,18 +13,18 @@ namespace QTool
 {
 	public static class QDebug
 	{
-	
+
 		private static QAverageValue FrameCount = new QAverageValue();
 		public static int FPS => (int)(FrameCount.SecondeSum);
 		private static long LastFrameTime { set; get; } = 0;
-		private static Label InfoLabel=null;
-		private static VisualElement DebugPanel=null;
+		private static Label InfoLabel = null;
+		private static VisualElement DebugPanel = null;
 		private static VisualElement LeftPanel = null;
 		private static VisualElement RightPanel = null;
 		private static VisualElement MidPanel = null;
 		private static VisualElement DownPanel = null;
+#if DEVELOPMENT_BUILD || UNITY_EDITOR
 
-#if UNITY_2021_1_OR_NEWER
 		[RuntimeInitializeOnLoadMethod]
 		private static void Init()
 		{
@@ -46,19 +46,19 @@ namespace QTool
 				InfoLabel.pickingMode = PickingMode.Ignore;
 				InfoLabel.style.position = Position.Absolute;
 				InfoLabel.style.width = new Length(100, LengthUnit.Percent);
-				InfoLabel.style.textShadow = new TextShadow { offset = Vector2.one, color = Color.black, blurRadius=1 };
+				InfoLabel.style.textShadow = new TextShadow { offset = Vector2.one, color = Color.black, blurRadius = 1 };
 			}
-			InfoLabel.text = Application.productName + " v" + Application.version+"\t 内存：" + useSize.ToSizeString() + " / " + (useSize + Profiler.GetTotalReservedMemoryLong()).ToSizeString() + "\t 帧率：" + FPS.ToString()+" |";
+			InfoLabel.text = Application.productName + " v" + Application.version + "\t 内存：" + useSize.ToSizeString() + " / " + (useSize + Profiler.GetTotalReservedMemoryLong()).ToSizeString() + "\t 帧率：" + FPS.ToString() + " |";
 		}
 
 		static Vector2 LeftScrollPosition = Vector2.zero;
 		static Vector2 RightScrollPosition = Vector2.zero;
-	
+
 		static QDictionary<int, List<GameObject>> rootGameObjects = new QDictionary<int, List<GameObject>>((key) => new List<GameObject>());
-		
-		private static void AddScene(this VisualElement root,Scene scene)
+
+		private static void AddScene(this VisualElement root, Scene scene)
 		{
-			var child = root.AddFoldout(scene.name,true).contentContainer;
+			var child = root.AddFoldout(scene.name, true).contentContainer;
 			scene.GetRootGameObjects(rootGameObjects[scene.handle]);
 			foreach (var gameObject in rootGameObjects[scene.handle])
 			{
@@ -70,7 +70,7 @@ namespace QTool
 			var element = new VisualElement();
 			element.style.flexDirection = FlexDirection.Row;
 			var foldout = element.AddFoldout(gameObject.name);
-			var childRoot= foldout.contentContainer;
+			var childRoot = foldout.contentContainer;
 			element.Q<VisualElement>("unity-checkmark").visible = gameObject.transform.childCount > 0;
 			root.Add(element);
 			foldout.Q<Toggle>().RegisterCallback<ClickEvent>((eventData) => { SelectObject(gameObject); });
@@ -87,7 +87,7 @@ namespace QTool
 			{
 				var title = RightPanel.AddVisualElement();
 				title.style.flexDirection = FlexDirection.Row;
-				title.AddToggle("", gameObject.activeSelf, (value) =>gameObject.SetActive(value));
+				title.AddToggle("", gameObject.activeSelf, (value) => gameObject.SetActive(value));
 				title.AddText("", gameObject.name, (value) => gameObject.name = value);
 				foreach (var component in gameObject.GetComponents<Component>())
 				{
@@ -99,11 +99,11 @@ namespace QTool
 		private static void AddComponent(this VisualElement root, Component component)
 		{
 			var typeInfo = QInspectorType.Get(component.GetType());
-			root= root.AddFoldout(typeInfo.Type.Name,true);
+			root = root.AddFoldout(typeInfo.Type.Name, true);
 			foreach (var memeberInfo in typeInfo.Members)
 			{
 				var value = memeberInfo.Get(component);
-				root.Add(memeberInfo.QName,value, memeberInfo.Type,(value)=>memeberInfo.Set(component,value));
+				root.Add(memeberInfo.QName, value, memeberInfo.Type, (value) => memeberInfo.Set(component, value));
 			}
 		}
 
@@ -134,7 +134,6 @@ namespace QTool
 			}
 		}
 		private static RenderTexture GameTexture = null;
-		[System.Diagnostics.Conditional("UNITY_EDITOR")]
 		private static void OpenPanel()
 		{
 			if (DebugPanel != null && DebugPanel.visible) return;
@@ -143,7 +142,7 @@ namespace QTool
 				DebugPanel = QToolManager.Instance.RootVisualElement.AddVisualElement();
 				var title = DebugPanel.AddVisualElement();
 				title.style.backgroundColor = Color.gray;
-				title= title.AddGroupBox();
+				title = title.AddGroupBox();
 				title.style.flexDirection = FlexDirection.Row;
 				title.AddButton("继续游戏", ClosePanel);
 				var commond = title.AddVisualElement();
@@ -157,19 +156,19 @@ namespace QTool
 				var top = new VisualElement();
 				LeftPanel.Split(top, DownPanel, 600, TwoPaneSplitViewOrientation.Vertical);
 				LeftPanel = new ScrollView();
-				MidPanel= new ScrollView();
+				MidPanel = new ScrollView();
 				top.Split(LeftPanel, MidPanel, 300);
 				foreach (var kv in QCommand.NameDictionary)
 				{
 					if (kv.Value.IsStringCommond)
-					{	
+					{
 						if (kv.Value.fullName.SplitTowString("/", out var start, out var end))
 						{
 							var group = MidPanel.Q<GroupBox>(start);
 							if (group == null)
 							{
 								MidPanel.AddLabel(start);
-								group=MidPanel.AddGroupBox(start);
+								group = MidPanel.AddGroupBox(start);
 							}
 							var button = group.Q<Button>(end);
 							if (button == null)
@@ -177,7 +176,7 @@ namespace QTool
 								group.AddButton(end, () =>
 								{
 									commond.Clear();
-									var view = commond.AddQCommandInfo(kv.Value,ClosePanel);
+									var view = commond.AddQCommandInfo(kv.Value, ClosePanel);
 									view.style.backgroundColor = Color.grey;
 								});
 							}
@@ -229,12 +228,12 @@ namespace QTool
 					return angle;
 				}
 				point -= QScreen.Size / 2;
-				angle += Vector2.Angle(last, point) * (Vector3.Cross(last, point).z > 0 ? -1:1);
+				angle += Vector2.Angle(last, point) * (Vector3.Cross(last, point).z > 0 ? -1 : 1);
 				last = point;
 				return angle;
 			}
 		}
-	
+
 		public static void DebugRun(string key, Action action)
 		{
 			GC.Collect();
@@ -269,19 +268,19 @@ namespace QTool
 		{
 			Debug.LogError("[" + nameof(QDebug) + "]  " + obj);
 		}
-		private static QDictionary<string, long> TimestampList= new QDictionary<string, long>();
+		private static QDictionary<string, long> TimestampList = new QDictionary<string, long>();
 		[System.Diagnostics.Conditional("DEVELOPMENT_BUILD"), System.Diagnostics.Conditional("UNITY_EDITOR")]
 		public static void Begin(string key)
 		{
-			TimestampList[key] =QTime.Timestamp;
+			TimestampList[key] = QTime.Timestamp;
 		}
 		[System.Diagnostics.Conditional("DEVELOPMENT_BUILD"), System.Diagnostics.Conditional("UNITY_EDITOR")]
 		public static void End(string key, string resultInfo = "")
 		{
-			Log(key + " " + resultInfo+ " 时间 " + TimestampList[key].GetIntervalSeconds().ToString("f3") + " s" + " 帧率 " + Mathf.Min(FPS, (int)(1f / LastFrameTime.GetIntervalSeconds())));
+			Log(key + " " + resultInfo + " 时间 " + TimestampList[key].GetIntervalSeconds().ToString("f3") + " s" + " 帧率 " + Mathf.Min(FPS, (int)(1f / LastFrameTime.GetIntervalSeconds())));
 		}
 		[System.Diagnostics.Conditional("DEVELOPMENT_BUILD"), System.Diagnostics.Conditional("UNITY_EDITOR")]
-		public static void ChangeProfilerCount(string key, int changeCount=0)
+		public static void ChangeProfilerCount(string key, int changeCount = 0)
 		{
 #if Profiler
 			var obj = ProfilerCount[key];
