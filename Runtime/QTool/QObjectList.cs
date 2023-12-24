@@ -113,7 +113,7 @@ namespace QTool
 			if (!Application.isPlaying && prefab != null && TestCount != lastCount)
 			{
 				lastCount = TestCount;
-				OnDestroy();
+				OnDestroy(); 
 				for (int i = 0; i < TestCount; i++)
 				{
 					var obj = prefab.CheckInstantiate(transform);

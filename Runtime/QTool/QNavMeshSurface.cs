@@ -109,6 +109,7 @@ namespace QTool
 						var sprites = root.GetComponentsInChildren<SpriteRenderer>();
 						foreach (var sprite in sprites)
 						{
+							if (sprite?.sprite == null) continue;
 							var src = new NavMeshBuildSource();
 							src.shape = NavMeshBuildSourceShape.Mesh;
 							src.area = 0;
