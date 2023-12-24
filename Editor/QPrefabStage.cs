@@ -42,6 +42,7 @@ public static class QPrefabStage
 				{
 					foreach (var path in PrefabPath.ToArray())
 					{
+						if (path == CurrrentStage.assetPath) continue;
 						if(GUILayout.Button(path.FileName(true)))
 						{
 							PrefabStageUtility.OpenPrefab(path);
