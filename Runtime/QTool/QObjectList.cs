@@ -79,15 +79,22 @@ namespace QTool
 #if UNITY_EDITOR
 		private void OnEnable()
 		{
-			UnityEditor.SceneManagement.PrefabStage.prefabStageClosing += OnPrefabStageClosing;
-			if (prefab != null)
+			if (!Application.isPlaying)
 			{
-				QEditorPath.Insert(UnityEditor.AssetDatabase.GetAssetPath(prefab), 1);
+				UnityEditor.SceneManagement.PrefabStage.prefabStageClosing += OnPrefabStageClosing;
+				if (prefab != null)
+				{
+					QEditorPath.Insert(UnityEditor.AssetDatabase.GetAssetPath(prefab), 1);
+				}
 			}
+			
 		}
 		private void OnDisable()
 		{
-			UnityEditor.SceneManagement.PrefabStage.prefabStageClosing -= OnPrefabStageClosing;
+			if (!Application.isPlaying)
+			{
+				UnityEditor.SceneManagement.PrefabStage.prefabStageClosing -= OnPrefabStageClosing;
+			}
 		}
 		private void OnDrawGizmos()
 		{

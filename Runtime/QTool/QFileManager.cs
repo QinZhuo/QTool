@@ -734,7 +734,14 @@ namespace QTool
 				if (PrefabPathList.Contains(path)) return;
 			}
 			PrefabPathList.Remove(path);
-			PrefabPathList.Insert(index, path);
+			if (index < PrefabPathList.Count)
+			{
+				PrefabPathList.Insert(index, path);
+			}
+			else
+			{
+				PrefabPathList.Add(path);
+			}
 			Save();
 		}
 
