@@ -34,27 +34,32 @@ public static class QPrefabStage
 		GUILayout.FlexibleSpace();
 		using (new GUILayout.HorizontalScope())
 		{
-			if (QEditorPath.PrefabPath.Count > 0)
+			if (QEditorPath.PrefabPaths.Count > 0)
 			{
 				if (IsPrefabMode)
 				{
-					foreach (var path in QEditorPath.PrefabPath.ToArray())
+					foreach (var path in QEditorPath.PrefabPaths.ToArray())
 					{
 						if (path == CurrrentStage.assetPath)
 						{
-							GUILayout.Button("【" + path.FileName() + "】", GUILayout.Height(18));
+							if (GUILayout.Button("【" + path.FileName() + "】", GUILayout.Height(20)))
+							{
+								StageUtility.GoBackToPreviousStage();
+								PrefabStageUtility.OpenPrefab(path);
+							}
 						}
-						else if (GUILayout.Button(path.FileName(), GUILayout.Height(18)))
+						else if (GUILayout.Button(path.FileName(), GUILayout.Height(20)))
 						{
+							
 							PrefabStageUtility.OpenPrefab(path);
 						}
 					}
 				}
 				else
 				{
-					if (GUILayout.Button(""+ QEditorPath.PrefabPath.QueuePeek().FileName().ToShortString(10), GUILayout.Width(130), GUILayout.Height(18)))
+					if (GUILayout.Button(""+ QEditorPath.PrefabPaths.QueuePeek().FileName().ToShortString(10), GUILayout.Width(130), GUILayout.Height(20)))
 					{
-						PrefabStageUtility.OpenPrefab(QEditorPath.PrefabPath.QueuePeek());
+						PrefabStageUtility.OpenPrefab(QEditorPath.PrefabPaths.QueuePeek());
 					}
 				}
 			}

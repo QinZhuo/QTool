@@ -711,25 +711,30 @@ namespace QTool
 #if UNITY_EDITOR
 	public static class QEditorPath
 	{
-		public static List<string> PrefabPath = new List<string>();
+		public static List<string> PrefabPaths = new List<string>();
+		private static List<string> PrefabPathList = new List<string>();
 		[UnityEditor.InitializeOnLoadMethod]
 		public static void Init()
 		{
-			QPlayerPrefs.Get(nameof(PrefabPath), PrefabPath);
+			QPlayerPrefs.Get(nameof(PrefabPathList), PrefabPathList);
+			Save();
 		}
 		public static void Save()
 		{
-			PrefabPath.RemoveAll(path => PrefabPath.IndexOf(path) > 10);
-			QPlayerPrefs.Set(nameof(PrefabPath), PrefabPath);
+			PrefabPathList.RemoveAll(path => PrefabPathList.IndexOf(path) > 10);
+			PrefabPaths.Clear();
+			PrefabPaths.AddRange(PrefabPathList);
+			PrefabPaths.Sort();
+			QPlayerPrefs.Set(nameof(PrefabPathList), PrefabPathList);
 		}
 		public static void Insert(string path, int index = 0)
 		{
 			if (index > 0)
 			{
-				if (PrefabPath.Contains(path)) return;
+				if (PrefabPathList.Contains(path)) return;
 			}
-			PrefabPath.Remove(path);
-			PrefabPath.Insert(index, path);
+			PrefabPathList.Remove(path);
+			PrefabPathList.Insert(index, path);
 			Save();
 		}
 
