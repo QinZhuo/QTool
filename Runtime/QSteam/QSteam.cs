@@ -397,10 +397,6 @@ namespace QTool.Steam
 		}
 		public static void UpdateCurrentLobby(CSteamID currentlobbyId)
 		{
-			if (!currentlobbyId.CheckLobby())
-			{
-				return;
-			}
 			if (QLobby.CurrentLobby.Key != currentlobbyId.m_SteamID)
 			{
 				if (QLobby.CurrentLobby.IsNull())
