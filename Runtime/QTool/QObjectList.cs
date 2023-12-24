@@ -100,14 +100,16 @@ namespace QTool
 		{
 			if (transform is RectTransform rectTransform)
 			{
-				Gizmos.color = name.ToColor().Lerp(Color.clear, 0.7f);
+			
 				if (UnityEditor.Selection.activeGameObject != gameObject)
 				{
+					Gizmos.color = name.ToColor().Lerp(Color.clear, 0.7f);
 					Gizmos.DrawCube(rectTransform.Center(), rectTransform.Size());
 				}
 				else
 				{
-					Gizmos.DrawWireCube(rectTransform.Center(), rectTransform.Size());
+					Gizmos.color = name.ToColor().Lerp(Color.clear, 0.8f);
+					Gizmos.DrawCube(rectTransform.Center(), rectTransform.Size());
 				}
 			}
 		}
