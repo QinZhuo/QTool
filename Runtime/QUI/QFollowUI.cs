@@ -16,11 +16,24 @@ namespace QTool
 			set
 			{
 				_Target = value;
+				Start();
 				FreshPosition();
 			}
 		}
 		public RenderMode Mode = RenderMode.ScreenSpaceOverlay;
 		public Vector3 Offset;
+		bool IsTargetInWorld = false;
+		private void Start()
+		{
+			if(_Target is RectTransform rect)
+			{
+				IsTargetInWorld = rect.GetComponentInParent<Canvas>().renderMode == RenderMode.WorldSpace;
+			}
+			else
+			{
+				IsTargetInWorld = true;
+			}
+		}
 		private void LateUpdate()
         {
 			FreshPosition();
@@ -31,11 +44,8 @@ namespace QTool
 			{
 				if (_Target.gameObject.activeInHierarchy)
 				{
-					if (Target is RectTransform targetRect)
-					{
-						rectTransform.SetLeftUpPosition(targetRect.RightUp()+(Vector2)Offset*transform.lossyScale);
-					}
-					else
+
+					if (IsTargetInWorld)
 					{
 						var position = _Target.position + Offset;
 						switch (Mode)
@@ -55,7 +65,11 @@ namespace QTool
 								break;
 						}
 					}
-					
+					else
+					{
+						rectTransform.SetLeftUpPosition((Target as RectTransform).RightUp() + (Vector2)Offset * transform.lossyScale);
+					}
+
 				}
 			}
 		}
