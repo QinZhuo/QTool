@@ -18,7 +18,7 @@ namespace QTool.Net
 		public QNetTransport transport; 
 		[QName("网络帧率"),SerializeField,Tooltip("每秒进行多少次网络帧同时更改物理帧率 两者保持同步")]
 		[Range(15,60)]
-		private int netFps = 30;
+		private int netFps = 30; 
 		public System.Random Random { get; private set; } = null;
 		protected override void Awake()
 		{
