@@ -78,7 +78,7 @@ namespace QTool.Steam
 			for (int i = 0; i < commands.Length-1; i++)  
 			{
 				switch (commands[i])
-				{
+				{  
 					case "+connect_lobby":
 						{
 							if (ulong.TryParse(commands[i + 1], out ulong lobbyID))
