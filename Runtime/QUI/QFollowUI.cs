@@ -53,7 +53,7 @@ namespace QTool
 						var rightUp = targetRect.RightUp();
 						if (IsTargetInWorld)
 						{
-							rightUp = Camera.main.WorldToScreenPoint(Target.position + Target.TransformVector((targetRect.rect.size / 2)));
+							rightUp = Camera.main.WorldToScreenPoint(Target.position+(Vector3)targetRect.Size()/2));
 						}
 						rectTransform.SetLeftUpPosition(rightUp + Offset * transform.lossyScale);
 					}
