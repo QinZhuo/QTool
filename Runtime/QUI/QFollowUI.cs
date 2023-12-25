@@ -4,12 +4,12 @@ using UnityEngine;
 namespace QTool
 {
 	[ExecuteInEditMode]
-    public class QFollowUI : MonoBehaviour
+	public class QFollowUI : MonoBehaviour
 	{
 
 		public RectTransform rectTransform => transform as RectTransform;
 		[SerializeField]
-        private Transform _Target;
+		private Transform _Target;
 		public Transform Target
 		{
 			get => _Target;
@@ -25,7 +25,7 @@ namespace QTool
 		bool IsTargetInWorld = false;
 		private void Start()
 		{
-			if(_Target is RectTransform rect)
+			if (_Target is RectTransform rect)
 			{
 				IsTargetInWorld = rect.GetComponentInParent<Canvas>().renderMode == RenderMode.WorldSpace;
 			}
@@ -34,8 +34,12 @@ namespace QTool
 				IsTargetInWorld = true;
 			}
 		}
+		private void OnValidate()
+		{
+			Start();
+		}
 		private void LateUpdate()
-        {
+		{
 			FreshPosition();
 		}
 		public void FreshPosition()
@@ -44,13 +48,22 @@ namespace QTool
 			{
 				if (_Target.gameObject.activeInHierarchy)
 				{
-					if (IsTargetInWorld)
+					if (Target is RectTransform targetRect)
 					{
-						var position = _Target.position ;
+						var rightUp = targetRect.RightUp();
+						if (IsTargetInWorld)
+						{
+							rightUp = Camera.main.WorldToScreenPoint(Target.position + Target.TransformVector((targetRect.rect.size / 2)));
+						}
+						rectTransform.SetLeftUpPosition(rightUp + Offset * transform.lossyScale);
+					}
+					else
+					{
+						var position = _Target.position;
 						switch (Mode)
 						{
 							case RenderMode.ScreenSpaceOverlay:
-								rectTransform.SetPosition((Vector2)Camera.main.WorldToScreenPoint(position) + Offset);
+								rectTransform.SetPosition((Vector2)Camera.main.WorldToScreenPoint(position) + Offset * transform.lossyScale);
 								break;
 							case RenderMode.ScreenSpaceCamera:
 								var point = Camera.main.WorldToViewportPoint(position);
@@ -59,19 +72,14 @@ namespace QTool
 								break;
 							case RenderMode.WorldSpace:
 								rectTransform.position = position;
-								break;  
+								break;
 							default:
 								break;
 						}
-					}
-					else
-					{
-						rectTransform.SetLeftUpPosition((Target as RectTransform).RightUp() +Offset * transform.lossyScale);
 					}
 
 				}
 			}
 		}
 	}
-
 }
