@@ -21,7 +21,7 @@ namespace QTool
 			}
 		}
 		public RenderMode Mode = RenderMode.ScreenSpaceOverlay;
-		public Vector3 Offset;
+		public Vector2 Offset;
 		bool IsTargetInWorld = false;
 		private void Start()
 		{
@@ -44,14 +44,13 @@ namespace QTool
 			{
 				if (_Target.gameObject.activeInHierarchy)
 				{
-
 					if (IsTargetInWorld)
 					{
-						var position = _Target.position + Offset;
+						var position = _Target.position ;
 						switch (Mode)
 						{
 							case RenderMode.ScreenSpaceOverlay:
-								rectTransform.position = Camera.main.WorldToScreenPoint(position);
+								rectTransform.SetPosition((Vector2)Camera.main.WorldToScreenPoint(position) + Offset);
 								break;
 							case RenderMode.ScreenSpaceCamera:
 								var point = Camera.main.WorldToViewportPoint(position);
@@ -67,7 +66,7 @@ namespace QTool
 					}
 					else
 					{
-						rectTransform.SetLeftUpPosition((Target as RectTransform).RightUp() + (Vector2)Offset * transform.lossyScale);
+						rectTransform.SetLeftUpPosition((Target as RectTransform).RightUp() +Offset * transform.lossyScale);
 					}
 
 				}
