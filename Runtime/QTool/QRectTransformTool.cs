@@ -21,37 +21,25 @@ namespace QTool
 		}
 		public static Vector2 UpRightRectOffset(this RectTransform rectTransform)
         {
-            return new Vector2(rectTransform.Width() * (1 - rectTransform.pivot.x), rectTransform.Height() * (1 - rectTransform.pivot.y));
+            return new Vector2(rectTransform.Width() * (1 - rectTransform.pivot.x), rectTransform.Height() * (1 - rectTransform.pivot.y))* rectTransform.localScale;
         }
         public static Vector2 DownLeftRectOffset(this RectTransform rectTransform)
         {
-            return new Vector2(rectTransform.Width() * (rectTransform.pivot.x), rectTransform.Height() * (rectTransform.pivot.y));
-        }
+            return new Vector2(rectTransform.Width() * (rectTransform.pivot.x), rectTransform.Height() * (rectTransform.pivot.y)) * rectTransform.localScale;
+		}
 
         public static float Height(this RectTransform rectTransform)
         {
-            return rectTransform.rect.size.y;
-        }
+			return rectTransform.rect.size.y * rectTransform.localScale.y;
+		}
         public static float Width(this RectTransform rectTransform)
         {
-            return rectTransform.rect.size.x;
+			return rectTransform.rect.size.x * rectTransform.lossyScale.x;
         }
         public static Vector2 Size(this RectTransform rectTransform)
         {
-            return rectTransform.rect.size;
+			return rectTransform.rect.size * rectTransform.lossyScale;
         }
-		public static float ScaleHeight(this RectTransform rectTransform)
-		{
-			return rectTransform.rect.size.y * rectTransform.lossyScale.y;
-		}
-		public static float ScaleWidth(this RectTransform rectTransform)
-		{
-			return rectTransform.rect.size.x * rectTransform.lossyScale.x;
-		}
-		public static Vector2 ScaleSize(this RectTransform rectTransform)
-		{
-			return new Vector2(rectTransform.ScaleWidth(), rectTransform.ScaleHeight());
-		}
 		public static RectTransform RectTransform(this Transform transform)
         {
             return transform as RectTransform;
