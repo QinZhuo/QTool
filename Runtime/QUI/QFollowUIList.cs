@@ -3,14 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 namespace QTool
 {
-	[RequireComponent(typeof(QObjectList))]
-	public class QFollowList :MonoBehaviour
+	public class QFollowUIList : QObjectList
 	{
-		private QObjectList _ObjectList;
-		public QObjectList ObjectList => _ObjectList ??= GetComponent<QObjectList>();
 		public void FreshPosition()
 		{
-			foreach (var obj in ObjectList.List)
+			foreach (var obj in List)
 			{
 				obj.GetComponent<QFollowUI>()?.FreshPosition();
 			}
@@ -24,11 +21,10 @@ namespace QTool
 					Debug.LogError("follow目标为空");
 					return null;
 				}
-				var obj = ObjectList[target.name+"_"+ target.gameObject.GetHashCode().ToString()];
+				var obj = this[target.name+"_"+ target.gameObject.GetHashCode().ToString()];
 				var followUI = obj.GetComponent<QFollowUI>();
 				if (followUI != null)
 				{
-					followUI.QFollowList = this;
 					followUI.Target = target;
 					return followUI;
 				}

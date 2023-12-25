@@ -886,19 +886,19 @@ namespace QTool
 		{
 			return new Vector3(value.x.GridFixed(size.x), value.y.GridFixed(size.y), value.z.GridFixed(size.z));
 		}
-		public static Vector3 GetCenter(this Transform transform)
+		public static Vector3 GetBoundsCenter(this Transform transform)
 		{
 			return transform.GetBounds().center;
 		}
-		public static void SetCenter(this Transform transform, Vector3 center)
+		public static void SetBoundsCenter(this Transform transform, Vector3 center)
 		{
-			var offset = transform.GetCenter() - transform.position;
+			var offset = transform.GetBoundsCenter() - transform.position;
 			transform.position = center - offset;
 		}
 		public static Vector3 GridFixed(this Transform transform,Vector3 gridSize)
 		{
 			var bounds = transform.GetBounds();
-			transform.SetCenter((bounds.center + bounds.size / 2).GridFixed(bounds.size.GridFixed(gridSize)) - bounds.size / 2);
+			transform.SetBoundsCenter((bounds.center + bounds.size / 2).GridFixed(bounds.size.GridFixed(gridSize)) - bounds.size / 2);
 			transform.position = transform.position.GridFixed(gridSize);
 			return transform.position;
 		}

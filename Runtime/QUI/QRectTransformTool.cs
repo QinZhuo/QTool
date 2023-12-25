@@ -7,109 +7,120 @@ namespace QTool
 {
     public static class QRectTransformTool
     {
-		public static bool ContainsScreenPoint(this RectTransform rectTransform,Vector2 screenPoint)
+		#region 位置点
+		public static bool ContainsScreenPoint(this RectTransform rect, Vector2 screenPoint)
 		{
-			return RectTransformUtility.RectangleContainsScreenPoint(rectTransform, screenPoint);
+			return RectTransformUtility.RectangleContainsScreenPoint(rect, screenPoint);
 		}
-		public static Vector2 ScreenPointToLocalPoint(this RectTransform rectTransform, Vector2 screenPoint)
+		public static Vector2 ScreenPointToLocalPoint(this RectTransform rect, Vector2 screenPoint)
 		{
-			if(RectTransformUtility.ScreenPointToLocalPointInRectangle(rectTransform, screenPoint,Camera.main,out var localPoint))
+			if (RectTransformUtility.ScreenPointToLocalPointInRectangle(rect, screenPoint, Camera.main, out var localPoint))
 			{
 				return localPoint;
 			}
 			return Vector2.zero;
 		}
-		public static Vector2 UpRightRectOffset(this RectTransform rectTransform)
-        {
-            return new Vector2(rectTransform.Width() * (1 - rectTransform.pivot.x), rectTransform.Height() * (1 - rectTransform.pivot.y))* rectTransform.localScale;
-        }
-        public static Vector2 DownLeftRectOffset(this RectTransform rectTransform)
-        {
-            return new Vector2(rectTransform.Width() * (rectTransform.pivot.x), rectTransform.Height() * (rectTransform.pivot.y)) * rectTransform.localScale;
-		}
 
-        public static float Height(this RectTransform rectTransform)
-        {
-			return rectTransform.rect.size.y * rectTransform.localScale.y;
-		}
-        public static float Width(this RectTransform rectTransform)
-        {
-			return rectTransform.rect.size.x * rectTransform.lossyScale.x;
-        }
-        public static Vector2 Size(this RectTransform rectTransform)
-        {
-			return rectTransform.rect.size * rectTransform.lossyScale;
-        }
-		public static RectTransform RectTransform(this Transform transform)
-        {
-            return transform as RectTransform;
-        }
-		public static Vector2 Center(this RectTransform rectTransform)
+		#endregion
+		#region 大小
+		public static float Height(this RectTransform rect)
 		{
-			return rectTransform.DownLeft() + rectTransform.Size() /2;
+			return rect.rect.size.y * rect.lossyScale.y;
 		}
-		public static Vector2 UpRight(this RectTransform rectTransform)
-        {
-            return new Vector2(rectTransform.position.x, rectTransform.position.y) + rectTransform.UpRightRectOffset();
-        }
-        public static Vector2 DownLeft(this RectTransform rectTransform)
-        {
-            return new Vector2(rectTransform.position.x, rectTransform.position.y) - rectTransform.DownLeftRectOffset();
-        }
-		public static void SetDefaultScale(this RectTransform trans)
+		public static float Width(this RectTransform rect)
 		{
-			trans.localScale = new Vector3(1, 1, 1);
+			return rect.rect.size.x * rect.lossyScale.x;
 		}
-
-		public static void SetPivotAndAnchors(this RectTransform trans, Vector2 aVec)
+		public static Vector2 Size(this RectTransform rect)
 		{
-			trans.pivot = aVec;
-			trans.anchorMin = aVec;
-			trans.anchorMax = aVec;
+			return rect.rect.size * rect.lossyScale;
 		}
-
-		public static void SetPositionOfPivot(this RectTransform trans, Vector2 newPos)
+		public static void SetSize(this RectTransform rect, Vector2 newSize)
 		{
-			trans.localPosition = new Vector3(newPos.x, newPos.y, trans.localPosition.z);
-		}
-
-		public static void SetLeftBottomPosition(this RectTransform trans, Vector2 newPos)
-		{
-			trans.localPosition = new Vector3(newPos.x + (trans.pivot.x * trans.rect.width), newPos.y + (trans.pivot.y * trans.rect.height), trans.localPosition.z);
-		}
-
-		public static void SetLeftTopPosition(this RectTransform trans, Vector2 newPos)
-		{
-			trans.localPosition = new Vector3(newPos.x + (trans.pivot.x * trans.rect.width), newPos.y - ((1f - trans.pivot.y) * trans.rect.height), trans.localPosition.z);
-		}
-
-		public static void SetRightBottomPosition(this RectTransform trans, Vector2 newPos)
-		{
-			trans.localPosition = new Vector3(newPos.x - ((1f - trans.pivot.x) * trans.rect.width), newPos.y + (trans.pivot.y * trans.rect.height), trans.localPosition.z);
-		}
-
-		public static void SetRightTopPosition(this RectTransform trans, Vector2 newPos)
-		{
-			trans.localPosition = new Vector3(newPos.x - ((1f - trans.pivot.x) * trans.rect.width), newPos.y - ((1f - trans.pivot.y) * trans.rect.height), trans.localPosition.z);
-		}
-
-		public static void SetSize(this RectTransform trans, Vector2 newSize)
-		{
-			Vector2 oldSize = trans.rect.size;
+			Vector2 oldSize = rect.rect.size;
 			Vector2 deltaSize = newSize - oldSize;
-			trans.offsetMin = trans.offsetMin - new Vector2(deltaSize.x * trans.pivot.x, deltaSize.y * trans.pivot.y);
-			trans.offsetMax = trans.offsetMax + new Vector2(deltaSize.x * (1f - trans.pivot.x), deltaSize.y * (1f - trans.pivot.y));
+			rect.offsetMin = rect.offsetMin - new Vector2(deltaSize.x * rect.pivot.x, deltaSize.y * rect.pivot.y);
+			rect.offsetMax = rect.offsetMax + new Vector2(deltaSize.x * (1f - rect.pivot.x), deltaSize.y * (1f - rect.pivot.y));
 		}
 
-		public static void SetWidth(this RectTransform trans, float newSize)
+		public static void SetWidth(this RectTransform rect, float newSize)
 		{
-			SetSize(trans, new Vector2(newSize, trans.rect.size.y));
+			SetSize(rect, new Vector2(newSize, rect.rect.size.y));
 		}
 
-		public static void SetHeight(this RectTransform trans, float newSize)
+		public static void SetHeight(this RectTransform rect, float newSize)
 		{
-			SetSize(trans, new Vector2(trans.rect.size.x, newSize));
+			SetSize(rect, new Vector2(rect.rect.size.x, newSize));
 		}
+
+		#endregion
+
+		#region 位置
+
+
+
+		public static Vector2 Center(this RectTransform rect)
+		{
+			return rect.LeftDown() + rect.Size() / 2;
+		}
+		public static float Up(this RectTransform rect)
+		{
+			return rect.transform.position.y + rect.Height() * (1 - rect.pivot.y);
+		}
+		public static float Down(this RectTransform rect)
+		{
+			return rect.transform.position.y - rect.Height() * rect.pivot.y;
+		}
+		public static float Left(this RectTransform rect)
+		{
+			return rect.transform.position.x - rect.Width() * rect.pivot.x;
+		}
+
+		public static float Right(this RectTransform rect)
+		{
+			return rect.transform.position.x + rect.Width() * (1 - rect.pivot.x);
+		}
+		public static Vector2 RightUp(this RectTransform rect)
+		{
+			return new Vector2(rect.Right(),rect.Up());
+		}
+		public static Vector2 LeftDown(this RectTransform rect)
+		{
+			return new Vector2(rect.Left(),rect.Down());
+		}
+
+		public static void SetPosition(this RectTransform rect, Vector2 newPos)
+		{
+			rect.position = new Vector3(newPos.x, newPos.y, rect.position.z);
+		}
+		public static void SetPivotAndAnchors(this RectTransform rect, Vector2 aVec)
+		{
+			rect.pivot = aVec;
+			rect.anchorMin = aVec;
+			rect.anchorMax = aVec;
+		}
+		public static void SetLeftDownPosition(this RectTransform rect, Vector2 newPos)
+		{
+			rect.position = new Vector3(newPos.x + rect.Width() * rect.pivot.x, newPos.y + (rect.pivot.y * rect.Height()), rect.position.z);
+		}
+
+		public static void SetLeftUpPosition(this RectTransform rect, Vector2 newPos)
+		{
+			rect.position = new Vector3(newPos.x + (rect.pivot.x * rect.Width()), newPos.y - (1f - rect.pivot.y) * rect.Height(), rect.position.z);
+		}
+
+		public static void SetRightDownPosition(this RectTransform rect, Vector2 newPos)
+		{
+			rect.position = new Vector3(newPos.x - ((1f - rect.pivot.x) * rect.Width()), newPos.y + (rect.pivot.y * rect.Height()), rect.position.z);
+		}
+
+		public static void SetRightUpPosition(this RectTransform rect, Vector2 newPos)
+		{
+			rect.position = new Vector3(newPos.x - ((1f - rect.pivot.x) * rect.Width()), newPos.y - ((1f - rect.pivot.y) * rect.Height()), rect.position.z);
+		}
+
+		#endregion
+		#region 重置
 		public static T ResetRotation<T>(this T comp) where T : Component
 		{
 			comp.transform.rotation = Quaternion.identity;
@@ -133,49 +144,35 @@ namespace QTool
 			comp.transform.localPosition = Vector3.zero;
 			return comp;
 		}
-		public static T RotationEulerAdd<T>(this T comp,Quaternion otherRotation) where T : Component
-		{
-			comp.transform.rotation=Quaternion.Euler(comp.transform.rotation.eulerAngles+otherRotation.eulerAngles);
-			return comp;
-		}
 		public static T Reset<T>(this T comp) where T : Component
 		{
 			comp.ResetRotation().ResetPosition().ResetScale();
 			return comp;
 		}
-
-	
-		public static float Up(this RectTransform rectTransform)
+		#endregion
+		public static RectTransform RectTransform(this Transform rectform)
 		{
-			return rectTransform.transform.position.y + rectTransform.UpRightRectOffset().y;
+			return rectform as RectTransform;
 		}
-		public static float Down(this RectTransform rectTransform)
+		public static bool ParentHas(this Transform rectform,params Transform[] targets)
 		{
-			return rectTransform.transform.position.y - rectTransform.DownLeftRectOffset().y;
-		}
-		public static float Left(this RectTransform rectTransform)
-		{
-			return rectTransform.transform.position.x - rectTransform.DownLeftRectOffset().x;
-		}
-
-		public static float Right(this RectTransform rectTransform)
-		{
-			return rectTransform.transform.position.x + rectTransform.UpRightRectOffset().x;
-		}
-		public static bool ParentHas(this Transform transform,params Transform[] targets)
-		{
-			if (transform.parent == null)
+			if (rectform.parent == null)
 			{
 				return false;
 			}
-			else if (targets.Contains(transform.parent))
+			else if (targets.Contains(rectform.parent))
 			{
 				return true;
 			}
 			else
 			{
-				return transform.parent.ParentHas(targets);
+				return rectform.parent.ParentHas(targets);
 			}
+		}
+		public static T RotationEulerAdd<T>(this T comp, Quaternion otherRotation) where T : Component
+		{
+			comp.transform.rotation = Quaternion.Euler(comp.transform.rotation.eulerAngles + otherRotation.eulerAngles);
+			return comp;
 		}
 	}
 }

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 namespace QTool
 {
-	public class QInteractUIList : QFollowList
+	public class QInteractUIList : QFollowUIList
 	{
 		public static QInteractUIList Instance { get; private set; }
 		private QInteractSystem _Target=null;
