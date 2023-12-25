@@ -75,7 +75,7 @@ namespace QTool.Steam
 			SteamNetworkingUtils.InitRelayNetworkAccess();
 			QDebug.Log(nameof(QSteam) + " 初始化成功 [" + Name + "][" + Id + "]");
 			var commands = Environment.GetCommandLineArgs();
-			for (int i = 0; i < commands.Length-1; i++)
+			for (int i = 0; i < commands.Length-1; i++)  
 			{
 				switch (commands[i])
 				{
