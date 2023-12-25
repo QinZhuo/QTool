@@ -59,7 +59,7 @@ namespace QTool
 								break;
 							case RenderMode.WorldSpace:
 								rectTransform.position = position;
-								break;
+								break;  
 							default:
 								break;
 						}
