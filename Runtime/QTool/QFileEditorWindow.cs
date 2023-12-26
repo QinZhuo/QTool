@@ -149,15 +149,15 @@ namespace QTool
 		{
 			var Toolbar = rootVisualElement.AddVisualElement();
 			Toolbar.style.flexDirection = FlexDirection.Row;
-			FilePathList=QPlayerPrefs.Get(typeof(T).Name + "_" + nameof(FilePathList), FilePathList);
-			FilePathList.RemoveAll(path => !path.Replace('/', '\\').ExistsFile());
+			FilePathList = QPlayerPrefs.Get(typeof(T).Name + "_" + nameof(FilePathList), FilePathList);
+			FilePathList.RemoveAll(path => path.IsNull() || !path.Replace('/', '\\').ExistsFile());
 			while (FilePathList.Count > 20)
 			{
 				FilePathList.Dequeue();
 			}
 			QPlayerPrefs.Set(typeof(T).Name + "_" + nameof(FilePathList), FilePathList);
 #if UNITY_2022_1_OR_NEWER
-			PathPopup = Toolbar.AddPopup("", FilePathList, FilePath?.Replace('/', '\\'), path => { OnLostFocus(); FilePath = path.Replace('\\', '/'); if (!FilePath.ExistsFile()) Data = "";  OnFocus(); });
+			PathPopup = Toolbar.AddPopup("", FilePathList, FilePath?.Replace('/', '\\'), path => { OnLostFocus(); FilePath = path.Replace('\\', '/'); if (!FilePath.ExistsFile()) Data = ""; OnFocus(); });
 #endif
 			Toolbar.AddButton("撤销", Undo);
 		}
