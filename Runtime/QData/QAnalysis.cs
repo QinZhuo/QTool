@@ -15,7 +15,7 @@ namespace QTool
 			游戏_暂离,
 			游戏_错误,
 			游戏_场景,
-			系统地区,
+			系统语言,
 		}
 		public static string PlayerId { private set; get; }
 		public static bool InitOver
@@ -67,7 +67,7 @@ namespace QTool
 				return;
 			}
 			InvokeEvent(nameof(QAnalysisEventName.游戏_开始),new StartInfo().Start());
-			InvokeEvent(nameof(QAnalysisEventName.系统地区), QTool.RealyCulture.EnglishName);
+			InvokeEvent(nameof(QAnalysisEventName.系统语言), Application.systemLanguage);
 			errorInfoList.Clear();
 			Application.focusChanged += OnFocus;
 			Application.logMessageReceived += LogCallback;

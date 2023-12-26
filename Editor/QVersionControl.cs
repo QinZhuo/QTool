@@ -93,24 +93,17 @@ namespace QTool
 			if (!PlayerPrefs.HasKey(nameof(CheckInit)))
 			{
 				var result = PathRun("config --global core.quotepath false", path);
-				var name =PathRun("config user.name", path);
+				var name = PathRun("config user.name", path);
 				var email = PathRun("config user.email", path);
 				Debug.LogError(name + "  " + email);
-				if (name.IsNull()||email.IsNull())
+				if (name.IsNull() || email.IsNull())
 				{
 					EditorUtility.ClearProgressBar();
-					var window =new EditorWindow();
-					window.titleContent = new GUIContent("设置用户名邮箱");
-					window.rootVisualElement.Clear();
-					window.rootVisualElement.AddText("联系用户名", name, value => name = value);
-					window.rootVisualElement.AddText("联系邮箱", email, value => email = value);
-					window.rootVisualElement.AddButton("确定", () =>
+					QEditorWindow.Show("设置用户名邮箱", window =>
 					{
-						window.Close();
-					});
-					window.ShowModal();
-					PathRun("config --global user.email \"" + email + "\"", path);
-					PathRun("config --global user.name \"" + name + "\"", path);
+						PathRun("config --global user.email \"" + window[0] + "\"", path);
+						PathRun("config --global user.name \"" + window[1] + "\"", path);
+					}, "联系用户名", "联系邮箱");
 				}
 				PlayerPrefs.SetInt(nameof(CheckInit), 1);
 			}

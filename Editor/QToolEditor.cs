@@ -60,73 +60,62 @@ namespace QTool
 				}
 			}
 		}
-		private static string command = "";
-		private static bool commandPath = true;
-		[MenuItem("QTool/终端命令")]
+		[MenuItem("QTool/测试/终端命令")]
 		public static void ProcessCommand()
 		{
 			EditorUtility.ClearProgressBar();
-			var window = new EditorWindow();
-			window.titleContent = new GUIContent("终端命令");
-			window.rootVisualElement.Clear();
-			window.rootVisualElement.AddText("命令", command, value => command = value);
-			window.rootVisualElement.AddToggle("包含运行路径", commandPath, value => commandPath = value);
-			window.rootVisualElement.AddButton("确定", () =>
+			QEditorWindow.Show("终端命令", window =>
 			{
-				window.Close();
-			}); 
-			window.rootVisualElement.AddButton("取消", () =>
-			{
-				command = "";
-				window.Close();
-			});
-			window.ShowModal();
-			if(command.SplitTowString(" ",out var start,out var end))
-			{
-				QTool.ProcessCommand(start, end, commandPath? Application.dataPath:"");
-			}
+				Debug.LogError(window[0]);
+				if (window[0].IsNull()) return;
+				if (window[0].SplitTowString(" ", out var start, out var end))
+				{
+					QTool.ProcessCommand(start, end, "");
+				}
+			}, "命令");
 		}
 		[MenuItem("QTool/翻译/查看翻译语言信息")]
-		public static void LanguageTest()
+		public static void QLocalizationDataLog()
 		{
 			Debug.LogError(QLocalizationData.List.ToOneString());
 			GUIUtility.systemCopyBuffer = QLocalizationData.List.ToOneString();
 		}
-		//[MenuItem("QTool/翻译/生成自动翻译文件")]
-		//public static async void AutoTranslate() 
-		//{
-		//	var newData = new QDataList();
-		//	newData.SetTitles(QLocalization.QTranslateData.TitleRow.ToArray());
-		//	QDictionary<string, string> keyCache = new QDictionary<string, string>();
-			
-		//	for (int rowIndex = 0; rowIndex < QLocalization.QTranslateData.Count; rowIndex++)
-		//	{
-		//		var data = QLocalization.QTranslateData[rowIndex];
-		//		for (int i = 2; i < data.Count; i++)
-		//		{
-		//			keyCache.Clear();
-		//			var text =  data[1];
-		//			keyCache[ "%".GetHashCode().ToString()] = "%";
-		//			text = text.Replace("%", "[" + "%".GetHashCode() + "]");
-		//			text = text.ForeachBlockValue('{', '}', (key) => { var value = key.GetHashCode().ToString();keyCache[value] ="{"+ key+"}";   return "["+value+"]"; });
-		//			text = text.ForeachBlockValue('<', '>', (key) => { var value = key.GetHashCode().ToString(); keyCache[value] ="<" +key+">"; return "["+value+"]"; });
-		//			var key = QLocalization.QTranslateData.TitleRow[i];
-
-		//			if (!text.IsNull() && data[i].IsNull() && !QLocalization.QTranslateData.TitleRow[i].IsNull()&&!key.IsNull()&& QLocalization.TranslateKeys.ContainsKey(key))
-		//			{  
-		//				var language = QLocalization.GetTranslateKey(key);
-		//				var newLine = newData[data[0]];
-		//				newLine[1] = data[1];
-		//			    var translateText = "#" + await text.NetworkTranslateAsync(language.WebAPI);
-		//				translateText = translateText.ForeachBlockValue('[', ']', (key) => keyCache.ContainsKey(key)?keyCache[key]:key );
-		//				newLine[i] = translateText;
-		//				QDebug.Log("翻译" + language.Key + " " + rowIndex + "/" + QLocalization.QTranslateData.Count + " " + " [" + data[1] + "]=>[" + newLine[i] + "]");
-		//			}
-		//		}
-		//	}
-		//	Debug.LogError(newData.ToString());
-		//	newData.Save(QDataList.GetModPath( nameof(QLocalization.QTranslateData),nameof(AutoTranslate)));
-		//}
+		[MenuItem("QTool/翻译/翻译所有文件夹名")]
+		public static void TranslateDirectory()
+		{
+			QEditorWindow.Show("翻译所有文件名", window =>
+			{
+				var rootPath = window[0];
+				if (rootPath.IsNull()) return;
+				rootPath.ForeachAllDirectory(async path =>
+				{
+					var name = path.SplitEndString("/");
+					if (!name.Contains("_Q_"))
+					{
+						var newPath = path + "_Q_" + await name.NetworkTranslateAsync(SystemLanguage.English, SystemLanguage.Chinese);
+						Directory.Move(path, newPath);
+					}
+				});
+			}, "文件夹路径");
+		}
+		[MenuItem("QTool/翻译/翻译所有文件名")]
+		public static void TranslateFile()
+		{
+			QEditorWindow.Show("翻译所有文件名", window =>
+			{
+				var rootPath = window[0];
+				if (rootPath.IsNull()) return;
+				rootPath.ForeachAllFiles(async path =>
+				{
+					var name = path.FileName();
+					if (!name.Contains("_Q_"))
+					{
+						var newName = name + "_Q_" + await name.NetworkTranslateAsync(SystemLanguage.English, SystemLanguage.Chinese);
+						path.FileRename(newName);
+					}
+				});
+			}, "文件夹路径");
+		}
 		[MenuItem("QTool/测试/QId对象信息")]
 		public static void QIdObjectInfo()
 		{
@@ -170,6 +159,54 @@ namespace QTool
 		public static void OpenSaveData()
 		{
 			System.Diagnostics.Process.Start("explorer.exe", Application.persistentDataPath.Replace('/','\\'));
+		}
+	}
+	public class QLoactionWindow : EditorWindow
+	{
+		public SystemLanguage From = SystemLanguage.English;
+		public SystemLanguage To = SystemLanguage.Chinese;
+		public string text;
+		[MenuItem("QTool/窗口/翻译")]
+		public static void OpenWindow()
+		{
+			var window = GetWindow<QLoactionWindow>();
+			window.minSize = new Vector2(400, 300);
+		}
+		private void CreateGUI()
+		{
+			rootVisualElement.AddEnum("文本语言", From, value => From = (SystemLanguage)value);
+			rootVisualElement.AddEnum("目标语言", To, value => To = (SystemLanguage)value);
+			var textView = rootVisualElement.AddText("", text, value => text = value, true);
+			rootVisualElement.AddButton("翻译", async () => { textView.value = await text.NetworkTranslateAsync(From,To); Debug.Log(textView.value); });
+		}
+	}
+	public class QEditorWindow : EditorWindow
+	{
+		public class Text
+		{
+			public string value;
+		}
+		private QList<Text> Texts = new QList<Text>(() => new Text());
+		public string this[int index] => Texts[index].value;
+		public static bool Show(string title, Action<QEditorWindow> comfirmAction, params string[] inputTextName)
+		{
+			var window = CreateInstance<QEditorWindow>();
+			window.maxSize = new Vector2(300, 200);
+			bool comfirm = false;
+			window.titleContent = new GUIContent(title);
+			window.rootVisualElement.Clear();
+			for (int i = 0; i < inputTextName.Length; i++)
+			{
+				var text = window.Texts[i];
+				window.rootVisualElement.AddText(inputTextName[i], window[i], value => text.value= value);
+			}
+			window.rootVisualElement.AddButton("确定", () => { comfirm = true; window.Close(); });
+			window.ShowModal();
+			if (comfirm)
+			{
+				comfirmAction(window);
+			}
+			return comfirm;
 		}
 	}
 	[InitializeOnLoad]
@@ -217,7 +254,7 @@ namespace QTool
 			{
 				case BuildTargetGroup.Standalone:
 					{
-						var path= QFileManager.GetFolderPath(report.summary.outputPath);
+						var path= QFileManager.DirectoryName(report.summary.outputPath);
 						var tempPath = path+"/"+Application.productName+ "_BackUpThisFolder_ButDontShipItWithYourGame";
 						if (Directory.Exists(tempPath))
 						{

@@ -34,7 +34,6 @@ namespace QTool
     {
 		public static bool IsPlaying => Application.isPlaying && !QToolManager.Destoryed;
 		public static bool IsBuilding { set; get; }
-		public static CultureInfo RealyCulture= CultureInfo.CurrentCulture;
 		private static string _LocalIp = null;
 		public static string LocalIp => _LocalIp??= Dns.GetHostEntry(Dns.GetHostName()).AddressList.FirstOrDefault(a => a.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork).ToString();
 
@@ -43,17 +42,14 @@ namespace QTool
 #else
 		[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
 #endif
-		static void Init()  
+		static void Init()
 		{
-			RealyCulture = CultureInfo.CurrentCulture;
-			QDebug.Log("系统语言环境"+RealyCulture);
-			CultureInfo.CurrentCulture = new CultureInfo("en-US");
-			CultureInfo.DefaultThreadCurrentCulture = new CultureInfo("en-US");
+			CultureInfo.CurrentCulture = new CultureInfo(QLocalizationCode.en_US.ToCodeString());
+			CultureInfo.DefaultThreadCurrentCulture = CultureInfo.CurrentCulture;
 			SceneManager.sceneUnloaded += scene =>
 			{
 				QEventManager.InvokeEvent(QToolEvent.卸载场景);
 			};
-			QLocalization.KeyReplace["版本号"] = Application.version;
 		}
 		public static void Quit()
 		{
@@ -75,15 +71,7 @@ namespace QTool
 			QDebug.Log(nameof(RunURLWeb) + url);
 			Application.OpenURL(url);
 		}
-		const string NetworkTranslateURL = "https://translate.googleapis.com/translate_a/single?client=gtx&sl={2}&tl={1}&dt=t&q={0}";
-
-		static List<List<List<string>>> translateData = new List<List<List<string>>>();
-		public static async Task<string> NetworkTranslateAsync(this string chineseText, string toLanguage="en",string fromLanguage= "zh-CN")
-		{
-			var jsonStr= await QTool.RunURLAsync(string.Format(NetworkTranslateURL, chineseText, toLanguage,fromLanguage ));
-			jsonStr.ParseQData(translateData);
-			return translateData[0][0][0];
-		}
+	
 		public static async Task<string> RunURLAsync(this string requestUrl)
 		{
 			UnityWebRequest req = UnityWebRequest.Get(requestUrl);

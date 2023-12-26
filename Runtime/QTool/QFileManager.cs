@@ -71,12 +71,12 @@ namespace QTool
 			}
 			return path;
         }
-        public static void ForeachDirectoryFiles(this string rootPath, Action<string> action)
+        public static void ForeachAllFiles(this string rootPath, Action<string> action)
         {
             ForeachFiles(rootPath, action);
             ForeachDirectory(rootPath, (path) =>
             {
-                path.ForeachDirectoryFiles(action);
+                path.ForeachAllFiles(action);
             });
         }
         public static int DirectoryFileCount(this string rootPath)
@@ -92,6 +92,10 @@ namespace QTool
         {
             return ExistsDirectory(rootPath) ? Directory.GetFiles(rootPath).Length / 2 : 0;
         }
+		public static string DirectoryName(this string path, bool withExtension = false)
+		{
+			return Path.GetDirectoryName(path);
+		}
 		public static string FileName(this string path,bool withExtension=false)
 		{
 			if (withExtension)
@@ -103,31 +107,38 @@ namespace QTool
 				return Path.GetFileNameWithoutExtension(path);
 			}
 		}
+		public static void FileRename(this string path,string newName)
+		{
+			var fileDirectory = path.DirectoryName();
+			var name = path.FileName();
+			var ext = path.FileExtension();
+			if (File.Exists(path))
+			{
+				File.Move(fileDirectory + "\\" + name + ext, fileDirectory + "\\" + newName + ext);
+			}
+		}
 		public static string FileExtension(this string path)
 		{
 			if (Path.HasExtension(path))
 			{
-				return "."+Path.GetExtension(path);
+				return Path.GetExtension(path);
 			}
 			else
 			{
 				return "";
 			}
 		}
-		public static void ForeachAllDirectoryWith(this string rootPath, string endsWith, Action<string> action)
-        {
-            rootPath.ForeachDirectory((path) =>
-            {
-                if (path.EndsWith(endsWith))
-                {
-                    action?.Invoke(path.Replace('\\', '/'));
-                }
-                else
-                {
-                    path.ForeachAllDirectoryWith(endsWith, action);
-                }
-            });
-        }
+		public static void ForeachAllDirectory(this string rootPath, Action<string> action, string endsWith = "")
+		{
+			rootPath.ForeachDirectory((path) =>
+			{
+				if (endsWith.IsNull() || path.EndsWith(endsWith))
+				{
+					action?.Invoke(path.Replace('\\', '/'));
+					path.ForeachAllDirectory(action, endsWith);
+				}
+			});
+		}
 		public const string SecretExtension = ".sec";
 		private static byte[] _SecretKey = null;
 		public static byte[] SecretKey => _SecretKey??=(Application.companyName.IsNull()||Application.productName.IsNull())? "QTSC".GetBytes():(Application.companyName.Substring(0,2)+Application.productName.Substring(0,2)).GetBytes();
@@ -247,7 +258,7 @@ namespace QTool
 			CheckDirectoryPath(targetPath + "/");
 			if (Directory.Exists(sourcePath))
 			{
-				sourcePath.ForeachDirectoryFiles((file) =>
+				sourcePath.ForeachAllFiles((file) =>
 				{
 					var newFile = file.Replace(sourcePath.CheckPath(), targetPath.CheckPath());
 					newFile.CheckDirectoryPath();
@@ -372,7 +383,7 @@ namespace QTool
 				else
 				{
 					path = Path.GetFileNameWithoutExtension(path);
-					path.ForeachDirectoryFiles((filePath) =>
+					path.ForeachAllFiles((filePath) =>
 					{
 						action(Load(filePath, defaultValue),filePath);
 					});
@@ -382,20 +393,10 @@ namespace QTool
    
         public static void ClearData(this string path)
         {
-            var directoryPath = GetFolderPath(path);
+            var directoryPath = DirectoryName(path);
             Directory.Delete(directoryPath, true);
          
         }
-        /// <summary>
-        /// 获取文件夹路径
-        /// </summary>
-        public static string GetFolderPath(this string path)
-        {
-            return Path.GetDirectoryName(path);
-        }
-    
-     
-   
 		public static void SaveQData<T>(this T data,string path)
 		{
 			Save(path, data.ToQData());
@@ -671,7 +672,7 @@ namespace QTool
 			tex.LoadImage(bytes);
 			return tex;
 		}
-		public static string SelectOpenPath(string title = "打开文件", string extension = "obj", string directory = "Assets")
+		public static string SelectOpenPath(string title = "打开文件", string extension = "*", string directory = "Assets")
         {
             var dialog = new FileDialog
             {
@@ -686,7 +687,7 @@ namespace QTool
             }
             return "";
         }
-        public static string SelectSavePath(string title = "保存文件", string directory= "Assets", string defaultName="newfile", string extension = "obj" )
+        public static string SelectSavePath(string title = "保存文件", string directory= "Assets", string defaultName="newfile", string extension = "*" )
         {
             var dialog = new FileDialog
             {
