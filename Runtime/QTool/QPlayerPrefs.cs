@@ -5,13 +5,20 @@ namespace QTool
 {
 	public static class QPlayerPrefs
 	{
-		public static QDataList Data { get; private set; } = QDataList.Load(QFileManager.SaveDataPathRoot + "/" + nameof(QPlayerPrefs) + QFileManager.SecretExtension, () => new QDataList());
+		private static QDataList Data { get; set; } = QDataList.Load(QFileManager.SaveDataPathRoot + "/" + nameof(QPlayerPrefs) + QFileManager.SecretExtension, () => new QDataList());
 #if UNITY_EDITOR
 		static QPlayerPrefs()
 		{
-			QDebug.Log("本地数据\n" + Data.ToString());
+			QDebug.Log("读取预设\n" + Data.ToString());
 		}
 #endif
+		private static void Save()
+		{
+			Data.Save();
+#if UNITY_EDITOR
+			QDebug.Log("保存预设\n" + Data.ToString());
+#endif
+		}
 		public static bool HasKey(string key)
 		{
 			return Data.ContainsKey(key);
@@ -19,13 +26,14 @@ namespace QTool
 		public static void DeleteKey(string key)
 		{  
 			Data.RemoveKey(key);
-			Data.Save();
+			Save();
 		}
 		public static void DeleteAll()
 		{
 			Data.Clear();
-			Data.Save();
+			Save();
 		}
+	
 		public static void Set<T>(string key,T value)
 		{
 			if (key.IsNull())
@@ -34,7 +42,7 @@ namespace QTool
 				return;
 			}
 			Data[key].SetValue(value);
-			Data.Save();
+			Save();
 		}
 		public static void SetInt(string key, int value)
 		{
