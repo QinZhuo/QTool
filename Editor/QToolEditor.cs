@@ -13,6 +13,7 @@ using UnityEditor.Callbacks;
 using UnityEditor.Build;
 using QTool.Inspector;
 using System.IO.Compression;
+using UnityEngine.UIElements;
 
 #if Addressable
 using UnityEditor.AddressableAssets.Settings;
@@ -74,7 +75,7 @@ namespace QTool
 				}
 			}, "命令");
 		}
-		[MenuItem("QTool/翻译/查看翻译语言信息")]
+		[MenuItem("QTool/翻译/查看本地化信息")]
 		public static void QLocalizationDataLog()
 		{
 			Debug.LogError(QLocalizationData.List.ToOneString());
@@ -163,9 +164,8 @@ namespace QTool
 	}
 	public class QLoactionWindow : EditorWindow
 	{
-		public SystemLanguage From = SystemLanguage.English;
-		public SystemLanguage To = SystemLanguage.Chinese;
-		public string text;
+		public SystemLanguage From = SystemLanguage.ChineseSimplified;
+		public List<SystemLanguage> ToList = new List<SystemLanguage>() { SystemLanguage.English };
 		[MenuItem("QTool/窗口/翻译")]
 		public static void OpenWindow()
 		{
@@ -174,10 +174,51 @@ namespace QTool
 		}
 		private void CreateGUI()
 		{
-			rootVisualElement.AddEnum("文本语言", From, value => From = (SystemLanguage)value);
-			rootVisualElement.AddEnum("目标语言", To, value => To = (SystemLanguage)value);
-			var textView = rootVisualElement.AddText("", text, value => text = value, true);
-			rootVisualElement.AddButton("翻译", async () => { textView.value = await text.NetworkTranslateAsync(From,To); Debug.Log(textView.value); });
+			QPlayerPrefs.Get(nameof(QLoactionWindow) + "_" + nameof(ToList), ToList);
+			Label toText = null;
+			rootVisualElement.AddEnum("当前语言", From, value => From = (SystemLanguage)value);
+			var fromText = rootVisualElement.AddText("", "", null, true);
+			rootVisualElement.RegisterCallback<ClickEvent>(async data =>
+			{
+				toText.text = "";
+				if (!fromText.text.IsNull())
+				{
+					foreach (var To in ToList)
+					{
+						toText.text += await fromText.text.NetworkTranslateAsync(From, To)+"\n";
+					}
+					GUIUtility.systemCopyBuffer = toText.text;
+				}
+			});
+			rootVisualElement.Add("目标语言", ToList, typeof(List<SystemLanguage>), newList =>
+			{
+				ToList = (List<SystemLanguage>)newList;
+				QPlayerPrefs.Set(nameof(QLoactionWindow) + "_" + nameof(ToList), ToList);
+			});
+			toText = rootVisualElement.AddLabel("");
+			rootVisualElement.AddButton("翻译" + nameof(QLocalization) + "本地化信息", QLocalizationTranslate);
+		}
+		public async void QLocalizationTranslate()
+		{
+			var fromData = QLocalizationData.LoadQDataList(From.ToString());
+			foreach (var To in ToList)
+			{
+				var toData = QLocalizationData.LoadQDataList(To.ToString());
+				var valueTitle = nameof(QLocalizationData.Localization);
+				foreach (var data in fromData)
+				{
+					var toDataValue = toData[data.Key][valueTitle];
+					if (!data.IsNull() && (toDataValue.IsNull() || toDataValue.EndsWith(QLocalizationData.AutoTranslateEndKey)))
+					{
+						toData[data.Key][valueTitle] = await data[valueTitle].NetworkTranslateAsync(From, To) + QLocalizationData.AutoTranslateEndKey;
+						QDebug.Log("翻译[" + data[valueTitle] + "] => " + To + " => [" + toData[data.Key][valueTitle] + "]");
+						await Task.Delay(100);
+					}
+				}
+				toData.Save();
+			}
+			QDebug.Log("翻译完成");
+			AssetDatabase.Refresh();
 		}
 	}
 	public class QEditorWindow : EditorWindow

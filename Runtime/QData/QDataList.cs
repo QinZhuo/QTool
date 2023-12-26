@@ -12,7 +12,7 @@ namespace QTool
     public class QDataList: QList<string, QDataRow>
 	{
 	
-		public static QDataList LoadData(string path,System.Func<QDataList> autoCreate=null)
+		public static QDataList Load(string path,System.Func<QDataList> autoCreate=null)
         {
 			QDataList data = null;
 			try
@@ -45,14 +45,14 @@ namespace QTool
 	
      
         public string LoadPath { get; internal set; }
-        public void Save(string path = null)
-        {
-            if (string.IsNullOrEmpty(path))
-            {
-                path = LoadPath;
+		public void Save(string path = null)
+		{
+			if (string.IsNullOrEmpty(path))
+			{
+				path = LoadPath;
 			}
 			QFileManager.Save(path, ToString());
-        }
+		}
         public int GetTitleIndex(string title)
         {
             var index = TitleRow.IndexOf(title);
@@ -189,8 +189,8 @@ namespace QTool
 			foreach (var type in typeof(QDataList<>).GetAllTypes())
 			{
 				await QTask.Step();
-				var result= type.InvokeStaticFunction("LoadAsync");
-				if(result is Task task)
+				var result = type.InvokeStaticFunction(nameof(QDataList<QLocalizationData>.PreLoadAsync));
+				if (result is Task task)
 				{
 					QSceneTool.PreLoadList.Add(task);
 				}
@@ -200,7 +200,7 @@ namespace QTool
 	/// <summary>
 	/// 运行时静态数据表 从Resouces文件夹加载字符数据 通过静态函数访问 只读
 	/// </summary>
-	public abstract class QDataList<T>: IKey<string> where T : QDataList<T>, new()
+	public abstract class QDataList<T> : IKey<string> where T : QDataList<T>, new()
 	{
 		[QName("Key")]
 		public virtual string Key { get; set; }
@@ -227,14 +227,7 @@ namespace QTool
 			}
 			return value;
 		}
-		public static async Task LoadAsync()
-		{
-			if (_List == null)
-			{
-				_List = new QList<string, T>();
-				await LoadQDataList().ParseQDataListAsync(_List).Run();
-			}
-		}
+
 		private static QList<string, T> _List = null;
 		public static QList<string, T> List
 		{
@@ -242,38 +235,32 @@ namespace QTool
 			{
 				if (_List == null)
 				{
-					FreshList();
+					Load();
 				}
 				return _List;
 			}
 		}
 		#region 加载数据
-		public static string ResourcesPathRoot => QFileManager.ResourcesPathRoot + "/" + nameof(QDataList) + "Asset";
-		public static string ModPath => QFileManager.ModPathRoot + "/" + nameof(QDataList) + "Asset";
-		public static string GetResourcesDataPath(string name, string child = null)
+		public static string GetResourcesPath(string key = null)
 		{
-			return ResourcesPathRoot.MergePath(name).MergePath(child) + ".txt";
-		}
-		public static string GetModPath(string name, string child = null)
-		{
-			return ModPath.MergePath(name).MergePath(child) + ".txt";
+			return (QFileManager.ResourcesPathRoot + "/" + nameof(QDataList) + "Asset").MergePath(typeof(T).Name).MergePath(key) + ".txt";
 		}
 		public static QDataList LoadQDataList(string key = null)
 		{
-			var Key = typeof(T).Name.MergePath(key);
-			QDebug.Begin("加载 QDataList<" + Key + "> 数据 ");
-			var dataList = QDataList.LoadData(GetResourcesDataPath(Key), () => new List<T> { new T { Key = "测试Key" }, }.ToQDataList());
-			//if (QToolSetting.Instance != null && QToolSetting.Instance.modeList.Contains(Key))
-			//{
-			//	QFileManager.LoadAll(GetModPath(Key), (fileValue, loadPath) =>
-			//	{
-			//		dataList.Add(new QDataList(fileValue) { LoadPath = loadPath });
-			//	}, "{}");
-			//}
-			QDebug.End("加载 QDataList<" + Key + "> 数据 ", dataList.Count + " 条");
+			QDebug.Begin("加载 QDataList<" + typeof(T) + "> 数据 ");
+			var dataList = QDataList.Load(GetResourcesPath(key), () => new List<T> { new T { Key = Application.productName }, }.ToQDataList());
+			QDebug.End("加载 QDataList<" + typeof(T) + "> 数据 ", dataList.Count + " 条");
 			return dataList;
 		}
-		public static void FreshList(string key = null)
+		public static async Task PreLoadAsync()
+		{
+			if (_List == null)
+			{
+				_List = new QList<string, T>();
+				await LoadQDataList().ParseQDataListAsync(_List).Run();
+			}
+		}
+		public static void Load(string key = null)
 		{
 			_List = new QList<string, T>();
 			LoadQDataList(key).ParseQDataList(_List);

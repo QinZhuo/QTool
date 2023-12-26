@@ -28,8 +28,6 @@ namespace QTool
 				}
 			}
 		}
-		public static string ModPathRoot=> Application.streamingAssetsPath;
-
 		public const string ResourcesPathRoot = "Assets/Resources";
 #if UNITY_SWITCH_API
 		public static nn.account.Uid userId;

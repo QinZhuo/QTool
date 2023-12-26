@@ -62,7 +62,7 @@ namespace QTool
 				if (value != Language)
 				{
 					QPlayerPrefs.Set(nameof(Language), value);
-					QLocalizationData.FreshList(value.ToString());
+					QLocalizationData.Load(value.ToString());
 					OnLanguageChange?.Invoke();
 				}
 			}
@@ -81,6 +81,10 @@ namespace QTool
 				QDebug.LogWarning("缺少翻译[" + value + "][" + Language + "]");
 			}
 #endif
+			if (value.EndsWith(QLocalizationData.AutoTranslateEndKey))
+			{
+				value = value.Substring(0, value.Length - QLocalizationData.AutoTranslateEndKey.Length);
+			}
 			return value;
 		}
 		public static QDictionary<string, string> KeyReplace = new QDictionary<string, string>();
@@ -100,11 +104,12 @@ namespace QTool
 	}
 	public class QLocalizationData : QDataList<QLocalizationData>
 	{
+		public const string AutoTranslateEndKey = " [Auto]";
 		[QName]
 		public string Localization { get; private set; }
 		static QLocalizationData()
 		{
-			FreshList(nameof(SystemLanguage.ChineseSimplified));
+			Load(nameof(SystemLanguage.ChineseSimplified));
 		}
 	}
 	public static class QLocalizationTool
@@ -113,11 +118,46 @@ namespace QTool
 		const string NetworkTranslateURL = "https://translate.googleapis.com/translate_a/single?client=gtx&sl={2}&tl={1}&dt=t&q={0}";
 
 		static List<List<List<string>>> translateData = new List<List<List<string>>>();
-		public static async Task<string> NetworkTranslateAsync(this string chineseText, QLocalizationCode fromLanguage, QLocalizationCode toLanguage)
+		public static async Task<string> NetworkTranslateAsync(this string text, QLocalizationCode fromLanguage, QLocalizationCode toLanguage)
 		{
-			var jsonStr = await QTool.RunURLAsync(string.Format(NetworkTranslateURL, chineseText, toLanguage, fromLanguage));
-			jsonStr.ParseQData(translateData);
-			return translateData[0][0][0];
+			if (text.IsNull()) return text;
+
+			QDictionary<string, string> IgnoreList = null;
+			if (text.Contains("{") && text.Contains("}"))
+			{
+				IgnoreList = new QDictionary<string, string>();
+				text = text.ForeachBlockValue('{', '}', key =>
+				 {
+					 var newKey = key.GetHashCode().ToString();
+					 IgnoreList[newKey] = key;
+					 return "[" + newKey + "]";
+				 });
+			}
+			try
+			{
+				var jsonStr = await QTool.RunURLAsync(string.Format(NetworkTranslateURL, text, toLanguage, fromLanguage));
+				jsonStr.ParseQData(translateData);
+				text = translateData[0][0][0];
+			}
+			catch (System.Exception e)
+			{
+				Debug.LogError("翻译出错[" + text + "] \n" + e);
+			}
+			if (IgnoreList != null)
+			{
+				text = text.ForeachBlockValue('[', ']', key =>
+				 {
+					 if (IgnoreList.ContainsKey(key))
+					 {
+						 return "{" + IgnoreList[key] + "}";
+					 }
+					 else
+					 {
+						 return key;
+					 }
+				 });
+			}
+			return text;
 		}
 		public static async Task<string> NetworkTranslateAsync(this string chineseText, SystemLanguage from = SystemLanguage.English, SystemLanguage to = SystemLanguage.ChineseSimplified)
 		{
