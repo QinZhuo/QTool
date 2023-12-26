@@ -62,7 +62,7 @@ namespace QTool
 		#region 静态方法
 		public static SystemLanguage Language
 		{
-			get => QPlayerPrefs.Get(nameof(Language), SystemLanguage.ChineseSimplified);
+			get => QPlayerPrefs.Get(nameof(Language), Application.systemLanguage);
 			set
 			{
 				if (value != Language)
@@ -115,7 +115,7 @@ namespace QTool
 		public string Localization { get; private set; }
 		static QLocalizationData()
 		{
-			Load(nameof(SystemLanguage.ChineseSimplified));
+			Load(Application.systemLanguage.ToString());
 		}
 	}
 	public static class QLocalizationTool
