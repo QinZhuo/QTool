@@ -70,7 +70,14 @@ namespace QTool
 			}
 			else
 			{
-				return Data[key].GetValue(1,defaultValue);
+				var data= Data[key].GetValue(1,defaultValue);
+#if UNITY_EDITOR
+				if (data.IsNull())
+				{
+					QDebug.LogError("读取预设[" + key + "]为空[" + Data[key] + "]");
+				}
+#endif
+				return data;
 			}
 		}
 		public static int GetInt(string key, int defaultValue = 0)
