@@ -15,9 +15,6 @@ namespace QTool
 		private static void Save()
 		{
 			Data.Save();
-#if UNITY_EDITOR
-			QDebug.Log("保存预设\n" + Data.ToString());
-#endif
 		}
 		public static bool HasKey(string key)
 		{
