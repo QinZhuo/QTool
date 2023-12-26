@@ -195,6 +195,7 @@ namespace QTool
 					fromDataList.Save();
 					GUIUtility.systemCopyBuffer = toText.text;
 					AssetDatabase.Refresh();
+					QLocalizationData.Fresh();
 				}
 			});
 			rootVisualElement.AddButton("翻译全部" + nameof(QLocalization) + "本地化信息", QLocalizationTranslate);
@@ -214,6 +215,7 @@ namespace QTool
 			}
 			QDebug.Log("翻译完成");
 			AssetDatabase.Refresh();
+			QLocalizationData.Fresh();
 		}
 		private const string TitleKey = nameof(QLocalizationData.Localization);
 		private async Task CheckTranslate(QDataRow fromData, QDataList toDataList, SystemLanguage toLanguage)

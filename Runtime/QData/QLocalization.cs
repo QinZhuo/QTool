@@ -115,6 +115,10 @@ namespace QTool
 		public string Localization { get; private set; }
 		static QLocalizationData()
 		{
+			Fresh();
+		}
+		public static void Fresh()
+		{
 			Load(QLocalization.Language.ToString());
 		}
 	}
