@@ -5,7 +5,13 @@ namespace QTool
 {
 	public static class QPlayerPrefs
 	{
-		public static QDataList Data { get; private set; } = QDataList.Load(QFileManager.SaveDataPathRoot + "/" + nameof(QPlayerPrefs)+QFileManager.SecretExtension,()=>new QDataList());
+		public static QDataList Data { get; private set; } = QDataList.Load(QFileManager.SaveDataPathRoot + "/" + nameof(QPlayerPrefs) + QFileManager.SecretExtension, () => new QDataList());
+#if UNITY_EDITOR
+		static QPlayerPrefs()
+		{
+			QDebug.Log("本地数据\n" + Data.ToString());
+		}
+#endif
 		public static bool HasKey(string key)
 		{
 			return Data.ContainsKey(key);
