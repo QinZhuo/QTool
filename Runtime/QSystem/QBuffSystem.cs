@@ -6,76 +6,6 @@ using QTool.FlowGraph;
 
 namespace QTool
 {
-	public abstract class QEffectData<T> : QDataList<T> where T : QEffectData<T>, IKey<string>, new()
-	{
-		private string GetAssetPath(string key)
-		{
-			return "Assets/Resources/" + nameof(QFlowGraph) + "/" + typeof(T).Name + "/" + key + ".asset";
-		}
-		[QIgnore]
-		protected string m_effectInfo = "";
-		[QName("效果说明")]
-		public virtual string EffectInfo
-		{
-			get
-			{
-				if (m_effectInfo.IsNull() && Effect != null)
-				{
-					m_effectInfo = Effect.Graph.QDataCopy().ToInfoString();
-				}
-				return m_effectInfo;
-			}
-			protected set => m_effectInfo = value;
-		}
-		[QIgnore]
-		protected QFlowGraphAsset m_effect = null;
-		[QName("效果")]
-		public virtual QFlowGraphAsset Effect
-		{
-			get { if (!Application.isPlaying) m_effect = null; return m_effect ??= QTool.LoadAndCreate<QFlowGraphAsset>(nameof(QFlowGraph) + "/" + typeof(T).Name + "/" + Key); }
-			protected set => m_effect = value;
-		}
-	}
-	public abstract class QBuffData<T> : QEffectData<T> where T : QBuffData<T>, IKey<string>, new()
-	{
-		[QName("最大层数")]
-		public int MaxCount { get; protected set; } = -1;
-		public class Runtime : QRuntime<Runtime, T>
-		{
-			[QName("层数")]
-			public QRuntimeValue Count { get; private set; } = new QRuntimeValue();
-
-			[QName("时间")]
-			public QRuntimeRangeValue Time { get; private set; } = new QRuntimeRangeValue();
-			public QFlowGraph Graph { get; private set; }
-			protected override void Init(string key)
-			{
-				base.Init(key);
-				if (Data.Effect != null)
-				{
-					Graph = Data.Effect.Graph.QDataCopy();
-					Graph.RegisterValue(this);
-				}
-			}
-			public override void OnDestroy()
-			{
-				base.OnDestroy();
-				if (Graph != null)
-				{
-					Graph.UnRegisterValue(this);
-					Graph = null;
-				}
-			}
-			public void InvokeEvent(string key)
-			{
-				InvokeEventIEnumerator(key).Start();
-			}
-			public IEnumerator InvokeEventIEnumerator(string key)
-			{
-				yield return Graph?.InvokeEventIEnumerator(key);
-			}
-		}
-	}
 	public class QBuffSystem<BuffData> where BuffData : QBuffData<BuffData>, new()
 	{
 		const string AddEventKey = "添加";
@@ -313,5 +243,78 @@ namespace QTool
 			}
 		}
 
+	}
+
+
+
+	public abstract class QBuffData<T> : QEffectData<T> where T : QBuffData<T>, IKey<string>, new()
+	{
+		[QName("最大层数")]
+		public int MaxCount { get; protected set; } = -1;
+		public class Runtime : QRuntime<Runtime, T>
+		{
+			[QName("层数")]
+			public QRuntimeValue Count { get; private set; } = new QRuntimeValue();
+
+			[QName("时间")]
+			public QRuntimeRangeValue Time { get; private set; } = new QRuntimeRangeValue();
+			public QFlowGraph Graph { get; private set; }
+			protected override void Init(string key)
+			{
+				base.Init(key);
+				if (Data.Effect != null)
+				{
+					Graph = Data.Effect.Graph.QDataCopy();
+					Graph.RegisterValue(this);
+				}
+			}
+			public override void OnDestroy()
+			{
+				base.OnDestroy();
+				if (Graph != null)
+				{
+					Graph.UnRegisterValue(this);
+					Graph = null;
+				}
+			}
+			public void InvokeEvent(string key)
+			{
+				InvokeEventIEnumerator(key).Start();
+			}
+			public IEnumerator InvokeEventIEnumerator(string key)
+			{
+				yield return Graph?.InvokeEventIEnumerator(key);
+			}
+		}
+	}
+	public abstract class QEffectData<T> : QDataList<T> where T : QEffectData<T>, IKey<string>, new()
+	{
+		private string GetAssetPath(string key)
+		{
+			return "Assets/Resources/" + nameof(QFlowGraph) + "/" + typeof(T).Name + "/" + key + ".asset";
+		}
+		[QIgnore]
+		protected string m_effectInfo = "";
+		[QName("效果说明")]
+		public virtual string EffectInfo
+		{
+			get
+			{
+				if (m_effectInfo.IsNull() && Effect != null)
+				{
+					m_effectInfo = Effect.Graph.QDataCopy().ToInfoString();
+				}
+				return m_effectInfo;
+			}
+			protected set => m_effectInfo = value;
+		}
+		[QIgnore]
+		protected QFlowGraphAsset m_effect = null;
+		[QName("效果")]
+		public virtual QFlowGraphAsset Effect
+		{
+			get { if (!Application.isPlaying) m_effect = null; return m_effect ??= QTool.LoadAndCreate<QFlowGraphAsset>(nameof(QFlowGraph) + "/" + typeof(T).Name + "/" + Key); }
+			protected set => m_effect = value;
+		}
 	}
 }

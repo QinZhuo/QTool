@@ -178,47 +178,63 @@ namespace QTool
 			Label toText = null;
 			rootVisualElement.AddEnum("当前语言", From, value => From = (SystemLanguage)value);
 			var fromText = rootVisualElement.AddText("", "", null, true);
-			rootVisualElement.RegisterCallback<ClickEvent>(async data =>
-			{
-				toText.text = "";
-				if (!fromText.text.IsNull())
-				{
-					foreach (var To in ToList)
-					{
-						toText.text += await fromText.text.NetworkTranslateAsync(From, To)+"\n";
-					}
-					GUIUtility.systemCopyBuffer = toText.text;
-				}
-			});
+
 			rootVisualElement.Add("目标语言", ToList, typeof(List<SystemLanguage>), newList =>
 			{
 				ToList = (List<SystemLanguage>)newList;
 				QPlayerPrefs.Set(nameof(QLoactionWindow) + "_" + nameof(ToList), ToList);
 			});
 			toText = rootVisualElement.AddLabel("");
-			rootVisualElement.AddButton("翻译" + nameof(QLocalization) + "本地化信息", QLocalizationTranslate);
+			rootVisualElement.AddButton("翻译并添加本地化", async () =>
+			{
+				toText.text = "";
+				if (!fromText.text.IsNull())
+				{
+					var fromDataList = QLocalizationData.LoadQDataList(From.ToString());
+					var key = fromText.text.ToKeyString();
+					var fromData = fromDataList[key];
+					fromData[TitleKey] = fromText.text;
+					foreach (var To in ToList)
+					{
+						if (From == To) continue;
+						var toDataList = QLocalizationData.LoadQDataList(To.ToString());
+						await CheckTranslate(fromData, toDataList, To);
+						toText.text += toDataList[key][TitleKey];
+						toDataList.Save();
+					}
+					fromDataList.Save();
+					GUIUtility.systemCopyBuffer = toText.text;
+					AssetDatabase.Refresh();
+				}
+			});
+			rootVisualElement.AddButton("翻译全部" + nameof(QLocalization) + "本地化信息", QLocalizationTranslate);
 		}
 		public async void QLocalizationTranslate()
 		{
-			var fromData = QLocalizationData.LoadQDataList(From.ToString());
+			var fromDataList = QLocalizationData.LoadQDataList(From.ToString());
 			foreach (var To in ToList)
 			{
-				var toData = QLocalizationData.LoadQDataList(To.ToString());
-				var valueTitle = nameof(QLocalizationData.Localization);
-				foreach (var data in fromData)
+				if (From == To) continue;
+				var toDataList = QLocalizationData.LoadQDataList(To.ToString());
+				foreach (var data in fromDataList)
 				{
-					var toDataValue = toData[data.Key][valueTitle];
-					if (!data.IsNull() && (toDataValue.IsNull() || toDataValue.EndsWith(QLocalizationData.AutoTranslateEndKey)))
-					{
-						toData[data.Key][valueTitle] = await data[valueTitle].NetworkTranslateAsync(From, To) + QLocalizationData.AutoTranslateEndKey;
-						QDebug.Log("翻译[" + data[valueTitle] + "] => " + To + " => [" + toData[data.Key][valueTitle] + "]");
-						await Task.Delay(100);
-					}
+					await CheckTranslate(data, toDataList, To);
 				}
-				toData.Save();
+				toDataList.Save();
 			}
 			QDebug.Log("翻译完成");
 			AssetDatabase.Refresh();
+		}
+		private const string TitleKey = nameof(QLocalizationData.Localization);
+		private async Task CheckTranslate(QDataRow fromData, QDataList toDataList, SystemLanguage toLanguage)
+		{
+			var toDataValue = toDataList[fromData.Key][TitleKey];
+			if (!fromData[TitleKey].IsNull() && (toDataValue.IsNull() || toDataValue.EndsWith(QLocalizationData.AutoTranslateEndKey)))
+			{
+				toDataList[fromData.Key][TitleKey] = await fromData[TitleKey].NetworkTranslateAsync(From, toLanguage) + QLocalizationData.AutoTranslateEndKey;
+				QDebug.Log("翻译[" + fromData[TitleKey] + "] => " + toLanguage + " => [" + toDataList[fromData.Key][TitleKey] + "]");
+				await Task.Delay(100);
+			}
 		}
 	}
 	public class QEditorWindow : EditorWindow

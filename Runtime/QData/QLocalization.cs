@@ -53,6 +53,12 @@ namespace QTool
 				Debug.LogError("翻译[" + key + "]出错" + e);
 			}
 		}
+#if UNITY_EDITOR
+		private void OnValidate()
+		{
+			Fresh();
+		}
+#endif
 		#region 静态方法
 		public static SystemLanguage Language
 		{
