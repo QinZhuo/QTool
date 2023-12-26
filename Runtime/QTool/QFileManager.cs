@@ -716,7 +716,6 @@ namespace QTool
 		public static void Init()
 		{
 			QPlayerPrefs.Get(nameof(PrefabPathList), PrefabPathList);
-			Save();
 		}
 		public static void Save()
 		{
