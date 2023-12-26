@@ -115,7 +115,7 @@ namespace QTool
 		public string Localization { get; private set; }
 		static QLocalizationData()
 		{
-			Load(Application.systemLanguage.ToString());
+			Load(QLocalization.Language.ToString());
 		}
 	}
 	public static class QLocalizationTool
