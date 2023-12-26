@@ -96,10 +96,6 @@ namespace QTool
 			}
 			return value;
 		}
-		static QLocalization()
-		{
-			KeyReplace["版本号"] = Application.version;
-		}
 		#endregion
 	}
 	public class QLocalizationData : QDataList<QLocalizationData>
