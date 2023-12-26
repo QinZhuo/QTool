@@ -11,7 +11,7 @@ namespace QTool
 			return Data.ContainsKey(key);
 		}
 		public static void DeleteKey(string key)
-		{
+		{  
 			Data.RemoveKey(key);
 			Data.Save();
 		}
