@@ -14,8 +14,8 @@ namespace QTool
 		public Object Object
 		{
 			get
-			{
-				if (_Object == null)
+			{  
+				if (_Object == null) 
 				{
 					_Object = QIdTool.GetObject(id,typeof(Object));
 				}
