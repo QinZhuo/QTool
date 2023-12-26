@@ -21,8 +21,8 @@ using UnityEditor.AddressableAssets.Settings;
 namespace QTool
 {
 	[InitializeOnLoad]
-    public static class QToolEditor
-    {
+	public static class QToolEditor
+	{
 		static QToolEditor()
 		{
 			Editor.finishedDefaultHeaderGUI += OnHeaderGUI;
@@ -39,7 +39,7 @@ namespace QTool
 			}
 			else
 			{
-				if(editor.target is GameObject gameObj)
+				if (editor.target is GameObject gameObj)
 				{
 					var qid = gameObj.GetComponent<QId>();
 					if (qid != null)
@@ -48,7 +48,7 @@ namespace QTool
 					}
 				}
 			}
-			
+
 		}
 		static void OnHierarchyGUI(int instanceID, Rect rect)
 		{
@@ -57,7 +57,7 @@ namespace QTool
 				var qid = gameObj.GetComponent<QId>();
 				if (qid != null)
 				{
-					GUI.Label(rect.HorizontalRect(0.5f,1),"[" + qid.Id.ToShortString(5) + "]",QEditorGUI.RightLabel);
+					GUI.Label(rect.HorizontalRect(0.5f, 1), "[" + qid.Id.ToShortString(5) + "]", QEditorGUI.RightLabel);
 				}
 			}
 		}
@@ -125,7 +125,7 @@ namespace QTool
 		[MenuItem("QTool/测试/运行测试包")]
 		private static void RunBuild()
 		{
-			var path= PlayerPrefs.GetString(nameof(QToolBuild));
+			var path = PlayerPrefs.GetString(nameof(QToolBuild));
 			if (path.IsNull())
 			{
 				Debug.LogError(nameof(QToolBuild) + " 测试包路径为空");
@@ -140,26 +140,16 @@ namespace QTool
 				Debug.LogError("运行：" + path + "出错：\n" + e);
 			}
 		}
-		[MenuItem("QTool/存档/清空全部")]
-        public static void ClearSaveData()
-        {
-            ClearPlayerPrefs();
-            ClearPersistentData();
-        }
-        [MenuItem("QTool/存档/清空PlayerPrefs")]
-        public static void ClearPlayerPrefs()
-        {
-            PlayerPrefs.DeleteAll();
-        }
-        [MenuItem("QTool/存档/清空PersistentData")]
-        public static void ClearPersistentData()
-        {
-            Application.persistentDataPath.ClearData();
+		[MenuItem("QTool/存档/清空存档")]
+		public static void ClearSaveData()
+		{
+			PlayerPrefs.DeleteAll();
+			Application.persistentDataPath.ClearData();
 		}
 		[MenuItem("QTool/存档/打开存档位置")]
 		public static void OpenSaveData()
 		{
-			System.Diagnostics.Process.Start("explorer.exe", Application.persistentDataPath.Replace('/','\\'));
+			System.Diagnostics.Process.Start("explorer.exe", Application.persistentDataPath.Replace('/', '\\'));
 		}
 	}
 	public class QLoactionWindow : EditorWindow
