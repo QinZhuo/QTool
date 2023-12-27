@@ -181,7 +181,7 @@ namespace QTool
 				if (!fromText.text.IsNull())
 				{
 					var fromDataList = QLocalizationData.LoadQDataList(From.ToString());
-					var key = fromText.text.ToKeyString();
+					var key = fromText.text;
 					var fromData = fromDataList[key];
 					fromData[TitleKey] = fromText.text;
 					foreach (var To in ToList)

@@ -73,11 +73,11 @@ namespace QTool.Test
 		[QName("切换语言")]
 		public void ChangeLangua()
 		{
-			QLocalization.Language = QLocalization.Language == Application.systemLanguage ? SystemLanguage.English : Application.systemLanguage;
-			Debug.LogError(QLocalization.Language);
+			QLocalizationData.Language = QLocalizationData.Language == Application.systemLanguage ? SystemLanguage.English : Application.systemLanguage;
+			Debug.LogError(QLocalizationData.Language);
 			for (int i = 0; i < 10; i++)
 			{
-				var testData = QLocalizationData.LoadQDataList(QLocalization.Language.ToString());
+				var testData = QLocalizationData.LoadQDataList(QLocalizationData.Language.ToString());
 				testData["测试翻译" + i].SetValue(nameof(QLocalizationData.Localization), "【翻译结果" + i + "】");
 				testData.Save();
 			}

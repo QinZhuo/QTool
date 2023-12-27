@@ -20,10 +20,10 @@ namespace QTool
 			{
 				if (key != value)
 				{
-					this.key = value;
+					key = value;
 					OnKeyChange?.Invoke(key);
 				}
-				Fresh();
+				FreshLocalization();
 			}
 		}
 		#endregion
@@ -31,35 +31,54 @@ namespace QTool
 		public StringEvent OnLocalizationChange;
 		private void Awake()
 		{
-			OnLanguageChange += Fresh;
+			QLocalizationData.OnLanguageChange += FreshLocalization;
 		}
 		private void Start()
 		{
-			Fresh();
+			FreshLocalization();
 		}
 		private void OnDestroy()
 		{
-			OnLanguageChange -= Fresh;
+			QLocalizationData.OnLanguageChange -= FreshLocalization;
 		}
-		private void Fresh()
+		private void FreshLocalization()
 		{
-			try
-			{
-				localization = Get(key);
-				OnLocalizationChange?.Invoke(localization);
-			}
-			catch (System.Exception e)
-			{
-				Debug.LogError("翻译[" + key + "]出错" + e);
-			}
+			localization = QLocalizationData.GetLozalization(key);
+			OnLocalizationChange?.Invoke(localization);
 		}
 #if UNITY_EDITOR
 		private void OnValidate()
 		{
-			Fresh();
+			FreshLocalization();
 		}
 #endif
-		#region 静态方法
+	}
+	public class QLocalizationData : QDataList<QLocalizationData>
+	{
+		public static string GetLozalization(string key)
+		{
+			if (key.IsNull()) return key;
+			var text = Get(key).Localization;
+			if (text.EndsWith(AutoTranslateEndKey))
+			{
+				text = text.Substring(0, text.Length - AutoTranslateEndKey.Length);
+			}
+			return text;
+		}
+		public const string AutoTranslateEndKey = " [Auto]";
+		[QName]
+		public string Localization { get; private set; }
+		static QLocalizationData()
+		{
+			QEventManager.Register<string>(nameof(QEventKey.设置更新), Fresh);
+		}
+		public static void Fresh(string key = "")
+		{
+			if (key == nameof(Language))
+			{
+				Language = QPlayerPrefs.Get(nameof(Language), Application.systemLanguage);
+			}
+		}
 		private static SystemLanguage _Language = SystemLanguage.Unknown;
 		public static SystemLanguage Language
 		{
@@ -70,8 +89,8 @@ namespace QTool
 				{
 					_Language = value;
 					QPlayerPrefs.Set(nameof(Language), value);
-					QLocalizationData.Load(value.ToString());
-					if (QLocalizationData.List.Count == 0 && Language != SystemLanguage.English)
+					Load(value.ToString());
+					if (List.Count == 0 && Language != SystemLanguage.English)
 					{
 						Language = SystemLanguage.English;
 						return;
@@ -81,78 +100,20 @@ namespace QTool
 			}
 		}
 		public static event System.Action OnLanguageChange = null;
-		public static string Get(string value)
-		{
-			if (value.IsNull()) { return value; }
-			value = value.Trim();
-			var oldValue = value;
-			value = TranslateKey(value);
-			value = value.ForeachBlockValue('{', '}', (key) => TranslateKey(key));
-#if UNITY_EDITOR
-			if (oldValue == value && !QLocalizationData.ContainsKey(oldValue))
-			{
-				QDebug.LogWarning("缺少翻译[" + value + "][" + Language + "]");
-			}
-#endif
-			if (value.EndsWith(QLocalizationData.AutoTranslateEndKey))
-			{
-				value = value.Substring(0, value.Length - QLocalizationData.AutoTranslateEndKey.Length);
-			}
-			return value;
-		}
-		public static QDictionary<string, string> KeyReplace = new QDictionary<string, string>();
-		static string TranslateKey(string value)
-		{
-			if (KeyReplace.ContainsKey(value))
-			{
-				return TranslateKey(KeyReplace[value]);
-			}
-			else if (QLocalizationData.ContainsKey(value))
-			{
-				return QLocalizationData.Get(value).Localization;
-			}
-			return value;
-		}
-		#endregion
 	}
-	public class QLocalizationData : QDataList<QLocalizationData>
-	{
-		public const string AutoTranslateEndKey = " [Auto]";
-		[QName]
-		public string Localization { get; private set; }
-		static QLocalizationData()
-		{
-			QEventManager.Register<string>(nameof(QEventKey.设置更新), Fresh);
-		}
-		public static void Fresh(string key = "")
-		{
-			if (key == nameof(QLocalization.Language))
-			{
-				QLocalization.Language = QPlayerPrefs.Get(nameof(QLocalization.Language), Application.systemLanguage);
-			}
-		}
-	}
+	#region Tool
 	public static class QLocalizationTool
 	{
-	
+		public static string GetLozalization(this string key, params object[] Params)
+		{
+			return string.Format(QLocalizationData.GetLozalization(key), Params);
+		}
 		const string NetworkTranslateURL = "https://translate.googleapis.com/translate_a/single?client=gtx&sl={2}&tl={1}&dt=t&q={0}";
 
 		static List<List<List<string>>> translateData = new List<List<List<string>>>();
 		public static async Task<string> NetworkTranslateAsync(this string text, QLocalizationCode fromLanguage, QLocalizationCode toLanguage)
 		{
 			if (text.IsNull()) return text;
-
-			QDictionary<string, string> IgnoreList = null;
-			if (text.Contains("{") && text.Contains("}"))
-			{
-				IgnoreList = new QDictionary<string, string>();
-				text = text.ForeachBlockValue('{', '}', key =>
-				 {
-					 var newKey = key.GetHashCode().ToString();
-					 IgnoreList[newKey] = key;
-					 return "[" + newKey + "]";
-				 });
-			}
 			try
 			{
 				var jsonStr = await QTool.RunURLAsync(string.Format(NetworkTranslateURL, text, toLanguage, fromLanguage));
@@ -162,20 +123,6 @@ namespace QTool
 			catch (System.Exception e)
 			{
 				Debug.LogError("翻译出错[" + text + "] \n" + e);
-			}
-			if (IgnoreList != null)
-			{
-				text = text.ForeachBlockValue('[', ']', key =>
-				 {
-					 if (IgnoreList.ContainsKey(key))
-					 {
-						 return "{" + IgnoreList[key] + "}";
-					 }
-					 else
-					 {
-						 return key;
-					 }
-				 });
 			}
 			return text;
 		}
@@ -441,4 +388,5 @@ namespace QTool
 		zu,//祖鲁语
 		zu_ZA,// 祖鲁语
 	}
+	#endregion
 }
