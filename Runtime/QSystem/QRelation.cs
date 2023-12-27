@@ -56,8 +56,8 @@ namespace QTool
 	{
 		static QTeam()
 		{
-			QEventManager.Register(QToolEvent.卸载场景, ClearNull);
-			QEventManager.Register(QToolEvent.游戏退出, Teams.Clear);
+			QEventManager.Register(QEventKey.卸载场景, ClearNull);
+			QEventManager.Register(QEventKey.游戏退出, Teams.Clear);
 		}
 		private static void ClearNull()
 		{

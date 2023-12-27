@@ -204,7 +204,7 @@ namespace QTool
 		public static QDictionary<string, ObjectPool<T>> Pools = new QDictionary<string, ObjectPool<T>>();
 		static QPoolManager()
 		{
-			QEventManager.Register(QToolEvent.游戏退出, Pools.Clear);
+			QEventManager.Register(QEventKey.游戏退出, Pools.Clear);
 		}
 	}
   

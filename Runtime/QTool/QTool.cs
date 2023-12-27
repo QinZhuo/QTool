@@ -48,7 +48,7 @@ namespace QTool
 			CultureInfo.DefaultThreadCurrentCulture = CultureInfo.CurrentCulture;
 			SceneManager.sceneUnloaded += scene =>
 			{
-				QEventManager.InvokeEvent(QToolEvent.卸载场景);
+				QEventManager.InvokeEvent(QEventKey.卸载场景);
 			};
 		}
 		public static void Quit()

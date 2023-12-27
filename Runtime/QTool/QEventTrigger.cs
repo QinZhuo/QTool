@@ -5,8 +5,9 @@ using UnityEngine.Events;
 namespace QTool
 {
 
-	public enum QToolEvent
+	public enum QEventKey
 	{
+		设置更新,
 	    卸载场景,
 		游戏退出,
 		游戏退出完成,
@@ -25,7 +26,7 @@ namespace QTool
 		internal static QDictionary<string, System.Action<string>> KeyEventList = new QDictionary<string ,System.Action<string>>();
 		static QEventManager()
 		{
-			QEventManager.Register(QToolEvent.游戏退出完成, EventList.Clear, OnceEventList.Clear, KeyEventList.Clear);
+			QEventManager.Register(QEventKey.游戏退出完成, EventList.Clear, OnceEventList.Clear, KeyEventList.Clear);
 		}
 		public static void InvokeEvent(System.Enum value)
 		{
@@ -149,7 +150,7 @@ namespace QTool
 		internal static QDictionary<string, System.Action<T>> OnceEventList = new QDictionary<string, System.Action<T>>();
 		static QEventManager()
 		{
-			QEventManager.Register(QToolEvent.游戏退出完成, EventList.Clear, OnceEventList.Clear);
+			QEventManager.Register(QEventKey.游戏退出完成, EventList.Clear, OnceEventList.Clear);
 		}
 		public static void InvokeEvent(string eventKey,T value)
 		{

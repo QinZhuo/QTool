@@ -60,15 +60,22 @@ namespace QTool
 		}
 #endif
 		#region 静态方法
+		private static SystemLanguage _Language = SystemLanguage.Unknown;
 		public static SystemLanguage Language
 		{
-			get => QPlayerPrefs.Get(nameof(Language), Application.systemLanguage);
+			get => _Language;
 			set
 			{
-				if (value != Language)
+				if (Language != value)
 				{
+					_Language = value;
 					QPlayerPrefs.Set(nameof(Language), value);
 					QLocalizationData.Load(value.ToString());
+					if (QLocalizationData.List.Count == 0 && Language != SystemLanguage.English)
+					{
+						Language = SystemLanguage.English;
+						return;
+					}
 					OnLanguageChange?.Invoke();
 				}
 			}
@@ -116,10 +123,11 @@ namespace QTool
 		static QLocalizationData()
 		{
 			Fresh();
+			QEventManager.Register(QEventKey.设置更新, Fresh);
 		}
 		public static void Fresh()
 		{
-			Load(QLocalization.Language.ToString());
+			QLocalization.Language = QPlayerPrefs.Get(nameof(QLocalization.Language), Application.systemLanguage);
 		}
 	}
 	public static class QLocalizationTool
