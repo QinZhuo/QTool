@@ -5,7 +5,7 @@ using UnityEngine.UI;
 namespace QTool
 {
 
-	[RequireComponent(typeof(Dropdown)), ExecuteInEditMode]
+	[ExecuteInEditMode]
 	public class QDropdownSetting : MonoBehaviour
 	{
 		public Dropdown dropdown;
