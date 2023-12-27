@@ -142,15 +142,13 @@ namespace QTool.Net
 			Server.TickIncoming();
 		}
         public override void ServerSendUpdate() => Server.TickOutgoing();
-#if UNITY_EDITOR||DEVELOPMENT_BUILD
+#if UNITY_2021_1_OR_NEWER
 		private string ServerIp = "localhost";
 		protected UnityEngine.UIElements.TextField IpText = null;
 		protected UnityEngine.UIElements.Button StartClientButton = null;
 		public override void DebugUI()
 		{
 			base.DebugUI();
-#if UNITY_2021_1_OR_NEWER
-
 			if (StartClientButton == null && IpText == null)
 			{
 				IpText = QToolManager.Instance.RootVisualElement.AddText("主机Ip", ServerIp, newValue => ServerIp = newValue);
@@ -161,8 +159,6 @@ namespace QTool.Net
 			}
 			IpText.visible = !ClientConnected;
 			StartClientButton.visible = !ClientConnected;
-
-#endif
 		}
 #endif
 	}

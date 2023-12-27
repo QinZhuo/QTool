@@ -32,7 +32,7 @@ namespace QTool.Net
 				QNetManager.PlayerAction(key, Params);
 			}
 		}
-		internal QNetTypeInfo TypeInfo { get; set; }
+		private QNetTypeInfo TypeInfo { get; set; }
 		public virtual void Awake()
 		{
 			TypeInfo = QNetTypeInfo.Get(GetType());
@@ -47,15 +47,14 @@ namespace QTool.Net
 		private void NetStart()
 		{
 			QNetManager.Instance.OnNetUpdate -= NetStart;
-			QNetManager.Instance.OnSyncCheck += OnSyncCheck;
 			if (TypeInfo.Members.Count > 0)
 			{
 				var qid = GetComponent<QId>().Id;
-				if (!QNetManager.Instance.QNetSyncCheckList.ContainsKey(qid))
+				if (!QNetManager.Instance.QNetSyncList.ContainsKey(qid))
 				{
-					QNetManager.Instance.QNetSyncCheckList.Add(qid, new List<QNetBehaviour>());
+					QNetManager.Instance.QNetSyncList.Add(qid, new List<QNetBehaviour>());
 				}
-				QNetManager.Instance.QNetSyncCheckList[qid].AddCheckExist(this);
+				QNetManager.Instance.QNetSyncList[qid].AddCheckExist(this);
 			}
 			if (IsPlayer && TypeInfo.Functions.Count > 0)
 			{
@@ -84,16 +83,15 @@ namespace QTool.Net
 			OnNetDestroy();
 			if (QNetManager.Instance != null)
 			{
-				QNetManager.Instance.OnSyncCheck -= OnSyncCheck;
 				if (TypeInfo.Members.Count > 0)
 				{
 					var qid = GetComponent<QId>().Id;
-					if (QNetManager.Instance.QNetSyncCheckList.ContainsKey(qid))
+					if (QNetManager.Instance.QNetSyncList.ContainsKey(qid))
 					{
-						QNetManager.Instance.QNetSyncCheckList[qid].Remove(this);
-						if (QNetManager.Instance.QNetSyncCheckList[qid].Count == 0)
+						QNetManager.Instance.QNetSyncList[qid].Remove(this);
+						if (QNetManager.Instance.QNetSyncList[qid].Count == 0)
 						{
-							QNetManager.Instance.QNetSyncCheckList.Remove(qid);
+							QNetManager.Instance.QNetSyncList.Remove(qid);
 						}
 					}
 				}
@@ -110,7 +108,16 @@ namespace QTool.Net
 		{
 			QNetManager.Destroy(obj);
 		}
-		private static int GetFlag(object obj, Type type)
+		public int GetCheckValue()
+		{
+			var flag = 0;
+			foreach (var check in TypeInfo.CheckList)
+			{
+				flag ^= GetCheckValue(check.Get(this), check.Type);
+			}
+			return flag;
+		}
+		private static int GetCheckValue(object obj, Type type = null)
 		{
 			var typeInfo = QSerializeType.Get(type);
 			switch (typeInfo.Code)
@@ -124,7 +131,7 @@ namespace QTool.Net
 									var flag = 0;
 									foreach (var member in typeInfo.Members)
 									{
-										flag ^= GetFlag(member.Get(obj), member.Type);
+										flag ^= GetCheckValue(member.Get(obj), member.Type);
 									}
 									return flag;
 								}
@@ -141,14 +148,6 @@ namespace QTool.Net
 			}
 			return 0;
 		}
-		internal void OnSyncCheck(QNetSyncFlag flag)
-		{
-			foreach (var check in TypeInfo.CheckList)
-			{
-				flag.Check(GetFlag(check.Get(this), check.Type));
-			}
-		}
-		
 		internal void OnSyncSave(QBinaryWriter writer)
 		{
 			foreach (var member in TypeInfo.Members)
@@ -163,62 +162,62 @@ namespace QTool.Net
 				member.Set(this, reader.ReadObjectType(member.Type,member.Get(this)));
 			}
 		}
-	}
-	/// <summary>
-	/// 标记函数为玩家动作 本地玩家使用PlayerAction远程调用所有客户端
-	/// </summary>
-	[AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
-	public class QSyncActionAttribute : Attribute
-	{
-		public QSyncActionAttribute()
+		protected class QNetTypeInfo : QTypeInfo<QNetTypeInfo>
 		{
-		}
-	}
-	/// <summary>
-	/// 标记变量在同步检测出错时进行同步更新 如果SyncCheck为True则会对该变量进行同步检测
-	/// </summary>
-	[AttributeUsage(AttributeTargets.Field|AttributeTargets.Property, AllowMultiple = false)]
-	public class QSyncVarAttribute : Attribute
-	{
-		public bool SyncCheck { get; private set; }
-		public QSyncVarAttribute(bool SyncCheck = false)
-		{
-			this.SyncCheck = SyncCheck;
-		}
-	}
-
-	public class QNetTypeInfo : QTypeInfo<QNetTypeInfo>
-	{
-		public const string QSyncAction_ = nameof(QSyncAction_);
-		public List<QMemeberInfo> CheckList { get; private set; } = new List<QMemeberInfo>();
-	
-		protected override void Init(Type type)
-		{
-			base.Init(type);
-			if (!TypeMembers.ContainsKey(type))
+			public List<QMemeberInfo> CheckList { get; private set; } = new List<QMemeberInfo>();
+			protected override void Init(Type type)
 			{
-				Members.RemoveAll((memberInfo) =>
+				base.Init(type);
+				if (!TypeMembers.ContainsKey(type))
 				{
-					if (memberInfo.Get != null || memberInfo.Set != null)
+					Members.RemoveAll((memberInfo) =>
 					{
-						var syncVar = memberInfo.MemeberInfo.GetAttribute<QSyncVarAttribute>();
-						if (syncVar != null)
+						if (memberInfo.Get != null || memberInfo.Set != null)
 						{
-							if (syncVar.SyncCheck)
+							var syncVar = memberInfo.MemeberInfo.GetAttribute<QSyncVarAttribute>();
+							if (syncVar != null)
 							{
-								CheckList.Add(memberInfo);
+								if (syncVar.SyncCheck)
+								{
+									CheckList.Add(memberInfo);
+								}
+								return false;
 							}
-							return false;
 						}
-					}
-					return true;
-				});
-				Functions.RemoveAll(function =>
-				{
-					return function.MethodInfo.GetAttribute<QSyncActionAttribute>() == null;
-				});
+						return true;
+					});
+					Functions.RemoveAll(function =>
+					{
+						return function.MethodInfo.GetAttribute<QSyncActionAttribute>() == null;
+					});
+				}
+			}
+		}
+		/// <summary>
+		/// 标记函数为玩家动作 本地玩家使用PlayerAction远程调用所有客户端
+		/// </summary>
+		[AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
+		protected class QSyncActionAttribute : Attribute
+		{
+			public QSyncActionAttribute()
+			{
+			}
+		}
+		/// <summary>
+		/// 标记变量在同步检测出错时进行同步更新 如果SyncCheck为True则会对该变量进行同步检测
+		/// </summary>
+		[AttributeUsage(AttributeTargets.Field | AttributeTargets.Property, AllowMultiple = false)]
+		protected class QSyncVarAttribute : Attribute
+		{
+			public bool SyncCheck { get; private set; }
+			public QSyncVarAttribute(bool SyncCheck = false)
+			{
+				this.SyncCheck = SyncCheck;
 			}
 		}
 	}
+
+
+	
 
 }

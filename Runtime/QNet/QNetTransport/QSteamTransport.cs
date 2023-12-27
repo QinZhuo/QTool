@@ -149,20 +149,17 @@ namespace QTool.Net
 			QDebug.Log(nameof(QSteamTransport) + " 客户端断开连接");
 			base.ClientDisconnect();
 		}
-#if UNITY_EDITOR || DEVELOPMENT_BUILD
+#if UNITY_2021_1_OR_NEWER
 		protected UnityEngine.UIElements.ListView RoomListView = null;
 		protected UnityEngine.UIElements.Button FreshButton = null;
 		private async void FreshList()
 		{
 			await QSteam.FreshLobbys();
-#if UNITY_2021_1_OR_NEWER
 			RoomListView.Rebuild();
-#endif
 		}
 		public override void DebugUI()
 		{
 			base.DebugUI();
-#if UNITY_2021_1_OR_NEWER
 			if (RoomListView == null)
 			{
 				FreshButton= QToolManager.Instance.RootVisualElement.AddButton("刷新列表", FreshList);
@@ -176,7 +173,6 @@ namespace QTool.Net
 			}
 			FreshButton.visible = !ClientConnected;
 			RoomListView.visible = !ClientConnected;
-#endif
 		}
 #endif
 	}

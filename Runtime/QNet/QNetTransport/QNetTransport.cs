@@ -194,10 +194,10 @@ namespace QTool.Net
 		/// <summary>
 		/// 用于Debug显示的GUI
 		/// </summary>
+		[System.Diagnostics.Conditional("DEVELOPMENT_BUILD"), System.Diagnostics.Conditional("UNITY_EDITOR")]
 		public virtual void DebugUI()
 		{
 #if UNITY_2021_1_OR_NEWER
-
 			if (StartHostButton == null)
 			{
 				StartHostButton = QToolManager.Instance.RootVisualElement.AddButton("开启主机", () =>
@@ -206,7 +206,6 @@ namespace QTool.Net
 				});
 			}
 			StartHostButton.visible = !ClientConnected && !ServerActive;
-
 #endif
 		}
 	}
