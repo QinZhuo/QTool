@@ -117,6 +117,10 @@ namespace QTool
 		{
 			return string.Format(QLocalizationData.GetLozalization(key), Params);
 		}
+		public static string GetLozalizationWithColor(this string key, params object[] Params)
+		{
+			return key.GetLozalization(Params).ToColorString(key.ToColor());
+		}
 		const string NetworkTranslateURL = "https://translate.googleapis.com/translate_a/single?client=gtx&sl={2}&tl={1}&dt=t&q={0}";
 
 		static List<List<List<string>>> translateData = new List<List<List<string>>>();
