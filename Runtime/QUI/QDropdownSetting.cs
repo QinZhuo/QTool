@@ -12,20 +12,22 @@ namespace QTool
 		protected void Awake()
 		{
 			dropdown = GetComponentInChildren<Dropdown>();
+		}
 
-		}
-		private void Reset()
-		{
-#if UNITY_EDITOR
-			dropdown.onValueChanged.RemoveAllListeners();
-			UnityEditor.Events.UnityEventTools.AddPersistentListener(dropdown.onValueChanged, Set);
-#endif
-		}
+
 		public void Set(int index)
 		{
 			QPlayerPrefs.Set(name, dropdown.options[index].text);
-			QEventManager.InvokeEvent(QEventKey.设置更新);
+			QEventManager.InvokeEvent(nameof(QEventKey.设置更新), name);
 		}
+
+#if UNITY_EDITOR
+		private void Reset()
+		{
+			dropdown.onValueChanged.RemoveAllListeners();
+			UnityEditor.Events.UnityEventTools.AddPersistentListener(dropdown.onValueChanged, Set);
+		}
+#endif
 	}
 }
 

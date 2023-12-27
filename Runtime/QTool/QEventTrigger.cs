@@ -23,10 +23,9 @@ namespace QTool
         /// </summary>
         internal static QDictionary<string, System.Action> EventList = new QDictionary<string, System.Action>();
 		internal static QDictionary<string, System.Action> OnceEventList = new QDictionary<string, System.Action>();
-		internal static QDictionary<string, System.Action<string>> KeyEventList = new QDictionary<string ,System.Action<string>>();
 		static QEventManager()
 		{
-			QEventManager.Register(QEventKey.游戏退出完成, EventList.Clear, OnceEventList.Clear, KeyEventList.Clear);
+			QEventManager.Register(QEventKey.游戏退出完成, EventList.Clear, OnceEventList.Clear);
 		}
 		public static void InvokeEvent(System.Enum value)
 		{
@@ -55,10 +54,6 @@ namespace QTool
 					OnceEventList[eventKey]?.Invoke();
 					OnceEventList[eventKey] = null;
 				}
-				if (KeyEventList.ContainsKey(eventKey))
-				{
-					KeyEventList[eventKey]?.Invoke(eventKey);
-				}
 			}
 			catch (System.Exception e)
 			{
@@ -69,22 +64,6 @@ namespace QTool
         {
             QEventManager<T>.InvokeEvent(eventKey, value);
         }
-		public static void RegisterKeyEvent(System.Enum eventKey, System.Action<string> action)
-		{
-			RegisterKeyEvent(eventKey.ToString(), action);
-		}
-		public static void RegisterKeyEvent(string eventKey, System.Action<string> action)
-		{
-			KeyEventList[eventKey] += action;
-		}
-		public static void UnRegisterKeyEvent(System.Enum eventKey, System.Action<string> action)
-		{
-			UnRegisterKeyEvent(eventKey.ToString(), action);
-		}
-		public static void UnRegisterKeyEvent(string eventKey, System.Action<string> action)
-		{
-			KeyEventList[eventKey] -= action;
-		}
 		public static void Register(System.Enum eventKey,params System.Action[] action)
 		{
 			var key = eventKey.ToString();

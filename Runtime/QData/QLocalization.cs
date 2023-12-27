@@ -122,12 +122,14 @@ namespace QTool
 		public string Localization { get; private set; }
 		static QLocalizationData()
 		{
-			Fresh();
-			QEventManager.Register(QEventKey.设置更新, Fresh);
+			QEventManager.Register<string>(nameof(QEventKey.设置更新), Fresh);
 		}
-		public static void Fresh()
+		public static void Fresh(string key = "")
 		{
-			QLocalization.Language = QPlayerPrefs.Get(nameof(QLocalization.Language), Application.systemLanguage);
+			if (key == nameof(QLocalization.Language))
+			{
+				QLocalization.Language = QPlayerPrefs.Get(nameof(QLocalization.Language), Application.systemLanguage);
+			}
 		}
 	}
 	public static class QLocalizationTool
