@@ -125,26 +125,23 @@ namespace QTool.Net
 		/// <summary>
 		/// 服务器游戏数据
 		/// </summary>
-		public QDictionary<int, QList<ulong, QNetFrameData>> ServerGameData = new QDictionary<int, QList<ulong, QNetFrameData>>((key) => new QList<ulong, QNetFrameData>(() => new QNetFrameData()));
-		/// <summary>
-		/// 服务器帧索引
-		/// </summary>
-		public int ServerIndex { get; private set; } = 0;
-		/// <summary>
-		/// 服务器当前帧游戏数据
-		/// </summary>
-		public QList<ulong, QNetFrameData> ServerActionData => ServerGameData[ServerIndex];
+		public List<QList<ulong, QNetFrameData>> ServerGameData = new QList<QList<ulong, QNetFrameData>>();
 		public void StartServer()
 		{
-			ServerActionData[ManagerId].InvokeEvent(nameof(QNetActionKey.ServerSeed), UnityEngine.Random.Range(0, int.MaxValue));
+			if (ServerGameData.Count == 0)
+			{
+				ServerGameData.Add(new QList<ulong, QNetFrameData>(() => new QNetFrameData()));
+				ServerGameData[0][ManagerId].InvokeEvent(nameof(QNetActionKey.ServerSeed), UnityEngine.Random.Range(0, int.MaxValue));
+			}
 			transport.OnServerConnected = (id) =>
 			{
+				var SendDataCount = ServerGameData.Count - 1;
 				QDebug.Log("[" + id + "]连接主机");
 				ServerConnectList.Add(id);
-				var max = Mathf.CeilToInt(ServerIndex * 1f / GameDataArrayLength) * GameDataArrayLength;
-				for (int startIndex = 0; startIndex < max; startIndex+=GameDataArrayLength)
+				var max = Mathf.CeilToInt(SendDataCount * 1f / GameDataArrayLength) * GameDataArrayLength;
+				for (int startIndex = 0; startIndex < max; startIndex += GameDataArrayLength)
 				{
-					var end = Mathf.Min(startIndex+GameDataArrayLength, ServerIndex);
+					var end = Mathf.Min(startIndex + GameDataArrayLength, SendDataCount);
 					using (var writer = new QBinaryWriter())
 					{
 						writer.Write(GameDataArrayId);
@@ -155,7 +152,7 @@ namespace QTool.Net
 							writer.WriteObject(i);
 							writer.WriteObject(ServerGameData[i]);
 						}
-						QDebug.Log("服务端发送游戏数据 " + startIndex + "=>" + end + " [" + count + "]"+ writer.BaseStream.Length.ToSizeString());
+						QDebug.Log("服务端发送游戏数据 " + startIndex + "=>" + end + " [" + count + "]" + writer.BaseStream.Length.ToSizeString());
 						transport.CheckServerSend(id, writer.ToArray());
 					}
 				}
@@ -171,17 +168,16 @@ namespace QTool.Net
 							{
 								var playerId = (ulong)eventData.Value[0];
 								PlayerIds[connectId] = playerId;
-								QDebug.Log("["+ServerIndex + "] 添加玩家[" + connectId + "][" + playerId+"]");
+								QDebug.Log("玩家加入[" + connectId + "][" + playerId + "]");
 							}
 							break;
 						default:
 							break;
 					}
 				}
-				var playerKey = PlayerIds[connectId];
-				ServerActionData[playerKey].MergeValues(netAction);
-				ServerActionData[playerKey].Events.AddRange(netAction.Events);
-
+				var playerData = ServerGameData.StackPeek()[PlayerIds[connectId]];
+				playerData.MergeValues(netAction);
+				playerData.Events.AddRange(netAction.Events);
 			};
 			transport.OnServerError = (id, e) =>
 			{
@@ -205,14 +201,15 @@ namespace QTool.Net
 			{
 				using (var writer = new QBinaryWriter())
 				{
-					writer.WriteObject(ServerIndex);
-					writer.WriteObject(ServerActionData);
+					var DataIndex = ServerGameData.Count - 1;
+					writer.WriteObject(DataIndex);
+					writer.WriteObject(ServerGameData[DataIndex]);
 					var data = writer.ToArray();
 					foreach (var player in ServerConnectList.ToArray())
 					{
 						transport.CheckServerSend(player, data);
 					}
-					ServerIndex++;
+					ServerGameData.Add(new QList<ulong, QNetFrameData>(() => new QNetFrameData()));
 				}
 			}
 		}
@@ -287,19 +284,24 @@ namespace QTool.Net
 		private void ReceiveGameData(QBinaryReader reader)
 		{
 			var index = reader.ReadInt32();
-			if (index == GameDataArrayId)
+			switch (index)
 			{
-				var count = reader.ReadInt32();
-				QDebug.Log("客户端接收游戏数据[" + count + "]" + reader.BaseStream.Length.ToSizeString());
-				for (int i = 0; i < count; i++)
-				{
-					ReceiveGameData(reader);
-				}
-			}
-			else
-			{
-				var GameData = reader.ReadObject<QList<ulong, QNetFrameData>>(); ;
-				ClientGameData[index] = GameData;
+				case GameDataArrayId:
+					{
+						var count = reader.ReadInt32();
+						QDebug.Log("客户端接收游戏数据[" + count + "]" + reader.BaseStream.Length.ToSizeString());
+						for (int i = 0; i < count; i++)
+						{
+							ReceiveGameData(reader);
+						}
+					}
+					break;
+				default:
+					{
+						var GameData = reader.ReadObject<QList<ulong, QNetFrameData>>(); ;
+						ClientGameData[index] = GameData;
+					}
+					break;
 			}
 		}
 
@@ -307,14 +309,17 @@ namespace QTool.Net
 		{
 			if (transport.ClientConnected)
 			{
+				#region 发送客户端数据
 				if (SendData.Active)
 				{
 					transport.CheckClientSend(SendData.Serialize());
 				}
 				SendData.Clear();
+				#endregion
 				if (ClientGameData.ContainsKey(ClientIndex))
 				{
-					byte[] loadEventData = null;
+					#region 处理客户端逻辑
+					byte[] SyncLoadData = null;
 					if (ClientGameData[ClientIndex].ContainsKey(ManagerId))
 					{
 						foreach (var eventData in ClientGameData[ClientIndex][ManagerId].Events)
@@ -325,7 +330,7 @@ namespace QTool.Net
 									{
 										if (eventData.Value[0] is byte[] loadData)
 										{
-											loadEventData = loadData;
+											SyncLoadData = loadData;
 										}
 										else
 										{
@@ -355,7 +360,7 @@ namespace QTool.Net
 							switch (eventData.Key)
 							{
 								case nameof(QNetActionKey.PlayerConnected):
-									if (player.gameObject==null)
+									if (player.gameObject == null)
 									{
 										if (playerPrefab != null)
 										{
@@ -402,10 +407,12 @@ namespace QTool.Net
 					QCoroutine.Update();
 					Physics.Simulate(Time.fixedDeltaTime);
 					Physics.SyncTransforms();
-					if (loadEventData != null)
+					#endregion
+					#region 加载同步数据
+					if (SyncLoadData != null)
 					{
 						Debug.LogWarning("[" + ClientIndex + "]尝试修复同步");
-						using (var reader = new QBinaryReader(loadEventData))
+						using (var reader = new QBinaryReader(SyncLoadData))
 						{
 							var Count = reader.ReadInt32();
 							for (int i = 0; i < Count; i++)
@@ -433,6 +440,8 @@ namespace QTool.Net
 							}
 						}
 					}
+					#endregion
+					#region 发送同步数据
 					if (QSyncCheck.Index == -1)
 					{
 						if (transport.ServerActive)
@@ -461,10 +470,12 @@ namespace QTool.Net
 										writer.Write(QIdData.ToArray());
 									}
 								}
-								ServerActionData[ManagerId].InvokeEvent(nameof(QNetActionKey.SyncLoad), writer.ToArray());
+								ServerGameData.StackPeek()[ManagerId].InvokeEvent(nameof(QNetActionKey.SyncLoad), writer.ToArray());
 							}
 						}
 					}
+					#endregion
+					#region 发送检测同步数据
 					if (ClientIndex % (netFps / 2) == 0)
 					{
 						QSyncCheck.Reset(ClientIndex);
@@ -477,8 +488,11 @@ namespace QTool.Net
 						}
 						PlayerAction(nameof(QNetActionKey.SyncCheck), QSyncCheck);
 					}
+					#endregion
+					#region 更新索引
 					ClientIndex++;
 					NetTime += NetDeltaTime;
+					#endregion
 				}
 			}
 		}
