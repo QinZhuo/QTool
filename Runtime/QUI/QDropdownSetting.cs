@@ -23,7 +23,7 @@ namespace QTool
 		}
 		public void Set(int index)
 		{
-			QPlayerPrefs.Set(name, dropdown.options[index]);
+			QPlayerPrefs.Set(name, dropdown.options[index].text);
 			QEventManager.InvokeEvent(QEventKey.设置更新);
 		}
 	}
