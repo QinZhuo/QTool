@@ -67,10 +67,7 @@ namespace QTool
 		{
 			return str.RemveChars('{', '}', '（', '）', '~', '\n', '\t', '\r', '、', '|', '*', '“', '”', '—', '。', '…', '=', '#', ' ', ';', '；', '-', ',', '，', '<', '>', '【', '】', '[', ']', '{', '}', '!', '！', '?', '？', '.', '\'', '‘', '’', '\"', ':', '：');
 		}
-		public static string ToLocationString(this string key)
-		{
-			return ('{' + key + '}');
-		}
+		
 		public static string ToShortString(this object obj, int length = 5000)
 		{
 			var str = obj?.ToString();
@@ -84,22 +81,22 @@ namespace QTool
 		{
 			return ToSizeString((long)byteLength);
 		}
-		public static string ToColorString(this string text, string color)
+		public static string ToColorString(this object obj, string color)
 		{
 			if (!color.StartsWith("#"))
 			{
 				color = "#" + color;
 			}
-			return "<color=" + color + ">" + text + "</color>";
+			return "<color=" + color + ">" + obj + "</color>";
+		}
+		public static string ToColorString(this object obj, Color color)
+		{
+			return obj.ToColorString(ColorUtility.ToHtmlStringRGB(color));
 		}
 		public static string ToColorString(this object obj)
 		{
 			var str = obj.ToString();
 			return str.ToColorString(str.ToColor());
-		}
-		public static string ToColorString(this string text, Color color)
-		{
-			return text.ToLocationString().ToColorString(ColorUtility.ToHtmlStringRGB(color));
 		}
 		public static string ToSizeString(this int byteLength)
 		{
