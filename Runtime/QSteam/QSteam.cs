@@ -331,8 +331,10 @@ namespace QTool.Steam
 	
 		public static void LeaveLobby()
         {
-			if (QLobby.CurrentLobby.IsNull()) return;
-            SteamMatchmaking.LeaveLobby(QLobby.CurrentLobby.Key.ToSteamId());
+			if (!QLobby.CurrentLobby.IsNull())
+			{
+				SteamMatchmaking.LeaveLobby(QLobby.CurrentLobby.Key.ToSteamId());
+			}
 			QDebug.Log(nameof(QSteam)+" 离开房间[" + QLobby.CurrentLobby.Key + "]");
 			QLobby.Leave();
         }
