@@ -15,11 +15,11 @@ namespace QTool
 			if (Application.isPlaying)
 			{
 				var select = QPlayerPrefs.Get<string>(name);
+				Debug.LogError(name + ":[" + select + "]");
 				for (int i = 0; i < dropdown.options.Count; i++)
 				{
 					if (dropdown.options[i].text == select)
 					{
-						Debug.LogError(name + ":[" + select + "]"+i);
 						dropdown.value = i;
 						break;
 					}
