@@ -259,6 +259,7 @@ namespace QTool.Steam
 			if (lobby.IsNull())
 			{
 				lobby.Data[key] = str;
+				QLobby.OnUpdate?.Invoke();
 			}
 			else
 			{
@@ -276,12 +277,16 @@ namespace QTool.Steam
 		public static void SetLobbyMemberData<T>(string key, T value)
 		{
 			var data = value.ToQData().Trim('"');
-			MemeberData[key] = data;
-			QDebug.Log(QLobby.CurrentLobby.Key + "." + Name + "." + key + " = " + data);
-			if (!QLobby.CurrentLobby.IsNull())
+			if (QLobby.CurrentLobby.IsNull())
+			{
+				MemeberData[key] = data;
+				QLobby.OnUpdate?.Invoke();
+			}
+			else
 			{
 				SteamMatchmaking.SetLobbyMemberData(QLobby.CurrentLobby.Key.ToSteamId(), nameof(QLobby.Data), MemeberData.ToQData());
 			}
+			QDebug.Log(QLobby.CurrentLobby.Key + "." + Name + "." + key + " = " + data);
 		}
 
 		/// <summary>
