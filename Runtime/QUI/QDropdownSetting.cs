@@ -19,6 +19,7 @@ namespace QTool
 				{
 					if (dropdown.options[i].text == select)
 					{
+						Debug.LogError(name + ":[" + select + "]"+i);
 						dropdown.value = i;
 						break;
 					}
