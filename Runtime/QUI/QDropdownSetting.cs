@@ -12,22 +12,26 @@ namespace QTool
 		protected void Awake()
 		{
 			dropdown = GetComponentInChildren<Dropdown>();
-			var select = QPlayerPrefs.Get<string>(name);
-			for (int i = 0; i < dropdown.options.Count; i++)
+			if (Application.isPlaying)
 			{
-				if (dropdown.options[i].text == select)
+				var select = QPlayerPrefs.Get<string>(name);
+				for (int i = 0; i < dropdown.options.Count; i++)
 				{
-					dropdown.value = i;
-					break;
+					if (dropdown.options[i].text == select)
+					{
+						dropdown.value = i;
+						break;
+					}
 				}
 			}
 		}
-
-
 		public void Set(int index)
 		{
-			QPlayerPrefs.Set(name, dropdown.options[index].text);
+			var value = dropdown.options[index].text;
+			QPlayerPrefs.Set(name, value);
+			QDebug.Log(name + ":[" + value + "]");
 			QEventManager.InvokeEvent(nameof(QEventKey.设置更新), name);
+	
 		}
 
 #if UNITY_EDITOR
