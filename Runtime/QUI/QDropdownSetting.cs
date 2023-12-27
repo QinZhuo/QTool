@@ -12,6 +12,15 @@ namespace QTool
 		protected void Awake()
 		{
 			dropdown = GetComponentInChildren<Dropdown>();
+			var select = QPlayerPrefs.Get<string>(name);
+			for (int i = 0; i < dropdown.options.Count; i++)
+			{
+				if (dropdown.options[i].text == select)
+				{
+					dropdown.value = i;
+					break;
+				}
+			}
 		}
 
 
