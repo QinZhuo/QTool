@@ -8,22 +8,22 @@ namespace QTool
 	[RequireComponent(typeof(Dropdown)), ExecuteInEditMode]
 	public class QDropdownSetting : MonoBehaviour
 	{
-		public Dropdown Dropdown { get; private set; }
+		public Dropdown dropdown;
 		protected void Awake()
 		{
-			Dropdown = GetComponent<Dropdown>();
+			dropdown = GetComponentInChildren<Dropdown>();
 
 		}
 		private void Reset()
 		{
 #if UNITY_EDITOR
-			Dropdown.onValueChanged.RemoveAllListeners();
-			UnityEditor.Events.UnityEventTools.AddPersistentListener(Dropdown.onValueChanged, Set);
+			dropdown.onValueChanged.RemoveAllListeners();
+			UnityEditor.Events.UnityEventTools.AddPersistentListener(dropdown.onValueChanged, Set);
 #endif
 		}
 		public void Set(int index)
 		{
-			QPlayerPrefs.Set(name, Dropdown.options[index]);
+			QPlayerPrefs.Set(name, dropdown.options[index]);
 			QEventManager.InvokeEvent(QEventKey.设置更新);
 		}
 	}
