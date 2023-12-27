@@ -14,7 +14,7 @@ namespace QTool
 			dropdown = GetComponentInChildren<Dropdown>();
 			if (Application.isPlaying)
 			{
-				var select = QPlayerPrefs.Get<string>(name).Trim('"');
+				var select = QPlayerPrefs.Get<string>(name)?.Trim('"');
 				for (int i = 0; i < dropdown.options.Count; i++)
 				{
 					if (dropdown.options[i].text == select)
