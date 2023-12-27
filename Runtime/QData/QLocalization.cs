@@ -58,21 +58,30 @@ namespace QTool
 		public static string GetLozalization(string key)
 		{
 			if (key.IsNull()) return key;
-			var text = Get(key).Localization;
-			if (text.EndsWith(AutoTranslateEndKey))
+			if (ContainsKey(key))
 			{
-				text = text.Substring(0, text.Length - AutoTranslateEndKey.Length);
+				var text = Get(key).Localization;
+				if (text.EndsWith(AutoTranslateEndKey))
+				{
+					text = text.Substring(0, text.Length - AutoTranslateEndKey.Length);
+				}
+				return text;
 			}
-			return text;
+			else
+			{
+				QDebug.LogWarning("缺少翻译[" + key + "]" + Language);
+			}
+			return key;
 		}
 		public const string AutoTranslateEndKey = " [Auto]";
 		[QName]
 		public string Localization { get; private set; }
 		static QLocalizationData()
 		{
+			Fresh();
 			QEventManager.Register<string>(nameof(QEventKey.设置更新), Fresh);
 		}
-		public static void Fresh(string key = "")
+		public static void Fresh(string key = nameof(Language))
 		{
 			if (key == nameof(Language))
 			{
