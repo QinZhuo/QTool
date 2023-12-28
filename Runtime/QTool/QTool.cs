@@ -155,10 +155,6 @@ namespace QTool
 			}
 			PlayerLoop.SetPlayerLoop(playerLoop);
 		}
-		public static bool IsActiveAndDontDestroyed(this GameObject obj)  
-		{
-			return obj.activeInHierarchy;
-		}
 		public static Color ToColor(this string key, float s = 0.5f, float v = 1f)
         {
             if (string.IsNullOrWhiteSpace(key)) return Color.white;

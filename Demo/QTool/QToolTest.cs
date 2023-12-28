@@ -146,6 +146,25 @@ namespace QTool.Test
 			});
 
 		}
+		[QName("Action速度测试")]
+		public void ActionTest()
+		{
+			List<Action> actions = new List<Action>();
+			Action testAction = null;
+			for (int i = 0; i < 100000; i++)
+			{
+				var info= " test " + i;
+				actions.Add(new Action(() => { var c = info + info; }));
+				testAction += actions[i];
+			}
+			QDebug.DebugRun("action ", testAction);
+			QDebug.DebugRun("foreach ", ()=> {
+				foreach (var action in actions)
+				{
+					action();
+				}
+			});
+		}
 
 		[QName("命令测试")]
 		public void CommandTest()
