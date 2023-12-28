@@ -13,18 +13,8 @@ namespace QTool
 {
 	public static class QDebug
 	{
-
 		private static QAverageValue FrameCount = new QAverageValue();
 		public static int FPS => (int)(FrameCount.SecondeSum);
-		private static long LastFrameTime { set; get; } = 0;
-		private static Label InfoLabel = null;
-		private static VisualElement DebugPanel = null;
-		private static VisualElement LeftPanel = null;
-		private static VisualElement RightPanel = null;
-		private static VisualElement MidPanel = null;
-		private static VisualElement DownPanel = null;
-#if DEVELOPMENT_BUILD || UNITY_EDITOR
-
 		[RuntimeInitializeOnLoadMethod]
 		private static void Init()
 		{
@@ -32,12 +22,89 @@ namespace QTool
 		}
 		public static void Update()
 		{
+			FrameCount.Push(1);
+			UpdateUI();
+		}
+		[System.Diagnostics.Conditional("DEVELOPMENT_BUILD"), System.Diagnostics.Conditional("UNITY_EDITOR")]
+		public static void DebugRun(string key, Action action)
+		{
+			GC.Collect();
+			GC.WaitForPendingFinalizers();
+			var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+			var lastMemery = GC.GetTotalMemory(false);
+			var lastCount = GC.CollectionCount(0);
+			try
+			{
+				action();
+			}
+			catch (Exception e)
+			{
+				Debug.LogError("【" + key + "】运行出错:" + e);
+				return;
+			}
+			Log("【" + key + "】运行时间 " + stopwatch.Elapsed + " 内存使用 " + (GC.GetTotalMemory(false) - lastMemery).ToSizeString() + " 垃圾回收次数 " + (GC.CollectionCount(0) - lastCount));
+			stopwatch.Stop();
+		}
+		[System.Diagnostics.Conditional("DEVELOPMENT_BUILD"), System.Diagnostics.Conditional("UNITY_EDITOR")]
+		public static void Log(object obj)
+		{
+			Debug.Log("[" + nameof(QDebug) + "]  " + obj);
+		}
+		[System.Diagnostics.Conditional("DEVELOPMENT_BUILD"), System.Diagnostics.Conditional("UNITY_EDITOR")]
+		public static void LogWarning(object obj)
+		{
+			Debug.LogWarning("[" + nameof(QDebug) + "]  " + obj);
+		}
+		[System.Diagnostics.Conditional("DEVELOPMENT_BUILD"), System.Diagnostics.Conditional("UNITY_EDITOR")]
+		public static void LogError(object obj)
+		{
+			Debug.LogError("[" + nameof(QDebug) + "]  " + obj);
+		}
+		private static Dictionary<string, long> StartTimestampList = new QDictionary<string, long>();
+		private static QDictionary<string, long> TimestampList = new QDictionary<string, long>();
+		[System.Diagnostics.Conditional("DEVELOPMENT_BUILD"), System.Diagnostics.Conditional("UNITY_EDITOR")]
+		public static void Begin(string key)
+		{
+			if (!StartTimestampList.ContainsKey(key))
+			{
+				StartTimestampList[key] = QTime.Timestamp;
+			}
+			TimestampList[key] = QTime.Timestamp;
+		}
+		[System.Diagnostics.Conditional("DEVELOPMENT_BUILD"), System.Diagnostics.Conditional("UNITY_EDITOR")]
+		public static void End(string key, string resultInfo = "")
+		{
+			Log(key + " " + resultInfo + " 时间 " + TimestampList[key].GetIntervalSeconds().ToString("f4")+"s / "+StartTimestampList[key].GetIntervalSeconds().ToString("f4") + " s" + " 帧率 " + FPS);
+		}
+		[System.Diagnostics.Conditional("DEVELOPMENT_BUILD"), System.Diagnostics.Conditional("UNITY_EDITOR")]
+		public static void ChangeProfilerCount(string key, int changeCount = 0)
+		{
+#if Profiler
+			var obj = ProfilerCount[key];
+			obj.Value=changeCount;
+#endif
+		}
+#if Profiler
+		private static readonly ProfilerCategory filerCategory = ProfilerCategory.Scripts;
+		private static QDictionary<string, ProfilerCounterValue<int>> ProfilerCount = new QDictionary<string, ProfilerCounterValue<int>>((key) => new ProfilerCounterValue<int>(filerCategory, key, ProfilerMarkerDataUnit.Count, ProfilerCounterOptions.FlushOnEndOfFrame));
+#endif
+
+
+		#region 测试面板UI
+#if DEVELOPMENT_BUILD || UNITY_EDITOR
+
+		private static Label InfoLabel = null;
+		private static VisualElement DebugPanel = null;
+		private static VisualElement LeftPanel = null;
+		private static VisualElement RightPanel = null;
+		private static VisualElement MidPanel = null;
+		private static VisualElement DownPanel = null;
+		private static void UpdateUI()
+		{
 			if ((QInput.Ctrl && QInput.Enter) || InputCircle > 720)
 			{
 				OpenPanel();
 			}
-			FrameCount.Push(1);
-			LastFrameTime = QTime.Timestamp;
 			var useSize = Profiler.GetTotalAllocatedMemoryLong();
 			if (InfoLabel == null)
 			{
@@ -49,8 +116,8 @@ namespace QTool
 				InfoLabel.style.textShadow = new TextShadow { offset = Vector2.one, color = Color.black, blurRadius = 1 };
 			}
 			InfoLabel.text = Application.productName + " v" + Application.version + "\t 内存：" + useSize.ToSizeString() + " / " + (useSize + Profiler.GetTotalReservedMemoryLong()).ToSizeString() + "\t 帧率：" + FPS.ToString() + " |";
-		}
 
+		}
 		static Vector2 LeftScrollPosition = Vector2.zero;
 		static Vector2 RightScrollPosition = Vector2.zero;
 
@@ -207,7 +274,6 @@ namespace QTool
 			GameTexture?.Release();
 			GameTexture = null;
 		}
-#endif
 		static Vector2 last = default;
 		static float angle = 0;
 		private static float InputCircle
@@ -233,63 +299,9 @@ namespace QTool
 				return angle;
 			}
 		}
-
-		public static void DebugRun(string key, Action action)
-		{
-			GC.Collect();
-			GC.WaitForPendingFinalizers();
-			var stopwatch = System.Diagnostics.Stopwatch.StartNew();
-			var lastMemery = GC.GetTotalMemory(false);
-			var lastCount = GC.CollectionCount(0);
-			try
-			{
-				action();
-			}
-			catch (Exception e)
-			{
-				Debug.LogError("【" + key + "】运行出错:" + e);
-				return;
-			}
-			Log("【" + key + "】运行时间 " + stopwatch.Elapsed + " 内存使用 " + (GC.GetTotalMemory(false) - lastMemery).ToSizeString() + " 垃圾回收次数 " + (GC.CollectionCount(0) - lastCount));
-			stopwatch.Stop();
-		}
-		[System.Diagnostics.Conditional("UNITY_EDITOR")]
-		public static void Log(object obj)
-		{
-			Debug.Log("[" + nameof(QDebug) + "]  " + obj);
-		}
-		[System.Diagnostics.Conditional("UNITY_EDITOR")]
-		public static void LogWarning(object obj)
-		{
-			Debug.LogWarning("[" + nameof(QDebug) + "]  " + obj);
-		}
-		[System.Diagnostics.Conditional("DEVELOPMENT_BUILD"), System.Diagnostics.Conditional("UNITY_EDITOR")]
-		public static void LogError(object obj)
-		{
-			Debug.LogError("[" + nameof(QDebug) + "]  " + obj);
-		}
-		private static QDictionary<string, long> TimestampList = new QDictionary<string, long>();
-		[System.Diagnostics.Conditional("DEVELOPMENT_BUILD"), System.Diagnostics.Conditional("UNITY_EDITOR")]
-		public static void Begin(string key)
-		{
-			TimestampList[key] = QTime.Timestamp;
-		}
-		[System.Diagnostics.Conditional("DEVELOPMENT_BUILD"), System.Diagnostics.Conditional("UNITY_EDITOR")]
-		public static void End(string key, string resultInfo = "")
-		{
-			Log(key + " " + resultInfo + " 时间 " + TimestampList[key].GetIntervalSeconds().ToString("f3") + " s" + " 帧率 " + Mathf.Min(FPS, (int)(1f / LastFrameTime.GetIntervalSeconds())));
-		}
-		[System.Diagnostics.Conditional("DEVELOPMENT_BUILD"), System.Diagnostics.Conditional("UNITY_EDITOR")]
-		public static void ChangeProfilerCount(string key, int changeCount = 0)
-		{
-#if Profiler
-			var obj = ProfilerCount[key];
-			obj.Value=changeCount;
+#else
+		private static void UpdateUI() { }
 #endif
-		}
-#if Profiler
-		private static readonly ProfilerCategory filerCategory = ProfilerCategory.Scripts;
-		private static QDictionary<string, ProfilerCounterValue<int>> ProfilerCount = new QDictionary<string, ProfilerCounterValue<int>>((key) => new ProfilerCounterValue<int>(filerCategory, key, ProfilerMarkerDataUnit.Count, ProfilerCounterOptions.FlushOnEndOfFrame));
-#endif
+		#endregion
 	}
 }

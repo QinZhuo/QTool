@@ -88,7 +88,6 @@ namespace QTool
 		public Mesh GetMesh()
 		{
 			if (Mesh == null) Mesh = new Mesh();
-			QDebug.Begin(nameof(QMeshData) + GetHashCode());
 			Dirty = false;
 			Mesh.Clear(false);
 			Mesh.vertices = vertices.ToArray();
@@ -113,7 +112,6 @@ namespace QTool
 			{
 				Mesh.tangents = tangents.ToArray();
 			}
-			QDebug.End(nameof(QMeshData) + GetHashCode());
 			return Mesh;
 		}
 		public void CombineVertices(float range)
