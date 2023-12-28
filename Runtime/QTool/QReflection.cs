@@ -554,9 +554,9 @@ namespace QTool.Reflection
 				return method.Name;
 			}
 		}
-		public static string GetNameWithParams(this MethodInfo method, string nameStart = "")
+		public static string GetNameWithParams(this MethodInfo method)
 		{
-			nameStart += method.Name;
+			var nameStart = method.Name;
 			var Params = method.GetParameters();
 			for (int i = 0; i < Params.Length; ++i)
 			{
