@@ -587,7 +587,7 @@ namespace QTool
 		public static PropertyField Add(this VisualElement root, UnityEditor.SerializedProperty serializedProperty)
 		{
 			var visual = new PropertyField(serializedProperty, QReflection.QName(serializedProperty));
-			visual.name = serializedProperty.name;
+			visual.name = visual.label;
 			root.Add(visual);
 			return visual;
 		}
