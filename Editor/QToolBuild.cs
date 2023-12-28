@@ -9,36 +9,17 @@ using UnityEngine;
 namespace QTool
 {
 
-	[InitializeOnLoad]
-	public class QToolBuild : Editor, IPreprocessBuildWithReport, IPostprocessBuildWithReport
+	public class QToolBuild: IPreprocessBuildWithReport, IPostprocessBuildWithReport
 	{
-		private void Awake()
-		{
-			BuildPlayerWindow.RegisterBuildPlayerHandler(
-			buildPlayerOptions =>
-			{
-				QTool.IsBuilding = true;
-//#if Addressable
-//				AddressableAssetSettings.BuildPlayerContent();
-//#endif
-				BuildPlayerWindow.DefaultBuildMethods.BuildPlayer(buildPlayerOptions);
-				QTool.IsBuilding = false;
-			});
-		}
-		public static string BuildPath => Application.dataPath.Substring(0, Application.dataPath.LastIndexOf("Assets")) + "Builds/" + EditorUserBuildSettings.selectedBuildTargetGroup + "/" + PlayerSettings.productName + "_v" + PlayerSettings.bundleVersion.Replace(".", "_");
-
 		public int callbackOrder => 0;
-		bool CheckBuildPath(string path)
-		{
-			return !Application.dataPath.StartsWith(path);
-		}
 		//打包前处理
-		public void OnPreprocessBuild(BuildReport report)
+		public void OnPreprocessBuild(BuildReport report) 
 		{
+			QTool.IsBuilding = true;
 			QDebug.Log("开始打包[" + report.summary.platformGroup + "]" + report.summary.outputPath);
 			PlayerPrefs.SetString(nameof(QToolBuild), report.summary.outputPath);
 			var path = Path.GetDirectoryName(report.summary.outputPath);
-			if (!CheckBuildPath(path))
+			if (!Application.dataPath.StartsWith(path))
 			{
 				if (Directory.Exists(path))
 				{
@@ -82,6 +63,7 @@ namespace QTool
 			PlayerSettings.bundleVersion = versions.ToOneString(".");
 			QEventManager.InvokeEvent("游戏版本", PlayerSettings.bundleVersion);
 			QDebug.Log("打包完成 " + report.summary.outputPath);
+			QTool.IsBuilding = false;
 		}
 	}
 }

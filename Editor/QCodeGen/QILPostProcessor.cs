@@ -61,7 +61,8 @@ namespace QTool.CodeGen
 		public AssemblyDefinition ReadAssembly(MemoryStream peStream, MemoryStream pdbStream, QAssemblyResolver asmResolver)
 		{
 			var readerParameters = new ReaderParameters
-			{
+			{ 
+				ReadingMode= ReadingMode.Deferred,  
 				SymbolStream = pdbStream,
 				ReadWrite = true,
 				ReadSymbols = true,
