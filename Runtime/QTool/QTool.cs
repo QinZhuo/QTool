@@ -110,10 +110,10 @@ namespace QTool
 			return obj;
 		}
 
-		private static PlayerLoopSystem AddPlayerLoop(this PlayerLoopSystem playerLoop,Type type, Action action)
+		private static PlayerLoopSystem AddPlayerLoop(this PlayerLoopSystem playerLoop, Type type, Action action)
 		{
 			var loopList = playerLoop.subSystemList.ToList();
-			loopList.Add(new PlayerLoopSystem { type = type, updateDelegate =new PlayerLoopSystem.UpdateFunction(action)});
+			loopList.Add(new PlayerLoopSystem { type = type, updateDelegate = new PlayerLoopSystem.UpdateFunction(action) });
 			playerLoop.subSystemList = loopList.ToArray();
 			return playerLoop;
 		}
@@ -154,6 +154,10 @@ namespace QTool
 			 	playerLoop= playerLoop.RemovePlayerLoop(type);
 			}
 			PlayerLoop.SetPlayerLoop(playerLoop);
+		}
+		public static bool IsActiveAndDontDestroyed(this GameObject obj)  
+		{
+			return obj.activeInHierarchy;
 		}
 		public static Color ToColor(this string key, float s = 0.5f, float v = 1f)
         {
