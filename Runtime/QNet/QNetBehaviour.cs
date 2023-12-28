@@ -25,13 +25,14 @@ namespace QTool.Net
 			}
 			return QNetManager.Instance.PlayerValue(PlayerId, key, value);
 		}
-		public void PlayerAction(string key,params object[] Params)
+		public void _PlayerAction(string key,params object[] Params)
 		{
-			if (IsLoaclPlayer)
+			if (IsLoaclPlayer) 
 			{
 				QNetManager.PlayerAction(key, Params);
 			}
 		}
+		public List<object> ParamList = new List<object>(); 
 		private QNetTypeInfo TypeInfo { get; set; }
 		public virtual void Awake()
 		{
@@ -188,7 +189,7 @@ namespace QTool.Net
 					});
 					Functions.RemoveAll(function =>
 					{
-						return function.MethodInfo.GetAttribute<QSyncActionAttribute>() == null;
+						return !function.MethodInfo.Name.EndsWith(nameof(QNetBehaviour._PlayerAction));
 					});
 				}
 			}
@@ -197,7 +198,7 @@ namespace QTool.Net
 		/// 标记函数为玩家动作 本地玩家使用PlayerAction远程调用所有客户端
 		/// </summary>
 		[AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
-		protected class QSyncActionAttribute : Attribute
+		public class QSyncActionAttribute : Attribute
 		{
 			public QSyncActionAttribute()
 			{
@@ -207,7 +208,7 @@ namespace QTool.Net
 		/// 标记变量在同步检测出错时进行同步更新 如果SyncCheck为True则会对该变量进行同步检测
 		/// </summary>
 		[AttributeUsage(AttributeTargets.Field | AttributeTargets.Property, AllowMultiple = false)]
-		protected class QSyncVarAttribute : Attribute
+		public class QSyncVarAttribute : Attribute
 		{
 			public bool SyncCheck { get; private set; }
 			public QSyncVarAttribute(bool SyncCheck = false)

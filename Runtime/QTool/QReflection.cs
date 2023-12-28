@@ -530,29 +530,39 @@ namespace QTool.Reflection
 			return size;
 		}
 	
-		public static string QName(this MemberInfo type)
+		public static string QName(this MemberInfo member)
         {
-            var att = type.GetCustomAttribute<QNameAttribute>();
+            var att = member.GetCustomAttribute<QNameAttribute>();
             if (att != null && !string.IsNullOrWhiteSpace(att.name))
             {
                 return att.name;
             }
             else
             {
-                return type.Name;
+                return member.Name;
             }
 		}
-		public static string QOldName(this MemberInfo type)
+		public static string QOldName(this MemberInfo method)
 		{
-			var att = type.GetCustomAttribute<QOldNameAttribute>();
+			var att = method.GetCustomAttribute<QOldNameAttribute>();
 			if (att != null && !string.IsNullOrWhiteSpace(att.name))
 			{
 				return att.name;
 			}
 			else
 			{
-				return type.Name;
+				return method.Name;
 			}
+		}
+		public static string GetNameWithParams(this MethodInfo method, string nameStart = "")
+		{
+			nameStart += method.Name;
+			var Params = method.GetParameters();
+			for (int i = 0; i < Params.Length; ++i)
+			{
+				nameStart += "_" + Params[i].ParameterType.Name;
+			}
+			return nameStart;
 		}
 		public static Type GetTrueType(this Type type)
         {

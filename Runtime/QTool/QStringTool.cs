@@ -133,6 +133,10 @@ namespace QTool
 				{
 					foreach (var item in array)
 					{
+						if (writer == null)
+						{
+							Debug.LogError("null");
+						}
 						writer.Write(item);
 						if (i < array.Count - 1)
 						{
