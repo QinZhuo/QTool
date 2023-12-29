@@ -9,7 +9,6 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using UnityEngine;
-using QTool.Lobby;
 namespace QTool.Steam
 {
 	public static class QSteam
