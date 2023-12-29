@@ -4,14 +4,14 @@ using System.Collections.Generic;
 using UnityEngine;
 namespace QTool
 {
-	public class QLobby:IKey<ulong>
+	public class QLobby : IKey<ulong>
 	{
-		public ulong Key { get; set; }   
-		public string Name => Data[nameof(Name)];  
-		public ulong Owner { get; set; }  
-		public QList<ulong, QLobbyMember> Members { get; private set; } = new QList<ulong, QLobbyMember>(() => new QLobbyMember());  
+		public ulong Key { get; set; }
+		public string Name => Data[nameof(Name)];
+		public ulong Owner { get; set; }
+		public QList<ulong, QLobbyMember> Members { get; private set; } = new QList<ulong, QLobbyMember>(() => new QLobbyMember());
 		public int MemberLimit { get; set; }
-		public QDictionary<string, string> Data { get;private set; } = new QDictionary<string, string>();
+		public QDictionary<string, string> Data { get; private set; } = new QDictionary<string, string>();
 
 		public QLobbyMember this[ulong playerId]
 		{
@@ -67,6 +67,7 @@ namespace QTool
 		{
 			public ulong Key { get; set; }
 			public string Name { get; set; }
+			public QLobbyState State => GetData(nameof(State), QLobbyState.空闲);
 			public QDictionary<string, string> Data { get; private set; } = new QDictionary<string, string>();
 			public T GetData<T>(string key, T defaultValue = default)
 			{
@@ -85,7 +86,12 @@ namespace QTool
 			}
 		}
 	}
-
-
-
+	public enum QLobbyState
+	{
+		空闲 = 0,
+		准备 = 1,
+		匹配 = 2,
+		加载 = 3,
+		游戏 = 4,
+	}
 }
