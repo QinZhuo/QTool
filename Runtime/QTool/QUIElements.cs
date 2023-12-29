@@ -171,7 +171,7 @@ namespace QTool
 			root.Add(visual);
 			return visual;
 		}
-		public static Label AddLabel(this VisualElement root, string text, TextAnchor textAlign = TextAnchor.MiddleLeft)
+		public static Label AddLabel(this VisualElement root, string text=nameof(Label), TextAnchor textAlign = TextAnchor.MiddleLeft)
 		{
 			var label = new Label(text);
 			label.name = text;
@@ -215,6 +215,11 @@ namespace QTool
 			return visual;
 		}
 #endif
+		public static VisualElement Name(this VisualElement visual,string name)
+		{
+			visual.name = name;
+			return visual;
+		}
 		public static VisualElement AddVisualElement(this VisualElement root, FlexDirection flexDirection = FlexDirection.Column)
 		{
 			var visual = new VisualElement();

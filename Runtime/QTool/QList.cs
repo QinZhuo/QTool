@@ -309,14 +309,14 @@ namespace QTool
 			this.AutoCreate = AutoCreate;
 		}
 	}
-	public class QConnectQDictionary<TKey,TValue>:IEnumerable
+	public class QConnect<TKey,TValue>:IEnumerable
 	{
-		public QDictionary<TKey, TValue> KeyToValue = new QDictionary<TKey, TValue>();
-		public QDictionary<TValue, TKey> ValueToKey = new QDictionary<TValue, TKey>();
+		protected Dictionary<TKey, TValue> KeyToValue = new Dictionary<TKey, TValue>();
+		protected Dictionary<TValue, TKey> ValueToKey = new Dictionary<TValue, TKey>();
 		public int Count => KeyToValue.Count;
 		public IEnumerator GetEnumerator() => KeyToValue.GetEnumerator();
-		public bool Contains(TKey key) => KeyToValue.ContainsKey(key);
-		public bool Contains(TValue value) => ValueToKey.ContainsKey(value);
+		public bool ContainsKey(TKey key) => KeyToValue.ContainsKey(key);
+		public bool ContainsValue(TValue value) => ValueToKey.ContainsKey(value);
 		public TValue this[TKey key]
 		{
 			get
@@ -332,17 +332,18 @@ namespace QTool
 			}
 		}
 		
-		public void Add(TKey key,TValue value)
+		public virtual void Set(TKey key,TValue value)
 		{
 			Remove(key);
+			Remove(value);
 			KeyToValue[key] = value;
 			ValueToKey[value] = key;
 		}
-		public void Add(TValue value, TKey key)
+		public void Set(TValue value, TKey key)
 		{
-			Add(key, value);
+			Set(key, value);
 		}
-		public void Remove(TKey key)
+		public virtual void Remove(TKey key)
 		{
 			if (KeyToValue.ContainsKey(key))
 			{
@@ -357,9 +358,14 @@ namespace QTool
 				Remove(ValueToKey[value]);
 			}
 		}
+		public virtual void Clear()
+		{
+			KeyToValue.Clear();
+			ValueToKey.Clear();
+		}
 	}
 
-	[System.Serializable]
+	[Serializable]
 	public struct QKeyValue<TKey, T> : IKey<TKey>
 	{
 		public TKey Key { get; set; }

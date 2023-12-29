@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-namespace QTool
+namespace QTool.Lobby
 {
 	public class QLobby : IKey<ulong>
 	{
