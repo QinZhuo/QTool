@@ -86,7 +86,7 @@ namespace QTool
 			}
 		}
 	}
-	public enum QLobbyState
+	public enum QLobbyState 
 	{
 		空闲 = 0,
 		准备 = 1,
