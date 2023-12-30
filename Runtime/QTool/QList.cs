@@ -100,22 +100,30 @@ namespace QTool
 			}
 			RemoveList.Add(item);
 		}
-		public void Update()
+		public void UpdateRemove()
 		{
-			if (AddList.Count > 0)
-			{
-				base.AddRange(AddList);
-				AddList.Clear();
-			}
 			if (RemoveList.Count > 0)
 			{
 				base.RemoveAll(item => RemoveList.Contains(item));
 				RemoveList.Clear();
 			}
 		}
+		public void UpdateAdd()
+		{
+			if (AddList.Count > 0)
+			{
+				base.AddRange(AddList);
+				AddList.Clear();
+			}
+		}
+		public void Update()
+		{
+			UpdateAdd();
+			UpdateRemove();
+		}
 		public new void Clear()
 		{
-			Clear();
+			base.Clear();
 			AddList.Clear();
 			RemoveList.Clear();
 		}
@@ -373,7 +381,7 @@ namespace QTool
 		}
 		public new void Clear()
 		{
-			Clear();
+			base.Clear();
 			AddList.Clear();
 			RemoveList.Clear();
 		}
