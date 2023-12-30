@@ -82,42 +82,42 @@ namespace QTool
 	}
 	public class QDelayList<T> : List<T>
 	{
-		private List<T> addList = new List<T>();
-		private List<T> removeList = new List<T>();
+		public List<T> AddList { get; private set; } = new List<T>();
+		public List<T> RemoveList { get; private set; } = new List<T>();
 		public new bool Contains(T item)
 		{
-			return !removeList.Contains(item) && (base.Contains(item) || addList.Contains(item));
+			return !RemoveList.Contains(item) && (base.Contains(item) || AddList.Contains(item));
 		}
 		public new void Add(T item)
 		{
-			addList.Add(item);
+			AddList.Add(item);
 		}
 		public new void Remove(T item)
 		{
-			if (addList.Contains(item))
+			if (AddList.Contains(item))
 			{
-				addList.Remove(item);
+				AddList.Remove(item);
 			}
-			removeList.Add(item);
+			RemoveList.Add(item);
 		}
 		public void Update()
 		{
-			if (addList.Count > 0)
+			if (AddList.Count > 0)
 			{
-				base.AddRange(addList);
-				addList.Clear();
+				base.AddRange(AddList);
+				AddList.Clear();
 			}
-			if (removeList.Count > 0)
+			if (RemoveList.Count > 0)
 			{
-				base.RemoveAll(item => removeList.Contains(item));
-				removeList.Clear();
+				base.RemoveAll(item => RemoveList.Contains(item));
+				RemoveList.Clear();
 			}
 		}
 		public new void Clear()
 		{
 			Clear();
-			addList.Clear();
-			removeList.Clear();
+			AddList.Clear();
+			RemoveList.Clear();
 		}
 	}
 	public class QList<TKey, T> : QList<T> where T : IKey<TKey>
@@ -351,15 +351,15 @@ namespace QTool
 	}
 	public class QDelayDictionary<TKey, TValue> : Dictionary<TKey, TValue>
 	{
-		private Dictionary<TKey, TValue> addList = new Dictionary<TKey, TValue>();
-		private List<TKey> removeList = new List<TKey>();
+		public Dictionary<TKey, TValue> AddList { get; private set; } = new Dictionary<TKey, TValue>();
+		public List<TKey> RemoveList { get; private set; } = new List<TKey>();
 		public new TValue this[TKey key]
 		{
 			get
 			{
-				if (addList.ContainsKey(key))
+				if (AddList.ContainsKey(key))
 				{
-					return addList[key];
+					return AddList[key];
 				}
 				else if (base.ContainsKey(key))
 				{
@@ -374,37 +374,37 @@ namespace QTool
 		public new void Clear()
 		{
 			Clear();
-			addList.Clear();
-			removeList.Clear();
+			AddList.Clear();
+			RemoveList.Clear();
 		}
 		public new bool ContainsKey(TKey key)
 		{
-			return !removeList.Contains(key) && (base.ContainsKey(key) || addList.ContainsKey(key));
+			return !RemoveList.Contains(key) && (base.ContainsKey(key) || AddList.ContainsKey(key));
 		}
 		public new void Add(TKey key, TValue value)
 		{
-			if (addList.ContainsKey(key))
+			if (AddList.ContainsKey(key))
 			{
-				addList[key] = value;
+				AddList[key] = value;
 			}
 			else
 			{
-				addList.Add(key, value);
+				AddList.Add(key, value);
 			}
 		}
 		public new void Remove(TKey key)
 		{
-			if (addList.ContainsKey(key))
+			if (AddList.ContainsKey(key))
 			{
-				addList.Remove(key);
+				AddList.Remove(key);
 			}
-			removeList.Add(key);
+			RemoveList.Add(key);
 		}
 		public void Update()
 		{
-			if (addList.Count > 0)
+			if (AddList.Count > 0)
 			{
-				foreach (var item in addList)
+				foreach (var item in AddList)
 				{
 					if (ContainsKey(item.Key))
 					{
@@ -415,15 +415,15 @@ namespace QTool
 						base.Add(item.Key, item.Value);
 					}
 				}
-				addList.Clear();
+				AddList.Clear();
 			}
-			if (removeList.Count > 0)
+			if (RemoveList.Count > 0)
 			{
-				foreach (var key in removeList)
+				foreach (var key in RemoveList)
 				{
 					base.Remove(key);
 				}
-				removeList.Clear();
+				RemoveList.Clear();
 			}
 		}
 	}

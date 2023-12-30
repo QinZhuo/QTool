@@ -29,7 +29,7 @@ namespace QTool
 		/// </summary>
 		public event Action<QBuffData<BuffData>.Runtime> OnEndBuff = null;
 		public QDelayDictionary<string, QBuffData<BuffData>.Runtime> Buffs { get; private set; } = new QDelayDictionary<string, QBuffData<BuffData>.Runtime>();
-		private QDictionary<string, QDelayList<QBuffData<BuffData>.Runtime>> EventBuffs { get; set; } = new QDictionary<string, QDelayList<QBuffData<BuffData>.Runtime>>(key=>new QDelayList<QBuffData<BuffData>.Runtime>());
+		private QDictionary<string, QDelayList<QBuffData<BuffData>.Runtime>> EventBuffs { get; set; } = new QDictionary<string, QDelayList<QBuffData<BuffData>.Runtime>>(key => new QDelayList<QBuffData<BuffData>.Runtime>());
 		public int this[string key]
 		{
 			get
@@ -52,7 +52,7 @@ namespace QTool
 				BeginBuff(buff);
 				for (int i = 0; i < count; i++)
 				{
-				 	OnAdd(buff);
+					OnAdd(buff);
 				}
 
 			}
@@ -253,12 +253,9 @@ namespace QTool
 		}
 		public void Clear()
 		{
-			foreach (var buff in Buffs.ToList())
-			{
-				Remove(buff.Key, buff.Count.IntValue);
-			}
+			Buffs.Clear();
+			EventBuffs.Clear();
 		}
-
 	}
 
 

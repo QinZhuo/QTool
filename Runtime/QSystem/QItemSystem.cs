@@ -49,6 +49,11 @@ namespace QTool
 		const string RemoveEventKey = "移除";
 		public QDelayList<QItemData<ItemData>.Runtime> Items { get; private set; } = new QDelayList<QItemData<ItemData>.Runtime>();
 		private QDictionary<string, QDelayList<QItemData<ItemData>.Runtime>> EventItems { get; set; } = new QDictionary<string, QDelayList<QItemData<ItemData>.Runtime>>(key => new QDelayList<QItemData<ItemData>.Runtime>());
+		public void Clear()
+		{
+			Items.Clear();
+			EventItems.Clear();
+		}
 		public int this[string key]
 		{
 			get
