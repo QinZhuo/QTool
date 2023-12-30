@@ -106,6 +106,7 @@ namespace QTool.Steam
 		}
 		public static void SetType(this QLobby lobby, ELobbyType type)
 		{
+			QDebug.Log("更改房间公开程度[" + type + "] " + lobby);
 			SteamMatchmaking.SetLobbyType(lobby.Key.ToSteamId(), type);
 		}
 		public static CSteamID ToSteamId(this ulong userId)
@@ -431,8 +432,8 @@ namespace QTool.Steam
 			var lobbyId = lobby.Key.ToSteamId();
 			lobby.Owner = SteamMatchmaking.GetLobbyOwner(lobbyId).m_SteamID;
 			lobby.Members.Clear();
-			var memeberCount= SteamMatchmaking.GetNumLobbyMembers(lobbyId);
-            lobby.MemberLimit = SteamMatchmaking.GetLobbyMemberLimit(lobbyId);
+			var memeberCount = SteamMatchmaking.GetNumLobbyMembers(lobbyId);
+			lobby.MemberLimit = SteamMatchmaking.GetLobbyMemberLimit(lobbyId);
 			for (int t = 0; t < memeberCount; t++)
 			{
 				var memeberId = SteamMatchmaking.GetLobbyMemberByIndex(lobbyId, t);
@@ -445,18 +446,17 @@ namespace QTool.Steam
 			}
 			lobby.Data.Clear();
 			var count = SteamMatchmaking.GetLobbyDataCount(lobbyId);
-			for (int t = 0; t < count; ++t) 
-            {
-				bool lobbyDataRet = SteamMatchmaking.GetLobbyDataByIndex(lobbyId, t, out var key, Constants.k_nMaxLobbyKeyLength,out var value, Constants.k_cubChatMetadataMax);
+			for (int t = 0; t < count; ++t)
+			{
+				bool lobbyDataRet = SteamMatchmaking.GetLobbyDataByIndex(lobbyId, t, out var key, Constants.k_nMaxLobbyKeyLength, out var value, Constants.k_cubChatMetadataMax);
 				lobby.Data[key] = value;
 				if (!lobbyDataRet)
-                {
-                    Debug.LogError(nameof(QSteam)+" 获取房间["+lobbyId+"]信息出错 " + t);
-                    continue;
-                }
+				{
+					Debug.LogError(nameof(QSteam) + " 获取房间[" + lobbyId + "]信息出错 " + t);
+					continue;
+				}
 			}
-			
-			QDebug.Log(nameof(QSteam)+" 房间信息更新 " + lobby.ToDetailString());
+			QDebug.Log(nameof(QSteam) + " 房间信息更新 " + lobby + "\n" + lobby.Members.ToOneString());
 		}
 		public static void AddLobbyFilter(string key, string value, ELobbyComparison comparison = ELobbyComparison.k_ELobbyComparisonEqual)
 		{
