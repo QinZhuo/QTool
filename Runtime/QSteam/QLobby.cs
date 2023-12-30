@@ -7,18 +7,23 @@ namespace QTool
 	public class QLobby : IKey<ulong>
 	{
 		public ulong Key { get; set; }
-		public string Name => Data[nameof(Name)];
+		public string Name { get; set; }
+		public QLobbyState State { get; set; }
 		public ulong Owner { get; set; }
 		public QList<ulong, QLobbyMember> Members { get; private set; } = new QList<ulong, QLobbyMember>(() => new QLobbyMember());
 		public int MemberLimit { get; set; }
 		public QDictionary<string, string> Data { get; private set; } = new QDictionary<string, string>();
-		public QLobbyState State => GetData(nameof(State), QLobbyState.组队);
 		public QLobbyMember this[ulong playerId]
 		{
 			get
 			{
 				return Members[playerId];
 			}
+		}
+		public void FreshData()
+		{
+			Name = GetData(nameof(Name), "");
+			State = GetData(nameof(State), QLobbyState.组队);
 		}
 		public bool IsNull()
 		{
@@ -30,6 +35,10 @@ namespace QTool
 			{
 				return Data[key].ParseQData(defaultValue);
 			}
+			else if (Data.ContainsKey(key.ToLower()))
+			{
+				return Data[key.ToLower()].ParseQData(defaultValue);
+			}
 			else
 			{
 				return defaultValue;
@@ -37,7 +46,7 @@ namespace QTool
 		}
 		public override string ToString()
 		{
-			return Name + "(" + Key + ") [" + Members.Count + "/" + MemberLimit + "]\t" + Data.ToOneString("\t", kv => kv.Key + ":" + kv.Value);
+			return "【"+Name + "】(" + Key + ") [" + Members.Count + "/" + MemberLimit + "] " + Data.ToOneString(" ", kv => kv.Key + ":" + kv.Value);
 		}
 		#region 静态
 
@@ -56,22 +65,31 @@ namespace QTool
 	{
 		public ulong Key { get; set; }
 		public string Name { get; set; }
+		public QLobbyState State { get; set; }
 		public QDictionary<string, string> Data { get; private set; } = new QDictionary<string, string>();
-		public QLobbyState State => GetData(nameof(State), QLobbyState.组队);
 		public T GetData<T>(string key, T defaultValue = default)
 		{
 			if (Data.ContainsKey(key))
 			{
 				return Data[key].ParseQData(defaultValue);
 			}
+			else if (Data.ContainsKey(key.ToLower()))
+			{
+				return Data[key.ToLower()].ParseQData(defaultValue);
+			}
 			else
 			{
 				return defaultValue;
 			}
 		}
+		public void FreshData()
+		{
+			Name = GetData(nameof(Name), "");
+			State = GetData(nameof(State), QLobbyState.组队);
+		}
 		public override string ToString()
 		{
-			return Name + "(" + Key + ") \t" + Data.ToOneString("\t", kv => kv.Key + ":" + kv.Value);
+			return "【"+Name + "】(" + Key + ") \t" + Data.ToOneString(" ", kv => kv.Key + ":" + kv.Value);
 		}
 	}
 	public enum QLobbyState

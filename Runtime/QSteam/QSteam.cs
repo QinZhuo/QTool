@@ -443,6 +443,7 @@ namespace QTool.Steam
 				{
 					SteamMatchmaking.GetLobbyMemberData(lobbyId, memeberId, nameof(memeber.Data)).ParseQData(memeber.Data);
 				}
+				memeber.FreshData();
 			}
 			lobby.Data.Clear();
 			var count = SteamMatchmaking.GetLobbyDataCount(lobbyId);
@@ -456,6 +457,7 @@ namespace QTool.Steam
 					continue;
 				}
 			}
+			lobby.FreshData();
 			QDebug.Log(nameof(QSteam) + " 房间信息更新 " + lobby + "\n" + lobby.Members.ToOneString());
 		}
 		public static void AddLobbyFilter(string key, string value, ELobbyComparison comparison = ELobbyComparison.k_ELobbyComparisonEqual)
