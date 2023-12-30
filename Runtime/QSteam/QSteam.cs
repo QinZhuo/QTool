@@ -255,21 +255,21 @@ namespace QTool.Steam
         }
 		public static void SetData<T>(this QLobby lobby, string key, T value)
 		{
-			var str = value.ToQData().Trim('"');
+			var data = value.ToQData().Trim('"');
+			lobby.Data[key] = data;
 			if (lobby.IsNull())
 			{
-				lobby.Data[key] = str;
 				QLobby.OnUpdate?.Invoke();
 			}
 			else
 			{
-				if (SteamMatchmaking.SetLobbyData(lobby.Key.ToSteamId(), key, str))
+				if (SteamMatchmaking.SetLobbyData(lobby.Key.ToSteamId(), key, data))
 				{
-					QDebug.Log("房间." + key + " = " + str);
+					QDebug.Log("房间." + key + " = " + data);
 				}
 				else
 				{
-					Debug.LogError("设置大厅数据出错[" + Id + "]" + key + ":" + str);
+					Debug.LogError("设置大厅数据出错[" + Id + "]" + key + ":" + data);
 				}
 			}
 		}
@@ -277,9 +277,9 @@ namespace QTool.Steam
 		public static void SetLobbyMemberData<T>(string key, T value)
 		{
 			var data = value.ToQData().Trim('"');
+			MemeberData[key] = data;
 			if (QLobby.CurrentLobby.IsNull())
 			{
-				MemeberData[key] = data;
 				QLobby.OnUpdate?.Invoke();
 			}
 			else
