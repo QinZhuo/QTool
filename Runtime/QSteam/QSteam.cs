@@ -417,6 +417,10 @@ namespace QTool.Steam
 						SteamMatchmaking.SetLobbyData(currentlobbyId, kv.Key, kv.Value);
 					}
 				}
+				else
+				{
+					LeaveLobby();
+				}
 				SteamMatchmaking.SetLobbyMemberData(currentlobbyId, nameof(QLobby.Data),MemeberData.ToQData());
 				QLobby.CurrentLobby.Key = currentlobbyId.m_SteamID;
 				_ = StartChatReceive();
