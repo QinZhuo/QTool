@@ -279,7 +279,10 @@ namespace QTool
 			}
 			return com;
 		}
-		
+		public static bool IsActiveSelf<T>(this Component com) where T : Component
+		{
+			return com != null && com.gameObject.activeSelf;
+		}
 		public static bool IsNull<T>(this T obj)
 		{
 			T checkObj = default;
