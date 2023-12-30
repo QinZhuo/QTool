@@ -48,7 +48,7 @@ namespace QTool
 		/// </summary>
 		public static void RunImmediate(this IEnumerator enumerator)
 		{
-			QDebug.LogError("RunOnceUpdate " + enumerator);
+			//QDebug.LogError(enumerator);
 			int count = 0;
 			while (UpdateIEnumerator(enumerator))
 			{
