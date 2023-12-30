@@ -11,9 +11,8 @@ namespace QTool
 		public ulong Owner { get; set; }
 		public QList<ulong, QLobbyMember> Members { get; private set; } = new QList<ulong, QLobbyMember>(() => new QLobbyMember());
 		public int MemberLimit { get; set; }
-		public QLobbyState State => GetData(nameof(State), QLobbyState.组队);
 		public QDictionary<string, string> Data { get; private set; } = new QDictionary<string, string>();
-
+		public QLobbyState State => GetData(nameof(State), QLobbyState.组队);
 		public QLobbyMember this[ulong playerId]
 		{
 			get
@@ -64,26 +63,28 @@ namespace QTool
 
 		public static Action OnUpdate = null;
 		#endregion
-		public class QLobbyMember : IKey<ulong>
+	
+	}
+	public class QLobbyMember : IKey<ulong>
+	{
+		public ulong Key { get; set; }
+		public string Name { get; set; }
+		public QDictionary<string, string> Data { get; private set; } = new QDictionary<string, string>();
+		public QLobbyState State => GetData(nameof(State), QLobbyState.组队);
+		public T GetData<T>(string key, T defaultValue = default)
 		{
-			public ulong Key { get; set; }
-			public string Name { get; set; }
-			public QDictionary<string, string> Data { get; private set; } = new QDictionary<string, string>();
-			public T GetData<T>(string key, T defaultValue = default)
+			if (Data.ContainsKey(key))
 			{
-				if (Data.ContainsKey(key))
-				{
-					return Data[key].ParseQData(defaultValue);
-				}
-				else
-				{
-					return defaultValue;
-				}
+				return Data[key].ParseQData(defaultValue);
 			}
-			public override string ToString()
+			else
 			{
-				return Key.ToString();
+				return defaultValue;
 			}
+		}
+		public override string ToString()
+		{
+			return Key.ToString();
 		}
 	}
 	public enum QLobbyState
