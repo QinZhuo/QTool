@@ -48,7 +48,7 @@ namespace QTool
 		const string AddEventKey = "添加";
 		const string RemoveEventKey = "移除";
 		public List<QItemData<ItemData>.Runtime> Items { get; private set; } = new List<QItemData<ItemData>.Runtime>();
-		private QDictionary<string, Func<string, IEnumerator>> EventActions { get; set; } = new QDictionary<string, Func<string, IEnumerator>>();
+		private QDictionary<string, List<QItemData<ItemData>.Runtime>> EventItems { get; set; } = new QDictionary<string, List<QItemData<ItemData>.Runtime>>(key => new List<QItemData<ItemData>.Runtime>());
 		public int this[string key]
 		{
 			get
@@ -174,7 +174,7 @@ namespace QTool
 					var name = node.Value.Name;
 					if (name != AddEventKey && name != RemoveEventKey)
 					{
-						EventActions[name] += item.InvokeEventIEnumerator;
+						EventItems[name].Add(item);
 					}
 				}
 			}
@@ -190,7 +190,7 @@ namespace QTool
 					var name = node.Value.Name;
 					if (name != AddEventKey && name != RemoveEventKey)
 					{
-						EventActions[name] -= item.InvokeEventIEnumerator;
+						EventItems[name].Remove(item);
 					}
 				}
 			}
@@ -215,12 +215,29 @@ namespace QTool
 		}
 		public IEnumerator InvokeEventIEnumerator(string key)
 		{
-			if (EventActions.ContainsKey(key) && EventActions[key] != null)
+			if (EventItems.ContainsKey(key))
 			{
-				foreach (Func<string, IEnumerator> func in EventActions[key].GetInvocationList())
+				foreach (var item in EventItems[key])
 				{
-					yield return func(key);
-				} 
+					yield return item.InvokeEventIEnumerator(key);
+				}
+			}
+		}
+		public void InvokeEventImmediate(string key)
+		{
+			if (EventItems.ContainsKey(key) )
+			{
+				foreach (var item in EventItems[key])
+				{
+					try
+					{
+						item.InvokeEventIEnumerator(key).RunImmediate();
+					}
+					catch (Exception e)
+					{
+						throw new Exception("item " + item, e);
+					}
+				}
 			}
 		}
 	}

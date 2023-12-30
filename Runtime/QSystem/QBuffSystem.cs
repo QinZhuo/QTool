@@ -29,7 +29,7 @@ namespace QTool
 		/// </summary>
 		public event Action<QBuffData<BuffData>.Runtime> OnEndBuff = null;
 		public QDictionary<string, QBuffData<BuffData>.Runtime> Buffs { get; private set; } = new QDictionary<string, QBuffData<BuffData>.Runtime>();
-		private QDictionary<string, Func<string, IEnumerator>> EventActions { get; set; } = new QDictionary<string, Func<string, IEnumerator>>();
+		private QDictionary<string, List<QBuffData<BuffData>.Runtime>> EventBuffs { get; set; } = new QDictionary<string, List<QBuffData<BuffData>.Runtime>>(key=>new List<QBuffData<BuffData>.Runtime>());
 		public int this[string key]
 		{
 			get
@@ -120,7 +120,7 @@ namespace QTool
 				{
 					if (!node.Value.Name.EndsWith("每层"))
 					{
-						EventActions[node.Value.Name] += buff.InvokeEventIEnumerator;
+						EventBuffs[node.Value.Name].Add(buff);
 					}
 				}
 			}
@@ -137,7 +137,7 @@ namespace QTool
 				{
 					if (!node.Value.Name.EndsWith("每层"))
 					{
-						EventActions[node.Value.Name] -= buff.InvokeEventIEnumerator;
+						EventBuffs[node.Value.Name].Remove(buff);
 					}
 				}
 			}
@@ -179,7 +179,7 @@ namespace QTool
 					{
 						if (node.Value.Name.EndsWith("每层"))
 						{
-							EventActions[node.Value.Name] += buff.InvokeEventIEnumerator;
+							EventBuffs[node.Value.Name].Add(buff);
 						}
 					}
 				}
@@ -197,7 +197,7 @@ namespace QTool
 					{
 						if (node.Value.Name.EndsWith("每层"))
 						{
-							EventActions[node.Value.Name] -= buff.InvokeEventIEnumerator;
+							EventBuffs[node.Value.Name].Remove(buff);
 						}
 					}
 				}
@@ -227,11 +227,32 @@ namespace QTool
 			{
 				yield return InvokeEventIEnumerator(key + "每层");
 			}
-			if (EventActions.ContainsKey(key) && EventActions[key] != null)
+			if (EventBuffs.ContainsKey(key))
 			{
-				foreach (Func<string, IEnumerator> func in EventActions[key].GetInvocationList())
+				foreach (var buff in EventBuffs[key])
 				{
-					yield return func(key);
+					yield return buff.InvokeEventIEnumerator(key);
+				}
+			}
+		}
+		public void InvokeEventImmediate(string key)
+		{
+			if (!key.EndsWith("每层"))
+			{
+				InvokeEventIEnumerator(key + "每层").RunImmediate();
+			}
+			if (EventBuffs.ContainsKey(key))
+			{
+				foreach (var buff in EventBuffs[key])
+				{
+					try
+					{
+						buff.InvokeEventIEnumerator(key).RunImmediate();
+					}
+					catch (Exception e)
+					{
+						throw new Exception("buff " + buff, e);
+					}
 				}
 			}
 		}

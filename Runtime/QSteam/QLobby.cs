@@ -10,6 +10,7 @@ namespace QTool
 		public string Name { get; set; }
 		public QLobbyState State { get; set; }
 		public ulong Owner { get; set; }
+		[QIgnore]
 		public QList<ulong, QLobbyMember> Members { get; private set; } = new QList<ulong, QLobbyMember>(() => new QLobbyMember());
 		public int MemberLimit { get; set; }
 		public QDictionary<string, string> Data { get; private set; } = new QDictionary<string, string>();
@@ -56,7 +57,16 @@ namespace QTool
 		{
 			CurrentLobby = new QLobby();
 		}
-
+		static QLobby()
+		{
+			OnUpdate += () =>
+			{
+				if (!CurrentLobby.IsNull())
+				{
+					QPlayerPrefs.Set(nameof(CurrentLobby), CurrentLobby);
+				}
+			};
+		}
 		public static Action OnUpdate = null;
 		#endregion
 	
