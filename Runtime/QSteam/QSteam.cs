@@ -346,7 +346,6 @@ namespace QTool.Steam
             {
                 for (int i = 0; i < QLobby.LobbyList.Count; i++)
                 {
-					if (QLobby.LobbyList[i].Owner == Id.m_SteamID) continue;
                     if (await JoinLobby(QLobby.LobbyList[i].Key.ToSteamId()))
                     {
 						return true;
@@ -378,11 +377,19 @@ namespace QTool.Steam
 				QDebug.Log("加入房间[" + QLobby.CurrentLobby.Key + "]");
 				QLobby.CurrentLobby.FreshData();
 			}
+			else
+			{
+				QDebug.LogWarning("已在房间[" + lobbyId + "]");
+				return false;
+			}
 			return true;
 		}
 		public static async Task<bool> CreateLobby(int maxMembers = 10, ELobbyType eLobbyType = ELobbyType.k_ELobbyTypePublic)
 		{
-			if (!QLobby.CurrentLobby.IsNull() && QLobby.CurrentLobby.Owner == Id.m_SteamID) return true;
+			if (!QLobby.CurrentLobby.IsNull())
+			{
+				LeaveLobby();
+			}
 			var create = await SteamMatchmaking.CreateLobby(eLobbyType, maxMembers).GetResult<LobbyCreated_t>();
 			if (create.m_ulSteamIDLobby != 0)
 			{
