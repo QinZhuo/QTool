@@ -44,10 +44,8 @@ namespace QTool
 			Destoryed = true;
 			QTask.StopAllWait();
 			QEventManager.InvokeEvent(QEventKey.游戏退出);
-			QEventManager.InvokeEvent(QEventKey.游戏退出完成);
 			Instance.OnUpdateEvent -= QCoroutine.Update;
 		}
-
 		private void OnGUI()
 		{
 			OnGUIEvent?.Invoke();

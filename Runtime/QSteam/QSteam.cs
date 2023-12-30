@@ -69,7 +69,7 @@ namespace QTool.Steam
 			{
 				UpdateCurrentLobby(info.m_ulSteamIDLobby.ToSteamId());
 			});
-			QEventManager.RegisterOnce(QEventKey.游戏退出完成, LeaveLobby, SteamAPI.Shutdown,
+			QEventManager.Register(QEventKey.游戏退出, LeaveLobby, SteamAPI.Shutdown,
 				OnJoinRequested.Unregister, OnLobbyDataUpdate.Unregister, OnLobbyChatUpdate.Unregister);
 			SteamNetworkingUtils.InitRelayNetworkAccess();
 			QDebug.Log(nameof(QSteam) + " 初始化成功 [" + Name + "][" + Id + "]");
