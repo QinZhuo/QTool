@@ -20,9 +20,9 @@ namespace QTool
 				return Members[playerId];
 			}
 		}
-		public void FreshData()
+		public void Init()
 		{
-			Name = GetData(nameof(Name), "");
+			Name = GetData(nameof(Name), Name);
 			State = GetData(nameof(State), QLobbyState.组队);
 		}
 		public bool IsNull()
@@ -82,9 +82,9 @@ namespace QTool
 				return defaultValue;
 			}
 		}
-		public void FreshData()
+		public void Init()
 		{
-			Name = GetData(nameof(Name), "");
+			Name = GetData(nameof(Name), Name);
 			State = GetData(nameof(State), QLobbyState.组队);
 		}
 		public override string ToString()
