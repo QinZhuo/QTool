@@ -375,7 +375,8 @@ namespace QTool.Steam
 					QDebug.LogError("加入房间失败[" + lobbyId + "]");
 					return false;
 				}
-				QLobby.CurrentLobby.SetData();
+				QDebug.Log("加入房间[" + QLobby.CurrentLobby.Key + "]");
+				QLobby.CurrentLobby.FreshData();
 			}
 			return true;
 		}
@@ -427,10 +428,10 @@ namespace QTool.Steam
 				chatId = 0;
 				QDebug.Log("加入房间[" + currentlobbyId + "]");
 			}
-			QLobby.CurrentLobby.SetData();
+			QLobby.CurrentLobby.FreshData();
 			QLobby.OnUpdate?.Invoke();
 		}
-		private static void SetData(this QLobby lobby)
+		private static void FreshData(this QLobby lobby)
 		{
 			if (lobby.Key == 0) return;
 			var lobbyId = lobby.Key.ToSteamId();
@@ -482,7 +483,7 @@ namespace QTool.Steam
             for (int i = 0; i < matchList.m_nLobbiesMatching; i++)
             {
 				var lobby = QLobby.LobbyList[SteamMatchmaking.GetLobbyByIndex(i).m_SteamID];
-				lobby.SetData();
+				lobby.FreshData();
 			}
 			QDebug.Log(nameof(QSteam) + " 刷新房间结束 " + QLobby.LobbyList.Count + "\n" + QLobby.LobbyList.ToOneString());
 			return QLobby.LobbyList;

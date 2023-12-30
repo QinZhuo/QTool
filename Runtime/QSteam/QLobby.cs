@@ -46,7 +46,7 @@ namespace QTool
 		}
 		public override string ToString()
 		{
-			return "【"+Name + "】(" + Key + ") [" + Members.Count + "/" + MemberLimit + "] " + Data.ToOneString(" ", kv => kv.Key + ":" + kv.Value);
+			return "【" + Name + "】(" + Key + ") [" + Members.Count + "/" + MemberLimit + "] 【" + Owner + "】" + Data.ToOneString(" ", kv => kv.Key + ":" + kv.Value);
 		}
 		#region 静态
 
