@@ -28,8 +28,8 @@ namespace QTool
 		/// 结束Buff时执行 多个叠层只会执行一次
 		/// </summary>
 		public event Action<QBuffData<BuffData>.Runtime> OnEndBuff = null;
-		public QDelayDictionary<string, QBuffData<BuffData>.Runtime> Buffs { get; private set; } = new QDelayDictionary<string, QBuffData<BuffData>.Runtime>();
-		private QDictionary<string, QDelayList<QBuffData<BuffData>.Runtime>> EventBuffs { get; set; } = new QDictionary<string, QDelayList<QBuffData<BuffData>.Runtime>>(key => new QDelayList<QBuffData<BuffData>.Runtime>());
+		public QDictionary<string, QBuffData<BuffData>.Runtime> Buffs { get; private set; } = new QDictionary<string, QBuffData<BuffData>.Runtime>();
+		private QDictionary<string, Func<string, IEnumerator>> EventActions { get; set; } = new QDictionary<string, Func<string, IEnumerator>>();
 		public int this[string key]
 		{
 			get
@@ -120,7 +120,7 @@ namespace QTool
 				{
 					if (!node.Value.Name.EndsWith("每层"))
 					{
-						EventBuffs[node.Value.Name].Add(buff);
+						EventActions[node.Value.Name] += buff.InvokeEventIEnumerator;
 					}
 				}
 			}
@@ -137,11 +137,12 @@ namespace QTool
 				{
 					if (!node.Value.Name.EndsWith("每层"))
 					{
-						EventBuffs[node.Value.Name].Remove(buff);
+						EventActions[node.Value.Name] -= buff.InvokeEventIEnumerator;
 					}
 				}
 			}
 		}
+		private List<string> DelayRemove = new List<string>();
 		public void Update(float deltaTime)
 		{
 			foreach (var kv in Buffs)
@@ -152,16 +153,20 @@ namespace QTool
 					buff.Time.CurrentValue -= deltaTime;
 					if (buff.Time.CurrentValue <= 0)
 					{
-						Buffs.Remove(buff.Key);
+						DelayRemove.Add(buff.Key);
 					}
 				}
 			}
-			Buffs.Update();
-			foreach (var kv in EventBuffs)
+			if (DelayRemove.Count > 0)
 			{
-				kv.Value.Update();
+				foreach (var key in DelayRemove)
+				{
+					Remove(key);
+				}
+				DelayRemove.Clear();
 			}
 		}
+
 		protected virtual void OnAdd(QBuffData<BuffData>.Runtime buff)
 		{
 			OnAddBuff?.Invoke(buff);
@@ -174,7 +179,7 @@ namespace QTool
 					{
 						if (node.Value.Name.EndsWith("每层"))
 						{
-							EventBuffs[node.Value.Name].Add(buff);
+							EventActions[node.Value.Name] += buff.InvokeEventIEnumerator;
 						}
 					}
 				}
@@ -192,7 +197,7 @@ namespace QTool
 					{
 						if (node.Value.Name.EndsWith("每层"))
 						{
-							EventBuffs[node.Value.Name].Remove(buff);
+							EventActions[node.Value.Name] -= buff.InvokeEventIEnumerator;
 						}
 					}
 				}
@@ -216,48 +221,28 @@ namespace QTool
 		{
 			InvokeEventIEnumerator(key).Start();
 		}
-		public IEnumerator InvokeEventIEnumerator(string key,params string[] ignores)
+		public IEnumerator InvokeEventIEnumerator(string key)
 		{
 			if (!key.EndsWith("每层"))
 			{
 				yield return InvokeEventIEnumerator(key + "每层");
 			}
-			if (EventBuffs.ContainsKey(key))
+			if (EventActions.ContainsKey(key) && EventActions[key] != null)
 			{
-				foreach (var buff in EventBuffs[key])
+				foreach (Func<string, IEnumerator> func in EventActions[key].GetInvocationList())
 				{
-					if (ignores.Contains(buff.Key)) continue;
-					yield return buff.InvokeEventIEnumerator(key);
-				}
-			}
-		}
-		public void InvokeEventImmediate(string key,params string[] ignores)
-		{
-			if (!key.EndsWith("每层"))
-			{
-				InvokeEventIEnumerator(key + "每层").RunImmediate();
-			}
-			if (EventBuffs.ContainsKey(key))
-			{
-				foreach (var buff in EventBuffs[key])
-				{
-					try
-					{
-						if (ignores.Contains(buff.Key)) continue;
-						buff.InvokeEventIEnumerator(key).RunImmediate();
-					}
-					catch (Exception e)
-					{
-						throw new Exception("buff " + buff, e);
-					}
+					yield return func(key);
 				}
 			}
 		}
 		public void Clear()
 		{
-			Buffs.Clear();
-			EventBuffs.Clear();
+			foreach (var buff in Buffs.ToList())
+			{
+				Remove(buff.Key, buff.Count.IntValue);
+			}
 		}
+
 	}
 
 

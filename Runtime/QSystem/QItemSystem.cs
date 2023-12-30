@@ -47,13 +47,8 @@ namespace QTool
 	{
 		const string AddEventKey = "添加";
 		const string RemoveEventKey = "移除";
-		public QDelayList<QItemData<ItemData>.Runtime> Items { get; private set; } = new QDelayList<QItemData<ItemData>.Runtime>();
-		private QDictionary<string, QDelayList<QItemData<ItemData>.Runtime>> EventItems { get; set; } = new QDictionary<string, QDelayList<QItemData<ItemData>.Runtime>>(key => new QDelayList<QItemData<ItemData>.Runtime>());
-		public void Clear()
-		{
-			Items.Clear();
-			EventItems.Clear();
-		}
+		public List<QItemData<ItemData>.Runtime> Items { get; private set; } = new List<QItemData<ItemData>.Runtime>();
+		private QDictionary<string, Func<string, IEnumerator>> EventActions { get; set; } = new QDictionary<string, Func<string, IEnumerator>>();
 		public int this[string key]
 		{
 			get
@@ -86,14 +81,6 @@ namespace QTool
 				{
 					OnRemove(item);
 				}
-			}
-		}
-		public void Update(float deltaTime)
-		{
-			Items.Update();
-			foreach (var items in EventItems)
-			{
-				items.Value.Update();
 			}
 		}
 		public void Add(string key, int count = 1)
@@ -187,7 +174,7 @@ namespace QTool
 					var name = node.Value.Name;
 					if (name != AddEventKey && name != RemoveEventKey)
 					{
-						EventItems[name].Add(item);
+						EventActions[name] += item.InvokeEventIEnumerator;
 					}
 				}
 			}
@@ -203,7 +190,7 @@ namespace QTool
 					var name = node.Value.Name;
 					if (name != AddEventKey && name != RemoveEventKey)
 					{
-						EventItems[name].Remove(item);
+						EventActions[name] -= item.InvokeEventIEnumerator;
 					}
 				}
 			}
@@ -226,33 +213,14 @@ namespace QTool
 		{
 			InvokeEventIEnumerator(key).Start();
 		}
-		public IEnumerator InvokeEventIEnumerator(string key,params string[] ignores)
+		public IEnumerator InvokeEventIEnumerator(string key)
 		{
-			if (EventItems.ContainsKey(key))
+			if (EventActions.ContainsKey(key) && EventActions[key] != null)
 			{
-				foreach (var item in EventItems[key])
+				foreach (Func<string, IEnumerator> func in EventActions[key].GetInvocationList())
 				{
-					if (ignores.Contains(item.Key)) continue;
-					yield return item.InvokeEventIEnumerator(key);
-				}
-			}
-		}
-		public void InvokeEventImmediate(string key,params string[] ignores)
-		{
-			if (EventItems.ContainsKey(key))
-			{
-				foreach (var item in EventItems[key])
-				{
-					if (ignores.Contains(item.Key)) continue;
-					try
-					{
-						item.InvokeEventIEnumerator(key).RunImmediate();
-					}
-					catch (Exception e)
-					{
-						throw new Exception("item " + item, e);
-					}
-				}
+					yield return func(key);
+				} 
 			}
 		}
 	}
