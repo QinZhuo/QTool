@@ -130,7 +130,9 @@ namespace QTool
 		}
 		public static void StopAll()
 		{
-			RemoveList.AddRange(List);
+			AddList.Clear();
+			RemoveList.Clear();
+			List.Clear();
 		}
 	}
 	public class QCoroutineQueue<T>
