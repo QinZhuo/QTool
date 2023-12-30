@@ -110,8 +110,8 @@ namespace QTool
 			if (removeList.Count > 0)
 			{
 				base.RemoveAll(item => removeList.Contains(item));
+				removeList.Clear();
 			}
-			removeList.Clear();
 		}
 		public new void Clear()
 		{
@@ -402,23 +402,29 @@ namespace QTool
 		}
 		public void Update()
 		{
-			foreach (var item in addList)
+			if (addList.Count > 0)
 			{
-				if (ContainsKey(item.Key))
+				foreach (var item in addList)
 				{
-					base[item.Key] = item.Value;
+					if (ContainsKey(item.Key))
+					{
+						base[item.Key] = item.Value;
+					}
+					else
+					{
+						base.Add(item.Key, item.Value);
+					}
 				}
-				else
-				{
-					base.Add(item.Key, item.Value);
-				}
+				addList.Clear();
 			}
-			addList.Clear();
-			foreach (var key in removeList)
+			if (removeList.Count > 0)
 			{
-				base.Remove(key);
+				foreach (var key in removeList)
+				{
+					base.Remove(key);
+				}
+				removeList.Clear();
 			}
-			removeList.Clear();
 		}
 	}
 	public class QConnect<TKey,TValue>:IEnumerable
