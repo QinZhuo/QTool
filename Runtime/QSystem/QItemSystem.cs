@@ -226,22 +226,24 @@ namespace QTool
 		{
 			InvokeEventIEnumerator(key).Start();
 		}
-		public IEnumerator InvokeEventIEnumerator(string key)
+		public IEnumerator InvokeEventIEnumerator(string key,params string[] ignores)
 		{
 			if (EventItems.ContainsKey(key))
 			{
 				foreach (var item in EventItems[key])
 				{
+					if (ignores.Contains(item.Key)) continue;
 					yield return item.InvokeEventIEnumerator(key);
 				}
 			}
 		}
-		public void InvokeEventImmediate(string key)
+		public void InvokeEventImmediate(string key,params string[] ignores)
 		{
-			if (EventItems.ContainsKey(key) )
+			if (EventItems.ContainsKey(key))
 			{
 				foreach (var item in EventItems[key])
 				{
+					if (ignores.Contains(item.Key)) continue;
 					try
 					{
 						item.InvokeEventIEnumerator(key).RunImmediate();

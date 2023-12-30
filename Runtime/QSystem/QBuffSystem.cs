@@ -216,7 +216,7 @@ namespace QTool
 		{
 			InvokeEventIEnumerator(key).Start();
 		}
-		public IEnumerator InvokeEventIEnumerator(string key)
+		public IEnumerator InvokeEventIEnumerator(string key,params string[] ignores)
 		{
 			if (!key.EndsWith("每层"))
 			{
@@ -226,11 +226,12 @@ namespace QTool
 			{
 				foreach (var buff in EventBuffs[key])
 				{
+					if (ignores.Contains(buff.Key)) continue;
 					yield return buff.InvokeEventIEnumerator(key);
 				}
 			}
 		}
-		public void InvokeEventImmediate(string key)
+		public void InvokeEventImmediate(string key,params string[] ignores)
 		{
 			if (!key.EndsWith("每层"))
 			{
@@ -242,6 +243,7 @@ namespace QTool
 				{
 					try
 					{
+						if (ignores.Contains(buff.Key)) continue;
 						buff.InvokeEventIEnumerator(key).RunImmediate();
 					}
 					catch (Exception e)
