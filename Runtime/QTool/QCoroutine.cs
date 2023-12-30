@@ -32,6 +32,7 @@ namespace QTool
 		}
 		public static IEnumerator Start(this IEnumerator enumerator)
 		{
+			QDebug.LogError("Start " + enumerator);
 			if (UpdateIEnumerator(enumerator))
 			{
 				AddList.Add(enumerator);
@@ -52,6 +53,7 @@ namespace QTool
 		}
 		public static void Stop(this IEnumerator enumerator)
 		{
+			QDebug.LogError("Stop " + enumerator);
 			RemoveList.Add(enumerator);
 		}
 		static Dictionary<YieldInstruction, float> YieldInstructionList = new Dictionary<YieldInstruction, float>();
