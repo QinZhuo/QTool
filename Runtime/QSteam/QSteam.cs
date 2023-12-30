@@ -411,7 +411,7 @@ namespace QTool.Steam
 			if (QLobby.CurrentLobby.Key != currentlobbyId.m_SteamID)
 			{
 				if (QLobby.CurrentLobby.IsNull())
-				{
+				{ 
 					foreach (var kv in QLobby.CurrentLobby.Data)
 					{
 						SteamMatchmaking.SetLobbyData(currentlobbyId, kv.Key, kv.Value);
