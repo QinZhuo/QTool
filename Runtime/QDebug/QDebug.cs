@@ -18,12 +18,13 @@ namespace QTool
 		[RuntimeInitializeOnLoadMethod]
 		private static void Init()
 		{
-			QToolManager.Instance.OnUpdateEvent += Update;
-		}
-		public static void Update()
-		{
-			FrameCount.Push(1);
-			UpdateUI();
+			QToolManager.Instance.OnUpdateEvent += () =>
+			{
+				FrameCount.Push(1);
+#if DEVELOPMENT_BUILD || UNITY_EDITOR
+				DebugUIUpdate();
+#endif
+			};
 		}
 		[System.Diagnostics.Conditional("DEVELOPMENT_BUILD"), System.Diagnostics.Conditional("UNITY_EDITOR")]
 		public static void DebugRun(string key, Action action)
@@ -99,7 +100,7 @@ namespace QTool
 		private static VisualElement RightPanel = null;
 		private static VisualElement MidPanel = null;
 		private static VisualElement DownPanel = null;
-		private static void UpdateUI()
+		private static void DebugUIUpdate()
 		{
 			if ((QInput.Ctrl && QInput.Enter) || InputCircle > 720)
 			{
