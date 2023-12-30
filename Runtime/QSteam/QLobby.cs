@@ -40,7 +40,7 @@ namespace QTool
 				return Data[key.ToLower()].ParseQData(defaultValue);
 			}
 			else
-			{
+			{ 
 				return defaultValue;
 			}
 		}
