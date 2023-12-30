@@ -37,7 +37,22 @@ namespace QTool
 			{
 				AddList.Add(enumerator);
 			}
+			else
+			{
+				QDebug.LogError("Stop " + enumerator);
+			}
 			return enumerator;
+		}
+		/// <summary>
+		/// 以同步方式
+		/// </summary>
+		public static void RunOnceUpdate(this IEnumerator enumerator)
+		{
+			QDebug.LogError("RunOnceUpdate " + enumerator);
+			if (UpdateIEnumerator(enumerator))
+			{
+				QDebug.LogError("运行没有完成 " + nameof(RunOnceUpdate) + enumerator);
+			}
 		}
 		public static IEnumerator Start(this IEnumerator enumerator, List<IEnumerator> coroutineList)
 		{
@@ -53,7 +68,7 @@ namespace QTool
 		}
 		public static void Stop(this IEnumerator enumerator)
 		{
-			//QDebug.LogError("Stop " + enumerator);
+			QDebug.LogError("Stop " + enumerator);
 			RemoveList.Add(enumerator);
 		}
 		static Dictionary<YieldInstruction, float> YieldInstructionList = new Dictionary<YieldInstruction, float>();
@@ -121,7 +136,6 @@ namespace QTool
 		}
 		public static void Update()
 		{
-			QDebug.LogError("Update" + List.Count + " + " + AddList.Count + " - " + RemoveList.Count + " ");
 			List.RemoveAll(ie => RemoveList.Contains(ie));
 			RemoveList.Clear();
 			if (AddList.Count > 0)
