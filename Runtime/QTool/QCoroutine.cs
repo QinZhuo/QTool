@@ -53,7 +53,7 @@ namespace QTool
 		}
 		public static void Stop(this IEnumerator enumerator)
 		{
-			QDebug.LogError("Stop " + enumerator);
+			//QDebug.LogError("Stop " + enumerator);
 			RemoveList.Add(enumerator);
 		}
 		static Dictionary<YieldInstruction, float> YieldInstructionList = new Dictionary<YieldInstruction, float>();
@@ -121,6 +121,7 @@ namespace QTool
 		}
 		public static void Update()
 		{
+			QDebug.LogError("Update" + List.Count + " + " + AddList.Count + " - " + RemoveList.Count + " ");
 			List.RemoveAll(ie => RemoveList.Contains(ie));
 			RemoveList.Clear();
 			if (AddList.Count > 0)
