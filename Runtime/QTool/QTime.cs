@@ -27,12 +27,13 @@ namespace QTool
             timeScaleList.Clear();
             UpdateTimeScale();
         }
-        public static event System.Action<float> OnScaleChange;
-
+        public static event Action<float> OnScaleChange;
+		private static List<object> removeBuffer = new List<object>();
         private static void UpdateTimeScale()
         {
             var value = 1f;
-            foreach (var kv in timeScaleList)
+			timeScaleList.RemoveAll(kv => kv.Key.IsNull(), removeBuffer);
+			foreach (var kv in timeScaleList)
             {
                 value *= kv.Value;
             }
@@ -58,6 +59,11 @@ namespace QTool
         static QDictionary<object, float> timeScaleList = new QDictionary<object, float>();
         public static void ChangeScale(object obj, float timeScale)
         {
+			if (obj.IsNull())
+			{
+				Debug.LogError(" obj IsNull");
+				return;
+			}
 			if (timeScaleList.ContainsKey(obj))
 			{
 				if (timeScaleList[obj] == timeScale) return;
