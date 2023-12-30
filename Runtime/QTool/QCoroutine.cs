@@ -54,8 +54,7 @@ namespace QTool
 			{
 				if (count++ > 10000)
 				{
-					QDebug.LogError("协程运行无法立即完成 已循环调用" + count + "次 " + nameof(RunImmediate) + enumerator);
-					break;
+					throw new Exception("协程运行无法立即完成 已循环调用" + count + "次 " + nameof(RunImmediate) + enumerator);
 				}
 			}
 		}
