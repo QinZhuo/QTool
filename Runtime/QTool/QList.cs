@@ -80,6 +80,46 @@ namespace QTool
 			return this.ToOneString();
 		}
 	}
+	public class QDelayList<T> : List<T>
+	{
+		private List<T> addList = new List<T>();
+		private List<T> removeList = new List<T>();
+		public new bool Contains(T item)
+		{
+			return !removeList.Contains(item) && (base.Contains(item) || addList.Contains(item));
+		}
+		public new void Add(T item)
+		{
+			addList.Add(item);
+		}
+		public new void Remove(T item)
+		{
+			if (addList.Contains(item))
+			{
+				addList.Remove(item);
+			}
+			removeList.Add(item);
+		}
+		public void Update()
+		{
+			if (addList.Count > 0)
+			{
+				base.AddRange(addList);
+				addList.Clear();
+			}
+			if (removeList.Count > 0)
+			{
+				base.RemoveAll(item => removeList.Contains(item));
+			}
+			removeList.Clear();
+		}
+		public new void Clear()
+		{
+			Clear();
+			addList.Clear();
+			removeList.Clear();
+		}
+	}
 	public class QList<TKey, T> : QList<T> where T : IKey<TKey>
 	{
 		[QIgnore]
@@ -307,6 +347,78 @@ namespace QTool
 		public QDictionary(Func<TKey, TValue> AutoCreate)
 		{
 			this.AutoCreate = AutoCreate;
+		}
+	}
+	public class QDelayDictionary<TKey, TValue> : Dictionary<TKey, TValue>
+	{
+		private Dictionary<TKey, TValue> addList = new Dictionary<TKey, TValue>();
+		private List<TKey> removeList = new List<TKey>();
+		public new TValue this[TKey key]
+		{
+			get
+			{
+				if (addList.ContainsKey(key))
+				{
+					return addList[key];
+				}
+				else if (base.ContainsKey(key))
+				{
+					return base[key];
+				}
+				else
+				{
+					return default;
+				}
+			}
+		}
+		public new void Clear()
+		{
+			Clear();
+			addList.Clear();
+			removeList.Clear();
+		}
+		public new bool ContainsKey(TKey key)
+		{
+			return !removeList.Contains(key) && (base.ContainsKey(key) || addList.ContainsKey(key));
+		}
+		public new void Add(TKey key, TValue value)
+		{
+			if (addList.ContainsKey(key))
+			{
+				addList[key] = value;
+			}
+			else
+			{
+				addList.Add(key, value);
+			}
+		}
+		public new void Remove(TKey key)
+		{
+			if (addList.ContainsKey(key))
+			{
+				addList.Remove(key);
+			}
+			removeList.Add(key);
+		}
+		public void Update()
+		{
+			foreach (var item in addList)
+			{
+				if (ContainsKey(item.Key))
+				{
+					base[item.Key] = item.Value;
+				}
+				else
+				{
+					base.Add(item.Key, item.Value);
+				}
+			}
+			addList.Clear();
+			foreach (var key in removeList)
+			{
+				base.Remove(key);
+			}
+			removeList.Clear();
 		}
 	}
 	public class QConnect<TKey,TValue>:IEnumerable

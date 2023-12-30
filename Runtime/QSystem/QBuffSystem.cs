@@ -28,8 +28,8 @@ namespace QTool
 		/// 结束Buff时执行 多个叠层只会执行一次
 		/// </summary>
 		public event Action<QBuffData<BuffData>.Runtime> OnEndBuff = null;
-		public QDictionary<string, QBuffData<BuffData>.Runtime> Buffs { get; private set; } = new QDictionary<string, QBuffData<BuffData>.Runtime>();
-		private QDictionary<string, List<QBuffData<BuffData>.Runtime>> EventBuffs { get; set; } = new QDictionary<string, List<QBuffData<BuffData>.Runtime>>(key=>new List<QBuffData<BuffData>.Runtime>());
+		public QDelayDictionary<string, QBuffData<BuffData>.Runtime> Buffs { get; private set; } = new QDelayDictionary<string, QBuffData<BuffData>.Runtime>();
+		private QDictionary<string, QDelayList<QBuffData<BuffData>.Runtime>> EventBuffs { get; set; } = new QDictionary<string, QDelayList<QBuffData<BuffData>.Runtime>>(key=>new QDelayList<QBuffData<BuffData>.Runtime>());
 		public int this[string key]
 		{
 			get
@@ -52,7 +52,7 @@ namespace QTool
 				BeginBuff(buff);
 				for (int i = 0; i < count; i++)
 				{
-					OnAdd(buff);
+				 	OnAdd(buff);
 				}
 
 			}
@@ -142,7 +142,6 @@ namespace QTool
 				}
 			}
 		}
-		private List<string> DelayRemove = new List<string>();
 		public void Update(float deltaTime)
 		{
 			foreach (var kv in Buffs)
@@ -153,20 +152,16 @@ namespace QTool
 					buff.Time.CurrentValue -= deltaTime;
 					if (buff.Time.CurrentValue <= 0)
 					{
-						DelayRemove.Add(buff.Key);
+						Buffs.Remove(buff.Key);
 					}
 				}
 			}
-			if (DelayRemove.Count > 0)
+			Buffs.Update();
+			foreach (var kv in EventBuffs)
 			{
-				foreach (var key in DelayRemove)
-				{
-					Remove(key);
-				}
-				DelayRemove.Clear();
+				kv.Value.Update();
 			}
 		}
-
 		protected virtual void OnAdd(QBuffData<BuffData>.Runtime buff)
 		{
 			OnAddBuff?.Invoke(buff);

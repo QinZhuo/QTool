@@ -47,8 +47,8 @@ namespace QTool
 	{
 		const string AddEventKey = "添加";
 		const string RemoveEventKey = "移除";
-		public List<QItemData<ItemData>.Runtime> Items { get; private set; } = new List<QItemData<ItemData>.Runtime>();
-		private QDictionary<string, List<QItemData<ItemData>.Runtime>> EventItems { get; set; } = new QDictionary<string, List<QItemData<ItemData>.Runtime>>(key => new List<QItemData<ItemData>.Runtime>());
+		public QDelayList<QItemData<ItemData>.Runtime> Items { get; private set; } = new QDelayList<QItemData<ItemData>.Runtime>();
+		private QDictionary<string, QDelayList<QItemData<ItemData>.Runtime>> EventItems { get; set; } = new QDictionary<string, QDelayList<QItemData<ItemData>.Runtime>>(key => new QDelayList<QItemData<ItemData>.Runtime>());
 		public int this[string key]
 		{
 			get
@@ -81,6 +81,14 @@ namespace QTool
 				{
 					OnRemove(item);
 				}
+			}
+		}
+		public void Update(float deltaTime)
+		{
+			Items.Update();
+			foreach (var items in EventItems)
+			{
+				items.Value.Update();
 			}
 		}
 		public void Add(string key, int count = 1)

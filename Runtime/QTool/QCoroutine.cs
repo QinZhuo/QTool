@@ -8,12 +8,10 @@ namespace QTool
 {
 	public static class QCoroutine
 	{
-		private static List<IEnumerator> List { set; get; } = new List<IEnumerator>();
-		private static List<IEnumerator> AddList { set; get; } = new List<IEnumerator>();
-		private static List<IEnumerator> RemoveList { set; get; } = new List<IEnumerator>();
+		private static QDelayList<IEnumerator> List { set; get; } = new QDelayList<IEnumerator>();
 		public static bool IsRunning(this IEnumerator enumerator)
 		{
-			if (List.Contains(enumerator) || AddList.Contains(enumerator))
+			if (List.Contains(enumerator))
 			{
 				return true;
 			}
@@ -35,7 +33,7 @@ namespace QTool
 			//QDebug.LogError("Start " + enumerator);
 			if (UpdateIEnumerator(enumerator))
 			{
-				AddList.Add(enumerator);
+				List.Add(enumerator);
 			}
 			//else
 			//{
@@ -73,7 +71,7 @@ namespace QTool
 		public static void Stop(this IEnumerator enumerator)
 		{
 			//QDebug.LogError("Stop " + enumerator);
-			RemoveList.Add(enumerator);
+			List.Remove(enumerator);
 		}
 		static Dictionary<YieldInstruction, float> YieldInstructionList = new Dictionary<YieldInstruction, float>();
 		/// <summary>
@@ -140,19 +138,11 @@ namespace QTool
 		}
 		public static void Update()
 		{
-			List.RemoveAll(ie => RemoveList.Contains(ie));
-			RemoveList.Clear();
-			if (AddList.Count > 0)
-			{
-				List.AddRange(AddList);
-				AddList.Clear();
-			}
+			List.Update();
 			List.RemoveAll(ie => !UpdateIEnumerator(ie));
 		}
 		public static void StopAll()
 		{
-			AddList.Clear();
-			RemoveList.Clear();
 			List.Clear();
 		}
 	}
