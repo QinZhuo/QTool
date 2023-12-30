@@ -56,7 +56,7 @@ namespace QTool
 		public static void Leave()
 		{
 			CurrentLobby = new QLobby();
-		}
+		} 
 		public static Action OnUpdate = null;
 		#endregion
 	
