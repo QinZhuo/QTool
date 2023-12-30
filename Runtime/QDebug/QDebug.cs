@@ -26,6 +26,7 @@ namespace QTool
 #endif
 			};
 		}
+		public static event Func<object,string> LogInfoCheck = info => info?.ToString();
 		[System.Diagnostics.Conditional("DEVELOPMENT_BUILD"), System.Diagnostics.Conditional("UNITY_EDITOR")]
 		public static void DebugRun(string key, Action action)
 		{
@@ -49,17 +50,17 @@ namespace QTool
 		[System.Diagnostics.Conditional("DEVELOPMENT_BUILD"), System.Diagnostics.Conditional("UNITY_EDITOR")]
 		public static void Log(object obj)
 		{
-			Debug.Log("[" + nameof(QDebug) + "]  " + obj);
+			Debug.Log("[" + nameof(QDebug) + "] " + LogInfoCheck(obj));
 		}
 		[System.Diagnostics.Conditional("DEVELOPMENT_BUILD"), System.Diagnostics.Conditional("UNITY_EDITOR")]
 		public static void LogWarning(object obj)
 		{
-			Debug.LogWarning("[" + nameof(QDebug) + "]  " + obj);
+			Debug.LogWarning("[" + nameof(QDebug) + "]  " + LogInfoCheck(obj));
 		}
 		[System.Diagnostics.Conditional("DEVELOPMENT_BUILD"), System.Diagnostics.Conditional("UNITY_EDITOR")]
 		public static void LogError(object obj)
 		{
-			Debug.LogError("[" + nameof(QDebug) + "]  " + obj);
+			Debug.LogError("[" + nameof(QDebug) + "] " + LogInfoCheck(obj));
 		}
 		private static Dictionary<string, long> StartTimestampList = new QDictionary<string, long>();
 		private static QDictionary<string, long> TimestampList = new QDictionary<string, long>();
