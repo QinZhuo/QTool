@@ -15,6 +15,7 @@ namespace QTool
 		public static Random Instance { get; set; } = new Random();
 		public static Color Color(this Random random)
 		{
+			Debug.LogError(random.Next());
 			return UnityEngine.Color.HSVToRGB(random.Range(0, 1f), 0.5f, 1);
 		}
 		public static T RandomPop<T>(this IList<T> list, Func<T, float> toRateIndex = null, params float[] rate)
@@ -24,6 +25,8 @@ namespace QTool
 		public static T RandomPop<T>(this Random random, IList<T> list, Func<T, float> toRateIndex = null, params float[] rate)
 		{
 			if (list == null || list.Count == 0) return default;
+
+			Debug.LogError(random.Next());
 			var index = random.RandomIndex(list, toRateIndex, rate);
 			var obj = list[index];
 			list.RemoveAt(index);
@@ -36,6 +39,7 @@ namespace QTool
 		public static T RandomGet<T>(this Random random, IList<T> list, Func<T, float> toRateIndex = null, params float[] rate)
 		{
 			if (list == null || list.Count == 0) return default;
+			Debug.LogError(random.Next());
 			return list[random.RandomIndex(list, toRateIndex, rate)];
 		}
 		public static int RandomIndex<T>(this IList<T> list, Func<T, float> toRateIndex = null, params float[] rate)
@@ -50,6 +54,7 @@ namespace QTool
 			}
 			else
 			{
+				Debug.LogError(random.Next());
 				var sum = 0f;
 				if (rate.Length > 0)
 				{
@@ -105,10 +110,12 @@ namespace QTool
 		}
 		public static IList<T> RandomList<T>(this IList<T> list, Random random = null)
 		{
+			Debug.LogError(random.Next());
 			return RandomList(random, list);
 		}
 		public static IList<T> RandomList<T>(this Random random, IList<T> list)
 		{
+			Debug.LogError(random.Next());
 			for (int i = 0; i < list.Count; i++)
 			{
 				var cur = list[i];
@@ -122,6 +129,7 @@ namespace QTool
 		/// </summary>
 		public static float NormalRange(this Random random, float min, float max)
 		{
+			Debug.LogError(random.Next());
 			if (min == max) return min;
 			var mid = (min + max) / 2;
 			var offset = max - min;
@@ -132,6 +140,7 @@ namespace QTool
 		/// </summary>
 		public static float Normal(this Random random)
 		{
+			Debug.LogError(random.Next());
 			var u = 0f;
 			var v = 0f;
 			var w = 0f;
@@ -146,20 +155,24 @@ namespace QTool
 		public static float Range(this Random random, float min, float max)
 		{
 			if (random == null) random = Instance;
+			Debug.LogError(random.Next());
 			return (float)random.NextDouble() * (max - min) + min;
 		}
 		public static int Range(this Random random, int min, int max)
 		{
 			if (random == null) random = Instance;
+			Debug.LogError(random.Next());
 			return random.Next(min, max);
 		}
 		public static Vector2 Vector2(this Random random, float range = 1, float centerOffset = 0)
 		{
+			Debug.LogError(random.Next());
 			var dir = new Vector2(random.Range(-1, 1f), random.Range(-1, 1f)).normalized;
 			return dir * random.Range(centerOffset, range);
 		}
 		public static Vector3 Vector3(this Random random, float range = 1, float centerOffset = 0)
 		{
+			Debug.LogError(random.Next());
 			var dir = new Vector3(random.Range(-1, 1f), random.Range(-1, 1f), random.Range(-1, 1f)).normalized;
 			return dir * random.Range(centerOffset, range);
 		}
