@@ -37,7 +37,7 @@ namespace QTool
 		}
 		public override string ToString()
 		{
-			return Name + "(" + Key + ") [" + Members.Count + "/" + MemberLimit + "] \n" + Data.ToOneString(" ", kv => kv.Key + ":" + kv.Value);
+			return Name + "(" + Key + ") [" + Members.Count + "/" + MemberLimit + "]\t" + Data.ToOneString("\t", kv => kv.Key + ":" + kv.Value);
 		}
 		#region 静态
 
@@ -71,7 +71,7 @@ namespace QTool
 		}
 		public override string ToString()
 		{
-			return Name + "(" + Key + ") " + Data.ToOneString(" ", kv => kv.Key + ":" + kv.Value);
+			return Name + "(" + Key + ") \t" + Data.ToOneString("\t", kv => kv.Key + ":" + kv.Value);
 		}
 	}
 	public enum QLobbyState
