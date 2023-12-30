@@ -57,16 +57,6 @@ namespace QTool
 		{
 			CurrentLobby = new QLobby();
 		}
-		static QLobby()
-		{
-			OnUpdate += () =>
-			{
-				if (!CurrentLobby.IsNull())
-				{
-					QPlayerPrefs.Set(nameof(CurrentLobby), CurrentLobby);
-				}
-			};
-		}
 		public static Action OnUpdate = null;
 		#endregion
 	
