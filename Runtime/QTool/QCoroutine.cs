@@ -130,8 +130,7 @@ namespace QTool
 		}
 		public static void Update()
 		{
-			List.UpdateRemove();
-			List.UpdateAdd();
+			List.Update();
 			List.RemoveAll(ie => !UpdateIEnumerator(ie));
 		}
 		public static void StopAll()
