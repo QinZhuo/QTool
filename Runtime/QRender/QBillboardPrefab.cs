@@ -57,7 +57,7 @@ namespace QTool
 			}
 			else
 			{
-				QFileTool.SavePNG(texture, pngPath);
+				texture.SavePNG(pngPath);
 				UnityEditor.AssetDatabase.Refresh();
 				texture = UnityEditor.AssetDatabase.LoadAssetAtPath<Texture2D>(pngPath);
 				QBillboard.GetComponent<MeshFilter>(true).sharedMesh = QMeshTool.GetMesh(PrimitiveType.Quad);

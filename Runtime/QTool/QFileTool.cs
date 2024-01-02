@@ -633,43 +633,7 @@ namespace QTool
 				return defaultValue;
 			}
 		}
-		public static void SaveJPG(this Texture2D tex, string path,int quality=50)
-		{
-			var bytes = tex.EncodeToJPG(quality);
-			if (bytes != null)
-			{
-				Save(path, bytes);
-			}
-		}
-		public static void SavePNG(this Texture2D tex, string path)
-		{
-			var bytes = tex.EncodeToPNG();
-			if (bytes != null)
-			{
-				Save(path,bytes);
-			}
-		}
-#if UNITY_EDITOR
-		public static Sprite SaveSprite(this Texture2D texture, string path,float spritePixelsPerUnit=100)
-		{
-			texture.SavePNG(path);
-			UnityEditor.AssetDatabase.Refresh();
-			var textureImporter = UnityEditor.AssetImporter.GetAtPath(path) as UnityEditor.TextureImporter;
-			textureImporter.textureType = UnityEditor.TextureImporterType.Sprite;
-			textureImporter.spriteImportMode = UnityEditor.SpriteImportMode.Single;
-			textureImporter.spritePixelsPerUnit = spritePixelsPerUnit;
-			textureImporter.maxTextureSize = 16384;
-			UnityEditor.AssetDatabase.ImportAsset(path);
-			return UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>(path);
-		}
-#endif
-		public static Texture2D LoadTexture(this string path)
-		{
-			var bytes =LoadBytes(path);
-			Texture2D tex = new Texture2D(2, 2);
-			tex.LoadImage(bytes);
-			return tex;
-		}
+
 		public static string SelectOpenPath(string title = "打开文件", string extension = "*", string directory = "Assets")
         {
             var dialog = new FileDialog

@@ -396,7 +396,7 @@ namespace QTool {
 						}
 					}
 				}
-				QFileTool.SavePNG(newText, textureImporter.assetPath);
+				newText.SavePNG(textureImporter.assetPath);
 				Debug.LogError("拓展图片用于压缩 " + textureImporter.assetPath);
 				if (textureImporter.isReadable != last)
 				{
