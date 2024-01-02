@@ -5,6 +5,11 @@ namespace QTool
 {
 	public static class QTextureTool 
 	{
+		public static float ToH(this Color color)
+		{
+			Color.RGBToHSV(color, out var h, out var s, out var v);
+			return h;
+		}
 		public static Texture2D Downsample(this Texture2D texture,int count=2)
 		{
 			var newTexture = new Texture2D(texture.width / count, texture.height / count, texture.format, false);
@@ -18,17 +23,84 @@ namespace QTool
 			newTexture.Apply();
 			return newTexture;
 		}
-		public static Color[] GetMainColors(this Texture texture,int colorCount=2)
+		private static float Average(this IList<float> values)
 		{
-			var colors = new Color[colorCount];
+			var sum = 0f;
+			foreach (var value in values)
+			{
+				sum += value;
+			}
+			return sum / values.Count;
+		}
+		private static int NearIndex(this float[] values, float value)
+		{
+			var index = 0;
+			var distance = float.MaxValue;
+			for (int i = 0; i < values.Length; i++)
+			{
+				if (Mathf.Abs(values[i] - value) > distance)
+				{
+					index = i;
+				}
+			}
+			return index;
+		}
+		public static Color GetMainColor(this Texture2D texture, int colorCount = 2, float s = 0.5f, float v = 1)
+		{
+			var colors = new float[texture.width * texture.height];
 			for (int x = 0; x < texture.width; x++)
 			{
 				for (int y = 0; y < texture.height; y++)
 				{
-
+					colors[x * texture.height + y] = texture.GetPixel(x, y).ToH();
 				}
 			}
-			return colors;
+			var mainIndex = 0;
+			var mainColors = new float[colorCount];
+			for (int i = 0; i < colors.Length; i++)
+			{
+				if (mainIndex == 0)
+				{
+					mainColors[mainIndex++] = colors[i];
+				}
+				else if (!mainColors.Contains(colors[i]))
+				{
+					mainColors[mainIndex++] = colors[i];
+				}
+				if (mainIndex >= mainColors.Length)
+				{
+					break;
+				}
+			}
+			var mainColorLists = new List<float>[colorCount];
+			for (int i = 0; i < mainColorLists.Length; i++)
+			{
+				mainColorLists[i] = new List<float>();
+			}
+			while (true)
+			{
+				for (int i = 0; i < colors.Length; i++)
+				{
+					mainIndex = mainColors.NearIndex(colors[i]);
+					mainColorLists[mainIndex].Add(colors[i]);
+				}
+				bool isOver = true;
+				for (mainIndex = 0; mainIndex < mainColors.Length; mainIndex++)
+				{
+					var newColor = mainColorLists[mainIndex].Average();
+					mainColorLists[mainIndex].Clear();
+					if (isOver && !newColor.Equals(mainColors[mainIndex]))
+					{
+						isOver = false;
+					}
+					mainColors[mainIndex] = newColor;
+				}
+				if (isOver)
+				{
+					break;
+				}
+			}
+			return Color.HSVToRGB(mainColors.Get(0), s, v);
 		}
 		#region 存储
 
