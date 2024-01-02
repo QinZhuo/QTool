@@ -5,17 +5,59 @@ namespace QTool
 {
 	public static class QTextureTool 
 	{
+		const float DefaultS = 0.5f;
+		const float DefaultV = 1f;
+		static QTextureTool()
+		{
+			foreach (var kv in QToolSetting.Instance.qKeyColorList)
+			{
+				KeyColor[kv.key] = kv.color;
+			}
+		}
+		#region 颜色映射
+		public static QDictionary<string, Color> KeyColor = new QDictionary<string, Color>();
+		public static Color ToColor(this string key, float s = DefaultS, float v = DefaultV)
+		{
+			if (key.IsNull()) return Color.white;
+			if (ColorUtility.TryParseHtmlString(key, out var newColor))
+			{
+				return newColor;
+			}
+			else
+			{
+				if (!KeyColor.ContainsKey(key))
+				{
+					if (key.SplitTowString("/", out var start, out var end))
+					{
+						var colorValue = Mathf.Abs(start.GetHashCode() % 700f) + Mathf.Abs(end.GetHashCode() % 300f);
+						KeyColor[key] = Color.HSVToRGB(colorValue / 1000f, s, v);
+					}
+					else
+					{
+						KeyColor[key] = Color.HSVToRGB(Mathf.Abs(key.GetHashCode() % 700f) / 1000f, s, v);
+					}
+				}
+				return KeyColor[key];
+			}
+		}
+		#endregion
+		#region 主色调提取
+		public static float ToColor(this float h, float s, float v)
+		{
+			Color.HSVToRGB(h, s, v);
+			return h;
+		}
 		public static float ToH(this Color color)
 		{
 			Color.RGBToHSV(color, out var h, out var s, out var v);
 			return h;
 		}
-		public static Texture2D Downsample(this Texture2D texture,int count=2)
+		public static Texture2D Downsample(this Texture2D texture, int count = 2)
 		{
 			var newTexture = new Texture2D(texture.width / count, texture.height / count, texture.format, false);
-			for (int x = 0; x < texture.width/count; x++)
+			for (int x = 0; x < texture.width / count; x++)
 			{
-				for (int y = 0; y < texture.height/count; y++)
+				for (int y = 0; y < texture.height / count; y++)
 				{
 					newTexture.SetPixel(x, y, texture.GetPixel(x, y));
 				}
@@ -45,7 +87,7 @@ namespace QTool
 			}
 			return index;
 		}
-		public static Color GetMainColor(this Texture2D texture, int colorCount = 2, float s = 0.5f, float v = 1)
+		public static Color GetMainColor(this Texture2D texture, int colorCount = 2, float s = DefaultS, float v = DefaultV)
 		{
 			var colors = new float[texture.width * texture.height];
 			for (int x = 0; x < texture.width; x++)
@@ -102,6 +144,8 @@ namespace QTool
 			}
 			return Color.HSVToRGB(mainColors.Get(0), s, v);
 		}
+		#endregion
+
 		#region 存储
 
 		public static void SaveJPG(this Texture2D tex, string path, int quality = 50)

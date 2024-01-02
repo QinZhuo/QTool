@@ -61,7 +61,6 @@ namespace QTool
 		}
 		public static string Version => Application.version; 
 		public static bool IsTestVersion => Application.version.StartsWith("0.");
-        static QDictionary<string, Color> KeyColor = new QDictionary<string, Color>();
 		public static string GetGuid()
 		{
 			return Guid.NewGuid().ToString("N");
@@ -159,35 +158,8 @@ namespace QTool
 		{
 			return obj.activeInHierarchy;
 		}
-		public static Color ToColor(this string key, float s = 0.5f, float v = 1f)
-        {
-            if (string.IsNullOrWhiteSpace(key)) return Color.white;
-			if(QToolSetting.Instance.qKeyColorList.ContainsKey(key))
-			{
-				return QToolSetting.Instance.qKeyColorList.Get(key).color;
-			}
-			if (ColorUtility.TryParseHtmlString(key,out var newColor))
-			{
-				return newColor;
-			}
-			else
-			{
-				var colorKey = key + s + v;
-				if (!KeyColor.ContainsKey(colorKey))
-				{
-					if (colorKey.SplitTowString("/",out var start,out var end))
-					{
-						var colorValue = Mathf.Abs(start.GetHashCode() % 700f) + Mathf.Abs(end.GetHashCode() % 300f);
-						KeyColor[colorKey] = Color.HSVToRGB(colorValue / 1000f, s, v);
-					}
-					else
-					{
-						KeyColor[colorKey] = Color.HSVToRGB(Mathf.Abs(colorKey.GetHashCode() % 700f) / 1000f, s, v);
-					}
-				}
-				return KeyColor[colorKey];
-			}
-        }
+
+	
 
 		public static string GetPath(this Transform transform)
 		{
