@@ -8,10 +8,15 @@ namespace QTool
 {
 	public abstract class QAssetLoader<TPath, TObj> : MonoBehaviour where TObj : UnityEngine.Object
 	{
-		public UnityEvent<TObj> OnLoad;
+		[UnityEngine.Serialization.FormerlySerializedAs("OnLoad")]
+		public UnityEvent<TObj> OnLoadEvent = new UnityEvent<TObj>();
 		public void Start()
 		{
 			InvokeLoad(name);
+		}
+		public virtual void OnLoad(TObj obj)
+		{
+			OnLoadEvent?.Invoke(obj);
 		}
 		public void InvokeLoad(string key)
 		{
@@ -22,7 +27,7 @@ namespace QTool
 			}
 			if (obj != null)
 			{
-				OnLoad?.Invoke(obj);
+				OnLoad(obj);
 			}
 		}
 		public async void InvokeLoadAsync(string key)
@@ -34,7 +39,7 @@ namespace QTool
 			}
 			if (obj != null)
 			{
-				OnLoad?.Invoke(obj);
+				OnLoad(obj);
 			}
 		}
 		public static string DirectoryPath
