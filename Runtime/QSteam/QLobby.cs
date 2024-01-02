@@ -90,11 +90,11 @@ namespace QTool
 			State = GetData(nameof(State), QLobbyState.组队);
 			if (Texture == null)
 			{
-				Color = Texture.GetMainColor();
+				Color = Name.ToColor();
 			}
 			else
 			{
-				Color = Name.ToColor();
+				Color = Texture.GetMainColorH().ToColor();
 			}
 		}
 		public override string ToString()

@@ -42,10 +42,9 @@ namespace QTool
 		}
 		#endregion
 		#region 主色调提取
-		public static float ToColor(this float h, float s, float v)
+		public static Color ToColor(this float h, float s = DefaultS, float v = DefaultV)
 		{
-			Color.HSVToRGB(h, s, v);
-			return h;
+			return Color.HSVToRGB(h, s, v);
 		}
 		public static float ToH(this Color color)
 		{
@@ -87,62 +86,67 @@ namespace QTool
 			}
 			return index;
 		}
-		public static Color GetMainColor(this Texture2D texture, int colorCount = 2, float s = DefaultS, float v = DefaultV)
+		private static QDictionary<Texture2D, float> ColorHCache = new QDictionary<Texture2D, float>();
+		public static float GetMainColorH(this Texture2D texture, int colorCount = 2)
 		{
-			var colors = new float[texture.width * texture.height];
-			for (int x = 0; x < texture.width; x++)
+			if (!ColorHCache.ContainsKey(texture))
 			{
-				for (int y = 0; y < texture.height; y++)
+				var colors = new float[texture.width * texture.height];
+				for (int x = 0; x < texture.width; x++)
 				{
-					colors[x * texture.height + y] = texture.GetPixel(x, y).ToH();
+					for (int y = 0; y < texture.height; y++)
+					{
+						colors[x * texture.height + y] = texture.GetPixel(x, y).ToH();
+					}
 				}
-			}
-			var mainIndex = 0;
-			var mainColors = new float[colorCount];
-			for (int i = 0; i < colors.Length; i++)
-			{
-				if (mainIndex == 0)
-				{
-					mainColors[mainIndex++] = colors[i];
-				}
-				else if (!mainColors.Contains(colors[i]))
-				{
-					mainColors[mainIndex++] = colors[i];
-				}
-				if (mainIndex >= mainColors.Length)
-				{
-					break;
-				}
-			}
-			var mainColorLists = new List<float>[colorCount];
-			for (int i = 0; i < mainColorLists.Length; i++)
-			{
-				mainColorLists[i] = new List<float>();
-			}
-			while (true)
-			{
+				var mainIndex = 0;
+				var mainColors = new float[colorCount];
 				for (int i = 0; i < colors.Length; i++)
 				{
-					mainIndex = mainColors.NearIndex(colors[i]);
-					mainColorLists[mainIndex].Add(colors[i]);
-				}
-				bool isOver = true;
-				for (mainIndex = 0; mainIndex < mainColors.Length; mainIndex++)
-				{
-					var newColor = mainColorLists[mainIndex].Average();
-					mainColorLists[mainIndex].Clear();
-					if (isOver && !newColor.Equals(mainColors[mainIndex]))
+					if (mainIndex == 0)
 					{
-						isOver = false;
+						mainColors[mainIndex++] = colors[i];
 					}
-					mainColors[mainIndex] = newColor;
+					else if (!mainColors.Contains(colors[i]))
+					{
+						mainColors[mainIndex++] = colors[i];
+					}
+					if (mainIndex >= mainColors.Length)
+					{
+						break;
+					}
 				}
-				if (isOver)
+				var mainColorLists = new List<float>[colorCount];
+				for (int i = 0; i < mainColorLists.Length; i++)
 				{
-					break;
+					mainColorLists[i] = new List<float>();
 				}
+				while (true)
+				{
+					for (int i = 0; i < colors.Length; i++)
+					{
+						mainIndex = mainColors.NearIndex(colors[i]);
+						mainColorLists[mainIndex].Add(colors[i]);
+					}
+					bool isOver = true;
+					for (mainIndex = 0; mainIndex < mainColors.Length; mainIndex++)
+					{
+						var newColor = mainColorLists[mainIndex].Average();
+						mainColorLists[mainIndex].Clear();
+						if (isOver && !newColor.Equals(mainColors[mainIndex]))
+						{
+							isOver = false;
+						}
+						mainColors[mainIndex] = newColor;
+					}
+					if (isOver)
+					{
+						break;
+					}
+				}
+				ColorHCache[texture] = mainColors.Get(0);
 			}
-			return Color.HSVToRGB(mainColors.Get(0), s, v);
+			return ColorHCache[texture];
 		}
 		#endregion
 
