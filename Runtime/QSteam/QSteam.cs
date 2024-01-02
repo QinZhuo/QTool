@@ -115,7 +115,7 @@ namespace QTool.Steam
 		}
 		public static Texture2D GetImage(this CSteamID player)
 		{
-			return SteamFriends.GetSmallFriendAvatar(player).GetImage();
+			return SteamFriends.GetMediumFriendAvatar(player).GetImage();
 		}
 		private static QDictionary<int, Texture2D> ImageCache = new QDictionary<int, Texture2D>();
 		public static Texture2D GetImage(this int image)
@@ -451,6 +451,7 @@ namespace QTool.Steam
 				var memeberId = SteamMatchmaking.GetLobbyMemberByIndex(lobbyId, t);
 				var memeber = lobby.Members[memeberId.m_SteamID];
 				memeber.Name = memeberId.GetName();
+				memeber.Texture = memeberId.GetImage();
 				if (lobby == QLobby.CurrentLobby)
 				{
 					SteamMatchmaking.GetLobbyMemberData(lobbyId, memeberId, nameof(memeber.Data)).ParseQData(memeber.Data);
