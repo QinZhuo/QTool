@@ -19,7 +19,7 @@ namespace QTool
 			{
 				data = new QDataList();
 				data.LoadPath = path;
-				QFileManager.LoadAll(path, (fileValue, loadPath) =>
+				QFileTool.LoadAll(path, (fileValue, loadPath) =>
 				{
 					data.Add(new QDataList(fileValue) { LoadPath = loadPath });
 				}, "{}");
@@ -51,7 +51,7 @@ namespace QTool
 			{
 				path = LoadPath;
 			}
-			QFileManager.Save(path, ToString());
+			QFileTool.Save(path, ToString());
 		}
         public int GetTitleIndex(string title)
         {
@@ -243,7 +243,7 @@ namespace QTool
 		#region 加载数据
 		public static string GetResourcesPath(string key = null)
 		{
-			return (QFileManager.ResourcesPathRoot + "/" + nameof(QDataList) + "Asset").MergePath(typeof(T).Name).MergePath(key) + ".txt";
+			return (QFileTool.ResourcesPathRoot + "/" + nameof(QDataList) + "Asset").MergePath(typeof(T).Name).MergePath(key) + ".txt";
 		}
 		public static QDataList LoadQDataList(string key = null)
 		{

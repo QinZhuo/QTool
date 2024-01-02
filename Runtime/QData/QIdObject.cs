@@ -86,7 +86,7 @@ namespace QTool
 						var qidr = ScriptableObject.CreateInstance<QIdReference>();
 						qidr.obj = obj;
 						var path = "Assets/Resources/" + nameof(QIdReference) + "/" + key + ".asset";
-						path = QFileManager.CheckDirectoryPath(path);
+						path = QFileTool.CheckDirectoryPath(path);
 						UnityEditor.AssetDatabase.CreateAsset(qidr, path);
 						if (!Application.isPlaying)
 						{

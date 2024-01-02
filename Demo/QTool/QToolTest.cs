@@ -181,8 +181,8 @@ namespace QTool.Test
 		[QName("加密文件测试")]
 		public void SecretTest()
 		{
-			QFileManager.Save(nameof(QToolTest) + QFileManager.SecretExtension, nameof(SecretTest));
-			Debug.LogError(QFileManager.Load(nameof(QToolTest) + QFileManager.SecretExtension));
+			QFileTool.Save(nameof(QToolTest) + QFileTool.SecretExtension, nameof(SecretTest));
+			Debug.LogError(QFileTool.Load(nameof(QToolTest) + QFileTool.SecretExtension));
 		}
 		public void ScreenTest(bool value)
 		{
@@ -240,7 +240,7 @@ namespace QTool.Test
 			Debug.LogError((new int[][] { new int[] { 1, 2 }, new int[] { 3, 4 } }).ToQData().ParseQData<int[][]>().ToQData());
 
 			Debug.LogError(new List<QTestClass>() { new QTestClass { Key = "1" }, new QTestClass { Key = "2" } }.ToQDataList());
-			QFileManager.Save("saveTest.txt", data.ToQData());
+			QFileTool.Save("saveTest.txt", data.ToQData());
 			QPlayerPrefs.Set("test1", data.ToString());
 			Debug.LogError(QPlayerPrefs.GetString("test1"));
 		}

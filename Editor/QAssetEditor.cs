@@ -79,11 +79,11 @@ namespace QTool {
 								case ".mat":
 								case ".playable":
 									{
-										var text = QFileManager.Load(path,"",true);
+										var text = QFileTool.Load(path,"",true);
 										if (text.Contains(oldId))
 										{
 											Debug.LogError("更改[" + path + "]引用资源");
-											QFileManager.Save(path, text.Replace(oldId, newId));
+											QFileTool.Save(path, text.Replace(oldId, newId));
 										}
 									}
 									break;
@@ -396,7 +396,7 @@ namespace QTool {
 						}
 					}
 				}
-				QFileManager.SavePNG(newText, textureImporter.assetPath);
+				QFileTool.SavePNG(newText, textureImporter.assetPath);
 				Debug.LogError("拓展图片用于压缩 " + textureImporter.assetPath);
 				if (textureImporter.isReadable != last)
 				{

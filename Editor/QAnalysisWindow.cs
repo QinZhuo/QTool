@@ -476,9 +476,9 @@ namespace QTool
 		{
 			ErrorList.LoadQDataList("QTool/" + QAnalysis.StartKey + "/错误数据" + ".txt");
 			EditorUtility.DisplayProgressBar("数据读取", "读取解析数据 QTool/" + QAnalysis.StartKey, 0.2f);
-			QFileManager.LoadBytes(Instance,"QTool/" + QAnalysis.StartKey+"/"+nameof(QAnalysisData) +".bin");
+			QFileTool.LoadBytes(Instance,"QTool/" + QAnalysis.StartKey+"/"+nameof(QAnalysisData) +".bin");
 			EditorUtility.DisplayProgressBar("数据读取", "读取解析数据设置 "+ "QTool/" + QAnalysis.StartKey, 0.9f); 
-			QFileManager.LoadBytes(Setting,"QTool/" + QAnalysis.StartKey + "/" + nameof(Setting)+ ".bin");  
+			QFileTool.LoadBytes(Setting,"QTool/" + QAnalysis.StartKey + "/" + nameof(Setting)+ ".bin");  
 			EditorUtility.ClearProgressBar();
 		}  
 		public static void SaveData(bool saveEvent=true) 
@@ -493,9 +493,9 @@ namespace QTool
 			EventList.Save();  
 			EditorUtility.ClearProgressBar(); 
 			EditorUtility.DisplayProgressBar("数据储存", "储存解析数据 QTool/" + QAnalysis.StartKey, 0.2f); 
-			QFileManager.SaveBytes(Instance,"QTool/" + QAnalysis.StartKey + "/" + nameof(QAnalysisData) + ".bin");
+			QFileTool.SaveBytes(Instance,"QTool/" + QAnalysis.StartKey + "/" + nameof(QAnalysisData) + ".bin");
 			EditorUtility.DisplayProgressBar("数据储存", "储存解析数据设置 " + "QTool/" + QAnalysis.StartKey, 0.9f);
-			QFileManager.SaveBytes(Setting,"QTool/" + QAnalysis.StartKey + "/" + nameof(Setting)+ ".bin");
+			QFileTool.SaveBytes(Setting,"QTool/" + QAnalysis.StartKey + "/" + nameof(Setting)+ ".bin");
 			EditorUtility.ClearProgressBar();
 		}
 	

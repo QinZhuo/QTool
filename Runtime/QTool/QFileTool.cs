@@ -12,7 +12,7 @@ using UnityEngine.Switch;
 #endif
 namespace QTool
 {
-	public static class QFileManager
+	public static class QFileTool
 	{
 		public static string SaveDataPathRoot
 		{
@@ -22,7 +22,7 @@ namespace QTool
 				{
 
 					case RuntimePlatform.Switch:
-						return nameof(QFileManager);
+						return nameof(QFileTool);
 					default:
 						return Application.persistentDataPath;
 				}
@@ -33,7 +33,7 @@ namespace QTool
 		public static nn.account.Uid userId;
 		public static nn.fs.FileHandle fileHandle = new nn.fs.FileHandle();
 #endif
-		static QFileManager()
+		static QFileTool()
 		{
 			switch (Application.platform)
 			{

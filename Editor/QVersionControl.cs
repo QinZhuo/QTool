@@ -127,11 +127,11 @@ namespace QTool
 			var packagePath = rootPath + "/package.json";
 			if (File.Exists(packagePath))
 			{
-				var text = QFileManager.Load(packagePath);
+				var text = QFileTool.Load(packagePath);
 				
 				var version = text.GetBlockValue("\"version\"", ",");
 				text = text.Replace(version, ": \"" + DateTime.Now.ToQVersionString() + "\"");
-				QFileManager.Save(packagePath, text);
+				QFileTool.Save(packagePath, text);
 			}
 		}
 		public static string Pull(string path)
@@ -386,7 +386,7 @@ namespace QTool
 #region 忽略文件
 		public static void GitIgnoreFile()
 		{
-			QFileManager.Save(".gitignore", @"# This .gitignore file should be placed at the root of your Unity project directory
+			QFileTool.Save(".gitignore", @"# This .gitignore file should be placed at the root of your Unity project directory
 #
 # Get latest from https://github.com/github/gitignore/blob/main/Unity.gitignore
 #

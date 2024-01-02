@@ -82,7 +82,7 @@ namespace QTool
 			{
 				Data = "";
 			}
-			else if (QFileManager.ExistsFile(path))
+			else if (QFileTool.ExistsFile(path))
 			{
 				{
 #if UNITY_EDITOR

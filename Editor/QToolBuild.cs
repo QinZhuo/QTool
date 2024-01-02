@@ -36,7 +36,7 @@ namespace QTool
 			{
 				case BuildTargetGroup.Standalone:
 					{
-						var path = QFileManager.DirectoryName(report.summary.outputPath);
+						var path = QFileTool.DirectoryName(report.summary.outputPath);
 						var tempPath = path + "/" + Application.productName + "_BackUpThisFolder_ButDontShipItWithYourGame";
 						if (Directory.Exists(tempPath))
 						{

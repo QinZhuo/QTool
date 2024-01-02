@@ -99,7 +99,7 @@ namespace QTool
 				QDebug.Log("自动创建<" + nameof(T) + "> " + key + "");
 				obj = ScriptableObject.CreateInstance<T>();
 				var path = ("Assets/Resources/" + key + ".asset");
-				path = QFileManager.CheckDirectoryPath(path);
+				path = QFileTool.CheckDirectoryPath(path);
 				UnityEditor.AssetDatabase.CreateAsset(obj, path);
 				if (!Application.isPlaying)
 				{
