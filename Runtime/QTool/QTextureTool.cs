@@ -11,40 +11,56 @@ namespace QTool
 		{
 			foreach (var kv in QToolSetting.Instance.qKeyColorList)
 			{
-				KeyColor[kv.key] = kv.color;
+				KeyColorH[kv.key] = kv.color.ToH();
 			}
 		}
 		#region 颜色映射
-		public static QDictionary<string, Color> KeyColor = new QDictionary<string, Color>();
-		public static Color ToColor(this string key, float s = DefaultS, float v = DefaultV)
+		public static QDictionary<string, float> KeyColorH = new QDictionary<string, float>();
+		public static Color ParseHtmlColor(this string key)
 		{
-			if (key.IsNull()) return Color.white;
 			if (ColorUtility.TryParseHtmlString(key, out var newColor))
 			{
 				return newColor;
 			}
-			else
+			return default;
+		}
+		public static Color ToColor(this string key, float s = DefaultS, float v = DefaultV)
+		{
+			return key.ToColorH().ToColor(s, v);
+		}
+		public static float ToColorH(this string key)
+		{
+			if (key.IsNull()) return 0;
+			if (!KeyColorH.ContainsKey(key))
 			{
-				if (!KeyColor.ContainsKey(key))
+				if (key.SplitTowString("/", out var start, out var end))
 				{
-					if (key.SplitTowString("/", out var start, out var end))
-					{
-						var colorValue = Mathf.Abs(start.GetHashCode() % 700f) + Mathf.Abs(end.GetHashCode() % 300f);
-						KeyColor[key] = Color.HSVToRGB(colorValue / 1000f, s, v);
-					}
-					else
-					{
-						KeyColor[key] = Color.HSVToRGB(Mathf.Abs(key.GetHashCode() % 700f) / 1000f, s, v);
-					}
+					var colorValue = Mathf.Abs(start.GetHashCode() % 700f) + Mathf.Abs(end.GetHashCode() % 300f);
+					KeyColorH[key] = colorValue / 1000f;
 				}
-				return KeyColor[key];
+				else
+				{
+					KeyColorH[key] = Mathf.Abs(key.GetHashCode() % 700f) / 1000f;
+				}
 			}
+			return KeyColorH[key];
 		}
 		#endregion
 		#region 主色调提取
-		public static Color ToColor(this float h, float s = DefaultS, float v = DefaultV)
+		public static Color ToColor(this float h, float s = DefaultS, float v = DefaultV, float a = 1)
 		{
-			return Color.HSVToRGB(h, s, v);
+			var color = Color.HSVToRGB(h, s, v);
+			color.a = a;
+			return color;
+		}
+		public static void SetColorH(this UnityEngine.UI.Graphic graphic, float h)
+		{
+			graphic.color = graphic.color.SetH(h);
+		}
+		public static Color SetH(this Color color, float newH)
+		{
+			Color.RGBToHSV(color, out var h, out var s, out var v);
+			return newH.ToColor(s, v, color.a);
 		}
 		public static float ToH(this Color color)
 		{
