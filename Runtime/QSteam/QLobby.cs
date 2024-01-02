@@ -66,8 +66,8 @@ namespace QTool
 		public ulong Key { get; set; }
 		public string Name { get; set; }
 		public QLobbyState State { get; set; }
-		public Color Color { get; set; }
 		public Texture2D Texture { get; set; }
+		public Color Color => Key.ToString().ToColor();
 		public QDictionary<string, string> Data { get; private set; } = new QDictionary<string, string>();
 		public T GetData<T>(string key, T defaultValue = default)
 		{
@@ -88,13 +88,9 @@ namespace QTool
 		{
 			Name = GetData(nameof(Name), Name);
 			State = GetData(nameof(State), QLobbyState.组队);
-			if (Texture == null)
+			if (Texture != null)
 			{
-				Color = Name.ToColor();
-			}
-			else
-			{
-				Color = Texture.GetMainColorH().ToColor();
+				QTextureTool.KeyColor[Key.ToString()] = Key.ToString().ToColor();
 			}
 		}
 		public override string ToString()
