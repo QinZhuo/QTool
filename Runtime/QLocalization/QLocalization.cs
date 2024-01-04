@@ -78,7 +78,15 @@ namespace QTool
 		public string Localization { get; private set; }
 		static QLocalizationData()
 		{
-			Fresh();
+
+			if (Application.isPlaying)
+			{
+				Fresh();
+			}
+			else
+			{
+				Language = Application.systemLanguage;
+			}
 			QEventManager.Register<string>(nameof(QEventKey.设置更新), Fresh);
 		}
 		public static void Fresh(string key = nameof(Language))
