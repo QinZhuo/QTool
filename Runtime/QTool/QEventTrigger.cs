@@ -151,11 +151,12 @@ namespace QTool
 			foreach (var kv in floatEventList)
 			{
 				var key = kv.Key;
-				if (key.StartsWith("当前"))
+				var target = transform.FindAll(key);
+				if (target == null && key.StartsWith("当前"))
 				{
 					key = key.Substring("当前".Length);
 				}
-				var target = transform.FindAll(key);
+				target = transform.FindAll(key);
 				if (target == null) continue;
 				foreach (var item in target.GetComponents<IQEvent<float>>())
 				{
