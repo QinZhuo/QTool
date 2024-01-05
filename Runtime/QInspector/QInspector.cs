@@ -281,17 +281,28 @@ namespace QTool.Inspector
 	{
 		public override VisualElement CreatePropertyGUI(SerializedProperty property)
 		{
+			var root = new VisualElement();
 			var popupData = QPopupData.Get(property, (attribute as QPopupAttribute).getListFuncs);
 			var value = property.propertyType == SerializedPropertyType.String ? property.stringValue : property.objectReferenceValue?.GetType()?.Name;
 			if (!popupData.List.Contains(value))
 			{
 				popupData.List.Add(value);
 			}
-			if (property.propertyType==SerializedPropertyType.ObjectReference &&value==null)
+			if (property.propertyType == SerializedPropertyType.ObjectReference && value == null)
 			{
 				value = popupData.List.Get(0);
 			}
 			var visual = new PopupField<string>(QReflection.QName(property), popupData.List, value);
+			root.Add(visual);
+			PropertyField propertyField = null;
+			if (property.propertyType != SerializedPropertyType.String)
+			{
+				propertyField = root.Add(property);
+				if (property.objectReferenceValue != null)
+				{
+					propertyField.SetEnabled(false);
+				}
+			}
 			visual.RegisterCallback<ChangeEvent<string>>(data =>
 			{
 				if (property.propertyType == SerializedPropertyType.String)
@@ -303,25 +314,33 @@ namespace QTool.Inspector
 					var gameObject = (property.serializedObject.targetObject as MonoBehaviour)?.gameObject;
 					if (gameObject != null)
 					{
-						if (!value.IsNull())
-						{
-							GameObject.DestroyImmediate(gameObject.GetComponent(QReflection.ParseType(value)));
-						}
 						value = data.newValue;
-						if (!value.IsNull())
+						if (value.IsNull())
 						{
-							property.objectReferenceValue = gameObject.GetComponent(QReflection.ParseType(value));
-							if (property.objectReferenceValue == null)
+							property.objectReferenceValue = null;
+							propertyField.SetEnabled(true);
+						}
+						else
+						{
+							try
 							{
-								property.objectReferenceValue = gameObject.AddComponent(QReflection.ParseType(value));
+								property.objectReferenceValue = gameObject.GetComponent(QReflection.ParseType(value), true);
 							}
+							catch (Exception)
+							{
+								throw;
+							}
+							finally
+							{
+								propertyField.SetEnabled(false);
+							}
+							
 						}
 					}
-
 				}
 				property.serializedObject.ApplyModifiedProperties();
 			});
-			return visual;
+			return root;
 		}
 	}
 	[CustomPropertyDrawer(typeof(QToolbarAttribute))]

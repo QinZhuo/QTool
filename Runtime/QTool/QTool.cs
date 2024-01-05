@@ -239,10 +239,14 @@ namespace QTool
 		}
 		public static T GetComponent<T>(this GameObject obj, bool autoCreate) where T : Component
 		{
-			var com = obj?.GetComponent<T>();
-			if (com==null&&autoCreate)
+			return obj?.GetComponent(typeof(T), autoCreate) as T;
+		}
+		public static Component GetComponent(this GameObject obj, Type type, bool autoCreate)
+		{
+			var com = obj?.GetComponent(type);
+			if (com == null && autoCreate)
 			{
-				com = obj?.AddComponent<T>();
+				com = obj?.AddComponent(type);
 				obj?.SetDirty();
 			}
 			return com;

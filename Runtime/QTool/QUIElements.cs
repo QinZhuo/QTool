@@ -710,6 +710,7 @@ namespace QTool
 		static QDictionary<string, QPopupData> DrawerDic = new QDictionary<string, QPopupData>((key) => new QPopupData());
 
 		public List<string> List = new List<string>();
+		public Type Type { get; private set; }
 
 		public static QPopupData Get(object obj, params string[] getListFuncs)
 		{
@@ -735,6 +736,7 @@ namespace QTool
 				drawerKey = type?.ToString();
 			}
 			var drawer = DrawerDic[drawerKey];
+			drawer.Type = type;
 			if (getListFuncs.Length > 0)
 			{
 				drawer.List.Clear();
@@ -770,6 +772,7 @@ namespace QTool
 			{
 				if (type.IsAbstract)
 				{
+					drawer.List.Add("\t");
 					foreach (var childType in type.GetAllTypes())
 					{
 						drawer.List.Add(childType.Name);
