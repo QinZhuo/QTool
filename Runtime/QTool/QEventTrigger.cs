@@ -13,15 +13,10 @@ namespace QTool
 	}
 	public static class QEventManager
     {
-        ///// <summary>
-        ///// 当任意事件触发时调用
-        ///// </summary>
-        //public static event System.Action<string> OnEventTigger;
         /// <summary>
         /// 事件列表 对应事件触发时调用对应Action 使用方法： EventList["事件名"]+=Action;
         /// </summary>
         internal static QDictionary<string, System.Action> EventList = new QDictionary<string, System.Action>();
-		internal static QDictionary<string, System.Action> OnceEventList = new QDictionary<string, System.Action>();
 		public static void InvokeEvent(System.Enum value)
 		{
 			InvokeEvent(value.ToString());
@@ -43,11 +38,6 @@ namespace QTool
 				if (EventList.ContainsKey(eventKey))
 				{
 					EventList[eventKey]?.Invoke();
-				}
-				if (OnceEventList.ContainsKey(eventKey))
-				{
-					OnceEventList[eventKey]?.Invoke();
-					OnceEventList[eventKey] = null;
 				}
 			}
 			catch (System.Exception e)
@@ -72,18 +62,6 @@ namespace QTool
 			EventList[eventKey] += action;
 		}
 	
-		public static void RegisterOnce(System.Enum eventKey, params System.Action[] action)
-		{
-			var key = eventKey.ToString();
-			foreach (var item in action)
-			{
-				RegisterOnce(key, item);
-			}
-		}
-		public static void RegisterOnce(string eventKey, System.Action action)
-		{
-			OnceEventList[eventKey] += action;
-		}
 		public static void UnRegister(System.Enum eventKey, params System.Action[] action)
 		{
 			var key = eventKey.ToString();
@@ -95,15 +73,10 @@ namespace QTool
 		public static void UnRegister(string eventKey, System.Action action)
         {
             EventList[eventKey] -= action;
-		//	OnceEventList[eventKey] -= action;
 		}
         public static void Register<T>(string eventKey,System.Action<T> action)
         {
 			QEventManager<T>.EventList[eventKey] += action;
-		}
-		public static void RegisterOnce<T>(string eventKey, System.Action<T> action)
-		{
-			QEventManager<T> .OnceEventList[eventKey] += action;
 		}
 		public static void UnRegister<T>(string eventKey, System.Action<T> action)
         {
@@ -112,16 +85,10 @@ namespace QTool
     }
     public class QEventManager<T>
     {
-        ///// <summary>
-        ///// 当任意事件触发时调用
-        ///// </summary>
-        //public static event System.Action<string, T> OnEventTigger;
         /// <summary>
         /// 事件列表 对应事件触发时调用对应Action 使用方法： EventList["事件名"]+=Action;
         /// </summary>
         internal static QDictionary<string, System.Action<T>> EventList = new QDictionary<string, System.Action<T>>();
-
-		internal static QDictionary<string, System.Action<T>> OnceEventList = new QDictionary<string, System.Action<T>>();
 		public static void InvokeEvent(string eventKey,T value)
 		{
 			try
@@ -135,11 +102,6 @@ namespace QTool
 				{
 					EventList[eventKey]?.Invoke(value);
 				}
-				if (OnceEventList.ContainsKey(eventKey))
-				{
-					OnceEventList[eventKey]?.Invoke(value);
-					OnceEventList[eventKey] = null;
-				}
 			}
 			catch (System.Exception e)
 			{
@@ -148,6 +110,10 @@ namespace QTool
 			
 		}
     }
+	public interface IQEvent<T>
+	{
+		void Set(T value);
+	}
     [System.Serializable,DisallowMultipleComponent]
     public class QEventTrigger : MonoBehaviour
     {
@@ -157,6 +123,42 @@ namespace QTool
         public List<StringEventTrigger> stringEventList = new List<StringEventTrigger>();
         public List<BoolEventTrigger> boolEventList = new List<BoolEventTrigger>();
         public List<FloatEventTrigger> floatEventList = new List<FloatEventTrigger>();
+		[QName("自动绑定")]
+		public void AutoRegisterEvent()
+		{
+			foreach (var kv in boolEventList)
+			{
+				var target = transform.FindAll(kv.Key);
+				if (target == null) continue;
+				foreach (var item in target.GetComponents<IQEvent<bool>>())
+				{
+					kv.eventAction.AddPersistentListener(item.Set);
+				}
+			}
+			foreach (var kv in stringEventList)
+			{
+				var target = transform.FindAll(kv.Key);
+				if (target == null) continue;
+				foreach (var item in target.GetComponents<IQEvent<string>>())
+				{
+					kv.eventAction.AddPersistentListener(item.Set);
+				}
+				foreach (var item in target.GetComponents<UnityEngine.UI.Text>())
+				{
+					kv.eventAction.AddPersistentListener(item.GetAction<string>("set_text"));
+				}
+			}
+			foreach (var kv in floatEventList)
+			{
+				var target = transform.FindAll(kv.Key);
+				if (target == null) continue;
+				foreach (var item in target.GetComponents<IQEvent<float>>())
+				{
+					kv.eventAction.AddPersistentListener(item.Set);
+				}
+
+			}
+		}
 		protected void Awake()
 		{
 			if (GlobalEvent)
@@ -241,10 +243,11 @@ namespace QTool
 #endif
 		}
 	}
-    public class EventTriggerBase<T> : IKey<string> where T : UnityEventBase
+    public class QUnityEvent<T> : IKey<string> where T : UnityEventBase
 	{
-		public string EventName;
-        public string Key { get => EventName; set => EventName = value; }
+		public string Key { get => eventName; set => eventName = value; }
+		[UnityEngine.Serialization.FormerlySerializedAs("EventName")]
+		public string eventName;
         public T eventAction = default;
     }
     [System.Serializable]
@@ -277,19 +280,19 @@ namespace QTool
 	{
 	}
 	[System.Serializable]
-    public class FloatEventTrigger : EventTriggerBase<FloatEvent>
+    public class FloatEventTrigger : QUnityEvent<FloatEvent>
     {
     }
     [System.Serializable]
-    public class BoolEventTrigger : EventTriggerBase<BoolEvent>
+    public class BoolEventTrigger : QUnityEvent<BoolEvent>
     {
     }
     [System.Serializable]
-    public class ActionEventTrigger : EventTriggerBase<UnityEvent>
+    public class ActionEventTrigger : QUnityEvent<UnityEvent>
     {
     }
     [System.Serializable]
-    public class StringEventTrigger : EventTriggerBase<StringEvent>
+    public class StringEventTrigger : QUnityEvent<StringEvent>
     {
     }
 	
@@ -309,6 +312,7 @@ namespace QTool
 #if UNITY_EDITOR
 			if (!Application.isPlaying)
 			{
+				onValueChanged.RemovePersistentListener(action);
 				UnityEditor.Events.UnityEventTools.AddPersistentListener(onValueChanged, action);
 			}
 			else
@@ -351,6 +355,7 @@ namespace QTool
 #if UNITY_EDITOR
 			if (!Application.isPlaying)
 			{
+				onValueChanged.RemovePersistentListener(action);
 				UnityEditor.Events.UnityEventTools.AddPersistentListener(onValueChanged, action);
 			}
 			else

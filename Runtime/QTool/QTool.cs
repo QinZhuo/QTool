@@ -170,6 +170,7 @@ namespace QTool
 		}
 		public static Transform FindAll(this Transform transform,string name)
 		{
+			if (transform.name == name) return transform;
 			var find= transform.Find(name);
 			if(find == null)
 			{
