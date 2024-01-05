@@ -295,8 +295,72 @@ namespace QTool
 	
 	public static class QEventTool
     {
+		public static UnityAction GetAction(this Object obj, string funcName)
+		{
+			return UnityEventBase.GetValidMethodInfo(obj, funcName, new System.Type[0]).CreateDelegate(typeof(UnityAction), obj) as UnityAction;
+		}
+		public static UnityAction<T> GetAction<T>(this Object obj, string funcName)
+		{
+			var method = UnityEventBase.GetValidMethodInfo(obj, funcName, new System.Type[] { typeof(T) });
+			return method.CreateDelegate(typeof(UnityAction<T>), obj) as UnityAction<T>;
+		}
+		public static void AddPersistentListener(this UnityEvent onValueChanged, UnityAction action)
+		{
+#if UNITY_EDITOR
+			if (!Application.isPlaying)
+			{
+				UnityEditor.Events.UnityEventTools.AddPersistentListener(onValueChanged, action);
+			}
+			else
 
-        public static QEventTrigger GetTrigger(this GameObject obj)
+#endif
+			{
+				onValueChanged.AddListener(action);
+			}
+		}
+		public static void RemovePersistentListener(this UnityEvent onValueChanged, UnityAction action)
+		{
+#if UNITY_EDITOR
+			if (!Application.isPlaying)
+			{
+				UnityEditor.Events.UnityEventTools.RemovePersistentListener(onValueChanged, action);
+			}
+			else
+
+#endif
+			{
+				onValueChanged.RemoveListener(action);
+			}
+		}
+		public static void RemovePersistentListener<T>(this UnityEvent<T> onValueChanged, UnityAction<T> action)
+		{
+#if UNITY_EDITOR
+			if (!Application.isPlaying)
+			{
+				UnityEditor.Events.UnityEventTools.RemovePersistentListener(onValueChanged, action);
+			}
+			else
+
+#endif
+			{
+				onValueChanged.RemoveListener(action);
+			}
+		}
+		public static void AddPersistentListener<T>(this UnityEvent<T> onValueChanged, UnityAction<T> action)
+		{
+#if UNITY_EDITOR
+			if (!Application.isPlaying)
+			{
+				UnityEditor.Events.UnityEventTools.AddPersistentListener(onValueChanged, action);
+			}
+			else
+
+#endif
+			{
+				onValueChanged.AddListener(action);
+			}
+		}
+		public static QEventTrigger GetTrigger(this GameObject obj)
         {
             if (obj == null)
             {

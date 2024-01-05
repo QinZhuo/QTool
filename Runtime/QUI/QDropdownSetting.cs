@@ -31,14 +31,12 @@ namespace QTool
 			QPlayerPrefs.Set(name, value);
 			QDebug.Log(name + ":[" + value + "]");
 			QEventManager.InvokeEvent(nameof(QEventKey.设置更新), name);
-	
 		}
 
 #if UNITY_EDITOR
 		private void Reset()
 		{
-			dropdown.onValueChanged.RemoveAllListeners();
-			UnityEditor.Events.UnityEventTools.AddPersistentListener(dropdown.onValueChanged, Set);
+			dropdown.onValueChanged.AddPersistentListener(Set);
 		}
 #endif
 	}

@@ -33,6 +33,14 @@ namespace QTool
 		{
 			QLocalizationData.OnLanguageChange += FreshLocalization;
 		}
+		private void Reset()
+		{
+			var text = GetComponentInChildren<UnityEngine.UI.Text>();
+			if (text != null)
+			{
+				OnLocalizationChange.AddPersistentListener(text.GetAction<string>("set_text"));
+			}
+		}
 		private void Start()
 		{
 			FreshLocalization();
