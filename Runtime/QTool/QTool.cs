@@ -19,11 +19,7 @@ using System.Net;
 using QTool.Inspector;
 using UnityEngine.AI;
 #if UNITY_EDITOR
-#if UNITY_2022_1_OR_NEWER
 using PrefabStageUtility = UnityEditor.SceneManagement.PrefabStageUtility;
-#else
-using PrefabStageUtility=UnityEditor.SceneManagement.PrefabStageUtility;
-#endif
 #endif
 
 namespace QTool
