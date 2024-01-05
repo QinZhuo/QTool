@@ -170,6 +170,7 @@ namespace QTool
 				}
 
 			}
+			gameObject.SetDirty();
 		}
 		protected void Awake()
 		{
