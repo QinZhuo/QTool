@@ -155,7 +155,7 @@ namespace QTool
 				{
 					key = key.Substring("当前".Length);
 				}
-				var target = transform.FindAll(kv.Key);
+				var target = transform.FindAll(key);
 				if (target == null) continue;
 				foreach (var item in target.GetComponents<IQEvent<float>>())
 				{
