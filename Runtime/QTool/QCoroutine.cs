@@ -175,5 +175,9 @@ namespace QTool
 				yield return null;
 			}
 		}
+		public void Clear()
+		{
+			Queue.Clear();
+		}
 	}
 }
