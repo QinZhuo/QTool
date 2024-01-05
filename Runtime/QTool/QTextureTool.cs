@@ -11,11 +11,11 @@ namespace QTool
 		{
 			foreach (var kv in QToolSetting.Instance.qKeyColorList)
 			{
-				KeyColorH[kv.key] = kv.color.ToH();
+				KeyColors[kv.key] = kv.color;
 			}
 		}
 		#region 颜色映射
-		public static QDictionary<string, float> KeyColorH = new QDictionary<string, float>();
+		public static QDictionary<string, Color> KeyColors= new QDictionary<string, Color>();
 		public static Color ParseHtmlColor(this string key)
 		{
 			if (ColorUtility.TryParseHtmlString(key, out var newColor))
@@ -26,24 +26,20 @@ namespace QTool
 		}
 		public static Color ToColor(this string key, float s = DefaultS, float v = DefaultV)
 		{
-			return key.ToColorH().ToColor(s, v);
-		}
-		public static float ToColorH(this string key)
-		{
-			if (key.IsNull()) return 0;
-			if (!KeyColorH.ContainsKey(key))
+			if (key.IsNull()) return Color.clear;
+			if (!KeyColors.ContainsKey(key))
 			{
 				if (key.SplitTowString("/", out var start, out var end))
 				{
 					var colorValue = Mathf.Abs(start.GetHashCode() % 700f) + Mathf.Abs(end.GetHashCode() % 300f);
-					KeyColorH[key] = colorValue / 1000f;
+					KeyColors[key] = (colorValue / 1000f).ToColor(s, v);
 				}
 				else
 				{
-					KeyColorH[key] = Mathf.Abs(key.GetHashCode() % 700f) / 1000f;
+					KeyColors[key] = (Mathf.Abs(key.GetHashCode() % 700f) / 1000f).ToColor(s, v);
 				}
 			}
-			return KeyColorH[key];
+			return KeyColors[key];
 		}
 		#endregion
 		#region 主色调提取
@@ -80,43 +76,53 @@ namespace QTool
 			newTexture.Apply();
 			return newTexture;
 		}
-		private static float Average(this IList<float> values)
+		private static Color Average(this IList<Color> values)
 		{
-			var sum = 0f;
+			var rSum = 0f;
+			var gSum = 0f;
+			var bSum = 0f;
 			foreach (var value in values)
 			{
-				sum += value;
+				rSum += value.r;
+				gSum += value.g;
+				bSum += value.b;
 			}
-			return sum / values.Count;
+			return new Color(rSum / values.Count, gSum / values.Count, bSum / values.Count);
 		}
-		private static int NearIndex(this float[] values, float value)
+		public static float Distance(this Color color,Color other)
+		{
+			return Vector3.Distance(new Vector3(color.r, color.g, color.b), new Vector3(other.r, other.g, other.b));
+		}
+		private static int NearIndex(this Color[] values, Color value)
 		{
 			var index = 0;
 			var distance = float.MaxValue;
 			for (int i = 0; i < values.Length; i++)
 			{
-				if (Mathf.Abs(values[i] - value) > distance)
+				var checkDis = values[i].Distance(value);
+				if (checkDis > distance)
 				{
+					distance = checkDis;
 					index = i;
 				}
 			}
 			return index;
 		}
-		private static QDictionary<Texture2D, float> ColorHCache = new QDictionary<Texture2D, float>();
-		public static float GetMainColorH(this Texture2D texture, int colorCount = 2)
+		private static QDictionary<Texture2D, Color> ColorCache = new QDictionary<Texture2D, Color>();
+		public static Color GetMainColor(this Texture2D texture, int colorCount = 2)
 		{
-			if (!ColorHCache.ContainsKey(texture))
+			if (!ColorCache.ContainsKey(texture))
 			{
-				var colors = new float[texture.width * texture.height];
+				var colors = new Color[texture.width * texture.height];
 				for (int x = 0; x < texture.width; x++)
 				{
 					for (int y = 0; y < texture.height; y++)
 					{
-						colors[x * texture.height + y] = texture.GetPixel(x, y).ToH();
+						colors[x * texture.height + y] = texture.GetPixel(x, y);
 					}
 				}
 				var mainIndex = 0;
-				var mainColors = new float[colorCount];
+				var mainColors = new Color[colorCount];
 				for (int i = 0; i < colors.Length; i++)
 				{
 					if (mainIndex == 0)
@@ -132,10 +138,10 @@ namespace QTool
 						break;
 					}
 				}
-				var mainColorLists = new List<float>[colorCount];
+				var mainColorLists = new List<Color>[colorCount];
 				for (int i = 0; i < mainColorLists.Length; i++)
 				{
-					mainColorLists[i] = new List<float>();
+					mainColorLists[i] = new List<Color>();
 				}
 				while (true)
 				{
@@ -160,9 +166,9 @@ namespace QTool
 						break;
 					}
 				}
-				ColorHCache[texture] = mainColors.Get(0);
+				ColorCache[texture] = mainColors.Get(0);
 			}
-			return ColorHCache[texture];
+			return ColorCache[texture];
 		}
 		#endregion
 
