@@ -150,11 +150,23 @@ namespace QTool
 			}
 			foreach (var kv in floatEventList)
 			{
+				var key = kv.Key;
+				if (key.StartsWith("当前"))
+				{
+					key = key.Substring("当前".Length);
+				}
 				var target = transform.FindAll(kv.Key);
 				if (target == null) continue;
 				foreach (var item in target.GetComponents<IQEvent<float>>())
 				{
 					kv.eventAction.AddPersistentListener(item.Set);
+				}
+				foreach (var item in target.GetComponents<UnityEngine.UI.Image>())
+				{
+					if (item.type == UnityEngine.UI.Image.Type.Filled)
+					{
+						kv.eventAction.AddPersistentListener(item.GetAction<float>("set_fillAmount"));
+					}
 				}
 
 			}
