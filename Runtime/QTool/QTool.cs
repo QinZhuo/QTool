@@ -652,7 +652,7 @@ namespace QTool
 			}
 			playableDirector.Play(value);
 		}
-		public static async void DelayInvoke(this float time, System.Action action, bool ignoreGameTime = true)
+		public static async void DelayInvoke(this float time, Action action, bool ignoreGameTime = true)
 		{
 			if (!await QTask.Wait(time, ignoreGameTime).IsCancel())
 			{
