@@ -7,7 +7,7 @@ namespace QTool
 		[SerializeField, QReadonly]
 		private Color m_Color;
 		[QName("刷新")]
-		private void Start()
+		private void Fresh()
 		{
 			SetKey(name);
 		}

@@ -11,7 +11,7 @@ namespace QTool
 		[UnityEngine.Serialization.FormerlySerializedAs("OnLoad")]
 		public UnityEvent<TObj> OnLoadEvent = new UnityEvent<TObj>();
 		[QName("刷新")]
-		public void Start()
+		public void Fresh()
 		{
 			InvokeLoad(name);
 		}
