@@ -10,6 +10,7 @@ namespace QTool
 	{
 		[UnityEngine.Serialization.FormerlySerializedAs("OnLoad")]
 		public UnityEvent<TObj> OnLoadEvent = new UnityEvent<TObj>();
+		[QName]
 		public void Start()
 		{
 			InvokeLoad(name);
