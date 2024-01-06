@@ -24,9 +24,9 @@ namespace QTool
 					Graph.RegisterValue(this);
 				}
 			}
-			public override void OnDestroy()
+			public override void OnPoolRelease()
 			{
-				base.OnDestroy();
+				base.OnPoolRelease();
 				if (Graph != null)
 				{
 					Graph.UnRegisterValue(this);

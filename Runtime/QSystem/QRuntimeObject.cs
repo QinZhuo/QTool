@@ -27,11 +27,11 @@ namespace QTool
 			Data = QDataList<DataT>.Get(key);
 		}
 
-		public virtual void Awake()
+		public virtual void OnPoolGet()
 		{
 
 		}
-		public virtual void OnDestroy()
+		public virtual void OnPoolRelease()
 		{
 			Key = "";
 			Data = null;
@@ -86,11 +86,11 @@ namespace QTool
 		public DataT Data => Runtime?.Data;
 		public virtual string Key { get => Runtime.Key; set => Runtime.Key = value; }
 		public Action<string> OnValueChange = null;
-		public virtual void Awake()
+		public virtual void OnPoolGet()
 		{
 			gameObject.RegisterEvent(this);
 		}
-		public virtual void OnDestroy()
+		public virtual void OnPoolRelease()
 		{
 			gameObject.UnRegisterEvent(this);
 			if (_Runtime != null)

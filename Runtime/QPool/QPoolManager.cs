@@ -31,8 +31,8 @@ namespace QTool
 				Action<T> OnRelease = actionOnRelease;
 				if (typeof(T).Is(typeof(IQPoolObject)))
 				{
-					OnGet += obj => (obj as IQPoolObject).Awake();
-					OnRelease += obj => (obj as IQPoolObject).OnDestroy();
+					OnGet += obj => (obj as IQPoolObject).OnPoolGet();
+					OnRelease += obj => (obj as IQPoolObject).OnPoolRelease();
 				}
 				else if (typeof(T).Is(typeof(GameObject)))
 				{
@@ -40,14 +40,14 @@ namespace QTool
 					{
 						foreach (var poolObj in (obj as GameObject).GetComponents<IQPoolObject>())
 						{
-							poolObj.Awake();
+							poolObj.OnPoolGet();
 						}
 					};
 					OnRelease += obj =>
 					{
 						foreach (var poolObj in (obj as GameObject).GetComponents<IQPoolObject>())
 						{
-							poolObj.OnDestroy();
+							poolObj.OnPoolRelease();
 						}
 					};
 				}
@@ -172,8 +172,8 @@ namespace QTool
 
 	public interface IQPoolObject
 	{
-		void Awake();
-		void OnDestroy();
+		void OnPoolGet();
+		void OnPoolRelease();
 	}
 	public static class QPoolTool
 	{

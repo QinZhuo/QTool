@@ -17,42 +17,54 @@ namespace QTool
 		{
 			m_view = transform.GetChild(nameof(View), true);
 		}
-		public void Awake()
+		public void OnPoolGet()
 		{
-			if (followView)
-			{
-				if (transform is RectTransform Rect)
-				{
-					this.Rect = Rect;
-					View.transform.SetParent(GetComponentInParent<Canvas>().transform.GetChild(nameof(QObjectView), true), true);
-					View.GetComponent<CanvasGroup>(true).blocksRaycasts = false;
-				}
-				else
-				{
-					View.transform.SetParent(null, true);
-				}
-			}
+		
 		}
 
 		private void LateUpdate()
 		{
-			if (followView && followSpeed > 0)
+			if (followView)
 			{
-				if (Rect != null)
+				if (View.parent == transform)
 				{
-					View.transform.position = Vector3.Lerp(View.transform.position, Rect.Center(), Time.deltaTime * followSpeed);
+					if (transform is RectTransform Rect)
+					{
+						this.Rect = Rect;
+						View.transform.SetParent(GetComponentInParent<Canvas>().transform.GetChild(nameof(QObjectView), true), true);
+						View.GetComponent<CanvasGroup>(true).blocksRaycasts = false;
+					}
+					else
+					{
+						View.transform.SetParent(null, true);
+					}
 				}
-				else
+				if (followSpeed > 0)
 				{
-					View.transform.position = Vector3.Lerp(View.transform.position, transform.position, Time.deltaTime * followSpeed);
+					if (Rect != null)
+					{
+						View.transform.position = Vector3.Lerp(View.transform.position, Rect.Center(), Time.deltaTime * followSpeed);
+					}
+					else
+					{
+						View.transform.position = Vector3.Lerp(View.transform.position, transform.position, Time.deltaTime * followSpeed);
+					}
 				}
+
 			}
 		}
-		public void OnDestroy()
+		public void OnPoolRelease()
 		{
 			if (View != null)
 			{
 				View.transform.SetParent(transform, true);
+			}
+		}
+		private void OnDestroy()
+		{
+			if (View != null)
+			{
+				Destroy(View.gameObject);
 			}
 		}
 
