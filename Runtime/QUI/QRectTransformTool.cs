@@ -161,7 +161,7 @@ namespace QTool
 		public static void ReleaseLayoutRect(this RectTransform rectTransform, RectTransform layoutRect)
 		{
 			rectTransform.GetComponent<UnityEngine.UI.LayoutElement>(true).ignoreLayout = false;
-			layoutRect.gameObject.PoolRelease();
+			layoutRect.gameObject.PoolRelease(); 
 		}
 		public static RectTransform CloneRect(this RectTransform rectTransform)
 		{
