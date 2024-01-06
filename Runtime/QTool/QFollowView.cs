@@ -19,12 +19,11 @@ namespace QTool
 		{
 
 		}
-
-		private void LateUpdate()
+		private void FreshViewParent()
 		{
-			if (View.parent == transform)
+			if (transform is RectTransform Rect)
 			{
-				if (transform is RectTransform Rect)
+				if (View.parent == transform || View.parent.parent != transform.parent)
 				{
 					this.Rect = Rect;
 					var parent = transform.parent.GetChild(nameof(QFollowView), true);
@@ -32,10 +31,20 @@ namespace QTool
 					View.transform.SetParent(parent, true);
 					View.GetComponent<CanvasGroup>(true).blocksRaycasts = false;
 				}
-				else
+			}
+			else
+			{
+				if (View.transform.parent != null)
 				{
 					View.transform.SetParent(null, true);
 				}
+			}
+		}
+		private void LateUpdate()
+		{
+			if (View.parent == transform)
+			{
+				FreshViewParent();
 			}
 			if (followSpeed > 0)
 			{
@@ -62,6 +71,10 @@ namespace QTool
 			{
 				Destroy(View.gameObject);
 			}
+		}
+		private void OnTransformParentChanged()
+		{
+			FreshViewParent();
 		}
 	}
 }
