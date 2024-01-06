@@ -974,7 +974,7 @@ namespace QTool
 			for (int i = transform.childCount - 1; i >= 0; i--)
 			{
 				var child = transform.GetChild(i);
-				if (check == null || check(child))
+				if (check == null || (child != null && check(child)))
 				{
 					child.gameObject.CheckDestory();
 				}
