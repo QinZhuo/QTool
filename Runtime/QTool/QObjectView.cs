@@ -41,7 +41,7 @@ namespace QTool
 		}
 		private void LateUpdate()
 		{
-			if (followView)
+			if (followView && followSpeed > 0)
 			{
 				if (Rect != null)
 				{
