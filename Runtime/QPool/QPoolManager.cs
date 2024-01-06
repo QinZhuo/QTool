@@ -52,6 +52,7 @@ namespace QTool
 					};
 				}
 				Pools[key] = new ObjectPool<T>(createFunc, OnGet, OnRelease, actionOnDestroy, true, 10, maxSize);
+				QEventManager.Register(QEventKey.卸载场景, Pools[key].Clear);
 			}
 			return Pools[key];
 		}
@@ -69,7 +70,6 @@ namespace QTool
 				return result;
 			}, obj =>
 			{
-				if (obj == null) return;
 				obj.transform.SetParent(null, true);
 				obj.transform.localScale = prefab.transform.localScale;
 				obj.transform.position = prefab.transform.position;
