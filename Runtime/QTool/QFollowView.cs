@@ -66,6 +66,7 @@ namespace QTool
 			if (View != null)
 			{
 				View.transform.SetParent(transform, true);
+				View.transform.localPosition = Vector3.zero;
 			}
 		}
 		private void OnDestroy()
