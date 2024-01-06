@@ -8,6 +8,10 @@ namespace QTool
 		[QName("对象池"), QReadonly, SerializeField]
 		internal string poolName = "";
 		public ActionEvent OnRelease = new ActionEvent();
+		public void Awake()
+		{
+			
+		}
 		public void OnDestroy()
 		{
 			OnRelease.Invoke();

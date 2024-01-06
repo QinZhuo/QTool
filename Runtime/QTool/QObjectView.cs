@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 namespace QTool
 {
-	public class QObjectView : MonoBehaviour
+	public class QObjectView : MonoBehaviour, IQPoolObject
 	{
 		[SerializeField]
 		private Transform m_view = null;
@@ -17,7 +17,7 @@ namespace QTool
 		{
 			m_view = transform.GetChild(nameof(View), true);
 		}
-		private void Start()
+		public void Awake()
 		{
 			if (followView)
 			{
@@ -33,13 +33,7 @@ namespace QTool
 				}
 			}
 		}
-		private void OnDestroy()
-		{
-			if (View != null)
-			{
-				Destroy(View.gameObject);
-			}
-		}
+
 		private void LateUpdate()
 		{
 			if (followView && followSpeed > 0)
@@ -54,6 +48,14 @@ namespace QTool
 				}
 			}
 		}
+		public void OnDestroy()
+		{
+			if (View != null)
+			{
+				View.transform.SetParent(transform, true);
+			}
+		}
+
 	}
 }
 

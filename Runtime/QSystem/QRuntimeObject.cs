@@ -27,7 +27,10 @@ namespace QTool
 			Data = QDataList<DataT>.Get(key);
 		}
 
+		public virtual void Awake()
+		{
 
+		}
 		public virtual void OnDestroy()
 		{
 			Key = "";

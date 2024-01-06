@@ -5,62 +5,16 @@ using UnityEngine.SceneManagement;
 using QTool.Inspector;
 using QTool.Reflection;
 using System.Threading.Tasks;
-#if UNITY_2021_1_OR_NEWER
 using UnityEngine.Pool;
-#endif
 #if UNITY_EDITOR
 using UnityEditor;
-#endif
-#if !UNITY_2022_1_OR_NEWER
-public class ObjectPool<T> where T : class
-{
-	public Func<T> CreateFunc { get; }
-	public Action<T> ActionOnGet { get; }
-	public Action<T> OnRelease { get; }
-	public Action<T> ActionOnDestroy { get; }
-	public bool V1 { get; }
-	public int V2 { get; }
-	public int MaxSize { get; }
-	public Stack<T> Stack { get; } = new Stack<T>();
-
-	public void Release(T obj)
-	{
-		OnRelease?.Invoke(obj);
-		Stack.Push(obj);
-	}
-
-	public T Get()
-	{
-		if (Stack.Count > 0)
-		{
-			var obj= Stack.Pop();
-			ActionOnGet?.Invoke(obj);
-			return obj;
-		}
-		else
-		{
-
-			return CreateFunc();
-		}
-	}
-	public ObjectPool(Func<T> createFunc, Action<T> actionOnGet, Action<T> onRelease, Action<T> actionOnDestroy, bool v1, int v2, int maxSize)
-	{
-		CreateFunc = createFunc;
-		ActionOnGet = actionOnGet;
-		OnRelease = onRelease;
-		ActionOnDestroy = actionOnDestroy;
-		V1 = v1;
-		V2 = v2;
-		MaxSize = maxSize;
-	}
-}
 #endif
 namespace QTool
 {
 	
     public class QPoolManager:QInstanceManager<QPoolManager>
     {
-		public static ObjectPool<T> GetPool<T>(string poolName, Func<T> createFunc, Action<T> actionOnGet = null, Action<T> actionOnRelease = null, Action<T> actionOnDestroy = null, int maxSize = 10000) where T : class
+		public static ObjectPool<T> GetPool<T>(string poolName, Func<T> createFunc, Action<T> OnGet = null, Action<T> actionOnRelease = null, Action<T> actionOnDestroy = null, int maxSize = 10000) where T : class
 		{
 			var key = poolName;
 			if (string.IsNullOrEmpty(key))
@@ -77,10 +31,18 @@ namespace QTool
 				Action<T> OnRelease = actionOnRelease;
 				if (typeof(T).Is(typeof(IQPoolObject)))
 				{
+					OnGet += obj => (obj as IQPoolObject).Awake();
 					OnRelease += obj => (obj as IQPoolObject).OnDestroy();
 				}
 				else if (typeof(T).Is(typeof(GameObject)))
 				{
+					OnGet += obj =>
+					{
+						foreach (var poolObj in (obj as GameObject).GetComponents<IQPoolObject>())
+						{
+							poolObj.Awake();
+						}
+					};
 					OnRelease += obj =>
 					{
 						foreach (var poolObj in (obj as GameObject).GetComponents<IQPoolObject>())
@@ -89,7 +51,7 @@ namespace QTool
 						}
 					};
 				}
-				Pools[key] = new ObjectPool<T>(createFunc, actionOnGet, OnRelease, actionOnDestroy, true, 10, maxSize);
+				Pools[key] = new ObjectPool<T>(createFunc, OnGet, OnRelease, actionOnDestroy, true, 10, maxSize);
 			}
 			return Pools[key];
 		}
@@ -207,9 +169,10 @@ namespace QTool
 			QEventManager.Register(QEventKey.游戏退出, Pools.Clear);
 		}
 	}
-  
+
 	public interface IQPoolObject
 	{
+		void Awake();
 		void OnDestroy();
 	}
 	public static class QPoolTool
