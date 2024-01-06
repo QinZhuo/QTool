@@ -7,16 +7,15 @@ namespace QTool
 	{
 		[SerializeField]
 		private Transform m_view = null;
-		public Transform View=>m_view??= transform.GetChild(nameof(View), true);
+		public Transform View => m_view ??= transform.GetChild(nameof(View), true);
 		[QName("脱离跟随")]
 		public bool followView = false;
 		[QName("跟随速度", nameof(followView))]
 		public float followSpeed = 10;
 		private void Reset()
 		{
-			m_view = transform.GetChild(nameof(View),true);
+			m_view = transform.GetChild(nameof(View), true);
 		}
-
 		private void Start()
 		{
 			if (followView)
@@ -31,7 +30,7 @@ namespace QTool
 				Destroy(View.gameObject);
 			}
 		}
-		void Update()
+		private void LateUpdate()
 		{
 			if (followView)
 			{
