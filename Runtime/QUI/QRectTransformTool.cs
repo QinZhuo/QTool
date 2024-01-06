@@ -150,6 +150,31 @@ namespace QTool
 			return comp;
 		}
 		#endregion
+
+		public static RectTransform GetLayoutRect(this RectTransform rectTransform)
+		{
+			rectTransform.GetComponent<UnityEngine.UI.LayoutElement>(true).ignoreLayout = true;
+			var layoutRect = rectTransform.CloneRect();
+			layoutRect.SetSiblingIndex(rectTransform.GetSiblingIndex());
+			return rectTransform;
+		}
+		public static RectTransform ReleaseLayoutRect(this RectTransform rectTransform, RectTransform layoutRect)
+		{
+			rectTransform.GetComponent<UnityEngine.UI.LayoutElement>(true).ignoreLayout = false;
+			layoutRect.gameObject.PoolRelease();
+			return rectTransform;
+		}
+		public static RectTransform CloneRect(this RectTransform rectTransform)
+		{
+			var cloneRect = rectTransform.parent.GetChild(rectTransform.name + "_" + rectTransform.GetHashCode(), true).GetComponent<RectTransform>(true);
+			cloneRect.sizeDelta = rectTransform.sizeDelta;
+			cloneRect.anchorMin = rectTransform.anchorMin;
+			cloneRect.anchorMax = rectTransform.anchorMax;
+			cloneRect.pivot = rectTransform.pivot;
+			cloneRect.position = rectTransform.position;
+			cloneRect.transform.SetParent(rectTransform.parent, true);
+			return cloneRect;
+		}
 		public static RectTransform RectTransform(this Transform rectform)
 		{
 			return rectform as RectTransform;
