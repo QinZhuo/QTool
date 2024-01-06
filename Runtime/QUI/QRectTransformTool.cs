@@ -150,20 +150,21 @@ namespace QTool
 			return comp;
 		}
 		#endregion
-
 		public static RectTransform GetLayoutRect(this RectTransform rectTransform)
 		{
 			rectTransform.GetComponent<UnityEngine.UI.LayoutElement>(true).ignoreLayout = true;
-			var layoutRect = rectTransform.CloneRect();
+			var layoutRect = rectTransform.CloneRectTransform();
 			layoutRect.SetSiblingIndex(rectTransform.GetSiblingIndex());
+			rectTransform.SetAsLastSibling();
 			return layoutRect;
 		}
 		public static void ReleaseLayoutRect(this RectTransform rectTransform, RectTransform layoutRect)
 		{
 			rectTransform.GetComponent<UnityEngine.UI.LayoutElement>(true).ignoreLayout = false;
-			layoutRect.gameObject.PoolRelease(); 
+			rectTransform.SetSiblingIndex(layoutRect.GetSiblingIndex());
+			layoutRect.gameObject.PoolRelease();
 		}
-		public static RectTransform CloneRect(this RectTransform rectTransform)
+		public static RectTransform CloneRectTransform(this RectTransform rectTransform)
 		{
 			var cloneRect = rectTransform.parent.GetChild(rectTransform.name + "_" + rectTransform.GetHashCode(), true).GetComponent<RectTransform>(true);
 			cloneRect.sizeDelta = rectTransform.sizeDelta;
@@ -174,9 +175,9 @@ namespace QTool
 			cloneRect.transform.SetParent(rectTransform.parent, true);
 			return cloneRect;
 		}
-		public static RectTransform RectTransform(this Transform rectform)
+		public static RectTransform RectTransform(this Component rectform)
 		{
-			return rectform as RectTransform;
+			return rectform.transform as RectTransform;
 		}
 		public static bool ParentHas(this Transform rectform,params Transform[] targets)
 		{
