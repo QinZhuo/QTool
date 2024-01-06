@@ -8,6 +8,7 @@ namespace QTool
 		[SerializeField]
 		private Transform m_view = null;
 		public Transform View => m_view ??= transform.GetChild(nameof(View), true);
+		private RectTransform RectView = null;
 		[QName("脱离跟随")]
 		public bool followView = false;
 		[QName("跟随速度", nameof(followView))]
@@ -20,8 +21,9 @@ namespace QTool
 		{
 			if (followView)
 			{
-				if (View is RectTransform)
+				if (View is RectTransform RectView)
 				{
+					this.RectView = RectView;
 					View.transform.SetParent(GetComponentInParent<Canvas>().transform.GetChild(nameof(QObjectView), true), true);
 				}
 				else
@@ -41,7 +43,14 @@ namespace QTool
 		{
 			if (followView)
 			{
-				View.transform.position = Vector3.Lerp(View.transform.position, transform.position, Time.deltaTime * followSpeed);
+				if (RectView != null)
+				{
+					View.transform.position = Vector3.Lerp(RectView.Center(), transform.position, Time.deltaTime * followSpeed);
+				}
+				else
+				{
+					View.transform.position = Vector3.Lerp(View.transform.position, transform.position, Time.deltaTime * followSpeed);
+				}
 			}
 		}
 	}
