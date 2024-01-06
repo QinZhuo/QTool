@@ -20,7 +20,14 @@ namespace QTool
 		{
 			if (followView)
 			{
-				View.transform.SetParent(null, true);
+				if (View is RectTransform)
+				{
+					View.transform.SetParent(GetComponentInParent<Canvas>().transform.GetChild(nameof(QObjectView), true), true);
+				}
+				else
+				{
+					View.transform.SetParent(null, true);
+				}
 			}
 		}
 		private void OnDestroy()
