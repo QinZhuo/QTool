@@ -202,9 +202,9 @@ namespace QTool
 			{
 				var child = transform.Find(start);
 
-				if (child!=null)
+				if (child != null)
 				{
-					var followView= transform.GetComponent<QFollowView>();
+					var followView = transform.GetComponent<QFollowView>();
 					if (followView != null && followView.View.name == start)
 					{
 						child = followView.View;
@@ -215,7 +215,7 @@ namespace QTool
 				{
 					if (autuCreate)
 					{
-						
+
 						child = new GameObject(start).transform;
 						if (transform is RectTransform)
 						{
