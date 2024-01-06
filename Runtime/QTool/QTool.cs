@@ -201,8 +201,14 @@ namespace QTool
 			else
 			{
 				var child = transform.Find(start);
+
 				if (child!=null)
 				{
+					var followView= transform.GetComponent<QFollowView>();
+					if (followView != null && followView.View.name == start)
+					{
+						child = followView.View;
+					}
 					return child;
 				}
 				else
