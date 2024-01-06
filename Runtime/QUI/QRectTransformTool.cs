@@ -156,13 +156,12 @@ namespace QTool
 			rectTransform.GetComponent<UnityEngine.UI.LayoutElement>(true).ignoreLayout = true;
 			var layoutRect = rectTransform.CloneRect();
 			layoutRect.SetSiblingIndex(rectTransform.GetSiblingIndex());
-			return rectTransform;
+			return layoutRect;
 		}
-		public static RectTransform ReleaseLayoutRect(this RectTransform rectTransform, RectTransform layoutRect)
+		public static void ReleaseLayoutRect(this RectTransform rectTransform, RectTransform layoutRect)
 		{
 			rectTransform.GetComponent<UnityEngine.UI.LayoutElement>(true).ignoreLayout = false;
 			layoutRect.gameObject.PoolRelease();
-			return rectTransform;
 		}
 		public static RectTransform CloneRect(this RectTransform rectTransform)
 		{
