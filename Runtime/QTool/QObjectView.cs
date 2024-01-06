@@ -25,6 +25,7 @@ namespace QTool
 				{
 					this.Rect = Rect;
 					View.transform.SetParent(GetComponentInParent<Canvas>().transform.GetChild(nameof(QObjectView), true), true);
+					View.GetComponent<CanvasGroup>(true).blocksRaycasts = false;
 				}
 				else
 				{
