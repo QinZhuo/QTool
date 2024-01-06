@@ -21,6 +21,8 @@ namespace QTool
 		public float targetAspect = 16f / 9f;
 		[QName("游戏数据邮箱")]
 		public QMailAccount QAnalysisMail;
+		[QName(nameof(QFollowView)+"开关")]
+		public bool qFollowViewSwitch;
 #if UNITY_EDITOR
 		[QName("音频强制单声道")]
 		public bool forceToMono = true;
