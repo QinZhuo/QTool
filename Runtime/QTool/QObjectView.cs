@@ -45,7 +45,7 @@ namespace QTool
 			{
 				if (Rect != null)
 				{
-					transform.position = Vector3.Lerp(transform.position, Rect.Center(), Time.deltaTime * followSpeed);
+					View.transform.position = Vector3.Lerp(View.transform.position, Rect.Center(), Time.deltaTime * followSpeed);
 				}
 				else
 				{
