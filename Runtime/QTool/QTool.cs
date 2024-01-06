@@ -204,14 +204,18 @@ namespace QTool
 
 				if (child != null)
 				{
-					if (start == nameof(QFollowView.View))
-					{
-						child = transform.GetComponent<QFollowView>()?.View;
-					}
 					return child;
 				}
 				else
 				{
+					if (start == nameof(QFollowView.View))
+					{
+						child = transform.GetComponent<QFollowView>()?.View;
+						if (child != null)
+						{
+							return child;
+						}
+					}
 					if (autuCreate)
 					{
 
