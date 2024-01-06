@@ -86,6 +86,14 @@ namespace QTool
 		public DataT Data => Runtime?.Data;
 		public virtual string Key { get => Runtime.Key; set => Runtime.Key = value; }
 		public Action<string> OnValueChange = null;
+		public virtual void Awake()
+		{
+			OnPoolGet();
+		}
+		public virtual void OnDestroy()
+		{
+			OnPoolRelease();
+		}
 		public virtual void OnPoolGet()
 		{
 			gameObject.RegisterEvent(this);
@@ -98,7 +106,6 @@ namespace QTool
 				Runtime = null;
 			}
 		}
-
 	}
 }
 
