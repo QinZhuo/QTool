@@ -15,6 +15,10 @@ namespace QTool
 		{
 			m_view = transform.GetChild(nameof(View), true);
 		}
+		private void Start()
+		{
+			FreshViewParent();
+		}
 		public void OnPoolGet()
 		{
 
@@ -23,6 +27,7 @@ namespace QTool
 		{
 			if (transform is RectTransform Rect)
 			{
+				if (transform.parent == null) return;
 				if (View.parent == transform || View.parent.parent != transform.parent)
 				{
 					this.Rect = Rect;
@@ -42,10 +47,7 @@ namespace QTool
 		}
 		private void LateUpdate()
 		{
-			if (View.parent == transform)
-			{
-				FreshViewParent();
-			}
+			
 			if (followSpeed > 0)
 			{
 				if (Rect != null)
