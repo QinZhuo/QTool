@@ -25,7 +25,6 @@ namespace QTool
 		}
 		private void FreshViewParent()
 		{
-			if (!QToolSetting.Instance.qFollowViewSwitch) return;
 			if (transform is RectTransform Rect)
 			{
 				if (transform.parent == null) return;
@@ -48,7 +47,6 @@ namespace QTool
 		}
 		private void LateUpdate()
 		{
-			if (!QToolSetting.Instance.qFollowViewSwitch) return;
 			if (followSpeed > 0)
 			{
 				if (Rect != null)
