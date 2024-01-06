@@ -124,6 +124,7 @@ namespace QTool
 		}
 		private void OnDestroy()
 		{
+			if (prefab == null) return;
 			transform.ClearChild(child => child.name == prefab.name + "测试");
 		}
 #endif
