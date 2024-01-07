@@ -5,8 +5,8 @@ using System.Linq;
 
 namespace QTool
 {
-    public static class QRectTransformTool
-    {
+	public static class QRectTransformTool
+	{
 		#region 位置点
 		public static bool ContainsScreenPoint(this RectTransform rect, Vector2 screenPoint)
 		{
@@ -82,11 +82,11 @@ namespace QTool
 		}
 		public static Vector2 RightUp(this RectTransform rect)
 		{
-			return new Vector2(rect.Right(),rect.Up());
+			return new Vector2(rect.Right(), rect.Up());
 		}
 		public static Vector2 LeftDown(this RectTransform rect)
 		{
-			return new Vector2(rect.Left(),rect.Down());
+			return new Vector2(rect.Left(), rect.Down());
 		}
 
 		public static void SetPosition(this RectTransform rect, Vector2 newPos)
@@ -150,6 +150,19 @@ namespace QTool
 			return comp;
 		}
 		#endregion
+		public static int GetLayoutIndex(this Transform transform)
+		{
+			var index = transform.GetSiblingIndex();
+			for (int i = index; i >= 0; i--)
+			{
+				var layout = transform.parent.GetChild(i)?.GetComponent<UnityEngine.UI.LayoutElement>();
+				if (layout?.ignoreLayout == true)
+				{
+					index--;
+				}
+			}
+			return index;
+		}
 		public static RectTransform GetLayoutRect(this RectTransform rectTransform)
 		{
 			rectTransform.GetComponent<UnityEngine.UI.LayoutElement>(true).ignoreLayout = true;
