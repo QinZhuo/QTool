@@ -58,7 +58,7 @@ namespace QTool
 				{
 					View.transform.position = Vector3.Lerp(View.transform.position, transform.position, Time.deltaTime * followSpeed);
 				}
-				View.transform.localScale = Vector3.Lerp(View.transform.localScale, transform.localScale, Time.deltaTime * followSpeed);
+				View.transform.localScale = transform.localScale;
 				View.transform.rotation = Quaternion.Lerp(View.transform.rotation, transform.rotation, Time.deltaTime * followSpeed * 360);
 			}
 		}
