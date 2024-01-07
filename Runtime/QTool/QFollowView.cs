@@ -27,7 +27,7 @@ namespace QTool
 		{
 			if (transform is RectTransform Rect)
 			{
-				if (transform.parent == null) return;
+				if (transform.parent?.parent == null) return;
 				if (View.parent == transform || View.parent.parent != transform.parent)
 				{
 					this.Rect = Rect;
