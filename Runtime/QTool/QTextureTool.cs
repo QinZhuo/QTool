@@ -197,6 +197,14 @@ namespace QTool
 			tex.LoadImage(bytes);
 			return tex;
 		}
+		public static void SetTexture(this UnityEngine.UI.RawImage rawImage, Texture2D texture, bool autoColor = true)
+		{
+			rawImage.texture = texture;
+			if (autoColor)
+			{
+				rawImage.color = texture == null ? Color.clear : Color.white;
+			}
+		}
 #if UNITY_EDITOR
 		public static Sprite SaveSprite(this Texture2D texture, string path, float spritePixelsPerUnit = 100)
 		{
