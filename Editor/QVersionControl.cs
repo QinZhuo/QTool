@@ -92,6 +92,7 @@ namespace QTool
 		{
 			if (!PlayerPrefs.HasKey(nameof(CheckInit)))
 			{
+				PathRun("config core.ignorecase false", path);
 				var result = PathRun("config --global core.quotepath false", path);
 				var name = PathRun("config user.name", path);
 				var email = PathRun("config user.email", path);
