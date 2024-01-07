@@ -150,18 +150,25 @@ namespace QTool
 			return comp;
 		}
 		#endregion
-		public static int GetLayoutIndex(this Transform transform)
+		private static int CheckIgnoreLayout(this Transform transform,int index)
 		{
-			var index = transform.GetSiblingIndex();
 			for (int i = index; i >= 0; i--)
 			{
-				var layout = transform.parent.GetChild(i)?.GetComponent<UnityEngine.UI.LayoutElement>();
+				var layout = transform.GetChild(i)?.GetComponent<UnityEngine.UI.LayoutElement>();
 				if (layout?.ignoreLayout == true)
 				{
 					index--;
 				}
 			}
 			return index;
+		}
+		public static int GetLayoutCount(this Transform transform)
+		{
+			return transform.CheckIgnoreLayout(transform.childCount);
+		}
+		public static int GetLayoutIndex(this Transform transform)
+		{
+			return transform.parent.CheckIgnoreLayout(transform.GetSiblingIndex());
 		}
 		public static RectTransform GetLayoutRect(this RectTransform rectTransform)
 		{
