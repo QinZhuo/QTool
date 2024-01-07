@@ -4,7 +4,7 @@ using UnityEngine;
 namespace QTool.UI
 {
 	[ExecuteInEditMode]
-	public class QScreenLimitUI : MonoBehaviour
+	public class QScreenLimitUI : MonoBehaviour 
 	{
 		private void LateUpdate()
 		{
