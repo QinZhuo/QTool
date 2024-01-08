@@ -9,9 +9,12 @@ namespace QTool
 	{
 		[QName("预制体")]
 		public GameObject prefab;
+		[QName("测试数目")]
+		public int TestCount = 4;
 		public List<GameObject> List { get; private set; } = new List<GameObject>();
 		public int Count => List.Count;
 		
+
 		public virtual GameObject this[string name]
 		{
 			get
@@ -100,8 +103,7 @@ namespace QTool
 				}
 			}
 		}
-		[QName("测试数目")]
-		public int TestCount = 4;
+	
 		private int lastCount = 0;
 		private void OnPrefabStageClosing(UnityEditor.SceneManagement.PrefabStage prefabStage)
 		{
