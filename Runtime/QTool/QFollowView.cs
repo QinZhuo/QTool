@@ -28,11 +28,11 @@ namespace QTool
 			if (transform is RectTransform Rect)
 			{
 				if (transform.parent?.parent == null) return;
-				if (View.parent == transform || View.parent.parent != transform.parent)
+				if (View.parent == transform)
 				{
 					this.Rect = Rect;
-					var parent = transform.parent.parent.GetChild(nameof(QFollowView), true);
-					parent.SetSiblingIndex(transform.parent.GetSiblingIndex());
+					var parent = transform.parent.GetChild(nameof(QFollowView), true);
+					parent.SetAsFirstSibling();
 					parent.GetComponent<UnityEngine.UI.LayoutElement>(true).ignoreLayout = true;
 					View.transform.SetParent(parent, true);
 					View.GetComponent<CanvasGroup>(true).blocksRaycasts = false;
