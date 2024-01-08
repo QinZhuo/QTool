@@ -32,7 +32,7 @@ namespace QTool
 				{
 					this.Rect = Rect;
 					var parent = transform.parent.parent.GetChild(nameof(QFollowView), true);
-					parent.SetSiblingIndex(transform.parent.GetSiblingIndex());
+					parent.SetSiblingIndex(transform.parent.GetSiblingIndex() + 1);
 					parent.GetComponent<UnityEngine.UI.LayoutElement>(true).ignoreLayout = true;
 					View.transform.SetParent(parent, true);
 					View.GetComponent<CanvasGroup>(true).blocksRaycasts = false;
