@@ -6,7 +6,7 @@ namespace QTool
 {
 
 	[ExecuteInEditMode]
-	public class QDropdownSetting : MonoBehaviour
+	public class QDropdownSettingUI : MonoBehaviour
 	{
 		public Dropdown dropdown;
 		protected void Awake()
