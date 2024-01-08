@@ -223,6 +223,7 @@ namespace QTool
 						if (transform is RectTransform)
 						{
 							child = child.GetComponent<RectTransform>(true);
+							child.Reset();
 						}
 						child.position = transform.position;
 						child.SetParent(transform, true);
