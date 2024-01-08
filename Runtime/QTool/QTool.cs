@@ -1060,7 +1060,7 @@ namespace QTool
 	public static class QSceneTool
 	{
 		public static List<Task> PreLoadList = new List<Task>();
-		public static async Task LoadSceneAsync(this string sceneName)
+		public static async Task LoadSceneAsync(string sceneName)
 		{
 			if (IsLoading)
 			{
