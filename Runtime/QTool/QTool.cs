@@ -218,15 +218,13 @@ namespace QTool
 					}
 					if (autuCreate)
 					{
-
 						child = new GameObject(start).transform;
+						child.SetParent(transform, true);
 						if (transform is RectTransform)
 						{
 							child = child.GetComponent<RectTransform>(true);
 							child.Reset();
 						}
-						child.position = transform.position;
-						child.SetParent(transform, true);
 						return child;
 					}
 					else

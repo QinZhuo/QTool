@@ -135,7 +135,7 @@ namespace QTool
 
 		public static T ResetPosition<T>(this T comp) where T : Component
 		{
-			comp.transform.position = Vector3.zero;
+			comp.transform.localPosition = Vector3.zero;
 			return comp;
 		}
 
