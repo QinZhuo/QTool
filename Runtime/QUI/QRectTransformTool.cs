@@ -162,6 +162,23 @@ namespace QTool
 			}
 			return index;
 		}
+		public static Transform GetLayoutChild(this Transform transform,int index)
+		{
+			for (int i = 0; i <= index; i++)
+			{
+				var child = transform.GetChild(i);
+				var layout = child?.GetComponent<UnityEngine.UI.LayoutElement>();
+				if (layout?.ignoreLayout == true)
+				{
+					index++;
+				}
+				if (i == index)
+				{
+					return child;
+				}
+			}
+			return null;
+		}
 		public static int GetLayoutCount(this Transform transform)
 		{
 			return transform.CheckIgnoreLayout(transform.childCount);
