@@ -225,7 +225,7 @@ namespace QTool
 							child = child.GetComponent<RectTransform>(true);
 						}
 						child.position = transform.position;
-						child.SetParent(transform);
+						child.SetParent(transform, true);
 						return child;
 					}
 					else
