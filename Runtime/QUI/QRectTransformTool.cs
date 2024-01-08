@@ -150,7 +150,7 @@ namespace QTool
 			return comp;
 		}
 		#endregion
-		private static int CheckIgnoreLayout(this Transform transform,int index)
+		private static int CheckIgnoreLayout(this Transform transform, int index)
 		{
 			for (int i = index; i >= 0; i--)
 			{
@@ -162,13 +162,12 @@ namespace QTool
 			}
 			return index;
 		}
-		public static Transform GetLayoutChild(this Transform transform,int index)
+		public static Transform GetLayoutChild(this Transform transform, int index)
 		{
-			for (int i = 0; i <= index; i++)
+			for (int i = 0; i <= index && i < transform.childCount; i++)
 			{
 				var child = transform.GetChild(i);
-				var layout = child?.GetComponent<UnityEngine.UI.LayoutElement>();
-				if (layout?.ignoreLayout == true)
+				if (child?.GetComponent<UnityEngine.UI.LayoutElement>()?.ignoreLayout == true)
 				{
 					index++;
 				}
@@ -181,7 +180,7 @@ namespace QTool
 		}
 		public static int GetLayoutCount(this Transform transform)
 		{
-			return transform.CheckIgnoreLayout(transform.childCount);
+			return transform.CheckIgnoreLayout(transform.childCount - 1) + 1;
 		}
 		public static int GetLayoutIndex(this Transform transform)
 		{
