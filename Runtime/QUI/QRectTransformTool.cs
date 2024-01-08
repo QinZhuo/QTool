@@ -164,7 +164,7 @@ namespace QTool
 		}
 		public static Transform GetLayoutChild(this Transform transform, int index)
 		{
-			for (int i = 0; i <= index && i < transform.childCount; i++)
+			for (int i = 0; i <= index; i++)
 			{
 				var child = transform.GetChild(i);
 				if (child?.GetComponent<UnityEngine.UI.LayoutElement>()?.ignoreLayout == true)
