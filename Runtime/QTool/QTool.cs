@@ -355,7 +355,7 @@ namespace QTool
 		}
         public static bool PercentRandom(float percent)
         {
-            var value = UnityEngine.Random.Range(0, 100);
+            var value = QRandom.Instance.Range(0, 100);
             return value <= percent;
         }
        
