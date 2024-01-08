@@ -223,6 +223,7 @@ namespace QTool
 						if (transform is RectTransform)
 						{
 							child = child.GetComponent<RectTransform>(true);
+							child.localScale = Vector3.one;
 						}
 						return child;
 					}
