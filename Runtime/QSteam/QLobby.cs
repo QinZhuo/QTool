@@ -52,6 +52,7 @@ namespace QTool
 		#region 静态
 
 		public static QLobby CurrentLobby = new QLobby();
+		public static ulong LastLobbyKey { get => QPlayerPrefs.Get<ulong>(nameof(LastLobbyKey)); set => QPlayerPrefs.Set<ulong>(nameof(LastLobbyKey), value); }
 		public static QList<ulong, QLobby> LobbyList { get; private set; } = new QList<ulong, QLobby>(() => new QLobby());
 		public static void Leave()
 		{

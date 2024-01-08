@@ -384,7 +384,7 @@ namespace QTool.Steam
 			}
 			return true;
 		}
-		public static bool HasLobby(CSteamID lobby)
+		public static bool HasLobby(this CSteamID lobby)
 		{
 			return SteamMatchmaking.GetNumLobbyMembers(lobby) > 0;
 		}
