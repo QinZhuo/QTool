@@ -111,13 +111,26 @@ namespace QTool.Inspector
 	/// 将int索引显示为toolbar工具栏 数据来源 listMember
 	/// </summary>
 	[AttributeUsage(AttributeTargets.Field)]
-    public class QToolbarAttribute : QNameAttribute
-    {
-        public string getListFunc;
-        public int pageSize= 0;
-        public QToolbarAttribute( string getListFunc="", string showControl = "",int pageSize =0) : base("", showControl)
+	public class QToolbarAttribute : QNameAttribute
+	{
+		public string[] getListFuncs;
+		public int pageSize = 0;
+		public Type type;
+		public QToolbarAttribute(Type type, string showControl = "", int pageSize = 0):this("")
+		{
+			this.type = type;
+		}
+
+		public QToolbarAttribute( string getListFunc="", string showControl = "",int pageSize =0) : base("", showControl)
         {
-            this.getListFunc = getListFunc;
+			if (getListFunc.IsNull())
+			{
+				getListFuncs = new string[0];
+			}
+			else
+			{
+				getListFuncs = new string[] { getListFunc };
+			}
 			this.pageSize = pageSize;
             if (name.IsNull())
             {
@@ -356,7 +369,7 @@ namespace QTool.Inspector
 		public static void Draw(QToolbarAttribute toolbar, Rect position, SerializedProperty property, GUIContent label)
 		{
 			position.height = Height;
-			var listData = QPopupData.Get(property, toolbar.getListFunc);
+			var listData = toolbar.type != null ? QPopupData.Get(toolbar.type) : QPopupData.Get(property, toolbar.getListFuncs);
 			if (listData.List.Count == 0)
 			{
 				GUI.Toolbar(position, 0, new string[] { "无" + toolbar.name });
@@ -408,7 +421,7 @@ namespace QTool.Inspector
 		public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
 		{
 			var toolbar = (attribute as QToolbarAttribute);
-			return property.IsShow() ? (toolbar.pageSize > 0 && QPopupData.Get(property, toolbar.getListFunc).List.Count > toolbar.pageSize ? Height + 20 : Height) : 0;
+			return property.IsShow() ? (toolbar.pageSize > 0 && QPopupData.Get(property, toolbar.getListFuncs).List.Count > toolbar.pageSize ? Height + 20 : Height) : 0;
 		}
 	}
 #endregion

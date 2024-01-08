@@ -737,6 +737,7 @@ namespace QTool
 			}
 			var drawer = DrawerDic[drawerKey];
 			drawer.Type = type;
+
 			if (getListFuncs.Length > 0)
 			{
 				drawer.List.Clear();

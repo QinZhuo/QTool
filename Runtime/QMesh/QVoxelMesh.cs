@@ -15,9 +15,9 @@ namespace QTool
 			gameObject.GenerateMesh(voxelData);
 		}
 		public QVoxelData voxelData = new QVoxelData();
-		[QToggle("编辑"),QOnChange(nameof(ModeChange))]
-		public bool editorMode;
-		[QToolbar("", nameof(editorMode))]
+		[QToggle("编辑"), QOnChange(nameof(ModeChange))]
+		public bool editorMode = false;
+		[QToolbar(typeof(QVoxelBrush), nameof(editorMode))]
 		public QVoxelBrush brush;
 		[QToolbar(nameof(Color32s), nameof(editorMode))]
 		[QOnChange(nameof(OnChangeColorIndex))]

@@ -882,7 +882,7 @@ namespace QTool.Reflection
 			var method=typeInfo.Functions[funcName]?.MethodInfo;
 			if (method == null)
 			{
-				method=typeInfo.Functions["get_"+funcName]?.MethodInfo;
+				method = typeInfo.Functions["get_" + funcName]?.MethodInfo;
 			}
 			if (method == null)
 			{ 
@@ -1082,10 +1082,6 @@ namespace QTool.Reflection
             var methods= type.GetMethods(bindingFlags);
             foreach (var method in methods)
             {
-				if(method.Name.StartsWith("set_")|| method.Name.StartsWith("get_"))
-				{
-					continue;
-				}
 				methodeInfo?.Invoke(method);
 			}
         }
