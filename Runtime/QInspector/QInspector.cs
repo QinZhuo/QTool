@@ -295,6 +295,7 @@ namespace QTool.Inspector
 		public override VisualElement CreatePropertyGUI(SerializedProperty property)
 		{
 			var root = new VisualElement();
+			root.style.flexDirection = FlexDirection.Row;
 			var popupData = QPopupData.Get(property, (attribute as QPopupAttribute).getListFuncs);
 			var value = property.propertyType == SerializedPropertyType.String ? property.stringValue : property.objectReferenceValue?.GetType()?.Name;
 			if (!popupData.List.Contains(value))
@@ -311,6 +312,8 @@ namespace QTool.Inspector
 			if (property.propertyType != SerializedPropertyType.String)
 			{
 				propertyField = root.Add(property);
+				propertyField.label = "";
+				propertyField.style.width = new Length(100, LengthUnit.Percent);
 				if (property.objectReferenceValue != null)
 				{
 					propertyField.SetEnabled(false);
