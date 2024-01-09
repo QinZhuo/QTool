@@ -307,12 +307,14 @@ namespace QTool.Inspector
 				value = popupData.List.Get(0);
 			}
 			var visual = new PopupField<string>(QReflection.QName(property), popupData.List, value);
+			visual.style.width = new Length(100, LengthUnit.Percent);
 			root.Add(visual);
 			PropertyField propertyField = null;
 			if (property.propertyType != SerializedPropertyType.String)
 			{
 				propertyField = root.Add(property);
 				propertyField.label = "";
+				visual.style.width = new Length(50, LengthUnit.Percent);
 				propertyField.style.width = new Length(100, LengthUnit.Percent);
 				if (property.objectReferenceValue != null)
 				{
