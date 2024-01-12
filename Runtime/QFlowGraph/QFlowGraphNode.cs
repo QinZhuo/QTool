@@ -244,7 +244,7 @@ namespace QTool.FlowGraph
 			}
 		}
 		[QName("触发/触发器")]
-		public static IEnumerator Trigger(QFlowNode This, [QName("起点"), QInputPort("起点")] Transform start, [QName("预制体"), QPopup(nameof(Resources) + "/" + nameof(QTrigger))] string prefabKey, QTeamRelaction relaction, [QName("初始化"),QFlowPort, QOutputPort] Transform init, [QName("触发"), QFlowPort, QOutputPort] Transform triggerObject)
+		public static IEnumerator Trigger(QFlowNode This, [QName("起点"), QInputPort("起点")] Transform start, [QName("预制体"), QPopup(nameof(Resources) + "/" + nameof(QTrigger))] string prefabKey, QTeamRelaction relaction, [QName("初始化"), QFlowPort, QOutputPort] Transform init, [QName("触发"), QFlowPort, QOutputPort] Transform triggerObject)
 		{
 			var prefab = Resources.Load<GameObject>(nameof(QTrigger) + "/" + prefabKey);
 			if (prefab == null)
@@ -263,16 +263,12 @@ namespace QTool.FlowGraph
 				trigger.Relaction = relaction;
 				yield return trigger.Init();
 				if (This.State != QNodeState.失败)
-				{ 
+				{
 					This[nameof(init)] = trigger.transform;
 					yield return This.RunPortIEnumerator(nameof(init));
 					if (This.GetPortConnectState(nameof(init)) != QNodeState.失败)
 					{
-						yield return trigger.Run((t) =>
-						{
-							This[nameof(triggerObject)] = t;
-							This.RunPort(nameof(triggerObject));
-						});
+						yield return trigger.Run();
 					}
 					else
 					{
