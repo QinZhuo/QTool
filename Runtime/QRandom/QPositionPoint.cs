@@ -51,7 +51,6 @@ namespace QTool
 		{
 			var newObject = prefab.CheckInstantiate(parent);
 			newObject.transform.position = transform.position;
-			newObject.transform.rotation = transform.rotation;
 			enabled = false;
 			return newObject;
 		}
