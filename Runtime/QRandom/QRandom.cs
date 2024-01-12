@@ -204,16 +204,16 @@ namespace QTool
 			}
 		}
 		[QIgnore]
-		public static GameObject QRandomPointCreate(this GameObject root, string pointKey, GameObject prefab)
+		public static GameObject RandomPointCreate(this GameObject prefab, string pointKey, Transform parent = null)
 		{
 			QPositionPoint createPoint = null;
-			if (root == null)
+			if (parent == null)
 			{
 				createPoint = QPositionPoint.GetRandomPoint(pointKey);
 			}
 			else
 			{
-				var list = new List<QPositionPoint>(root.GetComponentsInChildren<QPositionPoint>());
+				var list = new List<QPositionPoint>(parent.GetComponentsInChildren<QPositionPoint>());
 				list.RemoveAll(point => point.name != pointKey || !point.isActiveAndEnabled);
 				createPoint = list.RandomGet();
 			}
@@ -222,10 +222,10 @@ namespace QTool
 				QDebug.LogWarning("位置点[" + pointKey + "]不足 ");
 				return null;
 			}
-			return createPoint.CreateAndDisable(prefab, root.transform);
+			return createPoint.CreateAndDisable(prefab, parent);
 		}
 		[QName("随机点生成物体")]
-		private static IEnumerator QRandomPointCreate([QInputPort("场景"), QFlowPort] GameObject root, [QName("位置点")] string pointKey, [QName("预制体")] GameObject prefab, [QName("创建数目")] int count = 1, QFlowNode This = null, [QFlowPort, QOutputPort, QName("物体")] GameObject newObject = default)
+		private static IEnumerator RandomPointCreate([QInputPort("场景"), QFlowPort] GameObject root, [QName("位置点")] string pointKey, [QName("预制体")] GameObject prefab, [QName("创建数目")] int count = 1, QFlowNode This = null, [QFlowPort, QOutputPort, QName("物体")] GameObject newObject = default)
 		{
 			var pointList = new List<QPositionPoint>();
 			if (root == null)
