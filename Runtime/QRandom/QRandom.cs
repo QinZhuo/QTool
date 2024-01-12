@@ -203,30 +203,48 @@ namespace QTool
 				This.SetNetFlowPort(nameof(False));
 			}
 		}
+		[QIgnore]
+		public static GameObject QRandomPointCreate(this GameObject root, string pointKey, GameObject prefab)
+		{
+			QPositionPoint createPoint = null;
+			if (root == null)
+			{
+				createPoint = QPositionPoint.GetRandomPoint(pointKey);
+			}
+			else
+			{
+				var list = new List<QPositionPoint>(root.GetComponentsInChildren<QPositionPoint>());
+				list.RemoveAll(point => point.name != pointKey || !point.isActiveAndEnabled);
+				createPoint = list.RandomGet();
+			}
+			if (createPoint == null)
+			{
+				QDebug.LogWarning("位置点[" + pointKey + "]不足 ");
+				return null;
+			}
+			return createPoint.CreateAndDisable(prefab, root.transform);
+		}
 		[QName("随机点生成物体")]
-		private static IEnumerator RandomPointCreate(QFlowNode This, [QInputPort("场景"), QFlowPort] GameObject root, [QName("位置点")] string pointKey, [QName("预制体")] GameObject prefab, [QName("创建数目")] int count = 1, [QFlowPort, QOutputPort, QName("物体")] GameObject newObject = default)
+		private static IEnumerator QRandomPointCreate([QInputPort("场景"), QFlowPort] GameObject root, [QName("位置点")] string pointKey, [QName("预制体")] GameObject prefab, [QName("创建数目")] int count = 1, QFlowNode This = null, [QFlowPort, QOutputPort, QName("物体")] GameObject newObject = default)
 		{
 			var pointList = new List<QPositionPoint>();
 			if (root == null)
 			{
 				pointList.AddRange(QPositionPoint.GetPoints(pointKey));
-				pointList.RemoveAll((point) => point.HasChild);
 			}
 			else
 			{
-				var keyPotnts= QPositionPoint.GetPoints(pointKey);
 				pointList.AddRange(root.GetComponentsInChildren<QPositionPoint>());
-				pointList.RemoveAll((point) => !keyPotnts.Contains(point) || point.HasChild);
+				pointList.RemoveAll((point) => point.name != pointKey);
 			}
-			QRandom.Instance.RandomList(pointList);
+			pointList.RandomList();
 			if (pointList.Count < count)
 			{
 				QDebug.LogWarning("位置点[" + pointKey + "]不足 " + pointList.Count + "<" + count);
 			}
 			for (int i = 0; i < count && i < pointList.Count; i++)
 			{
-				newObject = prefab.CheckInstantiate(pointList[i].transform);
-				newObject.transform.rotation = pointList[i].transform.rotation;
+				newObject = pointList[i].CreateAndDisable(prefab, root.transform);
 				if (This != null)
 				{
 					This[nameof(newObject)] = newObject;

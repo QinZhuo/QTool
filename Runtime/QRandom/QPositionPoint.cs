@@ -5,7 +5,7 @@ namespace QTool
 {
 	public class QPositionPoint : MonoBehaviour
 	{
-		private static QDictionary<string, List<QPositionPoint>> Points = new QDictionary<string, List<QPositionPoint>>((key)=>new List<QPositionPoint>());
+		private static QDictionary<string, List<QPositionPoint>> Points = new QDictionary<string, List<QPositionPoint>>((key) => new List<QPositionPoint>());
 		public static QPositionPoint GetPoint(string key)
 		{
 			if (Points.ContainsKey(key))
@@ -17,35 +17,49 @@ namespace QTool
 				return null;
 			}
 		}
+		public static QPositionPoint GetRandomPoint(string key)
+		{
+			if (Points.ContainsKey(key))
+			{
+				return Points[key].RandomGet();
+			}
+			else
+			{
+				return null;
+			}
+		}
 		public static List<QPositionPoint> GetPoints(string key)
 		{
 			return Points[key];
 		}
-		private void OnValidate()
+		private void Reset()
 		{
 			name = gameObject.QName();
 		}
-		private void Awake()
+		private void OnEnable()
 		{
-			name = gameObject.QName();
 			Points[name].Add(this);
 		}
-		private void OnDestroy()
+		private void OnDisable()
 		{
 			if (Points.ContainsKey(name))
 			{
 				Points[name].Remove(this);
 			}
 		}
-
-		public bool HasChild => transform.childCount > 0;
-
+		public GameObject CreateAndDisable(GameObject prefab, Transform parent = null)
+		{
+			var newObject = prefab.CheckInstantiate(parent);
+			newObject.transform.position = transform.position;
+			newObject.transform.rotation = transform.rotation;
+			enabled = false;
+			return newObject;
+		}
 		private void OnDrawGizmos()
 		{
 			Gizmos.color = name.ToColor();
 			Gizmos.DrawSphere(transform.position, 0.5f);
 		}
 	}
-	
 }
 
