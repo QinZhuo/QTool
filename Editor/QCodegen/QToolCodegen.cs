@@ -17,16 +17,26 @@ namespace QTool.Codegen
 	/// </summary>
 	public class QToolCodegen : ILPostProcessor
 	{
-		private string m_TargetAssembly = null;
-		public string TargetAssembly => m_TargetAssembly ??= GetType().Name.Replace('_', '.').Substring(0, GetType().Name.Length - nameof(Codegen).Length);
 		public override ILPostProcessor GetInstance() 
 		{
 
 			return this;
 		}
+		private ICompiledAssembly CurrentCompiledAssembly = null;
 		public override bool WillProcess(ICompiledAssembly compiledAssembly)
-			=> (compiledAssembly.Name == TargetAssembly || compiledAssembly.References.Any(filePath => Path.GetFileNameWithoutExtension(filePath) == TargetAssembly)) && !compiledAssembly.Name.EndsWith(nameof(Codegen));
-
+		{
+			CurrentCompiledAssembly = compiledAssembly;
+			return !compiledAssembly.Name.EndsWith(nameof(Codegen)) && WillChange();
+		}
+		public virtual bool WillChange() => false;
+		public bool IsAssembly(string assemblyName)
+		{
+			return CurrentCompiledAssembly.Name == assemblyName;
+		}
+		public bool ContainsAssembly(string assemblyName)
+		{
+			return CurrentCompiledAssembly.References.Any(filePath => Path.GetFileNameWithoutExtension(filePath) == assemblyName);
+		}
 		public List<DiagnosticMessage> Logs = new List<DiagnosticMessage>();
 		public AssemblyDefinition Assembly => Resolver.selfAssembly;
 		public QAssemblyResolver Resolver { get; private set; }
@@ -37,11 +47,11 @@ namespace QTool.Codegen
 			using (Resolver = new QAssemblyResolver(compiledAssembly))
 			using (var assembly = ReadAssembly(peStream, pdbStream, Resolver))
 			{
-				if (!Assembly.MainModule.ContainsClass(nameof(QToolCodegen), TargetAssembly))
+				if (!Assembly.MainModule.ContainsClass(nameof(QToolCodegen), GetType().Name))
 				{
 					if (CheckChangeAssembly())
 					{
-						Assembly.MainModule.Types.Add(new TypeDefinition(nameof(QToolCodegen), TargetAssembly,
+						Assembly.MainModule.Types.Add(new TypeDefinition(nameof(QToolCodegen), GetType().Name,
 							TypeAttributes.BeforeFieldInit | TypeAttributes.Class | TypeAttributes.AnsiClass | TypeAttributes.Public | TypeAttributes.AutoClass | TypeAttributes.Abstract | TypeAttributes.Sealed,
 							 Get<object>()));
 						if (assembly.MainModule.AssemblyReferences.Any(r => r.Name == assembly.Name.Name))
@@ -67,7 +77,7 @@ namespace QTool.Codegen
 
 		public void Log(object obj, DiagnosticType type = DiagnosticType.Warning)
 		{
-			Logs.Add(new DiagnosticMessage { DiagnosticType = type, MessageData = TargetAssembly + "  " + obj?.ToString() });
+			Logs.Add(new DiagnosticMessage { DiagnosticType = type, MessageData = GetType().Name + "  " + obj?.ToString() });
 		}
 		public AssemblyDefinition ReadAssembly(MemoryStream peStream, MemoryStream pdbStream, QAssemblyResolver asmResolver)
 		{
