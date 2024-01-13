@@ -47,13 +47,14 @@ namespace QTool.Codegen
 			using (Resolver = new QAssemblyResolver(compiledAssembly))
 			using (var assembly = ReadAssembly(peStream, pdbStream, Resolver))
 			{
-				if (!Assembly.MainModule.ContainsClass(nameof(QToolCodegen), GetType().Name))
+				if (!Assembly.MainModule.ContainsClass(nameof(QTool), GetType().Name))
 				{
-					if (CheckChangeAssembly())
-					{
-						Assembly.MainModule.Types.Add(new TypeDefinition(nameof(QToolCodegen), GetType().Name,
+					var type = new TypeDefinition(nameof(QTool), GetType().Name,
 							TypeAttributes.BeforeFieldInit | TypeAttributes.Class | TypeAttributes.AnsiClass | TypeAttributes.Public | TypeAttributes.AutoClass | TypeAttributes.Abstract | TypeAttributes.Sealed,
-							 Get<object>()));
+							 Get<object>());
+					if (ChangeAssembly())
+					{
+						Assembly.MainModule.Types.Add(type);
 						if (assembly.MainModule.AssemblyReferences.Any(r => r.Name == assembly.Name.Name))
 						{
 							assembly.MainModule.AssemblyReferences.Remove(assembly.MainModule.AssemblyReferences.First(r => r.Name == assembly.Name.Name));
@@ -77,7 +78,7 @@ namespace QTool.Codegen
 
 		public void Log(object obj, DiagnosticType type = DiagnosticType.Warning)
 		{
-			Logs.Add(new DiagnosticMessage { DiagnosticType = type, MessageData = GetType().Name + "  " + obj?.ToString() });
+			Logs.Add(new DiagnosticMessage { DiagnosticType = type, MessageData = ": " + obj?.ToString() });
 		}
 		public AssemblyDefinition ReadAssembly(MemoryStream peStream, MemoryStream pdbStream, QAssemblyResolver asmResolver)
 		{
@@ -98,7 +99,7 @@ namespace QTool.Codegen
 		/// 更改程序集内容
 		/// </summary>
 		/// <returns>是否发生了更改</returns>
-		public virtual bool CheckChangeAssembly()
+		public virtual bool ChangeAssembly()
 		{
 			try
 			{
