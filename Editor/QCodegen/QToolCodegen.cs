@@ -49,12 +49,11 @@ namespace QTool.Codegen
 			{
 				if (!Assembly.MainModule.ContainsClass(nameof(QToolCodegen), GetType().Name))
 				{
-					var type = new TypeDefinition(nameof(QToolCodegen), GetType().Name,
-							TypeAttributes.BeforeFieldInit | TypeAttributes.Class | TypeAttributes.AnsiClass | TypeAttributes.Public | TypeAttributes.AutoClass | TypeAttributes.Abstract | TypeAttributes.Sealed,
-							 Get<object>());
 					if (ChangeAssembly())
 					{
-						Assembly.MainModule.Types.Add(type);
+						Assembly.MainModule.Types.Add(new TypeDefinition(nameof(QToolCodegen), GetType().Name,
+							TypeAttributes.BeforeFieldInit | TypeAttributes.Class | TypeAttributes.AnsiClass | TypeAttributes.Public | TypeAttributes.AutoClass | TypeAttributes.Abstract | TypeAttributes.Sealed,
+							 Get<object>()));
 						if (assembly.MainModule.AssemblyReferences.Any(r => r.Name == assembly.Name.Name))
 						{
 							assembly.MainModule.AssemblyReferences.Remove(assembly.MainModule.AssemblyReferences.First(r => r.Name == assembly.Name.Name));
