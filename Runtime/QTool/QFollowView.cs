@@ -46,6 +46,19 @@ namespace QTool
 				}
 			}
 		}
+		public void ForceUpdate()
+		{
+			if (Rect != null)
+			{
+				View.transform.position = Rect.Center();
+			}
+			else
+			{
+				View.transform.position = transform.position;
+			}
+			View.transform.localScale = transform.localScale;
+			View.transform.rotation = transform.rotation;
+		}
 		private void LateUpdate()
 		{
 			if (followSpeed > 0)
