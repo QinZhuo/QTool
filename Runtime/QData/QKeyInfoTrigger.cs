@@ -13,6 +13,7 @@ public class QKeyInfoTrigger : MonoBehaviour, IPointerEnterHandler, IPointerExit
 	public string Info { get; set; }
 	public void Set(string key, string info)
 	{
+		if (this == null) return;
 		Key = key;
 		Info = info;
 	}
