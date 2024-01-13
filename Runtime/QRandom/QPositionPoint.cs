@@ -32,7 +32,7 @@ namespace QTool
 		{
 			return Points[key];
 		}
-		private void Reset()
+		private void OnValidate()
 		{
 			name = gameObject.QName();
 		}
