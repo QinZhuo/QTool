@@ -1002,7 +1002,7 @@ namespace QTool.Reflection
 			}
 			else
 			{
-				Type type = Type.GetType(typeString);
+				var type = Type.GetType(typeString);
 				if (type == null)
 				{
 					Assembly[] assemblyArray = AppDomain.CurrentDomain.GetAssemblies();

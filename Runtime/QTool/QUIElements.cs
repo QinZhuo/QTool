@@ -755,9 +755,9 @@ namespace QTool
 					else
 					{
 						var funcKey = getListFunc;
-						if (!funcKey.EndsWith(".List") && QReflection.ParseType(funcKey).Is(typeof(QDataList<>)))
+						if (!funcKey.Contains('.') && !funcKey.EndsWith(".List") && QReflection.ParseType(funcKey).Is(typeof(QDataList<>)))
 						{
-							funcKey += ".List";
+							funcKey += ".List"; 
 						}
 						if (obj.InvokeFunction(funcKey) is IList itemList)
 						{
