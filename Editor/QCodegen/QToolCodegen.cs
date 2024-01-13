@@ -47,9 +47,9 @@ namespace QTool.Codegen
 			using (Resolver = new QAssemblyResolver(compiledAssembly))
 			using (var assembly = ReadAssembly(peStream, pdbStream, Resolver))
 			{
-				if (!Assembly.MainModule.ContainsClass(nameof(QTool), GetType().Name))
+				if (!Assembly.MainModule.ContainsClass(nameof(QToolCodegen), GetType().Name))
 				{
-					var type = new TypeDefinition(nameof(QTool), GetType().Name,
+					var type = new TypeDefinition(nameof(QToolCodegen), GetType().Name,
 							TypeAttributes.BeforeFieldInit | TypeAttributes.Class | TypeAttributes.AnsiClass | TypeAttributes.Public | TypeAttributes.AutoClass | TypeAttributes.Abstract | TypeAttributes.Sealed,
 							 Get<object>());
 					if (ChangeAssembly())
