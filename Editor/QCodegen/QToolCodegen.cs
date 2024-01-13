@@ -13,10 +13,123 @@ using Unity.CompilationPipeline.Common.Diagnostics;
 namespace QTool.Codegen
 {
 	/// <summary>
-	/// 代码生成工具类 
-	/// 代码生成期间是多线程运行的 不要使用静态变量
+	/// 继承必须 以目标程序集名为起始 以Codegen为结尾 '.'以'_'代替
 	/// </summary>
-	public static class QCodegen
+	public class QToolCodegen : ILPostProcessor
+	{
+		private string m_TargetAssembly = null;
+		public string TargetAssembly => m_TargetAssembly ??= GetType().Name.Replace('_', '.').Substring(0, GetType().Name.Length - nameof(Codegen).Length);
+		public override ILPostProcessor GetInstance() 
+		{
+
+			return this;
+		}
+		public override bool WillProcess(ICompiledAssembly compiledAssembly)
+			=> (compiledAssembly.Name == TargetAssembly || compiledAssembly.References.Any(filePath => Path.GetFileNameWithoutExtension(filePath) == TargetAssembly)) && !compiledAssembly.Name.EndsWith(nameof(Codegen));
+
+		public List<DiagnosticMessage> Logs = new List<DiagnosticMessage>();
+		public AssemblyDefinition Assembly => Resolver.selfAssembly;
+		public QAssemblyResolver Resolver { get; private set; }
+		public override ILPostProcessResult Process(ICompiledAssembly compiledAssembly)
+		{
+			using (var peStream = new MemoryStream(compiledAssembly.InMemoryAssembly.PeData))
+			using (var pdbStream = new MemoryStream(compiledAssembly.InMemoryAssembly.PdbData))
+			using (Resolver = new QAssemblyResolver(compiledAssembly))
+			using (var assembly = ReadAssembly(peStream, pdbStream, Resolver))
+			{
+				if (!Assembly.MainModule.ContainsClass(nameof(QToolCodegen), TargetAssembly))
+				{
+					if (CheckChangeAssembly())
+					{
+						Assembly.MainModule.Types.Add(new TypeDefinition(nameof(QToolCodegen), TargetAssembly,
+							TypeAttributes.BeforeFieldInit | TypeAttributes.Class | TypeAttributes.AnsiClass | TypeAttributes.Public | TypeAttributes.AutoClass | TypeAttributes.Abstract | TypeAttributes.Sealed,
+							 Get<object>()));
+						if (assembly.MainModule.AssemblyReferences.Any(r => r.Name == assembly.Name.Name))
+						{
+							assembly.MainModule.AssemblyReferences.Remove(assembly.MainModule.AssemblyReferences.First(r => r.Name == assembly.Name.Name));
+						}
+						var peOut = new MemoryStream();
+						var pdbOut = new MemoryStream();
+						var writerParameters = new WriterParameters
+						{
+							SymbolWriterProvider = new PortablePdbWriterProvider(),
+							SymbolStream = pdbOut,
+							WriteSymbols = true
+						};
+						assembly.Write(peOut, writerParameters);
+						var inMemory = new InMemoryAssembly(peOut.ToArray(), pdbOut.ToArray());
+						return new ILPostProcessResult(inMemory, Logs);
+					}
+				}
+			}
+			return new ILPostProcessResult(compiledAssembly.InMemoryAssembly, Logs);
+		}
+
+		public void Log(object obj, DiagnosticType type = DiagnosticType.Warning)
+		{
+			Logs.Add(new DiagnosticMessage { DiagnosticType = type, MessageData = TargetAssembly + "  " + obj?.ToString() });
+		}
+		public AssemblyDefinition ReadAssembly(MemoryStream peStream, MemoryStream pdbStream, QAssemblyResolver asmResolver)
+		{
+			var readerParameters = new ReaderParameters
+			{
+				//ReadingMode = ReadingMode.Deferred,
+				SymbolStream = pdbStream,
+				ReadWrite = true,
+				ReadSymbols = true,
+				AssemblyResolver = asmResolver,
+				ReflectionImporterProvider = new QReflectionImporterProvider(),
+			};
+			var assmebly = AssemblyDefinition.ReadAssembly(peStream, readerParameters);
+			asmResolver.selfAssembly = assmebly;
+			return assmebly;
+		}
+		/// <summary>
+		/// 更改程序集内容
+		/// </summary>
+		/// <returns>是否发生了更改</returns>
+		public virtual bool CheckChangeAssembly()
+		{
+			try
+			{
+				var modified = false;
+				foreach (TypeDefinition type in Assembly.MainModule.GetAllTypes().ToArray())
+				{
+					if (type.IsClass && type.BaseType.CanBeResolved())
+					{
+						modified |= ChangeType(type);
+					}
+				}
+				return modified;
+			}
+			catch (Exception e)
+			{
+				Log($" Exception :{e}", DiagnosticType.Error);
+				return false;
+			}
+		}
+		public virtual bool ChangeType(TypeDefinition type) => false;
+
+		private Dictionary<Type, TypeReference> Types = new Dictionary<Type, TypeReference>();
+		public TypeReference Get<T>()
+		{
+			var type = typeof(T);
+			if (!Types.ContainsKey(type))
+			{
+				Types.Add(type, Assembly.Import<T>());
+			}
+			return Types[type];
+		}
+		public MethodReference Get<T>(string methodName)
+		{
+			return Get<T>().ImportMethod(methodName, Assembly);
+		}
+	}
+	/// <summary>
+	/// 代码生成工具类 
+	/// 代码生成期间是多线程运行的 不要使用静态变量 会导致间歇性出现编译错误
+	/// </summary>
+	public static class QCodegenTool
 	{
 		public static bool HasDefine(this ICompiledAssembly assembly, string define) =>
 		   assembly.Defines != null &&
@@ -201,15 +314,15 @@ namespace QTool.Codegen
 			}
 			return nameStart;
 		}
-		public static bool Is(this TypeReference td, Type type) =>
+		public static bool IsType(this TypeReference td, Type type) =>
 			  type.IsGenericType
 				? td.GetElementType().FullName == type.FullName.Replace('+', '/')
 				: td.FullName == type.FullName.Replace('+', '/');
-		 
-		public static bool Is<T>(this TypeReference td) => Is(td, typeof(T));
-		public static bool IsDerivedFrom<T>(this TypeReference tr) => IsDerivedFrom(tr, typeof(T));
+		
+		public static bool IsType<T>(this TypeReference td) => IsType(td, typeof(T));
+		public static bool Is<T>(this TypeReference tr) => Is(tr, typeof(T));
 
-		public static bool IsDerivedFrom(this TypeReference tr, Type baseClass)
+		public static bool Is(this TypeReference tr, Type baseClass)
 		{
 			TypeDefinition td = tr.Resolve();
 			if (!td.IsClass)
@@ -220,11 +333,11 @@ namespace QTool.Codegen
 			if (parent == null)
 				return false;
 
-			if (parent.Is(baseClass))
+			if (parent.IsType(baseClass))
 				return true;
 
 			if (parent.CanBeResolved())
-				return IsDerivedFrom(parent.Resolve(), baseClass);
+				return Is(parent.Resolve(), baseClass);
 
 			return false;
 		}
