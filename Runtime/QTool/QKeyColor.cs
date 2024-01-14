@@ -6,8 +6,13 @@ namespace QTool
 	public class QKeyColor : MonoBehaviour
 	{
 		[SerializeField]
-		private Color m_Color;
-		private void OnValidate()
+		protected Color m_Color;
+		public void SetKey(string key)
+		{
+			m_Color = key.ToColor();
+			OnValidate();
+		}
+		protected virtual void OnValidate()
 		{
 			if (graphics.Count > 0)
 			{
@@ -19,11 +24,6 @@ namespace QTool
 				}
 			}
 			OnColorChange.Invoke(m_Color);
-		}
-		public void SetKey(string key)
-		{
-			m_Color = key.ToColor();
-			OnValidate();
 		}
 		[UnityEngine.Serialization.FormerlySerializedAs("OnKeyChange")]
 		public ColorEvent OnColorChange = new ColorEvent();
