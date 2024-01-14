@@ -2,39 +2,32 @@ using System.Collections.Generic;
 using UnityEngine;
 namespace QTool
 {
+
 	public class QKeyColor : MonoBehaviour
 	{
-		[SerializeField, QReadonly]
+		[SerializeField]
 		private Color m_Color;
-		[QName("刷新")]
-		private void Fresh()
+		private void OnValidate()
 		{
-			SetKey(name);
-		}
-		public void SetKey(string key)
-		{
-			if (List.ContainsKey(key))
+			if (graphics.Count > 0)
 			{
-				m_Color = List.Get(key).color;
-			}
-			else
-			{
-				m_Color = key.ToColor();
-			}
-			if (Application.isPlaying)
-			{
+				var h = m_Color.ToH();
 				foreach (var graphic in graphics)
 				{
 					if (graphic == null) continue;
-					graphic.SetColorH(m_Color.ToH());
+					graphic.SetColorH(h);
 				}
 			}
 			OnColorChange.Invoke(m_Color);
 		}
+		public void SetKey(string key)
+		{
+			m_Color = key.ToColor();
+			OnValidate();
+		}
 		[UnityEngine.Serialization.FormerlySerializedAs("OnKeyChange")]
 		public ColorEvent OnColorChange = new ColorEvent();
 		public List<UnityEngine.UI.Graphic> graphics = new List<UnityEngine.UI.Graphic>();
-		public List<QKeyColorValue> List = new List<QKeyColorValue>();
 	}
 }
 
