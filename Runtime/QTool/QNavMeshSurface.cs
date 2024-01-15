@@ -12,7 +12,7 @@ namespace QTool
 	[ExecuteInEditMode]
 	public class QNavMeshSurface : MonoBehaviour
 	{
-		public LayerMask Layer = NavMesh.AllAreas;
+		public LayerMask Layer = -1;
 		public NavMeshCollectGeometry CollectGeometry = NavMeshCollectGeometry.PhysicsColliders;
 #if Navigation
 		[QNavMeshArea]
