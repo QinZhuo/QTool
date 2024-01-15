@@ -55,6 +55,7 @@ namespace QTool
 		{
 			QAnalysisMail?.Init();
 		}
+		public static List<QKeyColorValue> ColorList => Instance.qKeyColorList;
 	}
 	[System.Serializable]
 	public class QKeyColorList : QList<string, QKeyColorValue>
