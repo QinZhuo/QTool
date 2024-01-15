@@ -242,19 +242,7 @@ namespace QTool.Inspector
 
 #if Navigation
 
-	[CustomPropertyDrawer(typeof(QNavMeshAreaAttribute))]
-	public class QNavMeshAreaDrawer : PropertyDrawer
-	{
-		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
-		{
-			Unity.AI.Navigation.Editor.NavMeshComponentsGUIUtility.AreaPopup(label.text, property);
-		}
-		public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
-		{
-			return 0;
-		}
-
-	}
+	
 	[CustomPropertyDrawer(typeof(QNavMeshAgentAttribute))]
 	public class QNavMeshAgentDrawer : PropertyDrawer
 	{
@@ -280,7 +268,27 @@ namespace QTool.Inspector
 		}
 	}
 #endif
+	[CustomPropertyDrawer(typeof(QNavMeshAreaAttribute))]
+	public class QNavMeshAreaDrawer : PropertyDrawer
+	{
+		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
+		{
+			AreaPopupMask(label.text, property);
+		}
+		public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
+		{
+			return 0;
+		}
 
+		public static void AreaPopupMask(string labelName, SerializedProperty areaProperty)
+		{
+			var areaNames = GameObjectUtility.GetNavMeshAreaNames();
+			var rect = EditorGUILayout.GetControlRect(true, EditorGUIUtility.singleLineHeight);
+			EditorGUI.BeginProperty(rect, GUIContent.none, areaProperty);
+			areaProperty.intValue = EditorGUI.MaskField(rect, labelName, areaProperty.intValue, areaNames);
+			EditorGUI.EndProperty();
+		}
+	}
 	[CustomPropertyDrawer(typeof(QNameAttribute))]
 	public class QNameDrawer : PropertyDrawer
 	{
