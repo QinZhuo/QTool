@@ -144,13 +144,13 @@ namespace QTool
 							src.area = 0;
 							src.component = collider;
 							src.sourceObject = collider.GetMesh();
-							if (collider.attachedRigidbody)
+							//if (collider.attachedRigidbody)
+							//{
+							//	src.transform = Matrix4x4.TRS(collider.attachedRigidbody.transform.position, collider.attachedRigidbody.transform.rotation, Vector3.one);
+							//}
+							//else
 							{
-								src.transform = Matrix4x4.TRS(collider.attachedRigidbody.transform.position, collider.attachedRigidbody.transform.rotation, Vector3.one);
-							}
-							else
-							{
-								src.transform = Matrix4x4.TRS(collider.transform.position, collider.transform.rotation, collider.transform.lossyScale);
+								src.transform = Matrix4x4.TRS(collider.transform.position, collider.transform.rotation, Vector3.one);
 							}
 							sourceList.Add(src);
 						}
