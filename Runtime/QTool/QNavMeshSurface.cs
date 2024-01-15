@@ -29,6 +29,7 @@ namespace QTool
 		}
 		private void OnValidate()
 		{
+			Settings.agentRadius = radius;
 			UpdateNavMesh();
 		}
 		private void OnTransformChildrenChanged()
