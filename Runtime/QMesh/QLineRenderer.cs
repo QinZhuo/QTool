@@ -18,7 +18,10 @@ namespace QTool
 			set => _EndTarget = value;
 		}
 		public LineRenderer lineRenderer;
-
+		public void SetEndPostion(Vector3 vector)
+		{
+			lineRenderer.SetPositions(new Vector3[] { transform.position, vector });
+		}
 		private void Reset()
 		{
 			lineRenderer = GetComponent<LineRenderer>();
@@ -28,7 +31,7 @@ namespace QTool
 		{
 			if (EndTarget != null)
 			{
-				lineRenderer.SetPositions(new Vector3[] { transform.position, EndTarget.position });
+				SetEndPostion(EndTarget.position);
 			}
 		}
 	}
