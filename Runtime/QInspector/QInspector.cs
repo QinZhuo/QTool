@@ -257,7 +257,11 @@ namespace QTool.Inspector
 	public class QNavMeshAgentDrawer : PropertyDrawer
 	{
 		private bool mask = false;
-		public QNavMeshAgentDrawer(bool mask = false)
+		public QNavMeshAgentDrawer()
+		{
+
+		}
+		public QNavMeshAgentDrawer(bool mask)
 		{
 			this.mask = mask;
 		}
