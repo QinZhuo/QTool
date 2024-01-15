@@ -150,7 +150,7 @@ namespace QTool
 							//}
 							//else
 							{
-								src.transform = Matrix4x4.TRS(collider.transform.position, collider.transform.rotation, Vector3.one);
+								src.transform = Matrix4x4.identity;
 							}
 							sourceList.Add(src);
 						}
