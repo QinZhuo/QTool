@@ -230,8 +230,10 @@ namespace QTool.Inspector
 	[AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
 	public class QNavMeshAgentAttribute : PropertyAttribute
 	{
-		public QNavMeshAgentAttribute()
+		public bool mask = false;
+		public QNavMeshAgentAttribute(bool mask=false)
 		{
+			this.mask = mask;
 		}
 	}
 
@@ -256,18 +258,14 @@ namespace QTool.Inspector
 	[CustomPropertyDrawer(typeof(QNavMeshAgentAttribute))]
 	public class QNavMeshAgentDrawer : PropertyDrawer
 	{
-		private bool mask = false;
+
 		public QNavMeshAgentDrawer()
 		{
 
 		}
-		public QNavMeshAgentDrawer(bool mask)
-		{
-			this.mask = mask;
-		}
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
-			if (mask)
+			if ((attribute as QNavMeshAgentAttribute).mask)
 			{
 				Unity.AI.Navigation.Editor.NavMeshComponentsGUIUtility.AgentMaskPopup(label.text, property);
 			}
