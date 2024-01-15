@@ -15,7 +15,7 @@ namespace QTool
 		public LayerMask Layer = -1;
 		public NavMeshCollectGeometry CollectGeometry = NavMeshCollectGeometry.PhysicsColliders;
 #if Navigation
-		[QNavMeshArea]
+		[QNavMeshAgent]
 		public int agent;
 #else
 		[SerializeField]
