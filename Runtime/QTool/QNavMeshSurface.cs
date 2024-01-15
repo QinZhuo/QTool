@@ -6,7 +6,7 @@ using Unity.AI.Navigation;
 #endif
 using UnityEngine;
 using UnityEngine.AI;
-
+using QTool.Inspector;
 namespace QTool
 {
 	[ExecuteInEditMode]
@@ -14,22 +14,32 @@ namespace QTool
 	{
 		public LayerMask Layer = NavMesh.AllAreas;
 		public NavMeshCollectGeometry CollectGeometry = NavMeshCollectGeometry.PhysicsColliders;
+#if Navigation
+		[QNavMeshArea]
+		public int agent;
+#else
 		[SerializeField]
 		private float radius = 0.5f;
+#endif
 		private List<NavMeshBuildSource> SourceList = new List<NavMeshBuildSource>();
 		private List<NavMeshBuildMarkup> Markups = new List<NavMeshBuildMarkup>();
 		private NavMeshDataInstance navMeshInstance = default;
 		private NavMeshData navMesh = null;
 		private NavMeshBuildSettings Settings = default;
+
 		private void OnEnable()
 		{
-			Settings=NavMesh.CreateSettings();
-			Settings.agentRadius = radius;
+			OnValidate();
 			UpdateNavMesh();
 		}
 		private void OnValidate()
 		{
+#if Navigation
+			Settings = NavMesh.GetSettingsByID(agent);
+#else
+			Settings=NavMesh.CreateSettings();
 			Settings.agentRadius = radius;
+#endif
 			UpdateNavMesh();
 		}
 		private void OnTransformChildrenChanged()
@@ -53,7 +63,7 @@ namespace QTool
 			navMesh = NavMeshBuilder.BuildNavMeshData(Settings, SourceList, bounds, transform.position, transform.rotation);
 			navMeshInstance = NavMesh.AddNavMeshData(navMesh, transform.position, transform.rotation);
 			navMeshInstance.owner = this;
-			NavMeshBuilder.UpdateNavMeshData(navMesh, NavMesh.GetSettingsByID(0), SourceList, bounds);
+			NavMeshBuilder.UpdateNavMeshData(navMesh, Settings, SourceList, bounds);
 		}
 		public void Clear()
 		{
@@ -140,7 +150,7 @@ namespace QTool
 							}
 							else
 							{
-								src.transform = Matrix4x4.identity;
+								src.transform = Matrix4x4.TRS(collider.transform.position, collider.transform.rotation, Vector3.one);
 							}
 							sourceList.Add(src);
 						}

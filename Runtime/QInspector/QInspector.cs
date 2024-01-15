@@ -220,8 +220,65 @@ namespace QTool.Inspector
 		
 	
 	}
+	[AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
+	public class QNavMeshAreaAttribute : PropertyAttribute
+	{
+		public QNavMeshAreaAttribute()
+		{
+		}
+	}
+	[AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
+	public class QNavMeshAgentAttribute : PropertyAttribute
+	{
+		public QNavMeshAgentAttribute()
+		{
+		}
+	}
+
 #if UNITY_EDITOR
 	#region 自定义显示效果
+
+#if Navigation
+
+	[CustomPropertyDrawer(typeof(QNavMeshAreaAttribute))]
+	public class QNavMeshAreaDrawer : PropertyDrawer
+	{
+		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
+		{
+			Unity.AI.Navigation.Editor.NavMeshComponentsGUIUtility.AreaPopup(label.text, property);
+		}
+		public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
+		{
+			return 0;
+		}
+
+	}
+	[CustomPropertyDrawer(typeof(QNavMeshAgentAttribute))]
+	public class QNavMeshAgentDrawer : PropertyDrawer
+	{
+		private bool mask = false;
+		public QNavMeshAgentDrawer(bool mask = false)
+		{
+			this.mask = mask;
+		}
+		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
+		{
+			if (mask)
+			{
+				Unity.AI.Navigation.Editor.NavMeshComponentsGUIUtility.AgentMaskPopup(label.text, property);
+			}
+			else
+			{
+				Unity.AI.Navigation.Editor.NavMeshComponentsGUIUtility.AgentTypePopup(label.text, property);
+			}
+		}
+		public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
+		{
+			return 0;
+		}
+	}
+#endif
+
 	[CustomPropertyDrawer(typeof(QNameAttribute))]
 	public class QNameDrawer : PropertyDrawer
 	{
