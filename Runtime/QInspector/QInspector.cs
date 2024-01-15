@@ -51,17 +51,17 @@ namespace QTool
 			this.name = name;
 		}
 	}
-	
+
 	/// <summary>
 	/// 使数据在inspector视窗不可更改
 	/// </summary>
-	[AttributeUsage(AttributeTargets.Field)]
-    public class QReadonlyAttribute : PropertyAttribute
+	[AttributeUsage(AttributeTargets.Field | AttributeTargets.Property | AttributeTargets.Parameter)]
+	public class QReadonlyAttribute : PropertyAttribute
 	{
-        public QReadonlyAttribute() 
-        {
-        }
-    }
+		public QReadonlyAttribute()
+		{
+		}
+	}
 
 	/// <summary>
 	/// 将字符传显示为枚举下拉款通过GetKeyListFunc获取所有可选择的字符串
