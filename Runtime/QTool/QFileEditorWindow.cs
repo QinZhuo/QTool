@@ -151,7 +151,7 @@ namespace QTool
 			Toolbar.style.flexDirection = FlexDirection.Row;
 			FilePathList = QPlayerPrefs.Get(typeof(T).Name + "_" + nameof(FilePathList), FilePathList);
 			FilePathList.RemoveAll(path => path.IsNull() || !path.Replace('/', '\\').ExistsFile());
-			while (FilePathList.Count > 20)
+			while (FilePathList.Count > 40)
 			{
 				FilePathList.Dequeue();
 			}
