@@ -86,7 +86,11 @@ namespace QTool.FlowGraph
 						label.style.marginLeft = 10;
 						label.style.marginRight = 10;
 						label.name = title;
-						if (!member.ReadOnly)
+						if(member.ReadOnly)
+						{
+							label.SetEnabled(false);
+						}
+						else
 						{
 							label.RegisterCallback<ClickEvent>((eventData) =>
 							{
