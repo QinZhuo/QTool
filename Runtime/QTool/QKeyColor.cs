@@ -16,11 +16,10 @@ namespace QTool
 		{
 			if (graphics.Count > 0)
 			{
-				var h = m_Color.ToH();
 				foreach (var graphic in graphics)
 				{
 					if (graphic == null) continue;
-					graphic.SetColorH(h);
+					graphic.color = m_Color;
 				}
 			}
 			OnColorChange.Invoke(m_Color);
