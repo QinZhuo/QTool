@@ -854,6 +854,7 @@ namespace QTool
 			var typeInfo = QSerializeType.Get(type);
 			foreach (var member in typeInfo.Members)
 			{
+				if (member.ReadOnly) continue;
 				qdataList.TitleRow.Add(member.QName);
 				for (int i = 0; i < list.Count; i++)
 				{
@@ -897,6 +898,7 @@ namespace QTool
 					{
 						try
 						{
+							if (member.ReadOnly) continue;
 							var value = row[i].ParseElement();
 							member.Set(t, value.ParseQDataType(member.Type, false));
 						}
