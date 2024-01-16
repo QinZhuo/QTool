@@ -116,6 +116,7 @@ namespace QTool
 			Key = typeInfo.Type.QTypeName();
 			foreach (var member in typeInfo.Members)
 			{
+				if (member.ReadOnly) continue;
 				var value = member.Get(component);
 				if (prefab == null)
 				{

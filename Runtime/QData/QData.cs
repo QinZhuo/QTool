@@ -93,6 +93,7 @@ namespace QTool
 					for (int i = 0; i < typeInfo.Members.Count; i++)
 					{
 						var memberInfo = typeInfo.Members[i];
+						if (memberInfo.ReadOnly) continue;
 						var member = memberInfo.Get(obj);
 						WriteCheckString(writer, memberInfo.Key);
 						writer.Write(':');
@@ -108,6 +109,7 @@ namespace QTool
 					for (int i = 0; i < typeInfo.Members.Count; i++)
 					{
 						var memberInfo = typeInfo.Members[i];
+						if (memberInfo.ReadOnly) continue;
 						var member = memberInfo.Get(obj);
 						WriteType(writer, member, memberInfo.Type, hasName,ObjStack);
 						if (i < typeInfo.Members.Count - 1)
@@ -362,6 +364,7 @@ namespace QTool
 						{
 							try
 							{
+								if (memeberInfo.ReadOnly) continue;
 								memeberInfo.Set(target, reader.ReadType(memeberInfo.Type, hasName, memeberInfo.Get(target), ObjStack));
 								if (!(reader.NextIsSplit(','))) 
 								{
@@ -1102,7 +1105,7 @@ namespace QTool
 				{
 					ObjType = QObjectType.UnityObject;
 				}
-				else if( type==typeof(object)||type.IsAbstract||type.IsInterface)
+				else if (type == typeof(object) || type.IsAbstract || type.IsInterface)
 				{
 					ObjType = QObjectType.DynamicObject;
 				}
@@ -1114,7 +1117,7 @@ namespace QTool
 				{
 					ObjType = QObjectType.List;
 				}
-				else if(IsDictionary)
+				else if (IsDictionary)
 				{
 					ObjType = QObjectType.Dictionary;
 				}
@@ -1137,7 +1140,7 @@ namespace QTool
 					{
 						return -1;
 					}
-					else if(b.MemeberInfo.Name==nameof(Key))
+					else if (b.MemeberInfo.Name == nameof(Key))
 					{
 						return 1;
 					}
@@ -1154,12 +1157,12 @@ namespace QTool
 						return -1;
 					}
 				}
-				);
+			);
 			if (!TypeMembers.ContainsKey(type))
 			{
 				Members.RemoveAll((member) =>
 				{
-					return member.MemeberInfo.GetCustomAttribute<QIgnoreAttribute>() != null || (!member.IsPublic && member.MemeberInfo.GetCustomAttribute<QNameAttribute>() == null) || member.Key == "Item" || member.Set == null || member.Get == null || (member.Type.IsArray && member.Type.GetArrayRank() > 1);
+					return member.MemeberInfo.GetCustomAttribute<QIgnoreAttribute>() != null || (!member.IsPublic && member.MemeberInfo.GetCustomAttribute<QNameAttribute>() == null) || member.Key == "Item" || member.Get == null || (member.Type.IsArray && member.Type.GetArrayRank() > 1);
 				});
 			}
 		}

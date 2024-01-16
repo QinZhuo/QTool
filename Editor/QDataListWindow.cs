@@ -86,64 +86,67 @@ namespace QTool.FlowGraph
 						label.style.marginLeft = 10;
 						label.style.marginRight = 10;
 						label.name = title;
-						label.RegisterCallback<ClickEvent>((eventData) =>
+						if (!member.ReadOnly)
 						{
-							if (CellView.style.display == DisplayStyle.Flex)
+							label.RegisterCallback<ClickEvent>((eventData) =>
 							{
-								return;
-							}
-							if (eventData.timestamp- lastCkickTime<500)
-							{
-								CellView.Clear();
-								CellView.style.width = new StyleLength(label.style.width.value.value * 2);
-								VisualElement view = null;
-								if (typeInfo == null || member == null)
+								if (CellView.style.display == DisplayStyle.Flex)
 								{
-									view = CellView.Add("", value, typeof(string), (newValue) =>
+									return;
+								}
+								if (eventData.timestamp - lastCkickTime < 500)
+								{
+									CellView.Clear();
+									CellView.style.width = new StyleLength(label.style.width.value.value * 2);
+									VisualElement view = null;
+									if (typeInfo == null || member == null)
 									{
-										row[title] = (string)newValue;
-										label.text = ((string)newValue)?.Replace("\\n", " ");
-									});
+										view = CellView.Add("", value, typeof(string), (newValue) =>
+										{
+											row[title] = (string)newValue;
+											label.text = ((string)newValue)?.Replace("\\n", " ");
+										});
+									}
+									else
+									{
+										view = CellView.Add("", member.Get(obj), member.Type, (newValue) =>
+										{
+											member.Set(obj, newValue);
+											label.text = member.Get(obj).ToQDataType(member.Type, false)?.Replace("\\n", " ").Trim('\"');
+											label.Tooltip(label.text);
+										}, member.MemeberInfo);
+									}
+									AutoSaveLoad = false;
+									CellView.style.display = DisplayStyle.Flex;
+									var foldout = CellView.Q<Foldout>();
+									if (foldout != null)
+									{
+										foldout.value = true;
+									}
+									lastCkickTime = 0;
 								}
 								else
 								{
-									view = CellView.Add("", member.Get(obj), member.Type, (newValue) =>
-									{
-										member.Set(obj, newValue);
-										label.text = member.Get(obj).ToQDataType(member.Type, false)?.Replace("\\n", " ").Trim('\"');
-										label.Tooltip(label.text);
-									}, member.MemeberInfo);
-								}
-								AutoSaveLoad = false;
-								CellView.style.display = DisplayStyle.Flex;
-								var foldout = CellView.Q<Foldout>();
-								if (foldout != null)
-								{
-									foldout.value = true;
-								}
-								lastCkickTime = 0;
-							}
-							else
-							{
-								lastCkickTime = eventData.timestamp;
-							}
-						});
-						label.AddMenu(menu =>
-						{
-							menu.menu.AppendAction("清空" + title, action =>
-							{
-								if (typeInfo == null || member == null)
-								{
-									row[title] = "";
-									label.text = "";
-								}
-								else
-								{
-									member.Set(obj, null);
-									label.text = member.Get(obj).ToQDataType(member.Type, false)?.Replace("\\n", " ").Trim('\"');
+									lastCkickTime = eventData.timestamp;
 								}
 							});
-						});
+							label.AddMenu(menu =>
+							{
+								menu.menu.AppendAction("清空" + title, action =>
+								{
+									if (typeInfo == null || member == null)
+									{
+										row[title] = "";
+										label.text = "";
+									}
+									else
+									{
+										member.Set(obj, null);
+										label.text = member.Get(obj).ToQDataType(member.Type, false)?.Replace("\\n", " ").Trim('\"');
+									}
+								});
+							});
+						}
 					}
 				}
 				visual.RegisterCallback<MouseDownEvent>(data =>

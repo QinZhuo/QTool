@@ -171,6 +171,7 @@ namespace QTool
 			root = root.AddFoldout(typeInfo.Type.Name, true);
 			foreach (var memeberInfo in typeInfo.Members)
 			{
+				if (memeberInfo.ReadOnly) continue;
 				var value = memeberInfo.Get(component);
 				root.Add(memeberInfo.QName, value, memeberInfo.Type, (value) => memeberInfo.Set(component, value));
 			}
