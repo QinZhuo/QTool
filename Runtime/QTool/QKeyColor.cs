@@ -7,6 +7,8 @@ namespace QTool
 	{
 		[SerializeField]
 		protected Color m_Color;
+		[QName("只控制色调")]
+		public bool onlyHue = true;
 		public void SetKey(string key)
 		{
 			m_Color = key.ToColor();
@@ -16,10 +18,18 @@ namespace QTool
 		{
 			if (graphics.Count > 0)
 			{
+				var h = m_Color.ToH();
 				foreach (var graphic in graphics)
 				{
 					if (graphic == null) continue;
-					graphic.color = m_Color;
+					if (onlyHue)
+					{
+						graphic.SetColorH(h);
+					}
+					else
+					{
+						graphic.color = m_Color;
+					}
 				}
 			}
 			OnColorChange.Invoke(m_Color);
