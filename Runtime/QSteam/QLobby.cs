@@ -89,10 +89,6 @@ namespace QTool
 		{
 			Name = GetData(nameof(Name), Name);
 			State = GetData(nameof(State), QLobbyState.组队);
-			if (Texture != null)
-			{
-				QTextureTool.KeyColors[Key.ToString()] = Texture.Downsample(4).GetMainColor();
-			}
 		}
 		public override string ToString()
 		{

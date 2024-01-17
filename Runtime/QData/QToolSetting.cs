@@ -15,8 +15,13 @@ namespace QTool
 #if Steamworks
 		public uint SteamId = 480;
 #endif
+		
 		[QName(nameof(QKeyColor) + "颜色")]
 		public List<QKeyColorValue> qKeyColorList = new List<QKeyColorValue>();
+		[QName("默认饱和度")]
+		public float DefualtColorSaturation = 0.5f;
+		[QName("默认亮度")]
+		public float DefualtColorValue = 1;
 		[QName("强制分辨率比例"), Tooltip("只有挂载 " + nameof(QScreenAspect) + " 脚本的相机和UI会生效")]
 		public float targetAspect = 16f / 9f;
 		[QName("游戏数据邮箱")]

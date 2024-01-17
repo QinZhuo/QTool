@@ -5,17 +5,15 @@ namespace QTool
 {
 	public static class QTextureTool 
 	{
-		const float DefaultS = 0.5f;
-		const float DefaultV = 1f;
 		static QTextureTool()
 		{
 			foreach (var kv in QToolSetting.Instance.qKeyColorList)
 			{
-				KeyColors[kv.key] = kv.color;
+				KeyColors[kv.key] = kv.color.ToH().ToColor();
 			}
 		}
 		#region 颜色映射
-		public static QDictionary<string, Color> KeyColors= new QDictionary<string, Color>();
+		private static QDictionary<string, Color> KeyColors= new QDictionary<string, Color>();
 		public static Color ParseHtmlColor(this string key)
 		{
 			if (ColorUtility.TryParseHtmlString(key, out var newColor))
@@ -24,11 +22,19 @@ namespace QTool
 			}
 			return default;
 		}
-		public static Color ToColor(this string key, float s = DefaultS, float v = DefaultV)
+		public static Color ToColor(this string key, float s = -1, float v = -1)
 		{
 			if (key.IsNull()) return Color.clear;
 			if (!KeyColors.ContainsKey(key))
 			{
+				if (s == -1)
+				{
+					s = QToolSetting.Instance.DefualtColorSaturation;
+				}
+				if (v == -1)
+				{
+					s = QToolSetting.Instance.DefualtColorValue;
+				}
 				if (key.SplitTowString("/", out var start, out var end))
 				{
 					var colorValue = Mathf.Abs(start.GetHashCode() % 700f) + Mathf.Abs(end.GetHashCode() % 300f);
@@ -43,8 +49,16 @@ namespace QTool
 		}
 		#endregion
 		#region 主色调提取
-		public static Color ToColor(this float h, float s = DefaultS, float v = DefaultV, float a = 1)
+		public static Color ToColor(this float h, float s = -1, float v = -1, float a = 1)
 		{
+			if (s == -1)
+			{
+				s = QToolSetting.Instance.DefualtColorSaturation;
+			}
+			if (v == -1)
+			{
+				s = QToolSetting.Instance.DefualtColorValue;
+			}
 			var color = Color.HSVToRGB(h, s, v);
 			color.a = a;
 			return color;
