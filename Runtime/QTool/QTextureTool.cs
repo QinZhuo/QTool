@@ -9,7 +9,7 @@ namespace QTool
 		{
 			foreach (var kv in QToolSetting.Instance.qKeyColorList)
 			{
-				KeyColors[kv.key] = kv.color.ToH().ToColor();
+				KeyColors[kv.key] = kv.color;
 			}
 		}
 		#region 颜色映射
@@ -33,7 +33,7 @@ namespace QTool
 				}
 				if (v == -1)
 				{
-					v = QToolSetting.Instance.DefualtColorValue;
+					s = QToolSetting.Instance.DefualtColorValue;
 				}
 				if (key.SplitTowString("/", out var start, out var end))
 				{
@@ -57,7 +57,7 @@ namespace QTool
 			}
 			if (v == -1)
 			{
-				v = QToolSetting.Instance.DefualtColorValue;
+				s = QToolSetting.Instance.DefualtColorValue;
 			}
 			var color = Color.HSVToRGB(h, s, v);
 			color.a = a;
