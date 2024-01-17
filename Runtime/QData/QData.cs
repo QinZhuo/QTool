@@ -949,6 +949,7 @@ namespace QTool
 					var member = memeberList[i];
 					if (member != null)
 					{
+						if (member.ReadOnly) continue;
 						var value = row[i].ParseElement();
 						try
 						{
