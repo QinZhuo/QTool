@@ -8,12 +8,16 @@ namespace QTool
 {
 	public abstract class QAssetLoader<TPath, TObj> : MonoBehaviour where TObj : UnityEngine.Object
 	{
+		[QName("开始时加载")]
+		public bool startSetColor = false;
 		[UnityEngine.Serialization.FormerlySerializedAs("OnLoad")]
 		public UnityEvent<TObj> OnLoadEvent = new UnityEvent<TObj>();
-		[QName("刷新")]
-		public void Fresh()
+		public virtual void Start()
 		{
-			InvokeLoad(name);
+			if (startSetColor)
+			{
+				InvokeLoad(name);
+			}
 		}
 		public virtual void OnLoad(TObj obj)
 		{
