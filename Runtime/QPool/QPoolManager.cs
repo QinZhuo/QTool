@@ -110,24 +110,15 @@ namespace QTool
 			}
 		}
 
-		public static TCom Get<TCom>(TCom prefab, Transform parent, Vector3 position = default, Quaternion rotation = default) where TCom : Component
+		public static TCom Get<TCom>(TCom prefab, Transform parent) where TCom : Component
 		{
-			return Get(prefab.gameObject, parent, position, rotation).GetComponent<TCom>();
+			return Get(prefab.gameObject, parent).GetComponent<TCom>();
 		}
-		public static TCom Get<TCom>(TCom prefab, Vector3 position = default, Quaternion rotation = default) where TCom : Component
+		public static TCom Get<TCom>(TCom prefab, Vector3 position, Quaternion rotation = default) where TCom : Component
 		{
 			return Get(prefab.gameObject, position, rotation).GetComponent<TCom>();
 		}
-		public static GameObject Get(GameObject prefab, Transform parent, Vector3 position = default, Quaternion rotation = default)
-		{
-			var obj = Get(prefab, position, rotation);
-			if (parent != null)
-			{
-				obj.transform.SetParent(parent, true);
-			}
-			return obj;
-		}
-		public static GameObject Get(GameObject prefab, Vector3 position = default, Quaternion rotation = default)
+		public static GameObject Get(GameObject prefab, Transform parent = null)
 		{
 			var pool = GetPool(prefab.name, prefab);
 			var obj = pool.Get();
@@ -135,6 +126,17 @@ namespace QTool
 			{
 				obj = pool.Get();
 			}
+			if (parent != null)
+			{
+				obj.transform.SetParent(parent, true);
+				obj.transform.localPosition = Vector3.zero;
+				obj.transform.rotation = Quaternion.identity;
+			}
+			return obj;
+		}
+		public static GameObject Get(GameObject prefab, Vector3 position, Quaternion rotation = default)
+		{
+			var obj = Get(prefab);
 			if (position != default)
 			{
 				obj.transform.position = position;
