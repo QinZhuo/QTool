@@ -33,7 +33,7 @@ namespace QTool
 				}
 				if (v == -1)
 				{
-					s = QToolSetting.Instance.DefualtColorValue;
+					v = QToolSetting.Instance.DefualtColorValue;
 				}
 				if (key.SplitTowString("/", out var start, out var end))
 				{
@@ -57,7 +57,7 @@ namespace QTool
 			}
 			if (v == -1)
 			{
-				s = QToolSetting.Instance.DefualtColorValue;
+				v = QToolSetting.Instance.DefualtColorValue;
 			}
 			var color = Color.HSVToRGB(h, s, v);
 			color.a = a;
