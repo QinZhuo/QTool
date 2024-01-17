@@ -68,14 +68,18 @@ namespace QTool
 		{
 			if (key.IsNull()) return null;
 			key = key.Replace('\\', '/');
-			return await Resources.LoadAsync<TObj>(DirectoryPath + "/" + key) as TObj; 
+			return await Resources.LoadAsync<TObj>(DirectoryPath + "/" + key) as TObj;
 		}
 	}
 	public abstract class QPrefabLoader<TPath> : QAssetLoader<TPath, GameObject> where TPath : QPrefabLoader<TPath>
 	{
-		public static GameObject PoolGet(string key, Transform parent = null)
+		public void InvokePoolGet(string key)
 		{
-			return QPoolManager.Get(DirectoryPath + "_" + key, Load(key), parent);
+			PoolGet(key, transform);
+		}
+		public static GameObject PoolGet(string key, Transform parent)
+		{
+			return QPoolManager.Get(Load(key), parent);
 		}
 	}
 }

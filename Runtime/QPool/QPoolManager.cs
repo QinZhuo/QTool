@@ -145,10 +145,6 @@ namespace QTool
 			}
 			return obj;
 		}
-		public static GameObject Get(string poolKey, GameObject prefab, Transform parent = null)
-		{
-			return GetPool(poolKey, prefab).Get();
-		}
 		public static void Release(GameObject gameObject)
         {
 			var tag= gameObject.GetComponent<QPoolObject>();
