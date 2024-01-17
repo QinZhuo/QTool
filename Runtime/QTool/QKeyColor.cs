@@ -7,8 +7,14 @@ namespace QTool
 	{
 		[SerializeField]
 		protected Color m_Color;
+		[QName("初始设置颜色")]
+		public bool awakeSetColor = false;
 		[QName("只控制色调")]
 		public bool onlyHue = true;
+		private void Awake()
+		{
+			SetKey(name);
+		}
 		public void SetKey(string key)
 		{
 			m_Color = key.ToColor();
