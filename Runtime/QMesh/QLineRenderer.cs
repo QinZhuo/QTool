@@ -20,6 +20,7 @@ namespace QTool
 		public LineRenderer lineRenderer;
 		public void SetEndPostion(Vector3 vector)
 		{
+			lineRenderer.positionCount = 2;
 			lineRenderer.SetPositions(new Vector3[] { transform.position, vector });
 		}
 		private void Reset()
