@@ -117,9 +117,11 @@ namespace QTool
 					Load(value.ToString());
 					if (List.Count == 0 && Language != SystemLanguage.English)
 					{
+						QDebug.LogError("不存在语言[" + value + "]转为英语");
 						Language = SystemLanguage.English;
 						return;
 					}
+					QDebug.Log(nameof(QLocalization) + " : " + value);
 					OnLanguageChange?.Invoke();
 				}
 			}
