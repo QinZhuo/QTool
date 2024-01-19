@@ -7,9 +7,10 @@ namespace QTool
 	public class QLobby : IKey<ulong>
 	{
 		public ulong Key { get; set; }
-		public string Name { get; set; }
-		public QLobbyState State { get; set; }
+		public string Name { get; private set; }
+		public QLobbyState State { get;private set; }
 		public ulong Owner { get; set; }
+		public ulong[] FixedMembers { get; private set; } = new ulong[0];
 		[QIgnore]
 		public QList<ulong, QLobbyMember> Members { get; private set; } = new QList<ulong, QLobbyMember>(() => new QLobbyMember());
 		public int MemberLimit { get; set; }
@@ -25,6 +26,7 @@ namespace QTool
 		{
 			Name = GetData(nameof(Name), Name);
 			State = GetData(nameof(State), QLobbyState.组队);
+			FixedMembers = GetData(nameof(FixedMembers), FixedMembers);
 		}
 		public bool IsNull()
 		{
