@@ -61,7 +61,7 @@ namespace QTool
 				}
 			}
 		}
-		public static void SetScriptingDefineSymbols(params string[] Symbols)
+		public static void SetScriptingDefineSymbolsByCscRsp(params string[] Symbols)
 		{
 			if (Symbols.Length == 0)
 			{
