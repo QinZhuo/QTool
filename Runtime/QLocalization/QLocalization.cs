@@ -95,9 +95,9 @@ namespace QTool
 				}
 				text = text.ForeachBlockValue('{', '}', subKey =>
 				{
-					if (ContainsKey(key))
+					if (ContainsKey(subKey))
 					{
-						return GetLozalization(key);
+						return GetLozalization(subKey);
 					}
 					else
 					{
