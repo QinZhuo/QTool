@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using UnityEngine;
 namespace QTool
 {
-
 	public class QKeyColor : MonoBehaviour
 	{
 		[SerializeField]
@@ -45,7 +44,7 @@ namespace QTool
 		}
 		[UnityEngine.Serialization.FormerlySerializedAs("OnKeyChange")]
 		public ColorEvent OnColorChange = new ColorEvent();
-		public List<UnityEngine.UI.Graphic> graphics = new List<UnityEngine.UI.Graphic>();
+		public List<UnityEngine.UI.Graphic> graphics = new List<UnityEngine.UI.Graphic>(); 
 	}
 }
 
