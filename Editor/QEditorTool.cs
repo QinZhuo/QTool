@@ -70,6 +70,7 @@ namespace QTool
 		public static void PopCscRsp()
 		{
 			QFileTool.Save(CscRspPath, CscRspStack.Pop());
+			//AssetDatabase.Refresh();
 		}
 		public static void SetScriptingDefineSymbolsByCscRsp(params string[] Symbols)
 		{
@@ -81,6 +82,7 @@ namespace QTool
 			{
 				QFileTool.Save(CscRspPath, "-define:" + Symbols.ToOneString(" "));
 			}
+			//AssetDatabase.Refresh();
 		}
 		[MenuItem("QTool/测试/终端命令")]
 		public static void ProcessCommand()
