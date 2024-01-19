@@ -11,7 +11,6 @@ namespace QTool
 		public QLobbyState State { get;private set; }
 		public ulong Owner { get; set; }
 		public ulong[] FixedMembers { get; private set; } = new ulong[0];
-		public Texture2D Texture { get; set; }
 		[QIgnore]
 		public QList<ulong, QLobbyMember> Members { get; private set; } = new QList<ulong, QLobbyMember>(() => new QLobbyMember());
 		public int MemberLimit { get; set; }
