@@ -29,8 +29,8 @@ namespace QTool
 			}
 		}
 		#endregion
-		public StringEvent OnKeyChange;
-		public StringEvent OnLocalizationChange;
+		public StringEvent OnKeyChange = new StringEvent();
+		public StringEvent OnLocalizationChange = new StringEvent();
 		private void Awake()
 		{
 			QLocalizationData.OnLanguageChange += FreshFont;
