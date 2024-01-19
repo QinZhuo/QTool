@@ -386,7 +386,7 @@ namespace QTool.Steam
 		}
 		public static bool HasLobby(this CSteamID lobby)
 		{
-			return SteamMatchmaking.GetNumLobbyMembers(lobby) > 0;
+			return SteamMatchmaking.GetNumLobbyMembers(lobby) > 1 || (SteamMatchmaking.GetNumLobbyMembers(lobby) == 1 && SteamMatchmaking.GetLobbyMemberByIndex(lobby, 0) != Id);
 		}
 		public static async Task<bool> CreateLobby(int maxMembers = 10, ELobbyType eLobbyType = ELobbyType.k_ELobbyTypePublic)
 		{
