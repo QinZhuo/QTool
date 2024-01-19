@@ -61,7 +61,7 @@ namespace QTool
 				}
 			}
 		}
-		public static void SetScriptingDefineSymbolsByCscRsp(params string[] Symbols)
+		public static void SetScriptingDefineSymbols(params string[] Symbols)
 		{
 			if (Symbols.Length == 0)
 			{
@@ -71,7 +71,6 @@ namespace QTool
 			{
 				QFileTool.Save("Assets/csc.rsp", "-define:" + Symbols.ToOneString(" "));
 			}
-			AssetDatabase.Refresh();
 		}
 		[MenuItem("QTool/测试/终端命令")]
 		public static void ProcessCommand()
@@ -137,10 +136,10 @@ namespace QTool
 		[MenuItem("QTool/测试/运行测试包")]
 		private static void RunBuild()
 		{
-			var path = PlayerPrefs.GetString(nameof(QToolBuild));
+			var path = PlayerPrefs.GetString(nameof(QBuildPlayerTool));
 			if (path.IsNull())
 			{
-				Debug.LogError(nameof(QToolBuild) + " 测试包路径为空");
+				Debug.LogError(nameof(QBuildPlayerTool) + " 测试包路径为空");
 				return;
 			}
 			try

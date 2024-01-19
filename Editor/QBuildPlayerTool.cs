@@ -9,15 +9,16 @@ using UnityEngine;
 namespace QTool
 {
 
-	public class QToolBuild: IPreprocessBuildWithReport, IPostprocessBuildWithReport
+	public class QBuildPlayerTool: IPreprocessBuildWithReport, IPostprocessBuildWithReport
 	{
 		public int callbackOrder => 0;
 		//打包前处理
 		public void OnPreprocessBuild(BuildReport report) 
 		{
+			AssetDatabase.Refresh();
 			QTool.IsBuilding = true;
 			QDebug.Log("开始打包[" + report.summary.platformGroup + "]" + report.summary.outputPath);
-			PlayerPrefs.SetString(nameof(QToolBuild), report.summary.outputPath);
+			PlayerPrefs.SetString(nameof(QBuildPlayerTool), report.summary.outputPath);
 			var path = Path.GetDirectoryName(report.summary.outputPath);
 			if (!Application.dataPath.StartsWith(path))
 			{
