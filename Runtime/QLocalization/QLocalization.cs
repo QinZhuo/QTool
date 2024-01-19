@@ -46,7 +46,11 @@ namespace QTool
 		}
 		private void Start()
 		{
-			FreshLocalization();
+			FreshFont();
+			if (!key.IsNull())
+			{
+				FreshLocalization();
+			}
 		}
 		private void OnDestroy()
 		{
