@@ -15,6 +15,7 @@ namespace QTool
 		//打包前处理
 		public void OnPreprocessBuild(BuildReport report)
 		{
+			AssetDatabase.Refresh();
 			QDebug.Log("开始打包[" + report.summary.platformGroup + "]" + report.summary.outputPath);
 			PlayerPrefs.SetString(nameof(QBuildPlayerTool), report.summary.outputPath);
 			var path = Path.GetDirectoryName(report.summary.outputPath);
@@ -63,13 +64,9 @@ namespace QTool
 			QEventManager.InvokeEvent("游戏版本", PlayerSettings.bundleVersion);
 			QDebug.Log("打包完成 " + report.summary.outputPath);
 		}
-		public static void Build(BuildTarget buildTarget, string ScriptingDefine = null)
+		public static string GetBuildPath(BuildTarget buildTarget, string versionName = null)
 		{
-			Build(buildTarget, BuildOptions.None, ScriptingDefine);
-		}
-		public static string GetBuildPath(BuildTarget buildTarget)
-		{
-			var path = nameof(Build) + "/" + buildTarget + "/" + Application.productName;
+			var path = nameof(Build) + "/" + buildTarget + "/" + (versionName.IsNull() ? "" : versionName + "/") + Application.productName;
 			switch (buildTarget)
 			{
 				case BuildTarget.StandaloneWindows:
@@ -87,14 +84,14 @@ namespace QTool
 			}
 			return path;
 		}
-		public static void Build(BuildTarget buildTarget, BuildOptions buildOptions, string ScriptingDefine = null)
+		public static void Build(BuildTarget buildTarget, string versionName = null, string ScriptingDefine = null, BuildOptions buildOptions = BuildOptions.None)
 		{
 			if (ScriptingDefine != null)
 			{
 				QEditorTool.PushCscRsp();
 				QEditorTool.SetScriptingDefineSymbolsByCscRsp();
 			}
-			BuildPipeline.BuildPlayer(EditorBuildSettings.scenes, GetBuildPath(buildTarget), buildTarget, buildOptions);
+			BuildPipeline.BuildPlayer(EditorBuildSettings.scenes, GetBuildPath(buildTarget, versionName), buildTarget, buildOptions);
 			if (ScriptingDefine != null)
 			{
 				QEditorTool.PopCscRsp();
