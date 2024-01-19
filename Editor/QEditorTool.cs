@@ -65,11 +65,11 @@ namespace QTool
 		{
 			if (Symbols.Length == 0)
 			{
-				QFileTool.Save("csc.rsp", "");
+				QFileTool.Save("Assets/csc.rsp", "");
 			}
 			else
 			{
-				QFileTool.Save("csc.rsp", "-define:" + Symbols.ToOneString(" "));
+				QFileTool.Save("Assets/csc.rsp", "-define:" + Symbols.ToOneString(" "));
 			}
 			AssetDatabase.Refresh();
 		}
