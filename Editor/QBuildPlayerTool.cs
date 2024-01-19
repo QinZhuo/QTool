@@ -67,7 +67,7 @@ namespace QTool
 		{
 			Build(buildTarget, BuildOptions.None, ScriptingDefine);
 		}
-		public static void Build(BuildTarget buildTarget, BuildOptions buildOptions, string ScriptingDefine = null)
+		public static string GetBuildPath(BuildTarget buildTarget)
 		{
 			var path = nameof(Build) + "/" + buildTarget + "/" + Application.productName;
 			switch (buildTarget)
@@ -85,12 +85,16 @@ namespace QTool
 				default:
 					break;
 			}
+			return path;
+		}
+		public static void Build(BuildTarget buildTarget, BuildOptions buildOptions, string ScriptingDefine = null)
+		{
 			if (ScriptingDefine != null)
 			{
 				QEditorTool.PushCscRsp();
 				QEditorTool.SetScriptingDefineSymbolsByCscRsp();
 			}
-			BuildPipeline.BuildPlayer(EditorBuildSettings.scenes, path, buildTarget, buildOptions);
+			BuildPipeline.BuildPlayer(EditorBuildSettings.scenes, GetBuildPath(buildTarget), buildTarget, buildOptions);
 			if (ScriptingDefine != null)
 			{
 				QEditorTool.PopCscRsp();
