@@ -89,7 +89,11 @@ namespace QTool
 			if (ContainsKey(key))
 			{
 				var text = Get(key).Localization;
-				text.ForeachBlockValue('{', '}', subKey =>
+				if (text.EndsWith(AutoTranslateEndKey))
+				{
+					text = text.Substring(0, text.Length - AutoTranslateEndKey.Length);
+				}
+				text = text.ForeachBlockValue('{', '}', subKey =>
 				{
 					if (ContainsKey(key))
 					{
@@ -100,10 +104,6 @@ namespace QTool
 						return "{" + subKey + "}";
 					}
 				});
-				if (text.EndsWith(AutoTranslateEndKey))
-				{
-					text = text.Substring(0, text.Length - AutoTranslateEndKey.Length);
-				}
 				return text;
 			}
 			else
