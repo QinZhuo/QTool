@@ -38,7 +38,7 @@ namespace QTool
 		}
 		private void Reset()
 		{
-			var text = GetComponentInChildren<UnityEngine.UI.Text>();
+			var text = GetComponentInChildren<Text>();
 			if (text != null)
 			{
 				OnLocalizationChange.AddPersistentListener(text.GetAction<string>("set_text"));
@@ -89,6 +89,17 @@ namespace QTool
 			if (ContainsKey(key))
 			{
 				var text = Get(key).Localization;
+				text.ForeachBlockValue('{', '}', subKey =>
+				{
+					if (ContainsKey(key))
+					{
+						return GetLozalization(key);
+					}
+					else
+					{
+						return "{" + subKey + "}";
+					}
+				});
 				if (text.EndsWith(AutoTranslateEndKey))
 				{
 					text = text.Substring(0, text.Length - AutoTranslateEndKey.Length);
