@@ -9,14 +9,12 @@ using UnityEngine;
 namespace QTool
 {
 
-	public class QBuildPlayerTool: IPreprocessBuildWithReport, IPostprocessBuildWithReport
+	public class QBuildPlayerTool : IPreprocessBuildWithReport, IPostprocessBuildWithReport
 	{
 		public int callbackOrder => 0;
 		//打包前处理
-		public void OnPreprocessBuild(BuildReport report) 
+		public void OnPreprocessBuild(BuildReport report)
 		{
-			AssetDatabase.Refresh();
-			QTool.IsBuilding = true;
 			QDebug.Log("开始打包[" + report.summary.platformGroup + "]" + report.summary.outputPath);
 			PlayerPrefs.SetString(nameof(QBuildPlayerTool), report.summary.outputPath);
 			var path = Path.GetDirectoryName(report.summary.outputPath);
@@ -64,7 +62,39 @@ namespace QTool
 			PlayerSettings.bundleVersion = versions.ToOneString(".");
 			QEventManager.InvokeEvent("游戏版本", PlayerSettings.bundleVersion);
 			QDebug.Log("打包完成 " + report.summary.outputPath);
-			QTool.IsBuilding = false;
+		}
+		public static void Build(BuildTarget buildTarget, string ScriptingDefine = null)
+		{
+			Build(buildTarget, BuildOptions.None, ScriptingDefine);
+		}
+		public static void Build(BuildTarget buildTarget, BuildOptions buildOptions, string ScriptingDefine = null)
+		{
+			var path = nameof(Build) + "/" + buildTarget + "/" + Application.productName;
+			switch (buildTarget)
+			{
+				case BuildTarget.StandaloneWindows:
+				case BuildTarget.StandaloneWindows64:
+					path += ".exe";
+					break;
+				case BuildTarget.StandaloneOSX:
+					path += ".app";
+					break;
+				case BuildTarget.Android:
+					path += ".apk";
+					break;
+				default:
+					break;
+			}
+			if (ScriptingDefine != null)
+			{
+				QEditorTool.PushCscRsp();
+				QEditorTool.SetScriptingDefineSymbolsByCscRsp();
+			}
+			BuildPipeline.BuildPlayer(EditorBuildSettings.scenes, path, buildTarget, buildOptions);
+			if (ScriptingDefine != null)
+			{
+				QEditorTool.PopCscRsp();
+			}
 		}
 	}
 }

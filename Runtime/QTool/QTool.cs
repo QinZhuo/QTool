@@ -29,7 +29,17 @@ namespace QTool
     public static class QTool
     {
 		public static bool IsPlaying => Application.isPlaying && !QToolManager.Destoryed;
-		public static bool IsBuilding { set; get; }
+		public static bool IsBuilding
+		{
+			get
+			{
+#if UNITY_EDITOR
+				return UnityEditor.BuildPipeline.isBuildingPlayer;
+#else
+				return false;
+#endif
+			}
+		}
 		private static string _LocalIp = null;
 		public static string LocalIp => _LocalIp??= Dns.GetHostEntry(Dns.GetHostName()).AddressList.FirstOrDefault(a => a.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork).ToString();
 

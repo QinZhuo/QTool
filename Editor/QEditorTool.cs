@@ -61,15 +61,25 @@ namespace QTool
 				}
 			}
 		}
+		private const string CscRspPath = "Assets/csc.rsp";
+		private static Stack<string> CscRspStack = new Stack<string>();
+		public static void PushCscRsp()
+		{
+			CscRspStack.Push(QFileTool.Load(CscRspPath));
+		}
+		public static void PopCscRsp()
+		{
+			QFileTool.Save(CscRspPath, CscRspStack.Pop());
+		}
 		public static void SetScriptingDefineSymbolsByCscRsp(params string[] Symbols)
 		{
 			if (Symbols.Length == 0)
 			{
-				QFileTool.Save("Assets/csc.rsp", "");
+				QFileTool.Save(CscRspPath, "");
 			}
 			else
 			{
-				QFileTool.Save("Assets/csc.rsp", "-define:" + Symbols.ToOneString(" "));
+				QFileTool.Save(CscRspPath, "-define:" + Symbols.ToOneString(" "));
 			}
 		}
 		[MenuItem("QTool/测试/终端命令")]
