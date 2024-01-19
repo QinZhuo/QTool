@@ -279,6 +279,10 @@ namespace QTool
 		{
 			return com != null && com.gameObject.activeSelf;
 		}
+		public static bool IsNull(this string str)
+		{
+			return string.IsNullOrWhiteSpace(str);
+		}
 		public static bool IsNull<T>(this T obj)
 		{
 			T checkObj = default;
