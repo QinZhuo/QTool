@@ -615,7 +615,14 @@ namespace QTool
 					}
 					else
 					{
-						return File.ReadAllText(path);
+						if (ExistsFile(path))
+						{
+							return File.ReadAllText(path);
+						}
+						else
+						{
+							return defaultValue;
+						}
 					}
 				}
 			}
