@@ -22,11 +22,19 @@ namespace QTool
 				return Members[playerId];
 			}
 		}
-		public void Init()
+		public void Update()
 		{
 			Name = GetData(nameof(Name), Name);
 			State = GetData(nameof(State), QLobbyState.组队);
 			FixedMembers = GetData(nameof(FixedMembers), FixedMembers);
+			foreach (var memeber in Members)
+			{
+				memeber.Update();
+			}
+			if (this == CurrentLobby)
+			{
+				OnLobbyUpdate?.Invoke();
+			}
 		}
 		public bool IsNull()
 		{
@@ -60,7 +68,7 @@ namespace QTool
 		{
 			CurrentLobby = new QLobby();
 		} 
-		public static Action OnUpdate = null;
+		public static event Action OnLobbyUpdate = null;
 		#endregion
 	
 	}
@@ -87,7 +95,7 @@ namespace QTool
 				return defaultValue;
 			}
 		}
-		public void Init()
+		internal void Update()
 		{
 			Name = GetData(nameof(Name), Name);
 			State = GetData(nameof(State), QLobbyState.组队);

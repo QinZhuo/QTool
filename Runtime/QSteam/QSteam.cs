@@ -259,7 +259,7 @@ namespace QTool.Steam
 			lobby.Data[key] = data;
 			if (lobby.IsNull())
 			{
-				QLobby.OnUpdate?.Invoke();
+				lobby.Update();
 			}
 			else
 			{
@@ -280,7 +280,7 @@ namespace QTool.Steam
 			MemeberData[key] = data;
 			if (QLobby.CurrentLobby.IsNull())
 			{
-				QLobby.OnUpdate?.Invoke();
+				QLobby.CurrentLobby.Update();
 			}
 			else
 			{
@@ -440,11 +440,14 @@ namespace QTool.Steam
 				QDebug.Log("加入房间[" + currentlobbyId + "]");
 			}
 			QLobby.CurrentLobby.FreshData();
-			QLobby.OnUpdate?.Invoke();
 		}
 		private static void FreshData(this QLobby lobby)
 		{
-			if (lobby.Key == 0) return;
+			if (lobby.Key == 0)
+			{
+				lobby.Update();
+				return;
+			}
 			var lobbyId = lobby.Key.ToSteamId();
 			lobby.Owner = SteamMatchmaking.GetLobbyOwner(lobbyId).m_SteamID;
 			lobby.Members.Clear();
@@ -460,7 +463,6 @@ namespace QTool.Steam
 				{
 					SteamMatchmaking.GetLobbyMemberData(lobbyId, memeberId, nameof(memeber.Data)).ParseQData(memeber.Data);
 				}
-				memeber.Init();
 			}
 			lobby.Data.Clear();
 			var count = SteamMatchmaking.GetLobbyDataCount(lobbyId);
@@ -474,7 +476,7 @@ namespace QTool.Steam
 					continue;
 				}
 			}
-			lobby.Init();
+			lobby.Update();
 			QDebug.Log(nameof(QSteam) + " 房间信息更新 " + lobby + "\n" + lobby.Members.ToOneString());
 		}
 		public static void AddLobbyFilter(string key, string value, ELobbyComparison comparison = ELobbyComparison.k_ELobbyComparisonEqual)
