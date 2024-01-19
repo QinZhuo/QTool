@@ -60,9 +60,16 @@ namespace QTool
 				var count = OnLocalizationChange.GetPersistentEventCount();
 				for (int i = 0; i < count; i++)
 				{
-					if (OnLocalizationChange.GetPersistentTarget(count) is Text text)
+					try
 					{
-						text.font = QLocalizationData.FontInfo.font;
+						if (OnLocalizationChange.GetPersistentTarget(count) is Text text)
+						{
+							text.font = QLocalizationData.FontInfo.font;
+						}
+					}
+					catch (System.Exception e)
+					{
+						QDebug.LogWarning(transform.GetPath() + " 更改字体出错 " + i + "/" + count + " ：" + e);
 					}
 				}
 			}
