@@ -18,6 +18,8 @@ namespace QTool
 		
 		[QName(nameof(QKeyColor) + "颜色")]
 		public List<QKeyColorValue> qKeyColorList = new List<QKeyColorValue>();
+		[QName(nameof(QLocalization) + "字体")]
+		public List<QLocalizationFont> qLocalizationFontList = new List<QLocalizationFont>();
 		[QName("默认饱和度")]
 		public float DefualtColorSaturation = 0.6f;
 		[QName("默认亮度")]
@@ -62,16 +64,13 @@ namespace QTool
 		}
 		public static List<QKeyColorValue> ColorList => Instance.qKeyColorList;
 	}
-	[System.Serializable]
-	public class QKeyColorList : QList<string, QKeyColorValue>
-	{
-
-	}
+	
 	[System.Serializable]
 	public struct QKeyColorValue : IKey<string>
 	{
-		public string Key { get => key; set => value = key; }
+		public string Key { get => key; set => key = value; }
 		public string key;
 		public Color color;
 	}
+
 }

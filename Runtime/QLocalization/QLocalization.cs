@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.UI;
+
 namespace QTool
 {
 	public class QLocalization : MonoBehaviour
@@ -31,6 +33,7 @@ namespace QTool
 		public StringEvent OnLocalizationChange;
 		private void Awake()
 		{
+			QLocalizationData.OnLanguageChange += FreshFont;
 			QLocalizationData.OnLanguageChange += FreshLocalization;
 		}
 		private void Reset()
@@ -47,7 +50,22 @@ namespace QTool
 		}
 		private void OnDestroy()
 		{
+			QLocalizationData.OnLanguageChange -= FreshFont;
 			QLocalizationData.OnLanguageChange -= FreshLocalization;
+		}
+		protected virtual void FreshFont()
+		{
+			if (!QLocalizationData.FontInfo.IsNull())
+			{
+				var count = OnLocalizationChange.GetPersistentEventCount();
+				for (int i = 0; i < count; i++)
+				{
+					if (OnLocalizationChange.GetPersistentTarget(count) is Text text)
+					{
+						text.font = QLocalizationData.FontInfo.font;
+					}
+				}
+			}
 		}
 		private void FreshLocalization()
 		{
@@ -97,6 +115,7 @@ namespace QTool
 			}
 		}
 		private static SystemLanguage _Language = SystemLanguage.Unknown;
+		public static QLocalizationFont FontInfo { get; private set; } = default;
 		public static SystemLanguage Language
 		{
 			get => _Language;
@@ -113,6 +132,7 @@ namespace QTool
 						Language = SystemLanguage.English;
 						return;
 					}
+					FontInfo = QToolSetting.Instance.qLocalizationFontList.Get(Language);
 					QDebug.Log(nameof(QLocalization) + " : " + value);
 					OnLanguageChange?.Invoke();
 				}
@@ -181,6 +201,13 @@ namespace QTool
 			return code.ToString().Replace('_', '-').TrimStart('-');
 		}
 
+	}
+	[System.Serializable]
+	public struct QLocalizationFont : IKey<SystemLanguage>
+	{
+		public SystemLanguage Key { get => language; set => language = value; }
+		public SystemLanguage language;
+		public Font font;
 	}
 	public enum QLocalizationCode
 	{
