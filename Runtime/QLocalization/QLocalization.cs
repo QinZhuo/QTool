@@ -98,7 +98,6 @@ namespace QTool
 					return "{" + (Params.Count - 1) + "}";
 				});
 			}
-			var containsSub = false;
 			var text = key;
 			if (ContainsKey(key))
 			{
@@ -107,30 +106,27 @@ namespace QTool
 				{
 					text = text.Substring(0, text.Length - AutoTranslateEndKey.Length);
 				}
-				if (Params != null)
-				{
-					text = string.Format(text, Params.ToArray());
-				}
 			}
-			else if (!(containsSub = key.Contains('{')))
+			else if (Params == null && !key.Contains('{'))
 			{
-				QDebug.LogWarning("缺少翻译[" + key + "]" + Language);
+				QDebug.LogWarning(nameof(QLocalizationData) + " 缺少翻译[" + key + "]");
 				return key;
 			}
-			if (containsSub)
+			if (Params != null)
 			{
-				text = text.ForeachBlockValue('{', '}', subKey =>
-				{
-					if (ContainsKey(subKey))
-					{
-						return GetLozalization(subKey);
-					}
-					else
-					{
-						return "{" + subKey + "}";
-					}
-				});
+				text = string.Format(text, Params.ToArray());
 			}
+			text = text.ForeachBlockValue('{', '}', subKey =>
+			{
+				if (ContainsKey(subKey))
+				{
+					return GetLozalization(subKey);
+				}
+				else
+				{
+					return "{" + subKey + "}";
+				}
+			});
 			return text;
 		}
 		public const string AutoTranslateEndKey = " [Auto]";
