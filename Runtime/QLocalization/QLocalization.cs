@@ -156,9 +156,9 @@ namespace QTool
 	#region Tool
 	public static class QLocalizationTool
 	{
-		public static string ToLozalization(this string key, params object[] Params)
+		public static string Format(this string key, params object[] Params)
 		{
-			return string.Format(QLocalizationData.GetLozalization(key), Params);
+			return string.Format(key, Params);
 		}
 		public static string ToLozalizationKey(this string key, bool withColor = true)
 		{
