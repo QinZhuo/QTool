@@ -188,14 +188,14 @@ namespace QTool
 		public static async Task PreLoadAsync()
 		{
 			if (LoadAllOver) return;
-			LoadAllOver = true;
+			LoadAllOver = true;;
 			foreach (var type in typeof(QDataList<>).GetAllTypes())
 			{
 				await QTask.Step();
 				var result = type.InvokeStaticFunction(nameof(PreLoadAsync));
 				if (result is Task task)
 				{
-					QSceneTool.PreLoadList.Add(task);
+					task.PreLoadRun();
 				}
 			}
 		}
