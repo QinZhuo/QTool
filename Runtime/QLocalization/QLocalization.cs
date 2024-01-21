@@ -83,17 +83,18 @@ namespace QTool
 	}
 	public class QLocalizationData : QDataList<QLocalizationData>
 	{
+		private static List<object> Params = new List<object>();
 		public static string GetLozalization(string key)
 		{
 			if (key.IsNull()) return key;
-			object[] Params = null;
-			if (key.EndsWith(FormatEndKey) && key.SplitTowString(FormatStartKey, out key, out var end))
+			if (key.Contains(FormatStart))
 			{
-				var data = end.Substring(0, end.Length - FormatEndKey.Length).Split('|');
-				for (int i = 0; i < data.Length; i++)
+				Params.Clear();
+				key = key.ForeachBlockValue(FormatStart, FormatEnd, key =>
 				{
-					Params[i] = data[i];
-				}
+					Params.Add(key);
+					return "{" + (Params.Count - 1) + "}";
+				});
 			}
 			if (ContainsKey(key))
 			{
@@ -102,9 +103,9 @@ namespace QTool
 				{
 					text = text.Substring(0, text.Length - AutoTranslateEndKey.Length);
 				}
-				if (Params != null)
+				if (Params.Count > 0)
 				{
-					text = string.Format(text, Params);
+					text = string.Format(text, Params.ToArray());
 				}
 				text = text.ForeachBlockValue('{', '}', subKey =>
 				{
@@ -126,8 +127,8 @@ namespace QTool
 			return key;
 		}
 		public const string AutoTranslateEndKey = " [Auto]";
-		public const string FormatStartKey = " [Format|";
-		public const string FormatEndKey = "]";
+		public const char FormatStart = '[';
+		public const char FormatEnd = ']';
 		[QName]
 		public string Localization { get; private set; }
 		static QLocalizationData()
@@ -171,9 +172,13 @@ namespace QTool
 	#region Tool
 	public static class QLocalizationTool
 	{
-		public static string ToLozalizationKey(this string key, params string[] Params)
+		public static string ToLozalizationKey(this string key, params object[] Params)
 		{
-			return key + QLocalizationData.FormatStartKey + Params.ToOneString("|") + QLocalizationData.FormatEndKey;
+			for (int i = 0; i < Params.Length; i++)
+			{
+				Params[i] = QLocalizationData.FormatStart + Params[i]?.ToString() + QLocalizationData.FormatEnd;
+			}
+			return string.Format(key, Params);
 		}
 		public static string ToLozalizationColorKey(this object key)
 		{
