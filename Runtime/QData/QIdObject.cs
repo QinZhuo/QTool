@@ -57,7 +57,7 @@ namespace QTool
 			}
 		}
 #endif
-
+		private const string ResourcesKey = "/" + nameof(Resources) + "/";
 		public static string GetQId(Object obj)
 		{
 			if (obj != null)
@@ -77,23 +77,26 @@ namespace QTool
 					if (!AssetIdCache.ContainsKey(obj))
 					{
 						var key = UnityEditor.AssetDatabase.GetAssetPath(obj);
+						if (key.Contains(ResourcesKey))
+						{
+							key = ResourcesKey + key.SplitEndString(ResourcesKey);
+						}
+						else
+						{
+							var qidr = ScriptableObject.CreateInstance<QIdReference>();
+							qidr.obj = obj;
+							var path = ResourcesKey + nameof(QIdReference) + "/" + key.WithoutExtension() + ".asset";
+							path = QFileTool.CheckDirectoryPath(path);
+							UnityEditor.AssetDatabase.CreateAsset(qidr, path);
+							if (!Application.isPlaying)
+							{
+								UnityEditor.AssetDatabase.Refresh();
+							}
+							QDebug.Log("生成对象 " + obj.GetType() + " 引用Id：" + key + " 文件路径:" + path);
+							key = ResourcesKey + path.SplitEndString(ResourcesKey);
+						}
 						AssetIdCache.Add(obj, key);
 						AssetObjectCache.Add(key, obj);
-						if (key.Contains("/" + nameof(Resources) + "/") || key.StartsWith(nameof(Resources) + "/"))
-						{
-							return key;
-						}
-						var qidr = ScriptableObject.CreateInstance<QIdReference>();
-						qidr.obj = obj;
-						var path = "Assets/Resources/" + nameof(QIdReference) + "/" + key + ".asset";
-						path = QFileTool.CheckDirectoryPath(path);
-						UnityEditor.AssetDatabase.CreateAsset(qidr, path);
-						if (!Application.isPlaying)
-						{
-							UnityEditor.AssetDatabase.Refresh();
-						}
-						QDebug.Log("生成对象 " + obj.GetType() + " 引用Id：" + key + " 文件路径:" + path);
-
 					}
 					return AssetIdCache[obj];
 				}
@@ -141,7 +144,7 @@ namespace QTool
 		private static string GetResourcesPath(string id)
 		{
 			string loadPath = null;
-			if (id.Contains("/" + nameof(Resources) + "/"))
+			if (id.Contains(ResourcesKey))
 			{
 				loadPath = id.SplitEndString("/" + nameof(Resources) + "/");
 				if (loadPath.Contains("."))
@@ -151,7 +154,7 @@ namespace QTool
 			}
 			else
 			{
-				loadPath = nameof(QIdReference) + "/" + id;
+				loadPath = nameof(QIdReference) + "/" + id.WithoutExtension();
 			}
 			return loadPath;
 		}
