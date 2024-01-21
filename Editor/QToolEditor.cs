@@ -83,7 +83,7 @@ namespace QTool
 		{
 			if (Symbols.IsNull())
 			{
-				QFileTool.Save(CscRspPath, " ");
+				QFileTool.FileDelete(CscRspPath);
 			}
 			else
 			{
