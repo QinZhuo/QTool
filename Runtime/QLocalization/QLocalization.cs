@@ -127,17 +127,17 @@ namespace QTool
 				Debug.LogError(text + " [" + Params.ToOneString("|") + "] " );
 				text = string.Format(text, Params.ToArray());
 			}
-			//text = text.ForeachBlockValue('{', '}', subKey =>
-			//{
-			//	if (ContainsKey(subKey))
-			//	{
-			//		return GetLozalization(subKey);
-			//	}
-			//	else
-			//	{
-			//		return "{" + subKey + "}";
-			//	}
-			//});
+			text = text.ForeachBlockValue('{', '}', subKey =>
+			{
+				if (ContainsKey(subKey))
+				{
+					return GetLozalization(subKey);
+				}
+				else
+				{
+					return "{" + subKey + "}";
+				}
+			});
 			return text;
 		}
 		public const string AutoTranslateEndKey = " [Auto]";
