@@ -21,9 +21,9 @@ using UnityEditor.AddressableAssets.Settings;
 namespace QTool
 {
 	[InitializeOnLoad]
-	public static class QEditorTool
+	public static class QToolEditor
 	{
-		static QEditorTool()
+		static QToolEditor()
 		{
 			Editor.finishedDefaultHeaderGUI += OnHeaderGUI;
 			EditorApplication.hierarchyWindowItemOnGUI += OnHierarchyGUI;
@@ -90,7 +90,8 @@ namespace QTool
 				QFileTool.Save(CscRspPath, "-define:" + Symbols);
 			}
 		}
-		[MenuItem("QTool/测试/终端命令")]
+		
+		[MenuItem("QTool/命令/终端命令")]
 		public static void ProcessCommand()
 		{
 			EditorUtility.ClearProgressBar();
@@ -146,13 +147,9 @@ namespace QTool
 				});
 			}, "文件夹路径");
 		}
-		[MenuItem("QTool/测试/QId对象信息")]
-		public static void QIdObjectInfo()
-		{
-			Debug.LogError(nameof(QId) + "信息 \n" + QId.InstanceIdList.ToOneString());
-		}
-		[MenuItem("QTool/测试/运行测试包")]
-		private static void RunBuild()
+		
+		[MenuItem("QTool/打包/运行包")]
+		public static void RunBuild()
 		{
 			var path = PlayerPrefs.GetString(nameof(QBuildPlayerTool));
 			if (path.IsNull())

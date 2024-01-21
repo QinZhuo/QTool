@@ -80,13 +80,13 @@ namespace QTool
 		{
 			if (ScriptingDefine != null)
 			{
-				QEditorTool.PushCscRsp();
-				QEditorTool.SetScriptingDefineSymbolsByCscRsp(ScriptingDefine);
+				QToolEditor.PushCscRsp();
+				QToolEditor.SetScriptingDefineSymbolsByCscRsp(ScriptingDefine);
 			}
 			BuildPipeline.BuildPlayer(EditorBuildSettings.scenes, GetBuildPath(buildTarget, ScriptingDefine), buildTarget, buildOptions);
 			if (ScriptingDefine != null)
 			{
-				QEditorTool.PopCscRsp();
+				QToolEditor.PopCscRsp();
 			}
 		}
 	}
