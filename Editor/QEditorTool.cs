@@ -72,7 +72,7 @@ namespace QTool
 			var data = CscRspStack.Pop();
 			if (data.IsNull())
 			{
-				File.Delete(CscRspPath);
+				QFileTool.FileDelete(CscRspPath);
 			}
 			else
 			{
