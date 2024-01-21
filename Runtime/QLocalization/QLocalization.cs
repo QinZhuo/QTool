@@ -109,17 +109,21 @@ namespace QTool
 					Params = new List<object>();
 					subKey = subKey.ForeachBlockValue(FormatStart, FormatEnd, key =>
 					{
+						if (key.Contains('{'))
+						{
+							key = GetLozalization(key);
+						}
 						Params.Add(key);
 						return "{" + (Params.Count - 1) + "}";
 					});
 				}
 				if (ContainsKey(subKey))
 				{
-					subKey= GetLozalization(subKey);
+					subKey = GetLozalization(subKey);
 				}
 				else
 				{
-					subKey= "{" + subKey + "}";
+					subKey = "{" + subKey + "}";
 				}
 				if (Params != null)
 				{
