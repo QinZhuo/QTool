@@ -103,16 +103,16 @@ namespace QTool
 			}
 			text = text.ForeachBlockValue('{', '}', subKey =>
 			{
-				//List<object> Params = null;
-				//if (subKey.Contains(FormatStart))
-				//{
-				//	Params = new List<object>();
-				//	subKey = subKey.ForeachBlockValue(FormatStart, FormatEnd, key =>
-				//	{
-				//		Params.Add(key);
-				//		return "{" + (Params.Count - 1) + "}";
-				//	});
-				//}
+				List<object> Params = null;
+				if (subKey.Contains(FormatStart))
+				{
+					Params = new List<object>();
+					subKey = subKey.ForeachBlockValue(FormatStart, FormatEnd, key =>
+					{
+						Params.Add(key);
+						return "{" + (Params.Count - 1) + "}";
+					});
+				}
 				if (ContainsKey(subKey))
 				{
 					subKey= GetLozalization(subKey);
@@ -121,11 +121,11 @@ namespace QTool
 				{
 					subKey= "{" + subKey + "}";
 				}
-				//if (Params != null)
-				//{
-				//	Debug.LogError(text + " [" + Params.ToOneString("|") + "] ");
-				//	subKey = string.Format(subKey, Params.ToArray());
-				//}
+				if (Params != null)
+				{
+					Debug.LogError(text + " [" + Params.ToOneString("|") + "] ");
+					subKey = string.Format(subKey, Params.ToArray());
+				}
 				return subKey;
 			});
 			return text;
@@ -178,11 +178,10 @@ namespace QTool
 	{
 		public static string ToLozalizationKey(this string key, params object[] Params)
 		{
-			//for (int i = 0; i < Params.Length; i++)
-			//{
-			//	Params[i] = QLocalizationData.FormatStart + Params[i]?.ToString() + QLocalizationData.FormatEnd;
-			//}
-			return string.Format(key, Params);
+			for (int i = 0; i < Params.Length; i++)
+			{
+				Params[i] = QLocalizationData.FormatStart + Params[i]?.ToString() + QLocalizationData.FormatEnd;
+			}
 			return "{" + string.Format(key, Params) + "}";
 		}
 		public static string ToLozalizationColorKey(this object key)
