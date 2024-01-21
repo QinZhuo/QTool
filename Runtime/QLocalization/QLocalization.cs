@@ -164,7 +164,7 @@ namespace QTool
 		{
 			if (withColor)
 			{
-				return "{" + key + "}".ToColorString(key.ToColor());
+				return ("{" + key + "}").ToColorString(key.ToColor());
 			}
 			else
 			{
