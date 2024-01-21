@@ -278,6 +278,7 @@ namespace QTool.Steam
 		{
 			var data = value.ToQData().Trim('"');
 			MemeberData[key] = data;
+			QDebug.Log("玩家[" + Name + "]." + key + " = " + data);
 			if (QLobby.CurrentLobby.IsNull())
 			{
 				QLobby.CurrentLobby.Update();
@@ -286,7 +287,6 @@ namespace QTool.Steam
 			{
 				SteamMatchmaking.SetLobbyMemberData(QLobby.CurrentLobby.Key.ToSteamId(), nameof(QLobby.Data), MemeberData.ToQData());
 			}
-			QDebug.Log("玩家[" + Name + "]." + key + " = " + data);
 		}
 
 		/// <summary>
