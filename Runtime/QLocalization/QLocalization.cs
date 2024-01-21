@@ -114,6 +114,7 @@ namespace QTool
 			}
 			if (Params != null)
 			{
+				Debug.LogError(text + " [" + Params.ToOneString("|") + "] " );
 				text = string.Format(text, Params.ToArray());
 			}
 			text = text.ForeachBlockValue('{', '}', subKey =>
