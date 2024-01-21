@@ -22,8 +22,9 @@ namespace QTool
 			}
 			return default;
 		}
-		public static Color ToColor(this string key, float s = -1, float v = -1)
+		public static Color ToColor(this object obj, float s = -1, float v = -1)
 		{
+			var key = obj?.ToString();
 			if (key.IsNull()) return Color.clear;
 			if (!KeyColors.ContainsKey(key))
 			{

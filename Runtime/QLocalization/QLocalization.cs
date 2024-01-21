@@ -160,7 +160,7 @@ namespace QTool
 		{
 			return string.Format(key, Params);
 		}
-		public static string ToLozalizationKey(this string key, bool withColor = true)
+		public static string ToLozalizationKey(this object key, bool withColor = true)
 		{
 			if (withColor)
 			{
