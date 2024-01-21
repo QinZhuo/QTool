@@ -252,7 +252,12 @@ namespace QTool
                 Debug.LogWarning("错误" + " 不存在文件夹" + rootPath);
             }
         }
-		public static void ResourcesDirectoryVisible(this string name, bool value)
+		/// <summary>
+		/// 控制所有同名文件夹显示与否 会影响打包是否包含此文件夹
+		/// </summary>
+		/// <param name="name">文件夹名</param>
+		/// <param name="value">是否显示</param>
+		public static void DirectoryVisible(this string name, bool value)
 		{
 			var startKey = (value ? "." : "") + name;
 			Application.dataPath.ForeachAllDirectory(path =>
