@@ -129,6 +129,10 @@ namespace QTool
 				{
 					subKey = GetLozalization(subKey);
 				}
+				else if (int.TryParse(subKey, out var index))
+				{
+					subKey = "{" + subKey + "}";
+				}
 				if (Params != null)
 				{
 					try
@@ -141,7 +145,7 @@ namespace QTool
 					}
 				}
 				return subKey;
-			});
+			}, true);
 			return text;
 		}
 		public const string AutoTranslateEndKey = " [Auto]";
