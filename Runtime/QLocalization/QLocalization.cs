@@ -87,7 +87,17 @@ namespace QTool
 		public static string GetLozalization(string key)
 		{
 			if (key.IsNull()) return key;
-			key = key.Trim();
+			key = key.ForeachBlockValue('{', '}', subKey =>
+			{
+				if (ContainsKey(subKey))
+				{
+					return GetLozalization(subKey);
+				}
+				else
+				{
+					return "{" + subKey + "}";
+				}
+			});
 			List<object> Params = null;
 			if (key.Contains(FormatStart))
 			{
@@ -117,17 +127,17 @@ namespace QTool
 				Debug.LogError(text + " [" + Params.ToOneString("|") + "] " );
 				text = string.Format(text, Params.ToArray());
 			}
-			text = text.ForeachBlockValue('{', '}', subKey =>
-			{
-				if (ContainsKey(subKey))
-				{
-					return GetLozalization(subKey);
-				}
-				else
-				{
-					return "{" + subKey + "}";
-				}
-			});
+			//text = text.ForeachBlockValue('{', '}', subKey =>
+			//{
+			//	if (ContainsKey(subKey))
+			//	{
+			//		return GetLozalization(subKey);
+			//	}
+			//	else
+			//	{
+			//		return "{" + subKey + "}";
+			//	}
+			//});
 			return text;
 		}
 		public const string AutoTranslateEndKey = " [Auto]";
@@ -176,10 +186,6 @@ namespace QTool
 	#region Tool
 	public static class QLocalizationTool
 	{
-		public static string ToLozalizationKey(this string key)
-		{
-			return "{" + key + "}";
-		}
 		public static string ToLozalizationKey(this string key, params object[] Params)
 		{
 			for (int i = 0; i < Params.Length; i++)
