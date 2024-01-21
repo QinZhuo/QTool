@@ -89,7 +89,6 @@ namespace QTool
 			if (key.IsNull()) return key;
 			if (key.Contains(FormatStart))
 			{
-				Params.Clear();
 				key = key.ForeachBlockValue(FormatStart, FormatEnd, key =>
 				{
 					Params.Add(key);
@@ -107,6 +106,7 @@ namespace QTool
 				{
 					Debug.LogError("替换 " + text + " [" + Params.ToOneString("|") + "]   " + string.Format(text, Params.ToArray()));
 					text = string.Format(text, Params.ToArray());
+					Params.Clear();
 				}
 				text = text.ForeachBlockValue('{', '}', subKey =>
 				{
