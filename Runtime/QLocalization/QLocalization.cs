@@ -83,13 +83,13 @@ namespace QTool
 	}
 	public class QLocalizationData : QDataList<QLocalizationData>
 	{
+		private static List<object> Params = new List<object>();
 		public static string GetLozalization(string key)
 		{
 			if (key.IsNull()) return key;
-			List<object> Params = null;
 			if (key.Contains(FormatStart))
 			{
-				Params = new List<object>();
+				Params.Clear();
 				key = key.ForeachBlockValue(FormatStart, FormatEnd, key =>
 				{
 					Params.Add(key);
@@ -103,8 +103,9 @@ namespace QTool
 				{
 					text = text.Substring(0, text.Length - AutoTranslateEndKey.Length);
 				}
-				if (Params != null)
+				if (Params.Count > 0)
 				{
+					Debug.LogError("替换 " + text + " [" + Params.ToOneString("|") + "]   " + string.Format(text, Params.ToArray()));
 					text = string.Format(text, Params.ToArray());
 				}
 				text = text.ForeachBlockValue('{', '}', subKey =>
