@@ -71,7 +71,15 @@ namespace QTool
 		private void FreshLocalization()
 		{
 			if (key.IsNull()) return;
-			localization = QLocalizationData.GetLozalization(key);
+			try
+			{
+				localization = QLocalizationData.GetLozalization(key);
+			}
+			catch (System.Exception e)
+			{
+				localization = key;
+				Debug.LogError("翻译[" + key + "]时出错 " + e);
+			}
 			OnLocalizationChange?.Invoke(localization);
 		}
 #if UNITY_EDITOR
@@ -103,6 +111,15 @@ namespace QTool
 			}
 			text = text.ForeachBlockValue('{', '}', subKey =>
 			{
+				try
+				{
+
+				}
+				catch (System.Exception)
+				{
+
+					throw;
+				}
 				List<object> Params = null;
 				if (subKey.Contains(FormatStart))
 				{
@@ -127,7 +144,14 @@ namespace QTool
 				}
 				if (Params != null)
 				{
-					subKey = string.Format(subKey, Params.ToArray());
+					try
+					{
+						subKey = string.Format(subKey, Params.ToArray());
+					}
+					catch (System.Exception e)
+					{
+						throw new System.Exception("替换出错[" + subKey + "][" + Params.ToOneString("|") + "] ", e);
+					}
 				}
 				return subKey;
 			});
