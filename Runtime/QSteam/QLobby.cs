@@ -35,6 +35,7 @@ namespace QTool
 			{
 				OnLobbyUpdate?.Invoke();
 			}
+			QDebug.Log(nameof(QLobby) + "." + nameof(Update) + " " + this);
 		}
 		public bool IsNull()
 		{

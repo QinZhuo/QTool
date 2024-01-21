@@ -477,7 +477,6 @@ namespace QTool.Steam
 				}
 			}
 			lobby.Update();
-			QDebug.Log(nameof(QSteam) + " 房间信息更新 " + lobby + "\n" + lobby.Members.ToOneString());
 		}
 		public static void AddLobbyFilter(string key, string value, ELobbyComparison comparison = ELobbyComparison.k_ELobbyComparisonEqual)
 		{
