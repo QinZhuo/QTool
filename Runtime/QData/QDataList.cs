@@ -9,11 +9,11 @@ namespace QTool
 	/// <summary>
 	/// 表格式字符存储逻辑
 	/// </summary>
-    public class QDataList: QList<string, QDataRow>
+	public class QDataList : QList<string, QDataRow>
 	{
-	
-		public static QDataList Load(string path,System.Func<QDataList> autoCreate=null)
-        {
+
+		public static QDataList Load(string path, System.Func<QDataList> autoCreate = null)
+		{
 			QDataList data = null;
 			try
 			{
@@ -42,9 +42,9 @@ namespace QTool
 			return data;
 
 		}
-	
-     
-        public string LoadPath { get; internal set; }
+
+
+		public string LoadPath { get; internal set; }
 		public void Save(string path = null)
 		{
 			if (string.IsNullOrEmpty(path))
@@ -53,9 +53,9 @@ namespace QTool
 			}
 			QFileTool.Save(path, ToString());
 		}
-        public int GetTitleIndex(string title)
-        {
-            var index = TitleRow.IndexOf(title);
+		public int GetTitleIndex(string title)
+		{
+			var index = TitleRow.IndexOf(title);
 			if (index >= 0)
 			{
 				return index;
@@ -65,36 +65,36 @@ namespace QTool
 				TitleRow.Add(title);
 				return TitleRow.IndexOf(title);
 			}
-        }
-        public QDataRow TitleRow
-        {
-            get
-            {
-                return this[0];
-            }
-        }
-        public void SetTitles(params string[] titles)
-        {
-            for (int i = 0; i < titles.Length; i++)
-            {
-                TitleRow[i] = titles[i];
-            }
-        }
-        public new QDataRow this[int index]
-        {
-            get
-            {
-                if (index >= Count)
-                {
-                    var line=new QDataRow(this);
+		}
+		public QDataRow TitleRow
+		{
+			get
+			{
+				return this[0];
+			}
+		}
+		public void SetTitles(params string[] titles)
+		{
+			for (int i = 0; i < titles.Length; i++)
+			{
+				TitleRow[i] = titles[i];
+			}
+		}
+		public new QDataRow this[int index]
+		{
+			get
+			{
+				if (index >= Count)
+				{
+					var line = new QDataRow(this);
 					var list = new List<float>();
-                    base[index] = line;
-                }
-                return base[index];
-            }
-        }
-       private void Parse(string dataStr)
-        {
+					base[index] = line;
+				}
+				return base[index];
+			}
+		}
+		private void Parse(string dataStr)
+		{
 			Clear();
 			using (var keyInfo = new StringWriter())
 			{
@@ -135,7 +135,7 @@ namespace QTool
 				}
 			}
 		}
-        public QDataList()
+		public QDataList()
 		{
 			AutoCreate = () => new QDataRow(this);
 		}
@@ -150,7 +150,7 @@ namespace QTool
 				var row = addList[i];
 				if (ContainsKey(row.Key))
 				{
-					QDebug.LogWarning("加载覆盖 [" + row.Key + "] 来自文件 " + addList.LoadPath +" 原文件 "+LoadPath+ "\n旧数据: " + this[row.Key] + "\n新数据: " + row);
+					QDebug.LogWarning("加载覆盖 [" + row.Key + "] 来自文件 " + addList.LoadPath + " 原文件 " + LoadPath + "\n旧数据: " + this[row.Key] + "\n新数据: " + row);
 				}
 				var newRow = this[row.Key];
 				for (int j = 1; j < addList.TitleRow.Count; j++)
@@ -161,42 +161,45 @@ namespace QTool
 			}
 
 		}
-        public QDataList(string dataStr):this()
-        {
-            Parse(dataStr);
-        }
-        public override string ToString()
-        {
-            using (var writer =new StringWriter())
-            {
-                for (int i = 0; i < this.Count; i++)
-                {
-                    writer.Write(this[i].ToString());
-                    if (i < Count - 1)
-                    {
-                        writer.Write('\n');
-                    }
-                }
-                return writer.ToString();
-            }
-          
-        }
+		public QDataList(string dataStr) : this()
+		{
+			Parse(dataStr);
+		}
+		public override string ToString()
+		{
+			using (var writer = new StringWriter())
+			{
+				for (int i = 0; i < this.Count; i++)
+				{
+					writer.Write(this[i].ToString());
+					if (i < Count - 1)
+					{
+						writer.Write('\n');
+					}
+				}
+				return writer.ToString();
+			}
+
+		}
+		private static bool LoadAllOver = false;
 		/// <summary>
 		/// 异步预加载所有QDataList<T>数据表
 		/// </summary>
-		public static async void PreLoadAll()
+		public static async Task PreLoadAsync()
 		{
+			if (LoadAllOver) return;
+			LoadAllOver = true;
 			foreach (var type in typeof(QDataList<>).GetAllTypes())
 			{
 				await QTask.Step();
-				var result = type.InvokeStaticFunction(nameof(QDataList<QLocalizationData>.PreLoadAsync));
+				var result = type.InvokeStaticFunction(nameof(PreLoadAsync));
 				if (result is Task task)
 				{
 					QSceneTool.PreLoadList.Add(task);
 				}
 			}
 		}
-    }
+	}
 	/// <summary>
 	/// 运行时静态数据表 从Resouces文件夹加载字符数据 通过静态函数访问 只读
 	/// </summary>
