@@ -86,12 +86,25 @@ namespace QTool
 		public static string GetLozalization(string key)
 		{
 			if (key.IsNull()) return key;
+			object[] Params = null;
+			if (key.EndsWith(FormatEndKey) && key.SplitTowString(FormatStartKey, out key, out var end))
+			{
+				var data = end.Substring(0, end.Length - FormatEndKey.Length).Split('|');
+				for (int i = 0; i < data.Length; i++)
+				{
+					Params[i] = data[i];
+				}
+			}
 			if (ContainsKey(key))
 			{
 				var text = Get(key).Localization;
 				if (text.EndsWith(AutoTranslateEndKey))
 				{
 					text = text.Substring(0, text.Length - AutoTranslateEndKey.Length);
+				}
+				if (Params != null)
+				{
+					text = string.Format(text, Params);
 				}
 				text = text.ForeachBlockValue('{', '}', subKey =>
 				{
@@ -113,6 +126,8 @@ namespace QTool
 			return key;
 		}
 		public const string AutoTranslateEndKey = " [Auto]";
+		public const string FormatStartKey = " [Format|";
+		public const string FormatEndKey = "]";
 		[QName]
 		public string Localization { get; private set; }
 		static QLocalizationData()
@@ -156,20 +171,13 @@ namespace QTool
 	#region Tool
 	public static class QLocalizationTool
 	{
-		public static string Format(this string key, params object[] Params)
+		public static string ToLozalizationKey(this string key, params string[] Params)
 		{
-			return string.Format(key, Params);
+			return key + QLocalizationData.FormatStartKey + Params.ToOneString("|") + QLocalizationData.FormatEndKey;
 		}
-		public static string ToLozalizationKey(this object key, bool withColor = true)
+		public static string ToLozalizationColorKey(this object key)
 		{
-			if (withColor)
-			{
-				return ("{" + key + "}").ToColorString(key.ToColor());
-			}
-			else
-			{
-				return "{" + key + "}";
-			}
+			return ("{" + key + "}").ToColorString(key.ToColor());
 		}
 		const string NetworkTranslateURL = "https://translate.googleapis.com/translate_a/single?client=gtx&sl={2}&tl={1}&dt=t&q={0}";
 
