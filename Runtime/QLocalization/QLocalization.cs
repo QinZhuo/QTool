@@ -174,13 +174,17 @@ namespace QTool
 	#region Tool
 	public static class QLocalizationTool
 	{
+		public static string ToLozalizationKey(this string key)
+		{
+			return "{" + key + "}";
+		}
 		public static string ToLozalizationKey(this string key, params object[] Params)
 		{
 			for (int i = 0; i < Params.Length; i++)
 			{
 				Params[i] = QLocalizationData.FormatStart + Params[i]?.ToString() + QLocalizationData.FormatEnd;
 			}
-			return string.Format(key, Params);
+			return "{" + string.Format(key, Params) + "}";
 		}
 		public static string ToLozalizationColorKey(this object key)
 		{

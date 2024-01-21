@@ -295,7 +295,7 @@ namespace QTool.FlowGraph
 				case nameof(Start):
 					if (node.Name != StartKey)
 					{
-						info += node.Name + "\n";
+						info += node.Name.ToLozalizationColorKey() + " ";
 					}
 					break;
 				case nameof(CountStart):
