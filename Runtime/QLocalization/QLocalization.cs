@@ -87,27 +87,6 @@ namespace QTool
 		public static string GetLozalization(string key)
 		{
 			if (key.IsNull()) return key;
-			key = key.ForeachBlockValue('{', '}', subKey =>
-			{
-				if (ContainsKey(subKey))
-				{
-					return GetLozalization(subKey);
-				}
-				else
-				{
-					return "{" + subKey + "}";
-				}
-			});
-			List<object> Params = null;
-			if (key.Contains(FormatStart))
-			{
-				Params = new List<object>();
-				key = key.ForeachBlockValue(FormatStart, FormatEnd, key =>
-				{
-					Params.Add(key);
-					return "{" + (Params.Count - 1) + "}";
-				});
-			}
 			var text = key;
 			if (ContainsKey(key))
 			{
@@ -117,26 +96,37 @@ namespace QTool
 					text = text.Substring(0, text.Length - AutoTranslateEndKey.Length);
 				}
 			}
-			else if (Params == null && !key.Contains('{'))
+			else if (!key.Contains('{'))
 			{
 				QDebug.LogWarning(nameof(QLocalizationData) + " 缺少翻译[" + key + "]");
 				return key;
 			}
-			if (Params != null)
-			{
-				Debug.LogError(text + " [" + Params.ToOneString("|") + "] " );
-				text = string.Format(text, Params.ToArray());
-			}
 			text = text.ForeachBlockValue('{', '}', subKey =>
 			{
+				List<object> Params = null;
+				if (subKey.Contains(FormatStart))
+				{
+					Params = new List<object>();
+					subKey = key.ForeachBlockValue(FormatStart, FormatEnd, key =>
+					{
+						Params.Add(key);
+						return "{" + (Params.Count - 1) + "}";
+					});
+				}
 				if (ContainsKey(subKey))
 				{
-					return GetLozalization(subKey);
+					subKey= GetLozalization(subKey);
 				}
 				else
 				{
-					return "{" + subKey + "}";
+					subKey= "{" + subKey + "}";
 				}
+				if (Params != null)
+				{
+					Debug.LogError(text + " [" + Params.ToOneString("|") + "] ");
+					subKey = string.Format(subKey, Params.ToArray());
+				}
+				return subKey;
 			});
 			return text;
 		}
