@@ -111,15 +111,6 @@ namespace QTool
 			}
 			text = text.ForeachBlockValue('{', '}', subKey =>
 			{
-				try
-				{
-
-				}
-				catch (System.Exception)
-				{
-
-					throw;
-				}
 				List<object> Params = null;
 				if (subKey.Contains(FormatStart))
 				{
@@ -138,10 +129,6 @@ namespace QTool
 				{
 					subKey = GetLozalization(subKey);
 				}
-				else
-				{
-					subKey = "{" + subKey + "}";
-				}
 				if (Params != null)
 				{
 					try
@@ -154,7 +141,7 @@ namespace QTool
 					}
 				}
 				return subKey;
-			});
+			}, true);
 			return text;
 		}
 		public const string AutoTranslateEndKey = " [Auto]";

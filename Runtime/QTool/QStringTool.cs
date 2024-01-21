@@ -184,7 +184,7 @@ namespace QTool
 				return str;
 			}
 		}
-		public static string ForeachBlockValue(this string value, char startChar, char endChar, Func<string, string> action)
+		public static string ForeachBlockValue(this string value, char startChar, char endChar, Func<string, string> action,bool deep=false)
 		{
 			if (string.IsNullOrEmpty(value)) { return value; }
 			var start = value.IndexOf(startChar);
@@ -203,6 +203,10 @@ namespace QTool
 				if (end > start)
 				{
 					key = value.Substring(start + 1, end - start - 1);
+				}
+				if (deep && value.Contains(key))
+				{
+					key.ForeachBlockValue(startChar, endChar, action, true);
 				}
 				var result = action(key);
 				value = value.Substring(0, start) + result + value.Substring(end + 1);
