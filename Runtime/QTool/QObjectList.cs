@@ -67,25 +67,6 @@ namespace QTool
 		public event System.Action<GameObject> OnRelease;
 		public event System.Action OnClear;
 #if UNITY_EDITOR
-		private void OnEnable()
-		{
-			if (!Application.isPlaying)
-			{
-				UnityEditor.SceneManagement.PrefabStage.prefabStageClosing += OnPrefabStageClosing;
-				if (prefab != null)
-				{
-					QEditorPath.Insert(UnityEditor.AssetDatabase.GetAssetPath(prefab), 1);
-				}
-			}
-			
-		}
-		private void OnDisable()
-		{
-			if (!Application.isPlaying)
-			{
-				UnityEditor.SceneManagement.PrefabStage.prefabStageClosing -= OnPrefabStageClosing;
-			}
-		}
 		private void OnDrawGizmos()
 		{
 			if (transform is RectTransform rectTransform)
@@ -105,11 +86,6 @@ namespace QTool
 		}
 	
 		private int lastCount = 0;
-		private void OnPrefabStageClosing(UnityEditor.SceneManagement.PrefabStage prefabStage)
-		{
-			lastCount = 0;
-		}
-
 		private void Update()
 		{
 			if (!Application.isPlaying && prefab != null && TestCount != lastCount)

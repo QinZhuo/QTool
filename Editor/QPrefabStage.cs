@@ -8,7 +8,9 @@ using System.IO;
 
 public static class QPrefabStage
 {
-	
+	public static QHistoryList HistoryList = new QHistoryList(nameof(QPrefabStage));
+
+
 	public static PrefabStage CurrrentStage = null;
 	public static bool IsPrefabMode => CurrrentStage != null;
 	[InitializeOnLoadMethod]
@@ -20,7 +22,7 @@ public static class QPrefabStage
 	}
 	private static void OnPrefabStageOpened(PrefabStage prefabStage)
 	{
-		QEditorPath.Insert(prefabStage.assetPath);
+		HistoryList.Add(prefabStage.assetPath);
 		CurrrentStage = prefabStage;
 	}
 	private static void OnPrefabStageClosing(PrefabStage prefabStage)
@@ -34,11 +36,11 @@ public static class QPrefabStage
 		GUILayout.FlexibleSpace();
 		using (new GUILayout.HorizontalScope())
 		{
-			if (QEditorPath.PrefabPaths.Count > 0)
+			if (HistoryList.List.Count > 0)
 			{
 				if (IsPrefabMode)
 				{
-					foreach (var path in QEditorPath.PrefabPaths.ToArray())
+					foreach (var path in HistoryList.List.ToArray())
 					{
 						if (path == CurrrentStage.assetPath)
 						{
@@ -50,16 +52,16 @@ public static class QPrefabStage
 						}
 						else if (GUILayout.Button(path.FileName(), GUILayout.Height(20)))
 						{
-							
+
 							PrefabStageUtility.OpenPrefab(path);
 						}
 					}
 				}
 				else
 				{
-					if (GUILayout.Button(""+ QEditorPath.PrefabPaths.QueuePeek().FileName().ToShortString(10), GUILayout.Width(130), GUILayout.Height(20)))
+					if (GUILayout.Button("" + HistoryList.List.QueuePeek().FileName().ToShortString(10), GUILayout.Width(130), GUILayout.Height(20)))
 					{
-						PrefabStageUtility.OpenPrefab(QEditorPath.PrefabPaths.QueuePeek());
+						PrefabStageUtility.OpenPrefab(HistoryList.List.QueuePeek());
 					}
 				}
 			}

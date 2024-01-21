@@ -677,45 +677,6 @@ namespace QTool
             return "";
         }
 	}
-
-#if UNITY_EDITOR
-	public static class QEditorPath
-	{
-		public static List<string> PrefabPaths = new List<string>();
-		private static List<string> PrefabPathList = new List<string>();
-		[UnityEditor.InitializeOnLoadMethod]
-		public static void Init()
-		{
-			QPlayerPrefs.Get(nameof(PrefabPathList), PrefabPathList);
-		}
-		public static void Save()
-		{
-			PrefabPathList.RemoveAll(path => PrefabPathList.IndexOf(path) > 10);
-			PrefabPaths.Clear();
-			PrefabPaths.AddRange(PrefabPathList);
-			PrefabPaths.Sort();
-			QPlayerPrefs.Set(nameof(PrefabPathList), PrefabPathList);
-		}
-		public static void Insert(string path, int index = 0)
-		{
-			if (index > 0)
-			{
-				if (PrefabPathList.Contains(path)) return;
-			}
-			PrefabPathList.Remove(path);
-			if (index < PrefabPathList.Count)
-			{
-				PrefabPathList.Insert(index, path);
-			}
-			else
-			{
-				PrefabPathList.Add(path);
-			}
-			Save();
-		}
-
-	}
-#endif
 	#region WindowsData
 
 	[StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]

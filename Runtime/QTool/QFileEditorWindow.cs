@@ -9,7 +9,8 @@ using UnityEditor;
 using UnityEditor.UIElements;
 #endif
 namespace QTool
-{	public abstract class QFileEditorWindow<T>
+{
+	public abstract class QFileEditorWindow<T>
 #if UNITY_EDITOR
 	: UnityEditor.EditorWindow
 #endif
@@ -23,10 +24,9 @@ namespace QTool
 				if (value != FilePath)
 				{
 					var select = value.Replace('/', '\\');
-					QPlayerPrefs.Get(typeof(T).Name + "_" + nameof(FilePathList), FilePathList);
 					if (select.ExistsFile())
 					{
-						FilePathList.AddCheckExist(select);
+						FilePathList.Add(select);
 					}
 					else
 					{
@@ -35,18 +35,17 @@ namespace QTool
 					AutoSaveLoad = true;
 					UndoList.Clear();
 					QPlayerPrefs.SetString(typeof(T).Name + "_" + nameof(FilePath), value);
-					QPlayerPrefs.Set(typeof(T).Name + "_" + nameof(FilePathList), FilePathList);
 #if UNITY_2022_1_OR_NEWER
 					if (PathPopup != null)
 					{
 						PathPopup.value = select;
 					}
-# endif
+#endif
 				}
 			}
 		}
-		
-		private static List<string> FilePathList = new List<string>();
+
+		private static QHistoryList FilePathList = new QHistoryList(typeof(T).Name);
 		public new GUIContent titleContent
 		{
 			get
@@ -71,7 +70,7 @@ namespace QTool
 			}
 		}
 #if UNITY_EDITOR
-		public static UnityEditor.SerializedProperty SerializedProperty { get; set; }
+		public static SerializedProperty SerializedProperty { get; set; }
 #endif
 
 		protected virtual void OnFocus()
@@ -86,7 +85,7 @@ namespace QTool
 			{
 				{
 #if UNITY_EDITOR
-					var asset = UnityEditor.AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(path);
+					var asset = AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(path);
 					titleContent.text = asset.name + " - " + typeof(T).Name.SplitStartString("Window");
 					if (asset != null)
 					{
@@ -115,10 +114,10 @@ namespace QTool
 				}
 			}
 		}
-		
-		public abstract string GetData(UnityEngine.Object file=null);
+
+		public abstract string GetData(UnityEngine.Object file = null);
 		public abstract void SaveData();
-		private  string _Data;
+		private string _Data;
 		public string Data
 		{
 			get => _Data;
@@ -137,7 +136,7 @@ namespace QTool
 				{
 					SaveData();
 #if UNITY_EDITOR
-					UnityEditor.AssetDatabase.ImportAsset(path);
+					AssetDatabase.ImportAsset(path);
 #endif
 				}
 			}
@@ -146,18 +145,13 @@ namespace QTool
 		protected static PopupField<string> PathPopup { get; private set; } = null;
 #endif
 		protected virtual void CreateGUI()
-		{ 
+		{
 			var Toolbar = rootVisualElement.AddVisualElement();
 			Toolbar.style.flexDirection = FlexDirection.Row;
-			FilePathList = QPlayerPrefs.Get(typeof(T).Name + "_" + nameof(FilePathList), FilePathList);
 			FilePathList.RemoveAll(path => path.IsNull() || !path.Replace('/', '\\').ExistsFile());
-			while (FilePathList.Count > 40)
-			{
-				FilePathList.Dequeue();
-			}
-			QPlayerPrefs.Set(typeof(T).Name + "_" + nameof(FilePathList), FilePathList);
+			FilePathList.Save();
 #if UNITY_2022_1_OR_NEWER
-			PathPopup = Toolbar.AddPopup("", FilePathList, FilePath?.Replace('/', '\\'), path => { OnLostFocus(); FilePath = path.Replace('\\', '/'); if (!FilePath.ExistsFile()) Data = ""; OnFocus(); });
+			PathPopup = Toolbar.AddPopup("", FilePathList.List, FilePath?.Replace('/', '\\'), path => { OnLostFocus(); FilePath = path.Replace('\\', '/'); if (!FilePath.ExistsFile()) Data = ""; OnFocus(); });
 #endif
 			Toolbar.AddButton("撤销", Undo);
 		}
@@ -193,5 +187,44 @@ namespace QTool
 			}
 		}
 	}
+	public class QHistoryList
+	{
+		private string SaveKey { get; set; }
+		private int MaxCount { get; set; } = 30;
+		private List<string> m_dataList = null;
+		public List<string> List
+		{
+			get
+			{
+				if (m_dataList == null)
+				{
+					m_dataList = QPlayerPrefs.Get(SaveKey, new List<string>());
+				}
+				return m_dataList;
+			}
+		}
+		private QHistoryList()
+		{
 
+		}
+		public QHistoryList(string Key, int count = 30)
+		{
+			SaveKey = Key + "." + nameof(QHistoryList);
+		}
+		public void Save()
+		{
+			RemoveAll(path => List.IndexOf(path) > MaxCount);
+		}
+		public void RemoveAll(Predicate<string> check)
+		{
+			List.RemoveAll(check);
+			QPlayerPrefs.Set(SaveKey, m_dataList);
+		}
+		public void Add(string path)
+		{
+			List.Remove(path);
+			List.Add(path);
+			Save();
+		}
+	}
 }
