@@ -15,7 +15,6 @@ namespace QTool
 #if Steamworks
 		public uint SteamId = 480;
 #endif
-		
 		[QName(nameof(QKeyColor) + "颜色")]
 		public List<QKeyColorValue> qKeyColorList = new List<QKeyColorValue>();
 		[QName(nameof(QLocalization) + "字体")]

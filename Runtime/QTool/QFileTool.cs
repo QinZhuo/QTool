@@ -105,6 +105,25 @@ namespace QTool
 				return Path.GetFileNameWithoutExtension(path);
 			}
 		}
+		public static void DirectoryRename(this string path, string newPath)
+		{
+			Directory.Move(path, newPath);
+			if (path != newPath)
+			{
+				if (File.Exists(path + ".meta"))
+				{
+					File.Delete(path + ".meta");
+				}
+			}
+		}
+		public static void FileDelete(this string path)
+		{
+			File.Delete(path);
+			if (File.Exists(path+".meta"))
+			{
+				File.Delete(path + ".meta");
+			}
+		}
 		public static void FileRename(this string path,string newName)
 		{
 			var fileDirectory = path.DirectoryName();
@@ -126,14 +145,16 @@ namespace QTool
 				return "";
 			}
 		}
+
+	
 		public static void ForeachAllDirectory(this string rootPath, Action<string> action, string endsWith = "")
 		{
 			rootPath.ForeachDirectory((path) =>
 			{
 				if (endsWith.IsNull() || path.EndsWith(endsWith))
 				{
-					action?.Invoke(path.Replace('\\', '/'));
 					path.ForeachAllDirectory(action, endsWith);
+					action?.Invoke(path.Replace('\\', '/'));
 				}
 			});
 		}
@@ -231,7 +252,25 @@ namespace QTool
                 Debug.LogWarning("错误" + " 不存在文件夹" + rootPath);
             }
         }
-        public static void ForeachFiles(this string rootPath, Action<string> action)
+		public static void ResourcesDirectoryVisible(this string name, bool value)
+		{
+			var startKey = (value ? "." : "") + name;
+			Application.dataPath.ForeachAllDirectory(path =>
+			{
+				if (path.Contains("/" + nameof(Resources) + "/") && path.EndsWith(name))
+				{
+					if (value)
+					{
+						path.DirectoryRename(path.Replace(startKey, name));
+					}
+					else
+					{
+						path.DirectoryRename(path.Replace(startKey, "." + name));
+					}
+				}
+			});
+		}
+		public static void ForeachFiles(this string rootPath, Action<string> action)
         {
             if (ExistsDirectory(rootPath))
             {
@@ -540,6 +579,7 @@ namespace QTool
 		{
 			return Path.GetDirectoryName(path)+"/"+ Path.GetFileNameWithoutExtension(path);
 		}
+		
 		public static byte[] LoadBytes(string path,byte[] defaultValue=default)
 		{
 			switch (Application.platform)
@@ -656,7 +696,7 @@ namespace QTool
             }
             return "";
         }
-        public static string SelectSavePath(string title = "保存文件", string directory= "Assets", string defaultName="newfile", string extension = "*" )
+		public static string SelectSavePath(string title = "保存文件", string directory= "Assets", string defaultName="newfile", string extension = "*" )
         {
             var dialog = new FileDialog
             {
