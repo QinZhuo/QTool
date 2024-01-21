@@ -87,6 +87,7 @@ namespace QTool
 		public static string GetLozalization(string key)
 		{
 			if (key.IsNull()) return key;
+			key = key.Trim();
 			List<object> Params = null;
 			if (key.Contains(FormatStart))
 			{
@@ -105,8 +106,7 @@ namespace QTool
 					text = text.Substring(0, text.Length - AutoTranslateEndKey.Length);
 				}
 				if (Params != null)
-				{
-					Debug.LogError("替换 " + text + " [" + Params.ToOneString("|") + "]   " + string.Format(text, Params.ToArray()));
+				{	
 					text = string.Format(text, Params.ToArray());
 				}
 				text = text.ForeachBlockValue('{', '}', subKey =>
