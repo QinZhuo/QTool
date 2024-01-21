@@ -101,32 +101,32 @@ namespace QTool
 				QDebug.LogWarning(nameof(QLocalizationData) + " 缺少翻译[" + key + "]");
 				return key;
 			}
-			text = text.ForeachBlockValue('{', '}', key =>
+			text = text.ForeachBlockValue('{', '}', subKey =>
 			{
-				List<object> Params = null;
-				if (key.Contains(FormatStart))
+				//List<object> Params = null;
+				//if (subKey.Contains(FormatStart))
+				//{
+				//	Params = new List<object>();
+				//	subKey = subKey.ForeachBlockValue(FormatStart, FormatEnd, key =>
+				//	{
+				//		Params.Add(key);
+				//		return "{" + (Params.Count - 1) + "}";
+				//	});
+				//}
+				if (ContainsKey(subKey))
 				{
-					Params = new List<object>();
-					key = key.ForeachBlockValue(FormatStart, FormatEnd, key =>
-					{
-						Params.Add(key);
-						return "{" + (Params.Count - 1) + "}";
-					});
-				}
-				if (ContainsKey(key))
-				{
-					key= GetLozalization(key);
+					subKey= GetLozalization(subKey);
 				}
 				else
 				{
-					key= "{" + key + "}";
+					subKey= "{" + subKey + "}";
 				}
-				if (Params != null)
-				{
-					Debug.LogError(text + " [" + Params.ToOneString("|") + "] ");
-					key = string.Format(key, Params.ToArray());
-				}
-				return key;
+				//if (Params != null)
+				//{
+				//	Debug.LogError(text + " [" + Params.ToOneString("|") + "] ");
+				//	subKey = string.Format(subKey, Params.ToArray());
+				//}
+				return subKey;
 			});
 			return text;
 		}
