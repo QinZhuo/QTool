@@ -127,7 +127,6 @@ namespace QTool
 				}
 				if (Params != null)
 				{
-					Debug.LogError(subKey + " [" + Params.ToOneString("|") + "] ");
 					subKey = string.Format(subKey, Params.ToArray());
 				}
 				return subKey;
