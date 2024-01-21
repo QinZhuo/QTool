@@ -193,11 +193,11 @@ namespace QTool
 			if (end < 0) return value;
 			while (start >= 0 && end >= 0)
 			{
-				var nextStart = value.IndexOf(startChar, start);
-				while (end < nextStart)
+				var nextStart = value.IndexOf(startChar, start + 1);
+				while (nextStart > 0 && nextStart < end)
 				{
-					end = value.IndexOf(endChar, nextStart);
-					nextStart = value.IndexOf(startChar, nextStart);
+					end = value.IndexOf(endChar, end + 1);
+					nextStart = value.IndexOf(startChar, nextStart + 1);
 				}
 				var key = "";
 				if (end > start)
