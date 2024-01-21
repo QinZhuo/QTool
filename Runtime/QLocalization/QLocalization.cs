@@ -141,7 +141,7 @@ namespace QTool
 					}
 				}
 				return subKey;
-			}, true);
+			});
 			return text;
 		}
 		public const string AutoTranslateEndKey = " [Auto]";
