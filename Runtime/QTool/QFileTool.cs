@@ -259,18 +259,18 @@ namespace QTool
 		/// <param name="value">是否显示</param>
 		public static void DirectoryVisible(this string name, bool value)
 		{
-			var startKey = (value ? "." : "") + name;
+			var startKey = "/" + (value ? "." : "") + name;
 			Application.dataPath.ForeachAllDirectory(path =>
 			{
-				if (path.Contains("/" + nameof(Resources) + "/") && path.EndsWith(name))
+				if (path.EndsWith(startKey))
 				{
 					if (value)
 					{
-						path.DirectoryRename(path.Replace(startKey, name));
+						path.DirectoryRename(path.Replace(startKey, "/" + name));
 					}
 					else
 					{
-						path.DirectoryRename(path.Replace(startKey, "." + name));
+						path.DirectoryRename(path.Replace(startKey, "/." + name));
 					}
 				}
 			});
