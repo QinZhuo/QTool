@@ -46,7 +46,7 @@ namespace QTool.Test
 		[QName("预加载测试")]
 		private void PreLoadTest()
 		{
-			_=QDataList.PreLoadAsync();
+			QDataList.PreLoadAll();
 		}
 		[QName("解析类型测试")]
 		public void CreateTest()

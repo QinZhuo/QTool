@@ -185,14 +185,14 @@ namespace QTool
 		/// <summary>
 		/// 异步预加载所有QDataList<T>数据表
 		/// </summary>
-		public static async Task PreLoadAsync()
+		public static async void PreLoadAll()
 		{
 			if (LoadAllOver) return;
 			LoadAllOver = true;;
 			foreach (var type in typeof(QDataList<>).GetAllTypes())
 			{
 				await QTask.Step();
-				var result = type.InvokeStaticFunction(nameof(PreLoadAsync));
+				var result = type.InvokeStaticFunction("PreLoadAsync");
 				if (result is Task task)
 				{
 					task.PreLoadRun();
