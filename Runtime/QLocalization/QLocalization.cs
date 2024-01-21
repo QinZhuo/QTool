@@ -156,13 +156,20 @@ namespace QTool
 	#region Tool
 	public static class QLocalizationTool
 	{
-		public static string GetLozalization(this string key, params object[] Params)
+		public static string ToLozalization(this string key, params object[] Params)
 		{
 			return string.Format(QLocalizationData.GetLozalization(key), Params);
 		}
-		public static string GetLozalizationWithColor(this string key, params object[] Params)
+		public static string ToLozalizationKey(this string key, bool withColor = true)
 		{
-			return key.GetLozalization(Params).ToColorString(key.ToColor());
+			if (withColor)
+			{
+				return "{" + key + "}".ToColorString(key.ToColor());
+			}
+			else
+			{
+				return "{" + key + "}";
+			}
 		}
 		const string NetworkTranslateURL = "https://translate.googleapis.com/translate_a/single?client=gtx&sl={2}&tl={1}&dt=t&q={0}";
 
