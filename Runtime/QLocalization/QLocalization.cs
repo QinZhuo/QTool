@@ -70,12 +70,12 @@ namespace QTool
 					{
 						textMesh.font = QLocalizationData.FontInfo.fontAsset;
 					}
-					else
-#endif
+#else
 					if (OnLocalizationChange.GetPersistentTarget(i) is Text text)
 					{
 						text.font = QLocalizationData.FontInfo.font;
 					}
+#endif
 				}
 			}
 		}
@@ -202,7 +202,7 @@ namespace QTool
 		}
 		public static event System.Action OnLanguageChange = null;
 	}
-	#region Tool
+#region Tool
 	public static class QLocalizationTool
 	{
 		public static string ToLozalizationKey(this string key, params object[] Params)
@@ -275,8 +275,9 @@ namespace QTool
 		public SystemLanguage language;
 #if TMPro
 		public TMP_FontAsset fontAsset;
-#endif
+#else
 		public Font font;
+#endif
 	}
 	public enum QLocalizationCode
 	{
