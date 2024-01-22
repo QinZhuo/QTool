@@ -11,9 +11,10 @@ namespace QTool
 	[ExecuteInEditMode]
 	public class QDropdownSettingUI : MonoBehaviour
 	{
-		public Dropdown dropdown;
 #if TMPro
 		public TMP_Dropdown TMP_Dropdown;
+#else
+		public Dropdown dropdown;
 #endif
 		protected void Awake()
 		{
@@ -33,8 +34,7 @@ namespace QTool
 						}
 					}
 				}
-				else
-#endif
+#else
 				if (dropdown != null)
 				{
 					for (int i = 0; i < dropdown.options.Count; i++)
@@ -46,27 +46,30 @@ namespace QTool
 						}
 					}
 				}
-
+#endif
 			}
 		}
 		public void Set(int index)
 		{
+#if TMPro
+			var value = TMP_Dropdown.options[index].text;
+#else
 			var value = dropdown.options[index].text;
+#endif
 			QPlayerPrefs.Set(name, value);
 			QDebug.Log(name + ":[" + value + "]");
 			QEventManager.InvokeEvent(nameof(QEventKey.设置更新), name);
 		}
-#if UNITY_EDITOR
 		private void Reset()
 		{
-			dropdown = GetComponentInChildren<Dropdown>();
-			dropdown.onValueChanged.AddPersistentListener(Set);
 #if TMPro
 			TMP_Dropdown = GetComponentInChildren<TMP_Dropdown>();
 			TMP_Dropdown.onValueChanged.AddPersistentListener(Set);
+#else
+			dropdown = GetComponentInChildren<Dropdown>();
+			dropdown.onValueChanged.AddPersistentListener(Set);
 #endif
 		}
-#endif
 	}
 }
 
