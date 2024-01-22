@@ -1,5 +1,8 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
+#if TMPro
+using TMPro;
+#endif
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -61,6 +64,14 @@ namespace QTool
 				var count = OnLocalizationChange.GetPersistentEventCount();
 				for (int i = 0; i < count; i++)
 				{
+					var target = OnLocalizationChange.GetPersistentTarget(i);
+#if TMPro
+					if (target is TextMeshProUGUI textMesh)
+					{
+						textMesh.font = QLocalizationData.FontInfo.fontAsset;
+					}
+					else
+#endif
 					if (OnLocalizationChange.GetPersistentTarget(i) is Text text)
 					{
 						text.font = QLocalizationData.FontInfo.font;
@@ -262,6 +273,9 @@ namespace QTool
 	{
 		public SystemLanguage Key { get => language; set => language = value; }
 		public SystemLanguage language;
+#if TMPro
+		public TMP_FontAsset fontAsset;
+#endif
 		public Font font;
 	}
 	public enum QLocalizationCode
@@ -493,5 +507,5 @@ namespace QTool
 		zu,//祖鲁语
 		zu_ZA,// 祖鲁语
 	}
-	#endregion
+#endregion
 }

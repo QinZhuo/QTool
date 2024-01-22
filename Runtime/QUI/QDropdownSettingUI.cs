@@ -2,6 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+#if TMPro
+using TMPro;
+#endif
 namespace QTool
 {
 
@@ -9,20 +12,41 @@ namespace QTool
 	public class QDropdownSettingUI : MonoBehaviour
 	{
 		public Dropdown dropdown;
+#if TMPro
+		public TMP_Dropdown TMP_Dropdown;
+#endif
 		protected void Awake()
 		{
-			dropdown = GetComponentInChildren<Dropdown>();
+
 			if (Application.isPlaying)
 			{
 				var select = QPlayerPrefs.Get<string>(name)?.Trim('"');
-				for (int i = 0; i < dropdown.options.Count; i++)
+#if TMPro
+				if (TMP_Dropdown != null)
 				{
-					if (dropdown.options[i].text == select)
+					for (int i = 0; i < TMP_Dropdown.options.Count; i++)
 					{
-						dropdown.value = i;
-						break;
+						if (TMP_Dropdown.options[i].text == select)
+						{
+							TMP_Dropdown.value = i;
+							break;
+						}
 					}
 				}
+				else
+#endif
+				if (dropdown != null)
+				{
+					for (int i = 0; i < dropdown.options.Count; i++)
+					{
+						if (dropdown.options[i].text == select)
+						{
+							dropdown.value = i;
+							break;
+						}
+					}
+				}
+
 			}
 		}
 		public void Set(int index)
@@ -32,11 +56,15 @@ namespace QTool
 			QDebug.Log(name + ":[" + value + "]");
 			QEventManager.InvokeEvent(nameof(QEventKey.设置更新), name);
 		}
-
 #if UNITY_EDITOR
 		private void Reset()
 		{
+			dropdown = GetComponentInChildren<Dropdown>();
 			dropdown.onValueChanged.AddPersistentListener(Set);
+#if TMPro
+			TMP_Dropdown = GetComponentInChildren<TMP_Dropdown>();
+			TMP_Dropdown.onValueChanged.AddPersistentListener(Set);
+#endif
 		}
 #endif
 	}
