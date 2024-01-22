@@ -60,10 +60,10 @@ namespace QTool
 					gameObject.UnRegisterEvent(_Runtime);
 					RuntimeValues.Clear();
 					_Runtime = value;
+					gameObject.RegisterEvent(_Runtime?.Data);
+					gameObject.RegisterEvent(_Runtime);
 					if (_Runtime != null)
 					{
-						gameObject.RegisterEvent(_Runtime?.Data);
-						gameObject.RegisterEvent(_Runtime);
 						var typeInfo = QSerializeType.Get(typeof(RuntimeT));
 						foreach (var member in typeInfo.Members)
 						{
