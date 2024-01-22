@@ -62,7 +62,7 @@ namespace QTool
 					_Runtime = value;
 					gameObject.RegisterEvent(_Runtime?.Data);
 					gameObject.RegisterEvent(_Runtime);
-					if (_Runtime != null)
+					if (_Runtime != null) 
 					{
 						var typeInfo = QSerializeType.Get(typeof(RuntimeT));
 						foreach (var member in typeInfo.Members)
