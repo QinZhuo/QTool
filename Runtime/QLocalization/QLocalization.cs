@@ -10,7 +10,7 @@ namespace QTool
 {
 	public class QLocalization : MonoBehaviour
 	{
-		#region 基础数据
+		#region 基础数据 
 		[QName, QPopup(nameof(QLocalizationData) + "." + nameof(QLocalizationData.List)), SerializeField]
 		private string key;
 		[QName("本地化"), SerializeField, QReadonly]
