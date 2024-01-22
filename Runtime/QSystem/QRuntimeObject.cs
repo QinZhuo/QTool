@@ -41,7 +41,7 @@ namespace QTool
 	public abstract class QRuntimeObject<RuntimeT, DataT> : MonoBehaviour,IKey<string>,IQPoolObject where RuntimeT : QRuntime<RuntimeT, DataT>, new() where DataT : QDataList<DataT>, new()
 	{
 		private RuntimeT _Runtime = null;
-		public RuntimeT Runtime
+		public virtual RuntimeT Runtime
 		{
 			get
 			{
@@ -60,10 +60,10 @@ namespace QTool
 					gameObject.UnRegisterEvent(_Runtime);
 					RuntimeValues.Clear();
 					_Runtime = value;
-					gameObject.RegisterEvent(_Runtime?.Data);
-					gameObject.RegisterEvent(_Runtime);
 					if (_Runtime != null)
 					{
+						gameObject.RegisterEvent(_Runtime?.Data);
+						gameObject.RegisterEvent(_Runtime);
 						var typeInfo = QSerializeType.Get(typeof(RuntimeT));
 						foreach (var member in typeInfo.Members)
 						{
