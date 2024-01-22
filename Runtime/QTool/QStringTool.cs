@@ -120,7 +120,7 @@ namespace QTool
 				return dblSByte.ToString("f1") + "" + Suffix[i];
 			}
 		}
-		public static string ToOneString<T>(this ICollection<T> array, string splitChar = "\n", Func<T, string> toString = null)
+		public static string ToOneString<T>(this ICollection<T> array, string splitChar = "\n", Func<T, string> toString = null, bool ignoreNull = false)
 		{
 			if (array == null)
 			{
@@ -149,7 +149,9 @@ namespace QTool
 				{
 					foreach (var item in array)
 					{
-						writer.Write(toString(item));
+						var data = toString(item);
+						if (ignoreNull && data.IsNull()) { i++; continue; }
+						writer.Write(data);
 						if (i < array.Count - 1)
 						{
 							writer.Write(splitChar);
@@ -157,7 +159,6 @@ namespace QTool
 						i++;
 					}
 				}
-
 			});
 		}
 		public static string SplitEndString(this string str, string splitStart)
