@@ -41,7 +41,7 @@ namespace QTool
 	public abstract class QRuntimeObject<RuntimeT, DataT> : MonoBehaviour,IKey<string>,IQPoolObject where RuntimeT : QRuntime<RuntimeT, DataT>, new() where DataT : QDataList<DataT>, new()
 	{
 		private RuntimeT _Runtime = null;
-		public virtual RuntimeT Runtime
+		public RuntimeT Runtime
 		{
 			get
 			{
@@ -57,27 +57,15 @@ namespace QTool
 			{
 				if (value != _Runtime)
 				{
-					gameObject.UnRegisterEvent(_Runtime);
-					RuntimeValues.Clear();
-					_Runtime = value;
-					gameObject.RegisterEvent(_Runtime?.Data);
-					gameObject.RegisterEvent(_Runtime);
-					if (_Runtime != null) 
+					if (_Runtime != null)
 					{
-						var typeInfo = QSerializeType.Get(typeof(RuntimeT));
-						foreach (var member in typeInfo.Members)
-						{
-							if (member.Type.Is(typeof(QRuntimeValue)))
-							{
-								var runtimeValue = member.Get(_Runtime).As<QRuntimeValue>();
-								runtimeValue.Name = member.QName;
-								RuntimeValues[member.QName] = runtimeValue;
-								runtimeValue.OnValueChange += (key, value) =>
-								{
-									OnValueChange?.Invoke(key);
-								};
-							}
-						}
+						OnUnsetRuntime();
+					}
+					_Runtime = value;
+				
+					if (_Runtime != null)
+					{
+						OnSetRuntime();
 					}
 				}
 			}
@@ -105,6 +93,30 @@ namespace QTool
 			{
 				Runtime = null;
 			}
+		}
+		protected virtual void OnSetRuntime()
+		{
+			gameObject.RegisterEvent(_Runtime?.Data);
+			gameObject.RegisterEvent(_Runtime);
+			var typeInfo = QSerializeType.Get(typeof(RuntimeT));
+			foreach (var member in typeInfo.Members)
+			{
+				if (member.Type.Is(typeof(QRuntimeValue)))
+				{
+					var runtimeValue = member.Get(_Runtime).As<QRuntimeValue>();
+					runtimeValue.Name = member.QName;
+					RuntimeValues[member.QName] = runtimeValue;
+					runtimeValue.OnValueChange += (key, value) =>
+					{
+						OnValueChange?.Invoke(key);
+					};
+				}
+			}
+		}
+		protected virtual void OnUnsetRuntime()
+		{
+			gameObject.UnRegisterEvent(_Runtime);
+			RuntimeValues.Clear();
 		}
 	}
 }
