@@ -438,14 +438,14 @@ namespace QTool
 		{
 			obj.GetParentTrigger()?.Invoke(eventName.Trim(), value);
 		}
-		public static void RegisterEvent<T>(this GameObject gameObject, T obj, params string[] keys)
+		public static void RegisterEvent(this GameObject gameObject, object obj, params string[] keys)
 		{
 			if (obj.IsNull()) return;
 			var trigger = gameObject?.GetTrigger();
 			var KeyTriggers= gameObject.GetComponentsInChildren<QKeyInfoTrigger>();
 			if (trigger != null)
 			{
-				var typeInfo = QSerializeType.Get(typeof(T));
+				var typeInfo = QSerializeType.Get(obj.GetType());
 				foreach (var member in typeInfo.Members)
 				{
 					if (member.QNameAttribute == null) continue;
@@ -501,14 +501,14 @@ namespace QTool
 				}
 			}
 		}
-		public static void UnRegisterEvent<T>(this GameObject gameObject, T obj, params string[] keys)
+		public static void UnRegisterEvent(this GameObject gameObject, object obj, params string[] keys)
 		{
 			if (obj.IsNull()) return;
 			var trigger = gameObject?.GetTrigger();
 			var KeyTriggers = gameObject.GetComponentsInChildren<QKeyInfoTrigger>();
 			if (trigger != null)
 			{
-				var typeInfo = QSerializeType.Get(typeof(T));
+				var typeInfo = QSerializeType.Get(obj.GetType());
 				foreach (var member in typeInfo.Members)
 				{
 					if (member.QNameAttribute == null) continue;
