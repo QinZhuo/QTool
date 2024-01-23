@@ -256,15 +256,22 @@ namespace QTool.FlowGraph
 				curNode.Start = curNode;
 				while (curNode != null)
 				{
-					RunningNodeList.Add(curNode.Key);
-					yield return curNode.RunIEnumerator();
-					if (RunningNodeList.Contains(curNode.Key))
+					if (curNode.WaitRunOver)
 					{
-						RunningNodeList.RemoveAt(RunningNodeList.IndexOf(curNode.Key));
+						RunningNodeList.Add(curNode.Key);
+						yield return curNode.RunIEnumerator();
+						if (RunningNodeList.Contains(curNode.Key))
+						{
+							RunningNodeList.RemoveAt(RunningNodeList.IndexOf(curNode.Key));
+						}
+						else
+						{
+							yield break;
+						}
 					}
 					else
 					{
-						yield break;
+						InvokeEvent(curNode.Key);
 					}
 					var port = curNode.NextNodePort;
 					if (port != null)
@@ -1070,6 +1077,8 @@ namespace QTool.FlowGraph
         public ReturnType returnType { private set; get; }= ReturnType.Void;
         [QIgnore]
         public List<QFlowPort> OutParamPorts = new List<QFlowPort>();
+		public bool WaitRunOver { get; set; } = true;
+		public bool HasInfoString { get; set; } = true;
 		public bool IsRunning => Graph.RunningNodeList.Contains(Key);
 		public string Name { get; set; }
 		public string Key { get;  set; } = QTool.GetGuid();
@@ -1322,6 +1331,7 @@ namespace QTool.FlowGraph
 		}
 		public string ToInfoString()
 		{
+			if (!HasInfoString) return "";
 			if (NodeToInfoString == null)
 			{
 				return Name;

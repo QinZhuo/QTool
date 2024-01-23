@@ -218,7 +218,6 @@ namespace QTool.FlowGraph
 						OnFocus();
 					});
 				}
-			
 			});
 			Back.RegisterCallback<MouseUpEvent>(data =>
 			{
@@ -280,7 +279,7 @@ namespace QTool.FlowGraph
 				SelectNodes.AddCheckExist(nodeView);
 				UpdateNodeSelect(nodeView);
 			});
-		
+
 			nodeView.AddMenu(data =>
 			{
 				MoveOffset = false;
@@ -305,6 +304,23 @@ namespace QTool.FlowGraph
 						RemoveNodeView(node);
 					}
 				});
+
+				data.menu.AppendSeparator();
+				data.menu.AppendAction("等待运行", action =>
+				{
+					node.WaitRunOver = !node.WaitRunOver;
+				}, state =>
+				{
+					return node.WaitRunOver ? DropdownMenuAction.Status.Checked : DropdownMenuAction.Status.Normal;
+				});
+				data.menu.AppendAction("节点信息", action =>
+				{
+					node.HasInfoString = !node.HasInfoString;
+				}, state =>
+				{
+					return node.HasInfoString ? DropdownMenuAction.Status.Checked : DropdownMenuAction.Status.Normal;
+				});
+				data.menu.AppendSeparator();
 			});
 			var label = nodeView.AddLabel(node.Name);
 			label.name = "Title";
