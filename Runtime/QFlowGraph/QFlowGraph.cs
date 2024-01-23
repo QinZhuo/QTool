@@ -1331,7 +1331,17 @@ namespace QTool.FlowGraph
 		}
 		public string ToInfoString()
 		{
-			if (!HasInfoString) return "";
+			if (!HasInfoString)
+			{
+				if (NextNodePort != null)
+				{
+					return Graph.GetNode(NextNodePort.Value.node).ToInfoString();
+				}
+				else
+				{
+					return "";
+				}
+			}
 			if (NodeToInfoString == null)
 			{
 				return Name;
