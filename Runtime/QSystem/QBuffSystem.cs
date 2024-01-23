@@ -90,6 +90,7 @@ namespace QTool
 			if (Buffs.ContainsKey(key))
 			{
 				var buff = Buffs[key];
+				count = Mathf.Max(count, buff.Count.IntValue);
 				if (buff.Data.MaxCount == 1)
 				{
 					EndBuff(buff);
