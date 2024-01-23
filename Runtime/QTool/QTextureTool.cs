@@ -205,12 +205,33 @@ namespace QTool
 				QFileTool.Save(path, bytes);
 			}
 		}
-		public static Texture2D LoadTexture(this string path)
+		public static Texture2D ReadableClone(this Texture2D tex)
 		{
-			var bytes =QFileTool.LoadBytes(path);
-			Texture2D tex = new Texture2D(2, 2);
+			var newText = new Texture2D(tex.width, tex.height, tex.format, false);
+			newText.LoadRawTextureData(tex.GetRawTextureData());
+			if(newText.format!= TextureFormat.RGBA32)
+			{
+				tex = newText;
+				newText = new Texture2D(tex.width, tex.height,  TextureFormat.RGBA32, false);
+				for (int x = 0; x < tex.width; x++)
+				{
+					for (int y = 0; y < tex.height; y++)
+					{
+						newText.SetPixel(x, y, tex.GetPixel(x, y));
+					}
+				}
+			}
+			return newText;
+		}
+		private static Texture2D LoadTexture(this byte[] bytes)
+		{
+			var tex = new Texture2D(2, 2);
 			tex.LoadImage(bytes);
 			return tex;
+		}
+		public static Texture2D LoadTexture(this string path)
+		{
+			return QFileTool.LoadBytes(path).LoadTexture();
 		}
 		public static void SetTexture(this UnityEngine.UI.RawImage rawImage, Texture2D texture, bool autoColor = true)
 		{

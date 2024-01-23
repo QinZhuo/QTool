@@ -9,14 +9,16 @@ using System.Threading.Tasks;
 using UnityEngine.U2D;
 using UnityEditor.U2D;
 using UnityEngine.Networking;
+using System.Reflection;
 #if Addressable
 using UnityEditor.AddressableAssets.Settings;
 using UnityEditor.AddressableAssets;
 #endif
-namespace QTool {
+namespace QTool
+{
 	public static class QAssetEditor
 	{
-		
+
 		#region 资源Id
 		[MenuItem("QTool/资源管理/场景资源/查找当前场景所有Mesh丢失")]
 		static void FindAllMeshNull()
@@ -84,7 +86,7 @@ namespace QTool {
 								case ".mat":
 								case ".playable":
 									{
-										var text = QFileTool.Load(path,"",true);
+										var text = QFileTool.Load(path, "", true);
 										if (text.Contains(oldId))
 										{
 											Debug.LogError("更改[" + path + "]引用资源");
@@ -106,7 +108,7 @@ namespace QTool {
 				Debug.LogError("选中过多");
 			}
 		}
-	
+
 		[MenuItem("QTool/资源管理/资源Id/查找资源引用 %#&f")]
 		static void FindreAssetFerencesMenu()
 		{
@@ -218,15 +220,15 @@ namespace QTool {
 		{
 			foreach (var asset in Selection.objects)
 			{
-				var path= AssetDatabase.GetAssetPath(asset);
+				var path = AssetDatabase.GetAssetPath(asset);
 				var newName = UnityWebRequest.UnEscapeURL(asset.name);
 				if (asset.name != newName)
 				{
 					QDebug.Log("更改资源名[" + asset.name + "]=>[" + newName + "]");
-					var error= AssetDatabase.RenameAsset(path, newName);
+					var error = AssetDatabase.RenameAsset(path, newName);
 					if (!error.IsNull())
 					{
-						Debug.LogError("更改资源名出错 "+error);
+						Debug.LogError("更改资源名出错 " + error);
 						return;
 					}
 				}
@@ -366,6 +368,22 @@ namespace QTool {
 				audioImporter.SaveAndReimport();
 			}
 		}
+		[MenuItem("QTool/资源管理/图集/图集生成Png")]
+		public static void AtlasToPng()
+		{
+			if (Selection.activeObject is SpriteAtlas atlas && Selection.activeObject.IsAsset())
+			{
+				var path = AssetDatabase.GetAssetPath(Selection.activeObject);
+				var folder = path.DirectoryName();
+				var name = path.FileName(false);
+				var textures = atlas.GetPreviewTextures();
+				for (int i = 0; i < textures.Length; i++)
+				{
+					textures[i].ReadableClone().SavePNG(folder + "/" + name + "_" + i + ".png");
+				}
+				AssetDatabase.Refresh();
+			}
+		}
 		public readonly static List<int> TextureSize = new List<int> { 1, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096 };
 		public const float MaxCompressionSize = 512 * 512;
 		public const float MinCompressionSize = 8 * 8;
@@ -374,8 +392,8 @@ namespace QTool {
 			if (texture == null || textureImporter.textureType == TextureImporterType.Cursor) return;
 			var setting = QToolSetting.Instance;
 			var size = texture.width * texture.height;
-			if (size <= MinCompressionSize|| size >= MaxCompressionSize) return;
-			if (textureImporter.assetPath.EndsWith(".png") && textureImporter.textureType == TextureImporterType.Sprite && textureImporter.spriteImportMode == SpriteImportMode.Single && (texture.width % 4 != 0 || texture.height % 4 != 0) )
+			if (size <= MinCompressionSize || size >= MaxCompressionSize) return;
+			if (textureImporter.assetPath.EndsWith(".png") && textureImporter.textureType == TextureImporterType.Sprite && textureImporter.spriteImportMode == SpriteImportMode.Single && (texture.width % 4 != 0 || texture.height % 4 != 0))
 			{
 				var last = textureImporter.isReadable;
 				if (!last)
@@ -460,5 +478,18 @@ namespace QTool {
 
 		#endregion
 
+		public static Texture2D[] GetPreviewTextures(this SpriteAtlas spriteAtlas)
+		{
+			var methodInfo = typeof(SpriteAtlasExtensions).GetMethod("GetPreviewTextures", BindingFlags.NonPublic | BindingFlags.Static);
+			if (methodInfo == null)
+			{
+				Debug.LogError("<color=red> 从 SpriteAtlasExtensions 获取方法为空！ </color>");
+				return null;
+			}
+			else
+			{
+				return methodInfo.Invoke(null, new SpriteAtlas[] { spriteAtlas }) as Texture2D[];
+			}
+		}
 	}
 }
