@@ -896,8 +896,7 @@ namespace QTool
 				for (int i = 0; i < titleRow.Count; i++)
 				{
 					var member = memeberList[i];
-					if (member.Set == null) continue;
-					if (member != null)
+					if (member?.Set != null)
 					{
 						try
 						{
