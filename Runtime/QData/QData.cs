@@ -854,7 +854,7 @@ namespace QTool
 				qdataList.Clear();
 			}
 
-			var typeInfo = QSerializeType.Get(type);
+			var typeInfo = QSerializeHasReadOnlyType.Get(type);
 			foreach (var member in typeInfo.Members)
 			{
 				qdataList.TitleRow.Add(member.QName);
@@ -876,13 +876,14 @@ namespace QTool
 				}
 			}
 			QDebug.Begin("解析QDataList<" + type.Name + ">数据");
-			var typeInfo = QSerializeType.Get(type);
+			var typeInfo = QSerializeHasReadOnlyType.Get(type);
 			list.Clear();
 			var titleRow = qdataList.TitleRow;
 			var memeberList = new List<QMemeberInfo>();
 			foreach (var title in titleRow)
 			{
 				var member = typeInfo.GetMemberInfo(title);
+				if (member.Set == null) continue;
 				if (member == null)
 				{
 					Debug.LogWarning("读取 " + type.Name + "出错 不存在属性 " + title);
