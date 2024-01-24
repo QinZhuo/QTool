@@ -883,7 +883,6 @@ namespace QTool
 			foreach (var title in titleRow)
 			{
 				var member = typeInfo.GetMemberInfo(title);
-				if (member.Set == null) continue;
 				if (member == null)
 				{
 					Debug.LogWarning("读取 " + type.Name + "出错 不存在属性 " + title);
@@ -897,6 +896,7 @@ namespace QTool
 				for (int i = 0; i < titleRow.Count; i++)
 				{
 					var member = memeberList[i];
+					if (member.Set == null) continue;
 					if (member != null)
 					{
 						try
