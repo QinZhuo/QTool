@@ -9,7 +9,8 @@ public class QKeyInfoTrigger : MonoBehaviour, IPointerEnterHandler, IPointerExit
 {
 	public static event Action<QKeyInfoTrigger> OnEnter;
 	public static event Action<QKeyInfoTrigger> OnExit;
-	public string Key { get => name; set => name = value; }
+	private string m_Key = null;
+	public string Key { get => m_Key ??= name; set => m_Key = value; }
 	public string Info { get; set; }
 	public void Set(string key, string info)
 	{
