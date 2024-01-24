@@ -194,7 +194,7 @@ namespace QTool
 		private static void PercentRun(QFlowNode This, int percent = 50, [QOutputPort] QFlow True = default, [QOutputPort] QFlow False = default)
 		{
 			var value = QRandom.Instance.Range(0, 100);
-			if (value <	 percent)
+			if (value < percent)
 			{
 				This.SetNetFlowPort(nameof(True));
 			}
@@ -260,7 +260,7 @@ namespace QTool
 			{
 				case nameof(PercentRun):
 					{
-						return node.Ports["percent"].ToInfoString() + "%概率" + node.Ports["True"].ToInfoString();
+						return "{0}%概率".ToLozalizationKey(node.Ports["percent"].ToInfoString()) + " " + node.Ports["True"].ToInfoString();
 					}
 				default:
 					break;
@@ -269,5 +269,4 @@ namespace QTool
 			return info;
 		}
 	}
-
 }
