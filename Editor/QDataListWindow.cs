@@ -46,7 +46,7 @@ namespace QTool.FlowGraph
 		{
 			QFileTool.Save(FilePath, Data);
 		}
-		public QSerializeViewType typeInfo;
+		public QSerializeType typeInfo;
 		public QDataList qdataList;
 		public QList<object> objList = new QList<object>();
 		public QList<QMemeberInfo> Members = new QList<QMemeberInfo>();
@@ -213,7 +213,7 @@ namespace QTool.FlowGraph
 				var type = QReflection.ParseType(path.GetBlockValue(nameof(QDataList) + "Asset" + '/', ".txt").SplitStartString("/"));
 				if (type != null)
 				{
-					typeInfo = QSerializeViewType.Get(type);
+					typeInfo = QSerializeType.Get(type);
 					qdataList = QDataList.Load(path);
 					qdataList.ParseQDataList(objList, type);
 					for (int i = 0; i < qdataList.TitleRow.Count; i++)
