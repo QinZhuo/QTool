@@ -269,7 +269,14 @@ namespace QTool.FlowGraph
 				var member = Members[x];
 				if (member == null) return "";
 				var obj = objList[y - 1];
-				return member.Get(obj)?.ToQDataType(member.Type,false).Trim('\"');
+				try
+				{
+					return member.Get(obj)?.ToQDataType(member.Type, false).Trim('\"');
+				}
+				catch (Exception e)
+				{
+					throw new Exception("获取数据出错[" + obj + "][" + member.Key + "][" + member.Get + "]", e);
+				}
 			}
 		}
 	}
