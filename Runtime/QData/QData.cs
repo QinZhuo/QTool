@@ -1174,5 +1174,9 @@ namespace QTool
 	{
 
 	}
+	public class QSerializeHasReadOnlyType : QSerializeType<QSerializeHasReadOnlyType>
+	{
+		public override bool IgnoreReadOnlyMember => false;
+	}
 }
 

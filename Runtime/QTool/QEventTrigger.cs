@@ -445,7 +445,7 @@ namespace QTool
 			var KeyTriggers= gameObject.GetComponentsInChildren<QKeyInfoTrigger>();
 			if (trigger != null)
 			{
-				var typeInfo = QSerializeType.Get(obj.GetType());
+				var typeInfo = QSerializeHasReadOnlyType.Get(obj.GetType());
 				foreach (var member in typeInfo.Members)
 				{
 					if (member.QNameAttribute == null) continue;
@@ -508,7 +508,7 @@ namespace QTool
 			var KeyTriggers = gameObject.GetComponentsInChildren<QKeyInfoTrigger>();
 			if (trigger != null)
 			{
-				var typeInfo = QSerializeType.Get(obj.GetType());
+				var typeInfo = QSerializeHasReadOnlyType.Get(obj.GetType());
 				foreach (var member in typeInfo.Members)
 				{
 					if (member.QNameAttribute == null) continue;
