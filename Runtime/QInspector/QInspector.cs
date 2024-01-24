@@ -181,7 +181,7 @@ namespace QTool.Inspector
 			base.Init(type);
 			if (!TypeMembers.ContainsKey(type))
 			{
-				Members.RemoveAll(memebr => (!memebr.IsPublic && memebr.MemeberInfo.GetCustomAttribute<SerializeField>() == null) || !(memebr.MemeberInfo is FieldInfo));
+				Members.RemoveAll(memebr => (!memebr.IsPublic && memebr.MemeberInfo.GetCustomAttribute<SerializeField>() == null) || !(memebr.MemeberInfo is FieldInfo) || memebr.Set == null);
 			}
 			foreach (var funcInfo in Functions)
 			{

@@ -440,10 +440,6 @@ namespace QTool
 
 									foreach (var member in typeInfo.Members)
 									{
-										if (member.ReadOnly)
-										{
-											continue;
-   										}
 										foldout.contentContainer.Add(member.QName, member.Get(obj), member.Type, (value) =>
 										{
 											member.Set(obj, value);

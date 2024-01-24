@@ -46,7 +46,7 @@ namespace QTool.FlowGraph
 		{
 			QFileTool.Save(FilePath, Data);
 		}
-		public QSerializeType typeInfo;
+		public QSerializeViewType typeInfo;
 		public QDataList qdataList;
 		public QList<object> objList = new QList<object>();
 		public QList<QMemeberInfo> Members = new QList<QMemeberInfo>();
@@ -57,10 +57,10 @@ namespace QTool.FlowGraph
 		#region 初始化UI
 		protected override void CreateGUI()
 		{
-			base.CreateGUI();	
+			base.CreateGUI();
 			var root = rootVisualElement.AddScrollView();
 			root.style.height = new Length(100, LengthUnit.Percent);
-		
+
 			listView = root.AddListView(qdataList, (visual, y) =>
 			{
 				visual.Clear();
@@ -86,7 +86,7 @@ namespace QTool.FlowGraph
 						label.style.marginLeft = 10;
 						label.style.marginRight = 10;
 						label.name = title;
-						if (member?.ReadOnly == true)
+						if (member.Set == null)
 						{
 							label.SetEnabled(false);
 						}
@@ -213,7 +213,7 @@ namespace QTool.FlowGraph
 				var type = QReflection.ParseType(path.GetBlockValue(nameof(QDataList) + "Asset" + '/', ".txt").SplitStartString("/"));
 				if (type != null)
 				{
-					typeInfo = QSerializeType.Get(type);
+					typeInfo = QSerializeViewType.Get(type);
 					qdataList = QDataList.Load(path);
 					qdataList.ParseQDataList(objList, type);
 					for (int i = 0; i < qdataList.TitleRow.Count; i++)
@@ -233,7 +233,7 @@ namespace QTool.FlowGraph
 				PlayerPrefs.SetString(nameof(QDataListWindow) + "_LastPath", path);
 				await QTask.Wait(() => listView != null);
 				listView.itemsSource = qdataList;
-				listView.style.width = qdataList.TitleRow.Count * 200+100;
+				listView.style.width = qdataList.TitleRow.Count * 200 + 100;
 				listView.Rebuild();
 			}
 			catch (Exception e)
@@ -247,7 +247,7 @@ namespace QTool.FlowGraph
 			qdataList.CreateAt(QSerializeType.Get(typeof(QDataList)), y);
 			if (objList != null)
 			{
-				objList.CreateAt(QSerializeType.Get(typeof(List<object>)),y-1);
+				objList.CreateAt(QSerializeType.Get(typeof(List<object>)), y - 1);
 			}
 		}
 		public void RemoveAt(int y)
@@ -255,12 +255,12 @@ namespace QTool.FlowGraph
 			qdataList.RemoveAt(y);
 			if (objList != null)
 			{
-				objList?.RemoveAt(y-1);
+				objList?.RemoveAt(y - 1);
 			}
 		}
-		public string GetValue(int x,int y)
+		public string GetValue(int x, int y)
 		{
-			if (y == 0||typeInfo==null)
+			if (y == 0 || typeInfo == null)
 			{
 				return qdataList[y][x];
 			}
@@ -280,5 +280,8 @@ namespace QTool.FlowGraph
 			}
 		}
 	}
-	
+	public class QSerializeViewType : QSerializeType<QSerializeViewType>
+	{
+		public override bool IgnoreReadOnlyMember => false;
+	}
 }

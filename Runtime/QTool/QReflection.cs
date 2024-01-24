@@ -27,7 +27,6 @@ namespace QTool.Reflection
 		public MemberInfo MemeberInfo { get; private set; }
 		public bool IsPublic { get; private set; }
 		public bool IsUnityObject { get; private set; }
-		public bool ReadOnly => Set == null;
 		public QMemeberInfo(FieldInfo info)
 		{
 			MemeberInfo = info;
@@ -671,7 +670,7 @@ namespace QTool.Reflection
 			else
 			{
 				var memebers = QReflectionType.Get(target.GetType()).Members;
-				if (memebers.ContainsKey(path) && !memebers[path].ReadOnly)
+				if (memebers.ContainsKey(path) && memebers[path].Set!=null)
 				{
 					memebers[path].Set(target, value);
 					return value;

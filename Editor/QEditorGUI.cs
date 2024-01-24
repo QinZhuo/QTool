@@ -256,7 +256,6 @@ namespace QTool
 													{
 														try
 														{
-															if (member.ReadOnly) continue;
 															if (member.Type.IsValueType)
 															{
 																member.Set(obj, member.Get(obj).Draw(member.QName, member.Type));

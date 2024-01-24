@@ -83,7 +83,6 @@ namespace QTool
 										writer.Write(typeInfo.Members.Count);
 										foreach (var item in typeInfo.Members)
                                         {
-											if (item.ReadOnly) continue;
 											writer.SerializeType(item.Get(value), item.Type);
                                         }
                                     }  
@@ -264,7 +263,6 @@ namespace QTool
                                     {
                                         foreach (var memeberInfo in typeInfo.Members)
                                         {
-											if (memeberInfo.ReadOnly) continue;
 											memeberInfo.Set.Invoke(target, DeserializeType(reader, memeberInfo.Type, memeberInfo.Get(target) ));
 										}
                                     }
@@ -272,7 +270,6 @@ namespace QTool
                                     {
                                         foreach (var memeberInfo in typeInfo.Members)  
                                         {
-											if (memeberInfo.ReadOnly) continue;
 											memeberInfo.Set.Invoke(target, DeserializeType(reader, memeberInfo.Type));
                                         }
                                     }
