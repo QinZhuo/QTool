@@ -49,7 +49,10 @@ namespace QTool
 		{
 			for (int i = 0; i < RunImmediateMaxLoopTimes; i++)
 			{
-				UpdateImmediate(enumerator);
+				if (!UpdateImmediate(enumerator))
+				{
+					return;
+				}
 			}
 			QDebug.LogError(enumerator + " 立即运行次数超过 " + RunImmediateMaxLoopTimes + " 次循环");
 		}
