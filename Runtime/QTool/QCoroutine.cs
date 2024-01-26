@@ -110,11 +110,11 @@ namespace QTool
 		private static bool UpdateIEnumerator(IEnumerator enumerator, bool waitYieldInstruction = true)
 		{
 			var start = enumerator.Current;
-			if (enumerator.Current is YieldInstruction ie && waitYieldInstruction)
+			if (enumerator.Current is YieldInstruction ie)
 			{
 				if (UpdateIEnumerator(ie))
 				{
-					return true;
+					return waitYieldInstruction;
 				}
 			}
 			else if (enumerator.Current is IEnumerator nextChild)
