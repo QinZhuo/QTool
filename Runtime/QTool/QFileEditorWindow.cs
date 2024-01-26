@@ -99,7 +99,9 @@ namespace QTool
 			}
 			else
 			{
-				Data = GetData();
+				Close();
+				return;
+				//Data = GetData();
 			}
 			if (!Data.IsNull())
 			{
