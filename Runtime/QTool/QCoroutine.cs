@@ -44,9 +44,16 @@ namespace QTool
 		/// <summary>
 		/// 以同步方式运行一次更新
 		/// </summary>
-		public static void RunImmediate(this IEnumerator enumerator)
+		public static void RunImmediate(this IEnumerator enumerator, int maxLoopTimes = 10)
 		{
-			UpdateIEnumerator(enumerator);
+			for (int i = 0; i < maxLoopTimes; i++)
+			{
+				if (!UpdateIEnumerator(enumerator))
+				{
+					return;
+				}
+			}
+			QDebug.LogError(enumerator + " 运行次数超过 " + maxLoopTimes + " 次循环");
 		}
 		public static IEnumerator Start(this IEnumerator enumerator, List<IEnumerator> coroutineList)
 		{
