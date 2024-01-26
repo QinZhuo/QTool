@@ -112,14 +112,15 @@ namespace QTool
 			var start = enumerator.Current;
 			if (enumerator.Current is YieldInstruction ie)
 			{
+				if (!waitYieldInstruction) return false;
 				if (UpdateIEnumerator(ie))
 				{
-					return waitYieldInstruction;
+					return true;
 				}
 			}
 			else if (enumerator.Current is IEnumerator nextChild)
 			{
-				if (UpdateIEnumerator(nextChild))
+				if (UpdateIEnumerator(nextChild, waitYieldInstruction))
 				{
 					return true;
 				}
@@ -127,7 +128,7 @@ namespace QTool
 			var result = enumerator.MoveNext();
 			if (enumerator.Current != null && start != enumerator.Current)
 			{
-				return UpdateIEnumerator(enumerator);
+				return UpdateIEnumerator(enumerator, waitYieldInstruction);
 			}
 			else
 			{
