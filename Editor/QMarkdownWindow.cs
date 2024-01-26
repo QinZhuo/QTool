@@ -105,7 +105,7 @@ namespace QTool
 
 		public override void SaveData()
 		{
-			QFileTool.Save(FilePath, Data);
+			QFileTool.SaveCheckChange(FilePath, Data);
 		}
 	}
 	[CustomEditor(typeof(TextAsset))]

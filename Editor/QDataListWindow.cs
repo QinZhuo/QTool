@@ -44,7 +44,7 @@ namespace QTool.FlowGraph
 
 		public override void SaveData()
 		{
-			QFileTool.Save(FilePath, Data);
+			QFileTool.SaveCheckChange(FilePath, Data);
 		}
 		public QSerializeHasReadOnlyType typeInfo;
 		public QDataList qdataList;

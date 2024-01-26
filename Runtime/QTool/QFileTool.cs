@@ -568,6 +568,13 @@ namespace QTool
 
 			}
 		}
+		public static void SaveCheckChange(string path, string data)
+		{
+			if (!string.Equals(Load(path).Trim(), data.Trim()))
+			{
+				Save(path, data);
+			}
+		}
 		public static void Save(string path, string data)
 		{
 			if (path.EndsWith(SecretExtension))

@@ -85,9 +85,9 @@ namespace QTool
 				{
 #if UNITY_EDITOR
 					var asset = AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(path);
-					titleContent.text = asset.name + " - " + typeof(T).Name.SplitStartString("Window");
 					if (asset != null)
 					{
+						titleContent.text = asset.name + " - " + typeof(T).Name.SplitStartString("Window");
 						Data = GetData(asset);
 					}
 					else
