@@ -32,7 +32,6 @@ namespace QTool
 					{
 						return;
 					}
-					AutoLoad = true;
 					UndoList.Clear();
 					QPlayerPrefs.SetString(typeof(T).Name + "_" + nameof(FilePath), value);
 #if UNITY_2022_1_OR_NEWER
@@ -126,11 +125,11 @@ namespace QTool
 				ChangeData(value);
 			}
 		}
-		public static bool AutoLoad { get; set; } = true;
+		public bool AutoLoad { get; set; } = true;
 		protected virtual void OnLostFocus()
 		{
 			var path = FilePath;
-			if (!path.IsNull())
+			if (!path.IsNull() && !Data.IsNull())
 			{
 				SaveData();
 #if UNITY_EDITOR
@@ -156,7 +155,7 @@ namespace QTool
 			FilePathList.RemoveAll(path => path.IsNull() || !path.Replace('/', '\\').ExistsFile());
 			FilePathList.Save();
 #if UNITY_2022_1_OR_NEWER
-			PathPopup = Toolbar.AddPopup("", FilePathList.List, FilePath?.Replace('/', '\\'), path => { OnLostFocus(); FilePath = path.Replace('\\', '/'); if (!FilePath.ExistsFile()) Data = ""; OnFocus(); });
+			PathPopup = Toolbar.AddPopup("", FilePathList.List, FilePath?.Replace('/', '\\'), path => { OnLostFocus(); AutoLoad = true; FilePath = path.Replace('\\', '/'); if (!FilePath.ExistsFile()) Data = ""; OnFocus(); });
 #endif
 			Toolbar.AddButton("撤销", Undo);
 		}
