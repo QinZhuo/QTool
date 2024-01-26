@@ -138,6 +138,9 @@ namespace QTool
 		[QName]
 		public QDictionary<string, QValue> OffsetValues = null;
 		private List<string> buffer = new List<string>();
+		/// <summary>
+		/// 不会受Scale影响的数值
+		/// </summary>
 		public float OffsetValue
 		{
 			get
@@ -176,7 +179,7 @@ namespace QTool
 		public int IntValue => Mathf.RoundToInt(Value);
 		private void FreshValue()
 		{
-			m_Value = (BaseValue + OffsetValue) * ScaleValue;
+			m_Value = BaseValue * ScaleValue + OffsetValue;
 			InvokeOnChange();
 		}
 		public override void OnQDeserializeOver()
