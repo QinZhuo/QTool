@@ -126,7 +126,7 @@ namespace QTool
 			}
 			else
 			{
-				return true;
+				return false;
 			}
 		}
 		/// <summary>
