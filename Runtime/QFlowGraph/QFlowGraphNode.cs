@@ -262,7 +262,7 @@ namespace QTool.FlowGraph
 				trigger.Start = start;
 				trigger.Relaction = relaction;
 				yield return trigger.Init();
-				if (This.State != QNodeState.失败 && trigger != null)
+				if (This.State != QNodeState.失败)
 				{
 					This[nameof(init)] = trigger.transform;
 					yield return This.RunPortIEnumerator(nameof(init));
