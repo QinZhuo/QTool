@@ -31,7 +31,7 @@ namespace QTool.FlowGraph
 		}
         public override string ToString()
         {
-            return this.ToQData();
+			return Name + "_" + GetHashCode();
         }
 		[QIgnore]
 		public float ToFloat(string startKey = null, Func<QFlowNode, float> toFloatFunc = null)
