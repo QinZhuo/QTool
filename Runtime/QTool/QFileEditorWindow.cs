@@ -101,7 +101,7 @@ namespace QTool
 			{
 				Close();
 				return;
-				//Data = GetData();
+				//Data = GetData(); 
 			}
 			if (!Data.IsNull())
 			{
