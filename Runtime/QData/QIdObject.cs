@@ -202,7 +202,7 @@ namespace QTool
 				}
 #endif
 			}
-			Debug.LogWarning("找不到[" + id + "]对象");
+			QDebug.LogWarning("找不到[" + id + "]对象");
 			return null;
 		}
 		public static T GetObject<T>(string id) where T : Object

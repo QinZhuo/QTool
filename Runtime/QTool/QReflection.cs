@@ -1110,7 +1110,7 @@ namespace QTool.Reflection
 				} 
 				else
 				{
-					Debug.LogError("["+target+"]("+target.GetType() + ") 找不到 key " + path+"\n"+ typeInfo.Members.ToOneString());
+					QDebug.LogError("["+target+"]("+target.GetType() + ") 找不到 key " + path+"\n"+ typeInfo.Members.ToOneString());
 					return target;
 				}
 			}

@@ -81,7 +81,7 @@ namespace QTool
 				var type= QReflection.ParseType(componentData.Key);
 				if (type == null)
 				{
-					Debug.LogError("找不到脚本[" + componentData.Key + "]");
+					QDebug.LogError("找不到脚本[" + componentData.Key + "]");
 				}
 				var component = gameObject.GetComponent(type);
 				if (component == null)

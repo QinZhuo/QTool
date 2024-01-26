@@ -47,7 +47,7 @@ namespace QTool
 			Log("【" + key + "】运行时间 " + stopwatch.Elapsed + " 内存使用 " + (GC.GetTotalMemory(false) - lastMemery).ToSizeString() + " 垃圾回收次数 " + (GC.CollectionCount(0) - lastCount));
 			stopwatch.Stop();
 		}
-		[System.Diagnostics.Conditional("DEVELOPMENT_BUILD"), System.Diagnostics.Conditional("UNITY_EDITOR")]
+		[System.Diagnostics.Conditional("UNITY_EDITOR"), System.Diagnostics.Conditional(nameof(QDebug)+"Log")]
 		public static void Log(object obj)
 		{
 			Debug.Log("[" + nameof(QDebug) + "] " + LogInfoCheck(obj));

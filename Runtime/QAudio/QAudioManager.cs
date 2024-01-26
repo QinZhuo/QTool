@@ -17,7 +17,7 @@ namespace QTool
 			QAudioSetting = Resources.Load<AudioMixer>(nameof(QAudioSetting));
 			if (QAudioSetting == null)
 			{
-				Debug.LogWarning(nameof(Resources) + "找不到设置文件" + nameof(QAudioSetting));
+				QDebug.LogWarning(nameof(Resources) + "找不到设置文件" + nameof(QAudioSetting));
 			}
 		}
 		public static void Play(AudioClip clip,QAudioType audioType= QAudioType.SE)
