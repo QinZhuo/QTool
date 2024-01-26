@@ -48,7 +48,7 @@ namespace QTool
 		{
 			for (int i = 0; i < maxLoopTimes; i++)
 			{
-				if (!UpdateIEnumerator(enumerator))
+				if (!UpdateIEnumerator(enumerator, false))
 				{
 					return;
 				}
@@ -107,11 +107,10 @@ namespace QTool
 		/// </summary>
 		/// <param name="enumerator">迭代器</param>
 		/// <returns>true继续等待 false时结束等待</returns>
-		private static bool UpdateIEnumerator(IEnumerator enumerator)
+		private static bool UpdateIEnumerator(IEnumerator enumerator, bool waitYieldInstruction = true)
 		{
 			var start = enumerator.Current;
-			//Debug.LogError(start + " " + Time.time);
-			if (enumerator.Current is YieldInstruction ie)
+			if (enumerator.Current is YieldInstruction ie && waitYieldInstruction)
 			{
 				if (UpdateIEnumerator(ie))
 				{
