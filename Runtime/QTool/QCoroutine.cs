@@ -70,8 +70,8 @@ namespace QTool
 		}
 		public static void Stop(this IEnumerator enumerator)
 		{
-			//QDebug.LogError("Stop " + enumerator);
 			List.Remove(enumerator);
+			enumerator.RunImmediate();
 		}
 		static Dictionary<YieldInstruction, float> YieldInstructionList = new Dictionary<YieldInstruction, float>();
 
