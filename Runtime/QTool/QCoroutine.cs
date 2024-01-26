@@ -41,19 +41,17 @@ namespace QTool
 			//}
 			return enumerator;
 		}
+		public const int RunImmediateMaxLoopTimes = 100;
 		/// <summary>
 		/// 以同步方式运行一次更新
 		/// </summary>
-		public static void RunImmediate(this IEnumerator enumerator, int maxLoopTimes = 10)
+		public static void RunImmediate(this IEnumerator enumerator)
 		{
-			for (int i = 0; i < maxLoopTimes; i++)
+			for (int i = 0; i < RunImmediateMaxLoopTimes; i++)
 			{
-				if (!UpdateIEnumerator(enumerator, false))
-				{
-					return;
-				}
+				UpdateImmediate(enumerator);
 			}
-			QDebug.LogError(enumerator + " 运行次数超过 " + maxLoopTimes + " 次循环");
+			QDebug.LogError(enumerator + " 立即运行次数超过 " + RunImmediateMaxLoopTimes + " 次循环");
 		}
 		public static IEnumerator Start(this IEnumerator enumerator, List<IEnumerator> coroutineList)
 		{
@@ -73,6 +71,8 @@ namespace QTool
 			List.Remove(enumerator);
 		}
 		static Dictionary<YieldInstruction, float> YieldInstructionList = new Dictionary<YieldInstruction, float>();
+
+		
 		/// <summary>
 		/// 处理Unity内置的等待逻辑
 		/// </summary>
@@ -102,17 +102,40 @@ namespace QTool
 				return false;
 			}
 		}
+		private static bool UpdateImmediate(this IEnumerator enumerator)
+		{
+			var start = enumerator.Current;
+			if (enumerator.Current is YieldInstruction ie)
+			{
+				//跳过处理YieldInstruction
+			}
+			else if (enumerator.Current is IEnumerator nextChild)
+			{
+				if (UpdateImmediate(nextChild))
+				{
+					return true;
+				}
+			}
+			enumerator.MoveNext();
+			if (enumerator.Current != null && start != enumerator.Current)
+			{
+				return UpdateImmediate(enumerator);
+			}
+			else
+			{
+				return true;
+			}
+		}
 		/// <summary>
 		/// 更新迭代
 		/// </summary>
 		/// <param name="enumerator">迭代器</param>
 		/// <returns>true继续等待 false时结束等待</returns>
-		private static bool UpdateIEnumerator(IEnumerator enumerator, bool waitYieldInstruction = true)
+		private static bool UpdateIEnumerator(IEnumerator enumerator)
 		{
 			var start = enumerator.Current;
 			if (enumerator.Current is YieldInstruction ie)
 			{
-				if (!waitYieldInstruction) return false;
 				if (UpdateIEnumerator(ie))
 				{
 					return true;
@@ -120,7 +143,7 @@ namespace QTool
 			}
 			else if (enumerator.Current is IEnumerator nextChild)
 			{
-				if (UpdateIEnumerator(nextChild, waitYieldInstruction))
+				if (UpdateIEnumerator(nextChild))
 				{
 					return true;
 				}
@@ -128,7 +151,7 @@ namespace QTool
 			var result = enumerator.MoveNext();
 			if (enumerator.Current != null && start != enumerator.Current)
 			{
-				return UpdateIEnumerator(enumerator, waitYieldInstruction);
+				return UpdateIEnumerator(enumerator);
 			}
 			else
 			{
