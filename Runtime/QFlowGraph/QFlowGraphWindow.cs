@@ -152,10 +152,7 @@ namespace QTool.FlowGraph
 			});
 			Back.RegisterCallback<MouseDownEvent>(data =>
 			{
-				if (data.target == Back)
-				{
-					AutoSaveLoad = true;
-				}
+				AutoLoad = true;
 			});
 			Back.RegisterCallback<MouseMoveEvent>(data =>
 			{
@@ -440,7 +437,7 @@ namespace QTool.FlowGraph
 		}
 		private void ValueMouseEnterEvent(MouseEnterEvent data)
 		{
-			AutoSaveLoad = false;
+			AutoLoad = false;
 		}
 		public Color GetColor(QFlowPort port)
 		{

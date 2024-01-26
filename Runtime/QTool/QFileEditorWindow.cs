@@ -32,7 +32,7 @@ namespace QTool
 					{
 						return;
 					}
-					AutoSaveLoad = true;
+					AutoLoad = true;
 					UndoList.Clear();
 					QPlayerPrefs.SetString(typeof(T).Name + "_" + nameof(FilePath), value);
 #if UNITY_2022_1_OR_NEWER
@@ -76,7 +76,7 @@ namespace QTool
 		protected virtual void OnFocus()
 		{
 			var path = FilePath;
-			if (!AutoSaveLoad) return;
+			if (!AutoLoad) return;
 			if (path.IsNull())
 			{
 				Data = "";
@@ -126,20 +126,25 @@ namespace QTool
 				ChangeData(value);
 			}
 		}
-		public static bool AutoSaveLoad { get; set; } = true;
+		public static bool AutoLoad { get; set; } = true;
 		protected virtual void OnLostFocus()
 		{
 			var path = FilePath;
-			if (AutoSaveLoad)
+			if (!path.IsNull())
 			{
-				if (!path.IsNull())
-				{
-					SaveData();
+				SaveData();
 #if UNITY_EDITOR
-					AssetDatabase.ImportAsset(path);
+				AssetDatabase.ImportAsset(path);
 #endif
-				}
 			}
+		}
+		private void OnEnable()
+		{
+			AutoLoad = true;
+		}
+		private void OnDisable()
+		{
+			OnLostFocus();
 		}
 #if UNITY_2022_1_OR_NEWER
 		protected static PopupField<string> PathPopup { get; private set; } = null;

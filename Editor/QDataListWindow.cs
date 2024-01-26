@@ -120,7 +120,7 @@ namespace QTool.FlowGraph
 											label.Tooltip(label.text);
 										}, member.MemeberInfo);
 									}
-									AutoSaveLoad = false;
+									AutoLoad = false;
 									CellView.style.display = DisplayStyle.Flex;
 									var foldout = CellView.Q<Foldout>();
 									if (foldout != null)
@@ -184,7 +184,7 @@ namespace QTool.FlowGraph
 			});
 			root.RegisterCallback<MouseDownEvent>(data =>
 			{
-				AutoSaveLoad = true;
+				AutoLoad = true;
 				CellView.style.display = DisplayStyle.None;
 			});
 			CellView = rootVisualElement.AddVisualElement();
