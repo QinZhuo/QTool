@@ -287,7 +287,7 @@ namespace QTool
 					QDebug.Log(info.state + "  " + info);
 				}
 				EditorUtility.ClearProgressBar();
-				return PathRun(nameof(Commit).ToLower() + " " + ChangeList.ToOneString(" ") + " -m \"" + QVersionControlWindow.Instance.CommitInfo + '\"', path);
+				return PathRun(nameof(Commit).ToLower() + " " + ChangeList.ToOneString(" ", info => info.select ? info.ToString() : "", true) + " -m \"" + QVersionControlWindow.Instance.CommitInfo + '\"', path);
 			}
 			else
 			{
