@@ -99,7 +99,9 @@ namespace QTool
 			}
 			else
 			{
+#if UNITY_EDITOR
 				Close();
+#endif
 				return;
 				//Data = GetData(); 
 			}
