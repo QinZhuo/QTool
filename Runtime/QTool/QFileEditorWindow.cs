@@ -106,7 +106,11 @@ namespace QTool
 				if (!asset.IsNull())
 				{
 					titleContent.text = asset.name + " - " + typeof(T).Name.SplitStartString("Window");
-					Data = GetData(asset);
+					var newData = GetData(asset);
+					if (!newData.IsNull())
+					{
+						Data = newData;
+					}
 				}
 				else
 				{
