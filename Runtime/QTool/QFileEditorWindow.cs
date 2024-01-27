@@ -47,10 +47,10 @@ namespace QTool
 
 		private static QHistoryList FilePathList = new QHistoryList(typeof(T).Name);
 
-		private static string _Data = null;
-		public static string Data
+		private string _Data = null;
+		public string Data
 		{
-			get => _Data ??= PlayerPrefs.GetString(typeof(T).Name + "_" + nameof(Data));
+			get => _Data;
 			set
 			{
 				if (!Equals(_Data, value))
@@ -147,6 +147,9 @@ namespace QTool
 			var path = FilePath;
 			if (!path.IsNull() && !Data.IsNull())
 			{
+#if UNITY_EDITOR
+				if (EditorApplication.isUpdating) return;
+#endif
 				SaveData();
 #if UNITY_EDITOR
 				AssetDatabase.ImportAsset(path);
