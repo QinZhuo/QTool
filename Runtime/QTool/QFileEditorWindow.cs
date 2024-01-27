@@ -154,7 +154,7 @@ namespace QTool
 #if UNITY_EDITOR
 				AssetDatabase.ImportAsset(path);
 #endif
-			}
+			} 
 		}
 		private void OnEnable()
 		{
