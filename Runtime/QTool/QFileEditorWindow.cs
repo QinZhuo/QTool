@@ -32,6 +32,7 @@ namespace QTool
 					{
 						return;
 					}
+					UndoList.Clear();
 					PlayerPrefs.SetString(typeof(T).Name + "_" + nameof(FilePath), value);
 
 #if UNITY_2022_1_OR_NEWER
@@ -46,10 +47,10 @@ namespace QTool
 
 		private static QHistoryList FilePathList = new QHistoryList(typeof(T).Name);
 
-		private string _Data = null;
-		public string Data
+		private static string _Data = null;
+		public static string Data
 		{
-			get => _Data;
+			get => _Data ??= PlayerPrefs.GetString(typeof(T).Name + "_" + nameof(Data));
 			set
 			{
 				if (!Equals(_Data, value))
@@ -59,6 +60,7 @@ namespace QTool
 						UndoList.Push(value);
 					}
 					_Data = value;
+					PlayerPrefs.SetString(typeof(T).Name + "_" + nameof(Data), value);
 				}
 			}
 		}
@@ -99,20 +101,18 @@ namespace QTool
 			}
 			else if (!path.IsNull() && QFileTool.ExistsFile(path))
 			{
-				{
 #if UNITY_EDITOR
-					var asset = AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(path);
-					if (asset != null)
-					{
-						titleContent.text = asset.name + " - " + typeof(T).Name.SplitStartString("Window");
-						Data = GetData(asset);
-					}
-					else
-					{
-						Debug.LogError("读取[" + path + "]为空");
-					}
-#endif
+				var asset = AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(path);
+				if (!asset.IsNull())
+				{
+					titleContent.text = asset.name + " - " + typeof(T).Name.SplitStartString("Window");
+					Data = GetData(asset);
 				}
+				else
+				{
+					Debug.LogError("读取[" + path + "]为空");
+				}
+#endif
 			}
 			else
 			{
@@ -120,7 +120,7 @@ namespace QTool
 				Close();
 #endif
 				return;
-			} 
+			}
 			if (!Data.IsNull())
 			{
 				try
@@ -169,7 +169,6 @@ namespace QTool
 #if UNITY_2022_1_OR_NEWER
 			PathPopup = Toolbar.AddPopup("", FilePathList.List, FilePath?.Replace('/', '\\'), path => { 
 				OnLostFocus();
-				UndoList.Clear();
 				AutoLoad = true;
 				FilePath = path.Replace('\\', '/');
 				if (!FilePath.ExistsFile())
@@ -180,8 +179,8 @@ namespace QTool
 			Toolbar.AddButton("撤销", Undo);
 		}
 		protected abstract void ParseData();
-		private Stack<string> UndoList = new Stack<string>();
-		private bool IsUndo = false;
+		private static Stack<string> UndoList = new Stack<string>();
+		private static bool IsUndo = false;
 		public void Undo()
 		{
 			if (UndoList.Count > 0)
@@ -228,7 +227,7 @@ namespace QTool
 		{
 			RemoveAll(path => List.IndexOf(path) > MaxCount);
 		}
-		public void RemoveAll(Predicate<string> check)
+		public void RemoveAll(Predicate<string> check) 
 		{
 			List.RemoveAll(check);
 			QPlayerPrefs.Set(SaveKey, m_dataList);
