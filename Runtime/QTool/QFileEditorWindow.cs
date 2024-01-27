@@ -102,19 +102,19 @@ namespace QTool
 			else if (!path.IsNull() && QFileTool.ExistsFile(path))
 			{
 #if UNITY_EDITOR
-				var asset = AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(path);
-				if (!asset.IsNull())
+				if (!EditorApplication.isUpdating)
 				{
-					titleContent.text = asset.name + " - " + typeof(T).Name.SplitStartString("Window");
-					var newData = GetData(asset);
-					if (!newData.IsNull())
+					var asset = AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(path);
+					if (!asset.IsNull())
 					{
+						titleContent.text = asset.name + " - " + typeof(T).Name.SplitStartString("Window");
+						var newData = GetData(asset);
 						Data = newData;
 					}
-				}
-				else
-				{
-					Debug.LogError("读取[" + path + "]为空");
+					else
+					{
+						Debug.LogError("读取[" + path + "]为空");
+					}
 				}
 #endif
 			}
@@ -130,7 +130,7 @@ namespace QTool
 				try
 				{
 					ParseData();
-				}
+				} 
 				catch (Exception e)
 				{
 					Debug.LogError(e);
