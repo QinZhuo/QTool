@@ -115,6 +115,10 @@ namespace QTool.FlowGraph
 									{
 										view = CellView.Add("", member.Get(obj), member.Type, (newValue) =>
 										{
+											if (member.Key == nameof(member.Key))
+											{
+												QPopupData.ClearAll();
+											}
 											member.Set(obj, newValue);
 											label.text = member.Get(obj).ToQDataType(member.Type, false)?.Replace("\\n", " ").Trim('\"');
 											label.Tooltip(label.text);

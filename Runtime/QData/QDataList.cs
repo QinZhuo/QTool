@@ -199,6 +199,13 @@ namespace QTool
 				}
 			}
 		}
+		public static void UnLoadAll()
+		{
+			foreach (var type in typeof(QDataList<>).GetAllTypes())
+			{
+				type.InvokeStaticFunction("UnLoad");
+			}
+		}
 	}
 	/// <summary>
 	/// 运行时静态数据表 从Resouces文件夹加载字符数据 通过静态函数访问 只读
@@ -267,6 +274,10 @@ namespace QTool
 		{
 			_List = new QList<string, T>();
 			LoadQDataList(key).ParseQDataList(_List);
+		}
+		public static void UnLoad()
+		{
+			_List = null;
 		}
 		#endregion
 	}

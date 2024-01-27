@@ -710,9 +710,15 @@ namespace QTool
 	{
 		static QDictionary<string, QPopupData> DrawerDic = new QDictionary<string, QPopupData>((key) => new QPopupData());
 
+		public static void ClearAll()
+		{
+			QDataList.UnLoadAll();
+			DrawerDic.Clear();
+		}
+
 		public List<string> List = new List<string>();
 		public Type Type { get; private set; }
-
+		
 		public static QPopupData Get(object obj, params string[] getListFuncs)
 		{
 			Type type = null;
