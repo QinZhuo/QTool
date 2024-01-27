@@ -148,6 +148,7 @@ namespace QTool
 		private void OnDisable()
 		{
 			OnLostFocus();
+			SerializedProperty = null;
 		}
 #if UNITY_2022_1_OR_NEWER
 		protected static PopupField<string> PathPopup { get; private set; } = null;
