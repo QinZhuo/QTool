@@ -189,15 +189,15 @@ namespace QTool
 		public override string ToString()
 		{
 			var info = BaseRuntimeValue == null ? (BaseValue == 0 ? "" : BaseValue.ToString()) : BaseRuntimeValue.ToString();
-			if (OffsetValues.Count > 0)
-			{
-				info += " " + OffsetValues.ToOneString(" ", kv => (kv.Value > 0 ? "+ " + kv.Value : "- " + -kv.Value) + " (" + kv.Key.ToColorString(kv.Key.ToColor()) + ") ");
-			}
 			if (ScaleValues.Count > 0)
 			{
 				info = "(" + info + ") * (";
-				info += ScaleValues.ToOneString(" ", kv => (kv.Value > 0 ? "+ " + kv.Value : "- " + -kv.Value) + " (" + kv.Key.ToColorString(kv.Key.ToColor()) + ") ");
+				info += ScaleValues.ToOneString(" ", kv => (kv.Value > 0 ? "+ " + kv.Value : "- " + -kv.Value) + " (" + kv.Key.SplitStartString("_").ToColorString(kv.Key.ToColor()) + ") ");
 				info += ")";
+			}
+			if (OffsetValues.Count > 0)
+			{
+				info += " " + OffsetValues.ToOneString(" ", kv => (kv.Value > 0 ? "+ " + kv.Value : "- " + -kv.Value) + " (" + kv.Key.SplitStartString("_").ToColorString(kv.Key.ToColor()) + ") ");
 			}
 			return info;
 		}
