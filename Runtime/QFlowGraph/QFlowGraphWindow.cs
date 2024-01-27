@@ -72,6 +72,10 @@ namespace QTool.FlowGraph
 					SerializedProperty.stringValue = Graph.ToQData();
 					SerializedProperty.serializedObject.ApplyModifiedProperties();
 				}
+				if (!FilePath.IsNull())
+				{
+					AssetDatabase.SaveAssetIfDirty(SerializedProperty.serializedObject.targetObject);
+				}
 #endif
 			}
 		}
