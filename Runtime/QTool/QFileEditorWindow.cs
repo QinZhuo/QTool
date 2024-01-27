@@ -18,7 +18,7 @@ namespace QTool
 	{
 		public static string FilePath
 		{
-			get => QPlayerPrefs.GetString(typeof(T).Name + "_" + nameof(FilePath));
+			get => PlayerPrefs.GetString(typeof(T).Name + "_" + nameof(FilePath));
 			set
 			{
 				if (value != FilePath)
@@ -33,7 +33,8 @@ namespace QTool
 						return;
 					}
 					UndoList.Clear();
-					QPlayerPrefs.SetString(typeof(T).Name + "_" + nameof(FilePath), value);
+					PlayerPrefs.SetString(typeof(T).Name + "_" + nameof(FilePath), value);
+
 #if UNITY_2022_1_OR_NEWER
 					if (PathPopup != null)
 					{
@@ -49,7 +50,7 @@ namespace QTool
 		private static string _Data = null;
 		public static string Data
 		{
-			get => _Data ??= QPlayerPrefs.GetString(typeof(T).Name + "_" + nameof(Data));
+			get => _Data ??= PlayerPrefs.GetString(typeof(T).Name + "_" + nameof(Data));
 			set
 			{
 				if (!Equals(_Data, value))
@@ -59,7 +60,7 @@ namespace QTool
 						UndoList.Push(value);
 					}
 					_Data = value;
-					QPlayerPrefs.SetString(typeof(T).Name + "_" + nameof(Data), value);
+					PlayerPrefs.SetString(typeof(T).Name + "_" + nameof(Data), value);
 				}
 			}
 		}
@@ -171,7 +172,15 @@ namespace QTool
 			FilePathList.RemoveAll(path => path.IsNull() || !path.Replace('/', '\\').ExistsFile());
 			FilePathList.Save();
 #if UNITY_2022_1_OR_NEWER
-			PathPopup = Toolbar.AddPopup("", FilePathList.List, FilePath?.Replace('/', '\\'), path => { OnLostFocus(); AutoLoad = true; FilePath = path.Replace('\\', '/'); if (!FilePath.ExistsFile()) Data = ""; OnFocus(); });
+			PathPopup = Toolbar.AddPopup("", FilePathList.List, FilePath?.Replace('/', '\\'), path => { 
+				OnLostFocus();
+				AutoLoad = true;
+				Data = "";
+				FilePath = path.Replace('\\', '/');
+				if (!FilePath.ExistsFile())
+					Data = ""; 
+				OnFocus(); 
+			});
 #endif
 			Toolbar.AddButton("撤销", Undo);
 		}
@@ -206,7 +215,7 @@ namespace QTool
 			get
 			{
 				if (m_dataList == null)
-				{
+				{ 
 					m_dataList = QPlayerPrefs.Get(SaveKey, new List<string>());
 				}
 				return m_dataList;
