@@ -46,14 +46,7 @@ namespace QTool.FlowGraph
 				SerializedProperty = new SerializedObject(file).FindProperty(nameof(QFlowGraphAsset.Graph)).FindPropertyRelative(nameof(QFlowGraph.SerializeString));
 #endif
 				var graphAsset = (file as QFlowGraphAsset);
-				if (graphAsset.Graph.NodeList.Count > 0)
-				{
-					return graphAsset.Graph.SerializeString;
-				}
-				else
-				{
-					return "";
-				}
+				return graphAsset.Graph.SerializeString;
 			}
 #if UNITY_EDITOR
 			else if (SerializedProperty != null)
