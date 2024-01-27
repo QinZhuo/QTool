@@ -135,8 +135,13 @@ namespace QTool
 			var path = FilePath;
 			if (!path.IsNull() && !Data.IsNull())
 			{
-				SaveData();
 #if UNITY_EDITOR
+				if (!EditorApplication.isCompiling)
+				{
+#endif
+					SaveData();
+#if UNITY_EDITOR 
+				}
 				AssetDatabase.ImportAsset(path);
 #endif
 			}
@@ -148,7 +153,6 @@ namespace QTool
 		private void OnDisable()
 		{
 			OnLostFocus();
-			SerializedProperty = null;
 		}
 #if UNITY_2022_1_OR_NEWER
 		protected static PopupField<string> PathPopup { get; private set; } = null;
