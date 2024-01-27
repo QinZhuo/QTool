@@ -32,7 +32,6 @@ namespace QTool
 					{
 						return;
 					}
-					UndoList.Clear();
 					PlayerPrefs.SetString(typeof(T).Name + "_" + nameof(FilePath), value);
 
 #if UNITY_2022_1_OR_NEWER
@@ -47,10 +46,10 @@ namespace QTool
 
 		private static QHistoryList FilePathList = new QHistoryList(typeof(T).Name);
 
-		private static string _Data = null;
-		public static string Data
+		private string _Data = null;
+		public string Data
 		{
-			get => _Data ??= PlayerPrefs.GetString(typeof(T).Name + "_" + nameof(Data));
+			get => _Data;
 			set
 			{
 				if (!Equals(_Data, value))
@@ -60,7 +59,6 @@ namespace QTool
 						UndoList.Push(value);
 					}
 					_Data = value;
-					PlayerPrefs.SetString(typeof(T).Name + "_" + nameof(Data), value);
 				}
 			}
 		}
@@ -95,37 +93,34 @@ namespace QTool
 		{
 			var path = FilePath;
 			if (!AutoLoad) return;
-			if (Data.IsNull()) 
+			if (path.IsNull())
 			{
-				if (path.IsNull())
+				Data = "";
+			}
+			else if (!path.IsNull() && QFileTool.ExistsFile(path))
+			{
 				{
-					Data = "";
-				}
-				else if (!path.IsNull() && QFileTool.ExistsFile(path))
-				{
+#if UNITY_EDITOR
+					var asset = AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(path);
+					if (asset != null)
 					{
-#if UNITY_EDITOR
-						var asset = AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(path);
-						if (asset != null)
-						{
-							titleContent.text = asset.name + " - " + typeof(T).Name.SplitStartString("Window");
-							Data = GetData(asset);
-						}
-						else
-						{
-							Debug.LogError("读取[" + path + "]为空");
-						}
-#endif
+						titleContent.text = asset.name + " - " + typeof(T).Name.SplitStartString("Window");
+						Data = GetData(asset);
 					}
-				}
-				else
-				{
-#if UNITY_EDITOR
-					Close();
+					else
+					{
+						Debug.LogError("读取[" + path + "]为空");
+					}
 #endif
-					return;
 				}
 			}
+			else
+			{
+#if UNITY_EDITOR
+				Close();
+#endif
+				return;
+			} 
 			if (!Data.IsNull())
 			{
 				try
@@ -174,8 +169,8 @@ namespace QTool
 #if UNITY_2022_1_OR_NEWER
 			PathPopup = Toolbar.AddPopup("", FilePathList.List, FilePath?.Replace('/', '\\'), path => { 
 				OnLostFocus();
+				UndoList.Clear();
 				AutoLoad = true;
-				Data = "";
 				FilePath = path.Replace('\\', '/');
 				if (!FilePath.ExistsFile())
 					Data = ""; 
@@ -185,8 +180,8 @@ namespace QTool
 			Toolbar.AddButton("撤销", Undo);
 		}
 		protected abstract void ParseData();
-		private static Stack<string> UndoList = new Stack<string>();
-		private static bool IsUndo = false;
+		private Stack<string> UndoList = new Stack<string>();
+		private bool IsUndo = false;
 		public void Undo()
 		{
 			if (UndoList.Count > 0)
