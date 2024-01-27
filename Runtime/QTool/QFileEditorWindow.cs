@@ -45,6 +45,24 @@ namespace QTool
 		}
 
 		private static QHistoryList FilePathList = new QHistoryList(typeof(T).Name);
+
+		private static string _Data = null;
+		public static string Data
+		{
+			get => _Data ??= QPlayerPrefs.GetString(typeof(T).Name + "_" + nameof(Data));
+			set
+			{
+				if (!Equals(_Data, value))
+				{
+					if (!IsUndo)
+					{
+						UndoList.Push(value);
+					}
+					_Data = value;
+					QPlayerPrefs.SetString(typeof(T).Name + "_" + nameof(Data), value);
+				}
+			}
+		}
 		public new GUIContent titleContent
 		{
 			get
@@ -76,34 +94,36 @@ namespace QTool
 		{
 			var path = FilePath;
 			if (!AutoLoad) return;
-			if (path.IsNull())
+			if (Data.IsNull()) 
 			{
-				Data = "";
-			}
-			else if (QFileTool.ExistsFile(path))
-			{
+				if (path.IsNull())
+				{
+					Data = "";
+				}
+				else if (!path.IsNull() && QFileTool.ExistsFile(path))
+				{
+					{
+#if UNITY_EDITOR
+						var asset = AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(path);
+						if (asset != null)
+						{
+							titleContent.text = asset.name + " - " + typeof(T).Name.SplitStartString("Window");
+							Data = GetData(asset);
+						}
+						else
+						{
+							Debug.LogError("读取[" + path + "]为空");
+						}
+#endif
+					}
+				}
+				else
 				{
 #if UNITY_EDITOR
-					var asset = AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(path);
-					if (asset != null)
-					{
-						titleContent.text = asset.name + " - " + typeof(T).Name.SplitStartString("Window");
-						Data = GetData(asset);
-					}
-					else
-					{
-						Debug.LogError("读取[" + path + "]为空");
-					}
+					Close();
 #endif
+					return;
 				}
-			}
-			else
-			{
-#if UNITY_EDITOR
-				Close();
-#endif
-				return;
-				//Data = GetData(); 
 			}
 			if (!Data.IsNull())
 			{
@@ -120,28 +140,15 @@ namespace QTool
 
 		public abstract string GetData(UnityEngine.Object file = null);
 		public abstract void SaveData();
-		private string _Data;
-		public string Data
-		{
-			get => _Data;
-			private set
-			{
-				ChangeData(value);
-			}
-		}
+		
 		public bool AutoLoad { get; set; } = true;
 		protected virtual void OnLostFocus()
 		{
 			var path = FilePath;
 			if (!path.IsNull() && !Data.IsNull())
 			{
+				SaveData();
 #if UNITY_EDITOR
-				if (!EditorApplication.isCompiling)
-				{
-#endif
-					SaveData();
-#if UNITY_EDITOR 
-				}
 				AssetDatabase.ImportAsset(path);
 #endif
 			}
@@ -170,7 +177,7 @@ namespace QTool
 		}
 		protected abstract void ParseData();
 		private static Stack<string> UndoList = new Stack<string>();
-		private bool IsUndo = false;
+		private static bool IsUndo = false;
 		public void Undo()
 		{
 			if (UndoList.Count > 0)
@@ -186,17 +193,6 @@ namespace QTool
 					Debug.LogError(e);
 				}
 				IsUndo = false;
-			}
-		}
-		protected virtual void ChangeData(string newValue)
-		{
-			if (!Equals(_Data, newValue))
-			{
-				if (!IsUndo)
-				{
-					UndoList.Push(newValue);
-				}
-				_Data = newValue;
 			}
 		}
 	}

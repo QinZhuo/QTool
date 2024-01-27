@@ -23,6 +23,7 @@ namespace QTool.FlowGraph
 			{
 				var path = AssetDatabase.GetAssetPath(asset);
 				FilePath = path;
+				ViewOffset = Vector2.zero;
 				OpenWindow();
 				return true;
 			}
@@ -36,7 +37,7 @@ namespace QTool.FlowGraph
 			window.minSize = new Vector2(500, 300);
 		}
 #endif
-	#endregion
+		#endregion
 		public override string GetData(UnityEngine.Object file)
 		{
 			if (file != null)
@@ -44,17 +45,18 @@ namespace QTool.FlowGraph
 #if UNITY_EDITOR
 				SerializedProperty = new SerializedObject(file).FindProperty(nameof(QFlowGraphAsset.Graph)).FindPropertyRelative(nameof(QFlowGraph.SerializeString));
 #endif
-				return (file as QFlowGraphAsset).Graph.SerializeString;
+				var graphAsset = (file as QFlowGraphAsset);
+				return graphAsset.Graph.SerializeString;
 			}
 #if UNITY_EDITOR
 			else if (SerializedProperty != null)
-			{
+			{ 
 				return SerializedProperty.stringValue;
 			}
 #endif
 			else
 			{
-				return new QFlowGraph().ToQData();
+				return "";
 			}
 		}
 		private QFlowGraph Graph { get; set; }
@@ -63,7 +65,7 @@ namespace QTool.FlowGraph
 			if (Graph != null)
 			{
 				Graph.OnBeforeSerialize();
-				ChangeData(Graph.SerializeString);
+				Data = Graph.SerializeString;
 #if UNITY_EDITOR
 				if (SerializedProperty != null)
 				{
@@ -72,15 +74,6 @@ namespace QTool.FlowGraph
 				}
 #endif
 			}
-
-		}
-		protected override void ChangeData(string newValue)
-		{
-			if (Data != newValue)
-			{
-				ViewOffset = Vector2.zero;
-			}
-			base.ChangeData(newValue);
 		}
 		private VisualElement ConnectCanvas { get; set; }
 		protected override async void ParseData()
@@ -247,7 +240,7 @@ namespace QTool.FlowGraph
 		private List<VisualElement> SelectNodes = new List<VisualElement>();
 		private PortId? StartPortId { get; set; }
 		private QConnectElement DragConnect { get; set; }
-		private Vector2 ViewOffset { get; set; }
+		private static Vector2 ViewOffset { get; set; }
 		private List<VisualElement> NodeViewList = new List<VisualElement>();
 		private List<QConnectElement> ConnectViewList = new List<QConnectElement>();
 		private VisualElement AddNodeView(VisualElement root, QFlowNode node)
@@ -603,6 +596,5 @@ namespace QTool.FlowGraph
 			return root;
 		}
 	}
-
 #endif
 }

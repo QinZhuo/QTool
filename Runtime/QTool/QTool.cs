@@ -96,7 +96,7 @@ namespace QTool
 			}
 			catch (Exception)
 			{
-				return null;
+				return null; 
 			}
 #if UNITY_EDITOR
 			if (obj == null)

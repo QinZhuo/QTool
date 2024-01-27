@@ -206,7 +206,7 @@ namespace QTool.FlowGraph
 			{
 				objList.ToQDataList(qdataList, typeInfo.Type);
 			}
-			ChangeData(qdataList?.ToString());
+			Data = qdataList?.ToString();	
 			base.OnLostFocus();
 		}
 		protected override async void ParseData()
@@ -219,7 +219,7 @@ namespace QTool.FlowGraph
 				{
 					typeInfo = QSerializeHasReadOnlyType.Get(type);
 					qdataList = QDataList.Load(path);
-					qdataList.ParseQDataList(objList, type);
+					qdataList.ParseQDataList(objList, type);  
 					for (int i = 0; i < qdataList.TitleRow.Count; i++)
 					{
 						Members[i] = typeInfo.GetMemberInfo(qdataList.TitleRow[i]);

@@ -43,7 +43,6 @@ namespace QTool
 		{
 			await QTask.Wait(() => markdownText != null);
 			markdownText.value = Data;
-			ChangeData(Data);
 		}
 		private TextField markdownText = null;
 		private ScrollView markdownView = null;
@@ -57,7 +56,9 @@ namespace QTool
 			markdownText = editorRange.AddText("", "", null, true);
 			markdownText.style.minHeight = 1000;
 			var split = root.Split(editorRange, markdownView);
-			markdownText.RegisterCallback<ChangeEvent<string>>((e) => ChangeData(e.newValue));
+			markdownText.RegisterCallback<ChangeEvent<string>>((e) => { Data = e.newValue;
+				markdownView.AddMarkdown(e.newValue);
+			}) ;
 			editorRange.verticalScroller.valueChanged += (value) =>
 			{
 				markdownView.verticalScroller.value = value / editorRange.verticalScroller.highValue * markdownView.verticalScroller.highValue;
@@ -91,12 +92,7 @@ namespace QTool
 				split.UnCollapse();
 			}
 		}
-		protected override async void ChangeData(string newValue)
-		{ 
-			base.ChangeData(newValue);
-			await QTask.Wait(() => markdownView != null); 
-			markdownView.AddMarkdown(newValue);
-		}
+	
 
 		public override string GetData(UnityEngine.Object file)
 		{
