@@ -86,7 +86,7 @@ namespace QTool.FlowGraph
 						label.style.marginLeft = 10;
 						label.style.marginRight = 10;
 						label.name = title;
-						if (member.Set == null)
+						if (member != null && member.Set == null)
 						{
 							label.SetEnabled(false);
 						}
