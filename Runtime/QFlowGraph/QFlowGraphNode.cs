@@ -301,7 +301,7 @@ namespace QTool.FlowGraph
 				case nameof(CountStart):
 					if (node.Name != StartKey)
 					{
-						info = "每" + node.Ports["times"].ToInfoString() + "次" + node.Name + "\n";
+						info = "每{0}次{1}".ToLozalizationKey(node.Ports["times"].ToInfoString(), node.Name) + " ";
 					}
 					info += node.Ports["Run"].GetConnectNode()?.ToInfoString();
 					return info;
@@ -310,13 +310,13 @@ namespace QTool.FlowGraph
 				case nameof(GetValue):
 					return "{" + node["key"] + "}";
 				case nameof(Add):
-					return node.Ports["a"].ToInfoString() + "+" + node.Ports["b"].ToInfoString();
+					return "(" + node.Ports["a"].ToInfoString() + "+" + node.Ports["b"].ToInfoString() + ")";
 				case nameof(Subtract):
-					return node.Ports["a"].ToInfoString() + "-" + node.Ports["b"].ToInfoString();
+					return "(" + node.Ports["a"].ToInfoString() + "-" + node.Ports["b"].ToInfoString() + ")";
 				case nameof(Multiply):
-					return node.Ports["a"].ToInfoString() + "x" + node.Ports["b"].ToInfoString();
+					return "(" + node.Ports["a"].ToInfoString() + "x" + node.Ports["b"].ToInfoString() + ")";
 				case nameof(Divide):
-					return node.Ports["a"].ToInfoString() + "/" + node.Ports["b"].ToInfoString();
+					return "(" + node.Ports["a"].ToInfoString() + "/" + node.Ports["b"].ToInfoString() + ")";
 				case nameof(AsyncBranch):
 					var port = node.Ports["branchs"];
 					var list = port?.Value.As<IList>();
