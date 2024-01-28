@@ -301,7 +301,7 @@ namespace QTool.FlowGraph
 				case nameof(CountStart):
 					if (node.Name != StartKey)
 					{
-						info = "每{0}次{1}".ToLozalizationKey(node.Ports["times"].ToInfoString(), node.Name) + " ";
+						info = "每{0}次{1}".ToLozalizationKey(node.Ports["times"].ToInfoString(), node.Name.ToLozalizationColorKey()) + " ";
 					}
 					info += node.Ports["Run"].GetConnectNode()?.ToInfoString();
 					return info;
