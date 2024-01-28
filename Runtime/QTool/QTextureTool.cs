@@ -25,6 +25,10 @@ namespace QTool
 		public static Color ToColor(this object obj, float s = -1, float v = -1)
 		{
 			var key = obj?.ToString();
+			if (key.Contains('_'))
+			{
+				key = key.SplitStartString("_");
+			}
 			if (key.IsNull()) return Color.clear;
 			if (!KeyColors.ContainsKey(key))
 			{
