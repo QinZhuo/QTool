@@ -219,13 +219,13 @@ namespace QTool.FlowGraph
 				{
 					typeInfo = QSerializeHasReadOnlyType.Get(type);
 					qdataList = QDataList.Load(path);
-					qdataList.ParseQDataList(objList, type);  
+					qdataList.ParseQDataList(objList, type);
 					for (int i = 0; i < qdataList.TitleRow.Count; i++)
 					{
 						Members[i] = typeInfo.GetMemberInfo(qdataList.TitleRow[i]);
 						if (Members[i] == null)
 						{
-							Debug.LogError("列[" + type + "]为空");
+							QDebug.LogError(type.Name + " 列[" + qdataList.TitleRow[i] + "]为空");
 						}
 					}
 				}
