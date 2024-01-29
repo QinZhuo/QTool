@@ -205,6 +205,10 @@ namespace QTool
 #region Tool
 	public static class QLocalizationTool
 	{
+		public static string ToLozalizationBoldKey(this string key)
+		{
+			return "<b>{" + key + "}</b>";
+		}
 		public static string ToLozalizationKey(this string key)
 		{
 			return "{" + key + "}";
