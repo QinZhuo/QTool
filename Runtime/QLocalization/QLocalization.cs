@@ -221,7 +221,10 @@ namespace QTool
 			}
 			return "{" + string.Format(key, Params) + "}";
 		}
-		
+		public static string ToLozalizationColorKey(this object key)
+		{
+			return ("{" + key + "}").ToColorString(key.ToColor());
+		}
 		const string NetworkTranslateURL = "https://translate.googleapis.com/translate_a/single?client=gtx&sl={2}&tl={1}&dt=t&q={0}";
 
 		static List<List<List<string>>> translateData = new List<List<List<string>>>();
