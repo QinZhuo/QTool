@@ -69,7 +69,7 @@ namespace QTool
 	[AttributeUsage(AttributeTargets.Field | AttributeTargets.Property | AttributeTargets.Parameter)]
 	public class QPopupAttribute : PropertyAttribute
 	{
-		public string[] getListFuncs = new string[0];
+		public string[] getListFuncs = new string[0]; 
 		public QPopupAttribute(params string[] getListFunc)
 		{
 			order = 1;
