@@ -122,10 +122,10 @@ namespace QTool
 						}
 					}
 				}
-				if (relactionType.HasFlag(QTeamRelaction.自己))
-				{
-					list.AddCheckExist(a);
-				}
+			}
+			if (relactionType.HasFlag(QTeamRelaction.自己))
+			{
+				list.AddCheckExist(a);
 			}
 		}
 	
