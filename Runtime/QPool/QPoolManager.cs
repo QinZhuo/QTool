@@ -149,13 +149,21 @@ namespace QTool
 		}
 		public static void Release(GameObject gameObject)
         {
-			var tag= gameObject.GetComponent<QPoolObject>();
-			if (tag == null)
+			try
 			{
-				GameObject.Destroy(gameObject);
-				return;
+				var tag = gameObject.GetComponent<QPoolObject>();
+				if (tag == null)
+				{
+					GameObject.Destroy(gameObject);
+					return;
+				}
+				Release(tag.poolName, gameObject);
 			}
-			Release(tag.poolName, gameObject);
+			catch (Exception e)
+			{
+
+				QDebug.LogError(e);
+			}
         }
 		
 	}
