@@ -102,7 +102,7 @@ namespace QTool
 			list.Clear();
 			foreach (var team in Teams)
 			{
-				if(relactionType.HasFlag( QRelation.GetRelaction(a.Team, team.Key)))
+				if(relactionType.HasFlag(QRelation.GetRelaction(a.Team, team.Key)))
 				{
 					foreach (var item in team.Value)
 					{
@@ -121,6 +121,10 @@ namespace QTool
 							}
 						}
 					}
+				}
+				if (relactionType.HasFlag(QTeamRelaction.自己))
+				{
+					list.AddCheckExist(a);
 				}
 			}
 		}
