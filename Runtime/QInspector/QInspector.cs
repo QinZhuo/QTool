@@ -376,18 +376,10 @@ namespace QTool.Inspector
 			var visual = new PopupField<string>(QReflection.QName(property), popupData.List, value);
 			visual.style.width = new Length(100, LengthUnit.Percent);
 			root.Add(visual);
-			PropertyField propertyField = null;
-			if (property.propertyType != SerializedPropertyType.String)
-			{
-				propertyField = root.Add(property);
-				propertyField.label = "";
-				visual.style.width = new Length(50, LengthUnit.Percent);
-				propertyField.style.width = new Length(100, LengthUnit.Percent);
-				if (property.objectReferenceValue != null)
-				{
-					propertyField.SetEnabled(false);
-				}
-			}
+			var propertyField = root.Add(property);
+			propertyField.label = "";
+			visual.style.width = new Length(50, LengthUnit.Percent);
+			propertyField.style.width = new Length(50, LengthUnit.Percent);
 			visual.RegisterCallback<ChangeEvent<string>>(data =>
 			{
 				if (property.propertyType == SerializedPropertyType.String)
@@ -403,7 +395,6 @@ namespace QTool.Inspector
 						if (value.IsNull())
 						{
 							property.objectReferenceValue = null;
-							propertyField.SetEnabled(true);
 						}
 						else
 						{
@@ -415,11 +406,6 @@ namespace QTool.Inspector
 							{
 								throw;
 							}
-							finally
-							{
-								propertyField.SetEnabled(false);
-							}
-							
 						}
 					}
 				}
