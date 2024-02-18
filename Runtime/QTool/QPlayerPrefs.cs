@@ -68,12 +68,10 @@ namespace QTool
 			else
 			{
 				var data= Data[key].GetValue(1,defaultValue);
-#if UNITY_EDITOR
 				if (data.IsNull())
 				{
-					QDebug.LogError("读取预设[" + key + "]为空[" + Data[key] + "]");
+					return defaultValue;
 				}
-#endif
 				return data;
 			}
 		}
