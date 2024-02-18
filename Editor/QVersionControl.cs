@@ -7,11 +7,56 @@ using UnityEditor.PackageManager;
 
 namespace QTool
 {
-#if QVersionControl
+
 	[InitializeOnLoad]
 	public static class QVersionControl
 	{
+#if QVersionControl
+		#region 全局菜单
+		[MenuItem("QTool/Git/全局还原")]
+		public static void AllRevert()
+		{
+			var path = Directory.GetCurrentDirectory();
+			Revert(path);
+		}
+		[MenuItem("QTool/Git/全局拉取")]
+		public static void AllPull()
+		{
+			var path = Directory.GetCurrentDirectory();
+			PullAndCommitPush(path, false);
+		}
+		[MenuItem("QTool/Git/全局同步")]
+		public static void AllPush()
+		{
+			var path = Directory.GetCurrentDirectory();
+			PullAndCommitPush(path);
+		}
 
+		[MenuItem("QTool/Git/以粘贴版信息初始化仓库")]
+		static void AllInit()
+		{
+			if (string.IsNullOrWhiteSpace(GUIUtility.systemCopyBuffer))
+			{
+				EditorUtility.DisplayDialog("粘贴板信息为空", " Git仓库远端地址不能为空", "确认");
+				return;
+
+			}
+			else
+			{
+				if (!EditorUtility.DisplayDialog("创建Git远端同步库", "以粘贴板信息 " + GUIUtility.systemCopyBuffer + " 为远端地址创建Git仓库", "确认", "取消"))
+				{
+					return;
+				}
+			}
+			var path = Directory.GetCurrentDirectory();
+			QDebug.Log(PathRun("init", path));
+			QDebug.Log(PathRun("remote add origin \"" + GUIUtility.systemCopyBuffer + "\"", path));
+			GitIgnoreFile();
+			QDebug.Log(PathRun(nameof(Add).ToLower() + " .", path));
+			QDebug.Log(PathRun(nameof(Commit).ToLower() + " -m 初始化", path));
+			Push(path);
+		}
+		#endregion
 		static QVersionControl()
 		{
 			Editor.finishedDefaultHeaderGUI += OnHeaderGUI;
@@ -37,6 +82,8 @@ namespace QTool
 			}
 			GUILayout.Space(10);
 		}
+
+#endif
 		static QDictionary<string, string> pathCache = new QDictionary<string, string>();
 		static string PathRun(string commond, string path,bool rootPath=true)
 		{
@@ -342,49 +389,7 @@ namespace QTool
 		{
 			return PathRun(nameof(Status).ToLower() + " -s "+"\""+Path.GetFullPath( path)+"\"", path);
 		}
-		[MenuItem("QTool/Git/全局还原")]
-		public static void AllRevert()
-		{
-			var path = Directory.GetCurrentDirectory();
-			Revert(path);
-		}
-		[MenuItem("QTool/Git/全局拉取")]
-		public static void AllPull()
-		{
-			var path = Directory.GetCurrentDirectory();
-			PullAndCommitPush(path,false);
-		}
-		[MenuItem("QTool/Git/全局同步")]
-		public static void AllPush()
-		{
-			var path = Directory.GetCurrentDirectory();
-			PullAndCommitPush(path);
-		}
-		
-		[MenuItem("QTool/Git/以粘贴版信息初始化仓库")]
-		static  void AllInit()
-		{
-			if(string.IsNullOrWhiteSpace(GUIUtility.systemCopyBuffer))
-			{
-				EditorUtility.DisplayDialog("粘贴板信息为空", " Git仓库远端地址不能为空", "确认");
-				return;
-
-			}
-			else
-			{
-				if (!EditorUtility.DisplayDialog("创建Git远端同步库", "以粘贴板信息 "+ GUIUtility.systemCopyBuffer+" 为远端地址创建Git仓库", "确认","取消"))
-				{
-					return;
-				}
-			}
-			var path = Directory.GetCurrentDirectory();
-			QDebug.Log(PathRun("init", path));
-			QDebug.Log(PathRun("remote add origin \"" + GUIUtility.systemCopyBuffer + "\"", path));
-			GitIgnoreFile();
-			QDebug.Log(PathRun(nameof(Add).ToLower() + " .", path));
-			QDebug.Log(PathRun(nameof(Commit).ToLower() + " -m 初始化", path));
-			Push(path);
-		}
+	
 #region 忽略文件
 		public static void GitIgnoreFile()
 		{
@@ -615,5 +620,4 @@ crashlytics-build.properties
 		}
 	}
 
-#endif
 }
