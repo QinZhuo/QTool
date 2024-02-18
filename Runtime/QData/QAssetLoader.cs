@@ -51,7 +51,7 @@ namespace QTool
 		{
 			get
 			{
-				return typeof(TPath).Name;
+				return typeof(TPath).Name.Replace('_', '/');
 			}
 		}
 		public static TObj[] LoadAll()
