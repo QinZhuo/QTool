@@ -21,7 +21,10 @@ namespace QTool
 		}
 		public virtual void OnLoad(TObj obj)
 		{
-			OnLoadEvent?.Invoke(obj);
+			if (obj != null)
+			{
+				OnLoadEvent?.Invoke(obj);
+			}
 		}
 		public void InvokeLoad(string key)
 		{
@@ -30,10 +33,7 @@ namespace QTool
 			{
 				obj = Load(DirectoryPath);
 			}
-			if (obj != null)
-			{
-				OnLoad(obj);
-			}
+			OnLoad(obj);
 		}
 		public async void InvokeLoadAsync(string key)
 		{
@@ -42,10 +42,7 @@ namespace QTool
 			{
 				obj = await LoadAsync(DirectoryPath);
 			}
-			if (obj != null)
-			{
-				OnLoad(obj);
-			}
+			OnLoad(obj);
 		}
 		public static string DirectoryPath
 		{
