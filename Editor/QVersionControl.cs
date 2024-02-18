@@ -7,11 +7,11 @@ using UnityEditor.PackageManager;
 
 namespace QTool
 {
-
+#if QVersionControl
 	[InitializeOnLoad]
 	public static class QVersionControl
 	{
-#if QVersionControl
+
 		static QVersionControl()
 		{
 			Editor.finishedDefaultHeaderGUI += OnHeaderGUI;
@@ -37,7 +37,6 @@ namespace QTool
 			}
 			GUILayout.Space(10);
 		}
-#endif 
 		static QDictionary<string, string> pathCache = new QDictionary<string, string>();
 		static string PathRun(string commond, string path,bool rootPath=true)
 		{
@@ -615,4 +614,6 @@ crashlytics-build.properties
 			还原本地更改,
 		}
 	}
+
+#endif
 }
