@@ -13,19 +13,7 @@ namespace QTool
 {
 	public static class QDebug
 	{
-		private static QAverageValue FrameCount = new QAverageValue();
-		public static int FPS => (int)(FrameCount.SecondeSum);
-		[RuntimeInitializeOnLoadMethod]
-		private static void Init()
-		{
-			QToolManager.Instance.OnUpdateEvent += () =>
-			{
-				FrameCount.Push(1);
-#if DEVELOPMENT_BUILD || UNITY_EDITOR
-				DebugUIUpdate();
-#endif
-			};
-		}
+
 		public static event Func<object,string> LogInfoCheck = info => info?.ToString();
 		[System.Diagnostics.Conditional("DEVELOPMENT_BUILD"), System.Diagnostics.Conditional("UNITY_EDITOR")]
 		public static void DebugRun(string key, Action action)
@@ -47,7 +35,7 @@ namespace QTool
 			Log("【" + key + "】运行时间 " + stopwatch.Elapsed + " 内存使用 " + (GC.GetTotalMemory(false) - lastMemery).ToSizeString() + " 垃圾回收次数 " + (GC.CollectionCount(0) - lastCount));
 			stopwatch.Stop();
 		}
-		[System.Diagnostics.Conditional("UNITY_EDITOR"), System.Diagnostics.Conditional(nameof(QDebug)+"Log")]
+		[System.Diagnostics.Conditional("UNITY_EDITOR"), System.Diagnostics.Conditional(nameof(QDebug))]
 		public static void Log(object obj)
 		{
 			Debug.Log("[" + nameof(QDebug) + "] " + LogInfoCheck(obj));
@@ -76,7 +64,7 @@ namespace QTool
 		[System.Diagnostics.Conditional("DEVELOPMENT_BUILD"), System.Diagnostics.Conditional("UNITY_EDITOR")]
 		public static void End(string key, string resultInfo = "")
 		{
-			Log(key + " " + resultInfo + " 时间 " + TimestampList[key].GetIntervalSeconds().ToString("f4")+"s / "+StartTimestampList[key].GetIntervalSeconds().ToString("f4") + " s" + " 帧率 " + FPS);
+			Log(key + " " + resultInfo + " 时间 " + TimestampList[key].GetIntervalSeconds().ToString("f4")+"s / "+StartTimestampList[key].GetIntervalSeconds().ToString("f4") + " s");
 		}
 		[System.Diagnostics.Conditional("DEVELOPMENT_BUILD"), System.Diagnostics.Conditional("UNITY_EDITOR")]
 		public static void ChangeProfilerCount(string key, int changeCount = 0)
@@ -93,6 +81,20 @@ namespace QTool
 
 
 		#region 测试面板UI
+#if QDebug
+		private static QAverageValue FrameCount = new QAverageValue();
+		public static int FPS => (int)(FrameCount.SecondeSum);
+		[RuntimeInitializeOnLoadMethod]
+		private static void Init()
+		{
+			QToolManager.Instance.OnUpdateEvent += () =>
+			{
+				FrameCount.Push(1);
+#if DEVELOPMENT_BUILD || UNITY_EDITOR
+				DebugUIUpdate();
+#endif
+			};
+		}
 #if DEVELOPMENT_BUILD || UNITY_EDITOR
 
 		private static Label InfoLabel = null;
@@ -117,7 +119,7 @@ namespace QTool
 				InfoLabel.style.width = new Length(100, LengthUnit.Percent);
 				InfoLabel.style.textShadow = new TextShadow { offset = Vector2.one, color = Color.black, blurRadius = 1 };
 			}
-			InfoLabel.text = Application.productName + " v" + Application.version + "\t 内存：" + useSize.ToSizeString() + " / " + (useSize + Profiler.GetTotalReservedMemoryLong()).ToSizeString() + "\t 帧率：" + FPS.ToString() + " |";
+			InfoLabel.text = Application.productName + " v" + Application.version + "\t 内存：" + useSize.ToSizeString() + " / " + (useSize + Profiler.GetTotalReservedMemoryLong()).ToSizeString() + "\t 帧率：" + FPS + " |";
 
 		}
 		static Vector2 LeftScrollPosition = Vector2.zero;
@@ -257,7 +259,7 @@ namespace QTool
 					}
 				}
 			}
-			#region 场景信息
+		#region 场景信息
 			LeftPanel.Clear();
 			for (int i = 0; i < SceneManager.sceneCount; i++)
 			{
@@ -265,7 +267,7 @@ namespace QTool
 			}
 			DebugPanel.visible = true;
 			LeftPanel.AddScene(GetDontDestroyOnLoadScene());
-			#endregion
+		#endregion
 			QTime.ChangeScale(nameof(QDebug), 0);
 			GameTexture = new RenderTexture(QScreen.Width / 2, QScreen.Height / 2, 30);
 		}
@@ -303,6 +305,7 @@ namespace QTool
 		}
 #else
 		private static void UpdateUI() { }
+#endif
 #endif
 		#endregion
 	}

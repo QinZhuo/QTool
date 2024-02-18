@@ -11,9 +11,7 @@ using UnityEngine.UIElements;
 
 namespace QTool.Inspector
 {
-  
-
-
+#if !DisableQInspectorEditor  
 	[CustomEditor(typeof(UnityEngine.Object), true, isFallback = true)]
 	[CanEditMultipleObjects]
 	public class QInspectorEditor : Editor
@@ -74,5 +72,5 @@ namespace QTool.Inspector
 			}
 		}
 	}
-
+#endif 
 }

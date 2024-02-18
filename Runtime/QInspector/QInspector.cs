@@ -12,24 +12,24 @@ using UnityEditor.UIElements;
 #endif
 namespace QTool
 {
-    /// <summary>
-    /// 更改显示的名字
-    /// </summary>
-    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Class | AttributeTargets.Method|AttributeTargets.Interface | AttributeTargets.Parameter|AttributeTargets.Property)]
-    public class QNameAttribute : PropertyAttribute
-    {
+	/// <summary>
+	/// 更改显示的名字
+	/// </summary>
+	[AttributeUsage(AttributeTargets.Field | AttributeTargets.Class | AttributeTargets.Method | AttributeTargets.Interface | AttributeTargets.Parameter | AttributeTargets.Property)]
+	public class QNameAttribute : PropertyAttribute
+	{
 		public string name;
 		public string visibleControl;
 		public string tooltip;
-        public QNameAttribute()
-        {
-            order = 0;
-        }
-        public QNameAttribute(string name, string visibleControl = "") :this()
-        {
-            this.name = name;
-            this.visibleControl = visibleControl;
-        }
+		public QNameAttribute()
+		{
+			order = 0;
+		}
+		public QNameAttribute(string name, string visibleControl = "") : this()
+		{
+			this.name = name;
+			this.visibleControl = visibleControl;
+		}
 		public bool Active(object target)
 		{
 			if (visibleControl.IsNull())
@@ -69,7 +69,7 @@ namespace QTool
 	[AttributeUsage(AttributeTargets.Field | AttributeTargets.Property | AttributeTargets.Parameter)]
 	public class QPopupAttribute : PropertyAttribute
 	{
-		public string[] getListFuncs = new string[0]; 
+		public string[] getListFuncs = new string[0];
 		public QPopupAttribute(params string[] getListFunc)
 		{
 			order = 1;
