@@ -1,12 +1,10 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 using System;
+using System.Collections.Generic;
 using System.IO;
-using System.Xml.Serialization;
 using System.Runtime.InteropServices;
-using System.Threading.Tasks;
 using System.Security.Cryptography;
+using System.Xml.Serialization;
+using UnityEngine;
 #if UNITY_SWITCH_API
 using UnityEngine.Switch;
 #endif
@@ -158,9 +156,10 @@ namespace QTool
 				}
 			});
 		}
-		public const string SecretExtension = ".sec";
-		private static byte[] _SecretKey = null;
-		public static byte[] SecretKey => _SecretKey??=(Application.companyName.IsNull()||Application.productName.IsNull())? "QTSC".GetBytes():(Application.companyName.Substring(0,2)+Application.productName.Substring(0,2)).GetBytes();
+		public const string DataExtension = ".data";
+#if QCrypto
+		private static byte[] _CryptoKey = null;
+		public static byte[] CryptoKey => _CryptoKey??=(Application.companyName.IsNull()||Application.productName.IsNull())? "QTCT".GetBytes():(Application.companyName.Substring(0,2)+Application.productName.Substring(0,2)).GetBytes();
 		public static byte[] Encrypt(this byte[] bytes)
 		{
 			if (bytes == null || bytes.Length == 0) return bytes;
@@ -168,7 +167,7 @@ namespace QTool
 			{
 				using (var des = new DESCryptoServiceProvider())
 				{
-					using (var writer = new CryptoStream(memery, des.CreateEncryptor(SecretKey,SecretKey), CryptoStreamMode.Write))
+					using (var writer = new CryptoStream(memery, des.CreateEncryptor(CryptoKey,CryptoKey), CryptoStreamMode.Write))
 					{
 						writer.Write(bytes, 0, bytes.Length);
 						writer.FlushFinalBlock();
@@ -184,7 +183,7 @@ namespace QTool
 			{
 				using (var des = new DESCryptoServiceProvider())
 				{
-					using (var writer = new CryptoStream(memery, des.CreateDecryptor(SecretKey, SecretKey), CryptoStreamMode.Write))
+					using (var writer = new CryptoStream(memery, des.CreateDecryptor(CryptoKey, CryptoKey), CryptoStreamMode.Write))
 					{
 						writer.Write(bytes, 0, bytes.Length);
 						writer.FlushFinalBlock();
@@ -193,6 +192,7 @@ namespace QTool
 				}
 			}
 		}
+#endif
 		public static bool ExistsFile(this string path)
 		{
 			if (path.IsNull()) return false;
@@ -553,10 +553,12 @@ namespace QTool
 						break;
 					default:
 						{
-							if (path.EndsWith(SecretExtension))
+#if QCrypto
+							if (path.EndsWith(DataExtension))
 							{
 								bytes = bytes.Encrypt();
 							}
+#endif
 							File.WriteAllBytes(path, bytes);
 						}
 						break;
@@ -577,11 +579,13 @@ namespace QTool
 		}
 		public static void Save(string path, string data)
 		{
-			if (path.EndsWith(SecretExtension))
+#if QCrypto 
+			if (path.EndsWith(DataExtension))
 			{
 				Save(path, data.GetBytes());
 			}
 			else
+#endif
 			{
 				path = CheckDirectoryPath(path);
 				File.WriteAllText(path, data);
@@ -620,10 +624,12 @@ namespace QTool
 					try
 					{
 						var result = File.ReadAllBytes(path);
-						if (path.EndsWith(SecretExtension))
+#if QCrypto
+						if (path.EndsWith(DataExtension))
 						{
 							result = result.Decrypt();
 						}
+#endif
 						return result;
 					}
 					catch (Exception e)
@@ -661,11 +667,13 @@ namespace QTool
 				}
 				else
 				{
-					if (path.EndsWith(SecretExtension))
+#if QCrypto
+					if (path.EndsWith(DataExtension))
 					{
 						return LoadBytes(path, defaultValue.IsNull()?null:defaultValue.GetBytes()).GetString();
 					}
 					else
+#endif
 					{
 						if (ExistsFile(path))
 						{
@@ -729,7 +737,7 @@ namespace QTool
             return "";
         }
 	}
-	#region WindowsData
+#region WindowsData
 
 	[StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
 	public class FileDialog

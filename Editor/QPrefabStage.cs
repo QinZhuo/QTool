@@ -8,19 +8,20 @@ using System.IO;
 
 public static class QPrefabStage
 {
-	public static QHistoryList HistoryList = new QHistoryList(nameof(QPrefabStage));
+	public static QHistoryList HistoryList = null; 
 	public static PrefabStage CurrrentStage = null;
 	public static bool IsPrefabMode => CurrrentStage != null;
 	[InitializeOnLoadMethod]
 	public static void Init()
-	{
+	{ 
+		HistoryList = new QHistoryList(nameof(QPrefabStage));
 		PrefabStage.prefabStageOpened += OnPrefabStageOpened;
 		PrefabStage.prefabStageClosing += OnPrefabStageClosing;
 		SceneView.duringSceneGui += SceneGUI;
 	}
 	private static void OnPrefabStageOpened(PrefabStage prefabStage)
 	{
-		HistoryList.Add(prefabStage.assetPath);
+		HistoryList.Add(prefabStage.assetPath); 
 		CurrrentStage = prefabStage;
 	}
 	private static void OnPrefabStageClosing(PrefabStage prefabStage)

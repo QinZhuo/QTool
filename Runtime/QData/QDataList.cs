@@ -21,14 +21,15 @@ namespace QTool
 				data.LoadPath = path;
 				QFileTool.LoadAll(path, (fileValue, loadPath) =>
 				{
+				
 					data.Add(new QDataList(fileValue) { LoadPath = loadPath });
+					Debug.LogError(loadPath + " \n " + new QDataList(fileValue) { LoadPath = loadPath });
 				}, "{}");
 			}
 			catch (System.Exception e)
 			{
 				Debug.LogError("读取QDataList[" + path + "]出错：\n" + e);
-
-			}
+			}    
 			if (data.Count == 0)
 			{
 				if (autoCreate != null)
@@ -40,7 +41,6 @@ namespace QTool
 				}
 			}
 			return data;
-
 		}
 
 
@@ -87,7 +87,6 @@ namespace QTool
 				if (index >= Count)
 				{
 					var line = new QDataRow(this);
-					var list = new List<float>();
 					base[index] = line;
 				}
 				return base[index];
@@ -143,7 +142,10 @@ namespace QTool
 		{
 			if (TitleRow.Count == 0)
 			{
-				TitleRow[0] = addList.TitleRow[0];
+				for (int i = 0; i < addList.TitleRow.Count; i++)
+				{
+					TitleRow[i] = addList.TitleRow[i];
+				} 
 			}
 			for (int i = 1; i < addList.Count; i++)
 			{

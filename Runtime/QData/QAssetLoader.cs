@@ -42,7 +42,7 @@ namespace QTool
 			{
 				obj = await LoadAsync(DirectoryPath);
 			}
-			OnLoad(obj);
+			OnLoad(obj); 
 		}
 		public static string DirectoryPath
 		{

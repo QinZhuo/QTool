@@ -52,7 +52,7 @@ namespace QTool
 		{
 			CultureInfo.CurrentCulture = new CultureInfo(QLocalizationCode.en_US.ToCodeString());
 			CultureInfo.DefaultThreadCurrentCulture = CultureInfo.CurrentCulture;
-			SceneManager.sceneUnloaded += scene =>
+			SceneManager.sceneUnloaded += scene => 
 			{
 				QEventManager.InvokeEvent(QEventKey.卸载场景);
 			};

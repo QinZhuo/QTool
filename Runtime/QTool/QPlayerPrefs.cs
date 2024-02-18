@@ -5,7 +5,7 @@ namespace QTool
 {
 	public static class QPlayerPrefs
 	{
-		private static QDataList Data { get; set; } = QDataList.Load(QFileTool.SaveDataPathRoot + "/" + nameof(QPlayerPrefs) + QFileTool.SecretExtension, () => new QDataList());
+		private static QDataList Data { get; set; } = QDataList.Load(QFileTool.SaveDataPathRoot + "/" + nameof(QPlayerPrefs) + QFileTool.DataExtension, () => new QDataList());
 #if UNITY_EDITOR
 		static QPlayerPrefs()
 		{
