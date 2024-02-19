@@ -21,9 +21,7 @@ namespace QTool
 				data.LoadPath = path;
 				QFileTool.LoadAll(path, (fileValue, loadPath) =>
 				{
-				
 					data.Add(new QDataList(fileValue) { LoadPath = loadPath });
-					Debug.LogError(loadPath + " \n " + new QDataList(fileValue) { LoadPath = loadPath });
 				}, "{}");
 			}
 			catch (System.Exception e)
