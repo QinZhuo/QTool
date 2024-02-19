@@ -264,51 +264,23 @@ namespace QTool
 		public string eventName;
         public T eventAction = default;
     }
-    [System.Serializable]
-    public class ActionEvent : UnityEvent
-    {
-    }
-    [System.Serializable]
-    public class BoolEvent : UnityEvent<bool>
-    {
-    }
-    [System.Serializable]
-    public class IntEvent : UnityEvent<int>
-    {
-    }
-    [System.Serializable]
-    public class FloatEvent : UnityEvent<float>
-    {
-    }
-   
+
 	[System.Serializable]
-	public class StringEvent : UnityEvent<string>
+	public class FloatEventTrigger : QUnityEvent<UnityEvent<float>>
 	{
 	}
 	[System.Serializable]
-	public class ColorEvent : UnityEvent<Color>
+	public class BoolEventTrigger : QUnityEvent<UnityEvent<bool>>
 	{
 	}
-	[System.Serializable]
-	public class GameObjectEvent : UnityEvent<GameObject>
-	{
-	}
-	[System.Serializable]
-    public class FloatEventTrigger : QUnityEvent<FloatEvent>
-    {
-    }
-    [System.Serializable]
-    public class BoolEventTrigger : QUnityEvent<BoolEvent>
-    {
-    }
     [System.Serializable]
     public class ActionEventTrigger : QUnityEvent<UnityEvent>
     {
     }
-    [System.Serializable]
-    public class StringEventTrigger : QUnityEvent<StringEvent>
-    {
-    }
+	[System.Serializable]
+	public class StringEventTrigger : QUnityEvent<UnityEvent<string>>
+	{
+	}
 	
 	public static class QEventTool
     {
