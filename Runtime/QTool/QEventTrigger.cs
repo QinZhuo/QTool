@@ -448,8 +448,7 @@ namespace QTool
 				var typeInfo = QSerializeHasReadOnlyType.Get(obj.GetType());
 				foreach (var member in typeInfo.Members)
 				{
-					if (member.QNameAttribute == null) continue;
-					if (keys.Length > 0 && keys.IndexOf(member.QName) < 0) continue;
+					if (keys.Length > 0 ? keys.IndexOf(member.QName) < 0 : member.QNameAttribute == null) return;
 					if (member.Type == typeof(string) || member.Type.Is(typeof(System.Enum)))
 					{
 						//	QDebug.Log(gameObject + " 静态数据初始化 " + obj + " " + member.QName + " : " + obj);
@@ -511,8 +510,7 @@ namespace QTool
 				var typeInfo = QSerializeHasReadOnlyType.Get(obj.GetType());
 				foreach (var member in typeInfo.Members)
 				{
-					if (member.QNameAttribute == null) continue;
-					if (keys.Length > 0 && keys.IndexOf(member.QName) < 0) continue;
+					if (keys.Length > 0 ? keys.IndexOf(member.QName) < 0 : member.QNameAttribute == null) return;
 					if (member.Type.Is(typeof(QRuntimeValue<float>)) && (trigger.floatEventList.ContainsKey(member.QName)
 								|| trigger.floatEventList.ContainsKey("当前" + member.QName) || trigger.floatEventList.ContainsKey(member.QName + "比例")))
 					{
