@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
+
 namespace QTool
 {
 	public class QInteractTrigger : MonoBehaviour
@@ -8,7 +10,7 @@ namespace QTool
 		[QName("手动触发"),UnityEngine.Serialization.FormerlySerializedAs("IsInteract")]
 		public bool IsManual = false;
 		[UnityEngine.Serialization.FormerlySerializedAs("OnEvent")]
-		public GameObjectEvent OnTrigger=new GameObjectEvent();
+		public UnityEvent<GameObject> OnTrigger =new UnityEvent<GameObject>();
 	}
 }
 

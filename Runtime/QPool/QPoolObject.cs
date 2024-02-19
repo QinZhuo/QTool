@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
+
 namespace QTool
 {
 	public class QPoolObject : MonoBehaviour, IQPoolObject
@@ -9,7 +11,7 @@ namespace QTool
 		internal string poolName = "";
 		[QName("延迟自动回收")]
 		public float delayRelease = -1;
-		public ActionEvent OnRelease = new ActionEvent();
+		public UnityEvent OnRelease = new UnityEvent();
 		private bool isReleased = false;
 		public void OnPoolGet()
 		{

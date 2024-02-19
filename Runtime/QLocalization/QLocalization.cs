@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using TMPro;
 #endif
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
 
 namespace QTool
@@ -32,8 +33,8 @@ namespace QTool
 			}
 		}
 		#endregion
-		public StringEvent OnKeyChange = new StringEvent();
-		public StringEvent OnLocalizationChange = new StringEvent();
+		public UnityEvent<string> OnKeyChange = new UnityEvent<string>();
+		public UnityEvent<string> OnLocalizationChange = new UnityEvent<string>();
 		private void Awake()
 		{
 			QLocalizationData.OnLanguageChange += FreshFont;
