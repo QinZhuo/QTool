@@ -13,7 +13,7 @@ namespace QTool
 		public int TestCount = 4;
 		public List<GameObject> List { get; private set; } = new List<GameObject>();
 		public int Count => List.Count;
-		
+
 
 		public virtual GameObject this[string name]
 		{
@@ -71,7 +71,7 @@ namespace QTool
 		{
 			if (transform is RectTransform rectTransform)
 			{
-			
+
 				if (UnityEditor.Selection.activeGameObject != gameObject)
 				{
 					Gizmos.color = name.ToColor().Lerp(Color.clear, 0.7f);
@@ -84,17 +84,17 @@ namespace QTool
 				}
 			}
 		}
-	
+
 		private int lastCount = 0;
 		private void Update()
 		{
 			if (!Application.isPlaying && prefab != null && TestCount != lastCount)
 			{
 				lastCount = TestCount;
-				OnDestroy(); 
+				OnDestroy();
 				for (int i = 0; i < TestCount; i++)
 				{
-					var obj = prefab.CheckInstantiate(transform);
+					var obj = Instantiate(prefab, transform);
 					obj.hideFlags = HideFlags.HideAndDontSave;
 					obj.name = prefab.name + "测试";
 				}
@@ -107,5 +107,4 @@ namespace QTool
 		}
 #endif
 	}
-
 }
