@@ -9,7 +9,7 @@ namespace QTool.UI
 	{
 		[QReadonly]
 		public Toggle toggle;
-		public Graphic on;
+		public Graphic off;
 		private void Reset()
 		{
 			toggle = GetComponent<Toggle>();
@@ -20,15 +20,15 @@ namespace QTool.UI
 		}
 		private void PlayEffect(bool instant)
 		{
-			if (on == null)
+			if (off == null)
 				return;
 
 #if UNITY_EDITOR
 			if (!Application.isPlaying)
-				on.canvasRenderer.SetAlpha(toggle.isOn ? 1f : 0f);
+				off.canvasRenderer.SetAlpha(!toggle.isOn ? 1f : 0f);
 			else
 #endif
-				on.CrossFadeAlpha(toggle.isOn ? 1f : 0f, instant ? 0f : 0.1f, true);
+				off.CrossFadeAlpha(!toggle.isOn ? 1f : 0f, instant ? 0f : 0.1f, true);
 		}
 	}
 }
