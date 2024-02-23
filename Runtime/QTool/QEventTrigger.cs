@@ -8,15 +8,15 @@ namespace QTool
 	public enum QEventKey
 	{
 		设置更新,
-	    卸载场景,
+		卸载场景,
 		游戏退出,
 	}
 	public static class QEventManager
-    {
-        /// <summary>
-        /// 事件列表 对应事件触发时调用对应Action 使用方法： EventList["事件名"]+=Action;
-        /// </summary>
-        internal static QDictionary<string, System.Action> EventList = new QDictionary<string, System.Action>();
+	{
+		/// <summary>
+		/// 事件列表 对应事件触发时调用对应Action 使用方法： EventList["事件名"]+=Action;
+		/// </summary>
+		internal static QDictionary<string, System.Action> EventList = new QDictionary<string, System.Action>();
 		public static void InvokeEvent(System.Enum value)
 		{
 			InvokeEvent(value.ToString());
@@ -26,8 +26,8 @@ namespace QTool
 		/// </summary>
 		/// <param name="eventKey">事件名</param>
 		public static void InvokeEvent(string eventKey)
-        {
-			QDebug.Log("触发事件[" + eventKey+"]");
+		{
+			QDebug.Log("触发事件[" + eventKey + "]");
 			try
 			{
 				eventKey = eventKey.Trim();
@@ -44,12 +44,12 @@ namespace QTool
 			{
 				Debug.LogError("触发事件[" + eventKey + "]出错：\n" + e);
 			}
-        }
-        public static void InvokeEvent<T>(string eventKey,T value)
-        {
-            QEventManager<T>.InvokeEvent(eventKey, value);
-        }
-		public static void Register(System.Enum eventKey,params System.Action[] action)
+		}
+		public static void InvokeEvent<T>(string eventKey, T value)
+		{
+			QEventManager<T>.InvokeEvent(eventKey, value);
+		}
+		public static void Register(System.Enum eventKey, params System.Action[] action)
 		{
 			var key = eventKey.ToString();
 			foreach (var item in action)
@@ -58,10 +58,10 @@ namespace QTool
 			}
 		}
 		public static void Register(string eventKey, System.Action action)
-        {
+		{
 			EventList[eventKey] += action;
 		}
-	
+
 		public static void UnRegister(System.Enum eventKey, params System.Action[] action)
 		{
 			var key = eventKey.ToString();
@@ -71,25 +71,25 @@ namespace QTool
 			}
 		}
 		public static void UnRegister(string eventKey, System.Action action)
-        {
-            EventList[eventKey] -= action;
+		{
+			EventList[eventKey] -= action;
 		}
-        public static void Register<T>(string eventKey,System.Action<T> action)
-        {
+		public static void Register<T>(string eventKey, System.Action<T> action)
+		{
 			QEventManager<T>.EventList[eventKey] += action;
 		}
 		public static void UnRegister<T>(string eventKey, System.Action<T> action)
-        {
-            QEventManager<T>.EventList[eventKey] -= action;
-        }
-    }
-    public class QEventManager<T>
-    {
-        /// <summary>
-        /// 事件列表 对应事件触发时调用对应Action 使用方法： EventList["事件名"]+=Action;
-        /// </summary>
-        internal static QDictionary<string, System.Action<T>> EventList = new QDictionary<string, System.Action<T>>();
-		public static void InvokeEvent(string eventKey,T value)
+		{
+			QEventManager<T>.EventList[eventKey] -= action;
+		}
+	}
+	public class QEventManager<T>
+	{
+		/// <summary>
+		/// 事件列表 对应事件触发时调用对应Action 使用方法： EventList["事件名"]+=Action;
+		/// </summary>
+		internal static QDictionary<string, System.Action<T>> EventList = new QDictionary<string, System.Action<T>>();
+		public static void InvokeEvent(string eventKey, T value)
 		{
 			try
 			{
@@ -107,22 +107,22 @@ namespace QTool
 			{
 				Debug.LogError("触发事件[" + eventKey + ":" + value + "]出错\n" + e);
 			}
-			
+
 		}
-    }
+	}
 	public interface IQEvent<T>
 	{
 		void Set(T value);
 	}
-    [System.Serializable,DisallowMultipleComponent]
-    public class QEventTrigger : MonoBehaviour
-    {
+	[System.Serializable, DisallowMultipleComponent]
+	public class QEventTrigger : MonoBehaviour
+	{
 		[QName("注册全局事件")]
 		public bool GlobalEvent = false;
 		public List<ActionEventTrigger> actionEventList = new List<ActionEventTrigger>();
-        public List<StringEventTrigger> stringEventList = new List<StringEventTrigger>();
-        public List<BoolEventTrigger> boolEventList = new List<BoolEventTrigger>();
-        public List<FloatEventTrigger> floatEventList = new List<FloatEventTrigger>();
+		public List<StringEventTrigger> stringEventList = new List<StringEventTrigger>();
+		public List<BoolEventTrigger> boolEventList = new List<BoolEventTrigger>();
+		public List<FloatEventTrigger> floatEventList = new List<FloatEventTrigger>();
 		[QName("自动绑定")]
 		public void AutoRegisterEvent()
 		{
@@ -221,49 +221,49 @@ namespace QTool
 		{
 			Log(eventName, value);
 			stringEventList.Get(eventName)?.eventAction?.Invoke(value);
-        }
-        public void Invoke(string eventName)
-        {
+		}
+		public void Invoke(string eventName)
+		{
 			Log(eventName);
 			actionEventList.Get(eventName)?.eventAction?.Invoke();
-        }
-        public void Invoke(string eventName, bool value)
+		}
+		public void Invoke(string eventName, bool value)
 		{
 			Log(eventName, value);
 			boolEventList.Get(eventName)?.eventAction?.Invoke((bool)value);
-			boolEventList.Get("!"+eventName)?.eventAction?.Invoke(!(bool)value);
+			boolEventList.Get("!" + eventName)?.eventAction?.Invoke(!(bool)value);
 		}
-        public new void Invoke(string eventName, float value)
+		public new void Invoke(string eventName, float value)
 		{
 			Log(eventName, value);
 			floatEventList.Get(eventName)?.eventAction?.Invoke(value);
 		}
 
 		[System.Diagnostics.Conditional("UNITY_EDITOR")]
-		void Log(string eventName, object value=null)
+		void Log(string eventName, object value = null)
 		{
 #if UNITY_EDITOR
 			if (UnityEditor.Selection.activeGameObject == gameObject)
 			{
 				if (value == null)
 				{
-					QDebug.Log("["+nameof(QEventTrigger)+"]"+eventName);
+					QDebug.Log("[" + nameof(QEventTrigger) + "]" + eventName);
 				}
 				else
 				{
-					QDebug.Log("[" + nameof(QEventTrigger) + "]" + eventName + "<"+value.GetType()+">(" + value + ")");
+					QDebug.Log("[" + nameof(QEventTrigger) + "]" + eventName + "<" + value.GetType() + ">(" + value + ")");
 				}
 			}
 #endif
 		}
 	}
-    public class QUnityEvent<T> : IKey<string> where T : UnityEventBase
+	public class QUnityEvent<T> : IKey<string> where T : UnityEventBase
 	{
 		public string Key { get => eventName; set => eventName = value; }
 		[UnityEngine.Serialization.FormerlySerializedAs("EventName")]
 		public string eventName;
-        public T eventAction = default;
-    }
+		public T eventAction = default;
+	}
 
 	[System.Serializable]
 	public class FloatEventTrigger : QUnityEvent<UnityEvent<float>>
@@ -273,15 +273,30 @@ namespace QTool
 	public class BoolEventTrigger : QUnityEvent<UnityEvent<bool>>
 	{
 	}
-    [System.Serializable]
-    public class ActionEventTrigger : QUnityEvent<UnityEvent>
-    {
-    }
+	[System.Serializable]
+	public class ActionEventTrigger : QUnityEvent<UnityEvent>
+	{
+	}
 	[System.Serializable]
 	public class StringEventTrigger : QUnityEvent<UnityEvent<string>>
 	{
 	}
-	
+	static class RuntimeUnityEvent
+	{
+		public static QDictionary<UnityEvent, UnityEvent> RuntimeEvents = new QDictionary<UnityEvent, UnityEvent>(key => {
+			var value = new UnityEvent();
+			key.AddListener(value.Invoke);
+			return value;
+		});
+	}
+	static class RuntimeUnityEvent<T>
+	{
+		public static QDictionary<UnityEvent<T>, UnityEvent<T>> RuntimeEvents = new QDictionary<UnityEvent<T>, UnityEvent<T>>(key => {
+			var value = new UnityEvent<T>();
+			key.AddListener(value.Invoke);
+			return value;
+		});
+	}
 	public static class QEventTool
     {
 		public static UnityAction GetAction(this Object obj, string funcName)
@@ -293,6 +308,7 @@ namespace QTool
 			var method = UnityEventBase.GetValidMethodInfo(obj, funcName, new System.Type[] { typeof(T) });
 			return method.CreateDelegate(typeof(UnityAction<T>), obj) as UnityAction<T>;
 		}
+	
 		public static void AddPersistentListener(this UnityEvent onValueChanged, UnityAction action)
 		{
 #if UNITY_EDITOR
@@ -321,6 +337,14 @@ namespace QTool
 			{
 				onValueChanged.RemoveListener(action);
 			}
+		}
+		public static UnityEvent GetRuntime(this UnityEvent onValueChanged)
+		{
+			return RuntimeUnityEvent.RuntimeEvents[onValueChanged];
+		}
+		public static UnityEvent<T> GetRuntime<T>(this UnityEvent<T> onValueChanged)
+		{
+			return RuntimeUnityEvent<T>.RuntimeEvents[onValueChanged];
 		}
 		public static void RemovePersistentListener<T>(this UnityEvent<T> onValueChanged, UnityAction<T> action)
 		{
