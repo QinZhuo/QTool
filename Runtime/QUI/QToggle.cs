@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
 namespace QTool.UI
 {
@@ -10,13 +11,19 @@ namespace QTool.UI
 		[QReadonly]
 		public Toggle toggle;
 		public Graphic off;
+		public UnityEvent<bool> onValueChanged;
 		private void Reset()
 		{
 			toggle = GetComponent<Toggle>();
 			if (toggle != null)
 			{
-				toggle.onValueChanged.AddPersistentListener(PlayEffect, true);
+				toggle.onValueChanged.AddPersistentListener(InvokeValueChange, true);
 			}
+		}
+		private void InvokeValueChange(bool isOn)
+		{
+			onValueChanged?.Invoke(isOn);
+			PlayEffect(isOn);
 		}
 		private void PlayEffect(bool instant)
 		{
