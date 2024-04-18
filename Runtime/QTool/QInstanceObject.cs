@@ -12,16 +12,16 @@ namespace QTool
     {
         protected static T _instance;
         public static T Instance
-        {
-            get
-            {
+		{
+			get
+			{
 				if (_instance == null)
 				{
-					_instance = QTool.LoadAndCreate<T>(typeof(T).Name);
+					_instance = QTool.LoadAndCreate<T>("Settings/" + typeof(T).Name);
 				}
-                return _instance; 
-            }
-        }
+				return _instance;
+			}
+		}
 
 		public virtual void Awake()
         {

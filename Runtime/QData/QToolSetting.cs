@@ -25,8 +25,7 @@ namespace QTool
 		public float DefualtColorValue = 1;
 		[QName("强制分辨率比例"), Tooltip("只有挂载 " + nameof(QScreenAspect) + " 脚本的相机和UI会生效")]
 		public float targetAspect = 16f / 9f;
-		[QName("游戏数据邮箱")]
-		public QMailAccount QAnalysisMail;
+		
 #if UNITY_EDITOR
 		[QName("音频强制单声道")]
 		public bool forceToMono = true;
@@ -57,13 +56,11 @@ namespace QTool
 		[Range(0, 100)]
 		public int compressionQuality = 50;
 #endif
-		private void OnValidate()
-		{
-			QAnalysisMail?.Init();
-		}
+
 		public static List<QKeyColorValue> ColorList => Instance.qKeyColorList;
 	}
 	
+
 	[System.Serializable]
 	public struct QKeyColorValue : IKey<string>
 	{
