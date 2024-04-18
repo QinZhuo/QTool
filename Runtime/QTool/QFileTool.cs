@@ -156,7 +156,6 @@ namespace QTool
 				}
 			});
 		}
-		public const string DataExtension = ".data";
 #if QCrypto
 		private static byte[] _CryptoKey = null;
 		public static byte[] CryptoKey => _CryptoKey??=(Application.companyName.IsNull()||Application.productName.IsNull())? "QTCT".GetBytes():(Application.companyName.Substring(0,2)+Application.productName.Substring(0,2)).GetBytes();
@@ -579,7 +578,7 @@ namespace QTool
 		}
 		public static void Save(string path, string data)
 		{
-#if QCrypto 
+#if QCrypto
 			if (path.EndsWith(DataExtension))
 			{
 				Save(path, data.GetBytes());
@@ -587,15 +586,16 @@ namespace QTool
 			else
 #endif
 			{
+
 				path = CheckDirectoryPath(path);
-				File.WriteAllText(path, data);
+				File.WriteAllText(path, data, Encoding);
 			}
 		}
 		public static string WithoutExtension(this string path)
 		{
 			return Path.GetDirectoryName(path)+"/"+ Path.GetFileNameWithoutExtension(path);
 		}
-		
+		public static System.Text.Encoding Encoding = System.Text.Encoding.Unicode;
 		public static byte[] LoadBytes(string path,byte[] defaultValue=default)
 		{
 			switch (Application.platform)

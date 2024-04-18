@@ -7,11 +7,10 @@ using QTool.Reflection;
 namespace QTool
 {
 	/// <summary>
-	/// 表格式字符存储逻辑
+	/// 表格式字符存储逻辑 类csv格式
 	/// </summary>
 	public class QDataList : QList<string, QDataRow>
 	{
-
 		public static QDataList Load(string path, System.Func<QDataList> autoCreate = null)
 		{
 			QDataList data = null;
@@ -27,7 +26,7 @@ namespace QTool
 			catch (System.Exception e)
 			{
 				Debug.LogError("读取QDataList[" + path + "]出错：\n" + e);
-			}    
+			}
 			if (data.Count == 0)
 			{
 				if (autoCreate != null)
@@ -49,7 +48,7 @@ namespace QTool
 			{
 				path = LoadPath;
 			}
-			QFileTool.Save(path, ToString());
+			QFileTool.Save(path, "\uFEFF" + ToString());
 		}
 		public int GetTitleIndex(string title)
 		{
@@ -143,7 +142,7 @@ namespace QTool
 				for (int i = 0; i < addList.TitleRow.Count; i++)
 				{
 					TitleRow[i] = addList.TitleRow[i];
-				} 
+				}
 			}
 			for (int i = 1; i < addList.Count; i++)
 			{
@@ -188,7 +187,7 @@ namespace QTool
 		public static async void PreLoadAll()
 		{
 			if (LoadAllOver) return;
-			LoadAllOver = true;;
+			LoadAllOver = true; ;
 			foreach (var type in typeof(QDataList<>).GetAllTypes())
 			{
 				await QTask.Step();
@@ -253,7 +252,7 @@ namespace QTool
 		#region 加载数据
 		public static string GetResourcesPath(string key = null)
 		{
-			return (QFileTool.ResourcesPathRoot + "/" + nameof(QDataList) + "Asset").MergePath(typeof(T).Name).MergePath(key) + ".txt";
+			return QFileTool.ResourcesPathRoot.MergePath(typeof(T).Name).MergePath(key).MergePath(QDataListTool.Extension);
 		}
 		public static QDataList LoadQDataList(string key = null)
 		{
@@ -284,19 +283,19 @@ namespace QTool
 	/// <summary>
 	/// 轻量级数据库 通过对象访问 速度不会快很多 主要为了数据分块加载 如果对象格式发生更改会读取失败 
 	/// </summary>
-	public class QDataDB<T> where T : IKey<string> , new()
+	public class QDataDB<T> where T : IKey<string>, new()
 	{
 		public string Path { get; private set; }
-		Func<T, string> GetDBPath;  
-		public QDataDB(string Path,Func<T,string> GetDBPath)
+		Func<T, string> GetDBPath;
+		public QDataDB(string Path, Func<T, string> GetDBPath)
 		{
 			this.Path = Path;
 			this.GetDBPath = GetDBPath;
 			PathIndex.LoadBytes(Path + "/" + nameof(PathIndex) + ".bin");
 		}
-		public void Save() 
+		public void Save()
 		{
-			PathIndex.SaveBytes(Path + "/" + nameof(PathIndex)+".bin");
+			PathIndex.SaveBytes(Path + "/" + nameof(PathIndex) + ".bin");
 			foreach (var item in Data)
 			{
 				if (item.Value.Changed)
@@ -305,7 +304,7 @@ namespace QTool
 				}
 			}
 		}
-		public void Load(string key=null)
+		public void Load(string key = null)
 		{
 			if (key.IsNull())
 			{
@@ -313,13 +312,13 @@ namespace QTool
 				{
 					if (!Data.ContainsKey(kv.Value))
 					{
-						var data= Data[kv.Value];
+						var data = Data[kv.Value];
 					}
 				}
 			}
-			else if(PathIndex.ContainsKey(key))
+			else if (PathIndex.ContainsKey(key))
 			{
-				var data= Data[PathIndex[key]];
+				var data = Data[PathIndex[key]];
 			}
 		}
 		public T Add(T data)
@@ -345,7 +344,7 @@ namespace QTool
 		{
 			if (PathIndex.ContainsKey(key))
 			{
-				var data= Data[PathIndex[key]].Get(key);
+				var data = Data[PathIndex[key]].Get(key);
 				if (data == null)
 				{
 					Debug.LogError("[" + key + "]数据为空:" + PathIndex[key]);
@@ -369,39 +368,41 @@ namespace QTool
 		public T this[string key]
 		{
 			get
-			{ 
+			{
 				return Get(key);
 			}
 		}
 		public int Count => PathIndex.Count;
 		Dictionary<string, string> PathIndex = new Dictionary<string, string>();
-		public QDictionary<string, QList<string,T>> Data = new QDictionary<string, QList<string,T>>((path) =>new QList<string,T>().LoadBytes(path));   
-	} 
-	public class QDataRow:QList<string>,IKey<string>
-    {
-        public string Key { get => base[0]; set
-            {
+		public QDictionary<string, QList<string, T>> Data = new QDictionary<string, QList<string, T>>((path) => new QList<string, T>().LoadBytes(path));
+	}
+	public class QDataRow : QList<string>, IKey<string>
+	{
+		public string Key
+		{
+			get => base[0]; set
+			{
 
-                base[0] = value;
-            }
-        }
+				base[0] = value;
+			}
+		}
 		public string this[string title]
 		{
 			get => base[OwnerData.GetTitleIndex(title)];
 			set => base[OwnerData.GetTitleIndex(title)] = value;
 		}
-        public T GetValue<T>(int index=1,T defaultValue=default)
-        {
+		public T GetValue<T>(int index = 1, T defaultValue = default)
+		{
 			if (typeof(T) == typeof(string))
 			{
-				return (T)(object)base[index] ;
+				return (T)(object)base[index];
 			}
 			else
 			{
 				return base[index].ParseQData(defaultValue, false);
 			}
-        }
-		public void SetValueType(object value,Type type,int index=1)
+		}
+		public void SetValueType(object value, Type type, int index = 1)
 		{
 			if (type == typeof(string))
 			{
@@ -413,12 +414,12 @@ namespace QTool
 				base[index] = value.ToQDataType(type, false);
 			}
 		}
-        public void SetValue<T>(T value, int index=1)
-        {
+		public void SetValue<T>(T value, int index = 1)
+		{
 			SetValueType(value, typeof(T), index);
-        }
-	
-		public T GetValue<T>(string title,T defaultValue=default)
+		}
+
+		public T GetValue<T>(string title, T defaultValue = default)
 		{
 			return GetValue(OwnerData.GetTitleIndex(title), defaultValue);
 		}
@@ -426,44 +427,46 @@ namespace QTool
 		{
 			return OwnerData.TitleRow.IndexOf(title) >= 0;
 		}
-		public QDataRow SetValueType(string title, object value,Type type)
+		public QDataRow SetValueType(string title, object value, Type type)
 		{
 			SetValueType(value, type, OwnerData.GetTitleIndex(title));
 			return this;
 		}
-		public QDataRow SetValue<T>(string title,T value)
-        {
+		public QDataRow SetValue<T>(string title, T value)
+		{
 			SetValueType(title, value, typeof(T));
-            return this;
-        }
-      
-        public QDataRow()
-        {
-        }
-        public QDataList OwnerData { get; internal set; }
-        public QDataRow(QDataList ownerData)
-        {
-            OwnerData = ownerData;
-        }
-        public override string ToString()
-        {
-            using (var writer=new StringWriter())
-            {
-                for (int j = 0; j < Count; j++)
-                {
-                    var qdata = this[j];
-                    writer.Write(qdata.ToElement());
-                    if (j < Count - 1)
-                    {
-                        writer.Write('\t');
-                    }
-                }
-                return writer.ToString();
-            }
-        }
-    }
+			return this;
+		}
+
+		public QDataRow()
+		{
+		}
+		public QDataList OwnerData { get; internal set; }
+		public QDataRow(QDataList ownerData)
+		{
+			OwnerData = ownerData;
+		}
+		public override string ToString()
+		{
+			using (var writer = new StringWriter())
+			{
+				for (int j = 0; j < Count; j++)
+				{
+					var qdata = this[j];
+					writer.Write(qdata.ToElement());
+					if (j < Count - 1)
+					{
+						writer.Write(QDataListTool.SplitChar);
+					}
+				}
+				return writer.ToString();
+			}
+		}
+	}
 	public static class QDataListTool
 	{
+		public const string Extension = ".csv"; 
+		public const char SplitChar = '\t';
 		public static string ToElement(this string value)
 		{
 			if (string.IsNullOrEmpty(value))
@@ -474,7 +477,7 @@ namespace QTool
 			{
 				value = value.Replace("\t", " ");
 			}
-			if (value.Contains("\n")||value.Contains(","))
+			if (value.Contains("\n") || value.Contains(","))
 			{
 				if (value.Contains("\""))
 				{
@@ -487,9 +490,9 @@ namespace QTool
 		public static string ParseElement(this string value)
 		{
 			if (value.IsNull()) return value;
-			if(value.StartsWith("\"") && value.EndsWith("\""))
+			if (value.StartsWith("\"") && value.EndsWith("\""))
 			{
-				if(value.Contains("\n") || value.Contains("\"\"")||value.Contains(","))
+				if (value.Contains("\n") || value.Contains("\"\"") || value.Contains(","))
 				{
 					value = value.Substring(1, value.Length - 2);
 					value = value.Replace("\"\"", "\"");
@@ -520,7 +523,7 @@ namespace QTool
 						{
 							reader.NextIs('\r');
 							if (reader.NextIs('\n')) break;
-							if (reader.NextIs('\t'))
+							if (reader.NextIs(SplitChar))
 							{
 								if (!reader.IsEnd())
 								{
@@ -531,16 +534,16 @@ namespace QTool
 						}
 
 					}
-					var value = ParseElement( writer.ToString());
+					var value = ParseElement(writer.ToString());
 					return value;
 				}
 				else
 				{
 					while (!reader.IsEnd() && !reader.NextIs('\n'))
 					{
-						if (reader.NextIs('\t'))
+						if (reader.NextIs(SplitChar))
 						{
-							if(!reader.IsEnd())
+							if (!reader.IsEnd())
 							{
 								newLine = false;
 							}
@@ -557,6 +560,5 @@ namespace QTool
 
 			}
 		}
-
 	}
 }

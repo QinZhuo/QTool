@@ -19,10 +19,10 @@ namespace QTool.FlowGraph
 		public static bool OnOpen(int instanceID, int line)
 		{
 			if (EditorUtility.InstanceIDToObject(instanceID) is TextAsset textAsset)
-			{
+			{ 
 				if (textAsset == null) return false;
 				var path = AssetDatabase.GetAssetPath(textAsset);
-				if (path.Contains(nameof(QDataList) + "Asset" + '/') && path.EndsWith(".txt"))
+				if (path.EndsWith(QDataListTool.Extension))
 				{
 					FilePath = path;
 					OpenWindow();
@@ -214,7 +214,7 @@ namespace QTool.FlowGraph
 			try
 			{
 				var path = FilePath;
-				var type = QReflection.ParseType(path.GetBlockValue(nameof(QDataList) + "Asset" + '/', ".txt").SplitStartString("/"));
+				var type = QReflection.ParseType(path.FileName());
 				if (type != null)
 				{
 					typeInfo = QSerializeHasReadOnlyType.Get(type);
