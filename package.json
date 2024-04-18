@@ -22,7 +22,7 @@
     {
       "displayName": "ComputeShader",
       "description": "ComputeShader",
-      "path": "ComputeShader"
+      "path": ".ComputeShader"
     }
   ]
 }
