@@ -48,7 +48,7 @@ namespace QTool
 		{
 			get
 			{
-				return typeof(TPath).Name.Replace('_', '/');
+				return typeof(TPath).Name.Replace("_Prefab", "").Replace('_', '/');
 			}
 		}
 		public static TObj[] LoadAll()
