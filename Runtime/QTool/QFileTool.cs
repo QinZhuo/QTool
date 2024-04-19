@@ -587,7 +587,14 @@ namespace QTool
 #endif
 			{
 				path = CheckDirectoryPath(path);
-				File.WriteAllText(path, data, Encoding);
+				if (Encoding == null)
+				{
+					File.WriteAllText(path, data);
+				}
+				else
+				{
+					File.WriteAllText(path, data, Encoding);
+				}
 			}
 		}
 		public static string WithoutExtension(this string path)
@@ -675,7 +682,14 @@ namespace QTool
 					{
 						if (ExistsFile(path))
 						{
-							return File.ReadAllText(path, Encoding);
+							if(Encoding == null)
+							{
+								return File.ReadAllText(path);
+							}
+							else
+							{
+								return File.ReadAllText(path, Encoding);
+							}
 						}
 						else
 						{
