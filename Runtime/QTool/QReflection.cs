@@ -1048,11 +1048,6 @@ namespace QTool.Reflection
 						
 					}
 				}
-
-				if(type==null)
-				{
-					Debug.LogWarning("未找到类型[" + typeString + "]");
-				}
 				if (typeString.Contains("System.Threading.Tasks.Task"))
 				{
 					TypeBuffer.Add(typeString, null);

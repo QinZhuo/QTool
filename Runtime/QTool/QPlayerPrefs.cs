@@ -6,12 +6,6 @@ namespace QTool
 	public static class QPlayerPrefs
 	{
 		private static QDataList Data { get; set; } = QDataList.Load(QFileTool.SaveDataPathRoot + "/" + nameof(QPlayerPrefs), () => new QDataList());
-#if UNITY_EDITOR
-		static QPlayerPrefs()
-		{
-			QDebug.Log("读取预设\n" + Data.ToString());
-		}
-#endif
 		private static void Save()
 		{
 			Data.Save();

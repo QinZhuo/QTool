@@ -17,7 +17,6 @@ namespace QTool {
 			if (CurLevel != QualitySettings.GetQualityLevel())
 			{
 				CurLevel = QualitySettings.GetQualityLevel();
-				QDebug.Log(nameof(QQualityActive) + " 画质级别 " + CurLevel);
 				OnQualityChange?.Invoke();
 			}
 		}

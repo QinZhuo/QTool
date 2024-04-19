@@ -215,6 +215,7 @@ namespace QTool.FlowGraph
 			{
 				var path = FilePath;
 				var type = QReflection.ParseType(path.FileName());
+				if (type == null) type = QReflection.ParseType(path.DirectoryName().FileName());
 				if (type != null)
 				{
 					typeInfo = QSerializeHasReadOnlyType.Get(type);

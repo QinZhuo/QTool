@@ -88,7 +88,7 @@ namespace QTool
         {
             return ExistsDirectory(rootPath) ? Directory.GetFiles(rootPath).Length / 2 : 0;
         }
-		public static string DirectoryName(this string path, bool withExtension = false)
+		public static string DirectoryName(this string path)
 		{
 			return Path.GetDirectoryName(path);
 		}
@@ -573,7 +573,7 @@ namespace QTool
 		{
 			if (!string.Equals(Load(path).Trim(), data.Trim()))
 			{
-				Save(path, data);
+				Save(path, data, System.Text.Encoding.Unicode);
 			}
 		}
 		public static void Save(string path, string data, System.Text.Encoding Encoding = null)

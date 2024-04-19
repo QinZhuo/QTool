@@ -913,7 +913,7 @@ namespace QTool
 				}
 				list.Add((T)t);
 			}
-			QDebug.End("解析QDataList<" + type.Name + ">数据", list.Count + " 条 ");
+			//QDebug.End("解析QDataList<" + type.Name + ">数据", list.Count + " 条 ");
 			return list;
 		}
 
