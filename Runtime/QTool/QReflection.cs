@@ -620,7 +620,7 @@ namespace QTool.Reflection
 				}
 				catch (Exception e)
 				{
-					throw new Exception("路径出错：" + path, e);
+					Debug.LogError("路径出错：" + path + ":" + e);
 				}
 			}
 			else
@@ -633,9 +633,10 @@ namespace QTool.Reflection
 				}
 				else
 				{
-					throw new Exception(" 找不到 key " + path);
+					Debug.LogError(" 找不到 key " + path);
 				}
 			}
+			return null;
 		}
 		public static object SetPathObject(this object target, string path, object value)
 		{
