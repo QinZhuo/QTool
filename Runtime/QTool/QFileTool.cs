@@ -444,7 +444,7 @@ namespace QTool
 		}
 		public static void SaveQDataList<T>(this IList<T> data, string path)
 		{
-			Save(path, data.ToQDataList().ToString());
+			Save(path, data.ToQDataList().ToString(), System.Text.Encoding.Unicode);
 		}
 		public static T LoadQData<T>(this T data, string path) 
 		{
@@ -576,7 +576,7 @@ namespace QTool
 				Save(path, data);
 			}
 		}
-		public static void Save(string path, string data)
+		public static void Save(string path, string data, System.Text.Encoding Encoding = null)
 		{
 #if QCrypto
 			if (path.EndsWith(DataExtension))
@@ -586,7 +586,6 @@ namespace QTool
 			else
 #endif
 			{
-
 				path = CheckDirectoryPath(path);
 				File.WriteAllText(path, data, Encoding);
 			}
@@ -595,7 +594,6 @@ namespace QTool
 		{
 			return Path.GetDirectoryName(path)+"/"+ Path.GetFileNameWithoutExtension(path);
 		}
-		public static System.Text.Encoding Encoding = System.Text.Encoding.Unicode;
 		public static byte[] LoadBytes(string path,byte[] defaultValue=default)
 		{
 			switch (Application.platform)
@@ -649,7 +647,7 @@ namespace QTool
 
 
 		}
-		public static string Load(string path, string defaultValue = "",bool ignoreResources=false)
+		public static string Load(string path, string defaultValue = "",bool ignoreResources=false, System.Text.Encoding Encoding = null)
 		{
 			try
 			{
@@ -677,7 +675,7 @@ namespace QTool
 					{
 						if (ExistsFile(path))
 						{
-							return File.ReadAllText(path);
+							return File.ReadAllText(path, Encoding);
 						}
 						else
 						{

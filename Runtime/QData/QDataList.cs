@@ -48,7 +48,7 @@ namespace QTool
 			{
 				path = LoadPath;
 			}
-			QFileTool.Save(path, "\uFEFF" + ToString());
+			QFileTool.Save(path, ToString(), System.Text.Encoding.Unicode);
 		}
 		public int GetTitleIndex(string title)
 		{
