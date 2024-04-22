@@ -82,6 +82,12 @@ namespace QTool
 		{
 			OnPoolRelease();
 		}
+#if UNITY_EDITOR
+		private void OnValidate()
+		{
+			gameObject.AutoAddPersistentListener(this);
+		}
+#endif
 		public virtual void OnPoolGet()
 		{
 		//	gameObject.RegisterEvent(this);
