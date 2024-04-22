@@ -1,0 +1,447 @@
+using log4net.Util;
+using QTool.Reflection;
+using System.Collections.Generic;
+using TMPro;
+using UnityEngine;
+using UnityEngine.Events;
+using UnityEngine.UI;
+namespace QTool
+{
+
+	public enum QEventKey
+	{
+		设置更新,
+		卸载场景,
+		游戏退出,
+	}
+	public static class QEventManager
+	{
+		/// <summary>
+		/// 事件列表 对应事件触发时调用对应Action 使用方法： EventList["事件名"]+=Action;
+		/// </summary>
+		internal static QDictionary<string, System.Action> EventList = new QDictionary<string, System.Action>();
+		public static void InvokeEvent(System.Enum value)
+		{
+			InvokeEvent(value.ToString());
+		}
+		/// <summary>
+		/// 触发事件
+		/// </summary>
+		/// <param name="eventKey">事件名</param>
+		public static void InvokeEvent(string eventKey)
+		{
+			QDebug.Log("触发事件[" + eventKey + "]");
+			try
+			{
+				eventKey = eventKey.Trim();
+				if (string.IsNullOrWhiteSpace(eventKey))
+				{
+					return;
+				}
+				if (EventList.ContainsKey(eventKey))
+				{
+					EventList[eventKey]?.Invoke();
+				}
+			}
+			catch (System.Exception e)
+			{
+				Debug.LogError("触发事件[" + eventKey + "]出错：\n" + e);
+			}
+		}
+		public static void InvokeEvent<T>(string eventKey, T value)
+		{
+			QEventManager<T>.InvokeEvent(eventKey, value);
+		}
+		public static void Register(System.Enum eventKey, params System.Action[] action)
+		{
+			var key = eventKey.ToString();
+			foreach (var item in action)
+			{
+				Register(key, item);
+			}
+		}
+		public static void Register(string eventKey, System.Action action)
+		{
+			EventList[eventKey] += action;
+		}
+
+		public static void UnRegister(System.Enum eventKey, params System.Action[] action)
+		{
+			var key = eventKey.ToString();
+			foreach (var item in action)
+			{
+				UnRegister(key, item);
+			}
+		}
+		public static void UnRegister(string eventKey, System.Action action)
+		{
+			EventList[eventKey] -= action;
+		}
+		public static void Register<T>(string eventKey, System.Action<T> action)
+		{
+			QEventManager<T>.EventList[eventKey] += action;
+		}
+		public static void UnRegister<T>(string eventKey, System.Action<T> action)
+		{
+			QEventManager<T>.EventList[eventKey] -= action;
+		}
+	}
+	public class QEventManager<T>
+	{
+		/// <summary>
+		/// 事件列表 对应事件触发时调用对应Action 使用方法： EventList["事件名"]+=Action;
+		/// </summary>
+		internal static QDictionary<string, System.Action<T>> EventList = new QDictionary<string, System.Action<T>>();
+		public static void InvokeEvent(string eventKey, T value)
+		{
+			try
+			{
+				eventKey = eventKey.Trim();
+				if (string.IsNullOrWhiteSpace(eventKey))
+				{
+					return;
+				}
+				if (EventList.ContainsKey(eventKey))
+				{
+					EventList[eventKey]?.Invoke(value);
+				}
+			}
+			catch (System.Exception e)
+			{
+				Debug.LogError("触发事件[" + eventKey + ":" + value + "]出错\n" + e);
+			}
+
+		}
+	}
+	static class RuntimeUnityEvent
+	{
+		public static QDictionary<UnityEvent, UnityEvent> RuntimeEvents = new QDictionary<UnityEvent, UnityEvent>(key => {
+			var value = new UnityEvent();
+			key.AddListener(value.Invoke);
+			return value;
+		});
+	}
+	static class RuntimeUnityEvent<T>
+	{
+		public static QDictionary<UnityEvent<T>, UnityEvent<T>> RuntimeEvents = new QDictionary<UnityEvent<T>, UnityEvent<T>>(key => {
+			var value = new UnityEvent<T>();
+			key.AddListener(value.Invoke);
+			return value;
+		});
+	}
+	public static class QEventTool
+    {
+		public static UnityAction GetUnityAction(this Object obj, string funcName)
+		{
+			return UnityEventBase.GetValidMethodInfo(obj, funcName, new System.Type[0]).CreateDelegate(typeof(UnityAction), obj) as UnityAction;
+		}
+		public static UnityAction<T> GetUnityAction<T>(this Object obj, string funcName)
+		{
+			var method = UnityEventBase.GetValidMethodInfo(obj, funcName, new System.Type[] { typeof(T) });
+			return method.CreateDelegate(typeof(UnityAction<T>), obj) as UnityAction<T>;
+		}
+	
+
+		public static void AddPersistentListener(this UnityEvent onValueChanged, UnityAction action, bool editorAndRuntime = false)
+		{
+#if UNITY_EDITOR
+			if (!Application.isPlaying)
+			{
+				onValueChanged.RemovePersistentListener(action);
+				UnityEditor.Events.UnityEventTools.AddPersistentListener(onValueChanged, action);
+				if (editorAndRuntime)
+				{
+					onValueChanged.SetPersistentListenerState(onValueChanged.GetPersistentEventCount() - 1, UnityEventCallState.EditorAndRuntime);
+				}
+			}
+			else
+
+#endif
+			{
+				onValueChanged.AddListener(action);
+			}
+		}
+		public static void RemovePersistentListener(this UnityEvent onValueChanged, UnityAction action)
+		{
+#if UNITY_EDITOR
+			if (!Application.isPlaying)
+			{
+				UnityEditor.Events.UnityEventTools.RemovePersistentListener(onValueChanged, action);
+			}
+			else
+
+#endif
+			{
+				onValueChanged.RemoveListener(action);
+			}
+		}
+		public static UnityEvent GetRuntime(this UnityEvent onValueChanged)
+		{
+			return RuntimeUnityEvent.RuntimeEvents[onValueChanged];
+		}
+		public static UnityEvent<T> GetRuntime<T>(this UnityEvent<T> onValueChanged)
+		{
+			return RuntimeUnityEvent<T>.RuntimeEvents[onValueChanged];
+		}
+		public static void RemovePersistentListener<T>(this UnityEvent<T> onValueChanged, UnityAction<T> action)
+		{
+#if UNITY_EDITOR
+			if (!Application.isPlaying)
+			{
+				UnityEditor.Events.UnityEventTools.RemovePersistentListener(onValueChanged, action);
+			}
+			else
+
+#endif
+			{
+				onValueChanged.RemoveListener(action);
+			}
+		}
+		public static void AddPersistentListener<T>(this UnityEvent<T> onValueChanged, UnityAction<T> action, bool editorAndRuntime = false)
+		{
+#if UNITY_EDITOR
+			if (!Application.isPlaying)
+			{
+				onValueChanged.RemovePersistentListener(action);
+				UnityEditor.Events.UnityEventTools.AddPersistentListener(onValueChanged, action);
+				if (editorAndRuntime)
+				{
+					onValueChanged.SetPersistentListenerState(onValueChanged.GetPersistentEventCount() - 1, UnityEventCallState.EditorAndRuntime);
+				}
+			}
+			else
+
+#endif
+			{
+				onValueChanged.AddListener(action);
+			}
+		}
+		private static T Find<T>(this GameObject gameObject, QMemeberInfo memeber) where T : MonoBehaviour
+		{
+			var view = gameObject.transform.FindAll(memeber.Key);
+			if (view == null && memeber.Key.StartsWith("on"))
+			{
+				view = gameObject.transform.FindAll(memeber.Key.Substring(2));
+			}
+			if (view == null)
+			{
+				view = gameObject.transform.FindAll(memeber.QName);
+			}
+			if (view == null)
+			{
+				view = gameObject.transform;
+			}
+			return view?.GetComponent<T>();
+		}
+		private static T Find<T>(this GameObject gameObject, QFunctionInfo memeber) where T : MonoBehaviour
+		{
+			var view = gameObject.transform.FindAll(memeber.Key);
+			if (view == null && memeber.Key.StartsWith("on"))
+			{
+				view = gameObject.transform.FindAll(memeber.Key.Substring(2));
+			}
+			if (view == null)
+			{
+				view = gameObject.transform;
+			}
+			return view?.GetComponent<T>();
+		}
+		/// <summary>
+		/// 自动注册持久化Unity事件
+		/// </summary>
+		public static void AutoAddPersistentListener<T>(this GameObject gameObject, T obj) where T:Object
+		{
+			var typeInfo = QSerializeHasReadOnlyType.Get(typeof(T));
+			foreach (var memeber in typeInfo.Members)
+			{
+				if (memeber.Key.StartsWith("on"))
+				{
+					if (memeber.Type.Is(typeof(UnityEventBase)))
+					{
+						if (memeber.Type == typeof(UnityEvent<string>))
+						{
+							var text = gameObject.Find<Text>(memeber);
+							if (text != null)
+							{
+								(memeber.Get(obj) as UnityEvent<string>).AddPersistentListener(text.GetUnityAction<string>("set_text"));
+							}
+#if TMPro
+							var tmp_text = gameObject.Find<TMP_Text>(memeber);
+							if (tmp_text != null)
+							{
+								(memeber.Get(obj) as UnityEvent<string>).AddPersistentListener(tmp_text.GetUnityAction<string>("set_text"));
+							}
+#endif
+						}
+						else if (memeber.Type.Is(typeof(UnityEvent<bool>)))
+						{
+							var toggle = gameObject.Find<Toggle>(memeber);
+							(memeber.Get(obj) as UnityEvent<bool>).AddPersistentListener(toggle.GetUnityAction<bool>("set_isOn"));
+						}
+						else if (memeber.Type.Is(typeof(UnityEvent<float>)))
+						{
+							var slider = gameObject.Find<Slider>(memeber);
+							(memeber.Get(obj) as UnityEvent<float>).AddPersistentListener(slider.GetUnityAction<float>("set_value"));
+							var image = gameObject.Find<Image>(memeber);
+							(memeber.Get(obj) as UnityEvent<float>).AddPersistentListener(image.GetUnityAction<float>("set_fillAmount"));
+						}
+					}
+				}
+			}
+			foreach (var function in typeInfo.Functions)
+			{
+				if (function.Key.StartsWith("on"))
+				{
+					switch (function.ParamInfos.Length)
+					{
+						case 0:
+							{
+								var button = gameObject.Find<Button>(function);
+								if (button != null)
+								{
+									button.onClick.AddPersistentListener(obj.GetUnityAction(function.Key));
+								}
+							}
+							break;
+						case 1:
+							{
+								var pType = function.ParamInfos[0].ParameterType;
+								if (pType == typeof(bool))
+								{
+									var toggle = gameObject.Find<Toggle>(function);
+									if (toggle != null)
+									{
+										toggle.onValueChanged.AddPersistentListener(obj.GetUnityAction<bool>(function.Key));
+									}
+								}
+								else if (pType == typeof(string))
+								{
+									var input = gameObject.Find<InputField>(function);
+									if (input != null)
+									{
+										input.onValueChanged.AddPersistentListener(obj.GetUnityAction<string>(function.Key));
+									}
+#if TMPro
+									var tmp_input = gameObject.Find<TMP_InputField>(function);
+									if (tmp_input != null)
+									{
+										tmp_input.onValueChanged.AddPersistentListener(obj.GetUnityAction<string>(function.Key));
+									}
+#endif
+								}
+							}
+							break;
+						default:
+							break;
+					}
+				}
+			}
+		}
+
+		//public static void RegisterEvent(this GameObject gameObject, object obj, params string[] keys)
+		//{
+		//	if (obj.IsNull()) return;
+		//	var trigger = gameObject?.GetTrigger();
+		//	var KeyTriggers= gameObject.GetComponentsInChildren<QKeyInfoTrigger>();
+		//	if (trigger != null)
+		//	{
+		//		var typeInfo = QSerializeHasReadOnlyType.Get(obj.GetType());
+		//		foreach (var member in typeInfo.Members)
+		//		{
+		//			if (keys.Length > 0 ? keys.IndexOf(member.QName) < 0 : member.QNameAttribute == null) return;
+		//			if (member.Type == typeof(string) || member.Type.Is(typeof(System.Enum)))
+		//			{
+		//				//	QDebug.Log(gameObject + " 静态数据初始化 " + obj + " " + member.QName + " : " + obj);
+		//				gameObject.InvokeEvent(member.QName, member.Get(obj)?.ToString());
+		//			}
+		//			else if (member.Type == typeof(int) || member.Type == typeof(float))
+		//			{
+		//				gameObject.InvokeEvent(member.QName, member.Get(obj).As<float>());
+		//			}
+		//			else if (member.Type.Is(typeof(QRuntimeValue<float>)) && (trigger.floatEventList.ContainsKey(member.QName)
+		//						|| trigger.floatEventList.ContainsKey("当前" + member.QName) || trigger.floatEventList.ContainsKey(member.QName + "比例")))
+		//			{
+		//				var runtimeValue = member.Get(obj).As<QRuntimeValue<float>>();
+		//				runtimeValue.Name = member.QName;
+		//				runtimeValue.OnValueChange += gameObject.InvokeEvent;
+		//				var keyTrigger = KeyTriggers.Get(runtimeValue.Name);
+		//				if (keyTrigger != null)
+		//				{
+		//					runtimeValue.OnStringChange += keyTrigger.Set;
+		//				}
+		//				runtimeValue.InvokeOnChange();
+		//				//	QDebug.Log(gameObject + " 注册" + member.Type.Name + "数据更改事件 " + obj + " " + member.QName);
+		//			}
+		//			else if (member.Type.Is(typeof(QRuntimeValue<string>)) && trigger.stringEventList.ContainsKey(member.QName))
+		//			{
+		//				var runtimeValue = member.Get(obj).As<QRuntimeValue<string>>();
+		//				runtimeValue.Name = member.QName;
+		//				runtimeValue.OnValueChange += gameObject.InvokeEvent;
+		//				runtimeValue.InvokeOnChange();
+		//				//	QDebug.Log(gameObject + " 注册" + member.Type.Name + "数据更改事件 " + obj + " " + member.QName);
+		//			}
+		//			else if (member.Type.Is(typeof(QRuntimeValue<bool>)) && trigger.boolEventList.ContainsKey(member.QName))
+		//			{
+		//				var runtimeValue = member.Get(obj).As<QRuntimeValue<bool>>();
+		//				runtimeValue.Name = member.QName;
+		//				runtimeValue.OnValueChange += gameObject.InvokeEvent;
+		//				runtimeValue.InvokeOnChange();
+		//				//	QDebug.Log(gameObject + " 注册" + member.Type.Name + "数据更改事件 " + obj + " " + member.QName);
+
+		//			}
+		//		}
+		//		foreach (var func in typeInfo.Functions)
+		//		{
+		//			var name = func.QName();
+		//			if (trigger.actionEventList.ContainsKey(name))
+		//			{
+		//				trigger.actionEventList.Get(name).eventAction.AddListener(() => func.Invoke(obj));
+		//			}
+		//		}
+		//	}
+		//}
+		//public static void UnRegisterEvent(this GameObject gameObject, object obj, params string[] keys)
+		//{
+		//	if (obj.IsNull()) return;
+		//	var trigger = gameObject?.GetTrigger();
+		//	var KeyTriggers = gameObject.GetComponentsInChildren<QKeyInfoTrigger>();
+		//	if (trigger != null)
+		//	{
+		//		var typeInfo = QSerializeHasReadOnlyType.Get(obj.GetType());
+		//		foreach (var member in typeInfo.Members)
+		//		{
+		//			if (keys.Length > 0 ? keys.IndexOf(member.QName) < 0 : member.QNameAttribute == null) return;
+		//			if (member.Type.Is(typeof(QRuntimeValue<float>)) && (trigger.floatEventList.ContainsKey(member.QName)
+		//						|| trigger.floatEventList.ContainsKey("当前" + member.QName) || trigger.floatEventList.ContainsKey(member.QName + "比例")))
+		//			{
+		//				var runtimeValue = member.Get(obj).As<QRuntimeValue<float>>();
+		//				runtimeValue.OnValueChange -= gameObject.InvokeEvent;
+		//				var keyTrigger = KeyTriggers.Get(runtimeValue.Name);
+		//				if (keyTrigger != null)
+		//				{
+		//					runtimeValue.OnStringChange -= keyTrigger.Set;
+		//				}
+		//			}
+		//			else if (member.Type.Is(typeof(QRuntimeValue<string>)) && trigger.stringEventList.ContainsKey(member.QName))
+		//			{
+		//				var runtimeValue = member.Get(obj).As<QRuntimeValue<string>>();
+		//				runtimeValue.OnValueChange -= gameObject.InvokeEvent;
+		//			}
+		//			else if (member.Type.Is(typeof(QRuntimeValue<bool>)) && trigger.boolEventList.ContainsKey(member.QName))
+		//			{
+		//				var runtimeValue = member.Get(obj).As<QRuntimeValue<bool>>();
+		//				runtimeValue.OnValueChange -= gameObject.InvokeEvent;
+		//			}
+		//		}
+		//		foreach (var func in typeInfo.Functions)
+		//		{
+		//			var name = func.QName();
+		//			if (trigger.actionEventList.ContainsKey(name))
+		//			{
+		//				trigger.actionEventList.Get(name).eventAction.RemoveAllListeners();
+		//			}
+		//		}
+		//	}
+		//}
+	}
+}

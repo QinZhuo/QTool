@@ -84,11 +84,11 @@ namespace QTool
 		}
 		public virtual void OnPoolGet()
 		{
-			gameObject.RegisterEvent(this);
+		//	gameObject.RegisterEvent(this);
 		}
 		public virtual void OnPoolRelease()
 		{
-			gameObject.UnRegisterEvent(this);
+			//gameObject.UnRegisterEvent(this);
 			if (_Runtime != null)
 			{
 				Runtime = null;
@@ -96,8 +96,8 @@ namespace QTool
 		}
 		protected virtual void OnSetRuntime()
 		{
-			gameObject.RegisterEvent(_Runtime?.Data);
-			gameObject.RegisterEvent(_Runtime);
+			//gameObject.RegisterEvent(_Runtime?.Data);
+			//gameObject.RegisterEvent(_Runtime);
 			var typeInfo = QSerializeType.Get(typeof(RuntimeT));
 			foreach (var member in typeInfo.Members)
 			{
@@ -115,7 +115,7 @@ namespace QTool
 		}
 		protected virtual void OnUnsetRuntime()
 		{
-			gameObject.UnRegisterEvent(_Runtime);
+			//gameObject.UnRegisterEvent(_Runtime);
 			RuntimeValues.Clear();
 		}
 	}

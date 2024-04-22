@@ -9,7 +9,6 @@ namespace QTool
 {
 
 	[RequireComponent(typeof(Animator))]
-	[RequireComponent(typeof(QEventTrigger))]
 	public class QAnimator : MonoBehaviour
 	{
 //		Animator _animator;

@@ -262,17 +262,17 @@ namespace QTool
 					List<AnimationEvent> events = new List<AnimationEvent>();
 					foreach (var eventData in animation.events)
 					{
-						if (eventData.functionName != nameof(QEventTrigger))
-						{
-							changed = true;
-							events.Add(new AnimationEvent
-							{
-								time = eventData.time,
-								stringParameter = eventData.functionName,
-								functionName = nameof(QEventTrigger)
-							});
-						}
-						else
+						//if (eventData.functionName != nameof(QEventTrigger))
+						//{
+						//	changed = true;
+						//	events.Add(new AnimationEvent
+						//	{
+						//		time = eventData.time,
+						//		stringParameter = eventData.functionName,
+						//		functionName = nameof(QEventTrigger)
+						//	});
+						//}
+						//else
 						{
 							events.Add(new AnimationEvent
 							{

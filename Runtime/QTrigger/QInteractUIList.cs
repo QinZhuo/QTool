@@ -39,13 +39,13 @@ namespace QTool
 		public void Add(QInteractTrigger qInteractObject)
 		{
 			var ui= this[qInteractObject.transform];
-			ui.gameObject.InvokeEvent("显示");
-			ui.gameObject.InvokeEvent("交互对象", qInteractObject);
+			//ui.gameObject.InvokeEvent("显示");
+			//ui.gameObject.InvokeEvent("交互对象", qInteractObject);
 		}
 		public void Remove(QInteractTrigger qInteractObject)
 		{
 			var ui = this[qInteractObject.transform];
-			ui.gameObject.InvokeEvent("隐藏");
+			//ui.gameObject.InvokeEvent("隐藏");
 			ui.gameObject.PoolRelease();
 		}
 		QFollowUI LastUI= null;
@@ -56,11 +56,11 @@ namespace QTool
 			{
 				if (LastUI != null)
 				{
-					LastUI.gameObject.InvokeEvent("可交互");
+				//	LastUI.gameObject.InvokeEvent("可交互");
 				}
 				if (ui != null)
 				{
-					ui.gameObject.InvokeEvent("不可交互");
+				//	ui.gameObject.InvokeEvent("不可交互");
 				}
 			}
 		}

@@ -45,7 +45,7 @@ namespace QTool
 			var text = GetComponentInChildren<Text>();
 			if (text != null)
 			{
-				OnLocalizationChange.AddPersistentListener(text.GetAction<string>("set_text"));
+				OnLocalizationChange.AddPersistentListener(text.GetUnityAction<string>("set_text"));
 			}
 		}
 		private void Start()
