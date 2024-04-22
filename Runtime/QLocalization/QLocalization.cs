@@ -10,7 +10,7 @@ using UnityEngine.UI;
 namespace QTool
 {
 	public class QLocalization : MonoBehaviour
-	{
+	{ 
 		#region 基础数据 
 		[QName, QPopup(nameof(QLocalizationData) + "." + nameof(QLocalizationData.List)), SerializeField]
 		private string key;
