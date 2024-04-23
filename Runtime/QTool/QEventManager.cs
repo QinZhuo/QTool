@@ -146,7 +146,7 @@ namespace QTool
 		}
 
 
-		public static void AddPersistentListener(this UnityEventBase onValueChanged, UnityAction action, bool editorAndRuntime = true)
+		public static void AddPersistentListener(this UnityEventBase onValueChanged, UnityAction action, bool editorAndRuntime = false)
 		{
 #if UNITY_EDITOR
 			if (!Application.isPlaying)
@@ -218,7 +218,7 @@ namespace QTool
 			}
 #endif
 		}
-		public static void AddPersistentListener<T>(this UnityEvent<T> onValueChanged, UnityAction<T> action, bool editorAndRuntime = true)
+		public static void AddPersistentListener<T>(this UnityEvent<T> onValueChanged, UnityAction<T> action, bool editorAndRuntime = false)
 		{
 #if UNITY_EDITOR
 			if (!Application.isPlaying)

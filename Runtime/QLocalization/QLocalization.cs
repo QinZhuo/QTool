@@ -45,8 +45,15 @@ namespace QTool
 			var text = GetComponentInChildren<Text>();
 			if (text != null)
 			{
-				OnLocalizationChange.AddPersistentListener(text.GetUnityAction<string>("set_text"));
+				OnLocalizationChange.AddPersistentListener(text.GetUnityAction<string>("set_text"), true);
 			}
+#if TMPro
+			var tmp_text = GetComponentInChildren<TMP_Text>();
+			if (tmp_text != null)
+			{
+				OnLocalizationChange.AddPersistentListener(tmp_text.GetUnityAction<string>("set_text"), true);
+			}
+#endif
 		}
 		private void Start()
 		{
