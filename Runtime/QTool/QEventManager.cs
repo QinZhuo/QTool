@@ -281,6 +281,7 @@ namespace QTool
 						if (valueEvent != null && valueEvent is MonoBehaviour mono)
 						{
 							(memeber.Get(obj) as UnityEvent<string>).AddPersistentListener(mono.GetUnityAction<string>(nameof(valueEvent.OnValueEvent)));
+							return;
 						}
 						var text = view.GetComponent<Text>();
 						if (text != null)
@@ -303,6 +304,7 @@ namespace QTool
 						if (valueEvent != null && valueEvent is MonoBehaviour mono)
 						{
 							(memeber.Get(obj) as UnityEvent<bool>).AddPersistentListener(mono.GetUnityAction<bool>(nameof(valueEvent.OnValueEvent)));
+							return;
 						}
 						var toggle = view.GetComponent<Toggle>();
 						if(toggle != null)
@@ -317,6 +319,7 @@ namespace QTool
 						if (valueEvent != null && valueEvent is MonoBehaviour mono)
 						{
 							(memeber.Get(obj) as UnityEvent<float>).AddPersistentListener(mono.GetUnityAction<float>(nameof(valueEvent.OnValueEvent)));
+							return;
 						}
 						var slider = view.GetComponent<Slider>();
 						if(slider != null)
