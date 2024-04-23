@@ -11,29 +11,38 @@ namespace QTool
 	public class QToolManager : QInstanceManager<QToolManager>
 	{
 		public static bool Destoryed { get; private set; } = false;
-		protected override void Awake()
-		{
-			if (!Application.isPlaying)
-			{
-				Destroy(gameObject);
-				return;
-			}
-			base.Awake();
-			DontDestroyOnLoad(gameObject);
-			Instance.OnUpdateEvent += QCoroutine.Update;
-#if UNITY_2021_1_OR_NEWER
-			var uiDoc = gameObject.GetComponent<UIDocument>(true);
-			uiDoc.panelSettings = Resources.Load<PanelSettings>(nameof(PanelSettings));
-			RootVisualElement = uiDoc.rootVisualElement;
-#endif
-		}
 		public event Action OnUpdateEvent = null;
 		public event Action OnGUIEvent = null;
 		public event Action OnPostRenderEvent = null;
 		public int FrameIndex { get; private set; } = 0;
 #if UNITY_2021_1_OR_NEWER
-		public VisualElement RootVisualElement { get; private set; }
+		private VisualElement _rootVisualElement = null;
+		public VisualElement RootVisualElement
+		{
+			get
+			{
+				if (_rootVisualElement == null)
+				{
+					var uiDoc = gameObject.GetComponent<UIDocument>(true);
+					uiDoc.panelSettings = Resources.Load<PanelSettings>(nameof(PanelSettings));
+					_rootVisualElement = uiDoc.rootVisualElement;
+				}
+				return _rootVisualElement;
+			}
+		}
 #endif
+		protected override void Awake()
+		{
+			if (!Application.isPlaying)
+			{
+				gameObject.CheckDestory();
+				return;
+			}
+			base.Awake();
+			DontDestroyOnLoad(gameObject);
+			Instance.OnUpdateEvent += QCoroutine.Update;
+			Instance.OnUpdateEvent += QEventManager.Update;
+		}
 		private void Update()
 		{
 			FrameIndex++;
@@ -45,6 +54,7 @@ namespace QTool
 			QTask.StopAllWait();
 			QEventManager.InvokeEvent(QEventKey.游戏退出);
 			Instance.OnUpdateEvent -= QCoroutine.Update;
+			Instance.OnUpdateEvent -= QEventManager.Update;
 		}
 		private void OnGUI()
 		{
