@@ -16,13 +16,17 @@ namespace QTool
 #endif
 	where T : QFileEditorWindow<T>
 	{
-		public static string FilePath
+		private static QHistoryList FilePathList = new QHistoryList(typeof(T).Name);
+		[SerializeField]
+		private string _filePath = "";
+		public string FilePath
 		{
-			get => PlayerPrefs.GetString(typeof(T).Name + "_" + nameof(FilePath));
+			get => _filePath;
 			set
 			{
-				if (value != FilePath)
+				if (value != _filePath)
 				{
+					StartRecord();
 					var select = value.Replace('/', '\\');
 					if (select.ExistsFile())
 					{
@@ -32,21 +36,19 @@ namespace QTool
 					{
 						return;
 					}
-					UndoList.Clear();
-					PlayerPrefs.SetString(typeof(T).Name + "_" + nameof(FilePath), value);
-
+					_filePath = value;
 #if UNITY_2022_1_OR_NEWER
 					if (PathPopup != null)
 					{
 						PathPopup.value = select;
 					}
 #endif
+					EndRecord();
 				}
 			}
 		}
-
-		private static QHistoryList FilePathList = new QHistoryList(typeof(T).Name);
-
+		
+		[SerializeField]
 		private string _Data = null;
 		public string Data
 		{
@@ -55,12 +57,10 @@ namespace QTool
 			{
 				if (!Equals(_Data, value))
 				{
-					if (!IsUndo)
-					{
-						UndoList.Push(value);
-					}
+					StartRecord();
 					_Data = value;
 					PlayerPrefs.SetString(typeof(T).Name + "_" + nameof(Data), value);
+					EndRecord();
 				}
 			}
 		}
@@ -137,7 +137,26 @@ namespace QTool
 				}
 			}
 		}
-
+		protected bool RecordChange { get; private set; } = true;
+		public void StartRecord()
+		{
+			if (RecordChange)
+			{
+				RecordChange = false;
+				Undo.RecordObject(this, "Data Change");
+			}
+		}
+		public void EndRecord()
+		{
+			RecordChange = true;
+		}
+		public void OnUndoRedo()
+		{
+			RecordChange = false;
+			PathPopup.value = _filePath.Replace('/', '\\');
+			ParseData();
+			RecordChange = true;
+		}
 		public abstract string GetData(UnityEngine.Object file = null);
 		public abstract void SaveData();
 		
@@ -159,11 +178,14 @@ namespace QTool
 		private void OnEnable()
 		{
 			AutoLoad = true;
+			Undo.undoRedoPerformed += OnUndoRedo;
 		}
 		private void OnDisable()
 		{
+			Undo.undoRedoPerformed -= OnUndoRedo;
 			OnLostFocus();
 		}
+
 #if UNITY_2022_1_OR_NEWER
 		protected static PopupField<string> PathPopup { get; private set; } = null;
 #endif
@@ -183,28 +205,9 @@ namespace QTool
 				OnFocus(); 
 			});
 #endif
-			Toolbar.AddButton("撤销", Undo);
 		}
+		
 		protected abstract void ParseData();
-		private static Stack<string> UndoList = new Stack<string>();
-		private static bool IsUndo = false;
-		public void Undo()
-		{
-			if (UndoList.Count > 0)
-			{
-				IsUndo = true;
-				Data = UndoList.Pop();
-				try
-				{
-					ParseData();
-				}
-				catch (Exception e)
-				{
-					Debug.LogError(e);
-				}
-				IsUndo = false;
-			}
-		}
 	}
 	public class QHistoryList
 	{

@@ -24,8 +24,9 @@ namespace QTool
 				var ext = Path.GetExtension(path).ToLower();
 				if (".md".Equals(ext) || ".markdown".Equals(ext))
 				{
-					FilePath = path;
-					OpenWindow();
+					var window = GetWindow<QMarkdownWindow>();
+					window.minSize = new Vector2(500, 300);
+					window.FilePath = path;
 					return true;
 				}
 			}

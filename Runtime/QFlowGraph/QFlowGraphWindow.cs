@@ -22,14 +22,14 @@ namespace QTool.FlowGraph
 			if (EditorUtility.InstanceIDToObject(instanceID) is QFlowGraphAsset asset)
 			{
 				var path = AssetDatabase.GetAssetPath(asset);
-				FilePath = path;
+				var window = GetWindow<QFlowGraphWindow>();
+				window.minSize = new Vector2(500, 300);
+				window.FilePath = path;
 				ViewOffset = Vector2.zero;
-				OpenWindow();
 				return true;
 			}
 			return false;
 		}
-
 		[MenuItem("QTool/窗口/QFlowGraph")]
 		public static void OpenWindow()
 		{
@@ -589,7 +589,6 @@ namespace QTool.FlowGraph
 				else
 				{
 					var graph = property.GetObject() as QFlowGraph;
-					QFlowGraphWindow.FilePath = nameof(SerializedProperty); 
 					QFlowGraphWindow.SerializedProperty = property.FindPropertyRelative(nameof(QFlowGraph.SerializeString));
 					QFlowGraphWindow.OpenWindow();
 				}

@@ -24,8 +24,9 @@ namespace QTool.FlowGraph
 				var path = AssetDatabase.GetAssetPath(textAsset);
 				if (path.EndsWith(QDataListTool.Extension))
 				{
-					FilePath = path;
-					OpenWindow();
+					var window = GetWindow<QDataListWindow>();
+					window.minSize = new Vector2(500, 300);
+					window.FilePath = path;
 					return true;
 				}
 			}
