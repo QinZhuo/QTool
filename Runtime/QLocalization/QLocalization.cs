@@ -58,7 +58,7 @@ namespace QTool
 			QLocalizationData.OnLanguageChange -= FreshFont;
 			QLocalizationData.OnLanguageChange -= FreshLocalization;
 		}
-		public void OnValueEvent(string value)
+		public void SetValue(string value)
 		{
 			Key = value;
 		}

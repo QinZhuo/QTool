@@ -8,24 +8,22 @@ namespace QTool.UI
 	[RequireComponent(typeof(Toggle))]
 	public class QToggle : MonoBehaviour
 	{
-		[QReadonly]
 		public Toggle toggle;
 		public Graphic off;
-		public UnityEvent<bool> onValueChanged;
 		private void Reset()
 		{
 			toggle = GetComponent<Toggle>();
+		}
+#if UNITY_EDITOR
+		private void OnValidate()
+		{
 			if (toggle != null)
 			{
-				toggle.onValueChanged.AddPersistentListener(InvokeValueChange, true);
+				toggle.onValueChanged.AddPersistentListener(PlayEffect, true);
 			}
 		}
-		private void InvokeValueChange(bool isOn)
-		{
-			onValueChanged?.Invoke(isOn);
-			PlayEffect(isOn);
-		}
-		private void PlayEffect(bool instant)
+#endif
+		public void PlayEffect(bool instant)
 		{
 			if (off == null)
 				return;

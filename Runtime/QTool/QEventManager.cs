@@ -131,7 +131,7 @@ namespace QTool
 	}
 	public interface IValueEvent<T>
 	{
-		void OnValueEvent(T value);
+		void SetValue(T value);
 	}
 	public static class QEventTool
 	{
@@ -302,7 +302,7 @@ namespace QTool
 						var valueEvent = view.GetComponent<IValueEvent<string>>();
 						if (valueEvent != null && valueEvent is MonoBehaviour mono)
 						{
-							(memeber.Get(obj) as UnityEvent<string>).AddPersistentListener(mono.GetUnityAction<string>(nameof(valueEvent.OnValueEvent)));
+							(memeber.Get(obj) as UnityEvent<string>).AddPersistentListener(mono.GetUnityAction<string>(nameof(valueEvent.SetValue)));
 							continue;
 						}
 						var text = view.GetComponent<Text>();
@@ -325,7 +325,7 @@ namespace QTool
 						var valueEvent = view.GetComponent<IValueEvent<bool>>();
 						if (valueEvent != null && valueEvent is MonoBehaviour mono)
 						{
-							(memeber.Get(obj) as UnityEvent<bool>).AddPersistentListener(mono.GetUnityAction<bool>(nameof(valueEvent.OnValueEvent)));
+							(memeber.Get(obj) as UnityEvent<bool>).AddPersistentListener(mono.GetUnityAction<bool>(nameof(valueEvent.SetValue)));
 							continue;
 						}
 						var toggle = view.GetComponent<Toggle>();
@@ -340,7 +340,7 @@ namespace QTool
 						var valueEvent = view.GetComponent<IValueEvent<float>>();
 						if (valueEvent != null && valueEvent is MonoBehaviour mono)
 						{
-							(memeber.Get(obj) as UnityEvent<float>).AddPersistentListener(mono.GetUnityAction<float>(nameof(valueEvent.OnValueEvent)));
+							(memeber.Get(obj) as UnityEvent<float>).AddPersistentListener(mono.GetUnityAction<float>(nameof(valueEvent.SetValue)));
 							continue;
 						}
 						var slider = view.GetComponent<Slider>();
