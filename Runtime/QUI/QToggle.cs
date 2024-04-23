@@ -19,7 +19,7 @@ namespace QTool.UI
 		{
 			if (toggle != null)
 			{
-				toggle.onValueChanged.AddPersistentListener(PlayEffect, true);
+				toggle.onValueChanged.AddPersistentListener(PlayEffect);
 			}
 		}
 #endif
