@@ -151,11 +151,13 @@ namespace QTool
 #if UNITY_EDITOR
 			if (!Application.isPlaying)
 			{
-				onValueChanged.RemovePersistentListener(action);
-				UnityEditor.Events.UnityEventTools.AddVoidPersistentListener(onValueChanged, action);
-				if (editorAndRuntime)
+				if (!onValueChanged.ContainsPersistentListener(action))
 				{
-					onValueChanged.SetPersistentListenerState(onValueChanged.GetPersistentEventCount() - 1, UnityEventCallState.EditorAndRuntime);
+					UnityEditor.Events.UnityEventTools.AddVoidPersistentListener(onValueChanged, action);
+					if (editorAndRuntime)
+					{
+						onValueChanged.SetPersistentListenerState(onValueChanged.GetPersistentEventCount() - 1, UnityEventCallState.EditorAndRuntime);
+					}
 				}
 			}
 			else
@@ -242,11 +244,14 @@ namespace QTool
 #if UNITY_EDITOR
 			if (!Application.isPlaying)
 			{
-				onValueChanged.RemovePersistentListener(action);
-				UnityEditor.Events.UnityEventTools.AddPersistentListener(onValueChanged, action);
-				if (editorAndRuntime)
+				if (!onValueChanged.ContainsPersistentListener(action))
 				{
-					onValueChanged.SetPersistentListenerState(onValueChanged.GetPersistentEventCount() - 1, UnityEventCallState.EditorAndRuntime);
+					onValueChanged.RemovePersistentListener(action);
+					UnityEditor.Events.UnityEventTools.AddPersistentListener(onValueChanged, action);
+					if (editorAndRuntime)
+					{
+						onValueChanged.SetPersistentListenerState(onValueChanged.GetPersistentEventCount() - 1, UnityEventCallState.EditorAndRuntime);
+					}
 				}
 			}
 			else
