@@ -281,20 +281,20 @@ namespace QTool
 						if (valueEvent != null && valueEvent is MonoBehaviour mono)
 						{
 							(memeber.Get(obj) as UnityEvent<string>).AddPersistentListener(mono.GetUnityAction<string>(nameof(valueEvent.OnValueEvent)));
-							return;
+							continue;
 						}
 						var text = view.GetComponent<Text>();
 						if (text != null)
 						{
 							(memeber.Get(obj) as UnityEvent<string>).AddPersistentListener(text.GetUnityAction<string>("set_text"));
-							return;
+							continue;
 						}
 #if TMPro
 						var tmp_text = view.GetComponent<TMP_Text>();
 						if (tmp_text != null)
 						{
 							(memeber.Get(obj) as UnityEvent<string>).AddPersistentListener(tmp_text.GetUnityAction<string>("set_text"));
-							return;
+							continue;
 						}
 #endif
 					}
@@ -304,13 +304,13 @@ namespace QTool
 						if (valueEvent != null && valueEvent is MonoBehaviour mono)
 						{
 							(memeber.Get(obj) as UnityEvent<bool>).AddPersistentListener(mono.GetUnityAction<bool>(nameof(valueEvent.OnValueEvent)));
-							return;
+							continue;
 						}
 						var toggle = view.GetComponent<Toggle>();
 						if(toggle != null)
 						{
 							(memeber.Get(obj) as UnityEvent<bool>).AddPersistentListener(toggle.GetUnityAction<bool>("set_isOn"));
-							return;
+							continue;
 						}
 					}
 					else if (memeber.Type.Is(typeof(UnityEvent<float>)))
@@ -319,19 +319,19 @@ namespace QTool
 						if (valueEvent != null && valueEvent is MonoBehaviour mono)
 						{
 							(memeber.Get(obj) as UnityEvent<float>).AddPersistentListener(mono.GetUnityAction<float>(nameof(valueEvent.OnValueEvent)));
-							return;
+							continue;
 						}
 						var slider = view.GetComponent<Slider>();
 						if(slider != null)
 						{
 							(memeber.Get(obj) as UnityEvent<float>).AddPersistentListener(slider.GetUnityAction<float>("set_value"));
-							return;
+							continue;
 						}
 						var image = view.GetComponent<Image>();
 						if(image != null)
 						{
 							(memeber.Get(obj) as UnityEvent<float>).AddPersistentListener(image.GetUnityAction<float>("set_fillAmount"));
-							return;
+							continue;
 						}
 					}
 				}
@@ -353,20 +353,20 @@ namespace QTool
 								if (button != null)
 								{
 									button.onClick.AddPersistentListener(obj.GetUnityAction(function.Key));
-									return;
+									continue;
 								}
 								var dropdown = view.GetComponent<Dropdown>();
 								if (dropdown != null)
 								{
 									dropdown.onValueChanged.AddPersistentListener(obj.GetUnityAction(function.Key));
-									return;
+									continue;
 								}
 #if TMPro
 								var tmp_dropdown = view.GetComponent<TMP_Dropdown>();
 								if(tmp_dropdown != null)
 								{
 									tmp_dropdown.onValueChanged.AddPersistentListener(obj.GetUnityAction(function.Key));
-									return;
+									continue;
 								}
 #endif
 							}
@@ -380,7 +380,7 @@ namespace QTool
 									if (toggle != null)
 									{
 										toggle.onValueChanged.AddPersistentListener(obj.GetUnityAction<bool>(function.Key));
-										return;
+										continue;
 									}
 								}
 								else if (pType == typeof(string))
@@ -389,14 +389,14 @@ namespace QTool
 									if (input != null)
 									{
 										input.onValueChanged.AddPersistentListener(obj.GetUnityAction<string>(function.Key));
-										return;
+										continue;
 									}
 #if TMPro
 									var tmp_input = view.GetComponent<TMP_InputField>();
 									if (tmp_input != null)
 									{
 										tmp_input.onValueChanged.AddPersistentListener(obj.GetUnityAction<string>(function.Key));
-										return;
+										continue;
 									}
 #endif
 								}
