@@ -304,6 +304,10 @@ namespace QTool
 				if (function.Key.IsEventKey(out var eventKey))
 				{
 					var view = gameObject.transform.FindAll(eventKey);
+					if (view == null)
+					{
+						view = gameObject.transform;
+					}
 					switch (function.ParamInfos.Length)
 					{
 						case 0:
