@@ -141,13 +141,13 @@ namespace QTool
 		}
 	
 
-		public static void AddPersistentListener(this UnityEvent onValueChanged, UnityAction action, bool editorAndRuntime = false)
+		public static void AddPersistentListener(this UnityEventBase onValueChanged, UnityAction action, bool editorAndRuntime = false)
 		{
 #if UNITY_EDITOR
 			if (!Application.isPlaying)
 			{
 				onValueChanged.RemovePersistentListener(action);
-				UnityEditor.Events.UnityEventTools.AddPersistentListener(onValueChanged, action);
+				UnityEditor.Events.UnityEventTools.AddVoidPersistentListener(onValueChanged, action);
 				if (editorAndRuntime)
 				{
 					onValueChanged.SetPersistentListenerState(onValueChanged.GetPersistentEventCount() - 1, UnityEventCallState.EditorAndRuntime);
@@ -157,10 +157,13 @@ namespace QTool
 
 #endif
 			{
-				onValueChanged.AddListener(action);
+				if(onValueChanged is UnityEvent unityEvent)
+				{
+					unityEvent.AddListener(action);
+				}
 			}
 		}
-		public static void RemovePersistentListener(this UnityEvent onValueChanged, UnityAction action)
+		public static void RemovePersistentListener(this UnityEventBase onValueChanged, UnityAction action)
 		{
 #if UNITY_EDITOR
 			if (!Application.isPlaying)
@@ -171,7 +174,10 @@ namespace QTool
 
 #endif
 			{
-				onValueChanged.RemoveListener(action);
+				if (onValueChanged is UnityEvent unityEvent)
+				{
+					unityEvent.RemoveListener(action);
+				}
 			}
 		}
 		public static UnityEvent GetRuntime(this UnityEvent onValueChanged)
@@ -215,15 +221,6 @@ namespace QTool
 				onValueChanged.AddListener(action);
 			}
 		}
-		private static T Find<T>(this GameObject gameObject, string eventKey) where T : MonoBehaviour
-		{
-			var view = gameObject.transform.FindAll(eventKey);
-			if (view == null)
-			{
-				view = gameObject.transform;
-			}
-			return view?.GetComponent<T>();
-		}
 		private static bool IsEventKey(this string key, out string eventKey)
 		{
 			if (key.StartsWith("on") || key.StartsWith("On"))
@@ -254,32 +251,51 @@ namespace QTool
 			{
 				if (memeber.Key.IsEventKey(out var eventKey))
 				{
+					var view = gameObject.transform.FindAll(eventKey);
+					if (view == null)
+					{
+						view = gameObject.transform;
+					}
 					if (memeber.Type.Is(typeof(UnityEvent<string>)))
 					{
-						var text = gameObject.Find<Text>(eventKey);
+						var text = view.GetComponent<Text>();
 						if (text != null)
 						{
 							(memeber.Get(obj) as UnityEvent<string>).AddPersistentListener(text.GetUnityAction<string>("set_text"));
+							return;
 						}
 #if TMPro
-						var tmp_text = gameObject.Find<TMP_Text>(eventKey);
+						var tmp_text = view.GetComponent<TMP_Text>();
 						if (tmp_text != null)
 						{
 							(memeber.Get(obj) as UnityEvent<string>).AddPersistentListener(tmp_text.GetUnityAction<string>("set_text"));
+							return;
 						}
 #endif
 					}
 					else if (memeber.Type.Is(typeof(UnityEvent<bool>)))
 					{
-						var toggle = gameObject.Find<Toggle>(eventKey);
-						(memeber.Get(obj) as UnityEvent<bool>).AddPersistentListener(toggle.GetUnityAction<bool>("set_isOn"));
+						var toggle = view.GetComponent<Toggle>();
+						if(toggle != null)
+						{
+							(memeber.Get(obj) as UnityEvent<bool>).AddPersistentListener(toggle.GetUnityAction<bool>("set_isOn"));
+							return;
+						}
 					}
 					else if (memeber.Type.Is(typeof(UnityEvent<float>)))
 					{
-						var slider = gameObject.Find<Slider>(eventKey);
-						(memeber.Get(obj) as UnityEvent<float>).AddPersistentListener(slider.GetUnityAction<float>("set_value"));
-						var image = gameObject.Find<Image>(eventKey);
-						(memeber.Get(obj) as UnityEvent<float>).AddPersistentListener(image.GetUnityAction<float>("set_fillAmount"));
+						var slider = view.GetComponent<Slider>();
+						if(slider != null)
+						{
+							(memeber.Get(obj) as UnityEvent<float>).AddPersistentListener(slider.GetUnityAction<float>("set_value"));
+							return;
+						}
+						var image = view.GetComponent<Image>();
+						if(image != null)
+						{
+							(memeber.Get(obj) as UnityEvent<float>).AddPersistentListener(image.GetUnityAction<float>("set_fillAmount"));
+							return;
+						}
 					}
 				}
 			}
@@ -287,15 +303,31 @@ namespace QTool
 			{
 				if (function.Key.IsEventKey(out var eventKey))
 				{
+					var view = gameObject.transform.FindAll(eventKey);
 					switch (function.ParamInfos.Length)
 					{
 						case 0:
 							{
-								var button = gameObject.Find<Button>(eventKey);
+								var button = view.GetComponent<Button>();
 								if (button != null)
 								{
 									button.onClick.AddPersistentListener(obj.GetUnityAction(function.Key));
+									return;
 								}
+								var dropdown = view.GetComponent<Dropdown>();
+								if (dropdown != null)
+								{
+									dropdown.onValueChanged.AddPersistentListener(obj.GetUnityAction(function.Key));
+									return;
+								}
+#if TMPro
+								var tmp_dropdown = view.GetComponent<TMP_Dropdown>();
+								if(tmp_dropdown != null)
+								{
+									tmp_dropdown.onValueChanged.AddPersistentListener(obj.GetUnityAction(function.Key));
+									return;
+								}
+#endif
 							}
 							break;
 						case 1:
@@ -303,24 +335,27 @@ namespace QTool
 								var pType = function.ParamInfos[0].ParameterType;
 								if (pType == typeof(bool))
 								{
-									var toggle = gameObject.Find<Toggle>(eventKey);
+									var toggle = view.GetComponent<Toggle>();
 									if (toggle != null)
 									{
 										toggle.onValueChanged.AddPersistentListener(obj.GetUnityAction<bool>(function.Key));
+										return;
 									}
 								}
 								else if (pType == typeof(string))
 								{
-									var input = gameObject.Find<InputField>(eventKey);
+									var input = view.GetComponent<InputField>();
 									if (input != null)
 									{
 										input.onValueChanged.AddPersistentListener(obj.GetUnityAction<string>(function.Key));
+										return;
 									}
 #if TMPro
-									var tmp_input = gameObject.Find<TMP_InputField>(eventKey);
+									var tmp_input = view.GetComponent<TMP_InputField>();
 									if (tmp_input != null)
 									{
 										tmp_input.onValueChanged.AddPersistentListener(obj.GetUnityAction<string>(function.Key));
+										return;
 									}
 #endif
 								}
