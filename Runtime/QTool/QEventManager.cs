@@ -1,6 +1,7 @@
 using QTool.Reflection;
 using System.Collections.Generic;
 using TMPro;
+using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
@@ -127,6 +128,10 @@ namespace QTool
 			key.AddListener(value.Invoke);
 			return value;
 		});
+	}
+	public interface IValueEvent<T>
+	{
+		void OnValueEvent(T value);
 	}
 	public static class QEventTool
     {
@@ -256,8 +261,14 @@ namespace QTool
 					{
 						view = gameObject.transform;
 					}
+
 					if (memeber.Type.Is(typeof(UnityEvent<string>)))
 					{
+						var valueEvent = view.GetComponent<IValueEvent<string>>();
+						if (valueEvent != null && valueEvent is MonoBehaviour mono)
+						{
+							(memeber.Get(obj) as UnityEvent<string>).AddPersistentListener(mono.GetUnityAction<string>(nameof(valueEvent.OnValueEvent)));
+						}
 						var text = view.GetComponent<Text>();
 						if (text != null)
 						{
@@ -275,6 +286,11 @@ namespace QTool
 					}
 					else if (memeber.Type.Is(typeof(UnityEvent<bool>)))
 					{
+						var valueEvent = view.GetComponent<IValueEvent<bool>>();
+						if (valueEvent != null && valueEvent is MonoBehaviour mono)
+						{
+							(memeber.Get(obj) as UnityEvent<bool>).AddPersistentListener(mono.GetUnityAction<bool>(nameof(valueEvent.OnValueEvent)));
+						}
 						var toggle = view.GetComponent<Toggle>();
 						if(toggle != null)
 						{
@@ -284,6 +300,11 @@ namespace QTool
 					}
 					else if (memeber.Type.Is(typeof(UnityEvent<float>)))
 					{
+						var valueEvent = view.GetComponent<IValueEvent<float>>();
+						if (valueEvent != null && valueEvent is MonoBehaviour mono)
+						{
+							(memeber.Get(obj) as UnityEvent<float>).AddPersistentListener(mono.GetUnityAction<float>(nameof(valueEvent.OnValueEvent)));
+						}
 						var slider = view.GetComponent<Slider>();
 						if(slider != null)
 						{

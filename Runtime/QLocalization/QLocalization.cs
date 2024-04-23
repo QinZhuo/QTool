@@ -9,7 +9,7 @@ using UnityEngine.UI;
 
 namespace QTool
 {
-	public class QLocalization : MonoBehaviour
+	public class QLocalization : MonoBehaviour, IValueEvent<string>
 	{ 
 		#region 基础数据 
 		[QName, QPopup(nameof(QLocalizationData) + "." + nameof(QLocalizationData.List)), SerializeField]
@@ -57,6 +57,10 @@ namespace QTool
 		{
 			QLocalizationData.OnLanguageChange -= FreshFont;
 			QLocalizationData.OnLanguageChange -= FreshLocalization;
+		}
+		public void OnValueEvent(string value)
+		{
+			Key = value;
 		}
 		protected virtual void FreshFont()
 		{
