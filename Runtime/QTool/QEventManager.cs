@@ -160,15 +160,7 @@ namespace QTool
 					}
 				}
 			}
-			else
-
 #endif
-			{
-				if (onValueChanged is UnityEvent unityEvent)
-				{
-					unityEvent.AddListener(action);
-				}
-			}
 		}
 		public static void ClearPersistentListener(this UnityEventBase onValueChanged)
 		{
@@ -203,15 +195,7 @@ namespace QTool
 					UnityEditor.Events.UnityEventTools.RemovePersistentListener(onValueChanged, action);
 				}
 			}
-			else
-
 #endif
-			{
-				if (onValueChanged is UnityEvent unityEvent)
-				{
-					unityEvent.RemoveListener(action);
-				}
-			}
 		}
 	
 		public static UnityEvent GetRuntime(this UnityEvent onValueChanged)
@@ -232,12 +216,7 @@ namespace QTool
 					UnityEditor.Events.UnityEventTools.RemovePersistentListener(onValueChanged, action);
 				}	
 			}
-			else
-
 #endif
-			{
-				onValueChanged.RemoveListener(action);
-			}
 		}
 		public static void AddPersistentListener<T>(this UnityEvent<T> onValueChanged, UnityAction<T> action, bool editorAndRuntime = true)
 		{
@@ -254,12 +233,8 @@ namespace QTool
 					}
 				}
 			}
-			else
 
 #endif
-			{
-				onValueChanged.AddListener(action);
-			}
 		}
 		private static bool IsEventKey(this string key, out string eventKey)
 		{
