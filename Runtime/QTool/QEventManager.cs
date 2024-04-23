@@ -134,7 +134,7 @@ namespace QTool
 		void OnValueEvent(T value);
 	}
 	public static class QEventTool
-    {
+	{
 		public static UnityAction GetUnityAction(this Object obj, string funcName)
 		{
 			return UnityEventBase.GetValidMethodInfo(obj, funcName, new System.Type[0]).CreateDelegate(typeof(UnityAction), obj) as UnityAction;
@@ -144,7 +144,7 @@ namespace QTool
 			var method = UnityEventBase.GetValidMethodInfo(obj, funcName, new System.Type[] { typeof(T) });
 			return method.CreateDelegate(typeof(UnityAction<T>), obj) as UnityAction<T>;
 		}
-	
+
 
 		public static void AddPersistentListener(this UnityEventBase onValueChanged, UnityAction action, bool editorAndRuntime = false)
 		{
@@ -162,7 +162,7 @@ namespace QTool
 
 #endif
 			{
-				if(onValueChanged is UnityEvent unityEvent)
+				if (onValueChanged is UnityEvent unityEvent)
 				{
 					unityEvent.AddListener(action);
 				}
@@ -179,13 +179,27 @@ namespace QTool
 				}
 			}
 		}
+		public static bool ContainsPersistentListener(this UnityEventBase onValueChanged, System.Delegate action)
+		{
+			var count = onValueChanged.GetPersistentEventCount();
+			for (int i = count - 1; i >= 0; i--)
+			{
+				if (onValueChanged.GetPersistentTarget(i) == action.Target as Object || onValueChanged.GetPersistentMethodName(i) == action.Method.Name)
+				{
+					return true;
+				}
+			}
+			return false;
+		}
 		public static void RemovePersistentListener(this UnityEventBase onValueChanged, UnityAction action)
 		{
 #if UNITY_EDITOR
 			if (!Application.isPlaying)
 			{
-				onValueChanged.ClearPersistentListener();
-				UnityEditor.Events.UnityEventTools.RemovePersistentListener(onValueChanged, action);
+				if (onValueChanged.ContainsPersistentListener(action))
+				{
+					UnityEditor.Events.UnityEventTools.RemovePersistentListener(onValueChanged, action);
+				}
 			}
 			else
 
@@ -197,6 +211,7 @@ namespace QTool
 				}
 			}
 		}
+	
 		public static UnityEvent GetRuntime(this UnityEvent onValueChanged)
 		{
 			return RuntimeUnityEvent.RuntimeEvents[onValueChanged];
@@ -210,8 +225,10 @@ namespace QTool
 #if UNITY_EDITOR
 			if (!Application.isPlaying)
 			{
-				onValueChanged.ClearPersistentListener();
-				UnityEditor.Events.UnityEventTools.RemovePersistentListener(onValueChanged, action);
+				if (onValueChanged.ContainsPersistentListener(action))
+				{
+					UnityEditor.Events.UnityEventTools.RemovePersistentListener(onValueChanged, action);
+				}	
 			}
 			else
 
