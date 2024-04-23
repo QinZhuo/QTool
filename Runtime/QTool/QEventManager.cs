@@ -168,11 +168,23 @@ namespace QTool
 				}
 			}
 		}
+		public static void ClearPersistentListener(this UnityEventBase onValueChanged)
+		{
+			var count = onValueChanged.GetPersistentEventCount();
+			for (int i = count - 1; i >= 0; i--)
+			{
+				if (onValueChanged.GetPersistentTarget(i) == null || onValueChanged.GetPersistentMethodName(i).IsNull())
+				{
+					UnityEditor.Events.UnityEventTools.RemovePersistentListener(onValueChanged, i);
+				}
+			}
+		}
 		public static void RemovePersistentListener(this UnityEventBase onValueChanged, UnityAction action)
 		{
 #if UNITY_EDITOR
 			if (!Application.isPlaying)
 			{
+				onValueChanged.ClearPersistentListener();
 				UnityEditor.Events.UnityEventTools.RemovePersistentListener(onValueChanged, action);
 			}
 			else
@@ -198,6 +210,7 @@ namespace QTool
 #if UNITY_EDITOR
 			if (!Application.isPlaying)
 			{
+				onValueChanged.ClearPersistentListener();
 				UnityEditor.Events.UnityEventTools.RemovePersistentListener(onValueChanged, action);
 			}
 			else
