@@ -3,13 +3,17 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 using System.IO;
-using System.Data;
 using System;
 using System.Threading.Tasks;
 using UnityEngine.U2D;
 using UnityEditor.U2D;
 using UnityEngine.Networking;
 using System.Reflection;
+using Codice.Client.BaseCommands.BranchExplorer;
+
+#if Sprite
+using UnityEditor.U2D.Sprites;
+#endif
 #if Addressable
 using UnityEditor.AddressableAssets.Settings;
 using UnityEditor.AddressableAssets;
@@ -383,6 +387,71 @@ namespace QTool
 				}
 				AssetDatabase.Refresh();
 			}
+		}
+		[MenuItem("QTool/资源管理/图集/合成网格图集")]
+		public static void GridAtlasPng()
+		{
+			if (Selection.activeObject == null || !Selection.activeObject.IsAsset()) return;
+			var folder = AssetDatabase.GetAssetPath(Selection.activeObject).DirectoryName();
+			var texList = new List<Texture2D>();
+			var size = 1024;
+			foreach (var obj in Selection.objects)
+			{
+				if (obj is Texture2D tex)
+				{
+					texList.Add(tex);
+					size = Mathf.Min(Mathf.Max(tex.width, tex.height), size);
+				}
+			}
+			var count = Mathf.CeilToInt(Mathf.Sqrt(texList.Count));
+			var newSize = size * count;
+			var newTexture = new Texture2D(newSize, newSize);
+			for (int x = 0; x < count; x++)
+			{
+				for (int y = 0; y < count; y++)
+				{
+					var index = x + y * count;
+					if (index < texList.Count)
+					{
+						var tex = texList[index];
+						newTexture.SetPixels(x * size, y * size, size, size, tex.ReadableClone().GetPixels());
+					}
+				}
+			}
+			newTexture.Apply();
+			var path = folder.MergePath(nameof(SpriteAtlas) + ".png");
+			newTexture.SavePNG(path);
+			AssetDatabase.Refresh();
+			var importer = AssetImporter.GetAtPath(path) as TextureImporter;
+			importer.textureType = TextureImporterType.Sprite;
+			importer.spriteImportMode = SpriteImportMode.Multiple;
+#if Sprite
+			var factory = new SpriteDataProviderFactories();
+			factory.Init();
+			var dataProvider = factory.GetSpriteEditorDataProviderFromObject(importer);
+			dataProvider.InitSpriteEditorDataProvider();
+			var spriteRects = new SpriteRect[texList.Count];
+			for (int x = 0; x < count; x++)
+			{
+				for (int y = 0; y < count; y++)
+				{
+					var index = x + y * count;
+					if (index < texList.Count)
+					{
+						var tex = texList[index];
+						spriteRects[index] = new SpriteRect();
+						spriteRects[index].name = tex.name;
+						spriteRects[index].rect = new Rect(x * size, y * size, size, size);
+					}
+				}
+			}
+			dataProvider.SetSpriteRects(spriteRects);
+			dataProvider.Apply();
+#endif
+
+			importer.SaveAndReimport();
+
+
 		}
 		public readonly static List<int> TextureSize = new List<int> { 1, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096 };
 		public const float MaxCompressionSize = 512 * 512;
