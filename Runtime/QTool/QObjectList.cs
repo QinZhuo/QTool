@@ -4,13 +4,10 @@ using UnityEngine;
 using UnityEngine.UI;
 namespace QTool
 {
-	[ExecuteInEditMode]
 	public class QObjectList : MonoBehaviour
 	{
 		[QName("预制体")]
 		public GameObject prefab;
-		[QName("测试数目")]
-		public int TestCount = 4;
 		public List<GameObject> List { get; private set; } = new List<GameObject>();
 		public int Count => List.Count;
 
@@ -49,6 +46,14 @@ namespace QTool
 				return view;
 			}
 		}
+
+		private void Awake()
+		{
+			if (prefab != null && prefab.transform.parent == transform)
+			{
+				prefab.gameObject.SetActive(false);
+			}
+		}
 		public GameObject Get(string name, GameObject prefab)
 		{
 			this.prefab = prefab;
@@ -83,34 +88,6 @@ namespace QTool
 					Gizmos.DrawCube(rectTransform.Center(), rectTransform.Size());
 				}
 			}
-		}
-
-		private void Awake()
-		{
-			if (prefab.transform.parent == transform)
-			{
-				prefab.gameObject.SetActive(false);
-			}
-		}
-		private int lastCount = 0;
-		private void Update()
-		{
-			if (!Application.isPlaying && prefab != null && TestCount != lastCount)
-			{
-				lastCount = TestCount;
-				OnDestroy();
-				for (int i = 0; i < TestCount; i++)
-				{
-					var obj = Instantiate(prefab, transform);
-					obj.hideFlags = HideFlags.HideAndDontSave;
-					obj.name = prefab.name + "测试";
-				}
-			}
-		}
-		private void OnDestroy()
-		{
-			if (prefab == null) return;
-			transform.ClearChild(child => child.name == prefab.name + "测试");
 		}
 #endif
 	}
