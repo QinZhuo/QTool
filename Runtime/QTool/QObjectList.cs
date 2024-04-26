@@ -85,6 +85,13 @@ namespace QTool
 			}
 		}
 
+		private void Awake()
+		{
+			if (prefab.transform.parent == transform)
+			{
+				prefab.gameObject.SetActive(false);
+			}
+		}
 		private int lastCount = 0;
 		private void Update()
 		{
