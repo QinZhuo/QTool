@@ -120,7 +120,7 @@ namespace QTool
 		}
 		public static GameObject Get(GameObject prefab, Transform parent = null)
 		{
-			var pool = GetPool(prefab.name, prefab);
+			var pool = GetPool(prefab.name + "_" + prefab.GetHashCode(), prefab);
 			var obj = pool.Get();
 			while (obj == null)
 			{
