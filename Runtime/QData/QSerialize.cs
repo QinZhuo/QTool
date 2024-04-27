@@ -280,7 +280,7 @@ namespace QTool
                             Debug.LogError("反序列化类型[" + type + "]出错");
                             return null;
                     }
-					callback?.OnQDeserializeOver();
+					callback?.OnLoad();
 					return target;
                 #region 基础类型
 

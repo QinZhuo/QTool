@@ -87,9 +87,6 @@ namespace QTool
 #endif
 			}
 		}
-#if UNITY_EDITOR
-		public static SerializedProperty SerializedProperty { get; set; }
-#endif
 
 		protected virtual void OnFocus()
 		{

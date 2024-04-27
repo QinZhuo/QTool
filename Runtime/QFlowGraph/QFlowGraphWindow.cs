@@ -42,18 +42,9 @@ namespace QTool.FlowGraph
 		{
 			if (file != null)
 			{
-#if UNITY_EDITOR
-				SerializedProperty = new SerializedObject(file).FindProperty(nameof(QFlowGraphAsset.Graph)).FindPropertyRelative(nameof(QFlowGraph.SerializeString));
-#endif
 				var graphAsset = (file as QFlowGraphAsset);
-				return graphAsset.Graph.SerializeString;
+				return graphAsset.Graph.ToQData();
 			}
-#if UNITY_EDITOR
-			else if (SerializedProperty != null)
-			{ 
-				return SerializedProperty.stringValue;
-			}
-#endif
 			else
 			{
 				return "";
@@ -65,13 +56,13 @@ namespace QTool.FlowGraph
 			if (Graph != null)
 			{
 				Graph.OnBeforeSerialize();
-				Data = Graph.SerializeString;
+				Data = Graph.ToQData(); 
+				QFileTool.Save(FilePath, Data);
 #if UNITY_EDITOR
-				if (SerializedProperty != null)
+				var importer= AssetDatabase.LoadAssetAtPath<UnityEditor.AssetImporters.ScriptedImporter>(FilePath);
+				if (importer != null)
 				{
-					SerializedProperty.stringValue = Graph.ToQData();
-					SerializedProperty.serializedObject.ApplyModifiedProperties(); 
-					AssetDatabase.SaveAssetIfDirty(SerializedProperty.serializedObject.targetObject);
+					importer.SaveAndReimport();
 				}
 #endif
 			}
@@ -571,30 +562,4 @@ namespace QTool.FlowGraph
 		}
 	}
 
-#if UNITY_EDITOR
-	[CustomPropertyDrawer(typeof(QFlowGraph))]
-	public class QFlowGraphDrawer : PropertyDrawer
-	{
-		public override VisualElement CreatePropertyGUI(SerializedProperty property)
-		{
-			var root= new VisualElement();
-			root.style.flexDirection = FlexDirection.Row;
-			root.AddLabel(QReflection.QName(property));
-			root.AddButton("编辑", () =>
-			{
-				if (property.serializedObject.targetObject.IsPrefabInstance(out var prefab))
-				{
-					AssetDatabase.OpenAsset(prefab);
-				}
-				else
-				{
-					var graph = property.GetObject() as QFlowGraph;
-					QFlowGraphWindow.SerializedProperty = property.FindPropertyRelative(nameof(QFlowGraph.SerializeString));
-					QFlowGraphWindow.OpenWindow();
-				}
-			});
-			return root;
-		}
-	}
-#endif
 }

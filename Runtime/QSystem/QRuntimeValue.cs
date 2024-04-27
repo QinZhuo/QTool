@@ -78,7 +78,7 @@ namespace QTool
 			return Value?.ToString();
 		}
 
-		public virtual void OnQDeserializeOver()
+		public virtual void OnLoad()
 		{
 			InvokeOnChange();
 		}
@@ -182,7 +182,7 @@ namespace QTool
 			m_Value = BaseValue * ScaleValue + OffsetValue;
 			InvokeOnChange();
 		}
-		public override void OnQDeserializeOver()
+		public override void OnLoad()
 		{
 			FreshValue();
 		}

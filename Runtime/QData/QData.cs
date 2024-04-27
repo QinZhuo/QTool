@@ -618,7 +618,7 @@ namespace QTool
 						}
 						if (typeInfo.HasCallback && target is IQSerializeCallback callback)
 						{
-							callback.OnQDeserializeOver();
+							callback.OnLoad();
 						}
 						return target;
 					}
@@ -1049,11 +1049,11 @@ namespace QTool
 		public virtual void OnAfterDeserialize()
 		{
 			SerializeString.ParseQData(this as T);
-			OnQDeserializeOver();
+			OnLoad();
 		}
 
 
-		public virtual void OnQDeserializeOver()
+		public virtual void OnLoad()
 		{
 		}
 	}
@@ -1077,7 +1077,7 @@ namespace QTool
 	}
 	public interface IQSerializeCallback
 	{
-		void OnQDeserializeOver();
+		void OnLoad();
 	}
 	public abstract class QSerializeType<T> : QTypeInfo<T> where T : QSerializeType<T>, new()
 	{
