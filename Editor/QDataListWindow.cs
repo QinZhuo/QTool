@@ -106,6 +106,7 @@ namespace QTool.FlowGraph
 										{
 											row[title] = (string)newValue;
 											label.text = ((string)newValue)?.Replace("\\n", " ");
+											SetDataDirty();
 										});
 									}
 									else
@@ -119,6 +120,7 @@ namespace QTool.FlowGraph
 											member.Set(obj, newValue);
 											label.text = member.Get(obj).ToQDataType(member.Type, false)?.Replace("\\n", " ").Trim('\"');
 											label.Tooltip(label.text);
+											SetDataDirty();
 										}, member.MemeberInfo);
 									}
 									AutoLoad = false;
@@ -149,6 +151,7 @@ namespace QTool.FlowGraph
 										member.Set(obj, null);
 										label.text = member.Get(obj).ToQDataType(member.Type, false)?.Replace("\\n", " ").Trim('\"');
 									}
+									SetDataDirty();
 								});
 							});
 						}
@@ -168,13 +171,14 @@ namespace QTool.FlowGraph
 						}
 						qdataList.Replace(DragIndex, y);
 						listView.Rebuild();
+						SetDataDirty();
 					}
 					DragIndex = -1;
 				});
 				visual.AddMenu(menu =>
 				{
-					menu.menu.AppendAction("添加行", action => { AddAt(y); listView.Rebuild(); });
-					menu.menu.AppendAction("删除行", action => { RemoveAt(y); listView.Rebuild(); });
+					menu.menu.AppendAction("添加行", action => { AddAt(y); listView.Rebuild(); SetDataDirty(); });
+					menu.menu.AppendAction("删除行", action => { RemoveAt(y); listView.Rebuild(); SetDataDirty(); });
 				});
 			},
 			() =>
@@ -197,14 +201,13 @@ namespace QTool.FlowGraph
 			CellView.style.right = new Length(0, LengthUnit.Percent);
 		}
 		#endregion
-		protected override void OnLostFocus()
+		public override void SetDataDirty()
 		{
 			if (typeInfo != null)
 			{
 				objList.ToQDataList(qdataList, typeInfo.Type);
 			}
-			Data = qdataList?.ToString();	
-			base.OnLostFocus();
+			Data = qdataList?.ToString();
 		}
 		protected override async void ParseData()
 		{
@@ -216,7 +219,7 @@ namespace QTool.FlowGraph
 				if (type != null)
 				{
 					typeInfo = QSerializeHasReadOnlyType.Get(type);
-					qdataList = QDataList.Load(path);
+					qdataList = new QDataList(Data);
 					qdataList.ParseQDataList(objList, type);
 					for (int i = 0; i < qdataList.TitleRow.Count; i++)
 					{
@@ -229,7 +232,7 @@ namespace QTool.FlowGraph
 				}
 				else
 				{
-					qdataList = QDataList.Load(path);
+					qdataList = new QDataList(Data);
 					typeInfo = null;
 				}
 				PlayerPrefs.SetString(nameof(QDataListWindow) + "_LastPath", path);

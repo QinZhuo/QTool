@@ -154,12 +154,10 @@ namespace QTool
 			RecordChange = true;
 		}
 		public abstract string GetData(UnityEngine.Object file = null);
-		public virtual void SetDataDirty()
+		public abstract void SetDataDirty();
+		public void SaveData()
 		{
-
-		}
-		public virtual void SaveData()
-		{
+			SetDataDirty();
 			QFileTool.SaveCheckChange(FilePath, Data);
 		}
 

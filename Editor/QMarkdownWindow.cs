@@ -57,7 +57,8 @@ namespace QTool
 			markdownText = editorRange.AddText("", "", null, true);
 			markdownText.style.minHeight = 1000;
 			var split = root.Split(editorRange, markdownView);
-			markdownText.RegisterCallback<ChangeEvent<string>>((e) => { Data = e.newValue;
+			markdownText.RegisterCallback<ChangeEvent<string>>((e) => {
+				SetDataDirty();
 				markdownView.AddMarkdown(e.newValue);
 			}) ;
 			editorRange.verticalScroller.valueChanged += (value) =>
@@ -100,6 +101,10 @@ namespace QTool
 			return (file as TextAsset)?.text;
 		}
 
+		public override void SetDataDirty()
+		{
+			Data = markdownText.text;
+		}
 	}
 	[CustomEditor(typeof(TextAsset))]
 	public class MarkdownEditor : Editor

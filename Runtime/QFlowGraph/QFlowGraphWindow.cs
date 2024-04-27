@@ -45,13 +45,8 @@ namespace QTool.FlowGraph
 		private QFlowGraph Graph { get; set; }
 		public override void SetDataDirty()
 		{
-			base.SetDataDirty();
-			Data = Graph?.ToQData();
-		}
-		public override void SaveData()
-		{
 			Graph.OnBeforeSerialize();
-			base.SaveData();    
+			Data = Graph?.ToQData();
 		}
 		private VisualElement ConnectCanvas { get; set; }
 		protected override async void ParseData()
