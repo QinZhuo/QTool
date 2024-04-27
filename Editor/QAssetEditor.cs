@@ -9,7 +9,6 @@ using UnityEngine.U2D;
 using UnityEditor.U2D;
 using UnityEngine.Networking;
 using System.Reflection;
-using Codice.Client.BaseCommands.BranchExplorer;
 
 #if Sprite
 using UnityEditor.U2D.Sprites;
