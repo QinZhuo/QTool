@@ -51,7 +51,7 @@ namespace QTool.FlowGraph
 		public override void SaveData()
 		{
 			Graph.OnBeforeSerialize();
-			base.SaveData();
+			base.SaveData();    
 		}
 		private VisualElement ConnectCanvas { get; set; }
 		protected override async void ParseData()
@@ -164,7 +164,7 @@ namespace QTool.FlowGraph
 			Back.AddMenu(data =>
 			{
 				MoveOffset = false;
-				var position = data.localMousePosition;
+				var position = data.localMousePosition - ViewOffset;
 				foreach (var kv in QCommand.KeyDictionary)
 				{
 					data.menu.AppendAction(kv.fullName, action =>
@@ -181,7 +181,8 @@ namespace QTool.FlowGraph
 					{
 						var nodeList = new List<QFlowNode>();
 						GUIUtility.systemCopyBuffer.ParseQData(nodeList);
-						Graph.Parse(nodeList, data.mousePosition - ViewOffset);
+						Graph.Parse(nodeList, position);
+						SetDataDirty();
 						OnLostFocus();
 						OnFocus();
 					});
@@ -198,7 +199,8 @@ namespace QTool.FlowGraph
 					ConnectViewList.Remove(DragConnect);
 					DragConnect = null;
 				}
-			
+				SetDataDirty();
+
 			});
 		}
 		protected override void OnLostFocus()
@@ -271,6 +273,7 @@ namespace QTool.FlowGraph
 					{
 						RemoveNodeView(node);
 					}
+					SetDataDirty();
 				});
 
 				data.menu.AppendSeparator();
@@ -335,7 +338,6 @@ namespace QTool.FlowGraph
 			Back.Remove(visual);
 			NodeViewList.Remove(visual);
 			SelectNodes.Remove(visual);
-			SetDataDirty();
 
 		}
 		public void AddPortView(VisualElement root, QFlowPort port)
@@ -529,6 +531,7 @@ namespace QTool.FlowGraph
 						DragConnect.EndColor = GetColor(endPort);
 						DragConnect.LineWidth = port.IsFlow && endPort.IsFlow ? 4 : 2;
 						DragConnect = null;
+						SetDataDirty();
 					}
 				}
 			});
