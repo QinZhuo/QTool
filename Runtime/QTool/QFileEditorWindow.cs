@@ -149,14 +149,21 @@ namespace QTool
 		}
 		public void OnUndoRedo()
 		{
-			RecordChange = false;
+			RecordChange= false;
 			PathPopup.value = _filePath.Replace('/', '\\');
 			ParseData();
 			RecordChange = true;
 		}
 		public abstract string GetData(UnityEngine.Object file = null);
-		public abstract void SaveData();
-		
+		public virtual void SetDataDirty()
+		{
+
+		}
+		public virtual void SaveData()
+		{
+			QFileTool.SaveCheckChange(FilePath, Data);
+		}
+
 		public bool AutoLoad { get; set; } = true;
 		protected virtual void OnLostFocus()
 		{

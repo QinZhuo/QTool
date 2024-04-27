@@ -100,10 +100,6 @@ namespace QTool
 			return (file as TextAsset)?.text;
 		}
 
-		public override void SaveData()
-		{
-			QFileTool.SaveCheckChange(FilePath, Data);
-		}
 	}
 	[CustomEditor(typeof(TextAsset))]
 	public class MarkdownEditor : Editor

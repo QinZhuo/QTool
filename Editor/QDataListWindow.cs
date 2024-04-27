@@ -43,10 +43,6 @@ namespace QTool.FlowGraph
 			return (file as TextAsset)?.text;
 		}
 
-		public override void SaveData()
-		{
-			QFileTool.SaveCheckChange(FilePath, Data);
-		}
 		public QSerializeHasReadOnlyType typeInfo;
 		public QDataList qdataList;
 		public QList<object> objList = new QList<object>();

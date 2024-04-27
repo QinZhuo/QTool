@@ -40,32 +40,18 @@ namespace QTool.FlowGraph
 		#endregion
 		public override string GetData(UnityEngine.Object file)
 		{
-			if (file != null)
-			{
-				var graphAsset = (file as QFlowGraphAsset);
-				return graphAsset.Graph.ToQData();
-			}
-			else
-			{
-				return "";
-			}
+			return (file as QFlowGraphAsset)?.Graph?.ToQData();
 		}
 		private QFlowGraph Graph { get; set; }
+		public override void SetDataDirty()
+		{
+			base.SetDataDirty();
+			Data = Graph?.ToQData();
+		}
 		public override void SaveData()
 		{
-			if (Graph != null)
-			{
-				Graph.OnBeforeSerialize();
-				Data = Graph.ToQData(); 
-				QFileTool.Save(FilePath, Data);
-#if UNITY_EDITOR
-				var importer= AssetDatabase.LoadAssetAtPath<UnityEditor.AssetImporters.ScriptedImporter>(FilePath);
-				if (importer != null)
-				{
-					importer.SaveAndReimport();
-				}
-#endif
-			}
+			Graph.OnBeforeSerialize();
+			base.SaveData();
 		}
 		private VisualElement ConnectCanvas { get; set; }
 		protected override async void ParseData()
@@ -313,6 +299,7 @@ namespace QTool.FlowGraph
 			{
 				AddPortView(nodeView, port);
 			}
+			SetDataDirty();
 			return nodeView;
 		}
 		private void UpdateNodeSelect(VisualElement visual)
@@ -348,6 +335,7 @@ namespace QTool.FlowGraph
 			Back.Remove(visual);
 			NodeViewList.Remove(visual);
 			SelectNodes.Remove(visual);
+			SetDataDirty();
 
 		}
 		public void AddPortView(VisualElement root, QFlowPort port)
