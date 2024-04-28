@@ -37,7 +37,7 @@ namespace QTool.Reflection
 			Set = info.SetValue;
 			Get = info.GetValue;
 			IsPublic = info.IsPublic;
-			IsUnityObject= Type.Is(typeof(UnityEngine.Object));
+			IsUnityObject = Type.Is(typeof(UnityEngine.Object));
 		}
 		public QMemeberInfo(PropertyInfo info)
 		{
@@ -49,10 +49,11 @@ namespace QTool.Reflection
 			Type = info.PropertyType;
 			IsPublic = true;
 			IsUnityObject = Type.Is(typeof(UnityEngine.Object));
-			if (info.SetMethod != null)
+			var setMethod = info.GetSetMethod(true);
+			if (info.CanWrite)
 			{
-				Set =(obj,value)=> info.SetMethod.Invoke(obj,new object[] { value });
-				if (!info.SetMethod.IsPublic)
+				Set = (obj, value) => setMethod.Invoke(obj, new object[] { value });
+				if (!setMethod.IsPublic)
 				{
 					IsPublic = false;
 				}
@@ -61,10 +62,11 @@ namespace QTool.Reflection
 			{
 				IsPublic = false;
 			}
-			if (info.GetMethod != null)
+			var getMethod = info.GetGetMethod(true);
+			if (getMethod != null)
 			{
-				Get =(obj)=> info.GetMethod.Invoke(obj,null);
-				if (! info.GetMethod.IsPublic)
+				Get = (obj) => getMethod.Invoke(obj, null);
+				if (!getMethod.IsPublic)
 				{
 					IsPublic = false;
 				}
@@ -86,7 +88,8 @@ namespace QTool.Reflection
 		public string NameWithParams { get; private set; }
 		public ParameterInfo[] ParamInfos { get; private set; }
 		public Type[] ParamTypes { get; private set; }
-		public Type ReturnType {
+		public Type ReturnType
+		{
 			get
 			{
 				return MethodInfo.ReturnType;
@@ -139,20 +142,20 @@ namespace QTool.Reflection
 			base.Init(type);
 		}
 	}
-    public class QTypeInfo<T>:IKey<string> where T:QTypeInfo<T> ,new()
+	public class QTypeInfo<T> : IKey<string> where T : QTypeInfo<T>, new()
 	{
-		public static BindingFlags MemberFlags = BindingFlags.Instance | BindingFlags.Public|BindingFlags.NonPublic;
-		public static BindingFlags FunctionFlags = BindingFlags.Instance | BindingFlags.Public|BindingFlags.NonPublic;
-		public string Key { get;  set; }
-        public QList<string, QMemeberInfo> Members = new QList<string, QMemeberInfo>();
-        public QList<string, QFunctionInfo> Functions = new QList<string, QFunctionInfo>();
-        public bool IsList;
+		public static BindingFlags MemberFlags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
+		public static BindingFlags FunctionFlags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
+		public string Key { get; set; }
+		public QList<string, QMemeberInfo> Members = new QList<string, QMemeberInfo>();
+		public QList<string, QFunctionInfo> Functions = new QList<string, QFunctionInfo>();
+		public bool IsList;
 		public bool IsDictionary;
 		public Type KeyType { get; private set; }
 		public Type ElementType { get; private set; }
 		public Type KeyValueType { get; private set; }
-        public Type Type { get; private set; }
-        public TypeCode Code { get; private set; }
+		public Type Type { get; private set; }
+		public TypeCode Code { get; private set; }
 		public static QDictionary<Type, List<string>> TypeMembers = new QDictionary<Type, List<string>>()
 		{
 			{
@@ -207,40 +210,41 @@ namespace QTool.Reflection
 			}
 			return info;
 		}
-        public bool IsArray {
-            get
-            {
-                return Type.IsArray;
-            }
-        }
-        public object Create(params object[] param)
-        {
-            return Activator.CreateInstance(Type, param);
-        }
-        public bool IsValueType
-        {
-            get
-            {
-                return Type.IsValueType;
-            }
-        }
-        public int[] IndexArray { get; private set; }
-        public int ArrayRank
-        {
-            get
-            {
-                if (IndexArray == null)
-                {
-                    return 0;
-                }
-                else
-                {
-                    return IndexArray.Length;
-                }
-            }
-        }
-        protected virtual void Init(Type type)
-        {
+		public bool IsArray
+		{
+			get
+			{
+				return Type.IsArray;
+			}
+		}
+		public object Create(params object[] param)
+		{
+			return Activator.CreateInstance(Type, param);
+		}
+		public bool IsValueType
+		{
+			get
+			{
+				return Type.IsValueType;
+			}
+		}
+		public int[] IndexArray { get; private set; }
+		public int ArrayRank
+		{
+			get
+			{
+				if (IndexArray == null)
+				{
+					return 0;
+				}
+				else
+				{
+					return IndexArray.Length;
+				}
+			}
+		}
+		protected virtual void Init(Type type)
+		{
 			Key = type.FullName;
 			Type = type;
 			ElementType = type;
@@ -308,9 +312,9 @@ namespace QTool.Reflection
 
 			}
 		}
-        public static Dictionary<Type, T> table = new Dictionary<Type, T>();
-        public static T Get(Type type)
-        {
+		public static Dictionary<Type, T> table = new Dictionary<Type, T>();
+		public static T Get(Type type)
+		{
 			lock (table)
 			{
 				if (!table.ContainsKey(type))
@@ -321,22 +325,38 @@ namespace QTool.Reflection
 					table.Add(type, info);
 				}
 			}
-            return table[type];
-        }
-        public override string ToString()
-        {
-            return "Type " + Key + " \n{\n\t" + Members.ToOneString("\n\t") + "\n\t" + Functions.ToOneString("\n\t") + "}";
-        }
-    }
+			return table[type];
+		}
+		public override string ToString()
+		{
+			return "Type " + Key + " \n{\n\t" + Members.ToOneString("\n\t") + "\n\t" + Functions.ToOneString("\n\t") + "}";
+		}
+	}
 
 	#endregion
-	
+
+	//public class QPropertyIWrapper<TTarget, TValue>
+	//{
+	//	private Action<TTarget, TValue> setter;
+	//	private Action<TTarget, TValue> getter;
+	//	public QPropertyIWrapper(QMemeberInfo memeberInfo)
+	//	{
+	//		if(memeberInfo.getm)
+	//		var m = propertyInfo.GetSetMethod(true);
+	//		_setter = (Action<TTarget, TValue>)Delegate.CreateDelegate(typeof(Action<TTarget, TValue>), null, m);
+	//	}
+
+	//	public void SetValue(TTarget target, TValue val)
+	//	{
+	//		_setter(target, val);
+	//	}
+	//}
 	public static class QReflection
 	{
 
-		static Type GetOperaterType(object a,object b)
+		static Type GetOperaterType(object a, object b)
 		{
-			Type type = a!=null ? a.GetType() : b?.GetType();
+			Type type = a != null ? a.GetType() : b?.GetType();
 			if (type == null)
 			{
 				return typeof(object);
@@ -445,18 +465,18 @@ namespace QTool.Reflection
 		}
 		public static bool OperaterEqual(this object a, object b)
 		{
-			
-			return Equals(a, b)|| a.ToComputeFloat() == b.ToComputeFloat();
+
+			return Equals(a, b) || a.ToComputeFloat() == b.ToComputeFloat();
 		}
-		public static T GetAttribute<T>(this ICustomAttributeProvider info) where T :Attribute
-        {
-            var type = typeof(T);
-            var array= info.GetCustomAttributes(typeof(T), true);
-            return array.QueuePeek() as T;
-        }
+		public static T GetAttribute<T>(this ICustomAttributeProvider info) where T : Attribute
+		{
+			var type = typeof(T);
+			var array = info.GetCustomAttributes(typeof(T), true);
+			return array.QueuePeek() as T;
+		}
 		public static string QTypeName(this Type type)
 		{
-			if (type.IsGenericType||type.IsArray)
+			if (type.IsGenericType || type.IsArray)
 			{
 				return type.FullName;
 			}
@@ -528,18 +548,18 @@ namespace QTool.Reflection
 			MinSizeCache[type] = size;
 			return size;
 		}
-	
+
 		public static string QName(this MemberInfo member)
-        {
-            var att = member.GetCustomAttribute<QNameAttribute>();
-            if (att != null && !string.IsNullOrWhiteSpace(att.name))
-            {
-                return att.name;
-            }
-            else
-            {
-                return member.Name;
-            }
+		{
+			var att = member.GetCustomAttribute<QNameAttribute>();
+			if (att != null && !string.IsNullOrWhiteSpace(att.name))
+			{
+				return att.name;
+			}
+			else
+			{
+				return member.Name;
+			}
 		}
 		public static string QOldName(this MemberInfo method)
 		{
@@ -564,32 +584,32 @@ namespace QTool.Reflection
 			return nameStart;
 		}
 		public static Type GetTrueType(this Type type)
-        {
-            if (type.Name.EndsWith("&"))
-            {
-                return type.GetElementType();
-            }
-            else if(typeof(Task).IsAssignableFrom(type))
-            { 
-                return type.GenericTypeArguments[0];
-            }
-            else if(typeof(Nullable).IsAssignableFrom(type))
-            {
-                return type.GenericTypeArguments[0];
-            }
-            return type;
-        }
-        public static string QName(this ParameterInfo info)
-        {
-            var att = info.GetCustomAttribute<QNameAttribute>();
-            if (att != null && !string.IsNullOrWhiteSpace(att.name))
-            {
-                return att.name;
-            }
-            else
-            {
-                return info.Name;
-            }
+		{
+			if (type.Name.EndsWith("&"))
+			{
+				return type.GetElementType();
+			}
+			else if (typeof(Task).IsAssignableFrom(type))
+			{
+				return type.GenericTypeArguments[0];
+			}
+			else if (typeof(Nullable).IsAssignableFrom(type))
+			{
+				return type.GenericTypeArguments[0];
+			}
+			return type;
+		}
+		public static string QName(this ParameterInfo info)
+		{
+			var att = info.GetCustomAttribute<QNameAttribute>();
+			if (att != null && !string.IsNullOrWhiteSpace(att.name))
+			{
+				return att.name;
+			}
+			else
+			{
+				return info.Name;
+			}
 		}
 
 		public static object GetPathObject(this object target, string path)
@@ -670,7 +690,7 @@ namespace QTool.Reflection
 			else
 			{
 				var memebers = QReflectionType.Get(target.GetType()).Members;
-				if (memebers.ContainsKey(path) && memebers[path].Set!=null)
+				if (memebers.ContainsKey(path) && memebers[path].Set != null)
 				{
 					memebers[path].Set(target, value);
 					return value;
@@ -718,7 +738,7 @@ namespace QTool.Reflection
 			}
 
 		}
-	
+
 		public static FieldInfo GetChildObject(Type type, string key)
 		{
 			if (type == null || string.IsNullOrWhiteSpace(key)) return null;
@@ -809,10 +829,10 @@ namespace QTool.Reflection
 		}
 #endif
 		public static Assembly[] GetAllAssemblies()
-        {
-            return AppDomain.CurrentDomain.GetAssemblies();
-        }
-        public static MethodInfo GetStaticMethod(this Type type, string name)
+		{
+			return AppDomain.CurrentDomain.GetAssemblies();
+		}
+		public static MethodInfo GetStaticMethod(this Type type, string name)
 		{
 			if (name.SplitTowString(".", out var start, out var end))
 			{
@@ -836,12 +856,12 @@ namespace QTool.Reflection
 				return GetStaticMethod(tType, "get_" + name);
 			};
 			return null;
-        }
-	
-		public static object InvokeStaticFunction(this Type type,string name,params object[] param)
-        {
+		}
+
+		public static object InvokeStaticFunction(this Type type, string name, params object[] param)
+		{
 			var method = GetStaticMethod(type, name);
-			
+
 			if (method != null)
 			{
 				return method.Invoke(null, param);
@@ -849,10 +869,10 @@ namespace QTool.Reflection
 			else
 			{
 				throw new Exception("不存在静态函数 " + type + " " + name);
-			
+
 			}
 		}
-		public static QFunctionInfo GetFunction(this Type type,string funcName)
+		public static QFunctionInfo GetFunction(this Type type, string funcName)
 		{
 			var typeInfo = QReflectionType.Get(type);
 			if (typeInfo.Functions.ContainsKey(funcName))
@@ -874,18 +894,18 @@ namespace QTool.Reflection
 			}
 #endif
 			Type objType = obj == null ? typeof(object) : obj?.GetType();
-			if(obj is Type)
+			if (obj is Type)
 			{
 				objType = obj as Type;
 			}
 			var typeInfo = QReflectionType.Get(objType);
-			var method=typeInfo.Functions[funcName]?.MethodInfo;
+			var method = typeInfo.Functions[funcName]?.MethodInfo;
 			if (method == null)
 			{
 				method = typeInfo.Functions["get_" + funcName]?.MethodInfo;
 			}
 			if (method == null)
-			{ 
+			{
 				return objType.InvokeStaticFunction(funcName, param);
 			}
 			else
@@ -896,7 +916,7 @@ namespace QTool.Reflection
 		static List<Type> typeList = new List<Type>();
 		static QDictionary<Type, Type[]> AllTypesCache = new QDictionary<Type, Type[]>();
 		public static Type[] GetAllTypes(this Type rootType)
-        {
+		{
 			if (!AllTypesCache.ContainsKey(rootType))
 			{
 				if (typeof(Attribute).IsAssignableFrom(rootType))
@@ -941,37 +961,37 @@ namespace QTool.Reflection
 			}
 			return AllTypesCache[rootType];
 		}
-		public static object CreateInstance(this Type type, object targetObj=null, params object[] param)
-        {
+		public static object CreateInstance(this Type type, object targetObj = null, params object[] param)
+		{
 			if (type.ContainsGenericParameters)
 			{
 				return targetObj;
 			}
-            if (targetObj != null)
-            { 
+			if (targetObj != null)
+			{
 				return targetObj;
 			}
-            try
-            {
-                if (type == typeof(string)||type==typeof(object))
-                {
-                    return ""; 
+			try
+			{
+				if (type == typeof(string) || type == typeof(object))
+				{
+					return "";
 				}
 				else if (param.Length == 0 && type.IsArray)
 				{
 					return CreateInstance(type, targetObj, 0);
 				}
-				else if(type==typeof(UnityEngine.Object))
+				else if (type == typeof(UnityEngine.Object))
 				{
 					return null;
 				}
-                return Activator.CreateInstance(type, param);
-            }
-            catch (Exception e)
-            {
-                throw new Exception("通过" + type + "(" + param.ToOneString(",") + ")创建对象" + type + "出错", e);
-            }
-        }
+				return Activator.CreateInstance(type, param);
+			}
+			catch (Exception e)
+			{
+				throw new Exception("通过" + type + "(" + param.ToOneString(",") + ")创建对象" + type + "出错", e);
+			}
+		}
 		public static bool Is(this Type type, Type checkType)
 		{
 			if (type == null) return false;
@@ -993,8 +1013,8 @@ namespace QTool.Reflection
 			return false;
 		}
 		static Dictionary<string, Type> TypeBuffer = new Dictionary<string, Type>();
-        public static Type ParseType(this string typeString)
-        {
+		public static Type ParseType(this string typeString)
+		{
 			if (typeString.IsNull()) return null;
 			if (TypeBuffer.ContainsKey(typeString))
 			{
@@ -1045,7 +1065,7 @@ namespace QTool.Reflection
 
 							throw new Exception("[" + assemblyArray[i].FullName + "]", e);
 						}
-						
+
 					}
 				}
 				if (typeString.Contains("System.Threading.Tasks.Task"))
@@ -1054,14 +1074,14 @@ namespace QTool.Reflection
 				}
 				return type;
 			}
-        }
-        public static void ForeachMemeber(this Type type, Action<FieldInfo> fieldInfo, Action<PropertyInfo> propertyInfo = null, BindingFlags bindingFlags= BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
-        {
-            var infos = type.GetProperties(bindingFlags);
-            foreach (var item in infos)
-            {
-                propertyInfo?.Invoke(item);
-            }
+		}
+		public static void ForeachMemeber(this Type type, Action<FieldInfo> fieldInfo, Action<PropertyInfo> propertyInfo = null, BindingFlags bindingFlags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+		{
+			var infos = type.GetProperties(bindingFlags);
+			foreach (var item in infos)
+			{
+				propertyInfo?.Invoke(item);
+			}
 			FieldInfo[] fields = type.GetFields(bindingFlags);
 			foreach (var item in fields)
 			{
@@ -1072,14 +1092,14 @@ namespace QTool.Reflection
 				fieldInfo?.Invoke(item);
 			}
 		}
-        public static void ForeachFunction(this Type type, Action<MethodInfo> methodeInfo, BindingFlags bindingFlags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
-        {
-            var methods= type.GetMethods(bindingFlags);
-            foreach (var method in methods)
-            {
+		public static void ForeachFunction(this Type type, Action<MethodInfo> methodeInfo, BindingFlags bindingFlags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+		{
+			var methods = type.GetMethods(bindingFlags);
+			foreach (var method in methods)
+			{
 				methodeInfo?.Invoke(method);
 			}
-        }
+		}
 
 		public static object GetValue(this object target, string path)
 		{
@@ -1099,13 +1119,13 @@ namespace QTool.Reflection
 			{
 				var typeInfo = QReflectionType.Get(target.GetType());
 				var memeberInfo = typeInfo.GetMemberInfo(path);
-				if (memeberInfo!=null)
+				if (memeberInfo != null)
 				{
 					return memeberInfo.Get(target);
-				} 
+				}
 				else
 				{
-					QDebug.LogError("["+target+"]("+target.GetType() + ") 找不到 key " + path+"\n"+ typeInfo.Members.ToOneString());
+					QDebug.LogError("[" + target + "](" + target.GetType() + ") 找不到 key " + path + "\n" + typeInfo.Members.ToOneString());
 					return target;
 				}
 			}

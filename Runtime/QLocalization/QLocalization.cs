@@ -172,7 +172,14 @@ namespace QTool
 			}, true);
 			return text;
 #else
-			return key;
+			if (ContainsKey(key))
+			{
+				return Get(key).Localization;
+			}
+			else
+			{
+				return key;
+			}
 #endif
 		}
 		public const string AutoTranslateEndKey = " [Auto]";
