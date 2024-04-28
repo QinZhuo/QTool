@@ -117,6 +117,7 @@ namespace QTool
 
 		public static string GetLozalization(string key)
 		{
+#if QLocalization
 			if (key.IsNull()) return key;
 			var text = key;
 			if (ContainsKey(key))
@@ -170,6 +171,9 @@ namespace QTool
 				return subKey;
 			}, true);
 			return text;
+#else
+			return key;
+#endif
 		}
 		public const string AutoTranslateEndKey = " [Auto]";
 		public const char FormatStart = '[';
@@ -219,23 +223,30 @@ namespace QTool
 	{
 		public static string ToLozalizationBoldKey(this string key)
 		{
-			return "<b>{" + key + "}</b>";
+			return "<b>{" + key.ToLozalizationKey() + "}</b>";
 		}
 		public static string ToLozalizationKey(this string key)
 		{
+#if QLocalization
 			return "{" + key + "}";
+#else
+			return QLocalizationData.Get(key).Localization;
+#endif
 		}
 		public static string ToLozalizationKey(this string key, params object[] Params)
 		{
+#if QLocalization
 			for (int i = 0; i < Params.Length; i++)
 			{
 				Params[i] = QLocalizationData.FormatStart + Params[i]?.ToString() + QLocalizationData.FormatEnd;
 			}
 			return "{" + string.Format(key, Params) + "}";
+#endif
+			return string.Format(key.ToLozalizationKey(), Params);
 		}
 		public static string ToLozalizationColorKey(this object key)
 		{
-			return ("{" + key + "}").ToColorString(key.ToColor());
+			return key?.ToString().ToLozalizationKey().ToColorString(key.ToColor());
 		}
 		const string NetworkTranslateURL = "https://translate.googleapis.com/translate_a/single?client=gtx&sl={2}&tl={1}&dt=t&q={0}";
 
