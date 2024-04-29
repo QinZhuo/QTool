@@ -8,6 +8,7 @@ namespace QTool
 {
 	public abstract class QAssetLoader<TPath, TObj> : MonoBehaviour where TObj : UnityEngine.Object
 	{
+		#region 加载逻辑
 		[QName("开始时加载")]
 		public bool startSetColor = false;
 		[UnityEngine.Serialization.FormerlySerializedAs("OnLoad")]
@@ -42,15 +43,12 @@ namespace QTool
 			{
 				obj = await LoadAsync(DirectoryPath);
 			}
-			OnLoad(obj); 
+			OnLoad(obj);
 		}
-		public static string DirectoryPath
-		{
-			get
-			{
-				return typeof(TPath).Name.Replace("_Prefab", "").Replace('_', '/');
-			}
-		}
+		#endregion
+		#region 静态
+		private static string _directoryPath = null;
+		public static string DirectoryPath => _directoryPath ??= typeof(TPath).Name.Replace("_Prefab", "").Replace("_Loader", "").Replace('_', '/');
 		public static TObj[] LoadAll()
 		{
 			return Resources.LoadAll<TObj>(DirectoryPath);
@@ -67,6 +65,7 @@ namespace QTool
 			key = key.Replace('\\', '/');
 			return await Resources.LoadAsync<TObj>(DirectoryPath + "/" + key) as TObj;
 		}
+		#endregion
 	}
 	public abstract class QPrefabLoader<TPath> : QAssetLoader<TPath, GameObject> where TPath : QPrefabLoader<TPath>
 	{
