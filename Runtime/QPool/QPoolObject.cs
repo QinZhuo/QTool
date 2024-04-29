@@ -5,6 +5,9 @@ using UnityEngine.Events;
 
 namespace QTool
 {
+	/// <summary>
+	/// GameObject对象池Get时自动添加 
+	/// </summary>
 	public class QPoolObject : MonoBehaviour, IQPoolObject
 	{
 		[QName("对象池"), QReadonly, SerializeField]
