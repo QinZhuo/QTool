@@ -60,6 +60,7 @@ namespace QTool
 				prefab.gameObject.SetActive(false);
 			}
 		}
+		public GameObject Get(string name) => this[name];
 		public GameObject Get(string name, GameObject prefab)
 		{
 			this.prefab = prefab;

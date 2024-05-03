@@ -288,6 +288,60 @@ namespace QTool
 			eventKey = key;
 			return false;
 		}
+		public static UnityAction<string> GetStringUnityAction(this GameObject obj)
+		{
+			var valueEvent = obj.GetComponent<IValueEvent<string>>();
+			if (valueEvent != null && valueEvent is MonoBehaviour mono)
+			{
+				return mono.GetUnityAction<string>(nameof(valueEvent.SetValue));
+			}
+			var text = obj.GetComponent<Text>();
+			if (text != null)
+			{
+				return text.GetUnityAction<string>("set_text");
+			}
+#if TMPro
+			var tmp_text = obj.GetComponent<TMP_Text>();
+			if (tmp_text != null)
+			{
+				return tmp_text.GetUnityAction<string>("set_text");
+			}
+#endif
+			return null;
+		}
+		public static UnityAction<bool> GetBoolUnityAction(this GameObject obj)
+		{
+			var valueEvent = obj.GetComponent<IValueEvent<bool>>();
+			if (valueEvent != null && valueEvent is MonoBehaviour mono)
+			{
+				return mono.GetUnityAction<bool>(nameof(valueEvent.SetValue));
+			}
+			var toggle = obj.GetComponent<Toggle>();
+			if (toggle != null)
+			{
+				return toggle.GetUnityAction<bool>("set_isOn");
+			}
+			return null;
+		}
+		public static UnityAction<float> GetFloatUnityAction(this GameObject obj)
+		{
+			var valueEvent = obj.GetComponent<IValueEvent<float>>();
+			if (valueEvent != null && valueEvent is MonoBehaviour mono)
+			{
+				return mono.GetUnityAction<float>(nameof(valueEvent.SetValue));
+			}
+			var slider = obj.GetComponent<Slider>();
+			if (slider != null)
+			{
+				return slider.GetUnityAction<float>("set_value");
+			}
+			var image = obj.GetComponent<Image>();
+			if (image != null)
+			{
+				return obj.GetUnityAction<float>("set_fillAmount");
+			}
+			return null;
+		}
 		/// <summary>
 		/// 自动注册持久化Unity事件
 		/// </summary>
@@ -304,64 +358,28 @@ namespace QTool
 					{
 						view = gameObject.transform;
 					}
-
 					if (memeber.Type.Is(typeof(UnityEvent<string>)))
 					{
-						var valueEvent = view.GetComponent<IValueEvent<string>>();
-						if (valueEvent != null && valueEvent is MonoBehaviour mono)
+						var unityEvent = gameObject.GetStringUnityAction();
+						if (unityEvent != null)
 						{
-							(memeber.Get(obj) as UnityEvent<string>).AddPersistentListener(mono.GetUnityAction<string>(nameof(valueEvent.SetValue)));
-							continue;
+							(memeber.Get(obj) as UnityEvent<string>).AddPersistentListener(unityEvent);
 						}
-						var text = view.GetComponent<Text>();
-						if (text != null)
-						{
-							(memeber.Get(obj) as UnityEvent<string>).AddPersistentListener(text.GetUnityAction<string>("set_text"));
-							continue;
-						}
-#if TMPro
-						var tmp_text = view.GetComponent<TMP_Text>();
-						if (tmp_text != null)
-						{
-							(memeber.Get(obj) as UnityEvent<string>).AddPersistentListener(tmp_text.GetUnityAction<string>("set_text"));
-							continue;
-						}
-#endif
 					}
 					else if (memeber.Type.Is(typeof(UnityEvent<bool>)))
 					{
-						var valueEvent = view.GetComponent<IValueEvent<bool>>();
-						if (valueEvent != null && valueEvent is MonoBehaviour mono)
+						var unityEvent = gameObject.GetBoolUnityAction();
+						if (unityEvent != null)
 						{
-							(memeber.Get(obj) as UnityEvent<bool>).AddPersistentListener(mono.GetUnityAction<bool>(nameof(valueEvent.SetValue)));
-							continue;
-						}
-						var toggle = view.GetComponent<Toggle>();
-						if(toggle != null)
-						{
-							(memeber.Get(obj) as UnityEvent<bool>).AddPersistentListener(toggle.GetUnityAction<bool>("set_isOn"));
-							continue;
+							(memeber.Get(obj) as UnityEvent<bool>).AddPersistentListener(unityEvent);
 						}
 					}
 					else if (memeber.Type.Is(typeof(UnityEvent<float>)))
 					{
-						var valueEvent = view.GetComponent<IValueEvent<float>>();
-						if (valueEvent != null && valueEvent is MonoBehaviour mono)
+						var unityEvent = gameObject.GetFloatUnityAction();
+						if (unityEvent != null)
 						{
-							(memeber.Get(obj) as UnityEvent<float>).AddPersistentListener(mono.GetUnityAction<float>(nameof(valueEvent.SetValue)));
-							continue;
-						}
-						var slider = view.GetComponent<Slider>();
-						if(slider != null)
-						{
-							(memeber.Get(obj) as UnityEvent<float>).AddPersistentListener(slider.GetUnityAction<float>("set_value"));
-							continue;
-						}
-						var image = view.GetComponent<Image>();
-						if(image != null)
-						{
-							(memeber.Get(obj) as UnityEvent<float>).AddPersistentListener(image.GetUnityAction<float>("set_fillAmount"));
-							continue;
+							(memeber.Get(obj) as UnityEvent<float>).AddPersistentListener(unityEvent);
 						}
 					}
 				}
