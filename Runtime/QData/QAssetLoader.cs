@@ -75,7 +75,7 @@ namespace QTool
 		}
 		public static GameObject PoolGet(string key, Transform parent)
 		{
-			return QPoolManager.Get(Load(key), parent);
+			return QGameObjectPool.Get(Load(key), parent);
 		}
 	}
 }

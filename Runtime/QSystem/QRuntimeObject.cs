@@ -17,7 +17,7 @@ namespace QTool
 		protected QRuntime() { }
 		public static RuntimeT Get(string key)
 		{
-			var t = QPoolManager.Get(typeof(RuntimeT).FullName, () => new RuntimeT());
+			var t = QObjectPool<RuntimeT>.Get();
 			t.Init(key);
 			return t;
 		}

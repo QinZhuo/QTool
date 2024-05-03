@@ -25,7 +25,7 @@ namespace QTool
 				var view = (trans != null && trans.gameObject.activeSelf) ? trans.gameObject : null;
 				if (view == null)
 				{
-					view = QPoolManager.Get(prefab);
+					view = QGameObjectPool.Get(prefab);
 					view.transform.SetParent(transform, false);
 					view.transform.localScale = Vector3.one;
 					view.transform.localRotation = Quaternion.identity;
