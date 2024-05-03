@@ -11,33 +11,7 @@ using UnityEditor;
 #endif
 namespace QTool
 {
-	/// <summary>
-	/// 简单类型对象池
-	/// </summary>
-	public class QObjectPool<T> where T : class, new()
-	{
-		internal static ObjectPool<T> Instance { get; private set; }
-		static QObjectPool()
-		{
-			if (typeof(T).Is(typeof(IQPoolObject)))
-			{
-				Instance = new ObjectPool<T>(() => new T(), obj => (obj as IQPoolObject).OnPoolGet(), obj => (obj as IQPoolObject).OnPoolRelease());
-			}
-			else
-			{
-				Instance = new ObjectPool<T>(() => new T());
-			}
-			QEventManager.Register(QEventKey.游戏退出, Instance.Clear);
-		}
-		public static T Get()
-		{
-			return Instance.Get();
-		}
-		public static void Release(T obj)
-		{
-			Instance.Release(obj);
-		}
-	}
+
 	/// <summary>
 	/// GameObject对象池
 	/// </summary>
@@ -162,7 +136,33 @@ namespace QTool
 		}
 	}
 
-
+	/// <summary>
+	/// 简单类型对象池
+	/// </summary>
+	public class QObjectPool<T> where T : class, new()
+	{
+		internal static ObjectPool<T> Instance { get; private set; }
+		static QObjectPool()
+		{
+			if (typeof(T).Is(typeof(IQPoolObject)))
+			{
+				Instance = new ObjectPool<T>(() => new T(), obj => (obj as IQPoolObject).OnPoolGet(), obj => (obj as IQPoolObject).OnPoolRelease());
+			}
+			else
+			{
+				Instance = new ObjectPool<T>(() => new T());
+			}
+			QEventManager.Register(QEventKey.游戏退出, Instance.Clear);
+		}
+		public static T Get()
+		{
+			return Instance.Get();
+		}
+		public static void Release(T obj)
+		{
+			Instance.Release(obj);
+		}
+	}
 	public interface IQPoolObject
 	{
 		void OnPoolGet();
