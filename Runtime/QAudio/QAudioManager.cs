@@ -14,10 +14,10 @@ namespace QTool
 		protected override void Awake()
 		{
 			base.Awake();
-			QAudioSetting = Resources.Load<AudioMixer>(nameof(QAudioSetting));
+			QAudioSetting = Resources.Load<AudioMixer>("Settings/" + nameof(QAudioSetting));
 			if (QAudioSetting == null)
 			{
-				QDebug.LogWarning(nameof(Resources) + "找不到设置文件" + nameof(QAudioSetting));
+				QDebug.LogWarning(nameof(Resources) + "/Settings/" + nameof(QAudioSetting));
 			}
 		}
 		public static void Play(AudioClip clip,QAudioType audioType= QAudioType.SE)
