@@ -11,7 +11,13 @@ namespace QTool
 		public List<GameObject> List { get; private set; } = new List<GameObject>();
 		public int Count => List.Count;
 
-
+		public virtual GameObject this[int index]
+		{
+			get
+			{
+				return this[index.ToString()];
+			}
+		}
 		public virtual GameObject this[string name]
 		{
 			get
