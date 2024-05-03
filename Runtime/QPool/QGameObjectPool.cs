@@ -16,9 +16,17 @@ namespace QTool
 	/// </summary>
 	public class QObjectPool<T> where T : class, new()
 	{
-		internal static ObjectPool<T> Instance { get; private set; } = new ObjectPool<T>(() => new T());
+		internal static ObjectPool<T> Instance { get; private set; }
 		static QObjectPool()
 		{
+			if (typeof(T).Is(typeof(IQPoolObject)))
+			{
+				Instance = new ObjectPool<T>(() => new T(), obj => (obj as IQPoolObject).OnPoolGet(), obj => (obj as IQPoolObject).OnPoolRelease());
+			}
+			else
+			{
+				Instance = new ObjectPool<T>(() => new T());
+			}
 			QEventManager.Register(QEventKey.游戏退出, Instance.Clear);
 		}
 		public static T Get()
