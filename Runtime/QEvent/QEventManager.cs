@@ -164,6 +164,10 @@ namespace QTool
 	}
 	public interface IValueEvent<T>
 	{
+		UnityEvent<T> OnValueEvent { get; }
+	}
+	public interface ISetValue<T>
+	{
 		void SetValue(T value);
 	}
 	public static class QEventTool
@@ -288,9 +292,55 @@ namespace QTool
 			eventKey = key;
 			return false;
 		}
+		public static UnityEventBase GetUnityEventBase(this GameObject obj)
+		{
+			var button = obj.GetComponent<Button>();
+			if (button != null)
+			{
+				return button.onClick;
+			}
+			var dropdown = obj.GetComponent<Dropdown>();
+			if (dropdown != null)
+			{
+				return dropdown.onValueChanged;
+			}
+#if TMPro
+			var tmp_dropdown = obj.GetComponent<TMP_Dropdown>();
+			if (tmp_dropdown != null)
+			{
+				return tmp_dropdown.onValueChanged;
+			}
+#endif
+			return null;
+		}
+		public static UnityEvent<bool> GetBoolUnityEvent(this GameObject obj)
+		{
+			var toggle = obj.GetComponent<Toggle>();
+			if (toggle != null)
+			{
+				return toggle.onValueChanged;
+			}
+			return null;
+		}
+		public static UnityEvent<string> GetStringUnityEvent(this GameObject obj)
+		{
+			var input = obj.GetComponent<InputField>();
+			if (input != null)
+			{
+				return input.onValueChanged;
+			}
+#if TMPro
+			var tmp_input = obj.GetComponent<TMP_InputField>();
+			if (tmp_input != null)
+			{
+				return tmp_input.onValueChanged;
+			}
+#endif
+			return null;
+		}
 		public static UnityAction<string> GetStringUnityAction(this GameObject obj)
 		{
-			var valueEvent = obj.GetComponent<IValueEvent<string>>();
+			var valueEvent = obj.GetComponent<ISetValue<string>>();
 			if (valueEvent != null && valueEvent is MonoBehaviour mono)
 			{
 				return mono.GetUnityAction<string>(nameof(valueEvent.SetValue));
@@ -311,7 +361,7 @@ namespace QTool
 		}
 		public static UnityAction<bool> GetBoolUnityAction(this GameObject obj)
 		{
-			var valueEvent = obj.GetComponent<IValueEvent<bool>>();
+			var valueEvent = obj.GetComponent<ISetValue<bool>>();
 			if (valueEvent != null && valueEvent is MonoBehaviour mono)
 			{
 				return mono.GetUnityAction<bool>(nameof(valueEvent.SetValue));
@@ -325,7 +375,7 @@ namespace QTool
 		}
 		public static UnityAction<float> GetFloatUnityAction(this GameObject obj)
 		{
-			var valueEvent = obj.GetComponent<IValueEvent<float>>();
+			var valueEvent = obj.GetComponent<ISetValue<float>>();
 			if (valueEvent != null && valueEvent is MonoBehaviour mono)
 			{
 				return mono.GetUnityAction<float>(nameof(valueEvent.SetValue));
@@ -356,7 +406,7 @@ namespace QTool
 					var view = gameObject.transform.FindAll(eventKey);
 					if (view == null)
 					{
-						view = gameObject.transform;
+						continue;
 					}
 					if (memeber.Type.Is(typeof(UnityEvent<string>)))
 					{
@@ -391,32 +441,18 @@ namespace QTool
 					var view = gameObject.transform.FindAll(eventKey);
 					if (view == null)
 					{
-						view = gameObject.transform;
+						continue;
 					}
 					switch (function.ParamInfos.Length)
 					{
 						case 0:
 							{
-								var button = view.GetComponent<Button>();
-								if (button != null)
+								var unityEvent = view.gameObject.GetUnityEventBase();
+								if (unityEvent != null)
 								{
-									button.onClick.AddPersistentListener(obj.GetUnityAction(function.Key));
+									unityEvent.AddPersistentListener(obj.GetUnityAction(function.Key));
 									continue;
 								}
-								var dropdown = view.GetComponent<Dropdown>();
-								if (dropdown != null)
-								{
-									dropdown.onValueChanged.AddPersistentListener(obj.GetUnityAction(function.Key));
-									continue;
-								}
-#if TMPro
-								var tmp_dropdown = view.GetComponent<TMP_Dropdown>();
-								if(tmp_dropdown != null)
-								{
-									tmp_dropdown.onValueChanged.AddPersistentListener(obj.GetUnityAction(function.Key));
-									continue;
-								}
-#endif
 							}
 							break;
 						case 1:
@@ -424,29 +460,21 @@ namespace QTool
 								var pType = function.ParamInfos[0].ParameterType;
 								if (pType == typeof(bool))
 								{
-									var toggle = view.GetComponent<Toggle>();
-									if (toggle != null)
+									var unityEvent = view.gameObject.GetBoolUnityEvent();
+									if (unityEvent != null)
 									{
-										toggle.onValueChanged.AddPersistentListener(obj.GetUnityAction<bool>(function.Key));
+										unityEvent.AddPersistentListener(obj.GetUnityAction<bool>(function.Key));
 										continue;
 									}
 								}
 								else if (pType == typeof(string))
 								{
-									var input = view.GetComponent<InputField>();
-									if (input != null)
+									var unityEvent = view.gameObject.GetStringUnityEvent();
+									if (unityEvent != null)
 									{
-										input.onValueChanged.AddPersistentListener(obj.GetUnityAction<string>(function.Key));
+										unityEvent.AddPersistentListener(obj.GetUnityAction<string>(function.Key));
 										continue;
 									}
-#if TMPro
-									var tmp_input = view.GetComponent<TMP_InputField>();
-									if (tmp_input != null)
-									{
-										tmp_input.onValueChanged.AddPersistentListener(obj.GetUnityAction<string>(function.Key));
-										continue;
-									}
-#endif
 								}
 							}
 							break;

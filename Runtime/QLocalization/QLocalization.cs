@@ -9,29 +9,30 @@ using UnityEngine.UI;
 
 namespace QTool
 {
-	public class QLocalization : MonoBehaviour, IValueEvent<string>
-	{ 
+	public class QLocalization : MonoBehaviour, ISetValue<string>
+	{
 		#region 基础数据 
-		[QName, QPopup(nameof(QLocalizationData) + "." + nameof(QLocalizationData.List)), SerializeField]
-		private string key;
+		[QName, QPopup(nameof(QLocalizationData) + "." + nameof(QLocalizationData.List)), SerializeField, UnityEngine.Serialization.FormerlySerializedAs("key")]
+		private string _key;
 		[QName("本地化"), SerializeField, QReadonly]
 		private string localization = "";
 		public string Key
 		{
 			get
 			{
-				return key;
+				return _key;
 			}
 			set
 			{
-				if (key != value)
+				if (_key != value)
 				{
-					key = value;
-					OnKeyChange?.Invoke(key);
+					_key = value;
+					OnKeyChange?.Invoke(_key);
 				}
 				FreshLocalization();
 			}
 		}
+
 		#endregion
 		public UnityEvent<string> OnKeyChange = new UnityEvent<string>();
 		public UnityEvent<string> OnLocalizationChange = new UnityEvent<string>();
@@ -65,10 +66,6 @@ namespace QTool
 			QLocalizationData.OnLanguageChange -= FreshFont;
 			QLocalizationData.OnLanguageChange -= FreshLocalization;
 		}
-		public void SetValue(string value)
-		{
-			Key = value;
-		}
 		protected virtual void FreshFont()
 		{
 			if (!QLocalizationData.FontInfo.IsNull())
@@ -93,17 +90,21 @@ namespace QTool
 		}
 		private void FreshLocalization()
 		{
-			if (key.IsNull()) return;
+			if (_key.IsNull()) return;
 			try
 			{
-				localization = QLocalizationData.GetLozalization(key);
+				localization = QLocalizationData.GetLozalization(_key);
 			}
 			catch (System.Exception e)
 			{
-				localization = key;
-				Debug.LogError("翻译[" + key + "]时出错 " + e);
+				localization = _key;
+				Debug.LogError("翻译[" + _key + "]时出错 " + e);
 			}
 			OnLocalizationChange?.Invoke(localization);
+		}
+		public void SetValue(string value)
+		{
+			Key = value;
 		}
 #if UNITY_EDITOR
 		private void OnValidate()
