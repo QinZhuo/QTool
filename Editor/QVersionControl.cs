@@ -302,6 +302,7 @@ namespace QTool
 		static List<QFileState> ChangeList = new List<QFileState>();
 		static void FreshCommitList(string path)
 		{
+			AssetDatabase.SaveAssets();
 			ChangeList.Clear();
 			var statusInfo = Status(path);
 			if (statusInfo.StartsWith("fatal")) return;
