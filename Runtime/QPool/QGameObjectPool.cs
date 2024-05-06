@@ -25,11 +25,11 @@ namespace QTool
 		}
 		internal static ObjectPool<GameObject> GetPool(string key, Func<GameObject> createFunc, Action<GameObject> OnGet = null, Action<GameObject> actionOnRelease = null, Action<GameObject> actionOnDestroy = null, int maxSize = 10000)
 		{
-			if (!GameObjectPools.TryGetValue((string)key, out var pool))
+			if (!GameObjectPools.TryGetValue(key, out var pool))
 			{
 				if (createFunc == null)
 				{
-					throw new Exception((string)("不存在对象池[" + key + "]" + typeof(GameObject)));
+					throw new Exception(("不存在对象池[" + key + "]" + typeof(GameObject)));
 				}
 				Action<GameObject> OnRelease = actionOnRelease;
 				OnGet += obj =>
@@ -46,8 +46,9 @@ namespace QTool
 						poolObj.OnPoolRelease();
 					}
 				};
-				GameObjectPools[(string)key] = new ObjectPool<GameObject>(createFunc, OnGet, OnRelease, actionOnDestroy, true, 10, maxSize);
-				QEventManager.Register(QEventKey.卸载场景, (Action)GameObjectPools[(string)key].Clear);
+				pool = new ObjectPool<GameObject>(createFunc, OnGet, OnRelease, actionOnDestroy, true, 10, maxSize);
+				GameObjectPools[key] = pool;
+				QEventManager.Register(QEventKey.卸载场景, pool.Clear);
 			}
 			return pool;
 		}
