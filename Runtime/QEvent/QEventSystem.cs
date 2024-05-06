@@ -33,7 +33,7 @@ namespace QTool
 				if (target != null)
 				{
 					var unityEvent = new UnityEvent<string>();
-					var unityAction = gameObject.GetStringUnityAction();
+					var unityAction = target.gameObject.GetStringUnityAction();
 					if (unityAction != null)
 					{
 						unityEvent.AddListener(unityAction);
@@ -48,7 +48,7 @@ namespace QTool
 				if (target != null)
 				{
 					var unityEvent = new UnityEvent<bool>();
-					var unityAction = gameObject.GetBoolUnityAction();
+					var unityAction = target.gameObject.GetBoolUnityAction();
 					if (unityAction != null)
 					{
 						unityEvent.AddListener(unityAction);
@@ -63,7 +63,7 @@ namespace QTool
 				if (target != null)
 				{
 					var unityEvent = new UnityEvent<float>();
-					var unityAction = gameObject.GetFloatUnityAction();
+					var unityAction = target.gameObject.GetFloatUnityAction();
 					if (unityAction != null)
 					{
 						unityEvent.AddListener(unityAction);
