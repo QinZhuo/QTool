@@ -6,7 +6,7 @@ using UnityEngine.Events;
 
 namespace QTool
 {
-	public abstract class QAssetLoader<TPath, TObj> : MonoBehaviour where TObj : UnityEngine.Object
+	public abstract class QAssetLoader<TPath, TObj> : MonoBehaviour,ISetValue<string> where TObj : UnityEngine.Object
 	{
 		#region 加载逻辑
 		[QName("开始时加载")]
@@ -20,12 +20,17 @@ namespace QTool
 				InvokeLoad(name);
 			}
 		}
+
 		public virtual void OnLoad(TObj obj)
 		{
 			if (obj != null)
 			{
 				OnLoadEvent?.Invoke(obj);
 			}
+		}
+		public void SetValue(string value)
+		{
+			InvokeLoad(value);
 		}
 		public void InvokeLoad(string key)
 		{
@@ -65,6 +70,8 @@ namespace QTool
 			key = key.Replace('\\', '/');
 			return await Resources.LoadAsync<TObj>(DirectoryPath + "/" + key) as TObj;
 		}
+
+		
 		#endregion
 	}
 	public abstract class QPrefabLoader<TPath> : QAssetLoader<TPath, GameObject> where TPath : QPrefabLoader<TPath>
