@@ -181,6 +181,7 @@ namespace QTool
 				var version = text.GetBlockValue("\"version\"", ",");
 				text = text.Replace(version, ": \"" + DateTime.Now.ToQVersionString() + "\"");
 				QFileTool.Save(packagePath, text);
+				AssetDatabase.Refresh();
 			}
 		}
 		public static string Pull(string path)
@@ -359,7 +360,7 @@ namespace QTool
 			{
 				EditorUtility.DisplayProgressBar("同步更新", "检测本地更改", 0.5f);
 				UpdatePackageVersion(path);
-				resultInfo =Commit(path);
+				resultInfo = Commit(path);
 				if (resultInfo.StartsWith("error")|| resultInfo.Contains("fatal"))
 				{
 					EditorUtility.DisplayDialog("提交更新失败", resultInfo, "确认");
