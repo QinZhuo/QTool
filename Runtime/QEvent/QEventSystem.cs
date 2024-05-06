@@ -87,7 +87,7 @@ namespace QTool
 		}
 		public void Set(string key, bool value)
 		{
-			_boolEvents[key]?.Invoke(value);
+			_boolEvents[key]?.Invoke(value); 
 		}
 		public void Set(string key, float value)
 		{
