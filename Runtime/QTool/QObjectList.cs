@@ -25,7 +25,7 @@ namespace QTool
 				if (name.IsNull())
 				{
 					Debug.LogError(this + "索引为空[" + name + "]");
-					return null;
+					return null; 
 				}
 				var trans = transform.Find(name);
 				var view = (trans != null && trans.gameObject.activeSelf) ? trans.gameObject : null;
