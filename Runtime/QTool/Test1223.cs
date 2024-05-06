@@ -5,7 +5,7 @@ namespace QTool
 {
 	public class Test1223 : MonoBehaviour
 	{
-		  
+		   
 	}
 }
 
