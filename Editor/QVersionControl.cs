@@ -318,6 +318,8 @@ namespace QTool
 		{
 			FreshCommitList(path);
 			if (ChangeList.Count == 0) return "";
+			UpdatePackageVersion(path);
+			FreshCommitList(path);
 			EditorUtility.ClearProgressBar();
 			if (QVersionControlWindow.Show(ChangeList, QVersionControlWindow.WindowType.提交本地更改))
 			{
@@ -359,7 +361,7 @@ namespace QTool
 			if (CheckResult(resultInfo)&&commit)
 			{
 				EditorUtility.DisplayProgressBar("同步更新", "检测本地更改", 0.5f);
-				UpdatePackageVersion(path);
+			
 				resultInfo = Commit(path);
 				if (resultInfo.StartsWith("error")|| resultInfo.Contains("fatal"))
 				{
