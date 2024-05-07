@@ -9,7 +9,6 @@ using Mono.Cecil.Cil;
 using Mono.Cecil.Rocks;
 using System.Collections.Generic;
 using Unity.CompilationPipeline.Common.Diagnostics;
-#if Codegen
 namespace QTool.Codegen
 {
 	/// <summary>
@@ -521,6 +520,4 @@ namespace QTool.Codegen
 		}
 
 	}
-
 }
-#endif
