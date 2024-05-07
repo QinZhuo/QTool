@@ -584,7 +584,10 @@ namespace QTool
 					foreach (var SettingType in typeof(QInstanceScriptable<>).GetAllTypes())
 					{
 						root.AddLabel(QReflection.QName(SettingType));
-						root.Add(new InspectorElement(new UnityEditor.SerializedObject(SettingType.InvokeFunction(nameof(global::QTool.QToolSetting.Instance)) as ScriptableObject)));
+						if (SettingType.InvokeFunction(nameof(global::QTool.QToolSetting.IsExist)) is bool boolValue && boolValue)
+						{
+							root.Add(new InspectorElement(new UnityEditor.SerializedObject(SettingType.InvokeFunction(nameof(global::QTool.QToolSetting.Instance)) as ScriptableObject)));
+						}
 					}
 				}
 			};
