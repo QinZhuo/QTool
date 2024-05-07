@@ -1,10 +1,12 @@
 using QTool.Reflection;
 using System.Collections;
 using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
+#if TMPro
+using TMPro;
+#endif
 namespace QTool
 {
 	public class QEventSystem : MonoBehaviour

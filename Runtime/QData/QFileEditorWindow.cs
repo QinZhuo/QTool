@@ -4,8 +4,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
 using QTool.Reflection;
-using UnityEditor;
 #if UNITY_EDITOR
+using UnityEditor;
 using UnityEditor.UIElements;
 #endif
 namespace QTool
@@ -139,7 +139,9 @@ namespace QTool
 			if (RecordChange)
 			{
 				RecordChange = false;
+#if UNITY_EDITOR
 				Undo.RecordObject(this, "Data Change");
+#endif
 			}
 		}
 		public void EndRecord()
@@ -179,11 +181,15 @@ namespace QTool
 		private void OnEnable()
 		{
 			AutoLoad = true;
+#if UNITY_EDITOR
 			Undo.undoRedoPerformed += OnUndoRedo;
+#endif
 		}
 		private void OnDisable()
 		{
+#if UNITY_EDITOR
 			Undo.undoRedoPerformed -= OnUndoRedo;
+#endif
 			OnLostFocus();
 		}
 
