@@ -80,6 +80,26 @@ namespace QTool
 				return transform.FindAll(key)?.GetComponent<QObjectList>();
 			});
 		}
+		public void AddListener(UnityAction action)
+		{
+			_events[QTool.THIS_KEY]?.AddListener(action);
+		}
+		public void RemoveListener(UnityAction action)
+		{
+			_events[QTool.THIS_KEY]?.RemoveListener(action);
+		}
+		public void InvokeEvent(string value)
+		{
+			_stringEvents[QTool.THIS_KEY]?.Invoke(value);
+		}
+		public void InvokeEvent(bool value)
+		{
+			_boolEvents[QTool.THIS_KEY]?.Invoke(value);
+		}
+		public void InvokeEvent(float value)
+		{
+			_floatEvents[QTool.THIS_KEY]?.Invoke(value);
+		}
 		public void AddListener(string key, UnityAction action)
 		{
 			_events[key]?.AddListener(action);
