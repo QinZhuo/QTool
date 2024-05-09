@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Text;
 using System.Xml.Serialization;
 using UnityEngine;
-using QTool.Inspector;
 using QTool.Reflection;
 using System.Linq;
 namespace QTool

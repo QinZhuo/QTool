@@ -289,16 +289,7 @@ namespace QTool
 			root.AddManipulator(new ContextualMenuManipulator(menuBuilder));
 		}
 		public static List<Type> TypeList = new List<Type>() { typeof(UnityEngine.Object), typeof(string) };
-		public static QDictionary<Type, Func<string, object, Action<object>, VisualElement>> TypeOverride = new QDictionary<Type, Func<string, object, Action<object>, VisualElement>>()
-		{
-			{
-				typeof(FlowGraph.QFlow),
-				(name, obj, chaneEvent) =>
-				{
-					return new Label(name);
-				}
-			}
-		};
+		public static QDictionary<Type, Func<string, object, Action<object>, VisualElement>> TypeOverride = new QDictionary<Type, Func<string, object, Action<object>, VisualElement>>();
 		public static VisualElement Add(this VisualElement root, string name, object obj, Type type, Action<object> changeEvent, ICustomAttributeProvider customAttribute = null)
 		{
 			if (type == null)
@@ -536,26 +527,7 @@ namespace QTool
 			style.borderBottomLeftRadius = radius;
 			style.borderBottomRightRadius = radius;
 		}
-		public static VisualElement AddQCommandInfo(this VisualElement root, QCommandInfo commandInfo, Action callBack)
-		{
-			root = root.AddVisualElement();
-			root.style.flexDirection = FlexDirection.Row;
-			root.AddLabel(commandInfo.name);
-			for (int i = 0; i < commandInfo.paramInfos.Length; i++)
-			{
-				var info = commandInfo.paramInfos[i];
-				if (i >= commandInfo.TempValues.Count && info.HasDefaultValue)
-				{
-					commandInfo.TempValues[i] = info.DefaultValue;
-				}
-				root.Add(commandInfo.paramViewNames[i], commandInfo.TempValues[i], info.ParameterType, (value) =>
-				 {
-					 commandInfo.TempValues[commandInfo.paramInfos.IndexOf(info)] = value;
-				 });
-			}
-			root.AddButton("运行", () => { commandInfo.Invoke(commandInfo.TempValues.ToArray()); callBack(); });
-			return root;
-		}
+	
 		public static VisualElement Tooltip(this VisualElement root, string text)
 		{
 			root.tooltip = text?.Replace("\\n", " "); 

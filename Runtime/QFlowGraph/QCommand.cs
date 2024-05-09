@@ -6,6 +6,7 @@ using System.Reflection;
 using UnityEngine;
 using QTool.FlowGraph;
 using System.Threading.Tasks;
+using UnityEngine.UIElements;
 
 namespace QTool
 {
@@ -277,6 +278,29 @@ namespace QTool
 	{
 		public QCommandType(string viewName) : base(viewName)
 		{
+		}
+	}
+	public static class QCommandTool
+	{
+		public static VisualElement AddQCommandInfo(this VisualElement root, QCommandInfo commandInfo, Action callBack)
+		{
+			root = root.AddVisualElement();
+			root.style.flexDirection = FlexDirection.Row;
+			root.AddLabel(commandInfo.name);
+			for (int i = 0; i < commandInfo.paramInfos.Length; i++)
+			{
+				var info = commandInfo.paramInfos[i];
+				if (i >= commandInfo.TempValues.Count && info.HasDefaultValue)
+				{
+					commandInfo.TempValues[i] = info.DefaultValue;
+				}
+				root.Add(commandInfo.paramViewNames[i], commandInfo.TempValues[i], info.ParameterType, (value) =>
+				{
+					commandInfo.TempValues[commandInfo.paramInfos.IndexOf(info)] = value;
+				});
+			}
+			root.AddButton("运行", () => { commandInfo.Invoke(commandInfo.TempValues.ToArray()); callBack(); });
+			return root;
 		}
 	}
 }

@@ -11,6 +11,13 @@ namespace QTool.FlowGraph
 	[Serializable]
     public class QFlowGraph: QSerializeObject<QFlowGraph>
 	{
+		static QFlowGraph()
+		{
+			QUIElements.TypeOverride.Add(typeof(QFlow), (name, obj, chaneEvent) =>
+			{
+				return new UnityEngine.UIElements.Label(name);
+			});
+		}
 		public override void OnLoad()
 		{
 			base.OnLoad();
