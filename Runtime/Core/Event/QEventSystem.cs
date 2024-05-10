@@ -88,6 +88,10 @@ namespace QTool
 		{
 			_events[QTool.THIS_KEY]?.RemoveListener(action);
 		}
+		public void RemoveAllListeners()
+		{
+			_events[QTool.THIS_KEY]?.RemoveAllListeners();
+		}
 		public void InvokeEvent(string value)
 		{
 			_stringEvents[QTool.THIS_KEY]?.Invoke(value);
@@ -107,6 +111,10 @@ namespace QTool
 		public void RemoveListener(string key, UnityAction action)
 		{
 			_events[key]?.RemoveListener(action);
+		}
+		public void RemoveAllListeners(string key)
+		{
+			_events[key]?.RemoveAllListeners();
 		}
 		public void InvokeEvent(string key, string value)
 		{
