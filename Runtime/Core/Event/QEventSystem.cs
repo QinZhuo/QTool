@@ -128,25 +128,79 @@ namespace QTool
 		{
 			_floatEvents[key]?.Invoke(value);
 		}
-		public QObjectList this[string key]
+		public QObjectList Get(string key)
 		{
-			get
-			{
-				return _objectLists[key];
-			}
+			return _objectLists[key];
 		}
-		public QEventSystem this[string key, string childKey]
+		public QEventSystem Get(string key, string childKey)
 		{
-			get
-			{
-				return _objectLists[key]?.Get(childKey).GetComponent<QEventSystem>(true);
-			}
+			return Get(key)?.Get(childKey).GetComponent<QEventSystem>(true);
 		}
+		public QObjectList this[string key] => Get(key);
+		public QEventSystem this[string key, string childKey] => Get(key, childKey);
 	}
 
 
 	public static class QEventTool
 	{
+		#region QEventSystem拓展
+		public static void AddListener(this GameObject gameObject, UnityAction action)
+		{
+			gameObject.GetComponent<QEventSystem>(true).AddListener(action);
+		}
+		public static void RemoveListener(this GameObject gameObject, UnityAction action)
+		{
+			gameObject.GetComponent<QEventSystem>(true).RemoveListener(action);
+		}
+		public static void RemoveAllListeners(this GameObject gameObject)
+		{
+			gameObject.GetComponent<QEventSystem>(true).RemoveAllListeners();
+		}
+		public static void InvokeEvent(this GameObject gameObject, string value)
+		{
+			gameObject.GetComponent<QEventSystem>(true).InvokeEvent(value);
+		}
+		public static void InvokeEvent(this GameObject gameObject, bool value)
+		{
+			gameObject.GetComponent<QEventSystem>(true).InvokeEvent(value);
+		}
+		public static void InvokeEvent(this GameObject gameObject, float value)
+		{
+			gameObject.GetComponent<QEventSystem>(true).InvokeEvent(value);
+		}
+		public static void AddListener(this GameObject gameObject, string key, UnityAction action)
+		{
+			gameObject.GetComponent<QEventSystem>(true).AddListener(key, action);
+		}
+		public static void RemoveListener(this GameObject gameObject, string key, UnityAction action)
+		{
+			gameObject.GetComponent<QEventSystem>(true).RemoveListener(key, action);
+		}
+		public static void RemoveAllListeners(this GameObject gameObject, string key, UnityAction action)
+		{
+			gameObject.GetComponent<QEventSystem>(true).RemoveAllListeners(key);
+		}
+		public static void InvokeEvent(this GameObject gameObject, string key, string value)
+		{
+			gameObject.GetComponent<QEventSystem>(true).InvokeEvent(key, value);
+		}
+		public static void InvokeEvent(this GameObject gameObject, string key, bool value)
+		{
+			gameObject.GetComponent<QEventSystem>(true).InvokeEvent(key, value);
+		}
+		public static void InvokeEvent(this GameObject gameObject, string key, float value)
+		{
+			gameObject.GetComponent<QEventSystem>(true).InvokeEvent(key, value);
+		}
+		public static QObjectList Get(this GameObject gameObject, string key)
+		{
+			return gameObject.GetComponent<QEventSystem>(true).Get(key);
+		}
+		public static QEventSystem Get(this GameObject gameObject, string key, string childKey)
+		{
+			return gameObject.GetComponent<QEventSystem>(true).Get(key, childKey);
+		}
+		#endregion
 		public static UnityAction GetUnityAction(this Object obj, string funcName)
 		{
 			return UnityEventBase.GetValidMethodInfo(obj, funcName, new System.Type[0]).CreateDelegate(typeof(UnityAction), obj) as UnityAction;
