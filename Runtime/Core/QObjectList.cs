@@ -49,6 +49,10 @@ namespace QTool
 					 };
 					poolObj.OnRelease.AddListener(action);
 				}
+				else
+				{
+					if (clearList.Count > 0) { clearList.Remove(view); }
+				}
 				return view;
 			}
 		}
@@ -65,6 +69,21 @@ namespace QTool
 		{
 			this.prefab = prefab;
 			return this[name];
+		}
+		private List<GameObject> clearList = new List<GameObject>();
+		public void DelayClear()
+		{
+			clearList.AddRange(List);
+			QToolManager.Instance.OnUpdateEvent += ClearUpdate;
+		}
+		private void ClearUpdate()
+		{
+			foreach (var item in clearList)
+			{
+				item.PoolRelease();
+			}
+			clearList.Clear();
+			QToolManager.Instance.OnUpdateEvent -= ClearUpdate;
 		}
 		public virtual void Clear()
 		{
