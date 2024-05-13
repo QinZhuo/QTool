@@ -7,45 +7,6 @@ using System;
 
 namespace QTool
 {
-	public struct QValue
-	{
-
-		private float a;
-		private float b;
-
-		public QValue(float value)
-		{
-			a = value * 0.5f;
-			b = value * 0.5f;
-		}
-		public float Value
-		{
-			get
-			{
-				return a + b;
-			}
-			set
-			{
-				if (value == Value) return;
-				a = value * UnityEngine.Random.Range(0.2f, 0.8f);
-				b = value - a;
-			}
-		}
-
-
-		public static implicit operator QValue(float value)
-		{
-			return new QValue(value);
-		}
-		public static implicit operator float(QValue value)
-		{
-			return value.Value;
-		}
-		public override string ToString()
-		{
-			return Value.ToString();
-		}
-	}
 	public class QRuntimeValue<T> : IQSerializeCallback
 	{
 		public string Name { get; set; }
@@ -92,11 +53,11 @@ namespace QTool
 	{
 		public QRuntimeValue()
 		{
-			OffsetValues = new QDictionary<string, QValue>()
+			OffsetValues = new QDictionary<string, float>()
 			{
 				OnChange = key => FreshValue()
 			};
-			ScaleValues = new QDictionary<string, QValue>()
+			ScaleValues = new QDictionary<string, float>()
 			{
 				OnChange = key => FreshValue()
 			};
@@ -124,9 +85,9 @@ namespace QTool
 			FreshValue();  
 		}
 
-		private QValue _BaseValue { get; set; } = 0f;
+		private float _BaseValue { get; set; } = 0f;
 		[QName]
-		public QValue BaseValue
+		public float BaseValue
 		{
 			get => BaseRuntimeValue == null ? _BaseValue : BaseRuntimeValue.Value;
 			set
@@ -136,7 +97,7 @@ namespace QTool
 			}
 		}
 		[QName]
-		public QDictionary<string, QValue> OffsetValues = null;
+		public QDictionary<string, float> OffsetValues = null;
 		private List<string> buffer = new List<string>();
 		/// <summary>
 		/// 不会受Scale影响的数值
@@ -154,7 +115,7 @@ namespace QTool
 			}
 		}
 		[QName]
-		public QDictionary<string, QValue> ScaleValues = null;
+		public QDictionary<string, float> ScaleValues = null;
 		public float ScaleValue
 		{
 			get
@@ -167,7 +128,7 @@ namespace QTool
 				return value;
 			}
 		}
-		private QValue m_Value { get; set; } = 0;
+		private float m_Value { get; set; } = 0;
 		[QIgnore]
 		public override float Value
 		{
@@ -211,9 +172,9 @@ namespace QTool
 			CurrentValue = value;
 		}
 
-		public QValue MinValue { get; set; } = 0;
+		public float MinValue { get; set; } = 0;
 		public float MaxValue => Value;
-		private QValue _CurrentValue = 0;
+		private float _CurrentValue = 0;
 		public float CurrentValue
 		{
 			get => _CurrentValue;
