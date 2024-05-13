@@ -12,13 +12,7 @@ namespace QTool
 	public class QEventSystem : MonoBehaviour
 	{
 		private QDictionary<string, UnityEvent> _events = null;
-		private QDictionary<string, QObjectList> _objectLists = null;
-		private QDictionary<string, UnityEvent<string>> _stringEvents = null;
-		private QDictionary<string, UnityEvent<bool>> _boolEvents = null;
-		private QDictionary<string, UnityEvent<float>> _floatEvents = null;
-		private void Awake()
-		{
-			_events = new QDictionary<string, UnityEvent>(key =>
+		private QDictionary<string, UnityEvent> events => _events ??= new QDictionary<string, UnityEvent>(key =>
 			{
 				var target = transform.FindAll(key);
 				if (target != null)
@@ -30,7 +24,8 @@ namespace QTool
 				}
 				return null;
 			});
-			_stringEvents = new QDictionary<string, UnityEvent<string>>(key =>
+		private QDictionary<string, UnityEvent<string>> _stringEvents = null;
+		private QDictionary<string, UnityEvent<string>> stringEvents => _stringEvents ??= new QDictionary<string, UnityEvent<string>>(key =>
 			{
 				var target = transform.FindAll(key);
 				if (target != null)
@@ -45,92 +40,94 @@ namespace QTool
 				}
 				return null;
 			});
-			_boolEvents = new QDictionary<string, UnityEvent<bool>>(key =>
+		private QDictionary<string, UnityEvent<bool>> _boolEvents = null;
+		private QDictionary<string, UnityEvent<bool>> boolEvents => _boolEvents ??= new QDictionary<string, UnityEvent<bool>>(key =>
+			 {
+				 var target = transform.FindAll(key);
+				 if (target != null)
+				 {
+					 var unityEvent = new UnityEvent<bool>();
+					 var unityAction = target.gameObject.GetBoolUnityAction();
+					 if (unityAction != null)
+					 {
+						 unityEvent.AddListener(unityAction);
+					 }
+					 return unityEvent;
+				 }
+				 return null;
+			 });
+		private QDictionary<string, UnityEvent<float>> _floatEvents = null;
+		private QDictionary<string, UnityEvent<float>> floatEvents => _floatEvents ??= new QDictionary<string, UnityEvent<float>>(key =>
+		{
+			var target = transform.FindAll(key);
+			if (target != null)
 			{
-				var target = transform.FindAll(key);
-				if (target != null)
+				var unityEvent = new UnityEvent<float>();
+				var unityAction = target.gameObject.GetFloatUnityAction();
+				if (unityAction != null)
 				{
-					var unityEvent = new UnityEvent<bool>();
-					var unityAction = target.gameObject.GetBoolUnityAction();
-					if (unityAction != null)
-					{
-						unityEvent.AddListener(unityAction);
-					}
-					return unityEvent;
+					unityEvent.AddListener(unityAction);
 				}
-				return null;
-			});
-			_floatEvents = new QDictionary<string, UnityEvent<float>>(key =>
-			{
-				var target = transform.FindAll(key);
-				if (target != null)
-				{
-					var unityEvent = new UnityEvent<float>();
-					var unityAction = target.gameObject.GetFloatUnityAction();
-					if (unityAction != null)
-					{
-						unityEvent.AddListener(unityAction);
-					}
-					return unityEvent;
-				}
-				return null;
-			});
-			_objectLists = new QDictionary<string, QObjectList>(key =>
-			{
-				return transform.FindAll(key)?.GetComponent<QObjectList>();
-			});
-		}
+				return unityEvent;
+			}
+			return null;
+		});
+		private QDictionary<string, QObjectList> _objectLists = null;
+		private QDictionary<string, QObjectList> objectLists => _objectLists ??= new QDictionary<string, QObjectList>(key =>
+		{
+			return transform.FindAll(key)?.GetComponent<QObjectList>();
+		});
 		public void AddListener(UnityAction action)
 		{
-			_events[QTool.THIS_KEY]?.AddListener(action);
+			events[name]?.AddListener(action);
 		}
 		public void RemoveListener(UnityAction action)
 		{
-			_events[QTool.THIS_KEY]?.RemoveListener(action);
+			events[name]?.RemoveListener(action);
 		}
 		public void RemoveAllListeners()
 		{
-			_events[QTool.THIS_KEY]?.RemoveAllListeners();
+			events[name]?.RemoveAllListeners();
 		}
 		public void InvokeEvent(string value)
 		{
-			_stringEvents[QTool.THIS_KEY]?.Invoke(value);
+			stringEvents[name]?.Invoke(value);
 		}
 		public void InvokeEvent(bool value)
 		{
-			_boolEvents[QTool.THIS_KEY]?.Invoke(value);
+			boolEvents[name]?.Invoke(value);
 		}
 		public void InvokeEvent(float value)
 		{
-			_floatEvents[QTool.THIS_KEY]?.Invoke(value);
+			floatEvents[name]?.Invoke(value);
 		}
 		public void AddListener(string key, UnityAction action)
 		{
-			_events[key]?.AddListener(action);
+			events[key]?.AddListener(action);
 		}
 		public void RemoveListener(string key, UnityAction action)
 		{
-			_events[key]?.RemoveListener(action);
+			events[key]?.RemoveListener(action);
 		}
 		public void RemoveAllListeners(string key)
 		{
-			_events[key]?.RemoveAllListeners();
+			events[key]?.RemoveAllListeners();
 		}
 		public void InvokeEvent(string key, string value)
 		{
-			_stringEvents[key]?.Invoke(value);
+			stringEvents[key]?.Invoke(value);
 		}
 		public void InvokeEvent(string key, bool value)
 		{
-			_boolEvents[key]?.Invoke(value);
+			boolEvents[key]?.Invoke(value);
 		}
 		public void InvokeEvent(string key, float value)
 		{
-			_floatEvents[key]?.Invoke(value);
+			floatEvents[key]?.Invoke(value);
 		}
 		public QObjectList Get(string key)
 		{
-			return _objectLists[key];
+			return objectLists[key];
 		}
 		public QEventSystem Get(string key, string childKey)
 		{

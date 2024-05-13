@@ -180,10 +180,9 @@ namespace QTool
 				return transform.parent.GetPath() + "." + transform.name;
 			}
 		}
-		public const string THIS_KEY = "this";
 		public static Transform FindAll(this Transform transform, string name)
 		{
-			if (transform.name == name || THIS_KEY.Equals(name)) return transform;
+			if (transform.name == name) return transform;
 			var find = transform.Find(name);
 			if (find == null)
 			{
