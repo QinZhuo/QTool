@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using UnityEngine;
 namespace QTool
@@ -15,7 +16,7 @@ namespace QTool
 		/// 事件列表 对应事件触发时调用对应Action 使用方法： EventList["事件名"]+=Action;
 		/// </summary>
 		private static QDictionary<string, System.Action> Events = new QDictionary<string, System.Action>();
-		private static Queue<string> EventQueue = new Queue<string>();
+		private static ConcurrentQueue<string> EventQueue = new ConcurrentQueue<string>();
 		internal static System.Action OnUpdate = InvokeQueueEvent;
 		public static void InvokeEvent(System.Enum value)
 		{
@@ -94,7 +95,10 @@ namespace QTool
 		{
 			while (EventQueue.Count > 0)
 			{
-				InvokeEvent(EventQueue.Dequeue());
+				if (EventQueue.TryDequeue(out var eventData))
+				{
+					InvokeEvent(eventData);
+				}
 			}
 		}
 		public static void Update()
@@ -108,7 +112,7 @@ namespace QTool
 		/// 事件列表 对应事件触发时调用对应Action 使用方法： EventList["事件名"]+=Action;
 		/// </summary>
 		internal static QDictionary<string, System.Action<T>> EventList = new QDictionary<string, System.Action<T>>();
-		internal static Queue<(string, T)> EventQueue = new Queue<(string, T)>();
+		internal static ConcurrentQueue<(string, T)> EventQueue = new ConcurrentQueue<(string, T)>();
 		static QEventManager()
 		{
 			QEventManager.OnUpdate += InvokeQueueEvent;
@@ -136,8 +140,10 @@ namespace QTool
 		{
 			while (EventQueue.Count > 0)
 			{
-				var data = EventQueue.Dequeue();
-				InvokeEvent(data.Item1, data.Item2);
+				if(EventQueue.TryDequeue(out var result))
+				{
+					InvokeEvent(result.Item1, result.Item2);
+				}
 			}
 		}
 	}

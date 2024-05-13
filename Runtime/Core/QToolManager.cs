@@ -41,7 +41,6 @@ namespace QTool
 			base.Awake();
 			DontDestroyOnLoad(gameObject);
 			Instance.OnUpdateEvent += QCoroutine.Update;
-			Instance.OnUpdateEvent += QEventManager.Update;
 		}
 		private void Update()
 		{
@@ -54,7 +53,6 @@ namespace QTool
 			QTask.StopAllWait();
 			QEventManager.InvokeEvent(QEventKey.游戏退出);
 			Instance.OnUpdateEvent -= QCoroutine.Update;
-			Instance.OnUpdateEvent -= QEventManager.Update;
 		}
 		private void OnGUI()
 		{
