@@ -10,8 +10,8 @@ namespace QTool
 	/// </summary>
 	public class QPoolObject : MonoBehaviour, IQPoolObject
 	{
-		[QName("对象池"), QReadonly, SerializeField]
-		internal string poolName = "";
+		[QName("对象池预制体"), QReadonly, SerializeField]
+		internal GameObject prefab;
 		[QName("延迟自动回收")]
 		public float delayRelease = -1;
 		public UnityEvent OnRelease = new UnityEvent();
