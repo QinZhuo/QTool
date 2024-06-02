@@ -15,7 +15,7 @@ namespace QTool {
 		private static Dictionary<GameObject, ObjectPool<GameObject>> GameObjectPools = new Dictionary<GameObject, ObjectPool<GameObject>>();
 		protected override void Awake() {
 			base.Awake();
-			QEventManager.Register(QEventKey.游戏退出, GameObjectPools.Clear); 
+			QEventManager.Register(QEventKey.游戏退出, GameObjectPools.Clear);
 		}
 		public static ObjectPool<GameObject> GetPool(GameObject prefab, int maxSize = 1000) {
 			if (GameObjectPools.TryGetValue(prefab, out var pool)) {
@@ -126,6 +126,12 @@ namespace QTool {
 	public static class QPoolTool {
 		public static void PoolRelease(this GameObject poolObj) {
 			QGameObjectPool.Release(poolObj);
+		}
+		public static void PoolReleaseList(this IList<GameObject> poolObjList) {
+			foreach (var poolObj in poolObjList) {
+				QGameObjectPool.Release(poolObj);
+			}
+			poolObjList.Clear();
 		}
 	}
 }

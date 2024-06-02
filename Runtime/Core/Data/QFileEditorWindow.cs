@@ -12,7 +12,7 @@ namespace QTool
 {
 	public abstract class QFileEditorWindow<T>
 #if UNITY_EDITOR
-	: UnityEditor.EditorWindow
+	: EditorWindow
 #endif
 	where T : QFileEditorWindow<T>
 	{
