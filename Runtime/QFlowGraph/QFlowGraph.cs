@@ -11,6 +11,7 @@ namespace QTool.FlowGraph
 	[Serializable]
     public class QFlowGraph: QSerializeObject<QFlowGraph>
 	{
+		public const string ext = ".qflowgraph";
 		static QFlowGraph()
 		{
 			QUIElements.TypeOverride.Add(typeof(QFlow), (name, obj, chaneEvent) =>
