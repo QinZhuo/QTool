@@ -7,25 +7,19 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
-namespace QTool
-{
-	public class QLocalization : MonoBehaviour, ISetValue<string>
-	{
+namespace QTool {
+	public class QLocalization : MonoBehaviour, ISetValue<string> {
 		#region 基础数据 
 		[QName, QPopup(nameof(QLocalizationData) + "." + nameof(QLocalizationData.List)), SerializeField, UnityEngine.Serialization.FormerlySerializedAs("key")]
 		private string _key;
 		[QName("本地化"), SerializeField, QReadonly]
 		private string localization = "";
-		public string Key
-		{
-			get
-			{
+		public string Key {
+			get {
 				return _key;
 			}
-			set
-			{
-				if (_key != value)
-				{
+			set {
+				if (_key != value) {
 					_key = value;
 					OnKeyChange?.Invoke(_key);
 				}
@@ -36,47 +30,37 @@ namespace QTool
 		#endregion
 		public UnityEvent<string> OnKeyChange = new UnityEvent<string>();
 		public UnityEvent<string> OnLocalizationChange = new UnityEvent<string>();
-		private void Awake()
-		{
+		private void Awake() {
 			QLocalizationData.OnLanguageChange += FreshFont;
 			QLocalizationData.OnLanguageChange += FreshLocalization;
 		}
-		private void Reset()
-		{
+		private void Reset() {
 			var text = GetComponentInChildren<Text>();
-			if (text != null)
-			{
+			if (text != null) {
 				OnLocalizationChange.AddPersistentListener(text.GetUnityAction<string>("set_text"), true);
 			}
 #if TMPro
 			var tmp_text = GetComponentInChildren<TMP_Text>();
-			if (tmp_text != null)
-			{
+			if (tmp_text != null) {
 				OnLocalizationChange.AddPersistentListener(tmp_text.GetUnityAction<string>("set_text"), true);
 			}
 #endif
 		}
-		private void Start()
-		{
+		private void Start() {
 			FreshFont();
 			FreshLocalization();
 		}
-		private void OnDestroy()
-		{
+		private void OnDestroy() {
 			QLocalizationData.OnLanguageChange -= FreshFont;
 			QLocalizationData.OnLanguageChange -= FreshLocalization;
 		}
-		protected virtual void FreshFont()
-		{
-			if (!QLocalizationData.FontInfo.IsNull())
-			{
+		protected virtual void FreshFont() {
+			if (!QLocalizationData.FontInfo.IsNull()) {
 				var count = OnLocalizationChange.GetPersistentEventCount();
-				for (int i = 0; i < count; i++)
-				{
+				for (int i = 0; i < count; i++) {
 					var target = OnLocalizationChange.GetPersistentTarget(i);
 #if TMPro
-					if (target is TextMeshProUGUI textMesh)
-					{
+					if (target is TextMeshProUGUI textMesh) {
 						textMesh.font = QLocalizationData.FontInfo.fontAsset;
 					}
 #else
@@ -88,132 +72,97 @@ namespace QTool
 				}
 			}
 		}
-		private void FreshLocalization()
-		{
-			if (_key.IsNull()) return;
-			try
-			{
+		private void FreshLocalization() {
+			if (_key.IsNull())
+				return;
+			try {
 				localization = QLocalizationData.GetLozalization(_key);
 			}
-			catch (System.Exception e)
-			{
+			catch (System.Exception e) {
 				localization = _key;
 				Debug.LogError("翻译[" + _key + "]时出错 " + e);
 			}
 			OnLocalizationChange?.Invoke(localization);
 		}
-		public void SetValue(string value)
-		{
+		public void SetValue(string value) {
 			Key = value;
 		}
 #if UNITY_EDITOR
-		private void OnValidate()
-		{
+		private void OnValidate() {
 			FreshLocalization();
 		}
 #endif
 	}
-	public class QLocalizationData : QDataList<QLocalizationData>
-	{
+	public class QLocalizationData : QDataList<QLocalizationData> {
 
-		public static string GetLozalization(string key)
-		{
-#if QLocalization
-			if (key.IsNull()) return key;
+		public static string GetLozalization(string key) {
+			if (key.IsNull())
+				return key;
 			var text = key;
-			if (ContainsKey(key))
-			{
+			if (ContainsKey(key)) {
 				text = Get(key).Localization;
-				if (text.EndsWith(AutoTranslateEndKey))
-				{
+				if (text.EndsWith(AutoTranslateEndKey)) {
 					text = text.Substring(0, text.Length - AutoTranslateEndKey.Length);
 				}
 			}
-			else if (!key.Contains('{'))
-			{
+			else if (!key.Contains('{')) {
 				QDebug.LogWarning(nameof(QLocalizationData) + " 缺少翻译[" + key + "]");
 				return key;
 			}
-			text = text.ForeachBlockValue('{', '}', subKey =>
-			{
+			text = text.ForeachBlockValue('{', '}', subKey => {
 				List<object> Params = null;
-				if (subKey.Contains(FormatStart))
-				{
+				if (subKey.Contains(FormatStart)) {
 					Params = new List<object>();
-					subKey = subKey.ForeachBlockValue(FormatStart, FormatEnd, key =>
-					{
-						if (key.Contains('{'))
-						{
+					subKey = subKey.ForeachBlockValue(FormatStart, FormatEnd, key => {
+						if (key.Contains('{')) {
 							key = GetLozalization(key);
 						}
 						Params.Add(key);
 						return "{" + (Params.Count - 1) + "}";
 					});
 				}
-				if (ContainsKey(subKey))
-				{
+				if (ContainsKey(subKey)) {
 					subKey = GetLozalization(subKey);
 				}
-				else if (int.TryParse(subKey, out var index))
-				{
+				else if (int.TryParse(subKey, out var index)) {
 					subKey = "{" + subKey + "}";
 				}
-				if (Params != null)
-				{
-					try
-					{
+				if (Params != null) {
+					try {
 						subKey = string.Format(subKey, Params.ToArray());
 					}
-					catch (System.Exception e)
-					{
+					catch (System.Exception e) {
 						throw new System.Exception("替换出错[" + subKey + "][" + Params.ToOneString("|") + "] ", e);
 					}
 				}
 				return subKey;
 			}, true);
 			return text;
-#else
-			if (ContainsKey(key))
-			{
-				return Get(key).Localization;
-			}
-			else
-			{
-				return key;
-			}
-#endif
 		}
 		public const string AutoTranslateEndKey = " [Auto]";
 		public const char FormatStart = '[';
 		public const char FormatEnd = ']';
 		[QName]
 		public string Localization { get; private set; }
-		static QLocalizationData()
-		{
+		static QLocalizationData() {
 			Fresh();
 			QEventManager.Register<string>(nameof(QEventKey.设置更新), Fresh);
 		}
-		public static void Fresh(string key = nameof(Language))
-		{
-			if (key == nameof(Language))
-			{
+		public static void Fresh(string key = nameof(Language)) {
+			if (key == nameof(Language)) {
 				Language = QPlayerPrefs.Get(nameof(Language), Application.systemLanguage);
 			}
 		}
 		private static SystemLanguage _Language = SystemLanguage.Unknown;
 		public static QLocalizationFont FontInfo { get; private set; } = default;
-		public static SystemLanguage Language
-		{
+		public static SystemLanguage Language {
 			get => _Language;
-			set
-			{
-				if (Language != value)
-				{
+			set {
+				if (Language != value) {
 					_Language = value;
 					QPlayerPrefs.Set(nameof(Language), value);
 					Load(value.ToString());
-					if (List.Count == 0 && Language != SystemLanguage.English)
-					{
+					if (List.Count == 0 && Language != SystemLanguage.English) {
 						QDebug.LogError("不存在语言[" + value + "]转为英语");
 						Language = SystemLanguage.English;
 						return;
@@ -226,62 +175,44 @@ namespace QTool
 		}
 		public static event System.Action OnLanguageChange = null;
 	}
-#region Tool
-	public static class QLocalizationTool
-	{
-		public static string ToLozalizationBoldKey(this string key)
-		{
+	#region Tool
+	public static class QLocalizationTool {
+		public static string ToLozalizationBoldKey(this string key) {
 			return "<b>{" + key.ToLozalizationKey() + "}</b>";
 		}
-		public static string ToLozalizationKey(this string key)
-		{
-#if QLocalization
+		public static string ToLozalizationKey(this string key) {
 			return "{" + key + "}";
-#else
-			return QLocalizationData.Get(key).Localization;
-#endif
 		}
-		public static string ToLozalizationKey(this string key, params object[] Params)
-		{
-#if QLocalization
-			for (int i = 0; i < Params.Length; i++)
-			{
+		public static string ToLozalizationKey(this string key, params object[] Params) {
+			for (int i = 0; i < Params.Length; i++) {
 				Params[i] = QLocalizationData.FormatStart + Params[i]?.ToString() + QLocalizationData.FormatEnd;
 			}
 			return "{" + string.Format(key, Params) + "}";
-#endif
-			return string.Format(key.ToLozalizationKey(), Params);
 		}
-		public static string ToLozalizationColorKey(this object key)
-		{
+		public static string ToLozalizationColorKey(this object key) {
 			return key?.ToString().ToLozalizationKey().ToColorString(key.ToColor());
 		}
 		const string NetworkTranslateURL = "https://translate.googleapis.com/translate_a/single?client=gtx&sl={2}&tl={1}&dt=t&q={0}";
 
 		static List<List<List<string>>> translateData = new List<List<List<string>>>();
-		public static async Task<string> NetworkTranslateAsync(this string text, QLocalizationCode fromLanguage, QLocalizationCode toLanguage)
-		{
-			if (text.IsNull()) return text;
-			try
-			{
+		public static async Task<string> NetworkTranslateAsync(this string text, QLocalizationCode fromLanguage, QLocalizationCode toLanguage) {
+			if (text.IsNull())
+				return text;
+			try {
 				var jsonStr = await QTool.RunURLAsync(string.Format(NetworkTranslateURL, text, toLanguage, fromLanguage));
 				jsonStr.ParseQData(translateData);
 				text = translateData[0][0][0];
 			}
-			catch (System.Exception e)
-			{
+			catch (System.Exception e) {
 				Debug.LogError("翻译出错[" + text + "] \n" + e);
 			}
 			return text;
 		}
-		public static async Task<string> NetworkTranslateAsync(this string chineseText, SystemLanguage from = SystemLanguage.English, SystemLanguage to = SystemLanguage.ChineseSimplified)
-		{
+		public static async Task<string> NetworkTranslateAsync(this string chineseText, SystemLanguage from = SystemLanguage.English, SystemLanguage to = SystemLanguage.ChineseSimplified) {
 			return await chineseText.NetworkTranslateAsync(from.ToCode(), to.ToCode());
 		}
-		public static QLocalizationCode ToCode(this SystemLanguage language)
-		{
-			switch (language)
-			{
+		public static QLocalizationCode ToCode(this SystemLanguage language) {
+			switch (language) {
 				case SystemLanguage.Chinese:
 					return QLocalizationCode.zh_CN;
 				case SystemLanguage.English:
@@ -301,15 +232,13 @@ namespace QTool
 			}
 			return QLocalizationCode.en;
 		}
-		public static string ToCodeString(this QLocalizationCode code)
-		{
+		public static string ToCodeString(this QLocalizationCode code) {
 			return code.ToString().Replace('_', '-').TrimStart('-');
 		}
 
 	}
 	[System.Serializable]
-	public struct QLocalizationFont : IKey<SystemLanguage>
-	{
+	public struct QLocalizationFont : IKey<SystemLanguage> {
 		public SystemLanguage Key { get => language; set => language = value; }
 		public SystemLanguage language;
 #if TMPro
@@ -318,8 +247,7 @@ namespace QTool
 		public Font font;
 #endif
 	}
-	public enum QLocalizationCode
-	{
+	public enum QLocalizationCode {
 		af,//南非语
 		af_ZA,// 南非语
 		ar,//阿拉伯语
@@ -547,5 +475,5 @@ namespace QTool
 		zu,//祖鲁语
 		zu_ZA,// 祖鲁语
 	}
-#endregion
+	#endregion
 }
