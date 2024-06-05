@@ -831,7 +831,7 @@ namespace QTool
 			}
 			else
 			{
-				return ReadObjectString(reader, ignore);
+				return reader.ReadToEnd();
 			}
 		}
 

@@ -252,6 +252,7 @@ namespace QTool.FlowGraph
 			qdataList.CreateAt(QSerializeType.Get(typeof(QDataList)), y);
 			if (objList != null)
 			{
+				Debug.LogError(objList.Count + " " + (y - 1));
 				objList.CreateAt(QSerializeType.Get(typeof(List<object>)), y - 1);
 			}
 		}

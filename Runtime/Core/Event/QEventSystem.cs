@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
+using System;
+
 #if TMPro
 using TMPro;
 #endif
@@ -198,11 +200,11 @@ namespace QTool
 			return gameObject.GetComponent<QEventSystem>(true).Get(key, childKey);
 		}
 		#endregion
-		public static UnityAction GetUnityAction(this Object obj, string funcName)
+		public static UnityAction GetUnityAction(this UnityEngine.Object obj, string funcName)
 		{
 			return UnityEventBase.GetValidMethodInfo(obj, funcName, new System.Type[0]).CreateDelegate(typeof(UnityAction), obj) as UnityAction;
 		}
-		public static UnityAction<T> GetUnityAction<T>(this Object obj, string funcName)
+		public static UnityAction<T> GetUnityAction<T>(this UnityEngine.Object obj, string funcName)
 		{
 			var method = UnityEventBase.GetValidMethodInfo(obj, funcName, new System.Type[] { typeof(T) });
 			return method.CreateDelegate(typeof(UnityAction<T>), obj) as UnityAction<T>;
@@ -212,7 +214,7 @@ namespace QTool
 			var count = onValueChanged.GetPersistentEventCount();
 			for (int i = count - 1; i >= 0; i--)
 			{
-				if (onValueChanged.GetPersistentTarget(i) == action.Target as Object || onValueChanged.GetPersistentMethodName(i) == action.Method.Name)
+				if (onValueChanged.GetPersistentTarget(i) == action.Target as UnityEngine.Object || onValueChanged.GetPersistentMethodName(i) == action.Method.Name)
 				{
 					return true;
 				}
@@ -413,7 +415,7 @@ namespace QTool
 		/// <summary>
 		/// 自动注册持久化Unity事件
 		/// </summary>
-		public static void AutoAddPersistentListener(this GameObject gameObject, Object obj)
+		public static void AutoAddPersistentListener(this GameObject gameObject, UnityEngine.Object obj)
 		{
 			if (obj == null) return;
 			var typeInfo = QSerializeType.Get(obj.GetType());
