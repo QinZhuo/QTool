@@ -505,111 +505,95 @@ namespace QTool
 			}
 		}
 
-		//public static void RegisterEvent(this GameObject gameObject, object obj, params string[] keys)
-		//{
-		//	if (obj.IsNull()) return;
-		//	var trigger = gameObject?.GetTrigger();
-		//	var KeyTriggers= gameObject.GetComponentsInChildren<QKeyInfoTrigger>();
-		//	if (trigger != null)
-		//	{
-		//		var typeInfo = QSerializeHasReadOnlyType.Get(obj.GetType());
-		//		foreach (var member in typeInfo.Members)
-		//		{
-		//			if (keys.Length > 0 ? keys.IndexOf(member.QName) < 0 : member.QNameAttribute == null) return;
-		//			if (member.Type == typeof(string) || member.Type.Is(typeof(System.Enum)))
-		//			{
-		//				//	QDebug.Log(gameObject + " 静态数据初始化 " + obj + " " + member.QName + " : " + obj);
-		//				gameObject.InvokeEvent(member.QName, member.Get(obj)?.ToString());
-		//			}
-		//			else if (member.Type == typeof(int) || member.Type == typeof(float))
-		//			{
-		//				gameObject.InvokeEvent(member.QName, member.Get(obj).As<float>());
-		//			}
-		//			else if (member.Type.Is(typeof(QRuntimeValue<float>)) && (trigger.floatEventList.ContainsKey(member.QName)
-		//						|| trigger.floatEventList.ContainsKey("当前" + member.QName) || trigger.floatEventList.ContainsKey(member.QName + "比例")))
-		//			{
-		//				var runtimeValue = member.Get(obj).As<QRuntimeValue<float>>();
-		//				runtimeValue.Name = member.QName;
-		//				runtimeValue.OnValueChange += gameObject.InvokeEvent;
-		//				var keyTrigger = KeyTriggers.Get(runtimeValue.Name);
-		//				if (keyTrigger != null)
-		//				{
-		//					runtimeValue.OnStringChange += keyTrigger.Set;
-		//				}
-		//				runtimeValue.InvokeOnChange();
-		//				//	QDebug.Log(gameObject + " 注册" + member.Type.Name + "数据更改事件 " + obj + " " + member.QName);
-		//			}
-		//			else if (member.Type.Is(typeof(QRuntimeValue<string>)) && trigger.stringEventList.ContainsKey(member.QName))
-		//			{
-		//				var runtimeValue = member.Get(obj).As<QRuntimeValue<string>>();
-		//				runtimeValue.Name = member.QName;
-		//				runtimeValue.OnValueChange += gameObject.InvokeEvent;
-		//				runtimeValue.InvokeOnChange();
-		//				//	QDebug.Log(gameObject + " 注册" + member.Type.Name + "数据更改事件 " + obj + " " + member.QName);
-		//			}
-		//			else if (member.Type.Is(typeof(QRuntimeValue<bool>)) && trigger.boolEventList.ContainsKey(member.QName))
-		//			{
-		//				var runtimeValue = member.Get(obj).As<QRuntimeValue<bool>>();
-		//				runtimeValue.Name = member.QName;
-		//				runtimeValue.OnValueChange += gameObject.InvokeEvent;
-		//				runtimeValue.InvokeOnChange();
-		//				//	QDebug.Log(gameObject + " 注册" + member.Type.Name + "数据更改事件 " + obj + " " + member.QName);
+		public static void RegisterEvent(this GameObject gameObject, object obj, params string[] keys) {
+			//if (obj.IsNull())
+			//	return;
+			//var trigger = gameObject?.GetTrigger();
+			//var KeyTriggers = gameObject.GetComponentsInChildren<QKeyInfoTrigger>();
+			//if (trigger != null) {
+			//	var typeInfo = QSerializeHasReadOnlyType.Get(obj.GetType());
+			//	foreach (var member in typeInfo.Members) {
+			//		if (keys.Length > 0 ? keys.IndexOf(member.QName) < 0 : member.QNameAttribute == null)
+			//			return;
+			//		if (member.Type == typeof(string) || member.Type.Is(typeof(System.Enum))) {
+			//			//	QDebug.Log(gameObject + " 静态数据初始化 " + obj + " " + member.QName + " : " + obj);
+			//			gameObject.InvokeEvent(member.QName, member.Get(obj)?.ToString());
+			//		}
+			//		else if (member.Type == typeof(int) || member.Type == typeof(float)) {
+			//			gameObject.InvokeEvent(member.QName, member.Get(obj).As<float>());
+			//		}
+			//		else if (member.Type.Is(typeof(QRuntimeValue<float>)) && (trigger.floatEventList.ContainsKey(member.QName)
+			//					|| trigger.floatEventList.ContainsKey("当前" + member.QName) || trigger.floatEventList.ContainsKey(member.QName + "比例"))) {
+			//			var runtimeValue = member.Get(obj).As<QRuntimeValue<float>>();
+			//			runtimeValue.Name = member.QName;
+			//			runtimeValue.OnValueChange += gameObject.InvokeEvent;
+			//			var keyTrigger = KeyTriggers.Get(runtimeValue.Name);
+			//			if (keyTrigger != null) {
+			//				runtimeValue.OnStringChange += keyTrigger.Set;
+			//			}
+			//			runtimeValue.InvokeOnChange();
+			//			//	QDebug.Log(gameObject + " 注册" + member.Type.Name + "数据更改事件 " + obj + " " + member.QName);
+			//		}
+			//		else if (member.Type.Is(typeof(QRuntimeValue<string>)) && trigger.stringEventList.ContainsKey(member.QName)) {
+			//			var runtimeValue = member.Get(obj).As<QRuntimeValue<string>>();
+			//			runtimeValue.Name = member.QName;
+			//			runtimeValue.OnValueChange += gameObject.InvokeEvent;
+			//			runtimeValue.InvokeOnChange();
+			//			//	QDebug.Log(gameObject + " 注册" + member.Type.Name + "数据更改事件 " + obj + " " + member.QName);
+			//		}
+			//		else if (member.Type.Is(typeof(QRuntimeValue<bool>)) && trigger.boolEventList.ContainsKey(member.QName)) {
+			//			var runtimeValue = member.Get(obj).As<QRuntimeValue<bool>>();
+			//			runtimeValue.Name = member.QName;
+			//			runtimeValue.OnValueChange += gameObject.InvokeEvent;
+			//			runtimeValue.InvokeOnChange();
+			//			//	QDebug.Log(gameObject + " 注册" + member.Type.Name + "数据更改事件 " + obj + " " + member.QName);
 
-		//			}
-		//		}
-		//		foreach (var func in typeInfo.Functions)
-		//		{
-		//			var name = func.QName();
-		//			if (trigger.actionEventList.ContainsKey(name))
-		//			{
-		//				trigger.actionEventList.Get(name).eventAction.AddListener(() => func.Invoke(obj));
-		//			}
-		//		}
-		//	}
-		//}
-		//public static void UnRegisterEvent(this GameObject gameObject, object obj, params string[] keys)
-		//{
-		//	if (obj.IsNull()) return;
-		//	var trigger = gameObject?.GetTrigger();
-		//	var KeyTriggers = gameObject.GetComponentsInChildren<QKeyInfoTrigger>();
-		//	if (trigger != null)
-		//	{
-		//		var typeInfo = QSerializeHasReadOnlyType.Get(obj.GetType());
-		//		foreach (var member in typeInfo.Members)
-		//		{
-		//			if (keys.Length > 0 ? keys.IndexOf(member.QName) < 0 : member.QNameAttribute == null) return;
-		//			if (member.Type.Is(typeof(QRuntimeValue<float>)) && (trigger.floatEventList.ContainsKey(member.QName)
-		//						|| trigger.floatEventList.ContainsKey("当前" + member.QName) || trigger.floatEventList.ContainsKey(member.QName + "比例")))
-		//			{
-		//				var runtimeValue = member.Get(obj).As<QRuntimeValue<float>>();
-		//				runtimeValue.OnValueChange -= gameObject.InvokeEvent;
-		//				var keyTrigger = KeyTriggers.Get(runtimeValue.Name);
-		//				if (keyTrigger != null)
-		//				{
-		//					runtimeValue.OnStringChange -= keyTrigger.Set;
-		//				}
-		//			}
-		//			else if (member.Type.Is(typeof(QRuntimeValue<string>)) && trigger.stringEventList.ContainsKey(member.QName))
-		//			{
-		//				var runtimeValue = member.Get(obj).As<QRuntimeValue<string>>();
-		//				runtimeValue.OnValueChange -= gameObject.InvokeEvent;
-		//			}
-		//			else if (member.Type.Is(typeof(QRuntimeValue<bool>)) && trigger.boolEventList.ContainsKey(member.QName))
-		//			{
-		//				var runtimeValue = member.Get(obj).As<QRuntimeValue<bool>>();
-		//				runtimeValue.OnValueChange -= gameObject.InvokeEvent;
-		//			}
-		//		}
-		//		foreach (var func in typeInfo.Functions)
-		//		{
-		//			var name = func.QName();
-		//			if (trigger.actionEventList.ContainsKey(name))
-		//			{
-		//				trigger.actionEventList.Get(name).eventAction.RemoveAllListeners();
-		//			}
-		//		}
-		//	}
-		//}
+			//		}
+			//	}
+			//	foreach (var func in typeInfo.Functions) {
+			//		var name = func.QName();
+			//		if (trigger.actionEventList.ContainsKey(name)) {
+			//			trigger.actionEventList.Get(name).eventAction.AddListener(() => func.Invoke(obj));
+			//		}
+			//	}
+			//}
+		}
+		public static void UnRegisterEvent(this GameObject gameObject, object obj, params string[] keys) {
+			//if (obj.IsNull())
+			//	return;
+			//var trigger = gameObject?.GetTrigger();
+			//var KeyTriggers = gameObject.GetComponentsInChildren<QKeyInfoTrigger>();
+			//if (trigger != null) {
+			//	var typeInfo = QSerializeHasReadOnlyType.Get(obj.GetType());
+			//	foreach (var member in typeInfo.Members) {
+			//		if (keys.Length > 0 ? keys.IndexOf(member.QName) < 0 : member.QNameAttribute == null)
+			//			return;
+			//		if (member.Type.Is(typeof(QRuntimeValue<float>)) && (trigger.floatEventList.ContainsKey(member.QName)
+			//					|| trigger.floatEventList.ContainsKey("当前" + member.QName) || trigger.floatEventList.ContainsKey(member.QName + "比例"))) {
+			//			var runtimeValue = member.Get(obj).As<QRuntimeValue<float>>();
+			//			runtimeValue.OnValueChange -= gameObject.InvokeEvent;
+			//			var keyTrigger = KeyTriggers.Get(runtimeValue.Name);
+			//			if (keyTrigger != null) {
+			//				runtimeValue.OnStringChange -= keyTrigger.Set;
+			//			}
+			//		}
+			//		else if (member.Type.Is(typeof(QRuntimeValue<string>)) && trigger.stringEventList.ContainsKey(member.QName)) {
+			//			var runtimeValue = member.Get(obj).As<QRuntimeValue<string>>();
+			//			runtimeValue.OnValueChange -= gameObject.InvokeEvent;
+			//		}
+			//		else if (member.Type.Is(typeof(QRuntimeValue<bool>)) && trigger.boolEventList.ContainsKey(member.QName)) {
+			//			var runtimeValue = member.Get(obj).As<QRuntimeValue<bool>>();
+			//			runtimeValue.OnValueChange -= gameObject.InvokeEvent;
+			//		}
+			//	}
+			//	foreach (var func in typeInfo.Functions) {
+			//		var name = func.QName();
+			//		if (trigger.actionEventList.ContainsKey(name)) {
+			//			trigger.actionEventList.Get(name).eventAction.RemoveAllListeners();
+			//		}
+			//	}
+			//}
+		}
 	}
 	public interface IValueEvent<T>
 	{
