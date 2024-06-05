@@ -23,12 +23,12 @@ namespace QTool {
 			}
 			else {
 				pool = new ObjectPool<GameObject>(() => {
-					var result = GameObject.Instantiate(prefab);
+					var result = Instantiate(prefab);
 					result.name = prefab.name;
 					result.GetComponent<QPoolObject>(true).prefab = prefab;
 					return result;
 				}, obj => {
-					obj.transform.SetParent(null, true);
+					obj.transform.SetParent(null, false);
 					obj.transform.localScale = prefab.transform.localScale;
 					obj.transform.position = prefab.transform.position;
 					obj.transform.rotation = prefab.transform.rotation;
@@ -39,18 +39,18 @@ namespace QTool {
 						newRect.anchorMax = rect.anchorMax;
 						newRect.anchoredPosition = rect.anchoredPosition;
 					}
-					foreach (var poolObj in (obj as GameObject).GetComponents<IQPoolObject>()) {
+					foreach (var poolObj in obj.GetComponents<IQPoolObject>()) {
 						poolObj.OnPoolGet();
 					}
 					obj.SetActive(true);
 				}, obj => {
-					foreach (var poolObj in (obj as GameObject).GetComponents<IQPoolObject>()) {
+					foreach (var poolObj in obj .GetComponents<IQPoolObject>()) {
 						poolObj.OnPoolRelease();
 					}
 					obj.SetActive(false);
 					obj.transform.SetParent(Instance.transform, true);
 				}, obj => {
-					GameObject.Destroy(obj);
+					Destroy(obj);
 				}, true, 10, maxSize);
 				GameObjectPools[prefab] = pool;
 				QEventManager.Register(QEventKey.卸载场景, pool.Clear);
@@ -67,9 +67,10 @@ namespace QTool {
 				obj = pool.Get();
 			}
 			if (parent != null) {
-				obj.transform.SetParent(parent, true);
-				obj.transform.localPosition = Vector3.zero;
-				obj.transform.rotation = Quaternion.identity;
+				obj.transform.SetParent(parent, false);
+				obj.transform.localPosition = prefab.transform.localPosition;
+				obj.transform.localRotation = prefab.transform.localRotation;
+				obj.transform.localScale = prefab.transform.localScale;
 			}
 			return obj;
 		}

@@ -33,8 +33,6 @@ namespace QTool
 				{
 					view = QGameObjectPool.Get(prefab);
 					view.transform.SetParent(transform, false);
-					view.transform.localScale = Vector3.one;
-					view.transform.localRotation = Quaternion.identity;
 					view.transform.SetAsLastSibling();
 					List.Add(view);
 					view.name = name;
@@ -73,16 +71,14 @@ namespace QTool
 		private List<GameObject> clearList = new List<GameObject>();
 		public void DelayClear()
 		{
-			clearList.AddRange(List);
+			foreach (var item in clearList) {
+				clearList.AddCheckExist(item);
+			}
 			QToolManager.Instance.OnUpdateEvent += ClearUpdate;
 		}
 		private void ClearUpdate()
 		{
-			foreach (var item in clearList)
-			{
-				item.PoolRelease();
-			}
-			clearList.Clear();
+			clearList.PoolReleaseList();
 			QToolManager.Instance.OnUpdateEvent -= ClearUpdate;
 		}
 		public virtual void Clear()
