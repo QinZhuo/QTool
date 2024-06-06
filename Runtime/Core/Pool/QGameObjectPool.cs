@@ -12,13 +12,12 @@ namespace QTool {
 	/// GameObject对象池
 	/// </summary>
 	public class QGameObjectPool : QInstanceManager<QGameObjectPool> {
-		private static Dictionary<GameObject, ObjectPool<GameObject>> GameObjectPools = new Dictionary<GameObject, ObjectPool<GameObject>>();
 		protected override void Awake() {
-			base.Awake();
-			QEventManager.Register(QEventKey.游戏退出, GameObjectPools.Clear);
+			Instance = this;
 		}
+		private Dictionary<GameObject, ObjectPool<GameObject>> GameObjectPools = new Dictionary<GameObject, ObjectPool<GameObject>>();
 		public static ObjectPool<GameObject> GetPool(GameObject prefab, int maxSize = 1000) {
-			if (GameObjectPools.TryGetValue(prefab, out var pool)) {
+			if (Instance.GameObjectPools.TryGetValue(prefab, out var pool)) {
 				return pool;
 			}
 			else {
@@ -52,7 +51,7 @@ namespace QTool {
 				}, obj => {
 					Destroy(obj);
 				}, true, 10, maxSize);
-				GameObjectPools[prefab] = pool;
+				Instance.GameObjectPools[prefab] = pool;
 				QEventManager.Register(QEventKey.卸载场景, pool.Clear);
 				return pool;
 			}
@@ -87,7 +86,7 @@ namespace QTool {
 		public static void Release(GameObject gameObject) {
 			var tag = gameObject.GetComponent<QPoolObject>();
 			try {
-				if (tag != null && GameObjectPools.TryGetValue(tag.prefab, out var pool)) {
+				if (tag != null && Instance.GameObjectPools.TryGetValue(tag.prefab, out var pool)) {
 					pool.Release(gameObject);
 					return;
 				}
@@ -103,7 +102,7 @@ namespace QTool {
 	/// 简单类型对象池
 	/// </summary>
 	public class QObjectPool<T> where T : class, new() {
-		internal static ObjectPool<T> Instance { get; private set; }
+		private static ObjectPool<T> Instance;
 		static QObjectPool() {
 			if (typeof(T).Is(typeof(IQPoolObject))) {
 				Instance = new ObjectPool<T>(() => new T(), obj => (obj as IQPoolObject).OnPoolGet(), obj => (obj as IQPoolObject).OnPoolRelease());
@@ -111,7 +110,6 @@ namespace QTool {
 			else {
 				Instance = new ObjectPool<T>(() => new T());
 			}
-			QEventManager.Register(QEventKey.游戏退出, Instance.Clear);
 		}
 		public static T Get() {
 			return Instance.Get();

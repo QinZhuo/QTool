@@ -56,7 +56,7 @@ namespace QTool.Steam
 				return;
 			}
 			SteamClient.SetWarningMessageHook(SteamAPIDebugTextHook);
-			QToolManager.Instance.OnUpdateEvent += SteamAPI.RunCallbacks;
+			QToolManager.Instance.OnUpdate += SteamAPI.RunCallbacks;
 			OnJoinRequested = Callback<GameLobbyJoinRequested_t>.Create(info =>
 			{
 				_ = JoinLobby(info.m_steamIDLobby);

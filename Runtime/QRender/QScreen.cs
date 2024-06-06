@@ -170,6 +170,10 @@ namespace QTool
 		}
 		static bool IsDrag = false;
 		public static event Action OnBeginDragWindow = null;
+
+		/// <summary>
+		/// 需要调用点击判断逻辑
+		/// </summary>
 		private static void OnGUI()
 		{
 			if (!IsDrag && Event.current.mousePosition.y < 40 && Event.current.type == EventType.MouseDown)
@@ -243,13 +247,11 @@ namespace QTool
 				SetWindowLong(CurWindow, GWL_STYLE, WS_POPUP);
 				SetWindowPos(CurWindow, 0, (Screen.currentResolution.width - width) / 2, (Screen.currentResolution.height - height) / 2, width, height, SWP_SHOWWINDOW);
 #endif
-				QToolManager.Instance.OnGUIEvent += OnGUI;
-				QToolManager.Instance.OnUpdateEvent += OnUpdate;
+				QToolManager.Instance.OnUpdate += OnUpdate;
 			}
 			else
 			{
-				QToolManager.Instance.OnGUIEvent -= OnGUI;
-				QToolManager.Instance.OnUpdateEvent -= OnUpdate;
+				QToolManager.Instance.OnUpdate -= OnUpdate;
 			}
 		}
 	

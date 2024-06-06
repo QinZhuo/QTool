@@ -10,7 +10,7 @@ namespace QTool {
 		[RuntimeInitializeOnLoadMethod]
 		static void Init()
 		{
-			QToolManager.Instance.OnUpdateEvent += CheckUpdate;
+			QToolManager.Instance.OnUpdate += CheckUpdate;
 		}
 		static void CheckUpdate()
 		{

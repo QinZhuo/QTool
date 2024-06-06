@@ -74,12 +74,12 @@ namespace QTool
 			foreach (var item in clearList) {
 				clearList.AddCheckExist(item);
 			}
-			QToolManager.Instance.OnUpdateEvent += ClearUpdate;
+			QToolManager.Instance.OnUpdate += ClearUpdate;
 		}
 		private void ClearUpdate()
 		{
 			clearList.PoolReleaseList();
-			QToolManager.Instance.OnUpdateEvent -= ClearUpdate;
+			QToolManager.Instance.OnUpdate -= ClearUpdate;
 		}
 		public virtual void Clear()
 		{
