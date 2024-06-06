@@ -11,7 +11,7 @@ namespace QTool.FlowGraph {
 			var graph = text.ParseQData<QFlowGraph>();
 			var asset = ObjectFactory.CreateInstance<QFlowGraphAsset>();
 			asset.Graph = graph;
-			ctx.AddObjectToAsset("main", asset);
+			ctx.AddObjectToAsset(nameof(QFlowGraphAsset), asset);
 			ctx.SetMainObject(asset);
 		}
 	}
