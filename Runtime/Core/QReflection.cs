@@ -17,8 +17,8 @@ namespace QTool.Reflection
 	public class QMemeberInfo : IKey<string>
 	{
 		public string Key { get; set; }
-		public string QName { get; set; }
-		public string QOldName { get; set; }
+		public string QName { get;private set; }
+		public string QOldName { get;private set; }
 		public Type Type { get; private set; }
 		public Action<object, object> Set { get; private set; }
 		public Func<object, object> Get { get; private set; }
@@ -83,8 +83,8 @@ namespace QTool.Reflection
 	}
 	public class QFunctionInfo : IKey<string>
 	{
-		public string Key { get => Name; set => Name = value; }
-		public string Name { get; private set; }
+		public string Key { get ; set ; }
+		public string QName { get;private set; }
 		public string NameWithParams { get; private set; }
 		public ParameterInfo[] ParamInfos { get; private set; }
 		public Type[] ParamTypes { get; private set; }
@@ -121,6 +121,7 @@ namespace QTool.Reflection
 		{
 			this.MethodInfo = info;
 			Key = info.Name;
+			QName = info.QName();
 			ParamInfos = info.GetParameters();
 			ParamTypes = new Type[ParamInfos.Length];
 			for (int i = 0; i < ParamInfos.Length; i++)
@@ -130,7 +131,7 @@ namespace QTool.Reflection
 		}
 		public override string ToString()
 		{
-			return "function " + Name + "(" + ParamInfos.ToOneString(",") + ") \t\t(" + ReturnType + ")";
+			return "function " + QName + "(" + ParamInfos.ToOneString(",") + ") \t\t(" + ReturnType + ")";
 		}
 	}
 	public class QReflectionType : QTypeInfo<QReflectionType>
@@ -470,7 +471,6 @@ namespace QTool.Reflection
 		}
 		public static T GetAttribute<T>(this ICustomAttributeProvider info) where T : Attribute
 		{
-			var type = typeof(T);
 			var array = info.GetCustomAttributes(typeof(T), true);
 			return array.QueuePeek() as T;
 		}

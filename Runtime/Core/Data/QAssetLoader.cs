@@ -6,7 +6,7 @@ using UnityEngine.Events;
 
 namespace QTool
 {
-	public abstract class QAssetLoader<TPath, TObj> : MonoBehaviour,ISetValue<string> where TObj : UnityEngine.Object
+	public abstract class QAssetLoader<TPath, TObj> : MonoBehaviour,IQEvent<string> where TObj : UnityEngine.Object
 	{
 		#region 加载逻辑
 		[QName("开始时加载")]
@@ -28,7 +28,7 @@ namespace QTool
 				OnLoadEvent?.Invoke(obj);
 			}
 		}
-		public void SetValue(string value)
+		public void InvokeEvent(string value)
 		{
 			InvokeLoad(value);
 		}

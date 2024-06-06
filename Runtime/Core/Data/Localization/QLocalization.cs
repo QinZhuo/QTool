@@ -8,7 +8,7 @@ using UnityEngine.Events;
 using UnityEngine.UI;
 
 namespace QTool {
-	public class QLocalization : MonoBehaviour, ISetValue<string> {
+	public class QLocalization : MonoBehaviour, IQEvent<string> {
 		#region 基础数据 
 		[QName, QPopup(nameof(QLocalizationData) + "." + nameof(QLocalizationData.List)), SerializeField, UnityEngine.Serialization.FormerlySerializedAs("key")]
 		private string _key;
@@ -84,7 +84,7 @@ namespace QTool {
 			}
 			OnLocalizationChange?.Invoke(localization);
 		}
-		public void SetValue(string value) {
+		public void InvokeEvent(string value) {
 			Key = value;
 		}
 #if UNITY_EDITOR

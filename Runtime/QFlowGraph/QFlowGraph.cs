@@ -369,22 +369,25 @@ namespace QTool.FlowGraph
 					if (member.Type.Is(typeof(QRuntimeValue<float>)))
 					{
 						var runtimeValue = member.Get(Runtime).As<QRuntimeValue<float>>();
-						runtimeValue.Name = member.QName;
-						runtimeValue.OnValueChange += SetValue;
+						runtimeValue.OnValueChange += value => {
+							SetValue(member.QName, value);
+						};
 						runtimeValue.InvokeOnChange();
 					}
 					else if (member.Type.Is(typeof(QRuntimeValue<string>)))
 					{
 						var runtimeValue = member.Get(Runtime).As<QRuntimeValue<string>>();
-						runtimeValue.Name = member.QName;
-						runtimeValue.OnValueChange += SetValue;
+						runtimeValue.OnValueChange += value => {
+							SetValue(member.QName, value);
+						};
 						runtimeValue.InvokeOnChange();
 					}
 					else if (member.Type.Is(typeof(QRuntimeValue<bool>)))
 					{
 						var runtimeValue = member.Get(Runtime).As<QRuntimeValue<bool>>();
-						runtimeValue.Name = member.QName;
-						runtimeValue.OnValueChange += SetValue;
+						runtimeValue.OnValueChange += value => {
+							SetValue(member.QName, value);
+						};
 						runtimeValue.InvokeOnChange();
 					}
 				}

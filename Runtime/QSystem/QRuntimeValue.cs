@@ -4,48 +4,34 @@ using UnityEngine;
 using QTool.Reflection;
 using System.IO;
 using System;
+using static UnityEngine.Rendering.DebugUI;
 
 namespace QTool
 {
-	public class QRuntimeValue<T> : IQSerializeCallback
-	{
-		public string Name { get; set; }
+	public class QRuntimeValue<T> : IQSerializeCallback {
 		private T _Value = default;
-		public virtual T Value
-		{
+		public virtual T Value {
 			get => _Value;
-			set
-			{
-				if (!Equals(value, _Value))
-				{
+			set {
+				if (!Equals(value, _Value)) {
 					_Value = value;
 					InvokeOnChange();
 				}
 			}
 		}
-		public event Action<string, T> OnValueChange = null;
-		public event Action<string, string> OnStringChange = null;
-		public virtual void InvokeOnChange()
-		{
-			InvokeOnChange(Name, Value);
+		public event Action<T> OnValueChange = null;
+		public virtual void InvokeOnChange() {
+			OnValueChange?.Invoke(Value);
 		}
-		protected void InvokeOnChange(string key, T value)
-		{
-			OnValueChange?.Invoke(key, value);
-			OnStringChange?.Invoke(key, ToString());
-		}
-		public override string ToString()
-		{
+		public override string ToString() {
 			return Value?.ToString();
 		}
 
-		public virtual void OnLoad()
-		{
+		public virtual void OnLoad() {
 			InvokeOnChange();
 		}
 
-		public virtual void OnBeforeQSerialize()
-		{
+		public virtual void OnBeforeQSerialize() {
 
 		}
 	}
@@ -164,38 +150,33 @@ namespace QTool
 		}
 	}
 
-	public class QRuntimeRangeValue : QRuntimeValue
-	{
+	public class QRuntimeRangeValue : QRuntimeValue {
 		public QRuntimeRangeValue() { }
-		public QRuntimeRangeValue(float value) : base(value)
-		{
+		public QRuntimeRangeValue(float value) : base(value) {
 			CurrentValue = value;
 		}
 
 		public float MinValue { get; set; } = 0;
 		public float MaxValue => Value;
 		private float _CurrentValue = 0;
-		public float CurrentValue
-		{
+		public float CurrentValue {
 			get => _CurrentValue;
-			set
-			{
-				if (_CurrentValue != value)
-				{
+			set {
+				if (_CurrentValue != value) {
 					_CurrentValue = Mathf.Clamp(value, MinValue, MaxValue);
 					InvokeOnChange();
 				}
 			}
 		}
-		public override string ToString()
-		{
+		public event Action<float> OnCurrentValueChange = null;
+		public event Action<float> OnMinValueChange = null;
+		public override string ToString() {
 			return CurrentValue + "/" + Value;
 		}
-		public override void InvokeOnChange()
-		{
+		public override void InvokeOnChange() {
 			base.InvokeOnChange();
-			InvokeOnChange("当前" + Name, CurrentValue);
-			InvokeOnChange(Name + "比例", (CurrentValue - MinValue) / MaxValue);
+			OnCurrentValueChange?.Invoke(CurrentValue);
+			OnMinValueChange?.Invoke(MinValue);
 		}
 	}
 	public class QAverageValue

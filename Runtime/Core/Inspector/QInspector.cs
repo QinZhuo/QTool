@@ -181,7 +181,7 @@ namespace QTool.Inspector
 	{
 		public QDictionary<QOnInspectorAttribute, QFunctionInfo> inspectorState = new QDictionary<QOnInspectorAttribute, QFunctionInfo>();
 		public QDictionary<QOnSceneInputAttribute, QFunctionInfo> mouseEventFunc = new QDictionary<QOnSceneInputAttribute, QFunctionInfo>();
-		public QDictionary<QFunctionInfo, QNameAttribute> buttonFunc = new QDictionary<QFunctionInfo, QNameAttribute>();
+		public List<QFunctionInfo> buttonFunc = new List<QFunctionInfo>();
 		protected override void Init(Type type)
 		{
 			base.Init(type);
@@ -197,11 +197,11 @@ namespace QTool.Inspector
 				}
 				foreach (var att in funcInfo.MethodInfo.GetCustomAttributes<QNameAttribute>())
 				{
-					buttonFunc[funcInfo] = att;
+					buttonFunc.Add(funcInfo);
 				}
 				foreach (var att in funcInfo.MethodInfo.GetCustomAttributes<ContextMenu>())
 				{
-					buttonFunc[funcInfo] = new QNameAttribute(att.menuItem);
+					buttonFunc.Add(funcInfo);
 				}
 				foreach (var att in funcInfo.MethodInfo.GetCustomAttributes<QOnInspectorAttribute>())
 				{

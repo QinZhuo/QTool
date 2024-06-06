@@ -535,12 +535,11 @@ namespace QTool
 		}
 		public static void Add(this VisualElement root, QInspectorType inspectorType, object target)
 		{
-			foreach (var butInfo in inspectorType.buttonFunc)
+			foreach (var func in inspectorType.buttonFunc)
 			{
-				var name = butInfo.Value.name.IsNull() ? butInfo.Key.Name : butInfo.Value.name;
-				root.AddButton(name, () =>
+				root.AddButton(func.QName, () =>
 				{
-					butInfo.Key.Invoke(target);
+					func.Invoke(target);
 				});
 			}
 		}
