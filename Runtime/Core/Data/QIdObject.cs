@@ -146,7 +146,7 @@ namespace QTool
 			string loadPath = null;
 			if (id.Contains(ResourcesKey))
 			{
-				loadPath = id.SplitEndString("/" + nameof(Resources) + "/");
+				loadPath = id.SplitEndString(ResourcesKey);
 				if (loadPath.Contains("."))
 				{
 					loadPath = loadPath.WithoutExtension();
@@ -201,8 +201,8 @@ namespace QTool
 					}
 				}
 #endif
+				QDebug.LogWarning("未找到【" + id + "】[" + loadPath + "]");
 			}
-			QDebug.LogWarning("找不到[" + id + "]对象");
 			return null;
 		}
 		public static T GetObject<T>(string id) where T : Object

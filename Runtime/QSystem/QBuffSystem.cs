@@ -290,10 +290,6 @@ namespace QTool
 	}
 	public abstract class QEffectData<T> : QDataList<T> where T : QEffectData<T>, IKey<string>, new()
 	{
-		private string GetAssetPath(string key)
-		{
-			return "Assets/Resources/" + nameof(QFlowGraph) + "/" + typeof(T).Name + "/" + key + ".asset";
-		}
 		[QIgnore]
 		protected string m_effectInfo = "";
 		[QName("效果说明")]
