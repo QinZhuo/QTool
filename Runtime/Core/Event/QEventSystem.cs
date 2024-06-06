@@ -404,7 +404,7 @@ namespace QTool {
 		}
 		#endregion
 		#region QEventSystem 拓展
-		public static void Invoke(this GameObject gameObject, string key) {
+		public static void InvokeEvent(this GameObject gameObject, string key) {
 			gameObject.GetComponent<QEventSystem>(true).InvokeEvent(key);
 		}
 		public static void InvokeEvent(this GameObject gameObject, string key, string value) {
