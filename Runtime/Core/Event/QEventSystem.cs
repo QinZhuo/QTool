@@ -61,6 +61,9 @@ namespace QTool {
 		private QDictionary<string, QObjectList> objectLists => _objectLists ??= new QDictionary<string, QObjectList>(key => {
 			return transform.FindAll(key)?.GetComponent<QObjectList>();
 		});
+		public void InvokeEvent(string key) {
+			Events[key]?.Invoke();
+		}
 		public void InvokeEvent(string key, string value) {
 			StringEvents[key]?.Invoke(value);
 		}
@@ -401,6 +404,9 @@ namespace QTool {
 		}
 		#endregion
 		#region QEventSystem 拓展
+		public static void Invoke(this GameObject gameObject, string key) {
+			gameObject.GetComponent<QEventSystem>(true).InvokeEvent(key);
+		}
 		public static void InvokeEvent(this GameObject gameObject, string key, string value) {
 			gameObject.GetComponent<QEventSystem>(true).InvokeEvent(key, value);
 		}
