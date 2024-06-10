@@ -364,16 +364,17 @@ namespace QTool {
 			if (valueEvent != null && valueEvent is MonoBehaviour mono) {
 				return mono.GetUnityAction<string>(nameof(valueEvent.InvokeEvent));
 			}
+#if TMPro
+			var tmp_text = obj.GetComponent<TMP_Text>();
+			if (tmp_text != null)
+			{
+				return tmp_text.GetUnityAction<string>("set_text");
+			}
+#endif
 			var text = obj.GetComponent<Text>();
 			if (text != null) {
 				return text.GetUnityAction<string>("set_text");
 			}
-#if TMPro
-			var tmp_text = obj.GetComponent<TMP_Text>();
-			if (tmp_text != null) {
-				return tmp_text.GetUnityAction<string>("set_text");
-			}
-#endif
 			return null;
 		}
 		public static UnityAction<bool> GetBoolUnityAction(this GameObject obj) {
@@ -399,6 +400,18 @@ namespace QTool {
 			var image = obj.GetComponent<Image>();
 			if (image != null) {
 				return obj.GetUnityAction<float>("set_fillAmount");
+			}
+#if TMPro
+			var tmp_text = obj.GetComponent<TMP_Text>();
+			if (tmp_text != null)
+			{
+				return value => tmp_text.text = value.ToString();
+			}
+#endif
+			var text = obj.GetComponent<Text>();
+			if (text != null)
+			{
+				return value=>text.text=value.ToString();
 			}
 			return null;
 		}
