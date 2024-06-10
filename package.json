@@ -1,30 +1,33 @@
 {
-  "name": "com.qtool.qtool",
+	"name": "com.qtool.qtool",
 
-  "version": "2024.6.7",
-  "displayName": "QTool",
-  "description": "QTool",
-  "unity": "2022.1",
- "keywords": [
-    "unity",
-    "tool"
-  ],
-  "author": {
-    "name": "QinZhuo",
-    "url": "https://space.bilibili.com/3981300"
-  },
-  "samples": [
-    {
-      "displayName": "Demo",
-      "description": "Demo",
-      "path": ".Demo"
-    },
-    {
-      "displayName": "ComputeShader",
-      "description": "ComputeShader",
-      "path": ".ComputeShader"
-    }
-  ]
+	"version": "2024.6.10",
+	"displayName": "QTool",
+	"description": "QTool",
+	"unity": "2022.1",
+	"keywords": [
+		"unity",
+		"tool"
+	],
+	"author": {
+		"name": "QinZhuo",
+		"url": "https://space.bilibili.com/3981300"
+	},
+	"dependencies": {
+		"com.unity.burst": "1.8.15"
+	},
+	"samples": [
+		{
+			"displayName": "Demo",
+			"description": "Demo",
+			"path": ".Demo"
+		},
+		{
+			"displayName": "ComputeShader",
+			"description": "ComputeShader",
+			"path": ".ComputeShader"
+		}
+	]
 }
 
 
