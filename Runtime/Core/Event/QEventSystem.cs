@@ -106,6 +106,7 @@ namespace QTool {
 					}
 					else if (member.Type.Is(typeof(QRuntimeValue<float>))) {
 						var runtimeValue = member.Get(obj).As<QRuntimeValue<float>>();
+						if (runtimeValue == null) continue;
 						runtimeValue.OnValueChange += system.FloatEvents[member.QName];
 						if (runtimeValue is QRuntimeRangeValue rangeValue) {
 							rangeValue.OnCurrentValueChange += system.FloatEvents[member.QName + "_" + nameof(rangeValue.CurrentValue)];
@@ -119,11 +120,13 @@ namespace QTool {
 					}
 					else if (member.Type.Is(typeof(QRuntimeValue<string>))) {
 						var runtimeValue = member.Get(obj).As<QRuntimeValue<string>>();
+						if (runtimeValue == null) continue;
 						runtimeValue.OnValueChange += system.StringEvents[member.QName];
 						runtimeValue.InvokeOnChange();
 					}
 					else if (member.Type.Is(typeof(QRuntimeValue<bool>)) ) {
 						var runtimeValue = member.Get(obj).As<QRuntimeValue<bool>>();
+						if (runtimeValue == null) continue;
 						runtimeValue.OnValueChange += system.BoolEvents[member.QName];
 						runtimeValue.InvokeOnChange();
 					}
@@ -139,6 +142,7 @@ namespace QTool {
 				foreach (var member in typeInfo.Members) {
 					if (member.Type.Is(typeof(QRuntimeValue<float>))) {
 						var runtimeValue = member.Get(obj).As<QRuntimeValue<float>>();
+						if (runtimeValue == null) continue;
 						runtimeValue.OnValueChange -= system.FloatEvents[member.QName];
 						if (runtimeValue is QRuntimeRangeValue rangeValue) {
 							rangeValue.OnCurrentValueChange -= system.FloatEvents[member.QName + "_" + nameof(rangeValue.CurrentValue)];
@@ -147,10 +151,12 @@ namespace QTool {
 					}
 					else if (member.Type.Is(typeof(QRuntimeValue<string>))) {
 						var runtimeValue = member.Get(obj).As<QRuntimeValue<string>>();
+						if (runtimeValue == null) continue;
 						runtimeValue.OnValueChange -= system.StringEvents[member.QName];
 					}
 					else if (member.Type.Is(typeof(QRuntimeValue<bool>))) {
 						var runtimeValue = member.Get(obj).As<QRuntimeValue<bool>>();
+						if (runtimeValue == null) continue;
 						runtimeValue.OnValueChange -= system.BoolEvents[member.QName];
 					}
 				}
