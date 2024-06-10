@@ -186,14 +186,22 @@ namespace QTool
 			var find = transform.Find(name);
 			if (find == null)
 			{
-				for (int i = 0; i < transform.childCount; i++)
+				if (transform.childCount > 0)
 				{
-					find = transform.GetChild(i).FindAll(name);
-					if (find != null)
+					for (int i = 0; i < transform.childCount; i++)
 					{
-						return find;
+						find = transform.GetChild(i).FindAll(name);
+						if (find != null)
+						{
+							return find;
+						}
 					}
 				}
+				else if(transform.TryGetComponent<QFollowView>(out var view))
+				{
+					return view.View.FindAll(name);
+				}
+			
 			}
 			return find;
 		}
