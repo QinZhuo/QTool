@@ -252,7 +252,7 @@ namespace QTool
 		#region 加载数据
 		public static string GetResourcesPath(string key = null)
 		{
-			return QFileTool.ResourcesPathRoot.MergePath(typeof(T).Name.TrimStart('Q')).MergePath(key) + QDataListTool.Extension;
+			return QFileTool.ResourcesPathRoot.MergePath(typeof(T).Name).MergePath(key) + QDataListTool.Extension;
 		}
 		public static QDataList LoadQDataList(string key = null)
 		{

@@ -465,7 +465,7 @@ namespace QTool
 			return target;
 		}
 
-		public static string MergePath(this string rootPath,string childe)
+		public static string MergePath(this string rootPath, string childe)
 		{
 			if (childe.IsNull())
 			{
@@ -473,7 +473,7 @@ namespace QTool
 			}
 			else
 			{
-				return rootPath + "/" + childe;
+				return Path.Combine(rootPath, childe);
 			}
 		}
 		public static string CheckDirectoryPath(this string path)

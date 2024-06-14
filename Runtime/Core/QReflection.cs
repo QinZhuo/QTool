@@ -939,22 +939,7 @@ namespace QTool.Reflection
 					{
 						typeList.AddRange(ass.GetTypes());
 					}
-					typeList.RemoveAll((type) =>
-					{
-						var baseType = type;
-						while (baseType != null && !type.IsAbstract)
-						{
-							if (baseType.Name == rootType.Name)
-							{
-								return false;
-							}
-							else
-							{
-								baseType = baseType.BaseType;
-							}
-						}
-						return true;
-					});
+					typeList.RemoveAll(type => !type.Is(rootType));
 					typeList.Remove(rootType);
 					AllTypesCache[rootType] = typeList.ToArray();
 				}
@@ -984,6 +969,10 @@ namespace QTool.Reflection
 				else if (type == typeof(UnityEngine.Object))
 				{
 					return null;
+				}
+				else if(type.IsInterface)
+				{
+					return CreateInstance(GetAllTypes(type)[0],targetObj,param);
 				}
 				return Activator.CreateInstance(type, param);
 			}

@@ -458,7 +458,7 @@ namespace QTool
 		public static IList CreateAt(this IList list, QSerializeType typeInfo, int index = -1)
 		{
 			var newObj = (index < 0||list[index]==null)? typeInfo.ElementType.CreateInstance():list[index].QDataCopy();
-			if (index < 0)
+			if (index < 0) 
 			{
 				index = 0;
 			}
