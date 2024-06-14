@@ -473,7 +473,7 @@ namespace QTool
 			}
 			else
 			{
-				return Path.Combine(rootPath, childe);
+				return rootPath + "/" + childe;
 			}
 		}
 		public static string CheckDirectoryPath(this string path)

@@ -25,7 +25,7 @@ namespace QTool.Inspector
 
 		protected virtual void OnDestroy()
 		{
-			typeInfo.InvokeQInspectorState(target,QInspectorState.OnDisable);
+			typeInfo.InvokeQInspectorState(target,QInspectorState.OnDisable); 
 		}
 		public override VisualElement CreateInspectorGUI()
 		{

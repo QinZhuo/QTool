@@ -32,7 +32,7 @@ namespace QTool {
 		public UnityEvent<string> OnLocalizationChange = new UnityEvent<string>();
 		private void Awake() {
 			QLocalizationData.OnLanguageChange += FreshFont;
-			QLocalizationData.OnLanguageChange += FreshLocalization;
+			QLocalizationData.OnLanguageChange += FreshLocalization; 
 		}
 		private void Reset() {
 			var text = GetComponentInChildren<Text>();

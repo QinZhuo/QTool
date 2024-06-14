@@ -99,6 +99,11 @@ namespace QTool.Reflection
 		public bool IsPublic => MethodInfo.IsPublic;
 		public object Invoke(object target, params object[] param)
 		{
+			var MethodInfo = this.MethodInfo;
+			if (MethodInfo.ContainsGenericParameters)
+			{
+				MethodInfo = MethodInfo.MakeGenericMethod(param.Select(obj => obj.GetType()).ToArray());
+			}
 			if (ParamInfos.Length > param.Length)
 			{
 				var newParam = new object[ParamInfos.Length];
@@ -119,8 +124,8 @@ namespace QTool.Reflection
 		}
 		public QFunctionInfo(MethodInfo info)
 		{
-			this.MethodInfo = info;
-			Key = info.Name;
+			Key = info.GetNameWithParams();
+			MethodInfo = info;
 			QName = info.QName();
 			ParamInfos = info.GetParameters();
 			ParamTypes = new Type[ParamInfos.Length];
@@ -150,6 +155,7 @@ namespace QTool.Reflection
 		public string Key { get; set; }
 		public QList<string, QMemeberInfo> Members = new QList<string, QMemeberInfo>();
 		public QList<string, QFunctionInfo> Functions = new QList<string, QFunctionInfo>();
+		public QDictionary<string, QDictionary<int, List<QFunctionInfo>>> FunctionsCache = new QDictionary<string, QDictionary<int, List<QFunctionInfo>>>(key=>new QDictionary<int, List<QFunctionInfo>>(key=>new List<QFunctionInfo>()));
 		public bool IsList;
 		public bool IsDictionary;
 		public Type KeyType { get; private set; }
@@ -308,6 +314,7 @@ namespace QTool.Reflection
 					{
 						var function = new QFunctionInfo(info);
 						Functions.Add(function);
+						FunctionsCache[function.MethodInfo.Name][function.ParamInfos.Length].Add(function);
 					}, FunctionFlags);
 				}
 
@@ -577,9 +584,9 @@ namespace QTool.Reflection
 		{
 			var nameStart = method.Name;
 			var Params = method.GetParameters();
-			for (int i = 0; i < Params.Length; ++i)
+			if (Params.Length > 0)
 			{
-				nameStart += "_" + Params[i].ParameterType.Name;
+				nameStart += "_" + Params.ToOneString("_", item => item.ParameterType.Name);
 			}
 			return nameStart;
 		}
@@ -872,15 +879,6 @@ namespace QTool.Reflection
 
 			}
 		}
-		public static QFunctionInfo GetFunction(this Type type, string funcName)
-		{
-			var typeInfo = QReflectionType.Get(type);
-			if (typeInfo.Functions.ContainsKey(funcName))
-			{
-				return typeInfo.Functions[funcName];
-			}
-			return null;
-		}
 		public static object InvokeFunction(this object obj, string funcName, params object[] param)
 		{
 			if (funcName.IsNull())
@@ -899,19 +897,34 @@ namespace QTool.Reflection
 				objType = obj as Type;
 			}
 			var typeInfo = QReflectionType.Get(objType);
-			var method = typeInfo.Functions[funcName]?.MethodInfo;
-			if (method == null)
+			if (typeInfo.FunctionsCache[funcName].ContainsKey(param.Length))
 			{
-				method = typeInfo.Functions["get_" + funcName]?.MethodInfo;
+				var methods = typeInfo.FunctionsCache[funcName][param.Length];
+				if (methods.Count > 1)
+				{
+					foreach (var method in methods)
+					{
+						var match = true;
+						for (int i = 0; i < param.Length; i++)
+						{
+							if (!method.ParamTypes[i].ContainsGenericParameters && param[i] != null && !param[i].GetType().Is(method.ParamTypes[i]))
+							{
+								match = false;
+								break;
+							}
+						}
+						if (match)
+						{
+							return method.Invoke(obj, param);
+						}
+					}
+				}
+				else
+				{
+					return methods[0].Invoke(obj, param);
+				}
 			}
-			if (method == null)
-			{
-				return objType.InvokeStaticFunction(funcName, param);
-			}
-			else
-			{
-				return method.Invoke(obj, param);
-			}
+			return objType.InvokeStaticFunction(funcName, param);
 		}
 		static List<Type> typeList = new List<Type>();
 		static QDictionary<Type, List<Type>> AllTypesCache = new QDictionary<Type, List<Type>>();
@@ -935,7 +948,7 @@ namespace QTool.Reflection
 
 				}
 				typeList.Remove(rootType);
-				AllTypesCache[rootType] = typeList.ToList();
+				AllTypesCache[rootType] = new List<Type>(typeList);
 			}
 			return AllTypesCache[rootType];
 		}

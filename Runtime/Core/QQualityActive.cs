@@ -7,11 +7,6 @@ namespace QTool {
 	public class QQualityActive : MonoBehaviour
 	{
 		public static int CurLevel { get; private set; } = -1;
-		[RuntimeInitializeOnLoadMethod]
-		static void Init()
-		{
-			QToolManager.Instance.OnUpdate += CheckUpdate;
-		}
 		static void CheckUpdate()
 		{
 			if (CurLevel != QualitySettings.GetQualityLevel())
