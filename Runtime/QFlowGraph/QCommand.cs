@@ -100,18 +100,18 @@ namespace QTool
 				return null;
 			}
         }
-        static void FreshCommands(params Type[] types)
-        {
-			QDebug.Begin(nameof(QCommandType)+"初始化");
+		static void FreshCommands(IEnumerable<Type> types)
+		{
+			QDebug.Begin(nameof(QCommandType) + "初始化");
 			foreach (var t in types)
 			{
 				if (!TypeList.Contains(t))
-                {
-                    FreshTypeCommands(t);
+				{
+					FreshTypeCommands(t);
 				}
-            }
+			}
 			QDebug.End(nameof(QCommandType) + "初始化", " 命令数 " + KeyDictionary.Count);
-        }
+		}
         static void FreshTypeCommands(Type type)
         {
             type.ForeachFunction((methodInfo) =>

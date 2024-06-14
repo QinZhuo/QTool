@@ -49,7 +49,11 @@ namespace QTool
 				}
 				else
 				{
-					if (clearList.Count > 0) { clearList.Remove(view); }
+					if (clearList.Count > 0)
+					{
+						clearList.Remove(view); 
+						view.transform.SetAsLastSibling();
+					}
 				}
 				return view;
 			}

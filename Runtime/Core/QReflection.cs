@@ -914,35 +914,28 @@ namespace QTool.Reflection
 			}
 		}
 		static List<Type> typeList = new List<Type>();
-		static QDictionary<Type, Type[]> AllTypesCache = new QDictionary<Type, Type[]>();
-		public static Type[] GetAllTypes(this Type rootType)
+		static QDictionary<Type, List<Type>> AllTypesCache = new QDictionary<Type, List<Type>>();
+		public static List<Type> GetAllTypes(this Type rootType)
 		{
 			if (!AllTypesCache.ContainsKey(rootType))
 			{
+				typeList.Clear();
+				foreach (var ass in GetAllAssemblies())
+				{
+					typeList.AddRange(ass.GetTypes());
+				}
+				typeList.RemoveAll(type => type.IsAbstract || type.IsInterface);
 				if (typeof(Attribute).IsAssignableFrom(rootType))
 				{
-					List<Type> typeList = new List<Type>();
-					foreach (var ass in GetAllAssemblies())
-					{
-						typeList.AddRange(ass.GetTypes());
-					}
-					typeList.RemoveAll((type) =>
-					{
-						return type.GetCustomAttribute(rootType) == null;
-					});
-					AllTypesCache[rootType] = typeList.ToArray();
+					typeList.RemoveAll(type => type.GetCustomAttribute(rootType) == null);
 				}
 				else
 				{
-					typeList.Clear();
-					foreach (var ass in GetAllAssemblies())
-					{
-						typeList.AddRange(ass.GetTypes());
-					}
 					typeList.RemoveAll(type => !type.Is(rootType));
-					typeList.Remove(rootType);
-					AllTypesCache[rootType] = typeList.ToArray();
+
 				}
+				typeList.Remove(rootType);
+				AllTypesCache[rootType] = typeList.ToList();
 			}
 			return AllTypesCache[rootType];
 		}

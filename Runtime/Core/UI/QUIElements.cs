@@ -288,7 +288,6 @@ namespace QTool
 		{
 			root.AddManipulator(new ContextualMenuManipulator(menuBuilder));
 		}
-		public static List<Type> TypeList = new List<Type>() { typeof(UnityEngine.Object), typeof(string) };
 		public static QDictionary<Type, Func<string, object, Action<object>, VisualElement>> TypeOverride = new QDictionary<Type, Func<string, object, Action<object>, VisualElement>>();
 		public static VisualElement Add(this VisualElement root, string name, object obj, Type type, Action<object> changeEvent, ICustomAttributeProvider customAttribute = null)
 		{
@@ -308,10 +307,6 @@ namespace QTool
 				obj = type.CreateInstance();
 			}
 			var typeInfo = QSerializeType.Get(type);
-			if (type != typeof(object) && !TypeList.Contains(type) && !type.IsGenericType)
-			{
-				TypeList.Add(type);
-			}
 			if (TypeOverride.ContainsKey(type))
 			{
 				var visual = TypeOverride[type](name, obj, changeEvent);
@@ -391,11 +386,10 @@ namespace QTool
 								var dynamicObjectView = root.AddVisualElement();
 								dynamicObjectView.style.flexDirection = FlexDirection.Row; ;
 								dynamicObjectView.AddLabel(name);
-								var typePopup = dynamicObjectView.AddPopup("", TypeList, obj.GetType(), (newType) =>
+								var typePopup = dynamicObjectView.AddPopup("", typeInfo.Type.GetAllTypes(), obj.GetType(), (newType) =>
 								 {
 									 obj = newType.CreateInstance();
 									 dynamicObjectView.Remove(dynamicObjectView.Q<VisualElement>(nameof(dynamicObjectView)));
-
 									 if (QSerializeType.Get(newType).ObjType != QObjectType.DynamicObject)
 									 {
 										 var temp = dynamicObjectView.Add("", obj, newType, changeEvent);
@@ -740,7 +734,7 @@ namespace QTool
 						{
 							funcKey += ".List"; 
 						}
-						if (obj.InvokeFunction(funcKey) is IList itemList)
+						if (obj.InvokeFunction(funcKey) is IEnumerable itemList)
 						{
 							foreach (var item in itemList)
 							{
