@@ -8,6 +8,8 @@ using QTool.Inspector;
 using QTool.Reflection;
 using System.Reflection;
 using System.Linq;
+using Unity.Collections;
+
 #if UNITY_EDITOR
 using UnityEditor.UIElements;
 #endif
@@ -395,6 +397,7 @@ namespace QTool
 										 var temp = dynamicObjectView.Add("", obj, newType, changeEvent);
 										 temp.name = nameof(dynamicObjectView);
 									 }
+									 changeEvent?.Invoke(obj);
 								 });
 								typePopup.style.maxWidth = 100;
 								if (QSerializeType.Get(typePopup.value).ObjType != QObjectType.DynamicObject)
@@ -434,6 +437,40 @@ namespace QTool
 									return foldout;
 								}
 							}
+						case QObjectType.FixedString: {
+
+							return root.AddText(name, obj.ToString(), newValue => {
+								switch (type.Name) {
+									case nameof(FixedString32Bytes): {
+										var fixedStr = (FixedString32Bytes)obj;
+										fixedStr.CopyFromTruncated(newValue);
+										changeEvent?.Invoke(fixedStr);
+									}
+									break;
+									case nameof(FixedString64Bytes): {
+										var fixedStr = (FixedString64Bytes)obj;
+										fixedStr.CopyFromTruncated(newValue);
+										changeEvent?.Invoke(fixedStr);
+									}
+									break;
+									case nameof(FixedString512Bytes): {
+										var fixedStr = (FixedString512Bytes)obj;
+										fixedStr.CopyFromTruncated(newValue);
+										changeEvent?.Invoke(fixedStr);
+									}
+									break;
+									case nameof(FixedString4096Bytes): {
+										var fixedStr = (FixedString4096Bytes)obj;
+										fixedStr.CopyFromTruncated(newValue);
+										changeEvent?.Invoke(fixedStr);
+									}
+									break;
+									default:
+										break;
+								}
+							});
+						}
+						break;
 						case QObjectType.Array:
 						case QObjectType.List:
 							{
