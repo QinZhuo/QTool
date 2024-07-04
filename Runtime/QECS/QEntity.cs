@@ -28,9 +28,11 @@ namespace QTool
     }
     public class QEntityData : QDataList<QEntityData>
     {
-        public List<IComponentData> comps = new List<IComponentData>();
+        public List<IQEntityComponmentData> comps = new List<IQEntityComponmentData>();
     }
-   
+	public interface IQEntityComponmentData : IComponentData {
+
+	}
 }
 #else
 namespace QTool

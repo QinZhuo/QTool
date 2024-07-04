@@ -1,16 +1,15 @@
 #if ECS
+using QTool;
 using System.Numerics;
 using Unity.Burst;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
 
-public struct Comp1 : IComponentData
-{
+public struct Comp1 : IQEntityComponmentData {
     public Vector2 pos;
 }
-public struct Comp2 : IComponentData
-{
+public struct Comp2 : IQEntityComponmentData {
     public float speed;
     public Entity prefab;
 }
