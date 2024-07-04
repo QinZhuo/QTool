@@ -483,14 +483,7 @@ namespace QTool.Reflection
 		}
 		public static string QTypeName(this Type type)
 		{
-			if (type.IsGenericType || type.IsArray)
-			{
-				return type.FullName;
-			}
-			else
-			{
-				return type.Name;
-			}
+			return type.FullName;
 		}
 		private static QDictionary<Type, int> MinSizeCache = new QDictionary<Type, int>();
 		public static int MinSize(this Type type)
@@ -1041,7 +1034,7 @@ namespace QTool.Reflection
 						{
 							foreach (var eType in assemblyArray[i].GetTypes())
 							{
-								if (eType.Name.Equals(typeString))
+								if (eType.Name.Equals(typeString) || eType.QOldName().Equals(typeString))
 								{
 									type = eType;
 									if (type != null)
@@ -1057,7 +1050,6 @@ namespace QTool.Reflection
 						}
 						catch (Exception e)
 						{
-
 							throw new Exception("[" + assemblyArray[i].FullName + "]", e);
 						}
 

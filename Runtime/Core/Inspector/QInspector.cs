@@ -15,7 +15,7 @@ namespace QTool
 	/// <summary>
 	/// 更改显示的名字
 	/// </summary>
-	[AttributeUsage(AttributeTargets.Field | AttributeTargets.Class | AttributeTargets.Method | AttributeTargets.Interface | AttributeTargets.Parameter | AttributeTargets.Property)]
+	[AttributeUsage(AttributeTargets.Field | AttributeTargets.Class| AttributeTargets.Struct | AttributeTargets.Method | AttributeTargets.Interface | AttributeTargets.Parameter | AttributeTargets.Property)]
 	public class QNameAttribute : PropertyAttribute
 	{
 		public string name;
@@ -48,7 +48,7 @@ namespace QTool
 
 	}
 
-	[AttributeUsage(AttributeTargets.Field | AttributeTargets.Class | AttributeTargets.Method | AttributeTargets.Interface | AttributeTargets.Parameter | AttributeTargets.Property)]
+	[AttributeUsage(AttributeTargets.Field | AttributeTargets.Class| AttributeTargets.Struct | AttributeTargets.Method | AttributeTargets.Interface | AttributeTargets.Parameter | AttributeTargets.Property)]
 	public class QOldNameAttribute : Attribute
 	{
 		public string name;
