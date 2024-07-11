@@ -1,4 +1,5 @@
 #if ECS
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using NUnit.Framework;
@@ -15,21 +16,30 @@ namespace QTool
     {
         [QPopup(nameof(QEntityData))]
         public string data;
-    }
+
+		public TransformUsageFlags usage = TransformUsageFlags.Dynamic;
+	}
     public class QEntityBaker : Baker<QEntity>
     {
+		private List<Type> typeList = new List<Type>();
         public override void Bake(QEntity authoring)
         {
-            GetEntity(TransformUsageFlags.Dynamic);
+			typeList.Clear();
+			GetEntity(authoring.usage);
             if (!QEntityData.ContainsKey(authoring.data)) return;
             foreach (var comp in QEntityData.Get(authoring.data).comps)
             {
-				var typeInfo = QSerializeType.Get(comp.GetType());
+				var type = comp.GetType();
+				if (typeList.Contains(type))
+					continue;
+				typeList.Add(type);
+				var typeInfo = QSerializeType.Get(type);
 				foreach (var memeber in typeInfo.Members) {
 					if (memeber.Type == typeof(QPrefabEntity) && memeber.Get(comp) is QPrefabEntity prefabEntity) {
 						var prefab = Resources.Load<GameObject>(prefabEntity.path.ToString());
 						if (prefab != null) {
-							prefabEntity.entity = GetEntity(prefab, TransformUsageFlags.Dynamic);
+							var entity= prefab.GetComponent<QEntity>();
+							prefabEntity.entity = GetEntity(prefab, entity == null ? TransformUsageFlags.Dynamic : entity.usage);
 							memeber.Set(comp, prefabEntity);
 						}
 					}
@@ -43,7 +53,7 @@ namespace QTool
         public List<IQEntityComponmentData> comps = new List<IQEntityComponmentData>();
     }	
 	public struct QPrefabEntity {
-		public FixedString64Bytes path; 
+		public FixedString64Bytes path;
 		[QIgnore]
 		public Entity entity;
 	}

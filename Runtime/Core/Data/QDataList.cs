@@ -213,6 +213,7 @@ namespace QTool
 	{
 		[QName("Key")]
 		public virtual string Key { get; set; }
+		public QDataRow DataRow { get;internal set; }
 		public override string ToString()
 		{
 			return Key;
@@ -249,6 +250,7 @@ namespace QTool
 				return _List;
 			}
 		}
+		public static QDataList DataList { internal set; get; }
 		#region 加载数据
 		public static string GetResourcesPath(string key = null)
 		{
@@ -272,11 +274,13 @@ namespace QTool
 		public static void Load(string key = null)
 		{
 			_List = new QList<string, T>();
-			LoadQDataList(key).ParseQDataList(_List);
+			DataList = LoadQDataList(key);
+			DataList.ParseQDataList(_List);
 		}
 		public static void UnLoad()
 		{
 			_List = null;
+			DataList = null;
 		}
 		#endregion
 	}
