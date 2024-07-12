@@ -9,7 +9,7 @@ using System.Reflection;
 namespace QTool.FlowGraph
 {
 	[Serializable]
-    public class QFlowGraph: QSerializeObject<QFlowGraph>
+    public class QFlowGraph: QSerializeObject
 	{
 		public const string ext = ".qflowgraph";
 		static QFlowGraph()

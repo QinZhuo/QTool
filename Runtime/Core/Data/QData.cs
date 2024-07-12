@@ -964,18 +964,18 @@ namespace QTool
 		void ToQData(StringWriter writer);
 		void ParseQData(StringReader reader);
 	}
-	public abstract class QSerializeObject<T> : ISerializationCallbackReceiver, IQSerializeCallback where T : QSerializeObject<T>
+	public abstract class QSerializeObject: ISerializationCallbackReceiver, IQSerializeCallback 
 	{
 
 		[QIgnore, HideInInspector, SerializeField]
 		internal string SerializeString;
 		public virtual void OnBeforeSerialize()
 		{
-			SerializeString = (this as T).ToQData();
+			SerializeString = this.ToQData();
 		}
 		public virtual void OnAfterDeserialize()
 		{
-			SerializeString.ParseQData(this as T);
+			SerializeString.ParseQData(this);
 			OnLoad();
 		}
 

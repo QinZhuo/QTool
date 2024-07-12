@@ -6,7 +6,7 @@ using UnityEngine;
 namespace QTool
 {
 	[System.Serializable]
-	public class QVoxelData: QSerializeObject<QVoxelData>
+	public class QVoxelData: QSerializeObject
 	{
 		[QName("Colors")]
 		public List<Color32> Colors { get; protected set; } = new List<Color32> { Color.white };
