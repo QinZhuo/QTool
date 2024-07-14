@@ -13,6 +13,8 @@ using UnityEngine.LowLevel;
 using System.Linq;
 using UnityEngine.Playables;
 using System.Net;
+using Unity.Entities;
+
 #if UNITY_EDITOR
 using PrefabStageUtility = UnityEditor.SceneManagement.PrefabStageUtility;
 #endif
@@ -292,6 +294,12 @@ namespace QTool
 		public static bool IsNull(this string str)
 		{
 			return string.IsNullOrWhiteSpace(str);
+		}
+		public static bool IsDefualt<T>(this ref T obj) where T : struct {
+			return Equals(obj, default);
+		}
+		public static bool IsDefualt(this in Entity obj) {
+			return Entity.Null.Equals(obj);
 		}
 		public static bool IsNull<T>(this T obj)
 		{
@@ -625,7 +633,7 @@ namespace QTool
 					}
 					else if (type.IsPrimitive)
 					{
-						return obj.ToQDataType(objType, false).ParseQDataType(type, false);
+						return obj.ToQDataType(objType).ParseQDataType(type);
 					}
 					else if (type == typeof(string))
 					{

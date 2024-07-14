@@ -321,10 +321,10 @@ namespace QTool
 			Instance.titleContent = new GUIContent( key);
 			Instance.type = type;
 			Instance.value = value;
-			var oldValue = Instance.value.ToQDataType(type, false)?.GetHashCode();
+			var oldValue = Instance.value.ToQDataType(type)?.GetHashCode();
 			Instance.customAttribute = customAttribute;
 			Instance.ShowModal();
-			changed = oldValue != Instance.value.ToQDataType(type, false)?.GetHashCode();
+			changed = oldValue != Instance.value.ToQDataType(type)?.GetHashCode();
 			return Instance.value;
 		}
 		public Type type;

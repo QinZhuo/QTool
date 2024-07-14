@@ -176,6 +176,7 @@ namespace QTool
 						writer.Write('\n');
 					}
 				}
+				writer.Write('\n');
 				return writer.ToString();
 			}
 
@@ -403,7 +404,7 @@ namespace QTool
 			}
 			else
 			{
-				return base[index].ParseQData(defaultValue, false);
+				return base[index].ParseQData(defaultValue);
 			}
 		}
 		public void SetValueType(object value, Type type, int index = 1)
@@ -415,7 +416,7 @@ namespace QTool
 			else
 			{
 
-				base[index] = value.ToQDataType(type, false);
+				base[index] = value.ToQDataType(type);
 			}
 		}
 		public void SetValue<T>(T value, int index = 1)

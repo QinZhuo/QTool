@@ -823,7 +823,7 @@ namespace QTool.FlowGraph
 				}
 				if (m_value.IsNull())
 				{
-					m_value = StringValue.ParseQDataType(ValueType, true, m_value);
+					m_value = StringValue.ParseQDataType(ValueType, m_value);
 				}
 				return m_value;
             }

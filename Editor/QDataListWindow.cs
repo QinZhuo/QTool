@@ -118,7 +118,7 @@ namespace QTool.FlowGraph
 												QPopupData.ClearAll();
 											}
 											member.Set(obj, newValue);
-											label.text = member.Get(obj).ToQDataType(member.Type, false)?.Replace("\\n", " ").Trim('\"');
+											label.text = member.Get(obj).ToQDataType(member.Type)?.Replace("\\n", " ").Trim('\"');
 											label.Tooltip(label.text);
 											SetDataDirty();
 										}, member.MemeberInfo);
@@ -149,7 +149,7 @@ namespace QTool.FlowGraph
 									else
 									{
 										member.Set(obj, null);
-										label.text = member.Get(obj).ToQDataType(member.Type, false)?.Replace("\\n", " ").Trim('\"');
+										label.text = member.Get(obj).ToQDataType(member.Type)?.Replace("\\n", " ").Trim('\"');
 									}
 									SetDataDirty();
 								});
@@ -277,7 +277,7 @@ namespace QTool.FlowGraph
 				var obj = objList[y - 1];
 				try
 				{
-					return member.Get(obj)?.ToQDataType(member.Type, false).Trim('\"');
+					return member.Get(obj)?.ToQDataType(member.Type).Trim('\"');
 				}
 				catch (Exception e)
 				{

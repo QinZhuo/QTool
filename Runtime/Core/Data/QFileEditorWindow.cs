@@ -15,7 +15,12 @@ namespace QTool {
 #endif
 	where T : QFileEditorWindow<T> {
 		private static T _instance;
-		public static T Instance => _instance ??= GetWindow<T>();
+		public static T Instance =>
+#if UNITY_EDITOR
+			_instance ??= GetWindow<T>();
+#else
+			_instance;
+#endif
 		private QHistoryList FilePathList = new QHistoryList(typeof(T).Name);
 		[SerializeField]
 		private string _filePath = "";
