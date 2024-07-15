@@ -29,6 +29,8 @@ namespace QTool
             if (!QEntityData.ContainsKey(authoring.data)) return;
             foreach (var comp in QEntityData.Get(authoring.data).comps)
             {
+				if (comp == null)
+					continue;
 				var type = comp.GetType();
 				if (typeList.Contains(type))
 					continue;

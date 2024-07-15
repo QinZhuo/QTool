@@ -115,7 +115,7 @@ namespace QTool
 								var runtimeTypeInfo = QSerializeType.Get(runtimeType);
 								switch (runtimeTypeInfo.ObjType) {
 									case QObjectType.DynamicObject: {
-										WriteCheckString(writer, runtimeType.QTypeName());
+										WriteCheckString(writer, runtimeType.GetTypeName(type));
 										writer.Write(':');
 										WriteObject(writer, obj, runtimeTypeInfo, ObjStack);
 									}
@@ -123,7 +123,7 @@ namespace QTool
 									case QObjectType.CantSerialize:
 										break;
 									default: {
-										WriteCheckString(writer, runtimeType.QTypeName());
+										WriteCheckString(writer, runtimeType.GetTypeName(type));
 										writer.Write(':');
 										WriteType(writer, obj, runtimeType, ObjStack);
 									}
@@ -316,9 +316,12 @@ namespace QTool
 									break;
 								}
 								var str = reader.ReadCheckString();
-								var runtimeType = QReflection.ParseType(str);
+								var runtimeType = QReflection.ParseType(str, type);
 								if (reader.NextIsSplit(':')) {
-									if (type == runtimeType) {
+									if (runtimeType == null) {
+										reader.ReadObjectString();
+										Debug.LogException(new Exception("runtimeType 丢失 [" + str + "]"));
+									}else if (type == runtimeType) {
 										target = ReadObject(reader, typeInfo, target, ObjStack);
 									}
 									else {
@@ -513,7 +516,6 @@ namespace QTool
 					return double.Parse(ReadObjectString(reader));
 				case TypeCode.Empty:
 					return null;
-
 				case TypeCode.Single:
 					return float.Parse(ReadObjectString(reader));
 				case TypeCode.String:

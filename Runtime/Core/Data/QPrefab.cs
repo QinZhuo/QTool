@@ -43,7 +43,7 @@ namespace QTool
 				if (component is IQPrefabComponent iprefab)
 				{
 					prefabComponent= iprefab.SaveQPrefab(prefab?.GetComponent(component.GetType()));
-					prefabComponent.Key = type.QTypeName();
+					prefabComponent.Key = type.GetTypeName();
 				}
 				else
 				{
@@ -113,7 +113,7 @@ namespace QTool
 		public QPrefabComponent(Component component,Component prefab)
 		{
 			var typeInfo = QInspectorType.Get(component.GetType());
-			Key = typeInfo.Type.QTypeName();
+			Key = typeInfo.Type.GetTypeName();
 			foreach (var member in typeInfo.Members)
 			{
 				var value = member.Get(component);

@@ -481,9 +481,8 @@ namespace QTool.Reflection
 			var array = info.GetCustomAttributes(typeof(T), true);
 			return array.QueuePeek() as T;
 		}
-		public static string QTypeName(this Type type)
-		{
-			return type.FullName;
+		public static string GetTypeName(this Type type, Type baseType = null) {
+			return baseType == null || baseType == typeof(object) ? type.FullName : type.Name;
 		}
 		private static QDictionary<Type, int> MinSizeCache = new QDictionary<Type, int>();
 		public static int MinSize(this Type type)
@@ -1001,64 +1000,55 @@ namespace QTool.Reflection
 			return false;
 		}
 		static Dictionary<string, Type> TypeBuffer = new Dictionary<string, Type>();
-		public static Type ParseType(this string typeString)
-		{
-			if (typeString.IsNull()) return null;
-			if (TypeBuffer.ContainsKey(typeString))
-			{
+		public static Type ParseType(this string typeString, Type baseType = null) {
+			if (typeString.IsNull())
+				return null;
+			if (TypeBuffer.ContainsKey(typeString)) {
 				return TypeBuffer[typeString];
 			}
-			else
-			{
+			else {
+
 				var type = Type.GetType(typeString);
-				if (type == null)
-				{
+				if (type == null) {
 					Assembly[] assemblyArray = AppDomain.CurrentDomain.GetAssemblies();
 					int assemblyArrayLength = assemblyArray.Length;
-					for (int i = 0; i < assemblyArrayLength; ++i)
-					{
+					for (int i = 0; i < assemblyArrayLength; ++i) {
 						type = assemblyArray[i].GetType(typeString);
-						if (type != null)
-						{
-							if (!TypeBuffer.ContainsKey(typeString))
-							{
+						if (type != null) {
+							if (!TypeBuffer.ContainsKey(typeString)) {
+								if (baseType != null && !type.Is(baseType))
+									continue;
 								TypeBuffer.Add(typeString, type);
 							}
 							return type;
 						}
 
 					}
-					for (int i = 0; i < assemblyArrayLength; ++i)
-					{
-						try
-						{
-							foreach (var eType in assemblyArray[i].GetTypes())
-							{
-								if (eType.Name.Equals(typeString) || eType.QOldName().Equals(typeString))
-								{
-									type = eType;
-									if (type != null)
-									{
-										if (!TypeBuffer.ContainsKey(typeString))
-										{
-											TypeBuffer.Add(typeString, type);
-										}
-										return type;
+					for (int i = 0; i < assemblyArrayLength; ++i) {
+						try {
+							foreach (var eType in assemblyArray[i].GetTypes()) {
+								if (eType.Name.Equals(typeString) || eType.QOldName().Equals(typeString)) {
+									if (baseType != null && !eType.Is(baseType)) {
+										continue;
 									}
+									type = eType;
+									if (!TypeBuffer.ContainsKey(typeString)) {
+										TypeBuffer.Add(typeString, type);
+									}
+									return type;
 								}
 							}
 						}
-						catch (Exception e)
-						{
+						catch (Exception e) {
 							throw new Exception("[" + assemblyArray[i].FullName + "]", e);
 						}
 
 					}
 				}
-				if (typeString.Contains("System.Threading.Tasks.Task"))
-				{
+				if (typeString.Contains("System.Threading.Tasks.Task")) {
 					TypeBuffer.Add(typeString, null);
 				}
+				Debug.LogWarning($"找不到类型{typeString}");
 				return type;
 			}
 		}

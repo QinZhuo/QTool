@@ -41,7 +41,7 @@ namespace QTool
 									{
 										writer.Write(1);
 										var runtimeType = value.GetType();
-										writer.Write(runtimeType.QTypeName());
+										writer.Write(runtimeType.GetTypeName(type));
 										writer.SerializeType(value,runtimeType);
 									}
 									break;
@@ -186,7 +186,7 @@ namespace QTool
 								{
 									return target;
 								}
-								var runtimeType = QReflection.ParseType(reader.ReadString());
+								var runtimeType = QReflection.ParseType(reader.ReadString(),type);
 								target = reader.ReadObjectType(runtimeType, target);
 								if (target == null)
 								{
