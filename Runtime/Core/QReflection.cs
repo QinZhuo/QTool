@@ -929,7 +929,7 @@ namespace QTool.Reflection
 				{
 					typeList.AddRange(ass.GetTypes());
 				}
-				typeList.RemoveAll(type => type.IsAbstract || type.IsInterface);
+				typeList.RemoveAll(type => (type.IsAbstract && !type.IsSealed) || type.IsInterface);
 				if (typeof(Attribute).IsAssignableFrom(rootType))
 				{
 					typeList.RemoveAll(type => type.GetCustomAttribute(rootType) == null);
