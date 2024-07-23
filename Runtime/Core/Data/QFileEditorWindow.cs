@@ -29,6 +29,8 @@ namespace QTool {
 			set {
 				if (value != _filePath) {
 					StartRecord();
+					OnLostFocus();
+					AutoLoad = true;
 					var select = value.Replace('/', '\\');
 					if (select.ExistsFile()) {
 						FilePathList.Add(select);
@@ -179,11 +181,7 @@ namespace QTool {
 			FilePathList.Save();
 #if UNITY_2022_1_OR_NEWER
 			PathPopup = Toolbar.AddPopup("", FilePathList.List, FilePath?.Replace('/', '\\'), path => {
-				OnLostFocus();
-				AutoLoad = true;
 				FilePath = path.Replace('\\', '/');
-				if (!FilePath.ExistsFile())
-					Data = "";
 			});
 #endif
 		}
