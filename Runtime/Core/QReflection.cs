@@ -919,7 +919,9 @@ namespace QTool.Reflection
 			return objType.InvokeStaticFunction(funcName, param);
 		}
 		static List<Type> typeList = new List<Type>();
-		static QDictionary<Type, List<Type>> AllTypesCache = new QDictionary<Type, List<Type>>();
+		static QDictionary<Type, List<Type>> AllTypesCache = new() {
+			{typeof(object),new(){typeof(int),typeof(float),typeof(string),typeof(bool),typeof(UnityEngine.Object) } }
+		};
 		public static List<Type> GetAllTypes(this Type rootType)
 		{
 			if (!AllTypesCache.ContainsKey(rootType))
