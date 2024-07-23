@@ -28,27 +28,13 @@ namespace QTool
 			Editor.finishedDefaultHeaderGUI += OnHeaderGUI;
 			EditorApplication.hierarchyWindowItemOnGUI += OnHierarchyGUI;
 		}
-		static void OnHeaderGUI(Editor editor)
-		{
-			if (editor.target.IsAsset())
-			{
-				if (QIdTool.AssetIdCache.ContainsKey(editor.target))
-				{
-					GUILayout.Label("QId : " + QIdTool.AssetIdCache[editor.target]);
+		static void OnHeaderGUI(Editor editor) {
+			if (editor.target is GameObject gameObj) {
+				var qid = gameObj.GetComponent<QId>();
+				if (qid != null) {
+					GUILayout.Label("QId : " + qid.Id);
 				}
 			}
-			else
-			{
-				if (editor.target is GameObject gameObj)
-				{
-					var qid = gameObj.GetComponent<QId>();
-					if (qid != null)
-					{
-						GUILayout.Label("QId : " + qid.Id);
-					}
-				}
-			}
-
 		}
 		static void OnHierarchyGUI(int instanceID, Rect rect)
 		{

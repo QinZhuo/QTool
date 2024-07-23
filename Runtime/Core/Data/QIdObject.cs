@@ -30,33 +30,6 @@ namespace QTool
 	}
 	public static class QIdTool
 	{
-#if UNITY_EDITOR
-		public static QDictionary<string, Object> AssetObjectCache = new QDictionary<string, Object>();
-		public static QDictionary<Object, string> AssetIdCache = new QDictionary<Object, string>();
-		static bool CacheInitOver = false;
-		static void InitCache()
-		{
-			if (CacheInitOver) return;
-			CacheInitOver = true;
-			var objs = Resources.LoadAll(nameof(QIdReference));
-			foreach (var obj in objs)
-			{
-				if (obj is QIdReference qidr)
-				{
-					try
-					{
-						var id = UnityEditor.AssetDatabase.GetAssetPath(qidr.obj);
-						AssetObjectCache.Add(id, qidr.obj);
-						AssetIdCache.Add(qidr.obj, id);
-					}
-					catch (System.Exception e)
-					{
-						Debug.LogError("缓存资源 " + qidr + " 出错:\n" + e);
-					}
-				}
-			}
-		}
-#endif
 		private const string ResourcesKey = "/" + nameof(Resources) + "/";
 		public static string GetQId(Object obj)
 		{
@@ -71,34 +44,16 @@ namespace QTool
 					obj = monoObj.gameObject;
 				}
 #if UNITY_EDITOR
-				if (!QTool.IsBuilding && obj.IsAsset())
+				if (obj.IsAsset())
 				{
-					InitCache();
-					if (!AssetIdCache.ContainsKey(obj))
-					{
-						var key = UnityEditor.AssetDatabase.GetAssetPath(obj);
-						if (key.Contains(ResourcesKey))
-						{
-							key = ResourcesKey + key.SplitEndString(ResourcesKey);
-						}
-						else
-						{
-							var qidr = ScriptableObject.CreateInstance<QIdReference>();
-							qidr.obj = obj;
-							var path = ResourcesKey + nameof(QIdReference) + "/" + key.WithoutExtension() + ".asset";
-							path = QFileTool.CheckDirectoryPath(path);
-							UnityEditor.AssetDatabase.CreateAsset(qidr, path);
-							if (!Application.isPlaying)
-							{
-								UnityEditor.AssetDatabase.Refresh();
-							}
-							QDebug.Log("生成对象 " + obj.GetType() + " 引用Id：" + key + " 文件路径:" + path);
-							key = ResourcesKey + path.SplitEndString(ResourcesKey);
-						}
-						AssetIdCache.Add(obj, key);
-						AssetObjectCache.Add(key, obj);
+					var key = UnityEditor.AssetDatabase.GetAssetPath(obj);
+					if (key.Contains(ResourcesKey)) {
+						key = ResourcesKey + key.SplitEndString(ResourcesKey);
 					}
-					return AssetIdCache[obj];
+					else {
+						throw new System.Exception($"无法引用非{ResourcesKey}目录下的文件");
+					}
+					return key;
 				}
 				else
 #endif
@@ -127,10 +82,6 @@ namespace QTool
 			}
 			var path = GetResourcesPath(id);
 			var obj = await Resources.LoadAsync(path);
-			if (obj is QIdReference idReference)
-			{
-				obj = idReference.obj;
-			}
 			if (obj != null && !obj.GetType().Is(type))
 			{
 				obj = await Resources.LoadAsync(path, type);
@@ -141,66 +92,41 @@ namespace QTool
 			}
 			return obj;
 		}
-		private static string GetResourcesPath(string id)
-		{
+		private static string GetResourcesPath(string id) {
 			string loadPath = null;
-			if (id.Contains(ResourcesKey))
-			{
+			if (id.Contains(ResourcesKey)) {
 				loadPath = id.SplitEndString(ResourcesKey);
-				if (loadPath.Contains("."))
-				{
+				if (loadPath.Contains(".")) {
 					loadPath = loadPath.WithoutExtension();
 				}
 			}
-			else
-			{
-				loadPath = nameof(QIdReference) + "/" + id.WithoutExtension();
+			else {
+				loadPath = id.WithoutExtension();
 			}
 			return loadPath;
 		}
-		public static Object GetObject(string id, System.Type type)
-		{
+		public static Object GetObject(string id, System.Type type) {
 
-			if (typeof(Component).IsAssignableFrom(type))
-			{
+			if (typeof(Component).IsAssignableFrom(type)) {
 				return GetObject<GameObject>(id)?.GetComponent(type);
 			}
-			if (string.IsNullOrWhiteSpace(id)) return null;
-			if (QId.InstanceIdList.ContainsKey(id) && QId.InstanceIdList[id] != null)
-			{
+			if (string.IsNullOrWhiteSpace(id))
+				return null;
+			if (QId.InstanceIdList.ContainsKey(id) && QId.InstanceIdList[id] != null) {
 				return QId.InstanceIdList[id].gameObject;
 			}
-			else
-			{
+			else {
 
 				Object obj = null;
 #if UNITY_EDITOR
-				if (QTool.IsBuilding) return obj;
+				if (QTool.IsBuilding)
+					return obj;
 #endif
 				var loadPath = GetResourcesPath(id);
 				obj = Resources.Load(loadPath);
-
-				if (obj is QIdReference qidr)
-				{
-					obj = qidr.obj;
-				}
-
-				if (obj != null)
-				{
+				if (obj != null) {
 					return obj;
 				}
-#if UNITY_EDITOR
-				if (id.StartsWith("Assets"))
-				{
-					Debug.LogError("未找到【" + id + "】[" + loadPath + "]");
-					obj = UnityEditor.AssetDatabase.LoadAssetAtPath(id, type);
-					if (obj != null)
-					{
-						GetQId(obj);
-						return obj;
-					}
-				}
-#endif
 				QDebug.LogWarning("未找到【" + id + "】[" + loadPath + "]");
 			}
 			return null;
