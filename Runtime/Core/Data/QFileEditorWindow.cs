@@ -131,7 +131,7 @@ namespace QTool {
 		}
 		public void OnUndoRedo() {
 			RecordChange = false;
-			PathPopup.value = _filePath.Replace('/', '\\');
+			PathPopup.SetValueWithoutNotify(_filePath.Replace('/', '\\'));
 			ParseData();
 			RecordChange = true;
 		}
