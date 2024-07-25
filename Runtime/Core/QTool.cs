@@ -296,7 +296,7 @@ namespace QTool
 			return string.IsNullOrWhiteSpace(str);
 		}
 		public static bool IsDefualt<T>(this ref T obj) where T : struct {
-			return Equals(obj, default);
+			return obj.GetHashCode() == default(T).GetHashCode();
 		}
 		public static bool IsDefualt(this in Entity obj) {
 			return Entity.Null.Equals(obj);
