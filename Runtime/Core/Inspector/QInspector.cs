@@ -288,7 +288,7 @@ namespace QTool.Inspector
 
 		public static void AreaPopupMask(string labelName, SerializedProperty areaProperty)
 		{
-			var areaNames = GameObjectUtility.GetNavMeshAreaNames();
+			var areaNames = UnityEngine.AI.NavMesh.GetAreaNames();
 			var rect = EditorGUILayout.GetControlRect(true, EditorGUIUtility.singleLineHeight);
 			EditorGUI.BeginProperty(rect, GUIContent.none, areaProperty);
 			areaProperty.intValue = EditorGUI.MaskField(rect, labelName, areaProperty.intValue, areaNames);
