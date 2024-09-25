@@ -6,6 +6,8 @@ using System.Reflection;
 using System.Threading.Tasks;
 using UnityEngine;
 using System.Linq;
+using Unity.Mathematics;
+
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -163,8 +165,16 @@ namespace QTool.Reflection
 		public Type KeyValueType { get; private set; }
 		public Type Type { get; private set; }
 		public TypeCode Code { get; private set; }
-		public static QDictionary<Type, List<string>> TypeMembers = new QDictionary<Type, List<string>>()
-		{
+		public static QDictionary<Type, List<string>> TypeMembers = new QDictionary<Type, List<string>>() {
+			{
+				typeof(float3),
+				 new List<string>
+				 {
+					 nameof(float3.x),
+					 nameof(float3.y),
+					 nameof(float3.z),
+				 }
+			},
 			{
 				 typeof(Rect),
 				 new List<string>
