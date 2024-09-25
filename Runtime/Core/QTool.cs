@@ -299,7 +299,7 @@ namespace QTool
 			return obj.GetHashCode() == default(T).GetHashCode();
 		}
 		public static bool IsDefualt(this in Entity obj) {
-			return Entity.Null.Equals(obj);
+			return obj.Index == 0 && obj.Version == 0;
 		}
 		public static bool IsNull<T>(this T obj)
 		{

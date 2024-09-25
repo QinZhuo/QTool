@@ -14,9 +14,6 @@ namespace QTool
 {
     public class QEntity : MonoBehaviour
     {
-        [QPopup(nameof(QEntityData))]
-        public string data;
-
 		public TransformUsageFlags usage = TransformUsageFlags.Dynamic;
 	}
     public class QEntityBaker : Baker<QEntity>
@@ -26,8 +23,8 @@ namespace QTool
         {
 			typeList.Clear();
 			GetEntity(authoring.usage);
-            if (!QEntityData.ContainsKey(authoring.data)) return;
-            foreach (var comp in QEntityData.Get(authoring.data).comps)
+            if (!QEntityData.ContainsKey(authoring.name)) return;
+            foreach (var comp in QEntityData.Get(authoring.name).comps)
             {
 				if (comp == null)
 					continue;
@@ -52,14 +49,14 @@ namespace QTool
     }
     public class QEntityData : QDataList<QEntityData>
     {
-        public List<IQEntityComponmentData> comps = new List<IQEntityComponmentData>();
+        public List<IQComponmentData> comps = new List<IQComponmentData>();
     }	
 	public struct QPrefabEntity {
 		public FixedString64Bytes path;
 		[QIgnore]
 		public Entity entity;
 	}
-	public interface IQEntityComponmentData : IComponentData {
+	public interface IQComponmentData : IComponentData {
 
 	}
 }
