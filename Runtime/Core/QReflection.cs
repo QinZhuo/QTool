@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using UnityEngine;
 using System.Linq;
 using Unity.Mathematics;
-
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -101,10 +100,20 @@ namespace QTool.Reflection
 		public bool IsPublic => MethodInfo.IsPublic;
 		public object Invoke(object target, params object[] param)
 		{
-			var MethodInfo = this.MethodInfo;
-			if (MethodInfo.ContainsGenericParameters)
-			{
-				MethodInfo = MethodInfo.MakeGenericMethod(param.Select(obj => obj.GetType()).ToArray());
+			var methodInfo = MethodInfo;
+			if (methodInfo.ContainsGenericParameters) {
+				var types = methodInfo.GetGenericArguments();
+				var paramArray=methodInfo.GetParameters();
+				for (int i = 0; i < types.Length; i++) {
+					var type = types[i];
+					for (int j = 0; j < paramArray.Length; j++) {
+						if (type + "&" == paramArray[j].ParameterType.ToString()) {
+							types[i] = param[j].GetType();
+							break;
+						}
+					}
+				}
+				methodInfo = methodInfo.MakeGenericMethod(types);
 			}
 			if (ParamInfos.Length > param.Length)
 			{
@@ -122,7 +131,7 @@ namespace QTool.Reflection
 				}
 				param = newParam;
 			}
-			return MethodInfo?.Invoke(target, param);
+			return methodInfo?.Invoke(target, param);
 		}
 		public QFunctionInfo(MethodInfo info)
 		{

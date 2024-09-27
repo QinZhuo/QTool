@@ -19,44 +19,58 @@ namespace QTool
     public class QEntityBaker : Baker<QEntity>
     {
 		private List<Type> typeList = new List<Type>();
-        public override void Bake(QEntity authoring)
-        {
+		private QDictionary<Type, object> bufferCache = new QDictionary<Type, object>();
+		public override void Bake(QEntity authoring)
+		{
 			typeList.Clear();
-			GetEntity(authoring.usage);
+			bufferCache.Clear();
+			var entity = GetEntity(authoring.usage);
+			bufferCache.AutoCreate = type => QReflectionType.Get(GetType()).FunctionsCache[nameof(AddBuffer)][1][0].MethodInfo.MakeGenericMethod(type).Invoke(this, new object[] {entity});
             if (!QEntityData.ContainsKey(authoring.name)) return;
-            foreach (var comp in QEntityData.Get(authoring.name).comps)
+			var data = QEntityData.Get(authoring.name);
+
+			foreach (var item in data.comps)
             {
-				if (comp == null)
+				if (item == null)
 					continue;
-				var type = comp.GetType();
+				var type = item.GetType();
 				if (typeList.Contains(type))
 					continue;
 				typeList.Add(type);
 				var typeInfo = QSerializeType.Get(type);
 				foreach (var memeber in typeInfo.Members) {
-					if (memeber.Type == typeof(QPrefabEntity) && memeber.Get(comp) is QPrefabEntity prefabEntity) {
+					if (memeber.Type == typeof(QPrefabEntity) && memeber.Get(item) is QPrefabEntity prefabEntity) {
 						var prefab = Resources.Load<GameObject>(prefabEntity.path.ToString());
 						if (prefab != null) {
-							var entity= prefab.GetComponent<QEntity>();
-							prefabEntity.entity = GetEntity(prefab, entity == null ? TransformUsageFlags.Dynamic : entity.usage);
-							memeber.Set(comp, prefabEntity);
+							var tempEntity= prefab.GetComponent<QEntity>();
+							prefabEntity.entity = GetEntity(prefab, tempEntity == null ? TransformUsageFlags.Dynamic : tempEntity.usage);
+							memeber.Set(item, prefabEntity);
 						}
 					}
 				}
-                this.InvokeFunction(nameof(AddComponent), comp);
+                this.InvokeFunction(nameof(AddComponent),entity, item);
             }
-        }
+			foreach (var item in data.elements) {
+				if (item == null)
+					continue;
+				bufferCache[item.GetType()].InvokeFunction("Add", item); 
+			}
+		}
     }
     public class QEntityData : QDataList<QEntityData>
     {
-        public List<IQComponmentData> comps = new List<IQComponmentData>();
-    }	
+        public List<IQComponment> comps = new List<IQComponment>();
+		public List<IQBufferElement> elements = new List<IQBufferElement>();
+	}	
 	public struct QPrefabEntity {
 		public FixedString64Bytes path;
 		[QIgnore]
 		public Entity entity;
 	}
-	public interface IQComponmentData : IComponentData {
+	public interface IQComponment : IComponentData {
+
+	}
+	public interface IQBufferElement : IBufferElementData {
 
 	}
 }

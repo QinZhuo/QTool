@@ -311,7 +311,7 @@ namespace QTool
 				Add(key, value);
 			}
 		}
-		protected Func<TKey, TValue> AutoCreate = null;
+		public Func<TKey, TValue> AutoCreate = null;
 		internal Action<TKey> OnChange = null;
 		public QDictionary()
 		{
