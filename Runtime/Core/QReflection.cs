@@ -107,7 +107,7 @@ namespace QTool.Reflection
 				for (int i = 0; i < types.Length; i++) {
 					var type = types[i];
 					for (int j = 0; j < paramArray.Length; j++) {
-						if (type + "&" == paramArray[j].ParameterType.ToString()) {
+						if (paramArray[j].ParameterType.ToString().TrimEnd('&')==type.ToString()) {
 							types[i] = param[j].GetType();
 							break;
 						}
