@@ -13,7 +13,6 @@ using Unity.Entities;
 using Unity.Transforms;
 using UnityEditor.PackageManager;
 using UnityEngine;
-using static UnityEngine.UI.GridLayoutGroup;
 namespace QTool {
 	public class QEntity : MonoBehaviour {
 		public TransformUsageFlags usage = TransformUsageFlags.Dynamic;
@@ -112,6 +111,12 @@ namespace QTool {
 
 	}
 	public interface IQBufferElement : IBufferElementData {
+	}
+	public static class QEntityTool
+	{
+		public static bool IsDefault(this in Entity obj) {
+			return obj.Index == 0 && obj.Version == 0;
+		}
 	}
 }
 #else

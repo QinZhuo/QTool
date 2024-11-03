@@ -13,8 +13,6 @@ using UnityEngine.LowLevel;
 using System.Linq;
 using UnityEngine.Playables;
 using System.Net;
-using Unity.Entities;
-
 #if UNITY_EDITOR
 using PrefabStageUtility = UnityEditor.SceneManagement.PrefabStageUtility;
 #endif
@@ -297,9 +295,6 @@ namespace QTool
 		}
 		public static bool IsDefualt<T>(this ref T obj) where T : struct {
 			return obj.GetHashCode() == default(T).GetHashCode();
-		}
-		public static bool IsDefualt(this in Entity obj) {
-			return obj.Index == 0 && obj.Version == 0;
 		}
 		public static bool IsNull<T>(this T obj)
 		{
