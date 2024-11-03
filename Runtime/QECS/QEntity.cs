@@ -120,6 +120,7 @@ namespace QTool {
 	}
 }
 #else
+using UnityEngine;
 namespace QTool
 {
 	public class QEntity : MonoBehaviour
