@@ -182,23 +182,23 @@ namespace QTool
 
 		}
 		private static bool LoadAllOver = false;
-		/// <summary>
-		/// 异步预加载所有QDataList<T>数据表
-		/// </summary>
-		public static async void PreLoadAll()
-		{
-			if (LoadAllOver) return;
-			LoadAllOver = true; ;
-			foreach (var type in typeof(QDataList<>).GetAllTypes())
-			{
-				await QTask.Step();
-				var result = type.InvokeStaticFunction("PreLoadAsync");
-				if (result is Task task)
-				{
-					task.PreLoadRun();
-				}
-			}
-		}
+		///// <summary>
+		///// 异步预加载所有QDataList<T>数据表
+		///// </summary>
+		//public static async void PreLoadAll()
+		//{
+		//	if (LoadAllOver) return;
+		//	LoadAllOver = true; ;
+		//	foreach (var type in typeof(QDataList<>).GetAllTypes())
+		//	{
+		//		await QTask.Step();
+		//		var result = type.InvokeStaticFunction("PreLoadAsync");
+		//		if (result is Task task)
+		//		{
+		//			task.PreLoadRun();
+		//		}
+		//	}
+		//}
 		public static void UnLoadAll()
 		{
 			foreach (var type in typeof(QDataList<>).GetAllTypes())
@@ -264,14 +264,14 @@ namespace QTool
 			QDebug.End("加载 QDataList<" + typeof(T) + "> 数据 ", dataList.Count + " 条");
 			return dataList;
 		}
-		public static async Task PreLoadAsync()
-		{
-			if (_List == null)
-			{
-				_List = new QList<string, T>();
-				await LoadQDataList().ParseQDataListAsync(_List).Run();
-			}
-		}
+		//public static async Task PreLoadAsync()
+		//{
+		//	if (_List == null)
+		//	{
+		//		_List = new QList<string, T>();
+		//		await LoadQDataList().ParseQDataListAsync(_List).Run();
+		//	}
+		//}
 		public static void Load(string key = null)
 		{
 			_List = new QList<string, T>();

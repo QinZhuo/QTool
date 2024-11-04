@@ -97,7 +97,7 @@ namespace QTool
 		{
 			if (AudioSources[audioKey] == null)
 			{
-				var audioPrefab = QAudioSourcePrefab.Load(audioKey);
+				var audioPrefab = Resources.Load<GameObject>($"QAudioSource/{audioKey}");
 				if (audioPrefab == null)
 				{
 					AudioSources[audioKey] = Instance.transform.GetChild(audioKey, true).GetComponent<QAudioSource>(true);
@@ -120,10 +120,6 @@ namespace QTool
 				}
 			}
 			return AudioSources[audioKey];
-		}
-		private class QAudioSourcePrefab:QAssetLoader<QAudioSourcePrefab,GameObject>
-		{
-			
 		}
 	}
 	public enum QAudioType

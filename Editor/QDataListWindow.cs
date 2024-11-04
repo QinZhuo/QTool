@@ -236,7 +236,7 @@ namespace QTool.FlowGraph
 					typeInfo = null;
 				}
 				PlayerPrefs.SetString(nameof(QDataListWindow) + "_LastPath", path);
-				await QTask.Wait(() => listView != null);
+				//await QTask.Wait(() => listView != null);
 				listView.itemsSource = qdataList;
 				listView.style.width = qdataList.TitleRow.Count * 200 + 100;
 				listView.Rebuild();

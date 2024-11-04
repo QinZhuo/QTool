@@ -218,7 +218,7 @@ namespace QTool.Inspector
 					var result = kv.Value.Invoke(target);
 					if (result is Task task)
 					{
-						_ = task.Run();
+						task.Start();
 					}
 				}
 			}

@@ -12,7 +12,7 @@ namespace QTool.Builder
 	[DisallowMultipleComponent]
 	public class QBuilder : MonoBehaviour
 	{
-		public static List<Type> PrefabTypes => typeof(QBuilderBrefab<>).GetAllTypes();
+		public static List<Type> PrefabTypes => null;//typeof(QBuilderBrefab<>).GetAllTypes();
 		public static string[] BurshMode { get; private set; } = new string[] { "普通", "框选", };
 		[QToggle("打开编辑模式")]
 		public bool EditorMode;
@@ -426,9 +426,5 @@ namespace QTool.Builder
 			this.gameObject = gameObject;
 			this.brushKey = gameObject?.name;
 		}
-	}
-	public abstract class QBuilderBrefab<T> : QPrefabLoader<T> where T : QBuilderBrefab<T>
-	{
-
 	}
 }

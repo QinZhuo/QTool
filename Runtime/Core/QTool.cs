@@ -687,13 +687,6 @@ namespace QTool
 			}
 			playableDirector.Play(value);
 		}
-		public static async void DelayInvoke(this float time, Action action, bool ignoreGameTime = true)
-		{
-			if (!await QTask.Wait(time, ignoreGameTime).IsCancel())
-			{
-				action?.Invoke();
-			}
-		}
 		public static T RayCast<T>(this Ray ray, float radius = 0, Func<T, bool> CanCast = null) where T : Component
 		{
 			var hits = radius <= 0 ? Physics.RaycastAll(ray) : Physics.SphereCastAll(ray, radius);
@@ -1077,54 +1070,4 @@ namespace QTool
 			}
 		}
 	}
-
-	public static class QSceneTool
-	{
-		public static void PreLoadRun(this Task task)
-		{
-			if (IsLoading)
-			{
-				lock (PreLoadList)
-				{
-					PreLoadList.Add(task.Run());
-				}
-			}
-			else
-			{
-				_ = task.Run();
-			}
-		}
-		private static List<Task> PreLoadList = new List<Task>();
-		public static async Task LoadSceneAsync(string sceneName)
-		{
-			if (IsLoading)
-			{
-				Debug.LogError("加载场景[" + sceneName + "]失败 正在加载新场景");
-				return;
-			}
-			IsLoading = true;
-			await PreLoadList.ToArray().WaitAllOver();
-			PreLoadList.Clear();
-			QDebug.Log("异步加载场景开始[" + sceneName + "]");
-			QDebug.Begin("异步加载场景结束[" + sceneName + "]");
-			await SceneManager.LoadSceneAsync(sceneName);
-			QId.InitSceneId();
-			GCCollect();
-			QDebug.End("异步加载场景结束[" + sceneName + "]");
-			await PreLoadList.ToArray().WaitAllOver();
-			PreLoadList.Clear();
-			IsLoading = false;
-		}
-		public static bool IsLoading { get; private set; } = false;
-		public static async Task WaitLoading()
-		{
-			await QTask.Wait(() => !IsLoading);
-		}
-		public static void GCCollect()
-		{
-			Resources.UnloadUnusedAssets();
-			Task.Run(GC.Collect);
-		}
-	}
-
 }

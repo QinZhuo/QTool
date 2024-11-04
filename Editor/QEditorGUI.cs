@@ -74,10 +74,6 @@ namespace QTool
 
 		public static List<Type> TypeList = new List<Type>() { typeof(UnityEngine.Object) };
 
-		public static async Task WaitLayout()
-		{
-			await QTask.Wait(() => Event.current?.type != EventType.Layout);
-		}
 	
 		private static QDictionary<int, bool> FoldoutCache = new QDictionary<int, bool>();
 		/// <summary>

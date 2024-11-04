@@ -49,11 +49,11 @@ namespace QTool.FlowGraph
 			Data = Graph?.ToQData();
 		}
 		private VisualElement ConnectCanvas { get; set; }
-		protected override async void ParseData()
+		protected override void ParseData()
 		{
 			Graph = Data.ParseQData<QFlowGraph>();
 			if (Graph == null) return;
-			await QTask.Wait(() => Back != null);
+			//await QTask.Wait(() => Back != null);
 			Back.Clear();
 			ConnectCanvas.Clear();
 			NodeViewList.Clear();

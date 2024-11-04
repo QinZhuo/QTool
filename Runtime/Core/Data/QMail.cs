@@ -127,7 +127,7 @@ namespace QTool
 
 			QDebug.Log("接收邮件" + startIndex + " -> " + endIndex+ " 完成 用时: " + (DateTime.Now-startTime).ToString("hh\\:mm\\:ss") );
 			QDebug.Log("开始读取邮件" + startIndex + " -> " + endIndex + " ...");
-			await QTask.Wait(0.1f,true);
+			await Task.Yield();
 			startTime = DateTime.Now;
 			for (var i = startIndex; i <= endIndex; i++)
 			{
@@ -159,7 +159,7 @@ namespace QTool
 			}
 #endif
 			QDebug.Log("读取邮件 " + startIndex + " -> " + endIndex+ " 完成 用时: " + (DateTime.Now - startTime).ToString("hh\\:mm\\:ss") );
-			await QTask.Wait(0.1f, true);
+			await Task.Yield();
 		}
 		static async Task ReceiveRemail(QMailAccount account, int startIndex, int endIndex, QDictionary<int, QMailInfo> mailList, int threadCount =1)
 		{

@@ -243,49 +243,49 @@ namespace QTool.FlowGraph
 				This.Graph.OnEvent -= action;
 			}
 		}
-		[QName("触发/触发器")]
-		public static IEnumerator Trigger(QFlowNode This, [QName("起点"), QInputPort("起点")] Transform start, [QName("预制体"), QPopup(nameof(Resources) + "/" + nameof(QTrigger))] string prefabKey, QTeamRelaction relaction, [QName("初始化"), QFlowPort, QOutputPort] Transform init, [QName("触发"), QFlowPort, QOutputPort] Transform triggerObject)
-		{
-			var prefab = Resources.Load<GameObject>(nameof(QTrigger) + "/" + prefabKey);
-			if (prefab == null)
-			{
-				Debug.LogError("不存在[" + nameof(Resources) + "/" + nameof(QTrigger) + "/" + prefabKey + "]触发器预制体");
-			}
-			var trigger = prefab.CheckInstantiate()?.GetComponent<QTrigger>();
-			if (start != null)
-			{
-				trigger.transform.position = start.transform.position;
-			}
-			if (trigger != null)
-			{
-				trigger.Node = This;
-				trigger.Start = start;
-				trigger.Relaction = relaction;
-				yield return trigger.Init();
-				if (This.State != QNodeState.失败)
-				{
-					This[nameof(init)] = trigger.transform;
-					yield return This.RunPortIEnumerator(nameof(init));
-					if (This.GetPortConnectState(nameof(init)) != QNodeState.失败 && trigger != null)
-					{
-						yield return trigger.Run();
-					}
-					else
-					{
-						trigger.Cancel();
-						This.State = QNodeState.失败;
-					}
-				}
-				else
-				{
-					trigger.Cancel();
-				}
-			}
-			if (trigger != null)
-			{
-				trigger.gameObject.CheckDestory();
-			}
-		}
+		//[QName("触发/触发器")]
+		//public static IEnumerator Trigger(QFlowNode This, [QName("起点"), QInputPort("起点")] Transform start, [QName("预制体"), QPopup(nameof(Resources) + "/" + nameof(QTrigger))] string prefabKey, QTeamRelaction relaction, [QName("初始化"), QFlowPort, QOutputPort] Transform init, [QName("触发"), QFlowPort, QOutputPort] Transform triggerObject)
+		//{
+		//	var prefab = Resources.Load<GameObject>(nameof(QTrigger) + "/" + prefabKey);
+		//	if (prefab == null)
+		//	{
+		//		Debug.LogError("不存在[" + nameof(Resources) + "/" + nameof(QTrigger) + "/" + prefabKey + "]触发器预制体");
+		//	}
+		//	var trigger = prefab.CheckInstantiate()?.GetComponent<QTrigger>();
+		//	if (start != null)
+		//	{
+		//		trigger.transform.position = start.transform.position;
+		//	}
+		//	if (trigger != null)
+		//	{
+		//		trigger.Node = This;
+		//		trigger.Start = start;
+		//		trigger.Relaction = relaction;
+		//		yield return trigger.Init();
+		//		if (This.State != QNodeState.失败)
+		//		{
+		//			This[nameof(init)] = trigger.transform;
+		//			yield return This.RunPortIEnumerator(nameof(init));
+		//			if (This.GetPortConnectState(nameof(init)) != QNodeState.失败 && trigger != null)
+		//			{
+		//				yield return trigger.Run();
+		//			}
+		//			else
+		//			{
+		//				trigger.Cancel();
+		//				This.State = QNodeState.失败;
+		//			}
+		//		}
+		//		else
+		//		{
+		//			trigger.Cancel();
+		//		}
+		//	}
+		//	if (trigger != null)
+		//	{
+		//		trigger.gameObject.CheckDestory();
+		//	}
+		//}
 		[QIgnore]
 		public static string ToInfoString(QFlowNode node)
 		{
@@ -305,8 +305,8 @@ namespace QTool.FlowGraph
 					}
 					info += node.Ports["Run"].GetConnectNode()?.ToInfoString();
 					return info;
-				case nameof(Trigger):
-					return node.Ports["init"].ToInfoString() + " " + node.Ports["triggerObject"].ToInfoString();
+				//case nameof(Trigger):
+				//	return node.Ports["init"].ToInfoString() + " " + node.Ports["triggerObject"].ToInfoString();
 				case nameof(GetValue):
 					return node["key"]?.ToString().ToLozalizationKey();
 				case nameof(Add):
@@ -345,8 +345,8 @@ namespace QTool.FlowGraph
 			{
 				switch (node.command.method.Name)
 				{
-					case nameof(Trigger):
-						return node.Ports["init"].ToFloat(toFloatFunc) + node.Ports["triggerObject"].ToFloat(toFloatFunc);
+					//case nameof(Trigger):
+					//	return node.Ports["init"].ToFloat(toFloatFunc) + node.Ports["triggerObject"].ToFloat(toFloatFunc);
 					case nameof(GetValue):
 						return node["key"].ToComputeFloat();
 					case nameof(Add):

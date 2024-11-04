@@ -72,26 +72,26 @@ namespace QTool
 			}
 			return "";
 		}
-		internal static async Task<Object> LoadObjectAsync(string key, System.Type type)
-		{
-			var id = key;
-			if (id.IsNull()) return null;
-			if (id.StartsWith("{") && id.EndsWith("}"))
-			{
-				id = id.GetBlockValue(":\"", "\"}");
-			}
-			var path = GetResourcesPath(id);
-			var obj = await Resources.LoadAsync(path);
-			if (obj != null && !obj.GetType().Is(type))
-			{
-				obj = await Resources.LoadAsync(path, type);
-			}
-			if (obj == null && !id.IsNull() && id != "null")
-			{
-				Debug.LogError("异步加载资源[" + key + "](" + type + ")失败 资源为空");
-			}
-			return obj;
-		}
+		//internal static async Task<Object> LoadObjectAsync(string key, System.Type type)
+		//{
+		//	var id = key;
+		//	if (id.IsNull()) return null;
+		//	if (id.StartsWith("{") && id.EndsWith("}"))
+		//	{
+		//		id = id.GetBlockValue(":\"", "\"}");
+		//	}
+		//	var path = GetResourcesPath(id);
+		//	var obj = await Resources.LoadAsync(path);
+		//	if (obj != null && !obj.GetType().Is(type))
+		//	{
+		//		obj = await Resources.LoadAsync(path, type);
+		//	}
+		//	if (obj == null && !id.IsNull() && id != "null")
+		//	{
+		//		Debug.LogError("异步加载资源[" + key + "](" + type + ")失败 资源为空");
+		//	}
+		//	return obj;
+		//}
 		private static string GetResourcesPath(string id) {
 			string loadPath = null;
 			if (id.Contains(ResourcesKey)) {

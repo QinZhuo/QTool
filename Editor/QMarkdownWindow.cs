@@ -42,7 +42,6 @@ namespace QTool
 		#endregion
 		protected override async void ParseData()
 		{
-			await QTask.Wait(() => markdownText != null);
 			markdownText.value = Data;
 		}
 		private TextField markdownText = null;
@@ -85,7 +84,6 @@ namespace QTool
 					lastClick = data.timestamp;
 				}
 			});
-			await QTask.Wait(0.5f);
 			if (QPlayerPrefs.Get<bool>(nameof(TwoPaneSplitView.CollapseChild))){
 				split.CollapseChild(0);
 			}
