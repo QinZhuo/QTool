@@ -40,7 +40,6 @@ namespace QTool {
 		}
 		private void OnDestroy() {
 			Destoryed = true;
-			QEventManager.InvokeEvent(QEventKey.游戏退出);
 			Instance.OnUpdate -= QCoroutine.Update;
 		}
 	}

@@ -1,20 +1,15 @@
 using System;
 using System.Collections.Concurrent;
 using UnityEngine;
+using UnityEngine.Events;
 namespace QTool {
-
-	public enum QEventKey {
-		设置更新,
-		卸载场景,
-		游戏退出,
-	}
 	public static class QEventManager {
 		/// <summary>
 		/// 事件列表 对应事件触发时调用对应Action 使用方法： EventList["事件名"]+=Action;
 		/// </summary>
 		private static QDictionary<string, Action> Events = new QDictionary<string, Action>();
 		private static ConcurrentQueue<string> EventQueue = new ConcurrentQueue<string>();
-		internal static Action OnUpdate = InvokeQueueEvent;
+		private static Action OnUpdate = InvokeQueueEvent;
 		public static void InvokeEvent(Enum value) {
 			InvokeEvent(value.ToString());
 		}
@@ -41,10 +36,10 @@ namespace QTool {
 			EventQueue.Enqueue(eventKey);
 		}
 		public static void InvokeEvent<T>(string eventKey, T value) {
-			QEventManager<T>.InvokeEvent(eventKey, value);
+			QEventList<T>.InvokeEvent(eventKey, value);
 		}
 		public static void QueueEvent<T>(string eventKey, T value) {
-			QEventManager<T>.EventQueue.Enqueue((eventKey, value));
+			QEventList<T>.EventQueue.Enqueue((eventKey, value));
 		}
 		public static void Register(Enum eventKey, params Action[] action) {
 			var key = eventKey.ToString();
@@ -66,10 +61,10 @@ namespace QTool {
 			Events[eventKey] -= action;
 		}
 		public static void Register<T>(string eventKey, Action<T> action) {
-			QEventManager<T>.EventList[eventKey] += action;
+			QEventList<T>.EventList[eventKey] += action;
 		}
 		public static void UnRegister<T>(string eventKey, Action<T> action) {
-			QEventManager<T>.EventList[eventKey] -= action;
+			QEventList<T>.EventList[eventKey] -= action;
 		}
 		private static void InvokeQueueEvent() {
 			while (EventQueue.Count > 0) {
@@ -81,46 +76,101 @@ namespace QTool {
 		public static void Update() {
 			OnUpdate();
 		}
+
+		private class QEventList<T> {
+			/// <summary>
+			/// 事件列表 对应事件触发时调用对应Action 使用方法： EventList["事件名"]+=Action;
+			/// </summary>
+			internal static QDictionary<string, Action<T>> EventList = new QDictionary<string, Action<T>>();
+			internal static ConcurrentQueue<(string, T)> EventQueue = new ConcurrentQueue<(string, T)>();
+			static QEventList() {
+				OnUpdate += InvokeQueueEvent;
+			}
+			internal static void InvokeEvent(string eventKey, T value) {
+				try {
+					eventKey = eventKey.Trim();
+					if (string.IsNullOrWhiteSpace(eventKey)) {
+						return;
+					}
+					if (EventList.ContainsKey(eventKey)) {
+						EventList[eventKey]?.Invoke(value);
+					}
+				}
+				catch (Exception e) {
+					Debug.LogError("触发事件[" + eventKey + ":" + value + "]出错\n" + e);
+				}
+			}
+			private static void InvokeQueueEvent() {
+				while (EventQueue.Count > 0) {
+					if (EventQueue.TryDequeue(out var result)) {
+						InvokeEvent(result.Item1, result.Item2);
+					}
+				}
+			}
+		}
 	}
-	internal class QEventManager<T> {
-		/// <summary>
-		/// 事件列表 对应事件触发时调用对应Action 使用方法： EventList["事件名"]+=Action;
-		/// </summary>
-		internal static QDictionary<string, Action<T>> EventList = new QDictionary<string, Action<T>>();
-		internal static ConcurrentQueue<(string, T)> EventQueue = new ConcurrentQueue<(string, T)>();
-		static QEventManager() {
-			QEventManager.OnUpdate += InvokeQueueEvent;
+	public static class QEventTool {
+		#region UnityEvent UnityAction 操作拓展
+		public static UnityAction GetUnityAction(this UnityEngine.Object obj, string funcName) {
+			return UnityEventBase.GetValidMethodInfo(obj, funcName, new Type[0]).CreateDelegate(typeof(UnityAction), obj) as UnityAction;
 		}
-		internal static void InvokeEvent(string eventKey, T value) {
-			try {
-				eventKey = eventKey.Trim();
-				if (string.IsNullOrWhiteSpace(eventKey)) {
-					return;
-				}
-				if (EventList.ContainsKey(eventKey)) {
-					EventList[eventKey]?.Invoke(value);
+		public static UnityAction<T> GetUnityAction<T>(this UnityEngine.Object obj, string funcName) {
+			var method = UnityEventBase.GetValidMethodInfo(obj, funcName, new Type[] { typeof(T) });
+			return method.CreateDelegate(typeof(UnityAction<T>), obj) as UnityAction<T>;
+		}
+		public static bool ContainsPersistentListener(this UnityEventBase onValueChanged, Delegate action) {
+			var count = onValueChanged.GetPersistentEventCount();
+			for (int i = count - 1; i >= 0; i--) {
+				if (onValueChanged.GetPersistentTarget(i) == action.Target as UnityEngine.Object || onValueChanged.GetPersistentMethodName(i) == action.Method.Name) {
+					return true;
 				}
 			}
-			catch (Exception e) {
-				Debug.LogError("触发事件[" + eventKey + ":" + value + "]出错\n" + e);
-			}
+			return false;
 		}
-		private static void InvokeQueueEvent() {
-			while (EventQueue.Count > 0) {
-				if (EventQueue.TryDequeue(out var result)) {
-					InvokeEvent(result.Item1, result.Item2);
+		public static void AddPersistentListener(this UnityEventBase onValueChanged, UnityAction action, bool editorAndRuntime = true) {
+#if UNITY_EDITOR
+			if (!Application.isPlaying) {
+				if (!onValueChanged.ContainsPersistentListener(action)) {
+					UnityEditor.Events.UnityEventTools.AddVoidPersistentListener(onValueChanged, action);
+					if (editorAndRuntime) {
+						onValueChanged.SetPersistentListenerState(onValueChanged.GetPersistentEventCount() - 1, UnityEventCallState.EditorAndRuntime);
+					}
 				}
 			}
+#endif
 		}
-	}
-	public class QEventQueue {
-		private Action eventQueue;
-		public void Register(Action action) {
-			eventQueue += action;
+		public static void RemovePersistentListener(this UnityEventBase onValueChanged, UnityAction action) {
+#if UNITY_EDITOR
+			if (!Application.isPlaying) {
+				if (onValueChanged.ContainsPersistentListener(action)) {
+					UnityEditor.Events.UnityEventTools.RemovePersistentListener(onValueChanged, action);
+				}
+			}
+#endif
 		}
-		public void Invoke() {
-			eventQueue?.Invoke();
-			eventQueue = null;
+
+		public static void AddPersistentListener<T>(this UnityEvent<T> onValueChanged, UnityAction<T> action, bool editorAndRuntime = true) {
+#if UNITY_EDITOR
+			if (!Application.isPlaying) {
+				if (!onValueChanged.ContainsPersistentListener(action)) {
+					onValueChanged.RemovePersistentListener(action);
+					UnityEditor.Events.UnityEventTools.AddPersistentListener(onValueChanged, action);
+					if (editorAndRuntime) {
+						onValueChanged.SetPersistentListenerState(onValueChanged.GetPersistentEventCount() - 1, UnityEventCallState.EditorAndRuntime);
+					}
+				}
+			}
+#endif
 		}
+		public static void RemovePersistentListener<T>(this UnityEvent<T> onValueChanged, UnityAction<T> action) {
+#if UNITY_EDITOR
+			if (!Application.isPlaying) {
+				if (onValueChanged.ContainsPersistentListener(action)) {
+					UnityEditor.Events.UnityEventTools.RemovePersistentListener(onValueChanged, action);
+				}
+			}
+#endif
+		}
+		#endregion
 	}
 }

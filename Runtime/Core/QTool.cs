@@ -13,9 +13,6 @@ using UnityEngine.LowLevel;
 using System.Linq;
 using UnityEngine.Playables;
 using System.Net;
-#if UNITY_EDITOR
-using PrefabStageUtility = UnityEditor.SceneManagement.PrefabStageUtility;
-#endif
 
 namespace QTool
 {
@@ -47,9 +44,8 @@ namespace QTool
 		{
 			CultureInfo.CurrentCulture = new CultureInfo(QLocalizationCode.en_US.ToCodeString());
 			CultureInfo.DefaultThreadCurrentCulture = CultureInfo.CurrentCulture;
-			SceneManager.sceneUnloaded += scene => 
-			{
-				QEventManager.InvokeEvent(QEventKey.卸载场景);
+			SceneManager.sceneUnloaded += scene => {
+				QGameObjectPool.Clear();
 			};
 		}
 		public static void Quit()

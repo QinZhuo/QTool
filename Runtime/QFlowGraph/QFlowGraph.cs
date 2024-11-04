@@ -348,78 +348,78 @@ namespace QTool.FlowGraph
 		{
 			yield return wait;
 		}
-		public void RegisterValue<RuntimeT, DataT>(QRuntime<RuntimeT, DataT> Runtime) where RuntimeT : QRuntime<RuntimeT, DataT>, new() where DataT : QDataList<DataT>, new()
-		{
-			if (Runtime != null)
-			{
-				SetValue((RuntimeT)Runtime);
-				var dataTypeInfo = QSerializeType.Get(typeof(DataT));
-				foreach (var member in dataTypeInfo.Members)
-				{
-					if (member.QNameAttribute == null) continue;
-					if(member.Type.IsValueType || member.Type == typeof(string))
-					{
-						Values[member.QName] = member.Get(Runtime.Data);
-					}
-				}
-				var runtimeTypeInfo = QSerializeType.Get(typeof(RuntimeT));
-				foreach (var member in runtimeTypeInfo.Members)
-				{
-					if (member.QNameAttribute == null) continue;
-					if (member.Type.Is(typeof(QRuntimeValue<float>)))
-					{
-						var runtimeValue = member.Get(Runtime).As<QRuntimeValue<float>>();
-						runtimeValue.OnValueChange += value => {
-							SetValue(member.QName, value);
-						};
-						runtimeValue.InvokeOnChange();
-					}
-					else if (member.Type.Is(typeof(QRuntimeValue<string>)))
-					{
-						var runtimeValue = member.Get(Runtime).As<QRuntimeValue<string>>();
-						runtimeValue.OnValueChange += value => {
-							SetValue(member.QName, value);
-						};
-						runtimeValue.InvokeOnChange();
-					}
-					else if (member.Type.Is(typeof(QRuntimeValue<bool>)))
-					{
-						var runtimeValue = member.Get(Runtime).As<QRuntimeValue<bool>>();
-						runtimeValue.OnValueChange += value => {
-							SetValue(member.QName, value);
-						};
-						runtimeValue.InvokeOnChange();
-					}
-				}
-			}
-		}
-		public void UnRegisterValue<RuntimeT, DataT>(QRuntime<RuntimeT, DataT> Runtime) where RuntimeT : QRuntime<RuntimeT, DataT>, new() where DataT : QDataList<DataT>, new()
-		{
-			if (Runtime != null)
-			{
-				var runtimeTypeInfo = QSerializeType.Get(typeof(RuntimeT));
-				foreach (var member in runtimeTypeInfo.Members)
-				{
-					if (member.QNameAttribute == null) continue;
+		//public void RegisterValue<RuntimeT, DataT>(QRuntime<RuntimeT, DataT> Runtime) where RuntimeT : QRuntime<RuntimeT, DataT>, new() where DataT : QDataList<DataT>, new()
+		//{
+		//	if (Runtime != null)
+		//	{
+		//		SetValue((RuntimeT)Runtime);
+		//		var dataTypeInfo = QSerializeType.Get(typeof(DataT));
+		//		foreach (var member in dataTypeInfo.Members)
+		//		{
+		//			if (member.QNameAttribute == null) continue;
+		//			if(member.Type.IsValueType || member.Type == typeof(string))
+		//			{
+		//				Values[member.QName] = member.Get(Runtime.Data);
+		//			}
+		//		}
+		//		var runtimeTypeInfo = QSerializeType.Get(typeof(RuntimeT));
+		//		foreach (var member in runtimeTypeInfo.Members)
+		//		{
+		//			if (member.QNameAttribute == null) continue;
+		//			if (member.Type.Is(typeof(QRuntimeValue<float>)))
+		//			{
+		//				var runtimeValue = member.Get(Runtime).As<QRuntimeValue<float>>();
+		//				runtimeValue.OnValueChange += value => {
+		//					SetValue(member.QName, value);
+		//				};
+		//				runtimeValue.InvokeOnChange();
+		//			}
+		//			else if (member.Type.Is(typeof(QRuntimeValue<string>)))
+		//			{
+		//				var runtimeValue = member.Get(Runtime).As<QRuntimeValue<string>>();
+		//				runtimeValue.OnValueChange += value => {
+		//					SetValue(member.QName, value);
+		//				};
+		//				runtimeValue.InvokeOnChange();
+		//			}
+		//			else if (member.Type.Is(typeof(QRuntimeValue<bool>)))
+		//			{
+		//				var runtimeValue = member.Get(Runtime).As<QRuntimeValue<bool>>();
+		//				runtimeValue.OnValueChange += value => {
+		//					SetValue(member.QName, value);
+		//				};
+		//				runtimeValue.InvokeOnChange();
+		//			}
+		//		}
+		//	}
+		//}
+		//public void UnRegisterValue<RuntimeT, DataT>(QRuntime<RuntimeT, DataT> Runtime) where RuntimeT : QRuntime<RuntimeT, DataT>, new() where DataT : QDataList<DataT>, new()
+		//{
+		//	if (Runtime != null)
+		//	{
+		//		var runtimeTypeInfo = QSerializeType.Get(typeof(RuntimeT));
+		//		foreach (var member in runtimeTypeInfo.Members)
+		//		{
+		//			if (member.QNameAttribute == null) continue;
 
-					if (member.Type.Is(typeof(QRuntimeValue<float>)))
-					{
-						var runtimeValue = member.Get(Runtime).As<QRuntimeValue<float>>();
-						runtimeValue.OnValueChange -= SetValue;
-					}
-					else if (member.Type.Is(typeof(QRuntimeValue<string>)))
-					{
-						var runtimeValue = member.Get(Runtime).As<QRuntimeValue<string>>();
-						runtimeValue.OnValueChange -= SetValue;
-					}
-					else if (member.Type.Is(typeof(QRuntimeValue<bool>)))
-					{
-						var runtimeValue = member.Get(Runtime).As<QRuntimeValue<bool>>();
-						runtimeValue.OnValueChange -= SetValue;
-					}
-				}
-			}
-		}
+		//			if (member.Type.Is(typeof(QRuntimeValue<float>)))
+		//			{
+		//				var runtimeValue = member.Get(Runtime).As<QRuntimeValue<float>>();
+		//				runtimeValue.OnValueChange -= SetValue;
+		//			}
+		//			else if (member.Type.Is(typeof(QRuntimeValue<string>)))
+		//			{
+		//				var runtimeValue = member.Get(Runtime).As<QRuntimeValue<string>>();
+		//				runtimeValue.OnValueChange -= SetValue;
+		//			}
+		//			else if (member.Type.Is(typeof(QRuntimeValue<bool>)))
+		//			{
+		//				var runtimeValue = member.Get(Runtime).As<QRuntimeValue<bool>>();
+		//				runtimeValue.OnValueChange -= SetValue;
+		//			}
+		//		}
+		//	}
+		//}
 	}
 	
 	public struct PortId

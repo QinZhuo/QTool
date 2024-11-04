@@ -15,6 +15,14 @@ namespace QTool {
 		protected override void Awake() {
 			Instance = this;
 		}
+		public static void Clear() {
+			if (IsExist) {
+				foreach (var pool in Instance.GameObjectPools) {
+					pool.Value.Clear();
+				}
+			}
+			
+		}
 		private Dictionary<GameObject, ObjectPool<GameObject>> GameObjectPools = new Dictionary<GameObject, ObjectPool<GameObject>>();
 		public static ObjectPool<GameObject> GetPool(GameObject prefab, int maxSize = 1000) {
 			if (Instance.GameObjectPools.TryGetValue(prefab, out var pool)) {
@@ -52,7 +60,6 @@ namespace QTool {
 					Destroy(obj);
 				}, true, 10, maxSize);
 				Instance.GameObjectPools[prefab] = pool;
-				QEventManager.Register(QEventKey.卸载场景, pool.Clear);
 				return pool;
 			}
 		}

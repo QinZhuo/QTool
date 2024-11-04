@@ -8,7 +8,7 @@ using UnityEngine.Events;
 using UnityEngine.UI;
 
 namespace QTool {
-	public class QLocalization : MonoBehaviour, IQEvent<string> {
+	public class QLocalization : MonoBehaviour{
 		#region 基础数据 
 		[QName, QPopup(nameof(QLocalizationData) + "." + nameof(QLocalizationData.List)), SerializeField, UnityEngine.Serialization.FormerlySerializedAs("key")]
 		private string _key;
@@ -146,7 +146,6 @@ namespace QTool {
 		public string Localization { get; private set; }
 		static QLocalizationData() {
 			Fresh();
-			QEventManager.Register<string>(nameof(QEventKey.设置更新), Fresh);
 		}
 		public static void Fresh(string key = nameof(Language)) {
 			if (key == nameof(Language)) {
