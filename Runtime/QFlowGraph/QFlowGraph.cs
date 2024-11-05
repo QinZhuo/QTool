@@ -246,7 +246,7 @@ namespace QTool.FlowGraph
 			{
 				OnLoad();
 			}
-			InvokeEventIEnumerator(startNode).Start(CoroutineList);
+			//InvokeEventIEnumerator(startNode).Start(CoroutineList);
 		}
 		public Action<string> OnEvent = null;
 		public IEnumerator InvokeEventIEnumerator(string startNode)
@@ -328,7 +328,7 @@ namespace QTool.FlowGraph
 			RunningNodeList.Clear();
 			foreach (var coroutine in CoroutineList.ToArray())
 			{
-				coroutine.Stop();
+			//	coroutine.Stop();
 			}
 			CoroutineList.Clear();
 		}
@@ -1513,7 +1513,7 @@ namespace QTool.FlowGraph
         }
         public void RunPort(string portKey,int index=0)
         {
-			RunPortIEnumerator(portKey, index).Start(Graph.CoroutineList);
+		//	RunPortIEnumerator(portKey, index).Start(Graph.CoroutineList);
         }
 		public QFlowNode GetPortConnectNode(string portKey, int index = 0)
 		{
