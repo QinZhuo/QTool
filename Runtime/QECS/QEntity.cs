@@ -1,17 +1,9 @@
 #if ECS
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.IO;
-using System.Runtime.CompilerServices;
-using NUnit.Framework;
-using QTool;
 using QTool.Reflection;
-using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
-using Unity.Transforms;
-using UnityEditor.PackageManager;
 using UnityEngine;
 namespace QTool {
 	public class QEntity : MonoBehaviour {
@@ -125,7 +117,6 @@ namespace QTool
 {
 	public class QEntity : MonoBehaviour
 	{
-		public string data;
 	}
 }
 #endif
