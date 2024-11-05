@@ -10,7 +10,7 @@ using UnityEditor;
 namespace QTool
 {
 	[QName("基础设置")]
-	public class QToolSetting : QInstanceScriptable<QToolSetting>
+	public class QToolSetting : QSingletonScriptable<QToolSetting>
 	{
 #if Steamworks
 		public uint SteamId = 480;

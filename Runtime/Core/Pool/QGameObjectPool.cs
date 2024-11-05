@@ -11,12 +11,12 @@ namespace QTool {
 	/// <summary>
 	/// GameObject对象池
 	/// </summary>
-	public class QGameObjectPool : QInstanceManager<QGameObjectPool> {
+	public class QGameObjectPool : QSingletonManager<QGameObjectPool> {
 		protected override void Awake() {
 			Instance = this;
 		}
 		public static void Clear() {
-			if (IsExist) {
+			if (Exists) {
 				foreach (var pool in Instance.GameObjectPools) {
 					pool.Value.Clear();
 				}

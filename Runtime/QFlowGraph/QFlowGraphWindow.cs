@@ -12,7 +12,7 @@ using UnityEngine.UIElements;
 
 namespace QTool.FlowGraph
 {
-	public class QFlowGraphWindow : QFileEditorWindow<QFlowGraphWindow>
+	public class QFlowGraphWindow : QTextEditorWindow<QFlowGraphWindow>
 	{
 		#region 静态函数
 #if UNITY_EDITOR

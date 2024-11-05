@@ -583,7 +583,7 @@ namespace QTool
 				activateHandler = (searchContext, root) =>
 				{
 					root = root.AddScrollView();
-					foreach (var SettingType in typeof(QInstanceScriptable<>).GetAllTypes())
+					foreach (var SettingType in typeof(QSingletonScriptable<>).GetAllTypes())
 					{
 						root.AddLabel(QReflection.QName(SettingType));
 						if (SettingType.InvokeFunction(nameof(global::QTool.QToolSetting.IsExist)) is bool boolValue && boolValue)

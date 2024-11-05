@@ -9,11 +9,11 @@ using UnityEditor;
 using UnityEditor.UIElements;
 #endif
 namespace QTool {
-	public abstract class QFileEditorWindow<T>
+	public abstract class QTextEditorWindow<T>
 #if UNITY_EDITOR
 	: EditorWindow
 #endif
-	where T : QFileEditorWindow<T> {
+	where T : QTextEditorWindow<T> {
 		private static T _instance;
 		public static T Instance =>
 #if UNITY_EDITOR

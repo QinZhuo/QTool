@@ -12,7 +12,7 @@ using UnityEngine.UIElements;
 namespace QTool.FlowGraph
 {
 
-	public class QDataListWindow : QFileEditorWindow<QDataListWindow>
+	public class QDataListWindow : QTextEditorWindow<QDataListWindow>
 	{
 
 		[OnOpenAsset(0)]

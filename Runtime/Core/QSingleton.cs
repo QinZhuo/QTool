@@ -7,25 +7,24 @@ namespace QTool {
 	/// <summary>
 	///会自动创建对象的单例 继承MonoBehaviour 
 	/// </summary>
-	public abstract class QInstanceManager<T> : MonoBehaviour where T : QInstanceManager<T> {
+	public abstract class QSingletonManager<T> : MonoBehaviour where T : QSingletonManager<T> {
 
 		private static T _instance;
 		public static T Instance {
 			get {
 				if (_instance == null) {
-					_instance = FindObjectOfType<T>(true);
+					_instance = FindFirstObjectByType<T>(FindObjectsInactive.Include);
 					if (_instance == null && QTool.IsPlaying) {
-						QDebug.Log("单例实例化 " + nameof(QInstanceManager<T>) + "<" + typeof(T).Name + ">");
+						QDebug.Log("单例实例化 " + nameof(QSingletonManager<T>) + "<" + typeof(T).Name + ">");
 						var obj = new GameObject(typeof(T).Name);
 						_instance = obj.AddComponent<T>();
-						_instance.SetDirty();
 					}
 				}
 				return _instance;
 			}
 			protected set => _instance = value;
 		}
-		public static bool IsExist => _instance != null;
+		public static bool Exists => _instance != null;
 		protected virtual void Awake() {
 			_instance = this as T;
 			DontDestroyOnLoad(gameObject);
@@ -34,13 +33,13 @@ namespace QTool {
 	/// <summary>
 	/// 不会自动创建的单例 继承MonoBehaviour
 	/// </summary>
-	public abstract class QInstanceBehaviour<T> : MonoBehaviour where T : QInstanceBehaviour<T> {
+	public abstract class QSingletonBehaviour<T> : MonoBehaviour where T : QSingletonBehaviour<T> {
 
 		private static T _instance;
 		public static T Instance {
 			get {
 				if (_instance == null) {
-					_instance = FindObjectOfType<T>(true);
+					_instance = FindFirstObjectByType<T>(FindObjectsInactive.Include);
 				}
 				return _instance;
 			}
@@ -53,7 +52,7 @@ namespace QTool {
 	/// <summary>
 	/// SO文件单例 存储在Resouces文件夹下 继承ScriptableObject 在ProjectSetting中可直接设置
 	/// </summary>
-	public abstract class QInstanceScriptable<T> : ScriptableObject where T : QInstanceScriptable<T> {
+	public abstract class QSingletonScriptable<T> : ScriptableObject where T : QSingletonScriptable<T> {
 		private static T _instance;
 		public static T Instance {
 			get {

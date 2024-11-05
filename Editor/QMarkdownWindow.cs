@@ -12,7 +12,7 @@ using QTool.Reflection;
 namespace QTool
 {
 
-	public class QMarkdownWindow : QFileEditorWindow<QMarkdownWindow>
+	public class QMarkdownWindow : QTextEditorWindow<QMarkdownWindow>
 	{
 		#region 静态函数
 		[UnityEditor.Callbacks.OnOpenAsset(0)]
