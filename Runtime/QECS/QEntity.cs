@@ -40,7 +40,7 @@ namespace QTool {
 						}
 						if (prefab != null) {
 							var tempEntity = prefab.GetComponent<QEntity>();
-							prefabEntity.entity = GetEntity(prefab, tempEntity == null ? TransformUsageFlags.Dynamic : tempEntity.usage);
+							prefabEntity.entity = GetEntity(prefab, tempEntity == null ? TransformUsageFlags.Dynamic : tempEntity.usage); 
 							memeber.Set(comp, prefabEntity);
 						}
 					}

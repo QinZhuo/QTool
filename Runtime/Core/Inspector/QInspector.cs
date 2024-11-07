@@ -226,7 +226,6 @@ namespace QTool.Inspector
 			return 0;
 		}
 	}
-#endif
 	[CustomPropertyDrawer(typeof(QNavMeshAreaAttribute))]
 	public class QNavMeshAreaDrawer : PropertyDrawer
 	{
@@ -248,6 +247,7 @@ namespace QTool.Inspector
 			EditorGUI.EndProperty();
 		}
 	}
+#endif
 	[CustomPropertyDrawer(typeof(QNameAttribute))]
 	public class QNameDrawer : PropertyDrawer
 	{
