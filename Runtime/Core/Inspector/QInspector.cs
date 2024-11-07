@@ -12,9 +12,6 @@ using UnityEditor.UIElements;
 #endif
 namespace QTool
 {
-	public class QInspectorBehaviour:MonoBehaviour {
-
-	}
 	/// <summary>
 	/// 更改显示的名字
 	/// </summary>
@@ -482,7 +479,7 @@ namespace QTool.Inspector
 			return property.IsShow() ? (toolbar.pageSize > 0 && QPopupData.Get(property, toolbar.getListFuncs).List.Count > toolbar.pageSize ? Height + 20 : Height) : 0;
 		}
 	}
-	[CustomEditor(typeof(QInspectorBehaviour), true, isFallback = true)]
+	[CustomEditor(typeof(MonoBehaviour), true, isFallback = true)]
 	[CanEditMultipleObjects]
 	public class QInspectorEditor : Editor {
 		public override VisualElement CreateInspectorGUI() {
