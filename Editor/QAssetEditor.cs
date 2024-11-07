@@ -418,7 +418,7 @@ namespace QTool
 				}
 			}
 			newTexture.Apply();
-			var path = folder.MergePath(nameof(SpriteAtlas) + ".png");
+			var path = folder.Combine(nameof(SpriteAtlas) + ".png");
 			newTexture.SavePNG(path);
 			AssetDatabase.Refresh();
 			var importer = AssetImporter.GetAtPath(path) as TextureImporter;

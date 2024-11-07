@@ -28,7 +28,7 @@ namespace QTool
 		readonly static Vector2 DefualtCellSize = new Vector2(100, 30);
 		public string Copy()
 		{
-			var qdata = new QDataList();
+			var qdata = new QDataTable();
 			for (int i = 0; i < GridSize.x; i++)
 			{
 				for (int j = 0; j < GridSize.y; j++)

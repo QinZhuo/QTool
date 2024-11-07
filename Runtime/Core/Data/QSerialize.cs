@@ -41,7 +41,7 @@ namespace QTool
 									{
 										writer.Write(1);
 										var runtimeType = value.GetType();
-										writer.Write(runtimeType.GetTypeName(type));
+										writer.Write(runtimeType.FullName);
 										writer.SerializeType(value,runtimeType);
 									}
 									break;

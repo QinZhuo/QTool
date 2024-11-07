@@ -7,6 +7,10 @@ namespace QTool
 {
 	public class QConnectElement : VisualElement
 	{
+		public enum ConnectType {
+			Hor,
+			Ver,
+		}
 		public QConnectElement()
 		{
 			generateVisualContent += data =>
@@ -24,20 +28,33 @@ namespace QTool
 
 				painter.MoveTo(Start);
 				var size = (End - Start);
-				if (End.x > Start.x || Mathf.Abs(size.x) < Mathf.Abs(size.y))
-				{
-					var center = (Start + End) / 2;
-					painter.LineTo(new Vector2(Start.x + 15, Start.y));
-					painter.LineTo(new Vector2(End.x - 15, End.y));
+				var center = (Start + End) / 2;
+				switch (Type) {
+					case ConnectType.Hor: {
+						painter.LineTo(new Vector2(Start.x + 15, Start.y));
+						painter.LineTo(new Vector2(End.x - 15, End.y));
+					}
+					break;
+					case ConnectType.Ver: {
+						painter.LineTo(new Vector2(Start.x, Start.y + 15));
+						painter.LineTo(new Vector2(End.x, End.y - 15));
+					}
+					break;
+					default:
+						break;
 				}
-				else
-				{
-					var top = Mathf.Min(Start.y, End.y) - 30;
-					painter.LineTo(new Vector2(Start.x + 15, Start.y));
-					painter.LineTo(new Vector2(Start.x + 15, top));
-					painter.LineTo(new Vector2(End.x - 15, top));
-					painter.LineTo(new Vector2(End.x - 15, End.y));
-				}
+				//if (End.x > Start.x || Mathf.Abs(size.x) < Mathf.Abs(size.y))
+				//{
+					
+				//}
+				//else
+				//{
+				//	var top = Mathf.Min(Start.y, End.y) - 30;
+				//	painter.LineTo(new Vector2(Start.x + 15, Start.y));
+				//	painter.LineTo(new Vector2(Start.x + 15, top));
+				//	painter.LineTo(new Vector2(End.x - 15, top));
+				//	painter.LineTo(new Vector2(End.x - 15, End.y));
+				//}
 				painter.LineTo(End);
 				painter.Stroke();
 #endif
@@ -53,6 +70,15 @@ namespace QTool
 			}
 		}
 		Color _StartColor;
+
+		public ConnectType Type {
+			get { return _Type; }
+			set {
+				_Type = value;
+				MarkDirtyRepaint();
+			}
+		}
+		ConnectType _Type = ConnectType.Hor;
 		public Color EndColor
 		{
 			get { return _EndColor; }

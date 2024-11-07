@@ -44,7 +44,7 @@ namespace QTool {
 				return _instance;
 			}
 		}
-		public static bool IsExist => _instance != null;
+		public static bool Exists => _instance != null;
 		protected virtual void Awake() {
 			_instance = this as T;
 		}
@@ -62,6 +62,6 @@ namespace QTool {
 				return _instance;
 			}
 		}
-		public static bool IsExist => _instance != null;
+		public static bool Exists => _instance != null;
 	}
 }

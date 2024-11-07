@@ -7,10 +7,8 @@ using System.IO;
 using QTool.Inspector;
 using QTool.Reflection;
 using System.Reflection;
-using System.Linq;
-using Unity.Collections;
-
 #if UNITY_EDITOR
+using UnityEditor;
 using UnityEditor.UIElements;
 #endif
 
@@ -49,6 +47,11 @@ namespace QTool
 			root.Add(visual);
 			return visual;
 		}
+		public static Label SetText(this Label root, string text) {
+			root.text = text;
+			root.style.SetDisplay(!text.IsNull());
+			return root;
+		}
 		public static EnumField AddEnum(this VisualElement root, string label, Enum defaultValue, Action<Enum> changeEvent = null)
 		{
 			var visual = new EnumField(label, defaultValue);
@@ -86,6 +89,7 @@ namespace QTool
 		{
 #if UNITY_EDITOR
 			var visual = new ObjectField(label);
+			visual.allowSceneObjects = false;
 			visual.objectType = type;
 			visual.value = defaultValue;
 			if (changeEvent != null)
@@ -222,8 +226,7 @@ namespace QTool
 			visual.name = name;
 			return visual;
 		}
-		public static VisualElement AddVisualElement(this VisualElement root, FlexDirection flexDirection = FlexDirection.Column)
-		{
+		public static VisualElement AddVisualElement(this VisualElement root, FlexDirection flexDirection = FlexDirection.Column) {
 			var visual = new VisualElement();
 			visual.style.flexDirection = flexDirection;
 			root.Add(visual);
@@ -285,38 +288,38 @@ namespace QTool
 			root.Refresh();
 		}
 #endif
-
+#if UNITY_EDITOR
+		public static void SetCursor(this VisualElement element, MouseCursor cursor) {
+			object objCursor = new UnityEngine.UIElements.Cursor();
+			PropertyInfo fields = typeof(UnityEngine.UIElements.Cursor).GetProperty("defaultCursorId", BindingFlags.NonPublic | BindingFlags.Instance);
+			fields.SetValue(objCursor, (int)cursor);
+			element.style.cursor = new StyleCursor((UnityEngine.UIElements.Cursor)objCursor);
+		}
+#endif
 		public static void AddMenu(this VisualElement root, Action<ContextualMenuPopulateEvent> menuBuilder)
 		{
 			root.AddManipulator(new ContextualMenuManipulator(menuBuilder));
 		}
 		public static QDictionary<Type, Func<string, object, Action<object>, VisualElement>> TypeOverride = new QDictionary<Type, Func<string, object, Action<object>, VisualElement>>();
-		public static VisualElement Add(this VisualElement root, string name, object obj, Type type, Action<object> changeEvent, ICustomAttributeProvider customAttribute = null)
-		{
-			if (type == null)
-			{
-				if (obj == null)
-				{
+		public static VisualElement Add(this VisualElement root, string name, object obj, Type type, Action<object> changeEvent, ICustomAttributeProvider customAttribute = null) {
+			if (type == null) {
+				if (obj == null) {
 					return root.AddLabel(name);
 				}
-				else
-				{
+				else {
 					type = obj.GetType();
 				}
 			}
-			if (obj == null && type.IsValueType)
-			{
+			if (obj == null && type.IsValueType) {
 				obj = type.CreateInstance();
 			}
 			var typeInfo = QSerializeType.Get(type);
-			if (TypeOverride.ContainsKey(type))
-			{
+			if (TypeOverride.ContainsKey(type)) {
 				var visual = TypeOverride[type](name, obj, changeEvent);
 				root.Add(visual);
 				return visual;
 			}
-			switch (typeInfo.Code)
-			{
+			switch (typeInfo.Code) {
 				case TypeCode.Boolean:
 					return root.AddToggle(name, (bool)obj, (value) => changeEvent(value));
 				case TypeCode.Char:
@@ -326,33 +329,25 @@ namespace QTool
 				case TypeCode.Int32:
 				case TypeCode.UInt16:
 				case TypeCode.UInt32:
-					if (type.IsEnum)
-					{
+					if (type.IsEnum) {
 						var flagsEnum = type.GetAttribute<FlagsAttribute>();
-						if (flagsEnum != null)
-						{
-							return root.AddEnumFlags(name, (Enum)obj, (value) =>
-							 {
-								 changeEvent(value);
-							 });
+						if (flagsEnum != null) {
+							return root.AddEnumFlags(name, (Enum)obj, (value) => {
+								changeEvent(value);
+							});
 						}
-						else
-						{
-							return root.AddEnum(name, (Enum)obj, (value) =>
-							{
+						else {
+							return root.AddEnum(name, (Enum)obj, (value) => {
 								changeEvent(value);
 							});
 						}
 					}
-					else
-					{
+					else {
 						var intValue = 0;
-						try
-						{
+						try {
 							intValue = (int)obj;
 						}
-						catch (Exception e)
-						{
+						catch (Exception e) {
 							Debug.LogWarning("错误[" + name + "][" + obj?.GetType() + "][" + obj + "] " + e);
 						}
 						return root.AddInt(name, intValue, (value) => { changeEvent(value); });
@@ -368,168 +363,163 @@ namespace QTool
 					return root.AddDouble(name, (double)obj, (value) => { changeEvent(value); });
 				case TypeCode.String:
 					var qpopup = customAttribute?.GetAttribute<QPopupAttribute>();
-					if (qpopup != null)
-					{
+					if (qpopup != null) {
 						return root.AddQPopupAttribute(qpopup, obj, (value) => changeEvent(value));
 					}
-					else
-					{
+					else {
 						return root.AddText(name, (string)obj, (value) => { changeEvent(value); });
 					}
 				case TypeCode.Object:
-					switch (typeInfo.ObjType)
-					{
-						case QObjectType.DynamicObject:
-							{
-								if (obj == null)
-								{
-									obj = "";
-								}
-								var dynamicObjectView = root.AddVisualElement();
-								dynamicObjectView.style.flexDirection = FlexDirection.Row; ;
-								dynamicObjectView.AddLabel(name);
-								var typePopup = dynamicObjectView.AddPopup("", typeInfo.Type.GetAllTypes(), obj.GetType(), (newType) =>
-								 {
-									 obj = newType.CreateInstance();
-									 dynamicObjectView.Remove(dynamicObjectView.Q<VisualElement>(nameof(dynamicObjectView)));
-									 if (QSerializeType.Get(newType).ObjType != QObjectType.DynamicObject)
-									 {
-										 var temp = dynamicObjectView.Add("", obj, newType, changeEvent);
-										 temp.name = nameof(dynamicObjectView);
-									 }
-									 changeEvent?.Invoke(obj);
-								 });
-								typePopup.style.maxWidth = 100;
-								if (QSerializeType.Get(typePopup.value).ObjType != QObjectType.DynamicObject)
-								{
-									var objView = dynamicObjectView.Add("", obj, typePopup.value, changeEvent);
-									objView.name = nameof(dynamicObjectView);
-								}
-								return dynamicObjectView;
+					switch (typeInfo.ObjType) {
+						case QObjectType.DynamicObject: {
+							if (obj == null) {
+								obj = typeInfo.Type.CreateInstance();
 							}
-						case QObjectType.UnityObject:
-							{
-								return root.AddObject(name, type, (UnityEngine.Object)obj, (value) => { changeEvent(value); });
-							}
-						case QObjectType.Object:
-							{
-								if (obj == null)
-								{
-									obj = type.CreateInstance();
-								}
-								if (typeof(QIdObject).IsAssignableFrom(type))
-								{
-									return root.AddLabel("暂不支持[" + type + "]");
-									//obj = (QIdObject)obj.Draw(name);
-								}
-								else
-								{
-									var foldout = root.AddFoldout(name);
-
-									foreach (var member in typeInfo.Members)
-									{
-										foldout.contentContainer.Add(member.QName, member.Get(obj), member.Type, (value) =>
-										{
-											member.Set(obj, value);
-											changeEvent?.Invoke(obj);
-										}, member.MemeberInfo);
-									}
-									return foldout;
-								}
-							}
-						case QObjectType.FixedString: {
-
-							return root.AddText(name, obj.ToString(), newValue => {
-								switch (type.Name) {
-									case nameof(FixedString32Bytes): {
-										var fixedStr = (FixedString32Bytes)obj;
-										fixedStr.CopyFromTruncated(newValue);
-										changeEvent?.Invoke(fixedStr);
-									}
-									break;
-									case nameof(FixedString64Bytes): {
-										var fixedStr = (FixedString64Bytes)obj;
-										fixedStr.CopyFromTruncated(newValue);
-										changeEvent?.Invoke(fixedStr);
-									}
-									break;
-									case nameof(FixedString512Bytes): {
-										var fixedStr = (FixedString512Bytes)obj;
-										fixedStr.CopyFromTruncated(newValue);
-										changeEvent?.Invoke(fixedStr);
-									}
-									break;
-									case nameof(FixedString4096Bytes): {
-										var fixedStr = (FixedString4096Bytes)obj;
-										fixedStr.CopyFromTruncated(newValue);
-										changeEvent?.Invoke(fixedStr);
-									}
-									break;
-									default:
-										break;
+							var dynamicObjectView = root.AddVisualElement();
+							dynamicObjectView.style.flexDirection = FlexDirection.Row;
+							dynamicObjectView.AddLabel(name);
+							//.style.width = new Length(40, LengthUnit.Percent);
+							dynamicObjectView.AddMenu(data => {
+								var types = typeInfo.Type.GetAllTypes();
+								foreach (var type in types) {
+									data.menu.AppendAction("更改类型/" + type.GetFriendlyName(), data => {
+										obj = type.CreateInstance();
+										var old = dynamicObjectView.Q<VisualElement>(nameof(dynamicObjectView));
+										if (old != null) {
+											dynamicObjectView.Remove(old);
+										}
+										if (QSerializeType.Get(type).ObjType != QObjectType.DynamicObject) {
+											dynamicObjectView.Add("", obj, type, changeEvent).name = nameof(dynamicObjectView);
+										}
+										changeEvent?.Invoke(obj);
+									}, type == obj?.GetType() ? DropdownMenuAction.Status.Checked : DropdownMenuAction.Status.Normal);
 								}
 							});
+							//var typePopup = dynamicObjectView.AddPopup("", typeInfo.Type.GetAllTypes(), obj.GetType(), (newType) => {
+							//	obj = newType.CreateInstance();
+							//	var old = dynamicObjectView.Q<VisualElement>(nameof(dynamicObjectView));
+							//	if (old != null) {
+							//		dynamicObjectView.Remove(old);
+							//	}
+							//	if (QSerializeType.Get(newType).ObjType != QObjectType.DynamicObject) {
+							//		var temp = dynamicObjectView.Add("", obj, newType, changeEvent);
+							//		temp.name = nameof(dynamicObjectView);
+							//	}
+							//	changeEvent?.Invoke(obj);
+							//});
+							//typePopup.style.maxWidth = 100;
+							if (QSerializeType.Get(obj.GetType()).ObjType != QObjectType.DynamicObject) {
+								dynamicObjectView.Add("", obj, obj.GetType(), changeEvent).name = nameof(dynamicObjectView);
+							}
+							return dynamicObjectView;
 						}
-						break;
+						case QObjectType.UnityObject: {
+							return root.AddObject(name, type, (UnityEngine.Object)obj, (value) => { changeEvent(value); });
+						}
+						case QObjectType.Object: {
+							if (obj == null) {
+								obj = type.CreateInstance();
+							}
+							if (obj == null) {
+								return root.AddLabel("暂不支持[" + type + "]");
+							}
+							else {
+								var foldout = name.IsNull() ? root.AddVisualElement() : root.AddFoldout(name);
+
+								foreach (var member in typeInfo.Members) {
+									foldout.contentContainer.Add(member.QName, member.Get(obj), member.Type, (value) => {
+										member.Set(obj, value);
+										changeEvent?.Invoke(obj);
+									}, member.MemeberInfo);
+								}
+								return foldout;
+							}
+						}
+						//case QObjectType.FixedString: {
+
+						//	return root.AddText(name, obj.ToString(), newValue => {
+						//		switch (type.Name) {
+						//			case nameof(FixedString32Bytes): {
+						//				var fixedStr = (FixedString32Bytes)obj;
+						//				fixedStr.CopyFromTruncated(newValue);
+						//				changeEvent?.Invoke(fixedStr);
+						//			}
+						//			break;
+						//			case nameof(FixedString64Bytes): {
+						//				var fixedStr = (FixedString64Bytes)obj;
+						//				fixedStr.CopyFromTruncated(newValue);
+						//				changeEvent?.Invoke(fixedStr);
+						//			}
+						//			break;
+						//			case nameof(FixedString512Bytes): {
+						//				var fixedStr = (FixedString512Bytes)obj;
+						//				fixedStr.CopyFromTruncated(newValue);
+						//				changeEvent?.Invoke(fixedStr);
+						//			}
+						//			break;
+						//			case nameof(FixedString4096Bytes): {
+						//				var fixedStr = (FixedString4096Bytes)obj;
+						//				fixedStr.CopyFromTruncated(newValue);
+						//				changeEvent?.Invoke(fixedStr);
+						//			}
+						//			break;
+						//			default:
+						//				break;
+						//		}
+						//	});
+						//}
+						//break;
 						case QObjectType.Array:
-						case QObjectType.List:
-							{
-								if (typeof(IList).IsAssignableFrom(type))
-								{
-									if (typeInfo.ArrayRank > 1)
-									{
-										break;
-									}
-									var list = obj as IList;
-									if (list == null)
-									{
-										obj = typeInfo.ArrayRank == 0 ? type.CreateInstance() : type.CreateInstance(null, 0);
-										list = obj as IList;
-										changeEvent?.Invoke(list);
-									}
-									var foldout = root.AddFoldout(name);
-									void FreshList()
-									{
-										foldout.contentContainer.Clear();
-										for (int i = 0; i < list.Count; i++)
-										{
-											object index = i;
-											var child = foldout.contentContainer.Add(name + i, list[i], typeInfo.ElementType, (value) =>
-											{
-												list[(int)index] = value;
+						case QObjectType.List: {
+							if (typeof(IList).IsAssignableFrom(type)) {
+								if (typeInfo.ArrayRank > 1) {
+									break;
+								}
+								var list = obj as IList;
+								if (list == null) {
+									obj = typeInfo.ArrayRank == 0 ? type.CreateInstance() : type.CreateInstance(null, 0);
+									list = obj as IList;
+									changeEvent?.Invoke(list);
+								}
+								var foldout = name.IsNull() ? root.AddVisualElement(): root.AddFoldout(name);
+								void FreshList() {
+									foldout.contentContainer.Clear();
+									for (int i = 0; i < list.Count; i++) {
+										object index = i;
+										VisualElement child = null;
+										child = foldout.contentContainer.Add($"[{i}] {list[i]}", list[i], typeInfo.ElementType, (value) => {
+											list[(int)index] = value;
+											if (typeInfo.ElementType != typeof(string)) {
+												child.Q<Label>().text = $"[{i}] {value}";
+											}
+											changeEvent?.Invoke(list);
+										}, customAttribute);
+										child.AddMenu((menu) => {
+											menu.menu.AppendAction("新增", action => {
+												list = list.CreateAt(typeInfo, (int)index);
+												FreshList();
 												changeEvent?.Invoke(list);
-											}, customAttribute);
-											child.AddMenu((menu) =>
-											{
-												menu.menu.AppendAction("新增", action =>
-												{
-													list = list.CreateAt(typeInfo, (int)index);
-													FreshList();
-													changeEvent?.Invoke(list);
-												});
-												menu.menu.AppendAction("删除", action =>
-												{
-													list = list.RemoveAt(typeInfo, (int)index);
-													FreshList();
-													changeEvent?.Invoke(list);
-												});
 											});
-										}
-										foldout.AddMenu((menu) =>
-										{
-											menu.menu.AppendAction("新增", action =>
-											{
-												list = list.CreateAt(typeInfo);
+											menu.menu.AppendAction("删除", action => {
+												list = list.RemoveAt(typeInfo, (int)index);
 												FreshList();
 												changeEvent?.Invoke(list);
 											});
 										});
 									}
-									FreshList();
-									return foldout;
+									foldout.AddMenu((menu) => {
+										menu.menu.AppendAction("新增", action => {
+											list = list.CreateAt(typeInfo);
+											FreshList();
+											changeEvent?.Invoke(list);
+										});
+									});
 								}
+								FreshList();
+								return foldout;
 							}
-							break;
+						}
+						break;
 						default:
 							return root.AddLabel("不支持类型[" + type + "]");
 					}
@@ -542,6 +532,12 @@ namespace QTool
 					return root.AddLabel(name + "\t" + obj?.ToString());
 			}
 			return root.AddLabel(name + " " + obj);
+		}
+		public static bool GetDisplay(this IStyle style) {
+			return style.display == DisplayStyle.Flex;
+		}
+		public static void SetDisplay(this IStyle style, bool display) {
+			style.display = display ? DisplayStyle.Flex : DisplayStyle.None;
 		}
 		public static void SetBorder(this IStyle style, Color color, float width = 1, float radius = 5)
 		{
@@ -558,27 +554,25 @@ namespace QTool
 			style.borderBottomLeftRadius = radius;
 			style.borderBottomRightRadius = radius;
 		}
-	
+		public static void SetFixedSize(this IStyle style, float width , float height) {
+			style.width = width;
+			style.height = height;
+			style.minWidth = width;
+			style.minHeight = height;
+			style.maxWidth = width;
+			style.maxHeight = height;
+		}
+
 		public static VisualElement Tooltip(this VisualElement root, string text)
 		{
 			root.tooltip = text?.Replace("\\n", " "); 
 			return root;
 		}
-		public static void Add(this VisualElement root, QInspectorType inspectorType, object target)
-		{
-			foreach (var func in inspectorType.buttonFunc)
-			{
-				root.AddButton(func.QName, () =>
-				{
-					func.Invoke(target);
-				});
-			}
-		}
 #if UNITY_EDITOR
-		[UnityEditor.SettingsProvider]
-		public static UnityEditor.SettingsProvider QToolSetting()
+		[SettingsProvider]
+		public static SettingsProvider QToolSetting()
 		{
-			return new UnityEditor.SettingsProvider("Project/" + nameof(QTool) + "设置", UnityEditor.SettingsScope.Project)
+			return new SettingsProvider("Project/" + nameof(QTool) + "设置", SettingsScope.Project)
 			{
 				activateHandler = (searchContext, root) =>
 				{
@@ -586,23 +580,23 @@ namespace QTool
 					foreach (var SettingType in typeof(QSingletonScriptable<>).GetAllTypes())
 					{
 						root.AddLabel(QReflection.QName(SettingType));
-						if (SettingType.InvokeFunction(nameof(global::QTool.QToolSetting.IsExist)) is bool boolValue && boolValue)
+						if (SettingType.InvokeFunction("IsExist") is bool boolValue && boolValue)
 						{
-							root.Add(new InspectorElement(new UnityEditor.SerializedObject(SettingType.InvokeFunction(nameof(global::QTool.QToolSetting.Instance)) as ScriptableObject)));
+							root.Add(new InspectorElement(new UnityEditor.SerializedObject(SettingType.InvokeFunction("Instance") as ScriptableObject)));
 						}
 					}
 				}
 			};
 		}
 
-		public static PropertyField Add(this VisualElement root, UnityEditor.SerializedProperty serializedProperty)
+		public static PropertyField Add(this VisualElement root, SerializedProperty serializedProperty)
 		{
-			var visual = new PropertyField(serializedProperty, QReflection.QName(serializedProperty));
+			var visual = new PropertyField(serializedProperty);
 			visual.name = visual.label;
 			root.Add(visual);
 			return visual;
 		}
-		public static void Add(this VisualElement root, UnityEditor.SerializedObject serializedObject)
+		public static void Add(this VisualElement root, SerializedObject serializedObject)
 		{
 			var iterator = serializedObject.GetIterator();
 			if (iterator.NextVisible(true))
@@ -717,7 +711,7 @@ namespace QTool
 
 		public static void ClearAll()
 		{
-			QDataList.UnLoadAll();
+			QDataTable.UnLoadAll();
 			DrawerDic.Clear();
 		}
 
@@ -740,7 +734,7 @@ namespace QTool
 			if (drawerKey.IsNull())
 			{
 #if UNITY_EDITOR
-				if (obj is UnityEditor.SerializedProperty property)
+				if (obj is SerializedProperty property)
 				{
 					type = QReflection.ParseType(property.type.SplitEndString("PPtr<$").TrimEnd('>'));
 				}
@@ -767,10 +761,10 @@ namespace QTool
 					else
 					{
 						var funcKey = getListFunc;
-						if (!funcKey.Contains('.') && !funcKey.EndsWith(".List") && QReflection.ParseType(funcKey).Is(typeof(QDataList<>)))
-						{
-							funcKey += ".List"; 
-						}
+						//if (!funcKey.Contains('.') && !funcKey.EndsWith(".List") && QReflection.ParseType(funcKey).Is(typeof(QDataTable<>)))
+						//{
+						//	funcKey += ".List"; 
+						//}
 						if (obj.InvokeFunction(funcKey) is IEnumerable itemList)
 						{
 							foreach (var item in itemList)

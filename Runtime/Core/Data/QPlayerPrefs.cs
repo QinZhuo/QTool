@@ -5,7 +5,7 @@ namespace QTool
 {
 	public static class QPlayerPrefs
 	{
-		private static QDataList Data { get; set; } = QDataList.Load(QFileTool.SaveDataPathRoot + "/" + nameof(QPlayerPrefs), () => new QDataList());
+		private static QDataTable Data { get; set; } = QDataTable.Load(QFileTool.SaveDataPathRoot + "/" + nameof(QPlayerPrefs), () => new QDataTable());
 		private static void Save()
 		{
 			Data.Save();

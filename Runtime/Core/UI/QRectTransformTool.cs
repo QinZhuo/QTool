@@ -89,10 +89,18 @@ namespace QTool
 			return new Vector2(rect.Left(), rect.Down());
 		}
 
-		public static void SetPosition(this RectTransform rect, Vector2 newPos)
+		public static void SetPosition(this RectTransform rect, Vector3 newPos)
 		{
-			rect.position = new Vector3(newPos.x, newPos.y, rect.position.z);
+			if (!rect.position.Similar(newPos)) {
+				rect.position = newPos;
+			}
 		}
+		public static void SetAnchoredPosition(this RectTransform rect, Vector2 newPos) {
+			if (!rect.anchoredPosition.Similar(newPos)) {
+				rect.anchoredPosition = newPos;
+			}
+		}
+		
 		public static void SetPivotAndAnchors(this RectTransform rect, Vector2 aVec)
 		{
 			rect.pivot = aVec;

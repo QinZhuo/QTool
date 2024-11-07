@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
-using System.Security.Cryptography;
 using System.Xml.Serialization;
 using UnityEngine;
 #if UNITY_SWITCH_API
@@ -27,34 +26,6 @@ namespace QTool
 			}
 		}
 		public const string ResourcesPathRoot = "Assets/Resources";
-#if UNITY_SWITCH_API
-		public static nn.account.Uid userId;
-		public static nn.fs.FileHandle fileHandle = new nn.fs.FileHandle();
-#endif
-		static QFileTool()
-		{
-			switch (Application.platform)
-			{
-				case RuntimePlatform.Switch:
-					{
-#if UNITY_SWITCH_API
-
-						nn.account.Account.Initialize();
-						nn.account.UserHandle userHandle = new nn.account.UserHandle();
-						if (!nn.account.Account.TryOpenPreselectedUser(ref userHandle))
-						{
-							nn.Nn.Abort("Failed to open preselected user.");
-						}
-						nn.Result result = nn.account.Account.GetUserId(ref userId, userHandle);
-						result.abortUnlessSuccess();
-						result = nn.fs.SaveData.Mount(nameof(QTool), userId);
-						result.abortUnlessSuccess();
-						Debug.Log("初始化" + Application.platform);
-#endif
-					}
-					break;
-			}
-		}
         public static T QDataCopy<T>(this T target)
         {
 			return target.ToQData().ParseQData<T>();
@@ -156,73 +127,10 @@ namespace QTool
 				}
 			});
 		}
-#if QCrypto
-		private static byte[] _CryptoKey = null;
-		public static byte[] CryptoKey => _CryptoKey??=(Application.companyName.IsNull()||Application.productName.IsNull())? "QTCT".GetBytes():(Application.companyName.Substring(0,2)+Application.productName.Substring(0,2)).GetBytes();
-		public static byte[] Encrypt(this byte[] bytes)
-		{
-			if (bytes == null || bytes.Length == 0) return bytes;
-			using (var memery = new MemoryStream())
-			{
-				using (var des = new DESCryptoServiceProvider())
-				{
-					using (var writer = new CryptoStream(memery, des.CreateEncryptor(CryptoKey,CryptoKey), CryptoStreamMode.Write))
-					{
-						writer.Write(bytes, 0, bytes.Length);
-						writer.FlushFinalBlock();
-						return memery.ToArray();
-					}
-				}
-			}
-		}
-		public static byte[] Decrypt(this byte[] bytes)
-		{
-			if (bytes == null || bytes.Length == 0) return bytes;
-			using (var memery = new MemoryStream())
-			{
-				using (var des = new DESCryptoServiceProvider())
-				{
-					using (var writer = new CryptoStream(memery, des.CreateDecryptor(CryptoKey, CryptoKey), CryptoStreamMode.Write))
-					{
-						writer.Write(bytes, 0, bytes.Length);
-						writer.FlushFinalBlock();
-						return memery.ToArray();
-					}
-				}
-			}
-		}
-#endif
 		public static bool ExistsFile(this string path)
 		{
 			if (path.IsNull()) return false;
-			path= CheckDirectoryPath( path);
-			switch (Application.platform)
-			{
-				case RuntimePlatform.Switch:
-					{
-#if UNITY_SWITCH_API
-						nn.fs.EntryType entryType = 0;
-						nn.Result result = nn.fs.FileSystem.GetEntryType(ref entryType, path);
-						if (result.IsSuccess())
-						{
-							return true;
-						}
-						if (!nn.fs.FileSystem.ResultPathNotFound.Includes(result))
-						{
-							result.abortUnlessSuccess();
-						}
-						QDebug.LogWarning("不存在 " + path);
-						return false;
-#else
-						return false;
-#endif
-					}
-				default:
-					{
-						return File.Exists(path);
-					}
-			}
-
+			return File.Exists(path);
 		}
 		public static bool ExistsDirectory(this string path)
 		{
@@ -365,22 +273,14 @@ namespace QTool
 			
 			try
 			{
-#if UNITY_SWITCH_API
-				return DateTime.MinValue;
-#else
 				if (Application.isPlaying && path.StartsWith(ResourcesPathRoot))
 				{
-#if UNITY_EDITOR
 					return File.GetLastWriteTime(path);
-#else
-					return DateTime.MinValue;
-#endif
 				}
 				else
 				{
 					return File.GetLastWriteTime(path);
 				}
-#endif
 			}
 			catch (Exception e)
 			{
@@ -452,63 +352,24 @@ namespace QTool
 		}
 		public static List<T> LoadQDataList<T>(this List<T> data, string path)
 		{
-			return new QDataList(Load(path, data.ToQDataList().ToString())).ParseQDataList(data);
-		} 
-		public static void SaveBytes<T>(this T data,string path)
-		{
-			Save(path, QSerialize.Serialize(data));
+			return new QDataTable(Load(path, data.ToQDataList().ToString())).ParseQDataList(data);
 		}
-		public static T LoadBytes<T>(this T target, string path)
+		public static string Combine(this string rootPath,string childe)
 		{
-			target= LoadBytes(path, target.Serialize()).Deserialize(target);
-			QDebug.Log("加载[" + path + "]成功\n" + target.ToShortString());
-			return target;
-		}
-
-		public static string MergePath(this string rootPath, string childe)
-		{
-			if (childe.IsNull())
-			{
-				return rootPath;
-			}
-			else
-			{
-				return rootPath + "/" + childe;
-			}
+			return $"{rootPath}/{childe}";
 		}
 		public static string CheckDirectoryPath(this string path)
 		{
 			path = path.CheckPath();
-			switch (Application.platform)
-			{
-				case RuntimePlatform.Switch:
-					{
-#if UNITY_SWITCH_API
-						if (!path.StartsWith(Application.streamingAssetsPath))
-						{
-							if (!path.StartsWith(nameof(QTool) + ":/"))
-							{
-								path = nameof(QTool) + ":/" + path.Replace('/','_');
-							}
-						}
-#endif
-					}
-					break;
-				default:
-					var directoryPath = Path.GetDirectoryName(path);
-					if (!string.IsNullOrWhiteSpace(directoryPath) && !ExistsDirectory(directoryPath))
-					{
-						try
-						{
-							Debug.LogWarning("自动创建文件夹 " + directoryPath);
-							Directory.CreateDirectory(directoryPath);
-						}
-						catch (Exception e)
-						{
-							Debug.LogError("创建文件夹出错：" + directoryPath + ":" + e);
-						}
-					}
-					break;
+			var directoryPath = Path.GetDirectoryName(path);
+			if (!string.IsNullOrWhiteSpace(directoryPath) && !ExistsDirectory(directoryPath)) {
+				try {
+					Debug.LogWarning("自动创建文件夹 " + directoryPath);
+					Directory.CreateDirectory(directoryPath);
+				}
+				catch (Exception e) {
+					Debug.LogError("创建文件夹出错：" + directoryPath + ":" + e);
+				}
 			}
 			return path;
 		}
@@ -569,12 +430,13 @@ namespace QTool
 
 			}
 		}
-		public static void SaveCheckChange(string path, string data)
+		public static bool SaveCheckChange(string path, string data)
 		{
-			if (!string.Equals(Load(path).Trim(), data.Trim()))
-			{
+			if (!Equals(Load(path).GetHashCode(), data.GetHashCode())) {
 				Save(path, data, System.Text.Encoding.Unicode);
+				return true;
 			}
+			return false;
 		}
 		public static void Save(string path, string data, System.Text.Encoding Encoding = null)
 		{
@@ -599,7 +461,14 @@ namespace QTool
 		}
 		public static string WithoutExtension(this string path)
 		{
-			return Path.GetDirectoryName(path)+"/"+ Path.GetFileNameWithoutExtension(path);
+			try {
+				path = Path.Combine(Path.GetDirectoryName(path), Path.GetFileNameWithoutExtension(path));
+			}
+			catch (Exception) {
+				Debug.LogError($"路径出错[{path}]");
+				throw;
+			}
+			return path;
 		}
 		public static byte[] LoadBytes(string path,byte[] defaultValue=default)
 		{
@@ -740,10 +609,6 @@ namespace QTool
             };
             if (FileDialog.GetSaveFileName(dialog))
             {
-                if (dialog.file.EndsWith("." + extension))
-                {
-                    return dialog.file + "." + extension;
-                }
                 return  dialog.file;
             }
             return "";

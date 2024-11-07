@@ -34,7 +34,7 @@ namespace QTool {
 						if (prefab == null && QEntityData.ContainsKey(key)) {
 #if UNITY_EDITOR
 							var obj = new GameObject(key, typeof(QEntity));
-							prefab = UnityEditor.PrefabUtility.SaveAsPrefabAsset(obj, Application.dataPath.MergePath(nameof(Resources)).MergePath(path) + ".prefab");
+							prefab = UnityEditor.PrefabUtility.SaveAsPrefabAsset(obj, Application.dataPath.Combine(nameof(Resources)).Combine(path) + ".prefab");
 							UnityEngine.Object.DestroyImmediate(obj);
 #endif
 						}
@@ -56,7 +56,7 @@ namespace QTool {
 			//data._entity = entity;
 		}
 	}
-	public class QEntityData : QDataList<QEntityData> {
+	public class QEntityData : QDataTable<QEntityData> {
 		public List<IQComponment> comps = new List<IQComponment>();
 		public List<IQBufferElement> elements = new List<IQBufferElement>();
 		//[QIgnore]

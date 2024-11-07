@@ -12,10 +12,13 @@ using UnityEditor.UIElements;
 #endif
 namespace QTool
 {
+	public class QInspectorBehaviour:MonoBehaviour {
+
+	}
 	/// <summary>
 	/// 更改显示的名字
 	/// </summary>
-	[AttributeUsage(AttributeTargets.Field | AttributeTargets.Class| AttributeTargets.Struct | AttributeTargets.Method | AttributeTargets.Interface | AttributeTargets.Parameter | AttributeTargets.Property)]
+	[AttributeUsage(AttributeTargets.Field | AttributeTargets.Class | AttributeTargets.Method | AttributeTargets.Interface | AttributeTargets.Parameter | AttributeTargets.Property)]
 	public class QNameAttribute : PropertyAttribute
 	{
 		public string name;
@@ -48,12 +51,10 @@ namespace QTool
 
 	}
 
-	[AttributeUsage(AttributeTargets.Field | AttributeTargets.Class| AttributeTargets.Struct | AttributeTargets.Method | AttributeTargets.Interface | AttributeTargets.Parameter | AttributeTargets.Property)]
-	public class QOldNameAttribute : Attribute
-	{
+	[AttributeUsage(AttributeTargets.Field | AttributeTargets.Class | AttributeTargets.Method | AttributeTargets.Interface | AttributeTargets.Parameter | AttributeTargets.Property, AllowMultiple = false)]
+	public class QOldNameAttribute : Attribute {
 		public string name;
-		public QOldNameAttribute(string name)
-		{
+		public QOldNameAttribute(string name) {
 			this.name = name;
 		}
 	}
@@ -68,6 +69,16 @@ namespace QTool
 		{
 		}
 	}
+	[AttributeUsage(AttributeTargets.Field | AttributeTargets.Property | AttributeTargets.Parameter, AllowMultiple = false)]
+	public class QObjectAttribute : PropertyAttribute {
+		public Type type;
+		public QObjectAttribute(Type type = null) {
+			if (type == null) {
+				type = typeof(UnityEngine.Object);
+			}
+			this.type = type;
+		}
+	}
 
 	/// <summary>
 	/// 将字符传显示为枚举下拉款通过GetKeyListFunc获取所有可选择的字符串
@@ -78,6 +89,16 @@ namespace QTool
 		public string[] getListFuncs = new string[0];
 		public QPopupAttribute(params string[] getListFunc)
 		{
+			order = 1;
+			this.getListFuncs = getListFunc;
+		}
+	}/// <summary>
+	 /// 将int显示为枚举下拉款通过GetKeyListFunc获取所有可选择的字符串
+	 /// </summary>
+	[AttributeUsage(AttributeTargets.Field | AttributeTargets.Property | AttributeTargets.Parameter)]
+	public class QMaskAttribute : PropertyAttribute {
+		public string[] getListFuncs = new string[0];
+		public QMaskAttribute(params string[] getListFunc) {
 			order = 1;
 			this.getListFuncs = getListFunc;
 		}
@@ -158,74 +179,6 @@ namespace QTool.Inspector
             this.eventType = eventType;
         }
     }
-    /// <summary>
-    /// inspector状态更改时调用
-    /// </summary>
-    [AttributeUsage(AttributeTargets.Method)]
-    public class QOnInspectorAttribute : Attribute
-    {
-		public QInspectorState state;
-		public QOnInspectorAttribute(QInspectorState state)
-        {
-			this.state = state;
-		}
-    }
-	public enum QInspectorState
-	{
-		OnEnable,
-		OnDisable,
-	}
- 
-
-	public class QInspectorType : QTypeInfo<QInspectorType>
-	{
-		public QDictionary<QOnInspectorAttribute, QFunctionInfo> inspectorState = new QDictionary<QOnInspectorAttribute, QFunctionInfo>();
-		public QDictionary<QOnSceneInputAttribute, QFunctionInfo> mouseEventFunc = new QDictionary<QOnSceneInputAttribute, QFunctionInfo>();
-		public List<QFunctionInfo> buttonFunc = new List<QFunctionInfo>();
-		protected override void Init(Type type)
-		{
-			base.Init(type);
-			if (!TypeMembers.ContainsKey(type))
-			{
-				Members.RemoveAll(memebr => (!memebr.IsPublic && memebr.MemeberInfo.GetCustomAttribute<SerializeField>() == null) || !(memebr.MemeberInfo is FieldInfo) || memebr.Set == null);
-			}
-			foreach (var funcInfo in Functions)
-			{
-				foreach (var att in funcInfo.MethodInfo.GetCustomAttributes<QOnSceneInputAttribute>())
-				{
-					mouseEventFunc[att] = funcInfo;
-				}
-				foreach (var att in funcInfo.MethodInfo.GetCustomAttributes<QNameAttribute>())
-				{
-					buttonFunc.Add(funcInfo);
-				}
-				foreach (var att in funcInfo.MethodInfo.GetCustomAttributes<ContextMenu>())
-				{
-					buttonFunc.Add(funcInfo);
-				}
-				foreach (var att in funcInfo.MethodInfo.GetCustomAttributes<QOnInspectorAttribute>())
-				{
-					inspectorState[att] = funcInfo;
-				}
-			}
-		}
-		public void InvokeQInspectorState(object target,QInspectorState state)
-		{
-			foreach (var kv in inspectorState)
-			{
-				if (kv.Key.state == state)
-				{
-					var result = kv.Value.Invoke(target);
-					if (result is Task task)
-					{
-						task.Start();
-					}
-				}
-			}
-		}
-		
-	
-	}
 	[AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
 	public class QNavMeshAreaAttribute : PropertyAttribute
 	{
@@ -298,9 +251,11 @@ namespace QTool.Inspector
 	[CustomPropertyDrawer(typeof(QNameAttribute))]
 	public class QNameDrawer : PropertyDrawer
 	{
-		public override VisualElement CreatePropertyGUI(SerializedProperty property)
-		{
+		public override VisualElement CreatePropertyGUI(SerializedProperty property) {
 			return new PropertyField(property, QReflection.QName(property));
+		}
+		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label) {
+			EditorGUI.PropertyField(position, property, new GUIContent(QReflection.QName(property)));
 		}
 	}
 	[CustomPropertyDrawer(typeof(QReadonlyAttribute))]
@@ -326,22 +281,6 @@ namespace QTool.Inspector
 			return visual;
 		}
 	}
-	[CustomPropertyDrawer(typeof(QIdObject))]
-	public class QIdObjectReferenceDrawer : PropertyDrawer
-	{
-		public override VisualElement CreatePropertyGUI(SerializedProperty property)
-		{
-			var id = property.FindPropertyRelative(nameof(QIdObject.id));
-			var obj = property.FindPropertyRelative("_"+nameof(QIdObject.Object));
-			var visual = new PropertyField(obj, QReflection.QName(property) + "[" + id.stringValue.ToShortString(5) + "]");
-			visual.RegisterCallback<ChangeEvent<UnityEngine.Object>>(data =>
-			{
-				id.stringValue = QIdTool.GetQId(data.newValue)?.ToString();
-				visual.Q<Label>().text = QReflection.QName(property) + "[" + id.stringValue.ToShortString(5) + "]";
-			});
-			return visual;
-		}
-	}
 
 	[CustomPropertyDrawer(typeof(QToggleAttribute))]
 	public class QToggleDrawer : PropertyDrawer
@@ -359,6 +298,31 @@ namespace QTool.Inspector
 				button.style.backgroundColor = property.boolValue ?Color.black.Lerp(color.value,0.8f): color;
 			});
 			return button;
+		}
+	}
+	[CustomPropertyDrawer(typeof(QObjectAttribute))]
+	public class QIdObjectReferenceDrawer : PropertyDrawer {
+		public override VisualElement CreatePropertyGUI(SerializedProperty property) {
+			var qIdObject = attribute as QObjectAttribute;
+			var root = new VisualElement();
+			root.style.flexDirection = FlexDirection.Row;
+			switch (property.propertyType) {
+				case SerializedPropertyType.String: {
+					var visual = root.AddObject(QReflection.QName(property), qIdObject.type, QObjectTool.GetObject(property.stringValue, qIdObject.type));
+					visual.style.width = new Length(50, LengthUnit.Percent);
+					visual.RegisterCallback<ChangeEvent<UnityEngine.Object>>(data =>
+					{
+						property.stringValue = QObjectTool.GetPath(data.newValue);
+						property.serializedObject.ApplyModifiedProperties();
+					});
+				}
+				break;
+				default:
+					break;
+			}
+			var propertyField = root.Add(property);
+			propertyField.style.width = new Length(50, LengthUnit.Percent);
+			return root;
 		}
 	}
 
@@ -379,8 +343,8 @@ namespace QTool.Inspector
 			{
 				value = popupData.List.Get(0);
 			}
+			
 			var visual = new PopupField<string>(QReflection.QName(property), popupData.List, value);
-			visual.style.width = new Length(100, LengthUnit.Percent);
 			root.Add(visual);
 			var propertyField = root.Add(property);
 			propertyField.label = "";
@@ -418,6 +382,36 @@ namespace QTool.Inspector
 				property.serializedObject.ApplyModifiedProperties();
 			});
 			return root;
+		}
+
+		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label) {
+			EditorGUI.PropertyField(position, property, label);
+		}
+	}
+	[CustomPropertyDrawer(typeof(QMaskAttribute))]
+	public class QMaskDrawer : PropertyDrawer {
+		public override VisualElement CreatePropertyGUI(SerializedProperty property) {
+			var root = new VisualElement();
+			root.style.flexDirection = FlexDirection.Row;
+			var popupData = QPopupData.Get(property, (attribute as QMaskAttribute).getListFuncs);
+			popupData.List.RemoveAt(0);
+			var value = property.intValue ;
+			var visual = new MaskField(QReflection.QName(property), popupData.List, value);
+			visual.style.width = new Length(100, LengthUnit.Percent);
+			root.Add(visual);
+			var propertyField = root.Add(property);
+			propertyField.label = "";
+			visual.style.width = new Length(50, LengthUnit.Percent);
+			propertyField.style.width = new Length(50, LengthUnit.Percent);
+			visual.RegisterCallback<ChangeEvent<int>>(data => {
+				property.intValue = data.newValue;
+				property.serializedObject.ApplyModifiedProperties();
+			});
+			return root;
+		}
+
+		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label) {
+			EditorGUI.PropertyField(position, property, label);
 		}
 	}
 	[CustomPropertyDrawer(typeof(QToolbarAttribute))]
@@ -486,6 +480,22 @@ namespace QTool.Inspector
 		{
 			var toolbar = (attribute as QToolbarAttribute);
 			return property.IsShow() ? (toolbar.pageSize > 0 && QPopupData.Get(property, toolbar.getListFuncs).List.Count > toolbar.pageSize ? Height + 20 : Height) : 0;
+		}
+	}
+	[CustomEditor(typeof(QInspectorBehaviour), true, isFallback = true)]
+	[CanEditMultipleObjects]
+	public class QInspectorEditor : Editor {
+		public override VisualElement CreateInspectorGUI() {
+			var root = new VisualElement();
+			root.Add(serializedObject);
+			if (target != null) {
+				foreach (var func in QSerializeType.Get(target?.GetType()).Functions) {
+					if (func.MethodInfo.GetCustomAttribute<QNameAttribute>() != null) {
+						root.AddButton(func.QName, () => func.Invoke(target));
+					}
+				}
+			}
+			return root;
 		}
 	}
 #endregion
