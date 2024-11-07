@@ -51,7 +51,7 @@ namespace QTool
 
 	}
 
-	[AttributeUsage(AttributeTargets.Field | AttributeTargets.Class | AttributeTargets.Method | AttributeTargets.Interface | AttributeTargets.Parameter | AttributeTargets.Property, AllowMultiple = false)]
+	[AttributeUsage(AttributeTargets.Field | AttributeTargets.Class| AttributeTargets.Struct | AttributeTargets.Method | AttributeTargets.Interface | AttributeTargets.Parameter | AttributeTargets.Property, AllowMultiple = false)]
 	public class QOldNameAttribute : Attribute {
 		public string name;
 		public QOldNameAttribute(string name) {

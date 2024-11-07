@@ -213,6 +213,9 @@ namespace QTool {
 	public abstract class QDataTable<T>: IKey<string> where T :IKey<string>, new() {
 		public string Key { get; set; }
 		public static bool ContainsKey(string key) {
+			if (DataTable == null) {
+				Load();
+			}
 			return DataTable?.ContainsKey(key) == true;
 		}
 		public static T Get(string key) {
@@ -233,7 +236,7 @@ namespace QTool {
 		public static QDataTable DataTable { internal set; get; } 
 		#region 加载数据
 		public static string GetResourcesPath(string key = null) {
-			return QFileTool.ResourcesPathRoot.Combine(typeof(T).Name.TrimStart('Q')).Combine(key) + QDataTable.Extension;
+			return QFileTool.ResourcesPathRoot.Combine(typeof(T).Name).Combine(key) + QDataTable.Extension; 
 		}
 		public static QDataTable LoadQDataList(string key = null) {
 			QDebug.Begin("加载 QDataList<" + typeof(T) + "> 数据 ");

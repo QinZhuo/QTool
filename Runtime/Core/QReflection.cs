@@ -93,9 +93,19 @@ namespace QTool.Reflection
 		public object Invoke(object target, params object[] param)
 		{
 			var MethodInfo = this.MethodInfo;
-			if (MethodInfo.ContainsGenericParameters)
-			{
-				MethodInfo = MethodInfo.MakeGenericMethod(param.Select(obj => obj.GetType()).ToArray());
+			if (MethodInfo.ContainsGenericParameters) {
+				var types = MethodInfo.GetGenericArguments();
+				var paramArray=MethodInfo.GetParameters();
+				for (int i = 0; i < types.Length; i++) {
+					var type = types[i];
+					for (int j = 0; j < paramArray.Length; j++) {
+						if (paramArray[j].ParameterType.ToString().TrimEnd('&')==type.ToString()) {
+							types[i] = param[j].GetType();
+							break;
+						}
+					}
+				}
+				MethodInfo = MethodInfo.MakeGenericMethod(types);
 			}
 			if (ParamInfos.Length > param.Length)
 			{
