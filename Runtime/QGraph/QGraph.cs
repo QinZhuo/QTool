@@ -388,13 +388,13 @@ namespace QTool.Graph {
 	public struct QFlow
     {
         public static Type Type = typeof(QFlow);
-#if UNITY_EDITOR
-		static QFlow() {
-			QUIElements.TypeOverride.Add(typeof(QFlow), (name, obj, chaneEvent) => {
-				return new UnityEngine.UIElements.Label(name);
-			});
-		}
-#endif
+//#if UNITY_EDITOR
+//		static QFlow() {
+//			QUIElements.TypeOverride.Add(typeof(QFlow), (name, obj, chaneEvent) => {
+//				return new UnityEngine.UIElements.Label(name);
+//			});
+//		}
+//#endif
 		public override string ToString() {
 			return nameof(QFlow);
 		}

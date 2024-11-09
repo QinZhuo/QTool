@@ -2,13 +2,14 @@ using QTool;
 using QTool.Reflection;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEditor;
 using UnityEditor.Callbacks;
 using UnityEngine;
 using UnityEngine.UIElements;
 namespace QTool {
 
-	public class QDataTableWindow : QTextEditorWindow<QDataTableWindow> {
+	public class QDataTableWindow : QFileEditorWindow<QDataTableWindow> {
 
 		[OnOpenAsset(0)]
 		public static bool OnOpen(int instanceID, int line) {
@@ -17,9 +18,7 @@ namespace QTool {
 					return false;
 				var path = AssetDatabase.GetAssetPath(textAsset);
 				if (path.EndsWith(QDataTable.Extension)) {
-					var window = GetWindow<QDataTableWindow>();
-					window.minSize = new Vector2(500, 300);
-					window.FilePath = path;
+					Open(path);
 					return true;
 				}
 			}
@@ -30,16 +29,13 @@ namespace QTool {
 			var window = GetWindow<QDataTableWindow>();
 			window.minSize = new Vector2(500, 300);
 		}
-		public override string GetData(UnityEngine.Object file) {
-			return (file as TextAsset)?.text;
-		}
 
 		public QSerializeHasReadOnlyType typeInfo;
-		public QDataTable qdataList;
+		public QDataTable table = new QDataTable();
 		public QList<object> objList = new QList<object>();
-		public QList<QMemeberInfo> Members = new QList<QMemeberInfo>();
-		private int DragIndex { get; set; } = -1;
+		public QList<QMemeberInfo> Members = new QList<QMemeberInfo>();   
 		ListView listView = null;
+		VisualElement titlesView = null;
 		long lastCkickTime = 0;
 		VisualElement CellView = null;
 		#region 初始化UI
@@ -47,28 +43,51 @@ namespace QTool {
 			base.CreateGUI();
 			var root = rootVisualElement.AddScrollView();
 			root.style.height = new Length(100, LengthUnit.Percent);
-
-			listView = root.AddListView(qdataList, (visual, y) => {
+			titlesView = root.AddVisualElement(FlexDirection.Row);
+			listView = root.AddListView(table, (visual, y) => {
 				visual.Clear();
-				for (int x = 0; x < qdataList[y].Count; x++) {
-					var row = qdataList[y];
-					var value = GetValue(x, y);
-					var member = Members[x];
-					var title = qdataList.Titles[x];
-					var obj = objList[y - 1];
-					if (y == 0) {
-						var label = visual.AddLabel(value?.Replace("\\n", " "), TextAnchor.MiddleCenter);
+				AddRow(visual, table[y], objList.Get(y));
+				visual.AddMenu(menu => {
+					menu.menu.AppendAction("添加行", action => { AddAt(y); listView.Rebuild(); SetDataDirty(); });
+					menu.menu.AppendAction("删除行", action => { RemoveAt(y); listView.Rebuild(); SetDataDirty(); });
+				});
+			},
+				() => {
+					var layout = new VisualElement();
+					layout.style.flexDirection = FlexDirection.Row;
+					return layout;
+				});
+			root.RegisterCallback<MouseDownEvent>(data => {
+				AutoLoad = true;
+				CellView.style.display = DisplayStyle.None;
+			});
+			CellView = rootVisualElement.AddVisualElement();
+			CellView.style.position = Position.Absolute;
+			CellView.style.display = DisplayStyle.None;
+			CellView.style.backgroundColor = Color.Lerp(Color.black, Color.white, 0.3f);
+			CellView.style.SetBorder(Color.black);
+			CellView.style.overflow = Overflow.Visible;
+			CellView.style.right = new Length(0, LengthUnit.Percent);
+		}
+		private void AddRow(VisualElement visual, QDataTable.Row row, object obj = null, bool isTitle = false) {
+			if (row == null) return;
+			for (int x = 0; x < row.Count; x++) {
+				var member = Members[x];
+				try {
+					var title = row.Table.Titles[x];
+					if (isTitle) {
+						var label = visual.AddLabel(row[x]?.Replace("\\n", " "), TextAnchor.MiddleCenter);
 						label.style.width = 180;
 						label.style.marginLeft = 10;
 						label.style.marginRight = 10;
 					}
 					else {
+						var value = obj == null || member == null ? row[x] : member.Get(obj)?.ToQDataType(member.Type).Trim('\"');
 						var label = visual.AddLabel(value?.Replace("\\n", " "), TextAnchor.MiddleCenter);
 						label.Tooltip(value);
 						label.style.width = 180;
 						label.style.marginLeft = 10;
 						label.style.marginRight = 10;
-						label.name = title;
 						if (member != null && member.Set == null) {
 							label.SetEnabled(false);
 						}
@@ -127,48 +146,17 @@ namespace QTool {
 						}
 					}
 				}
-				visual.RegisterCallback<MouseDownEvent>(data => {
-					DragIndex = y;
-				});
-				visual.RegisterCallback<MouseUpEvent>(data => {
-					if (DragIndex > 0 && y > 0 && DragIndex != y) {
-						if (typeInfo != null) {
-							objList.Replace(DragIndex - 1, y - 1);
-						}
-						qdataList.Replace(DragIndex, y);
-						listView.Rebuild();
-						SetDataDirty();
-					}
-					DragIndex = -1;
-				});
-				visual.AddMenu(menu => {
-					menu.menu.AppendAction("添加行", action => { AddAt(y); listView.Rebuild(); SetDataDirty(); });
-					menu.menu.AppendAction("删除行", action => { RemoveAt(y); listView.Rebuild(); SetDataDirty(); });
-				});
-			},
-			() => {
-				var layout = new VisualElement();
-				layout.style.flexDirection = FlexDirection.Row;
-				return layout;
-			});
-			root.RegisterCallback<MouseDownEvent>(data => {
-				AutoLoad = true;
-				CellView.style.display = DisplayStyle.None;
-			});
-			CellView = rootVisualElement.AddVisualElement();
-			CellView.style.position = Position.Absolute;
-			CellView.style.display = DisplayStyle.None;
-			CellView.style.backgroundColor = Color.Lerp(Color.black, Color.white, 0.3f);
-			CellView.style.SetBorder(Color.black);
-			CellView.style.overflow = Overflow.Visible;
-			CellView.style.right = new Length(0, LengthUnit.Percent);
+				catch (Exception e) {
+					Debug.LogException(new Exception($" {x} {obj} : {member} \n{row.Table.Titles}\n{row} ", e));
+				}
+			}
 		}
 		#endregion
 		public override void SetDataDirty() {
 			if (typeInfo != null) {
-				objList.ToQDataList(qdataList, typeInfo.Type);
+				objList.ToQDataList(table, typeInfo.Type);
 			}
-			Data = qdataList?.ToString();
+			Data = table?.ToString();
 		}
 		protected override async void ParseData() {
 			try {
@@ -177,61 +165,51 @@ namespace QTool {
 				if (type == null)
 					type = QReflection.ParseType(path.DirectoryName().FileName());
 				if (type != null) {
+					table = new QDataTable(Data);
+					table.ParseQDataList(objList, type);
 					typeInfo = QSerializeHasReadOnlyType.Get(type);
-					qdataList = new QDataTable(Data);
-					qdataList.ParseQDataList(objList, type);
-					for (int i = 0; i < qdataList.Titles.Count; i++) {
-						Members[i] = typeInfo.GetMemberInfo(qdataList.Titles[i]);
+					for (int i = 0; i < table.Titles.Count; i++) {
+						Members[i] = typeInfo.GetMemberInfo(table.Titles[i]);
 						if (Members[i] == null) {
-							QDebug.LogError(type.Name + " 列[" + qdataList.Titles[i] + "]为空");
+							QDebug.LogError(type.Name + " 列[" + table.Titles[i] + "]为空");
 						}
 					}
 				}
 				else {
-					qdataList = new QDataTable(Data);
+					table = new QDataTable(Data);
+					objList.Clear();
 					typeInfo = null;
+					Members.Clear();
 				}
 				PlayerPrefs.SetString(nameof(QDataTableWindow) + "_LastPath", path);
-				//await QTask.Wait(() => listView != null);
-				listView.itemsSource = qdataList;
-				listView.style.width = qdataList.Titles.Count * 200 + 100;
+				while (listView == null || titlesView == null) {
+					await Task.Yield();
+				}
+				titlesView.Clear();
+				AddRow(titlesView, table.Titles, null, true);
+				listView.itemsSource = table;
+				listView.style.width = table.Titles.Count * 200 + 100;
 				listView.Rebuild();
 			}
 			catch (Exception e) {
-				Debug.LogError("解析QDataList类型[" + typeInfo?.Type + "]出错：\n" + e);
+				Debug.LogError("解析QDataList类型[" + typeInfo?.Type + "]出错");
+				Debug.LogException(e);
 				Close();
 			}
 		}
 		public void AddAt(int y) {
-			qdataList.CreateAt(QSerializeType.Get(typeof(QDataTable)), y);
+			table.CreateAt(QSerializeType.Get(typeof(QDataTable)), y - 1);
 			if (objList != null) {
-				Debug.LogError(objList.Count + " " + (y - 1));
 				objList.CreateAt(QSerializeType.Get(typeof(List<object>)), y - 1);
 			}
 		}
 		public void RemoveAt(int y) {
-			qdataList.RemoveAt(y);
+			table.RemoveAt(y);
 			if (objList != null) {
-				objList?.RemoveAt(y - 1);
+				objList?.RemoveAt(y);
 			}
 		}
-		public string GetValue(int x, int y) {
-			if (y == 0 || typeInfo == null) {
-				return qdataList[y][x];
-			}
-			else {
-				var member = Members[x];
-				if (member == null)
-					return "";
-				var obj = objList[y - 1];
-				try {
-					return member.Get(obj)?.ToQDataType(member.Type).Trim('\"');
-				}
-				catch (Exception e) {
-					throw new Exception("获取数据出错[" + obj + "][" + member.Key + "][" + member.Get + "]", e);
-				}
-			}
-		}
+	
 	}
 
 }

@@ -96,8 +96,17 @@ namespace QTool {
 	public struct QEntityPath {
 		[QIgnore]
 		public Entity entity;
-		[HideInInspector]
+		[QName, HideInInspector]
 		public FixedString64Bytes path;
+	}
+	public class FixedString64Info : QTypeInfo.CustomTypeInfo<FixedString64Bytes, string> {
+		public override string ChangeType(FixedString64Bytes obj) {
+			return obj.ToString();
+		}
+
+		public override FixedString64Bytes ChangeType(string obj) {
+			return (FixedString64Bytes)obj;
+		}
 	}
 	public interface IQComponment : IComponentData {
 

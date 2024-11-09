@@ -20,7 +20,7 @@ namespace QTool {
 			window.GraphList.Add(path);
 			window.ParseData();
 		}
-		#region »ù´¡ÊôÐÔ
+		#region åŸºç¡€å±žæ€§
 		[SerializeField]
 		private string _filePath = "";
 		public string FilePath {
@@ -139,7 +139,7 @@ namespace QTool {
 			}
 		}
 		protected abstract void ParseData();
-		#region UIÏÔÊ¾
+		#region UIæ˜¾ç¤º
 		public VisualElement toolbar { get; private set; }
 		public ToolbarBreadcrumbs breadcrumbs { get; private set; }
 		protected virtual void CreateGUI() {

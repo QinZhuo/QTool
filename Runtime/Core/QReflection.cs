@@ -6,6 +6,10 @@ using System.Reflection;
 using System.Threading.Tasks;
 using UnityEngine;
 using System.Linq;
+using Unity.Jobs.LowLevel.Unsafe;
+
+
+
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -151,186 +155,134 @@ namespace QTool.Reflection
 			base.Init(type);
 		}
 	}
-	public class QTypeInfo<T> : IKey<string> where T : QTypeInfo<T>, new()
-	{
-		public static BindingFlags MemberFlags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
-		public static BindingFlags FunctionFlags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
-		public string Key { get; set; }
+	public class QTypeInfo {
+
+
 		public QList<string, QMemeberInfo> Members = new QList<string, QMemeberInfo>();
 		public QList<string, QFunctionInfo> Functions = new QList<string, QFunctionInfo>();
-		public QDictionary<string, QDictionary<int, List<QFunctionInfo>>> FunctionsCache = new QDictionary<string, QDictionary<int, List<QFunctionInfo>>>(key=>new QDictionary<int, List<QFunctionInfo>>(key=>new List<QFunctionInfo>()));
-		public bool IsList;
-		public bool IsDictionary;
-		public Type KeyType { get; private set; }
-		public Type ElementType { get; private set; }
-		//public Type KeyValueType { get; private set; }
-		public Type Type { get; private set; }
-		public TypeCode Code { get; private set; }
-		public static QDictionary<Type, List<string>> TypeMembers = new QDictionary<Type, List<string>>()
-		{
-			{
-				 typeof(Rect),
-				 new List<string>
-				 {
-					 nameof(Rect.x),
-					 nameof(Rect.y),
-					 nameof(Rect.height),
-					 nameof(Rect.width),
-				 }
-			},
-			{
-				 typeof(Quaternion),
-				 new List<string>
-				 {
-					 nameof(Quaternion.x),
-					 nameof(Quaternion.y),
-					 nameof(Quaternion.z),
-					 nameof(Quaternion.w),
-				 }
-			},
-			{
-				 typeof(Transform),
-				 new List<string>
-				 {
-					 nameof(Transform.localPosition),
-					 nameof(Transform.localRotation),
-					 nameof(Transform.localScale),
-				 }
-			},
-			{
-				typeof(Camera),
-				new List<string>
-				{
-					nameof(Camera.aspect),
-					nameof(Camera.rect),
-				}
-			}
-		};
-
-		public QMemeberInfo GetMemberInfo(string keyOrViewName)
-		{
+		public QDictionary<string, QDictionary<int, List<QFunctionInfo>>> FunctionsCache = new QDictionary<string, QDictionary<int, List<QFunctionInfo>>>(key => new QDictionary<int, List<QFunctionInfo>>(key => new List<QFunctionInfo>()));
+		public bool IsList { get; protected set; } = false;
+		public bool IsDictionary { get; protected set; } = false;
+		public Type KeyType { get; protected set; }
+		public Type ElementType { get; protected set; }
+		public virtual Type Type { get; protected set; }
+		public TypeCode Code { get; protected set; }
+		public QMemeberInfo GetMemberInfo(string keyOrViewName) {
 			var info = Members[keyOrViewName];
-			if (info == null)
-			{
+			if (info == null) {
 				info = Members.FirstOrDefault(obj => Equals(keyOrViewName, obj.QName));
 			}
-			if (info == null)
-			{
+			if (info == null) {
 				info = Members.FirstOrDefault(obj => Equals(keyOrViewName, obj.QOldName));
 			}
 			return info;
 		}
-		public bool IsArray
-		{
-			get
-			{
+		public bool IsArray {
+			get {
 				return Type.IsArray;
 			}
 		}
-		public object Create(params object[] param)
-		{
+		public object Create(params object[] param) {
 			return Activator.CreateInstance(Type, param);
 		}
-		public bool IsValueType
-		{
-			get
-			{
+		public bool IsValueType {
+			get {
 				return Type.IsValueType;
 			}
 		}
-		public int[] IndexArray { get; private set; }
-		public int ArrayRank
-		{
-			get
-			{
-				if (IndexArray == null)
-				{
+		public int[] IndexArray { get; protected set; }
+		public int ArrayRank {
+			get {
+				if (IndexArray == null) {
 					return 0;
 				}
-				else
-				{
+				else {
 					return IndexArray.Length;
 				}
 			}
 		}
-		protected virtual void Init(Type type)
-		{
-			Key = type.FullName;
-			Type = type;
-			ElementType = type;
-			Code = Type.GetTypeCode(type);
-			if (TypeCode.Object.Equals(Code))
-			{
-				if (type.IsArray)
-				{
-					ElementType = type.GetElementType();
-					IndexArray = new int[type.GetArrayRank()];
-				}
-				else if (type.GetInterface(typeof(IList<>).FullName, true) != null)
-				{
-					ElementType = type.GetInterface(typeof(IList<>).FullName, true).GenericTypeArguments[0];
-					IsList = true;
-				}
-				else if (type.GetInterface(typeof(IDictionary<,>).FullName, true) != null)
-				{
-					var arges = type.GetInterface(typeof(IDictionary<,>).FullName, true).GenericTypeArguments;
-					KeyType = arges[0];
-					ElementType = arges[1];
-					//KeyValueType = typeof(QKeyValue<,>).MakeGenericType(KeyType, ElementType);
-					IsDictionary = true;
-				}
-				if (Members != null)
-				{
-					QMemeberInfo memeber = null;
-					type.ForeachMemeber((info) =>
-					{
-						memeber = new QMemeberInfo(info);
-						Members.Add(memeber);
-					},
-					(info) =>
-					{
-						memeber = new QMemeberInfo(info);
-						Members.Add(memeber);
-					}, MemberFlags);
-					if (TypeMembers.ContainsKey(type))
-					{
-						Members.RemoveAll((member) =>
-						{
-							if (TypeMembers[type].Contains(member.Key))
-							{
-								if (member.Get != null && member.Set != null)
-								{
-									return false;
-								}
-								else
-								{
-									Debug.LogError(type + "." + member.Key + " Get" + member.Get + " Set " + member.Set);
-								}
-							}
-							return true;
-						});
-					}
-				}
-				if (Functions != null)
-				{
-					type.ForeachFunction((info) =>
-					{
-						var function = new QFunctionInfo(info);
-						Functions.Add(function);
-						FunctionsCache[function.MethodInfo.Name][function.ParamInfos.Length].Add(function);
-					}, FunctionFlags);
-				}
-
+		public static Dictionary<Type, ICustomTypeInfo> CustomTypeInfos = new();
+		static QTypeInfo() {
+			foreach (Type type in typeof(ICustomTypeInfo).GetAllTypes()) {
+				var obj = type.CreateInstance() as ICustomTypeInfo;
+				CustomTypeInfos.Add(obj.Type, obj);
 			}
 		}
+		public interface ICustomTypeInfo {
+			public Type Type { get; }
+			public Type TargetType { get; }
+			public object ChangeType(object obj);
+			public string[] Members { get; }
+		}
+		public abstract class CustomTypeInfo<TType> : ICustomTypeInfo {
+			public Type Type => typeof(TType);
+			public virtual Type TargetType { get; }
+			public abstract string[] Members { get; }
+			public virtual object ChangeType(object obj) {
+				return obj;
+			}
+		}
+		public abstract class CustomTypeInfo<TType,TTarget> : ICustomTypeInfo {
+			public Type Type => typeof(TType);
+			public Type TargetType => typeof(TTarget);
+			public virtual string[] Members { get; }
+			public abstract TTarget ChangeType(TType obj);
+			public abstract TType ChangeType(TTarget obj);
+			public object ChangeType(object obj) {
+				if(obj is TType type) {
+					return ChangeType(type);
+				}
+				else if(obj is TTarget target) {
+					return ChangeType(target);
+				}
+				else {
+					return obj;
+				}
+			}
+		}
+		public class RectMemebers : CustomTypeInfo<Rect> {
+			public override string[] Members => new string[] {
+					nameof(Rect.x),
+					 nameof(Rect.y),
+					 nameof(Rect.height),
+					 nameof(Rect.width)
+				};
+		}
+		public class QuaternionMemebers : CustomTypeInfo<Quaternion> {
+			public override string[] Members => new string[] {
+					nameof(Quaternion.x),
+					 nameof(Quaternion.y),
+					 nameof(Quaternion.z),
+					 nameof(Quaternion.w)
+				};
+		}
+		public class TransformMemebers : CustomTypeInfo<Transform> {
+			public override string[] Members => new string[] {
+					 nameof(Transform.localPosition),
+					 nameof(Transform.localRotation),
+					 nameof(Transform.localScale),
+				};
+		}
+		public class CameraMemebers : CustomTypeInfo<Camera> {
+			public override string[] Members => new string[] {
+					nameof(Camera.aspect),
+					nameof(Camera.rect),
+				};
+		}
+	}
+
+	
+	public class QTypeInfo<T> : QTypeInfo where T : QTypeInfo<T>, new() {
+		public static BindingFlags MemberFlags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
+		public static BindingFlags FunctionFlags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
 		public static Dictionary<Type, T> table = new Dictionary<Type, T>();
+		public ICustomTypeInfo CustomTypeInfo { get; private set; }
 		public static T Get(Type type)
 		{
 			lock (table)
 			{
 				if (!table.ContainsKey(type))
 				{
-
 					var info = new T();
 					info.Init(type);
 					table.Add(type, info);
@@ -338,9 +290,49 @@ namespace QTool.Reflection
 			}
 			return table[type];
 		}
-		public override string ToString()
-		{
-			return "Type " + Key + " \n{\n\t" + Members.ToOneString("\n\t") + "\n\t" + Functions.ToOneString("\n\t") + "}";
+		protected virtual void Init(Type type) {
+			Type = type;
+			ElementType = type;
+			Code = Type.GetTypeCode(type);
+			if (TypeCode.Object.Equals(Code)) {
+				if (type.IsArray) {
+					ElementType = type.GetElementType();
+					IndexArray = new int[type.GetArrayRank()];
+				}
+				else if (type.GetInterface(typeof(IList<>).FullName, true) != null) {
+					ElementType = type.GetInterface(typeof(IList<>).FullName, true).GenericTypeArguments[0];
+					IsList = true;
+				}
+				else if (type.GetInterface(typeof(IDictionary<,>).FullName, true) != null) {
+					var arges = type.GetInterface(typeof(IDictionary<,>).FullName, true).GenericTypeArguments;
+					KeyType = arges[0];
+					ElementType = arges[1];
+					//KeyValueType = typeof(QKeyValue<,>).MakeGenericType(KeyType, ElementType);
+					IsDictionary = true;
+				}
+				if (Members != null) {
+					QMemeberInfo memeber = null;
+					type.ForeachMemeber((info) => {
+						memeber = new QMemeberInfo(info);
+						Members.Add(memeber);
+					},
+					(info) => {
+						memeber = new QMemeberInfo(info);
+						Members.Add(memeber);
+					}, MemberFlags);
+					if (CustomTypeInfos.ContainsKey(type)) {
+						CustomTypeInfo = CustomTypeInfos[type];
+						Members.RemoveAll(member => !CustomTypeInfo.Members.Contains(member.Key));
+					}
+				}
+				if (Functions != null) {
+					type.ForeachFunction((info) => {
+						var function = new QFunctionInfo(info);
+						Functions.Add(function);
+						FunctionsCache[function.MethodInfo.Name][function.ParamInfos.Length].Add(function);
+					}, FunctionFlags);
+				}
+			}
 		}
 	}
 
@@ -364,7 +356,6 @@ namespace QTool.Reflection
 	//}
 	public static class QReflection
 	{
-
 		static Type GetOperaterType(object a, object b)
 		{
 			Type type = a != null ? a.GetType() : b?.GetType();

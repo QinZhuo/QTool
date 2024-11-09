@@ -300,7 +300,7 @@ namespace QTool
 		{
 			root.AddManipulator(new ContextualMenuManipulator(menuBuilder));
 		}
-		public static QDictionary<Type, Func<string, object, Action<object>, VisualElement>> TypeOverride = new QDictionary<Type, Func<string, object, Action<object>, VisualElement>>();
+		//public static QDictionary<Type, Func<string, object, Action<object>, VisualElement>> TypeOverride = new QDictionary<Type, Func<string, object, Action<object>, VisualElement>>();
 		public static VisualElement Add(this VisualElement root, string name, object obj, Type type, Action<object> changeEvent, ICustomAttributeProvider customAttribute = null) {
 			if (type == null) {
 				if (obj == null) {
@@ -314,10 +314,10 @@ namespace QTool
 				obj = type.CreateInstance();
 			}
 			var typeInfo = QSerializeType.Get(type);
-			if (TypeOverride.ContainsKey(type)) {
-				var visual = TypeOverride[type](name, obj, changeEvent);
-				root.Add(visual);
-				return visual;
+			if (typeInfo.CustomTypeInfo?.TargetType != null) {
+				return root.Add(name, typeInfo.CustomTypeInfo.ChangeType(obj), typeInfo.CustomTypeInfo.TargetType, newValue => {
+					changeEvent(typeInfo.CustomTypeInfo.ChangeType(newValue));
+				}, customAttribute);
 			}
 			switch (typeInfo.Code) {
 				case TypeCode.Boolean:
@@ -395,19 +395,6 @@ namespace QTool
 									}, type == obj?.GetType() ? DropdownMenuAction.Status.Checked : DropdownMenuAction.Status.Normal);
 								}
 							});
-							//var typePopup = dynamicObjectView.AddPopup("", typeInfo.Type.GetAllTypes(), obj.GetType(), (newType) => {
-							//	obj = newType.CreateInstance();
-							//	var old = dynamicObjectView.Q<VisualElement>(nameof(dynamicObjectView));
-							//	if (old != null) {
-							//		dynamicObjectView.Remove(old);
-							//	}
-							//	if (QSerializeType.Get(newType).ObjType != QObjectType.DynamicObject) {
-							//		var temp = dynamicObjectView.Add("", obj, newType, changeEvent);
-							//		temp.name = nameof(dynamicObjectView);
-							//	}
-							//	changeEvent?.Invoke(obj);
-							//});
-							//typePopup.style.maxWidth = 100;
 							if (QSerializeType.Get(obj.GetType()).ObjType != QObjectType.DynamicObject) {
 								dynamicObjectView.Add("", obj, obj.GetType(), changeEvent).name = nameof(dynamicObjectView);
 							}
@@ -435,40 +422,6 @@ namespace QTool
 								return foldout;
 							}
 						}
-						//case QObjectType.FixedString: {
-
-						//	return root.AddText(name, obj.ToString(), newValue => {
-						//		switch (type.Name) {
-						//			case nameof(FixedString32Bytes): {
-						//				var fixedStr = (FixedString32Bytes)obj;
-						//				fixedStr.CopyFromTruncated(newValue);
-						//				changeEvent?.Invoke(fixedStr);
-						//			}
-						//			break;
-						//			case nameof(FixedString64Bytes): {
-						//				var fixedStr = (FixedString64Bytes)obj;
-						//				fixedStr.CopyFromTruncated(newValue);
-						//				changeEvent?.Invoke(fixedStr);
-						//			}
-						//			break;
-						//			case nameof(FixedString512Bytes): {
-						//				var fixedStr = (FixedString512Bytes)obj;
-						//				fixedStr.CopyFromTruncated(newValue);
-						//				changeEvent?.Invoke(fixedStr);
-						//			}
-						//			break;
-						//			case nameof(FixedString4096Bytes): {
-						//				var fixedStr = (FixedString4096Bytes)obj;
-						//				fixedStr.CopyFromTruncated(newValue);
-						//				changeEvent?.Invoke(fixedStr);
-						//			}
-						//			break;
-						//			default:
-						//				break;
-						//		}
-						//	});
-						//}
-						//break;
 						case QObjectType.Array:
 						case QObjectType.List: {
 							if (typeof(IList).IsAssignableFrom(type)) {
@@ -761,10 +714,6 @@ namespace QTool
 					else
 					{
 						var funcKey = getListFunc;
-						//if (!funcKey.Contains('.') && !funcKey.EndsWith(".List") && QReflection.ParseType(funcKey).Is(typeof(QDataTable<>)))
-						//{
-						//	funcKey += ".List"; 
-						//}
 						if (obj.InvokeFunction(funcKey) is IEnumerable itemList)
 						{
 							foreach (var item in itemList)

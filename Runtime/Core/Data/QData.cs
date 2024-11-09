@@ -5,8 +5,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
+using Unity.Collections;
+using Unity.Mathematics;
 using UnityEngine;
-using UnityEngine.Profiling;
 namespace QTool
 {
 	public static class QData
@@ -67,6 +68,10 @@ namespace QTool
 			switch (typeCode) {
 				case TypeCode.Object: {
 					var typeInfo = QSerializeType.Get(type);
+					if (typeInfo.CustomTypeInfo != null) {
+						WriteType(writer, typeInfo.CustomTypeInfo.ChangeType(obj), typeInfo.CustomTypeInfo.TargetType);
+						return;
+					}
 					switch (typeInfo.ObjType) {
 						case QObjectType.DynamicObject: {
 							if (obj == null) {
@@ -219,12 +224,12 @@ namespace QTool
 
 						}
 						catch (Exception e) {
-							throw new Exception("读取成员【" + name + ":" + typeInfo.Type.Name + "." + memeberInfo.Key + "】出错" + memeberInfo.Type + ":" + result + ":" + memeberInfo.Get(target) + ":" + memeberInfo.Set + "\n" + e + "\n 剩余信息" + reader.ReadToEnd());
+							throw new Exception("读取成员【" + name + ":" + typeInfo.Type.Name + "." + memeberInfo.Key + "】出错" + memeberInfo.Type + ":" + result + ":" + memeberInfo.Get(target) + ":" + memeberInfo.Set + "\n 剩余信息" + reader.ReadToEnd(), e);
 						}
 					}
 					else {
 						var info = reader.ReadObjectString();
-						Debug.LogWarning("不存在成员" + typeInfo.Key + "." + name + ":" + info);
+						Debug.LogWarning("不存在成员" + typeInfo.Type + "." + name + ":" + info);
 					}
 
 					if (!(reader.NextIsSplit(','))) {
@@ -243,7 +248,7 @@ namespace QTool
 					target = null;
 				}
 				else {
-					throw new Exception("对象数据出错|" + objData + "|");
+					throw new Exception($"对象数据出错[{objData}]:{typeInfo.Type}");
 				}
 			}
 			return target;
@@ -253,6 +258,9 @@ namespace QTool
 			switch (typeCode) {
 				case TypeCode.Object: {
 					var typeInfo = QSerializeType.Get(type);
+					if (typeInfo.CustomTypeInfo != null && typeInfo.CustomTypeInfo.TargetType != null) {
+						return typeInfo.CustomTypeInfo.ChangeType(ReadType(reader, typeInfo.CustomTypeInfo.TargetType, null));
+					}
 					switch (typeInfo.ObjType) {
 						case QObjectType.DynamicObject: {
 							if (reader.NextIsSplit('{')) {
@@ -622,7 +630,7 @@ namespace QTool
 		Object,
 		List,
 		Array,
-	//	FixedString,
+		//FixedString,
 		Dictionary,
 		TimeSpan,
 		CantSerialize,
@@ -682,11 +690,9 @@ namespace QTool
 					}
 				}
 			);
-			if (!TypeMembers.ContainsKey(type)) {
-				Members.RemoveAll((member) => {
-					return member.MemeberInfo.GetCustomAttribute<HideInInspector>() != null || member.MemeberInfo.GetCustomAttribute<QIgnoreAttribute>() != null || (!member.IsPublic && member.MemeberInfo.GetCustomAttribute<QNameAttribute>() == null) || member.Key == "Item" || member.Get == null || (IgnoreReadOnlyMember && member.Set == null) || (member.Type.IsArray && member.Type.GetArrayRank() > 1);
-				});
-			}
+			Members.RemoveAll((member) => {
+				return (member.Type.IsValueType && member.Type == type) || ((member.MemeberInfo.GetCustomAttribute<HideInInspector>() != null || member.MemeberInfo.GetCustomAttribute<QIgnoreAttribute>() != null || !member.IsPublic) && member.MemeberInfo.GetCustomAttribute<QNameAttribute>() == null) || member.Key == "Item" || member.Get == null || (IgnoreReadOnlyMember && member.Set == null) || (member.Type.IsArray && member.Type.GetArrayRank() > 1);
+			});
 		}
 		public virtual bool IgnoreReadOnlyMember => true;
 	}

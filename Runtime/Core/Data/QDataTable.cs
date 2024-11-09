@@ -345,6 +345,7 @@ namespace QTool {
 				qdataList = new QDataTable();
 			}
 			else {
+				qdataList.Titles.Clear();
 				qdataList.Clear();
 			}
 
