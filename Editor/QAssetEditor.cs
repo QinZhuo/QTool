@@ -26,7 +26,7 @@ namespace QTool
 		[MenuItem("QTool/资源管理/场景资源/查找当前场景所有Mesh丢失")]
 		static void FindAllMeshNull()
 		{
-			var meshs = GameObject.FindObjectsOfType<MeshFilter>();
+			var meshs = GameObject.FindObjectsByType<MeshFilter>(FindObjectsSortMode.None);
 			foreach (var mesh in meshs)
 			{
 				if (Application.isPlaying ? mesh.mesh == null : mesh.sharedMesh == null)
@@ -34,11 +34,6 @@ namespace QTool
 					Debug.LogError(mesh.transform.GetPath() + " Mesh为null");
 				}
 			}
-		}
-		[MenuItem("QTool/资源管理/资源Id/打印当前所有QId对象信息")]
-		public static void QIdObjectInfo()
-		{
-			Debug.LogError(nameof(QId) + "信息 \n" + QId.InstanceIdList.ToOneString());
 		}
 		[MenuItem("QTool/资源管理/资源Id/复制Id")]
 		static void CopyID()

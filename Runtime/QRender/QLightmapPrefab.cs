@@ -71,6 +71,7 @@ namespace QTool
 		{
 			if (gameObject.IsPrefabInstance(out var prefab))
 			{
+				
 				if (UnityEditor.Lightmapping.giWorkflowMode != UnityEditor.Lightmapping.GIWorkflowMode.OnDemand)
 				{
 					Debug.LogError("生成光照信息数据要求您删除已烘焙光照信息并禁用自动模式");
@@ -85,11 +86,10 @@ namespace QTool
 				{
 					gameObject.SetActive(true);
 				}
-				foreach (var lightObj in GameObject.FindObjectsOfType<QLightmapPrefab>())
-				{
-					if (lightObj == this) continue;
-					if (lightObj.gameObject.activeInHierarchy)
-					{
+				foreach (var lightObj in FindObjectsByType<QLightmapPrefab>(FindObjectsSortMode.None)) {
+					if (lightObj == this)
+						continue; 
+					if (lightObj.gameObject.activeInHierarchy) {
 						lightObj.gameObject.SetActive(false);
 					}
 				}

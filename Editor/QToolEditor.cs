@@ -15,30 +15,6 @@ namespace QTool
 	[InitializeOnLoad]
 	public static class QToolEditor
 	{
-		static QToolEditor()
-		{
-			Editor.finishedDefaultHeaderGUI += OnHeaderGUI;
-			EditorApplication.hierarchyWindowItemOnGUI += OnHierarchyGUI;
-		}
-		static void OnHeaderGUI(Editor editor) {
-			if (editor.target is GameObject gameObj) {
-				var qid = gameObj.GetComponent<QId>();
-				if (qid != null) {
-					GUILayout.Label("QId : " + qid.Id);
-				}
-			}
-		}
-		static void OnHierarchyGUI(int instanceID, Rect rect)
-		{
-			if (EditorUtility.InstanceIDToObject(instanceID) is GameObject gameObj)
-			{
-				var qid = gameObj.GetComponent<QId>();
-				if (qid != null)
-				{
-					GUI.Label(rect.HorizontalRect(0.5f, 1), "[" + qid.Id.ToShortString(5) + "]", QEditorGUI.RightLabel);
-				}
-			}
-		}
 		private const string CscRspPath = "Assets/csc.rsp";
 		private static Stack<string> CscRspStack = new Stack<string>();
 		public static void PushCscRsp()

@@ -48,7 +48,7 @@ namespace QTool
 								case QObjectType.UnityObject:
 									{
 										writer.Write(1);
-										writer.Write(QIdTool.GetQId(value as UnityEngine.Object));
+										writer.Write(QObjectTool.GetPath(value as UnityEngine.Object));
 									}
 									break;
 								case QObjectType.List:
@@ -199,7 +199,7 @@ namespace QTool
 								{
 									return target;
 								}
-								target = QIdTool.GetObject(reader.ReadString(), type);
+								target = QObjectTool.GetObject(reader.ReadString(), type);
 							}break;
 						case QObjectType.List:
 						case QObjectType.Array:

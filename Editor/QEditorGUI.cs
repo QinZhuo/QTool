@@ -90,69 +90,32 @@ namespace QTool
 #endif
 			return FoldoutCache[hashCode];
 		}
-		public static string DrawQIdObject(string lable, string id, Type type, Rect? rect = null, params GUILayoutOption[] options)
-		{
-			var name = lable + "[" + id.ToShortString(5) + "]";
-			var oldObj = QIdTool.GetObject(id, type);
-			var newObj = oldObj;
-#if UNITY_EDITOR
-			if (rect == null)
-			{
-				newObj = EditorGUILayout.ObjectField(name, oldObj, type,true);
-			}
-			else
-			{
-				newObj = EditorGUI.ObjectField(rect.Value, name, oldObj, type, true);
-			}
-#endif
-			if (newObj != oldObj)
-			{
-				id = QIdTool.GetQId(newObj);
-			}
-			return id;
-		}
-		public static QIdObject Draw(this QIdObject ir, string lable, params GUILayoutOption[] options)
-		{
-			var newId = DrawQIdObject(lable, ir.id, typeof(UnityEngine.Object), null, options);
-			if (newId != ir.id)
-			{
-				ir.id = newId;
-			}
-			return ir;
-		}
-		public static object Draw(this object obj, string name, Type type = null, ICustomAttributeProvider customAttribute = null, Func<int, object, string, Type, object> DrawElement = null, Action<int, int> IndexChange = null)
-		{
+		public static object Draw(this object obj, string name, Type type = null, ICustomAttributeProvider customAttribute = null, Func<int, object, string, Type, object> DrawElement = null, Action<int, int> IndexChange = null) {
 			var hasName = !string.IsNullOrWhiteSpace(name);
-			if (type == null)
-			{
-				if (obj == null)
-				{
+			if (type == null) {
+				if (obj == null) {
 					GUILayout.Label(name);
 					return obj;
 				}
-				else
-				{
+				else {
 					type = obj.GetType();
 				}
 			}
-			if (obj == null && type.IsValueType)
-			{
+			if (obj == null && type.IsValueType) {
 				obj = type.CreateInstance();
 			}
-			if (DrawOverride.ContainsKey(type))
-			{
+			if (DrawOverride.ContainsKey(type)) {
 				return DrawOverride[type].Invoke(obj, name);
 			}
 			var typeInfo = QSerializeType.Get(type);
-			if (type != typeof(object) && !TypeList.Contains(type) && !type.IsGenericType)
-			{
+			if (type != typeof(object) && !TypeList.Contains(type) && !type.IsGenericType) {
 				TypeList.Add(type);
 				TypeMenuList.AddCheckExist(type.FullName.Replace('.', '/'));
 			}
-			switch (typeInfo.Code)
-			{
+			switch (typeInfo.Code) {
 				case TypeCode.Boolean:
-					obj =EditorGUILayout.Toggle(name, (bool)obj); break;
+					obj = EditorGUILayout.Toggle(name, (bool)obj);
+					break;
 				case TypeCode.Char:
 				case TypeCode.SByte:
 				case TypeCode.Byte:
@@ -160,209 +123,161 @@ namespace QTool
 				case TypeCode.Int32:
 				case TypeCode.UInt16:
 				case TypeCode.UInt32:
-					if (type.IsEnum)
-					{
+					if (type.IsEnum) {
 						var flagsEnum = type.GetAttribute<FlagsAttribute>();
-						if (flagsEnum != null)
-						{
+						if (flagsEnum != null) {
 							obj = EditorGUILayout.EnumFlagsField(name, (Enum)obj);
 						}
-						else
-						{
+						else {
 							obj = EditorGUILayout.EnumPopup(name, (Enum)obj);
 						}
 					}
-					else
-					{
+					else {
 						obj = EditorGUILayout.IntField(name, (int)obj);
 					}
 					break;
 				case TypeCode.Int64:
 				case TypeCode.UInt64:
-					obj = EditorGUILayout.LongField(name, (long)obj); break;
+					obj = EditorGUILayout.LongField(name, (long)obj);
+					break;
 				case TypeCode.Single:
-					obj = EditorGUILayout.FloatField(name, (float)obj); break;
+					obj = EditorGUILayout.FloatField(name, (float)obj);
+					break;
 				case TypeCode.Decimal:
 				case TypeCode.Double:
-					obj = EditorGUILayout.DoubleField(name, (double)obj); break;
+					obj = EditorGUILayout.DoubleField(name, (double)obj);
+					break;
 				case TypeCode.String:
-					obj = EditorGUILayout.TextField(name, obj?.ToString()); break;
+					obj = EditorGUILayout.TextField(name, obj?.ToString());
+					break;
 				case TypeCode.Object:
-					switch (typeInfo.ObjType)
-					{
-						case QObjectType.DynamicObject:
-							{
-								using (new GUILayout.HorizontalScope())
-								{
-									if (obj == null)
-									{
-										obj = "";
-									}
-									var objType = obj.GetType();
-									var oldType = TypeList.IndexOf(objType);
-									var newType = EditorGUILayout.Popup(oldType, TypeMenuList.ToArray());
-									if (newType != oldType)
-									{
-										objType = TypeList[newType];
-										obj = objType.CreateInstance();
-									}
-									if (objType != type)
-									{
-										obj = Draw(obj, name, objType);
-									}
+					switch (typeInfo.ObjType) {
+						case QObjectType.DynamicObject: {
+							using (new GUILayout.HorizontalScope()) {
+								if (obj == null) {
+									obj = "";
+								}
+								var objType = obj.GetType();
+								var oldType = TypeList.IndexOf(objType);
+								var newType = EditorGUILayout.Popup(oldType, TypeMenuList.ToArray());
+								if (newType != oldType) {
+									objType = TypeList[newType];
+									obj = objType.CreateInstance();
+								}
+								if (objType != type) {
+									obj = Draw(obj, name, objType);
 								}
 							}
-							break;
-						case QObjectType.UnityObject:
-							{
-								obj = EditorGUILayout.ObjectField(name, (UnityEngine.Object)obj, type,true);
+						}
+						break;
+						case QObjectType.UnityObject: {
+							obj = EditorGUILayout.ObjectField(name, (UnityEngine.Object)obj, type, true);
+						}
+						break;
+						case QObjectType.Object: {
+							if (obj == null) {
+								obj = type.CreateInstance();
 							}
-							break;
-						case QObjectType.Object:
-							{
-								if (obj == null)
-								{
-									obj = type.CreateInstance();
+							using (new GUILayout.VerticalScope()) {
+								var show = false;
+								if (hasName) {
+									show = Foldout(name);
 								}
-								if (typeof(QIdObject).IsAssignableFrom(type))
-								{
-									obj = (QIdObject)obj.Draw(name);
-								}
-								else
-								{
-									using (new GUILayout.VerticalScope())
-									{
-										var show = false;
-										if (hasName)
-										{
-											show = Foldout(name);
+								if (!hasName || show) {
+									using (new GUILayout.HorizontalScope()) {
+										if (hasName) {
+											GUILayout.Space(10);
 										}
-										if (!hasName || show)
-										{
-											using (new GUILayout.HorizontalScope())
-											{
-												if (hasName)
-												{
-													GUILayout.Space(10);
-												}
-												using (new GUILayout.VerticalScope())
-												{
+										using (new GUILayout.VerticalScope()) {
 
-													foreach (var member in typeInfo.Members)
-													{
-														try
-														{
-															if (member.Type.IsValueType)
-															{
-																member.Set(obj, member.Get(obj).Draw(member.QName, member.Type));
-															}
-															else
-															{
-																member.Set(obj, member.Get(obj).Draw(member.QName, member.Type));
-															}
-														}
-														catch (Exception e)
-														{
-															Debug.LogError("序列化【" + member.Key + "】出错\n" + e);
-														}
-
+											foreach (var member in typeInfo.Members) {
+												try {
+													if (member.Type.IsValueType) {
+														member.Set(obj, member.Get(obj).Draw(member.QName, member.Type));
+													}
+													else {
+														member.Set(obj, member.Get(obj).Draw(member.QName, member.Type));
 													}
 												}
+												catch (Exception e) {
+													Debug.LogError("序列化【" + member.Key + "】出错\n" + e);
+												}
+
 											}
 										}
 									}
 								}
 							}
-							break;
+						}
+						break;
 
 						case QObjectType.Array:
-						case QObjectType.List:
-							{
-								if (typeof(IList).IsAssignableFrom(type))
-								{
-									if (typeInfo.ArrayRank > 1)
-									{
-										break;
-									}
-									var list = obj as IList;
-									if (list == null)
-									{
-										obj = typeInfo.ArrayRank == 0 ? type.CreateInstance() : type.CreateInstance(null, 0);
-										list = obj as IList;
-									}
-									using (new GUILayout.VerticalScope())
-									{
-										var canHideChild = DrawElement == null;
-										if (hasName)
-										{
-											if (canHideChild)
-											{
-												canHideChild = !Foldout(name);
-											}
-											else
-											{
-												EditorGUILayout.LabelField(name);
-											}
+						case QObjectType.List: {
+							if (typeof(IList).IsAssignableFrom(type)) {
+								if (typeInfo.ArrayRank > 1) {
+									break;
+								}
+								var list = obj as IList;
+								if (list == null) {
+									obj = typeInfo.ArrayRank == 0 ? type.CreateInstance() : type.CreateInstance(null, 0);
+									list = obj as IList;
+								}
+								using (new GUILayout.VerticalScope()) {
+									var canHideChild = DrawElement == null;
+									if (hasName) {
+										if (canHideChild) {
+											canHideChild = !Foldout(name);
 										}
-										if (!canHideChild || !hasName)
-										{
-											using (new GUILayout.HorizontalScope())
-											{
-												if (hasName)
-												{
-													GUILayout.Space(Size);
-												}
-												using (new GUILayout.VerticalScope())
-												{
-													for (int i = 0; i < list.Count; i++)
-													{
-														using (new GUILayout.VerticalScope())
-														{
-															var key = name + "[" + i + "]";
-															if (DrawElement == null)
-															{
-																list[i] = list[i].Draw(key, typeInfo.ElementType, customAttribute);
-															}
-															else
-															{
-																list[i] = DrawElement.Invoke(i, list[i], key, typeInfo.ElementType);
-															}
-															using (new GUILayout.HorizontalScope())
-															{
-																GUILayout.FlexibleSpace();
-																QEditorGUI.PushColor(Color.blue.Lerp(Color.white, 0.5f));
-																if (GUILayout.Button(new GUIContent("", "新增当前数据"), GUILayout.Width(10), GUILayout.Height(10)))
-																{
-																	obj = list.CreateAt(typeInfo, i);
-																	IndexChange?.Invoke(-1, i + 1);
-																}
-																QEditorGUI.PopColor();
-																QEditorGUI.PushColor(Color.red.Lerp(Color.white, 0.5f));
-																if (GUILayout.Button(new GUIContent("", "删除当前数据"), GUILayout.Width(10), GUILayout.Height(10)))
-																{
-																	obj = list.RemoveAt(typeInfo, i);
-																	IndexChange?.Invoke(i, -1);
-																}
-																QEditorGUI.PopColor();
-															}
+										else {
+											EditorGUILayout.LabelField(name);
+										}
+									}
+									if (!canHideChild || !hasName) {
+										using (new GUILayout.HorizontalScope()) {
+											if (hasName) {
+												GUILayout.Space(Size);
+											}
+											using (new GUILayout.VerticalScope()) {
+												for (int i = 0; i < list.Count; i++) {
+													using (new GUILayout.VerticalScope()) {
+														var key = name + "[" + i + "]";
+														if (DrawElement == null) {
+															list[i] = list[i].Draw(key, typeInfo.ElementType, customAttribute);
 														}
-
+														else {
+															list[i] = DrawElement.Invoke(i, list[i], key, typeInfo.ElementType);
+														}
+														using (new GUILayout.HorizontalScope()) {
+															GUILayout.FlexibleSpace();
+															QEditorGUI.PushColor(Color.blue.Lerp(Color.white, 0.5f));
+															if (GUILayout.Button(new GUIContent("", "新增当前数据"), GUILayout.Width(10), GUILayout.Height(10))) {
+																obj = list.CreateAt(typeInfo, i);
+																IndexChange?.Invoke(-1, i + 1);
+															}
+															QEditorGUI.PopColor();
+															QEditorGUI.PushColor(Color.red.Lerp(Color.white, 0.5f));
+															if (GUILayout.Button(new GUIContent("", "删除当前数据"), GUILayout.Width(10), GUILayout.Height(10))) {
+																obj = list.RemoveAt(typeInfo, i);
+																IndexChange?.Invoke(i, -1);
+															}
+															QEditorGUI.PopColor();
+														}
 													}
-												}
-											}
-											if (list.Count == 0)
-											{
-												if (GUILayout.Button("添加新元素", GUILayout.Height(20)))
-												{
-													obj = list.CreateAt(typeInfo);
-												}
-											}
 
+												}
+											}
 										}
+										if (list.Count == 0) {
+											if (GUILayout.Button("添加新元素", GUILayout.Height(20))) {
+												obj = list.CreateAt(typeInfo);
+											}
+										}
+
 									}
 								}
 							}
-							break;
+						}
+						break;
 
 						default:
 							break;

@@ -300,7 +300,6 @@ namespace QTool
 		{
 			root.AddManipulator(new ContextualMenuManipulator(menuBuilder));
 		}
-		//public static QDictionary<Type, Func<string, object, Action<object>, VisualElement>> TypeOverride = new QDictionary<Type, Func<string, object, Action<object>, VisualElement>>();
 		public static VisualElement Add(this VisualElement root, string name, object obj, Type type, Action<object> changeEvent, ICustomAttributeProvider customAttribute = null) {
 			if (type == null) {
 				if (obj == null) {
@@ -377,8 +376,8 @@ namespace QTool
 							}
 							var dynamicObjectView = root.AddVisualElement();
 							dynamicObjectView.style.flexDirection = FlexDirection.Row;
-							dynamicObjectView.AddLabel(name);
-							//.style.width = new Length(40, LengthUnit.Percent);
+							var label= dynamicObjectView.AddLabel(name);
+							label.style.width = new Length(30, LengthUnit.Percent);
 							dynamicObjectView.AddMenu(data => {
 								var types = typeInfo.Type.GetAllTypes();
 								foreach (var type in types) {
@@ -521,79 +520,6 @@ namespace QTool
 			root.tooltip = text?.Replace("\\n", " "); 
 			return root;
 		}
-#if UNITY_EDITOR
-		[SettingsProvider]
-		public static SettingsProvider QToolSetting()
-		{
-			return new SettingsProvider("Project/" + nameof(QTool) + "设置", SettingsScope.Project)
-			{
-				activateHandler = (searchContext, root) =>
-				{
-					root = root.AddScrollView();
-					foreach (var SettingType in typeof(QSingletonScriptable<>).GetAllTypes())
-					{
-						root.AddLabel(QReflection.QName(SettingType));
-						if (SettingType.InvokeFunction("IsExist") is bool boolValue && boolValue)
-						{
-							root.Add(new InspectorElement(new UnityEditor.SerializedObject(SettingType.InvokeFunction("Instance") as ScriptableObject)));
-						}
-					}
-				}
-			};
-		}
-
-		public static PropertyField Add(this VisualElement root, SerializedProperty serializedProperty)
-		{
-			var visual = new PropertyField(serializedProperty);
-			visual.name = visual.label;
-			root.Add(visual);
-			return visual;
-		}
-		public static void Add(this VisualElement root, SerializedObject serializedObject)
-		{
-			var iterator = serializedObject.GetIterator();
-			if (iterator.NextVisible(true))
-			{
-				do
-				{
-					var visual = root.Add(iterator);
-					if ("m_Script".Equals(iterator.name))
-					{
-						visual.SetEnabled(false);
-					}
-					else
-					{
-						var att = iterator.GetAttribute<QNameAttribute>();
-						if (att != null && !att.visibleControl.IsNull())
-						{
-							var copy = iterator.Copy();
-							visual.style.display = copy.IsShow() ? DisplayStyle.Flex : DisplayStyle.None;
-							root.RegisterCallback<ClickEvent>(data =>
-							{
-								visual.style.display = copy.IsShow() ? DisplayStyle.Flex : DisplayStyle.None;
-							});
-						}
-					}
-
-				} while (iterator.NextVisible(false));
-			}
-		}
-		public static string AddMarkdown(this VisualElement root, TextAsset textAsset)
-		{
-			var path = UnityEditor.AssetDatabase.GetAssetPath(textAsset);
-			var ext = Path.GetExtension(path).ToLower();
-			if (".md".Equals(ext) || ".markdown".Equals(ext))
-			{
-				root.AddMarkdown(textAsset.text);
-			}
-			else
-			{
-				root.AddLabel(textAsset.text);
-			}
-			return path;
-		}
-#endif
-
 		public static VisualElement AddMarkdown(this VisualElement root, string markdown)
 		{
 			root.Clear();
@@ -657,6 +583,73 @@ namespace QTool
 		}
 
 
+		#region 编辑器拓展
+#if UNITY_EDITOR
+		[SettingsProvider]
+		public static SettingsProvider QToolSetting() {
+			return new SettingsProvider("Project/" + nameof(QTool) + "设置", SettingsScope.Project) {
+				activateHandler = (searchContext, root) => {
+					root = root.AddScrollView();
+					foreach (var SettingType in typeof(QSingletonScriptable<>).GetAllTypes()) {
+						root.AddLabel(QReflection.QName(SettingType));
+						if (SettingType.InvokeFunction("Exists") is bool boolValue && boolValue) {
+							root.Add(new InspectorElement(new SerializedObject(SettingType.InvokeFunction("Instance") as ScriptableObject)));
+						}
+					}
+				}
+			};
+		}
+
+		public static PropertyField Add(this VisualElement root, SerializedProperty serializedProperty) {
+			var visual = new PropertyField(serializedProperty);
+			visual.name = visual.label;
+			root.Add(visual);
+			return visual;
+		}
+		public static void Add(this VisualElement root, SerializedObject serializedObject) {
+			var iterator = serializedObject.GetIterator();
+			if (iterator.NextVisible(true)) {
+				do {
+					var visual = root.Add(iterator);
+					if ("m_Script".Equals(iterator.name)) {
+						visual.SetEnabled(false);
+					}
+					else {
+						var att = iterator.GetAttribute<QNameAttribute>();
+						if (att != null && !att.visibleControl.IsNull()) {
+							var copy = iterator.Copy();
+							visual.style.display = copy.IsShow() ? DisplayStyle.Flex : DisplayStyle.None;
+							root.RegisterCallback<ClickEvent>(data => {
+								visual.style.display = copy.IsShow() ? DisplayStyle.Flex : DisplayStyle.None;
+							});
+						}
+					}
+
+				} while (iterator.NextVisible(false));
+			}
+		}
+		[CustomEditor(typeof(TextAsset))]
+		public class MarkdownEditor : Editor {
+			public override VisualElement CreateInspectorGUI() {
+				var root = new VisualElement();
+				root.AddMarkdown(target as TextAsset);
+				return root;
+			}
+
+		}
+		public static string AddMarkdown(this VisualElement root, TextAsset textAsset) {
+			var path = UnityEditor.AssetDatabase.GetAssetPath(textAsset);
+			var ext = Path.GetExtension(path).ToLower();
+			if (".md".Equals(ext) || ".markdown".Equals(ext)) {
+				root.AddMarkdown(textAsset.text);
+			}
+			else {
+				root.AddLabel(textAsset.text);
+			}
+			return path;
+		}
+#endif
+		#endregion
 	}
 	public class QPopupData
 	{
