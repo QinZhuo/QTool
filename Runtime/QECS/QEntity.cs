@@ -4,10 +4,20 @@ using System.Collections.Generic;
 using QTool.Reflection;
 using Unity.Collections;
 using Unity.Entities;
+using UnityEditor;
+using UnityEditor.PackageManager;
 using UnityEngine;
 namespace QTool {
 	public class QEntity : MonoBehaviour {
 		public TransformUsageFlags usage = TransformUsageFlags.Dynamic;
+#if UNITY_EDITOR
+		[QName]
+		public void OpenData() {
+			var asset = AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(QEntityData.Get(name).Row.Table.LoadPath);
+			Debug.LogError(QEntityData.Get(name).Row.Table.LoadPath+":"+asset);
+			AssetDatabase.OpenAsset(asset);
+		}
+#endif
 	}
 	public class QEntityBaker : Baker<QEntity> {
 		public override void Bake(QEntity authoring) {

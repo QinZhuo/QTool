@@ -356,6 +356,7 @@ namespace QTool
 		}
 		public static string Combine(this string rootPath,string childe)
 		{
+			if(childe.IsNull())return rootPath;
 			return $"{rootPath}/{childe}";
 		}
 		public static string CheckDirectoryPath(this string path)

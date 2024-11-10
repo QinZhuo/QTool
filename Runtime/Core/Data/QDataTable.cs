@@ -212,6 +212,9 @@ namespace QTool {
 	/// </summary>
 	public abstract class QDataTable<T>: IKey<string> where T :IKey<string>, new() {
 		public string Key { get; set; }
+		[QIgnore]
+		public QDataTable.Row Row { get; private set; }
+
 		public static bool ContainsKey(string key) {
 			if (DataTable == null) {
 				Load();
@@ -232,7 +235,13 @@ namespace QTool {
 				return default;
 			}
 		}
-		private static QDictionary<string, T> Cache = new(key => DataTable[key].Parse<T>());
+		private static QDictionary<string, T> Cache = new(key => {
+			var data= DataTable[key].Parse<T>();
+			if(data is QDataTable<T> rowData) {
+				rowData.Row = DataTable[key];
+			}
+			return data;
+		});
 		public static QDataTable DataTable { internal set; get; } 
 		#region 加载数据
 		public static string GetResourcesPath(string key = null) {
