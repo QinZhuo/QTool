@@ -99,16 +99,17 @@ namespace QTool {
 								if (eventData.timestamp - lastCkickTime < 500) {
 									CellView.Clear();
 									CellView.style.width = new StyleLength(label.style.width.value.value * 2);
+									CellView.style.minHeight = 20;
 									VisualElement view = null;
 									if (typeInfo == null || member == null) {
-										view = CellView.Add("", value, typeof(string), (newValue) => {
+										view = CellView.Add(title, value, typeof(string), (newValue) => {
 											row[title] = (string)newValue;
 											label.text = ((string)newValue)?.Replace("\\n", " ");
 											SetDataDirty();
 										});
 									}
 									else {
-										view = CellView.Add("", member.Get(obj), member.Type, (newValue) => {
+										view = CellView.Add(title, member.Get(obj), member.Type, (newValue) => {
 											if (member.Key == nameof(member.Key)) {
 												QPopupData.ClearAll();
 											}

@@ -4,9 +4,10 @@ using System.Collections.Generic;
 using QTool.Reflection;
 using Unity.Collections;
 using Unity.Entities;
-using UnityEditor;
-using UnityEditor.PackageManager;
 using UnityEngine;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 namespace QTool {
 	public class QEntity : MonoBehaviour {
 		public TransformUsageFlags usage = TransformUsageFlags.Dynamic;
