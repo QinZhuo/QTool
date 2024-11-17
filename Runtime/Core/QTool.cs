@@ -289,7 +289,7 @@ namespace QTool
 		{
 			return string.IsNullOrWhiteSpace(str);
 		}
-		public static bool IsDefualt<T>(this ref T obj) where T : struct {
+		public static bool IsDefault<T>(this ref T obj) where T : struct {
 			return obj.GetHashCode() == default(T).GetHashCode();
 		}
 		public static bool IsNull<T>(this T obj)
