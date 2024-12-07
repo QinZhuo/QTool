@@ -13,10 +13,10 @@ using System.Reflection;
 #if Sprite
 using UnityEditor.U2D.Sprites;
 #endif
-#if Addressable
-using UnityEditor.AddressableAssets.Settings;
-using UnityEditor.AddressableAssets;
-#endif
+//#if Addressable
+//using UnityEditor.AddressableAssets.Settings;
+//using UnityEditor.AddressableAssets;
+//#endif
 namespace QTool
 {
 	public static class QAssetEditor

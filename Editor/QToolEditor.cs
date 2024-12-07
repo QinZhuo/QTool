@@ -7,9 +7,9 @@ using UnityEngine.SceneManagement;
 using System;
 using System.IO;
 using QTool.Reflection;
-#if Addressable
-using UnityEditor.AddressableAssets.Settings;
-#endif
+//#if Addressable
+//using UnityEditor.AddressableAssets.Settings;
+//#endif
 namespace QTool
 {
 	[InitializeOnLoad]
