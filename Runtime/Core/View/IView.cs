@@ -7,7 +7,7 @@ namespace QTool {
 	}
 	public static class QViewTool {
 		public static void SetData<T>(this GameObject view,T data) {
-			view.GetComponent<IView<T>>().Fresh(data);
+			view?.GetComponent<IView<T>>()?.Fresh(data);
 		}
 		public static void SetDatas<T>(QObjectList objectList, IList<T> data) {
 			foreach (var item in data) {
