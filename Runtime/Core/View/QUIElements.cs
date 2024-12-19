@@ -606,6 +606,12 @@ namespace QTool
 			root.Add(visual);
 			return visual;
 		}
+		public static void Add<T>(this VisualElement root, SerializedProperty serializedProperty) {
+			var type = typeof(T);
+			root = root.Add(QReflection.QName(serializedProperty), serializedProperty.stringValue.ParseQDataType(type), type, newObj => {
+				serializedProperty.stringValue = QData.ToQDataType(newObj, type);
+			});
+		}
 		public static void Add(this VisualElement root, SerializedObject serializedObject) {
 			var iterator = serializedObject.GetIterator();
 			if (iterator.NextVisible(true)) {

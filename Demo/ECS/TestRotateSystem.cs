@@ -1,3 +1,4 @@
+#if ECS
 using QTool;
 using Unity.Entities;
 using Unity.Mathematics;
@@ -20,3 +21,4 @@ public struct RotateData :IQEntityComponmentData
 {
     public int a;
 }
+#endif

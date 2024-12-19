@@ -1019,7 +1019,7 @@ namespace QTool.Reflection
 			return AllGenericTypesCache[rootType];
 		}
 		public static object CreateInstance(this Type type, object targetObj = null, params object[] param) {
-			if (targetObj != null) {
+			if (targetObj != null || type == null) {
 				return targetObj;
 			}
 			try {
@@ -1036,7 +1036,7 @@ namespace QTool.Reflection
 					return null;
 				}
 				else if (type.IsInterface || type.IsAbstract) {
-					return CreateInstance(GetAllTypes(type)[0], targetObj, param);
+					return CreateInstance(GetAllTypes(type).Get(0), targetObj, param);
 				}
 				return Activator.CreateInstance(type, param);
 			}

@@ -20,7 +20,7 @@
 		{
 			"displayName": "Demo",
 			"description": "Demo",
-			"path": ".Demo"
+			"path": "Demo"
 		},
 		{
 			"displayName": "ComputeShader",

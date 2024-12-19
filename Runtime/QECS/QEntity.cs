@@ -5,11 +5,16 @@ using QTool.Reflection;
 using Unity.Collections;
 using Unity.Entities;
 using UnityEngine;
+using UnityEngine.UIElements;
+using System.Reflection;
+
+
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
 namespace QTool {
-	public class QEntity : MonoBehaviour {
+	public sealed class QEntity : MonoBehaviour {
+		public string data;
 		public TransformUsageFlags usage = TransformUsageFlags.Dynamic;
 #if UNITY_EDITOR
 		[QName]
@@ -20,6 +25,23 @@ namespace QTool {
 		}
 #endif
 	}
+#if UNITY_EDITOR
+	[CustomEditor(typeof(QEntity), true, isFallback = true)]
+	public class QEntityEditor:Editor {
+		public override VisualElement CreateInspectorGUI() {
+			var root = new VisualElement();
+			root.Add<QEntityData>(serializedObject.FindProperty(nameof(QEntity.data)));
+			//if (target != null) {
+			//	foreach (var func in QSerializeType.Get(target?.GetType()).Functions) {
+			//		if (func.MethodInfo.GetCustomAttribute<QNameAttribute>() != null) {
+			//			root.AddButton(func.QName, () => func.Invoke(target));
+			//		}
+			//	}
+			//}
+			return root;
+		}
+	}
+#endif
 	public class QEntityBaker : Baker<QEntity> {
 		public override void Bake(QEntity authoring) {
 			var entity = GetEntity(authoring.usage);
