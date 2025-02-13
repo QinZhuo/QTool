@@ -482,6 +482,7 @@ namespace QTool.Inspector
 	[CustomEditor(typeof(MonoBehaviour), true, isFallback = true)]
 	[CanEditMultipleObjects]
 	public class QInspectorEditor : Editor {
+		private QDictionary<QOnSceneInputAttribute, QFunctionInfo> sceneInputs = new();
 		public override VisualElement CreateInspectorGUI() {
 			var root = new VisualElement();
 			root.Add(serializedObject);
@@ -490,9 +491,40 @@ namespace QTool.Inspector
 					if (func.MethodInfo.GetCustomAttribute<QNameAttribute>() != null) {
 						root.AddButton(func.QName, () => func.Invoke(target));
 					}
+					foreach (var item in func.MethodInfo.GetCustomAttributes<QOnSceneInputAttribute>()) {
+						sceneInputs[item] = func;
+					}
 				}
 			}
 			return root;
+		}
+		private void OnSceneGUI() {
+			MouseCheck();
+		}
+		public void MouseCheck() {
+			if (sceneInputs.Count <= 0)
+				return;
+			HandleUtility.AddDefaultControl(GUIUtility.GetControlID(FocusType.Passive));
+			Event input = Event.current;
+			if (!input.alt) {
+				if (input.button == 0) {
+					var mouseRay = HandleUtility.GUIPointToWorldRay(input.mousePosition);
+					foreach (var kv in sceneInputs) {
+						if (input.type == kv.Key.eventType) {
+							if (input.isMouse) {
+								if ((bool)kv.Value.Invoke(target, mouseRay)) {
+									input.Use();
+								}
+							}
+							else {
+								if ((bool)kv.Value.Invoke(target)) {
+									input.Use();
+								}
+							}
+						}
+					}
+				}
+			}
 		}
 	}
 #endregion
