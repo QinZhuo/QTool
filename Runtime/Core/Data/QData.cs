@@ -5,8 +5,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
-using Unity.Collections;
-using Unity.Mathematics;
 using UnityEngine;
 namespace QTool
 {
