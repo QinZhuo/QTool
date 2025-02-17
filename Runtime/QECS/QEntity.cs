@@ -16,14 +16,14 @@ namespace QTool {
 	public sealed class QEntity : MonoBehaviour {
 		public string data;
 		public TransformUsageFlags usage = TransformUsageFlags.Dynamic;
-#if UNITY_EDITOR
-		[QName]
-		public void OpenData() {
-			var asset = AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(QEntityData.Get(name).Row.Table.LoadPath);
-			Debug.LogError(QEntityData.Get(name).Row.Table.LoadPath+":"+asset);
-			AssetDatabase.OpenAsset(asset);
-		}
-#endif
+//#if UNITY_EDITOR
+//		[QName]
+//		public void OpenData() {
+//			var asset = AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(QDataTable<QEntityData>.Get(name).Row.Table.LoadPath);
+//			Debug.LogError(QEntityData.Get(name).Row.Table.LoadPath+":"+asset);
+//			AssetDatabase.OpenAsset(asset);
+//		}
+//#endif
 	}
 #if UNITY_EDITOR
 	[CustomEditor(typeof(QEntity), true, isFallback = true)]
@@ -48,7 +48,7 @@ namespace QTool {
 			var typeList = new List<Type>();
 			var bufferCache = new QDictionary<Type, object>();
 			bufferCache.AutoCreate = type => QReflectionType.Get(GetType()).FunctionsCache[nameof(AddBuffer)][1][0].MethodInfo.MakeGenericMethod(type).Invoke(this, new object[] { entity });
-			var data = QEntityData.Get(authoring.name);
+			var data = QDataTable<QEntityData>.Get(authoring.name);
 			if (data == null)
 				return;
 			foreach (var comp in data.comps) {
@@ -64,16 +64,17 @@ namespace QTool {
 						var path = prefabEntity.path.ToString();
 						var prefab = Resources.Load<GameObject>(path);
 						var key = path.SplitEndString("/");
-						if (prefab == null && QEntityData.ContainsKey(key)) {
+						if (prefab == null && QDataTable<QEntityData>.ContainsKey(key)) {
+							//var newEntity = GetEntityWithoutDependency();
 #if UNITY_EDITOR
 							var obj = new GameObject(key, typeof(QEntity));
-							prefab = UnityEditor.PrefabUtility.SaveAsPrefabAsset(obj, Application.dataPath.Combine(nameof(Resources)).Combine(path) + ".prefab");
+							prefab = PrefabUtility.SaveAsPrefabAsset(obj, Application.dataPath.Combine(nameof(Resources)).Combine(path) + ".prefab");
 							UnityEngine.Object.DestroyImmediate(obj);
 #endif
 						}
 						if (prefab != null) {
 							var tempEntity = prefab.GetComponent<QEntity>();
-							prefabEntity.entity = GetEntity(prefab, tempEntity == null ? TransformUsageFlags.Dynamic : tempEntity.usage); 
+							prefabEntity.entity = GetEntity(prefab, tempEntity == null ? TransformUsageFlags.Dynamic : tempEntity.usage);
 							memeber.Set(comp, prefabEntity);
 						}
 					}
@@ -89,7 +90,8 @@ namespace QTool {
 			//data._entity = entity;
 		}
 	}
-	public class QEntityData : QDataTable<QEntityData> {
+	public class QEntityData : IKey<string>{
+		public string Key { get; set; }
 		public List<IQComponment> comps = new List<IQComponment>();
 		public List<IQBufferElement> elements = new List<IQBufferElement>();
 		//[QIgnore]

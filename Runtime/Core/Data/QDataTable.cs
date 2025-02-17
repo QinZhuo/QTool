@@ -210,10 +210,10 @@ namespace QTool {
 	/// <summary>
 	/// 运行时静态数据表 从Resouces文件夹加载字符数据 通过静态函数访问 只读
 	/// </summary>
-	public abstract class QDataTable<T>: IKey<string> where T :IKey<string>, new() {
-		public string Key { get; set; }
-		[QIgnore]
-		public QDataTable.Row Row { get; private set; }
+	public static class QDataTable<T> where T :IKey<string>, new() {
+		//public string Key { get; set; }
+		//[QIgnore]
+		//public QDataTable.Row Row { get; private set; }
 
 		public static bool ContainsKey(string key) {
 			if (DataTable == null) {
@@ -228,18 +228,16 @@ namespace QTool {
 			}
 			key = key.Trim();
 			if (ContainsKey(key)) {
-				return Cache[key];
+				return DataCache[key];
 			}
 			else {
 				Debug.LogError(typeof(T).Name + " 未找到[" + key + "]");
 				return default;
 			}
 		}
-		private static QDictionary<string, T> Cache = new(key => {
-			var data= DataTable[key].Parse<T>();
-			if(data is QDataTable<T> rowData) {
-				rowData.Row = DataTable[key];
-			}
+		private static QDictionary<string, T> DataCache = new(key => {
+			var row = DataTable[key];
+			var data= row.Parse<T>();
 			return data;
 		});
 		public static QDataTable DataTable { internal set; get; } 
@@ -260,11 +258,11 @@ namespace QTool {
 		//	}
 		//}
 		public static void Load(string key = null) {
-			Cache.Clear();
+			DataCache.Clear();
 			DataTable = LoadQDataList(key);
 		}
 		public static void UnLoad() {
-			Cache.Clear();
+			DataCache.Clear();
 			DataTable = null;
 		}
 		#endregion

@@ -62,8 +62,8 @@ namespace QTool
 		[MenuItem("QTool/翻译/查看本地化信息")]
 		public static void QLocalizationDataLog()
 		{
-			Debug.LogError(QLocalizationData.DataTable.ToOneString());
-			GUIUtility.systemCopyBuffer = QLocalizationData.DataTable.ToOneString();
+			Debug.LogError(QDataTable<QLocalizationData>.DataTable.ToOneString());
+			GUIUtility.systemCopyBuffer = QDataTable<QLocalizationData>.DataTable.ToOneString();
 		}
 		[MenuItem("QTool/翻译/翻译所有文件夹名")]
 		public static void TranslateDirectory()

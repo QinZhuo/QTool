@@ -10,7 +10,7 @@ using UnityEngine.UI;
 namespace QTool {
 	public class QLocalization : MonoBehaviour {
 		#region 基础数据 
-		[QName, QPopup(nameof(QLocalizationData) + "." + nameof(QLocalizationData.DataTable)), SerializeField, UnityEngine.Serialization.FormerlySerializedAs("key")]
+		[QName, QPopup(nameof(QLocalizationData) + "." + nameof(QDataTable<QLocalizationData>.DataTable)), SerializeField, UnityEngine.Serialization.FormerlySerializedAs("key")]
 		private string _key;
 		[QName("本地化"), SerializeField, QReadonly]
 		private string localization = "";
@@ -93,11 +93,11 @@ namespace QTool {
 		}
 #endif
 	}
-	public class QLocalizationData : QDataTable<QLocalizationData> {
-
+	public class QLocalizationData :IKey<string> {
+		public string Key { get; set; }
 		public static string GetLozalization(string key) {
-			if (ContainsKey(key) && !Get(key).Localization.IsNull()) {
-				return Get(key).Localization;
+			if (QDataTable<QLocalizationData>.ContainsKey(key) && !QDataTable<QLocalizationData>.Get(key).Localization.IsNull()) {
+				return QDataTable<QLocalizationData>.Get(key).Localization;
 			}
 			else {
 				return key;
@@ -115,8 +115,8 @@ namespace QTool {
 		}
 		public static void Load(SystemLanguage key) {
 			_Language = key;
-			Load(key.ToString());
-			if (DataTable.Count == 0 && Language != SystemLanguage.English) {
+			QDataTable<QLocalizationData>.Load(key.ToString());
+			if (QDataTable<QLocalizationData>.DataTable.Count == 0 && Language != SystemLanguage.English) {
 				QDebug.LogError("不存在语言[" + key + "]转为英语");
 				Language = SystemLanguage.English;
 				return;
@@ -146,7 +146,7 @@ namespace QTool {
 #if QLocalization
 			return "{" + key + "}";
 #else
-			return QLocalizationData.Get(key).Localization;
+			return QDataTable<QLocalizationData>.Get(key).Localization;
 #endif
 		}
 		public static string ToLozalizationKey(this string key, params object[] Params) {
