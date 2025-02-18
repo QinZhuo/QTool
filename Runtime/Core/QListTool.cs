@@ -598,23 +598,23 @@ namespace QTool
 			}
 			return list;
 		}
-		public static Dictionary<KeyT, ObjT> ToDictionary<KeyT, ObjT>(this IList<ObjT> list, Dictionary<KeyT, ObjT> dic = null) where ObjT : IKey<KeyT>
-		{
-			if (dic == null)
-			{
-				dic = new Dictionary<KeyT, ObjT>();
-			}
-			else
-			{
-				dic.Clear();
-			}
-			foreach (var item in list)
-			{
-				if (item == null) continue;
-				dic.Add(item.Key, item);
-			}
-			return dic;
-		}
+		//public static Dictionary<KeyT, ObjT> ToDictionary<KeyT, ObjT>(this IList<ObjT> list, Dictionary<KeyT, ObjT> dic = null) where ObjT : IKey<KeyT>
+		//{
+		//	if (dic == null)
+		//	{
+		//		dic = new Dictionary<KeyT, ObjT>();
+		//	}
+		//	else
+		//	{
+		//		dic.Clear();
+		//	}
+		//	foreach (var item in list)
+		//	{
+		//		if (item == null) continue;
+		//		dic.Add(item.Key, item);
+		//	}
+		//	return dic;
+		//}
 		public static TValue Get<TKey, TValue>(this IDictionary<TKey, TValue> dic, TKey key)
 		{
 			if (dic.ContainsKey(key))
