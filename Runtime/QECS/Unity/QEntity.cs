@@ -1,14 +1,52 @@
 
-//using System;
-//using System.Collections.Generic;
-//using QTool.Reflection;
-//using Unity.Collections;
-//using Unity.Entities;
-//using UnityEngine;
-//using UnityEngine.UIElements;
-//using System.Reflection;
+using NUnit.Framework;
+using System.Collections.Generic;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
+using UnityEngine;
+using UnityEngine.UIElements;
+namespace QTool.ECS {
+	public class QEntity : MonoBehaviour, IQComponent {
+		public Entity Entity { get; private set; }
+		public string entityData;
+		private void Awake() {
+			Entity = QWorld.Active.CreateEntity();
+			QWorld.Active.AddComponent(Entity, this);
+			var data = entityData.ParseQData<QEntityData>();
+			if (data != null) {
+				foreach (var comp in data.comps) {
+					QWorld.Active.AddComponent(Entity, comp);
+				}
+			}
+		}
+	}
+#if UNITY_EDITOR
+	[CustomEditor(typeof(QEntity), true, isFallback = true)]
+	public class QEntityEditor : Editor {
+		public override VisualElement CreateInspectorGUI() {
+			var root = new VisualElement();
+			root.Add<QEntityData>(serializedObject.FindProperty(nameof(QEntity.entityData)));
+			return root;
+		}
+	}
+#endif
+	[RequireComponent(typeof(QEntity))]
+	public abstract class QComponent : MonoBehaviour, IQComponent {
+		public QEntity entity;
+		private void Reset() {
+			entity = GetComponent<QEntity>();
+		}
+		private void Start() {
+			QWorld.Active.AddComponent(entity.Entity, this);
+		}
+	}
 
-
+	public class QEntityData : IKey<string> {
+		public string Key { get; set; }
+		public List<IQComponent> comps = new List<IQComponent>();
+	}
+}
 //#if UNITY_EDITOR
 //using UnityEditor;
 //#endif
@@ -90,44 +128,7 @@
 //			//data._entity = entity;
 //		}
 //	}
-//	public class QEntityData : IKey<string>{
-//		public string Key { get; set; }
-//		public List<IQComponment> comps = new List<IQComponment>();
-//		public List<IQBufferElement> elements = new List<IQBufferElement>();
-//		//[QIgnore]
-//		//private Entity _entity;
-//		//public Entity Entity {
-//		//	get {
 
-//		//		if (!_entity.IsDefualt()) {
-//		//			return _entity;
-//		//		}
-//		//		foreach (var world in World.All) {
-//		//			var entityManager = world.EntityManager;
-//		//			_entity = entityManager.CreateEntity();
-//		//			entityManager.SetName(_entity, Key);
-//		//			foreach (var comp in comps) {
-//		//				if (comp == null)
-//		//					continue;
-//		//				var type = comp.GetType();
-//		//				var typeInfo = QSerializeType.Get(type);
-//		//				foreach (var memeber in typeInfo.Members) {
-//		//					if (memeber.Type == typeof(QEntityPath) && memeber.Get(comp) is QEntityPath prefabEntity) {
-//		//						var path = prefabEntity.path.ToString();
-//		//						var prefab = Resources.Load<GameObject>(path);
-//		//						if (prefab == null) {
-//		//							prefabEntity.entity = Get(path).Entity;
-//		//							memeber.Set(comp, prefabEntity);
-//		//						}
-//		//					}
-//		//				}
-//		//				entityManager.InvokeFunction(nameof(entityManager.AddComponentData), _entity, comp);
-//		//			}
-//		//		}
-//		//		return _entity;
-//		//	}
-//		//}
-//	}
 //	public struct QEntityPath {
 //		[QIgnore]
 //		public Entity entity;
@@ -155,3 +156,5 @@
 //		}
 //	}
 //}
+
+

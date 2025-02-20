@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using UnityEngine;
 namespace QTool.ECS {
 	#region Entity
 	public struct Entity {
@@ -11,6 +12,7 @@ namespace QTool.ECS {
 		}
 	}
 	public sealed class EntityType {
+		public World World { get;private set; }
 		public override string ToString() => $"{name} {entityMap.Count}";
 		public string name { get; private set; }
 		public const int INIT_SIZE = 1024;
@@ -18,11 +20,11 @@ namespace QTool.ECS {
 		private readonly Dictionary<Type, IComponentArray> componentArrays = new();
 		public bool ContainsType(Type type) => componentArrays.ContainsKey(type);
 		public IEnumerable<Entity> Entities => entityMap.Keys;
-		public IEnumerable<Type> Types => componentArrays.Keys;
 		public int Count { get; private set; } = 0;
 		public int Capacity { get; private set; } = INIT_SIZE;
-		public EntityType(Type[] types) {
-			name = nameof(EntityType) + "( ";
+		public EntityType(Type[] types,World world) {
+			World = world;
+			name = nameof(EntityType) + " ( ";
 			foreach (var type in types) {
 				name += type.Name + " ";
 				componentArrays.Add(type, Activator.CreateInstance(typeof(ComponentArray<>).MakeGenericType(type)) as IComponentArray);
@@ -53,7 +55,19 @@ namespace QTool.ECS {
 			entityMap.Remove(entity);
 			Count--;
 		}
-		public void MoveTo(in Entity entity, EntityType targetType) {
+		public EntityType AddComponent<T>(in Entity entity, in T component) where T : IQComponent {
+			var trueType = component.GetType();
+			var newType =World.GetEntityType(componentArrays.Keys.Append(trueType).ToArray());
+			MoveTo(entity, newType);
+			if (trueType == typeof(T)) {
+				newType.GetComponent<T>(entity) = component;
+			}
+			else {
+				newType.componentArrays[trueType].Set(newType.entityMap[entity], component);
+			}
+			return newType; ;
+		}
+		private void MoveTo(in Entity entity, EntityType targetType) {
 			if (!entityMap.TryGetValue(entity, out var index))
 				throw new ArgumentException("Invalid entity");
 			var targetIndex = targetType.Count;
@@ -63,7 +77,7 @@ namespace QTool.ECS {
 			}
 			RemoveEntity(entity);
 		}
-		public ref T GetComponent<T>(in Entity entity) where T : struct, IComponent {
+		public ref T GetComponent<T>(in Entity entity) where T : IQComponent {
 			if (!entityMap.TryGetValue(entity, out var index))
 				throw new ArgumentException("Invalid entity");
 			return ref (componentArrays[typeof(T)] as ComponentArray<T>).Get(index);
@@ -76,11 +90,13 @@ namespace QTool.ECS {
 		private readonly Dictionary<Entity, EntityType> entityMap = new();
 		private readonly Dictionary<Types, EntityType> entityTypes = new();
 		private readonly Dictionary<Types, List<EntityType>> entityTypesCache = new();
-		private readonly List<System> systems = new();
-		public void RegisterSystem<T>() where T : System, new() {
-			var system = new T() { World = this };
+		private readonly List<QSystem> systems = new();
+		public void RegisterSystem(QSystem system) {
+			system.World = this;
 			system.Init();
 			systems.Add(system);
+			Debug.Log($"{nameof(RegisterSystem)} {system}");
+
 		}
 		public void Update() {
 			foreach (var system in systems) {
@@ -103,8 +119,15 @@ namespace QTool.ECS {
 		internal EntityType GetEntityType(params Type[] types) {
 			var key = (Types)types;
 			if (!entityTypes.TryGetValue(key, out var type)) {
-				type = new EntityType(types);
+				type = new EntityType(types,this);
 				entityTypes.Add(key, type);
+				Debug.Log($"new {type}");
+				foreach (var (typeKey, list) in entityTypesCache) {
+					if (key.Contains(typeKey)) {
+						list.Add(type);
+						Debug.Log($"typeList {typeKey} {list.ToOneString()}");
+					}
+				}
 			}
 			return type;
 		}
@@ -117,19 +140,17 @@ namespace QTool.ECS {
 					}
 				}
 				entityTypesCache.Add(types, typeList);
+				Debug.Log($"entityTypesCache {types} {typeList.ToOneString()}");
 			}
 			return typeList;
 		}
 
-		public void AddComponent<T>(in Entity entity, in T component) where T : struct, IComponent {
-			if (!entityMap.TryGetValue(entity, out var oldType))
+		public void AddComponent<T>(in Entity entity, in T component) where T : IQComponent {
+			if (!entityMap.TryGetValue(entity, out var type))
 				throw new ArgumentException("Invalid entity");
-			var newType = GetEntityType(oldType.Types.Append(typeof(T)).ToArray());
-			oldType.MoveTo(entity, newType);
-			newType.GetComponent<T>(entity) = component;
-			entityMap[entity] = newType;
+			entityMap[entity] = type.AddComponent(entity, component);
 		}
-		public ref T GetComponent<T>(in Entity entity) where T : struct, IComponent {
+		public ref T GetComponent<T>(in Entity entity) where T : struct, IQComponent {
 			if (!entityMap.TryGetValue(entity, out var type))
 				throw new ArgumentException("Invalid entity");
 			return ref type.GetComponent<T>(entity);
@@ -159,23 +180,29 @@ namespace QTool.ECS {
 			var hash = new Types { hash = types.Select(type => GetHash(type)).Sum() };
 			return hash;
 		}
+		public override string ToString() {
+			return $"{hash}";
+		}
 	}
 	#endregion
 	#region Component
-	public interface IComponent { }
+	public interface IQComponent { }
 	internal interface IComponentArray {
 		public void Resize(int size);
 		public void Remove(int index, int end);
+		public void Set(int index, object obj);
 		public void CopyTo(int index, IComponentArray targetArrary, int targetIndex);
 	}
-	internal sealed class ComponentArray<T> : IComponentArray where T : struct, IComponent {
+	internal sealed class ComponentArray<T> : IComponentArray where T : IQComponent {
 		public T[] components = new T[EntityType.INIT_SIZE];
-
 		public void Resize(int size) {
 			Array.Resize(ref components, size);
 		}
 		public void Remove(int index, int end) {
 			components[index] = components[end];
+		}
+		public void Set(int index, object obj) {
+			components[index] = (T)obj;
 		}
 		public void Set(int index, in T comp) {
 			components[index] = comp;
@@ -195,12 +222,24 @@ namespace QTool.ECS {
 	}
 	#endregion
 	#region System
-	public abstract class System {
+	public abstract class QSystem {
 		public World World { get; internal set; }
 		public abstract void Init();
 		public abstract void Update();
 	}
-	public abstract class System<T1, T2> : System where T1 : struct, IComponent where T2 : struct, IComponent {
+	public abstract class QSystem<T1> : QSystem where T1 : IQComponent {
+		public Types typeKey = new Type[] { typeof(T1) };
+		public sealed override void Update() {
+			var types = World.GetEntityTypes(typeKey);
+			foreach (var type in types) {
+				foreach (var entity in type.Entities) {
+					Query(ref type.GetComponent<T1>(entity));
+				}
+			}
+		}
+		public abstract void Query(ref T1 comp1);
+	}
+	public abstract class QSystem<T1, T2> : QSystem where T1 : IQComponent where T2 : IQComponent {
 		public Types typeKey = new Type[] { typeof(T1), typeof(T2) };
 		public sealed override void Update() {
 			var types = World.GetEntityTypes(typeKey);

@@ -394,7 +394,7 @@ namespace QTool
 									}, type == obj?.GetType() ? DropdownMenuAction.Status.Checked : DropdownMenuAction.Status.Normal);
 								}
 							});
-							if (QSerializeType.Get(obj.GetType()).ObjType != QObjectType.DynamicObject) {
+							if (obj!=null&&QSerializeType.Get(obj.GetType()).ObjType != QObjectType.DynamicObject) {
 								dynamicObjectView.Add("", obj, obj.GetType(), changeEvent).name = nameof(dynamicObjectView);
 							}
 							return dynamicObjectView;
@@ -610,6 +610,8 @@ namespace QTool
 			var type = typeof(T);
 			root = root.Add(QReflection.QName(serializedProperty), serializedProperty.stringValue.ParseQDataType(type), type, newObj => {
 				serializedProperty.stringValue = QData.ToQDataType(newObj, type);
+				Debug.LogError(serializedProperty.stringValue); 
+				serializedProperty.serializedObject.targetObject.SetDirty();
 			});
 		}
 		public static void Add(this VisualElement root, SerializedObject serializedObject) {
