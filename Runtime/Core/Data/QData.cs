@@ -637,7 +637,7 @@ namespace QTool
 	{
 		void OnLoad();
 	}
-	public abstract class QSerializeType<T> : QTypeInfo<T> where T : QSerializeType<T>, new() {
+	public class QSerializeType : QTypeInfo<QSerializeType> {
 		public QObjectType ObjType { get; protected set; } = QObjectType.Object;
 		public bool IsIQSerialize { private set; get; }
 		
@@ -689,18 +689,9 @@ namespace QTool
 				}
 			);
 			Members.RemoveAll((member) => {
-				return (member.Type.IsValueType && member.Type == type) || ((member.MemeberInfo.GetCustomAttribute<HideInInspector>() != null || member.MemeberInfo.GetCustomAttribute<QIgnoreAttribute>() != null || !member.IsPublic) && member.MemeberInfo.GetCustomAttribute<QNameAttribute>() == null) || member.Key == "Item" || member.Get == null || (IgnoreReadOnlyMember && member.Set == null) || (member.Type.IsArray && member.Type.GetArrayRank() > 1);
+				return (member.Type.IsValueType && member.Type == type) || ((member.MemeberInfo.GetCustomAttribute<HideInInspector>() != null || member.MemeberInfo.GetCustomAttribute<QIgnoreAttribute>() != null || !member.IsPublic) && member.MemeberInfo.GetCustomAttribute<QNameAttribute>() == null) || member.Key == "Item" || member.Get == null || ( member.Set == null) || (member.Type.IsArray && member.Type.GetArrayRank() > 1);
 			});
 		}
-		public virtual bool IgnoreReadOnlyMember => true;
-	}
-	public class QSerializeType : QSerializeType<QSerializeType>
-	{
-
-	}
-	public class QSerializeHasReadOnlyType : QSerializeType<QSerializeHasReadOnlyType>
-	{
-		public override bool IgnoreReadOnlyMember => false;
 	}
 }
 

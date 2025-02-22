@@ -1,5 +1,5 @@
 
-using NUnit.Framework;
+using QTool.Inspector;
 using System.Collections.Generic;
 #if UNITY_EDITOR
 using UnityEditor;
@@ -7,32 +7,35 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 namespace QTool.ECS {
-	public class QEntity : MonoBehaviour, IQComponent {
-		public Entity Entity { get; private set; }
+	public class QEntity : MonoBehaviour, IComponent {
+		[QReadonly]
+		public Entity Entity;
+		[QObject(typeof(QEntityData))]
 		public string entityData;
 		private void Awake() {
 			Entity = QWorld.Active.CreateEntity();
 			QWorld.Active.AddComponent(Entity, this);
 			var data = entityData.ParseQData<QEntityData>();
-			if (data != null) {
-				foreach (var comp in data.comps) {
+			if (data.components != null) {
+				foreach (var comp in data.components) {
 					QWorld.Active.AddComponent(Entity, comp);
 				}
 			}
 		}
-	}
-#if UNITY_EDITOR
-	[CustomEditor(typeof(QEntity), true, isFallback = true)]
-	public class QEntityEditor : Editor {
-		public override VisualElement CreateInspectorGUI() {
-			var root = new VisualElement();
-			root.Add<QEntityData>(serializedObject.FindProperty(nameof(QEntity.entityData)));
-			return root;
+		private void OnValidate() {
+			if (!Application.IsPlaying(this) || Entity.IsNull() || QWorld.Active == null)
+				return;
+			var type = QWorld.Active.GetEntityType(Entity);
+			var data = entityData.ParseQData<QEntityData>();
+			if (data.components != null) {
+				foreach (var comp in data.components) {
+					type.SetComponent(Entity, comp);
+				}
+			}
 		}
 	}
-#endif
 	[RequireComponent(typeof(QEntity))]
-	public abstract class QComponent : MonoBehaviour, IQComponent {
+	public abstract class QComponent : MonoBehaviour, IComponent {
 		public QEntity entity;
 		private void Reset() {
 			entity = GetComponent<QEntity>();
@@ -42,9 +45,9 @@ namespace QTool.ECS {
 		}
 	}
 
-	public class QEntityData : IKey<string> {
-		public string Key { get; set; }
-		public List<IQComponent> comps = new List<IQComponent>();
+	public struct QEntityData {
+		[QOldName("comps")]
+		public List<IComponent> components;
 	}
 }
 //#if UNITY_EDITOR

@@ -30,7 +30,7 @@ namespace QTool {
 			window.minSize = new Vector2(500, 300);
 		}
 
-		public QSerializeHasReadOnlyType typeInfo;
+		public QSerializeType typeInfo;
 		public QDataTable table = new QDataTable();
 		public QList<object> objList = new QList<object>();
 		public QList<QMemeberInfo> Members = new QList<QMemeberInfo>();   
@@ -103,8 +103,8 @@ namespace QTool {
 									VisualElement view = null;
 									if (typeInfo == null || member == null) {
 										view = CellView.Add(title, value, typeof(string), (newValue) => {
-											row[title] = (string)newValue;
-											label.text = ((string)newValue)?.Replace("\\n", " ");
+											row[title] = (string)newValue.obj;
+											label.text = ((string)newValue.obj)?.Replace("\\n", " ");
 											SetDataDirty();
 										});
 									}
@@ -113,7 +113,7 @@ namespace QTool {
 											if (member.Key == nameof(member.Key)) {
 												QPopupData.ClearAll();
 											}
-											member.Set(obj, newValue);
+											member.Set(obj, newValue.obj);
 											label.text = member.Get(obj).ToQDataType(member.Type)?.Replace("\\n", " ").Trim('\"');
 											label.Tooltip(label.text);
 											SetDataDirty();
@@ -168,7 +168,7 @@ namespace QTool {
 				if (type != null) {
 					table = new QDataTable(Data);
 					table.ParseQDataList(objList, type);
-					typeInfo = QSerializeHasReadOnlyType.Get(type);
+					typeInfo = QSerializeType.Get(type);
 					for (int i = 0; i < table.Titles.Count; i++) {
 						Members[i] = typeInfo.GetMemberInfo(table.Titles[i]);
 						if (Members[i] == null) {

@@ -356,7 +356,7 @@ namespace QTool {
 				qdataList.Clear();
 			}
 
-			var typeInfo = QSerializeHasReadOnlyType.Get(type);
+			var typeInfo = QSerializeType.Get(type);
 			foreach (var member in typeInfo.Members) {
 				qdataList.Titles.Add(member.QName);
 				for (int i = 0; i < list.Count; i++) {
@@ -373,7 +373,7 @@ namespace QTool {
 				}
 			}
 			QDebug.Begin("解析QDataList<" + type.Name + ">数据");
-			var typeInfo = QSerializeHasReadOnlyType.Get(type);
+			var typeInfo = QSerializeType.Get(type);
 			list.Clear();
 			var memeberList = new List<QMemeberInfo>();
 			foreach (var title in qdataList.Titles) {
@@ -413,7 +413,7 @@ namespace QTool {
 			if (type == null) {
 				type = typeof(T);
 			}
-			var typeInfo = QSerializeHasReadOnlyType.Get(type);
+			var typeInfo = QSerializeType.Get(type);
 			var memeberList = new List<QMemeberInfo>();
 			var result = type.CreateInstance();
 			for (int i = 0; i < row.Table.Titles.Count; i++) {

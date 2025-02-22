@@ -12,12 +12,9 @@ using UnityEditor;
 using UnityEditor.UIElements;
 #endif
 
-namespace QTool
-{
-	public static class QUIElements
-	{
-		public static TwoPaneSplitView Split(this VisualElement root, VisualElement left, VisualElement right, float pos = 300, TwoPaneSplitViewOrientation dreciton = TwoPaneSplitViewOrientation.Horizontal)
-		{
+namespace QTool {
+	public static class QUIElements {
+		public static TwoPaneSplitView Split(this VisualElement root, VisualElement left, VisualElement right, float pos = 300, TwoPaneSplitViewOrientation dreciton = TwoPaneSplitViewOrientation.Horizontal) {
 			var split = new TwoPaneSplitView();
 			split.fixedPaneInitialDimension = pos;
 			split.orientation = dreciton;
@@ -26,21 +23,18 @@ namespace QTool
 			root.Add(split);
 			return split;
 		}
-		public static Toggle AddToggle(this VisualElement root, string text, bool value, Action<bool> changeEvent = null)
-		{
+		public static Toggle AddToggle(this VisualElement root, string text, bool value, Action<bool> changeEvent = null) {
 			var visual = new Toggle();
 			visual.name = text;
 			visual.text = text;
 			visual.value = value;
-			visual.RegisterCallback<ChangeEvent<bool>>((evt) =>
-			{
+			visual.RegisterCallback<ChangeEvent<bool>>((evt) => {
 				changeEvent(evt.newValue);
 			});
 			root.Add(visual);
 			return visual;
 		}
-		public static Button AddButton(this VisualElement root, string text, Action clickEvent = null)
-		{
+		public static Button AddButton(this VisualElement root, string text, Action clickEvent = null) {
 			var visual = new Button(clickEvent);
 			visual.name = text;
 			visual.text = text;
@@ -52,50 +46,41 @@ namespace QTool
 			root.style.SetDisplay(!text.IsNull());
 			return root;
 		}
-		public static EnumField AddEnum(this VisualElement root, string label, Enum defaultValue, Action<Enum> changeEvent = null)
-		{
+		public static EnumField AddEnum(this VisualElement root, string label, Enum defaultValue, Action<Enum> changeEvent = null) {
 			var visual = new EnumField(label, defaultValue);
-			visual.RegisterCallback<ChangeEvent<Enum>>((evt) =>
-			{
+			visual.RegisterCallback<ChangeEvent<Enum>>((evt) => {
 				changeEvent(evt.newValue);
 			});
 			root.Add(visual);
 			return visual;
 		}
-		public static FloatField AddFloat(this VisualElement root, string label, float defaultValue = 0, Action<float> changeEvent = null)
-		{
+		public static FloatField AddFloat(this VisualElement root, string label, float defaultValue = 0, Action<float> changeEvent = null) {
 			var visual = new FloatField(label);
 			visual.value = defaultValue;
-			visual.RegisterCallback<ChangeEvent<float>>((evt) =>
-			{
+			visual.RegisterCallback<ChangeEvent<float>>((evt) => {
 				changeEvent(evt.newValue);
 			});
 			root.Add(visual);
 			return visual;
 		}
-		public static DoubleField AddDouble(this VisualElement root, string label, double defaultValue = 0, Action<double> changeEvent = null)
-		{
+		public static DoubleField AddDouble(this VisualElement root, string label, double defaultValue = 0, Action<double> changeEvent = null) {
 			var visual = new DoubleField(label);
 			visual.value = defaultValue;
-			visual.RegisterCallback<ChangeEvent<double>>((evt) =>
-			{
+			visual.RegisterCallback<ChangeEvent<double>>((evt) => {
 				changeEvent(evt.newValue);
 			});
 			root.Add(visual);
 			return visual;
 		}
 
-		public static VisualElement AddObject(this VisualElement root, string label, Type type, UnityEngine.Object defaultValue = null, Action<UnityEngine.Object> changeEvent = null)
-		{
+		public static VisualElement AddObject(this VisualElement root, string label, Type type, UnityEngine.Object defaultValue = null, Action<UnityEngine.Object> changeEvent = null) {
 #if UNITY_EDITOR
 			var visual = new ObjectField(label);
 			visual.allowSceneObjects = false;
 			visual.objectType = type;
 			visual.value = defaultValue;
-			if (changeEvent != null)
-			{
-				visual.RegisterCallback<ChangeEvent<UnityEngine.Object>>((evt) =>
-				{
+			if (changeEvent != null) {
+				visual.RegisterCallback<ChangeEvent<UnityEngine.Object>>((evt) => {
 					changeEvent(evt.newValue);
 				});
 			}
@@ -105,14 +90,11 @@ namespace QTool
 			root.Add(visual);
 			return visual;
 		}
-		public static TextField AddText(this VisualElement root, string label, string defaultValue = "", Action<string> changeEvent = null, bool multiline = false)
-		{
+		public static TextField AddText(this VisualElement root, string label, string defaultValue = "", Action<string> changeEvent = null, bool multiline = false) {
 			var visual = new TextField(label);
 			visual.value = defaultValue;
-			if (changeEvent != null)
-			{
-				visual.RegisterCallback<ChangeEvent<string>>((evt) =>
-				{
+			if (changeEvent != null) {
+				visual.RegisterCallback<ChangeEvent<string>>((evt) => {
 					changeEvent(evt.newValue);
 				});
 			}
@@ -121,54 +103,43 @@ namespace QTool
 			return visual;
 		}
 
-		public static PopupField<T> AddPopup<T>(this VisualElement root, string label, List<T> choices, T defaultValue, Action<T> changeEvent = null)
-		{
-			if (defaultValue == null)
-			{
+		public static PopupField<T> AddPopup<T>(this VisualElement root, string label, List<T> choices, T defaultValue, Action<T> changeEvent = null) {
+			if (defaultValue == null) {
 				defaultValue = (T)typeof(T).CreateInstance();
 			}
-			if (!choices.Contains(defaultValue))
-			{
+			if (!choices.Contains(defaultValue)) {
 				choices.Add(defaultValue);
 			}
 			var visual = new PopupField<T>(label, choices, defaultValue);
-			visual.RegisterCallback<ChangeEvent<T>>((evt) =>
-			{
+			visual.RegisterCallback<ChangeEvent<T>>((evt) => {
 				changeEvent(evt.newValue);
 			});
 			root.Add(visual);
 			return visual;
 		}
-		public static PopupField<string> AddQPopupAttribute(this VisualElement root, QPopupAttribute att, object obj, Action<object> changeEvent = null)
-		{
+		public static PopupField<string> AddQPopupAttribute(this VisualElement root, QPopupAttribute att, object obj, Action<object> changeEvent = null) {
 			var str = obj.QName();
-			if (str.IsNull())
-			{
+			if (str.IsNull()) {
 				str = "\t";
 			}
 			var data = QPopupData.Get(obj, att.getListFuncs);
-			return root.AddPopup("", data.List, str, (value) =>
-			{
+			return root.AddPopup("", data.List, str, (value) => {
 				changeEvent(value);
 			});
 		}
-		public static IntegerField AddInt(this VisualElement root, string label, int defaultValue = 0, Action<int> changeEvent = null)
-		{
+		public static IntegerField AddInt(this VisualElement root, string label, int defaultValue = 0, Action<int> changeEvent = null) {
 			var visual = new IntegerField(label);
 			visual.value = defaultValue;
-			visual.RegisterCallback<ChangeEvent<int>>((evt) =>
-			{
+			visual.RegisterCallback<ChangeEvent<int>>((evt) => {
 				changeEvent(evt.newValue);
 			});
 			root.Add(visual);
 			return visual;
 		}
-		public static VisualElement AddEnumFlags(this VisualElement root, string label, Enum defaultValue = null, Action<Enum> changeEvent = null)
-		{
+		public static VisualElement AddEnumFlags(this VisualElement root, string label, Enum defaultValue = null, Action<Enum> changeEvent = null) {
 #if UNITY_EDITOR
 			var visual = new EnumFlagsField(label, defaultValue);
-			visual.RegisterCallback<ChangeEvent<Enum>>((evt) =>
-			{
+			visual.RegisterCallback<ChangeEvent<Enum>>((evt) => {
 				changeEvent(evt.newValue);
 			});
 #else
@@ -177,8 +148,7 @@ namespace QTool
 			root.Add(visual);
 			return visual;
 		}
-		public static Label AddLabel(this VisualElement root, string text=nameof(Label), TextAnchor textAlign = TextAnchor.MiddleLeft)
-		{
+		public static Label AddLabel(this VisualElement root, string text = nameof(Label), TextAnchor textAlign = TextAnchor.MiddleLeft) {
 			var label = new Label(text);
 			label.name = text;
 			label.style.overflow = Overflow.Hidden;
@@ -186,21 +156,52 @@ namespace QTool
 			root.Add(label);
 			return label;
 		}
-		public static Foldout AddFoldout(this VisualElement root, string text = "", bool value = false)
-		{
+		private static QDictionary<string, bool> FoldoutCache;
+		private static int GetDeep(this VisualElement root) {
+			if (root.parent == null) {
+				return 1;
+			}
+			else {
+				return root.parent.GetDeep() + 1;
+			}
+		}
+		public static VisualElement AddFoldout(this VisualElement root, string text, Action<VisualElement> action) {
+			if (text.IsNull()) {
+				action?.Invoke(root);
+				return root;
+			}
+			if (FoldoutCache == null) {
+				FoldoutCache = PlayerPrefs.GetString(nameof(FoldoutCache), "{}").ParseQData(FoldoutCache);
+			}
 			var visual = new Foldout();
-			visual.text = text;
-			visual.value = value;
 			root.Add(visual);
+			var cacheKey = root.GetDeep() + text;
+			visual.text = text;
+			visual.value = FoldoutCache.TryGetValue(cacheKey, out var value) ? value : false;
+			visual.RegisterValueChangedCallback(e => {
+				if (e.target != visual)
+					return;
+				if (e.newValue) {
+					action?.Invoke(visual.contentContainer);
+				}
+				else {
+					visual.contentContainer.Clear();
+				}
+				if (FoldoutCache[cacheKey] != e.newValue) {
+					FoldoutCache[cacheKey] = e.newValue;
+					PlayerPrefs.SetString(nameof(FoldoutCache), FoldoutCache.ToQData());
+				}
+			});
+			if (visual.value) {
+				action?.Invoke(visual.contentContainer);
+			}
 			return visual;
 		}
-		public static ListView AddListView(this VisualElement root, IList itemsSource, Action<VisualElement, int> bindItem = null, Func<VisualElement> makeItem = null)
-		{
+		public static ListView AddListView(this VisualElement root, IList itemsSource, Action<VisualElement, int> bindItem = null, Func<VisualElement> makeItem = null) {
 			var visual = new ListView();
 			visual.itemsSource = itemsSource;
 			visual.bindItem = bindItem;
-			if (makeItem == null)
-			{
+			if (makeItem == null) {
 				makeItem = () => new VisualElement();
 			}
 			visual.makeItem = makeItem;
@@ -208,12 +209,10 @@ namespace QTool
 			return visual;
 		}
 #if UNITY_2022_1_OR_NEWER
-		public static TreeView AddTreeView(this VisualElement root, Action<VisualElement, int> bindItem, Func<VisualElement> makeItem = null)
-		{
+		public static TreeView AddTreeView(this VisualElement root, Action<VisualElement, int> bindItem, Func<VisualElement> makeItem = null) {
 			var visual = new TreeView();
 			visual.bindItem = bindItem;
-			if (makeItem == null)
-			{
+			if (makeItem == null) {
 				makeItem = () => new VisualElement();
 			}
 			visual.makeItem = makeItem;
@@ -221,8 +220,7 @@ namespace QTool
 			return visual;
 		}
 #endif
-		public static VisualElement Name(this VisualElement visual,string name)
-		{
+		public static VisualElement Name(this VisualElement visual, string name) {
 			visual.name = name;
 			return visual;
 		}
@@ -232,13 +230,11 @@ namespace QTool
 			root.Add(visual);
 			return visual;
 		}
-		public static T IgnoreClick<T>(this T root, bool value = true) where T : VisualElement
-		{
+		public static T IgnoreClick<T>(this T root, bool value = true) where T : VisualElement {
 			root.pickingMode = value ? PickingMode.Ignore : PickingMode.Position;
 			return root;
 		}
-		public static VisualElement SetBackground(this VisualElement root, Color color = default, float offset = 0)
-		{
+		public static VisualElement SetBackground(this VisualElement root, Color color = default, float offset = 0) {
 			root.style.position = Position.Absolute;
 			root.style.left = offset;
 			root.style.top = offset;
@@ -247,8 +243,7 @@ namespace QTool
 			root.style.backgroundColor = color;
 			return root;
 		}
-		public static QConnectElement AddConnect(this VisualElement root, Color color, float lineWidth = 3)
-		{
+		public static QConnectElement AddConnect(this VisualElement root, Color color, float lineWidth = 3) {
 			var visual = new QConnectElement();
 			root.Add(visual);
 			visual.StartColor = color;
@@ -256,25 +251,21 @@ namespace QTool
 			visual.LineWidth = lineWidth;
 			return visual;
 		}
-		public static Vector2 GetWorldPosition(this VisualElement root)
-		{
+		public static Vector2 GetWorldPosition(this VisualElement root) {
 			return root.worldTransform.MultiplyPoint(root.transform.position);
 		}
-		public static void SetWorldPosition(this VisualElement root, Vector2 worldPosition)
-		{
+		public static void SetWorldPosition(this VisualElement root, Vector2 worldPosition) {
 			root.style.position = Position.Absolute;
 			root.transform.position = worldPosition - root.worldBound.position;
 		}
-		public static ScrollView AddScrollView(this VisualElement root)
-		{
+		public static ScrollView AddScrollView(this VisualElement root) {
 			var visual = new ScrollView();
 			root.Add(visual);
 			return visual;
 		}
 
 #if UNITY_2021_1_OR_NEWER
-		public static GroupBox AddGroupBox(this VisualElement root, string name = "")
-		{
+		public static GroupBox AddGroupBox(this VisualElement root, string name = "") {
 			var visual = new GroupBox();
 			visual.name = name;
 			visual.style.flexDirection = FlexDirection.Row;
@@ -296,11 +287,22 @@ namespace QTool
 			element.style.cursor = new StyleCursor((UnityEngine.UIElements.Cursor)objCursor);
 		}
 #endif
-		public static void AddMenu(this VisualElement root, Action<ContextualMenuPopulateEvent> menuBuilder)
-		{
-			root.AddManipulator(new ContextualMenuManipulator(menuBuilder));
+		public static void AddMenu(this VisualElement root, Action<ContextualMenuPopulateEvent> menuBuilder) {
+			root.AddManipulator(new ContextualMenuManipulator(e => {
+				if (e.target != root)
+					return;
+				menuBuilder(e);
+			}));
 		}
-		public static VisualElement Add(this VisualElement root, string name, object obj, Type type, Action<object> changeEvent, ICustomAttributeProvider customAttribute = null) {
+		public struct ChangeEvent {
+			public VisualElement newView;
+			public object obj;
+			public ChangeEvent(object obj, VisualElement newView = null) {
+				this.obj = obj;
+				this.newView = newView;
+			}
+		}
+		public static VisualElement Add(this VisualElement root, string name, object obj, Type type, Action<ChangeEvent> changeEvent, ICustomAttributeProvider customAttribute = null) {
 			if (type == null) {
 				if (obj == null) {
 					return root.AddLabel(name);
@@ -315,12 +317,12 @@ namespace QTool
 			var typeInfo = QSerializeType.Get(type);
 			if (typeInfo.CustomTypeInfo?.TargetType != null) {
 				return root.Add(name, typeInfo.CustomTypeInfo.ChangeType(obj), typeInfo.CustomTypeInfo.TargetType, newValue => {
-					changeEvent(typeInfo.CustomTypeInfo.ChangeType(newValue));
+					changeEvent(new ChangeEvent(typeInfo.CustomTypeInfo.ChangeType(newValue.obj)));
 				}, customAttribute);
 			}
 			switch (typeInfo.Code) {
 				case TypeCode.Boolean:
-					return root.AddToggle(name, (bool)obj, (value) => changeEvent(value));
+					return root.AddToggle(name, (bool)obj, (value) => changeEvent(new ChangeEvent(value)));
 				case TypeCode.Char:
 				case TypeCode.SByte:
 				case TypeCode.Byte:
@@ -332,12 +334,12 @@ namespace QTool
 						var flagsEnum = type.GetAttribute<FlagsAttribute>();
 						if (flagsEnum != null) {
 							return root.AddEnumFlags(name, (Enum)obj, (value) => {
-								changeEvent(value);
+								changeEvent(new ChangeEvent(value));
 							});
 						}
 						else {
 							return root.AddEnum(name, (Enum)obj, (value) => {
-								changeEvent(value);
+								changeEvent(new ChangeEvent(value));
 							});
 						}
 					}
@@ -349,77 +351,79 @@ namespace QTool
 						catch (Exception e) {
 							Debug.LogWarning("错误[" + name + "][" + obj?.GetType() + "][" + obj + "] " + e);
 						}
-						return root.AddInt(name, intValue, (value) => { changeEvent(value); });
+						return root.AddInt(name, intValue, (value) => { changeEvent(new ChangeEvent(value)); });
 
 					}
 				case TypeCode.Int64:
 				case TypeCode.UInt64:
-					return root.AddInt(name, (int)obj, (value) => { changeEvent(value); });
+					return root.AddInt(name, (int)obj, (value) => { changeEvent(new ChangeEvent(value)); });
 				case TypeCode.Single:
-					return root.AddFloat(name, (float)obj, (value) => { changeEvent(value); });
+					return root.AddFloat(name, (float)obj, (value) => { changeEvent(new ChangeEvent(value)); });
 				case TypeCode.Decimal:
 				case TypeCode.Double:
-					return root.AddDouble(name, (double)obj, (value) => { changeEvent(value); });
+					return root.AddDouble(name, (double)obj, (value) => { changeEvent(new ChangeEvent(value)); });
 				case TypeCode.String:
-					var qpopup = customAttribute?.GetAttribute<QPopupAttribute>();
-					if (qpopup != null) {
-						return root.AddQPopupAttribute(qpopup, obj, (value) => changeEvent(value));
+					var attribute = customAttribute?.GetAttribute<PropertyAttribute>();
+					if (attribute is QObjectAttribute qObject) {
+						var visual = QObjectDrawer.CreateGUI(name, obj, type, changeEvent, qObject);
+						root.Add(visual);
+						return visual;
+					}
+					else if (attribute is QPopupAttribute qPopup && qPopup != null) {
+						return root.AddQPopupAttribute(qPopup, obj, (value) => changeEvent(new ChangeEvent(value)));
 					}
 					else {
-						return root.AddText(name, (string)obj, (value) => { changeEvent(value); });
+						return root.AddText(name, (string)obj, (value) => { changeEvent(new ChangeEvent(value)); });
 					}
 				case TypeCode.Object:
+					void FreshChild(VisualElement old, object obj) {
+						var index = root.IndexOf(old);
+						root.RemoveAt(index);
+						var newView = root.Add(name, obj, type, changeEvent, customAttribute);
+						root.Insert(index, newView);
+						changeEvent?.Invoke(new ChangeEvent(obj, newView));
+					}
+					if (obj == null) {
+						var view = root.AddVisualElement(FlexDirection.Row);
+						view.AddLabel(name);
+						view.AddLabel("null");
+						view.AddMenu(menu => {
+							menu.menu.AppendAction($"新建/{name} {typeInfo.Type}", e => {
+								obj = typeInfo.Type.CreateInstance();
+								FreshChild(view, obj);
+							});
+						});
+						return null;
+					}
 					switch (typeInfo.ObjType) {
 						case QObjectType.DynamicObject: {
-							if (obj == null) {
-								obj = typeInfo.Type.CreateInstance();
-							}
-							var dynamicObjectView = root.AddVisualElement();
-							dynamicObjectView.style.flexDirection = FlexDirection.Row;
-							var label= dynamicObjectView.AddLabel(name);
-							label.style.width = new Length(30, LengthUnit.Percent);
-							dynamicObjectView.AddMenu(data => {
+							var view = root.Add(name, obj, obj.GetType(), changeEvent);
+							view.AddMenu(data => {
 								var types = typeInfo.Type.GetAllTypes();
 								foreach (var type in types) {
+									if (type.Is(typeof(UnityEngine.Object)))
+										continue;
 									data.menu.AppendAction("更改类型/" + type.GetFriendlyName(), data => {
 										obj = type.CreateInstance();
-										var old = dynamicObjectView.Q<VisualElement>(nameof(dynamicObjectView));
-										if (old != null) {
-											dynamicObjectView.Remove(old);
-										}
-										if (QSerializeType.Get(type).ObjType != QObjectType.DynamicObject) {
-											dynamicObjectView.Add("", obj, type, changeEvent).name = nameof(dynamicObjectView);
-										}
-										changeEvent?.Invoke(obj);
+										FreshChild(view, obj);
 									}, type == obj?.GetType() ? DropdownMenuAction.Status.Checked : DropdownMenuAction.Status.Normal);
 								}
 							});
-							if (obj!=null&&QSerializeType.Get(obj.GetType()).ObjType != QObjectType.DynamicObject) {
-								dynamicObjectView.Add("", obj, obj.GetType(), changeEvent).name = nameof(dynamicObjectView);
-							}
-							return dynamicObjectView;
+							return view;
 						}
 						case QObjectType.UnityObject: {
-							return root.AddObject(name, type, (UnityEngine.Object)obj, (value) => { changeEvent(value); });
+							return root.AddObject(name, type, (UnityEngine.Object)obj, (value) => { changeEvent(new ChangeEvent(value)); });
 						}
 						case QObjectType.Object: {
-							if (obj == null) {
-								obj = type.CreateInstance();
-							}
-							if (obj == null) {
-								return root.AddLabel("暂不支持[" + type + "]");
-							}
-							else {
-								var foldout = name.IsNull() ? root.AddVisualElement() : root.AddFoldout(name);
-
+							var foldout = root.AddFoldout(name, view => {
 								foreach (var member in typeInfo.Members) {
-									foldout.contentContainer.Add(member.QName, member.Get(obj), member.Type, (value) => {
-										member.Set(obj, value);
-										changeEvent?.Invoke(obj);
+									view.Add(member.QName, member.Get(obj), member.Type, (value) => {
+										member.Set(obj, value.obj);
+										changeEvent?.Invoke(new ChangeEvent(obj));
 									}, member.MemeberInfo);
 								}
-								return foldout;
-							}
+							});
+							return foldout;
 						}
 						case QObjectType.Array:
 						case QObjectType.List: {
@@ -427,48 +431,69 @@ namespace QTool
 								if (typeInfo.ArrayRank > 1) {
 									break;
 								}
-								var list = obj as IList;
-								if (list == null) {
-									obj = typeInfo.ArrayRank == 0 ? type.CreateInstance() : type.CreateInstance(null, 0);
-									list = obj as IList;
-									changeEvent?.Invoke(list);
-								}
-								var foldout = name.IsNull() ? root.AddVisualElement(): root.AddFoldout(name);
-								void FreshList() {
-									foldout.contentContainer.Clear();
-									for (int i = 0; i < list.Count; i++) {
-										object index = i;
-										VisualElement child = null;
-										child = foldout.contentContainer.Add($"[{i}] {list[i]}", list[i], typeInfo.ElementType, (value) => {
-											list[(int)index] = value;
-											if (typeInfo.ElementType != typeof(string)) {
-												child.Q<Label>().text = $"[{i}] {value}";
-											}
-											changeEvent?.Invoke(list);
-										}, customAttribute);
-										child.AddMenu((menu) => {
-											menu.menu.AppendAction("新增", action => {
-												list = list.CreateAt(typeInfo, (int)index);
-												FreshList();
-												changeEvent?.Invoke(list);
+								if (obj is IList list) {
+									VisualElement foldout = null;
+									foldout = root.AddFoldout(name, view => {
+										view.Clear();
+										for (int i = 0; i < list.Count; i++) {
+											object index = i;
+											VisualElement child = null;
+											child = view.Add($"[{i}] {list[i]}", list[i], typeInfo.ElementType, (value) => {
+												if (value.newView != null) {
+													child = value.newView;
+												}
+												list[(int)index] = value.obj;
+												if (typeInfo.ElementType != typeof(string)) {
+													if (child != null) {
+														var label = child.Q<Label>();
+														label.text = $"[{i}] {value.obj}";
+													}
+												}
+												changeEvent?.Invoke(new ChangeEvent(list));
+											}, customAttribute);
+											child.RegisterCallback<ClickEvent>(e => {
+												if (e.clickCount == 2) {
+													list[(int)index]?.GetType().LocateTypeFile();
+												}
 											});
-											menu.menu.AppendAction("删除", action => {
-												list = list.RemoveAt(typeInfo, (int)index);
-												FreshList();
-												changeEvent?.Invoke(list);
+											child.AddMenu((menu) => {
+												menu.menu.AppendAction($"添加/{name} {index}", action => {
+													list = list.CreateAt(typeInfo, (int)index);
+													FreshChild(foldout, list);
+												});
+												menu.menu.AppendAction($"删除/{name} {index}", action => {
+													list = list.RemoveAt(typeInfo, (int)index);
+													FreshChild(foldout, list);
+												});
 											});
-										});
-									}
-									foldout.AddMenu((menu) => {
-										menu.menu.AppendAction("新增", action => {
-											list = list.CreateAt(typeInfo);
-											FreshList();
-											changeEvent?.Invoke(list);
+										}
+										view.parent.AddMenu((menu) => {
+											menu.menu.AppendAction($"添加/{name}", action => {
+												list = list.CreateAt(typeInfo);
+												FreshChild(foldout, list);
+											});
 										});
 									});
+									return foldout;
 								}
-								FreshList();
-								return foldout;
+							}
+						}
+						break;
+						case QObjectType.Dictionary: {
+							if (typeof(IDictionary).IsAssignableFrom(type)) {
+								if (obj is IDictionary dic) {
+									VisualElement foldout = null;
+									foldout = root.AddFoldout(name, view => {
+										view.Clear();
+										foreach (DictionaryEntry item in dic) {
+											view.Add(item.Key?.ToString(), item.Value, typeInfo.ElementType, (value) => {
+												dic[item.Key] = value.obj;
+												changeEvent?.Invoke(new ChangeEvent(dic));
+											}, customAttribute);
+										}
+									});
+									return foldout;
+								}
 							}
 						}
 						break;
@@ -491,8 +516,7 @@ namespace QTool
 		public static void SetDisplay(this IStyle style, bool display) {
 			style.display = display ? DisplayStyle.Flex : DisplayStyle.None;
 		}
-		public static void SetBorder(this IStyle style, Color color, float width = 1, float radius = 5)
-		{
+		public static void SetBorder(this IStyle style, Color color, float width = 1, float radius = 5) {
 			style.borderTopWidth = width;
 			style.borderBottomWidth = width;
 			style.borderLeftWidth = width;
@@ -506,7 +530,7 @@ namespace QTool
 			style.borderBottomLeftRadius = radius;
 			style.borderBottomRightRadius = radius;
 		}
-		public static void SetFixedSize(this IStyle style, float width , float height) {
+		public static void SetFixedSize(this IStyle style, float width, float height) {
 			style.width = width;
 			style.height = height;
 			style.minWidth = width;
@@ -515,64 +539,53 @@ namespace QTool
 			style.maxHeight = height;
 		}
 
-		public static VisualElement Tooltip(this VisualElement root, string text)
-		{
-			root.tooltip = text?.Replace("\\n", " "); 
+		public static VisualElement Tooltip(this VisualElement root, string text) {
+			root.tooltip = text?.Replace("\\n", " ");
 			return root;
 		}
-		public static VisualElement AddMarkdown(this VisualElement root, string markdown)
-		{
+		public static VisualElement AddMarkdown(this VisualElement root, string markdown) {
 			root.Clear();
 			var newline = false;
-			void CheckNewLine()
-			{
-				if (!newline)
-				{
+			void CheckNewLine() {
+				if (!newline) {
 					root.AddLabel("");
 					newline = true;
 				}
 			}
 			if (markdown.IsNull()) return root;
-			foreach (var line in markdown.Split('\n'))
-			{
+			foreach (var line in markdown.Split('\n')) {
 				line.SplitTowString(" ", out var key, out var text);
-				switch (key)
-				{
+				switch (key) {
 					case "#":
 					case "##":
 					case "###":
 					case "####":
 					case "#####":
-					case "######":
-						{
-							CheckNewLine();
-							var size = Mathf.Lerp(25, 10, (key.Length - 1) / 5f);
-							root.AddLabel(text).Tooltip(line).style.fontSize = size;
-							newline = false;
-							CheckNewLine();
-						}
-						break;
-					case ">":
-						{
-							var label = root.AddLabel("||  " + text).Tooltip(line);
-							label.style.fontSize = 15;
-							label.style.color = Color.HSVToRGB(1, 0, 0.8f);
-							newline = false;
-						}
-						break;
-					case "-":
-						{
-							root.AddLabel("◆ " + text).Tooltip(line);
-							newline = false;
-						}
-						break;
+					case "######": {
+						CheckNewLine();
+						var size = Mathf.Lerp(25, 10, (key.Length - 1) / 5f);
+						root.AddLabel(text).Tooltip(line).style.fontSize = size;
+						newline = false;
+						CheckNewLine();
+					}
+					break;
+					case ">": {
+						var label = root.AddLabel("||  " + text).Tooltip(line);
+						label.style.fontSize = 15;
+						label.style.color = Color.HSVToRGB(1, 0, 0.8f);
+						newline = false;
+					}
+					break;
+					case "-": {
+						root.AddLabel("◆ " + text).Tooltip(line);
+						newline = false;
+					}
+					break;
 					default:
-						if (line.IsNull() || line.Length >= 3 && line.Replace("*", "").Replace("-", "").Replace("_", "").IsNull())
-						{
+						if (line.IsNull() || line.Length >= 3 && line.Replace("*", "").Replace("-", "").Replace("_", "").IsNull()) {
 							CheckNewLine();
 						}
-						else
-						{
+						else {
 							root.AddLabel(line);
 							newline = false;
 						}
@@ -609,9 +622,7 @@ namespace QTool
 		public static void Add<T>(this VisualElement root, SerializedProperty serializedProperty) {
 			var type = typeof(T);
 			root = root.Add(QReflection.QName(serializedProperty), serializedProperty.stringValue.ParseQDataType(type), type, newObj => {
-				serializedProperty.stringValue = QData.ToQDataType(newObj, type);
-				Debug.LogError(serializedProperty.stringValue); 
-				serializedProperty.serializedObject.targetObject.SetDirty();
+				serializedProperty.stringValue = QData.ToQDataType(newObj.obj, type);
 			});
 		}
 		public static void Add(this VisualElement root, SerializedObject serializedObject) {
@@ -659,37 +670,30 @@ namespace QTool
 #endif
 		#endregion
 	}
-	public class QPopupData
-	{
+	public class QPopupData {
 		static QDictionary<string, QPopupData> DrawerDic = new QDictionary<string, QPopupData>((key) => new QPopupData());
 
-		public static void ClearAll()
-		{
+		public static void ClearAll() {
 			QDataTable.UnLoadAll();
 			DrawerDic.Clear();
 		}
 
 		public List<string> List = new List<string>();
 		public Type Type { get; private set; }
-		
-		public static QPopupData Get(object obj, params string[] getListFuncs)
-		{
+
+		public static QPopupData Get(object obj, params string[] getListFuncs) {
 			Type type = null;
-			if (obj is Type)
-			{
+			if (obj is Type) {
 				type = obj as Type;
 			}
-			else
-			{
+			else {
 				type = obj?.GetType();
 			}
 
 			var drawerKey = getListFuncs.ToOneString(" ");
-			if (drawerKey.IsNull())
-			{
+			if (drawerKey.IsNull()) {
 #if UNITY_EDITOR
-				if (obj is SerializedProperty property)
-				{
+				if (obj is SerializedProperty property) {
 					type = QReflection.ParseType(property.type.SplitEndString("PPtr<$").TrimEnd('>'));
 				}
 #endif
@@ -698,71 +702,54 @@ namespace QTool
 			var drawer = DrawerDic[drawerKey];
 			drawer.Type = type;
 
-			if (getListFuncs.Length > 0)
-			{
+			if (getListFuncs.Length > 0) {
 				drawer.List.Clear();
 				drawer.List.Add("\t");
-				foreach (var getListFunc in getListFuncs)
-				{
-					if (getListFunc.StartsWith(nameof(Resources) + "/"))
-					{
+				foreach (var getListFunc in getListFuncs) {
+					if (getListFunc.StartsWith(nameof(Resources) + "/")) {
 						var assets = Resources.LoadAll(getListFunc.SplitEndString(nameof(Resources) + "/"));
-						foreach (var asset in assets)
-						{
+						foreach (var asset in assets) {
 							drawer.List.Add(asset.name);
 						}
 					}
-					else
-					{
+					else {
 						var funcKey = getListFunc;
-						if (obj.InvokeFunction(funcKey) is IEnumerable itemList)
-						{
-							foreach (var item in itemList)
-							{
+						if (obj.InvokeFunction(funcKey) is IEnumerable itemList) {
+							foreach (var item in itemList) {
 								drawer.List.Add(item.QName());
 							}
 						}
 					}
 				}
 			}
-			else if (drawer.List.Count == 0)
-			{
-				if (type.IsAbstract)
-				{
+			else if (drawer.List.Count == 0) {
+				if (type.IsAbstract) {
 					drawer.List.Add("\t");
-					foreach (var childType in type.GetAllTypes())
-					{
+					foreach (var childType in type.GetAllTypes()) {
 						drawer.List.Add(childType.Name);
 					}
 				}
-				else if (type.IsEnum)
-				{
-					foreach (var name in Enum.GetNames(type))
-					{
+				else if (type.IsEnum) {
+					foreach (var name in Enum.GetNames(type)) {
 						drawer.List.Add(name);
 					}
 				}
 #if UNITY_EDITOR
-				else if (obj is UnityEditor.SerializedProperty property)
-				{
+				else if (obj is UnityEditor.SerializedProperty property) {
 					drawer.List.Clear();
-					switch (property.propertyType)
-					{
-						case UnityEditor.SerializedPropertyType.Enum:
-							{
-								foreach (var item in property.enumNames)
-								{
-									drawer.List.Add(item);
-								}
+					switch (property.propertyType) {
+						case UnityEditor.SerializedPropertyType.Enum: {
+							foreach (var item in property.enumNames) {
+								drawer.List.Add(item);
 							}
-							break;
+						}
+						break;
 						default:
 							break;
 					}
 				}
 #endif
-				else
-				{
+				else {
 					Debug.LogError("错误函数[" + getListFuncs.ToOneString(" ") + "]");
 				}
 			}

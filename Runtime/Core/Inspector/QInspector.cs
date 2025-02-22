@@ -6,6 +6,8 @@ using QTool.Reflection;
 using System.Reflection;
 using System.Threading.Tasks;
 using UnityEngine.UIElements;
+using static UnityEngine.Analytics.IAnalytic;
+
 #if UNITY_EDITOR
 using UnityEditor;
 using UnityEditor.UIElements;
@@ -298,29 +300,66 @@ namespace QTool.Inspector
 		}
 	}
 	[CustomPropertyDrawer(typeof(QObjectAttribute))]
-	public class QIdObjectReferenceDrawer : PropertyDrawer {
+	public class QObjectDrawer : PropertyDrawer {
+		public static VisualElement CreateGUI(string name, object obj, Type type, Action<QUIElements.ChangeEvent> changeEvent,QObjectAttribute attribute) {
+			var root= new VisualElement();
+			root.style.flexDirection = FlexDirection.Row;
+			var targetType = attribute.type;
+			if (type == typeof(string)) {
+				if (targetType.Is(typeof(UnityEngine.Object))) {
+					var visual = root.AddObject(name, targetType, QObjectTool.GetObject(obj?.ToString(), targetType));
+					visual.style.width = new Length(50, LengthUnit.Percent);
+					visual.RegisterCallback<ChangeEvent<UnityEngine.Object>>(data => {
+						changeEvent?.Invoke(new QUIElements.ChangeEvent(QObjectTool.GetPath(data.newValue)));
+					});
+					var propertyField = root.Add("",obj,type,changeEvent);
+					propertyField.style.width = new Length(50, LengthUnit.Percent);
+				}
+				else {
+					var tObj= obj?.ToString().ParseQDataType(targetType);
+					root.Add(name, tObj, targetType, newValue => {
+						changeEvent?.Invoke(new QUIElements.ChangeEvent(newValue.obj.ToQDataType(targetType)));
+					});
+				}
+			}
+			return root;
+		}
+
 		public override VisualElement CreatePropertyGUI(SerializedProperty property) {
 			var qIdObject = attribute as QObjectAttribute;
+			var targetType = qIdObject.type;
 			var root = new VisualElement();
-			root.style.flexDirection = FlexDirection.Row;
 			switch (property.propertyType) {
 				case SerializedPropertyType.String: {
-					var visual = root.AddObject(QReflection.QName(property), qIdObject.type, QObjectTool.GetObject(property.stringValue, qIdObject.type));
-					visual.style.width = new Length(50, LengthUnit.Percent);
-					visual.RegisterCallback<ChangeEvent<UnityEngine.Object>>(data =>
-					{
-						property.stringValue = QObjectTool.GetPath(data.newValue);
-						property.serializedObject.ApplyModifiedProperties();
-					});
+					if (targetType.Is(typeof(UnityEngine.Object))) {
+						var visual = root.AddObject(QReflection.QName(property), qIdObject.type, QObjectTool.GetObject(property.stringValue, qIdObject.type));
+						visual.style.width = new Length(50, LengthUnit.Percent);
+						visual.RegisterCallback<ChangeEvent<UnityEngine.Object>>(data => {
+							property.stringValue = QObjectTool.GetPath(data.newValue);
+							property.serializedObject.ApplyModifiedProperties();
+						});
+						var propertyField = root.Add(property);
+						propertyField.style.width = new Length(50, LengthUnit.Percent);
+					}
+					//else if(targetType.Is(typeof(IKey<string>))) {
+						
+					//}
+					else {
+						var obj = property.stringValue.ParseQDataType(targetType);
+						root.Add(QReflection.QName(property), obj, targetType, newValue => {
+							property.stringValue = newValue.obj.ToQDataType(targetType);
+							property.serializedObject.ApplyModifiedProperties();
+						});
+					}
 				}
 				break;
 				default:
 					break;
 			}
-			var propertyField = root.Add(property);
-			propertyField.style.width = new Length(50, LengthUnit.Percent);
 			return root;
 		}
+
+
 	}
 
 	[CustomPropertyDrawer(typeof(QPopupAttribute))]

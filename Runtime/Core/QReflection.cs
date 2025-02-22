@@ -1036,7 +1036,12 @@ namespace QTool.Reflection
 					return null;
 				}
 				else if (type.IsInterface || type.IsAbstract) {
-					return CreateInstance(GetAllTypes(type).Get(0), targetObj, param);
+					foreach (var item in GetAllTypes(type)) {
+						if (!item.Is(typeof(UnityEngine.Object))) {
+							return CreateInstance(item, targetObj, param);
+						}
+					}
+					return null;
 				}
 				return Activator.CreateInstance(type, param);
 			}

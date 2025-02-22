@@ -5,9 +5,7 @@ using UnityEngine;
 public class TestRotate : QComponent {
 	public int a;
 }
-public class TestRotateSystem : QSystem<QEntity, TestRotate> {
-	public override void Init() {
-	}
+public class TestRotateSystem : QuerySystem<QEntity, TestRotate> {
 	public override void Query(ref QEntity entity, ref TestRotate rotate) {
 		entity.transform.Rotate(Vector3.right * rotate.a * 360 * Time.deltaTime);
 	}

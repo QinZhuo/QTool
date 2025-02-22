@@ -888,7 +888,7 @@ namespace QTool.Graph {
 							});
 						}
 					}
-					viewList = row.Add(port.ViewName, port.DefaultValue, port.ValueType, newValue => { port.DefaultValue = newValue; if (port.DefaultValue is IList list && list.Count == viewList?.childCount) { FreshList(); } });
+					viewList = row.Add(port.ViewName, port.DefaultValue, port.ValueType, newValue => { port.DefaultValue = newValue.obj; if (port.DefaultValue is IList list && list.Count == viewList?.childCount) { FreshList(); } });
 					row.Remove(viewList);
 					FreshList();
 				}
@@ -897,7 +897,7 @@ namespace QTool.Graph {
 						AddDotView(row, GetColor(port), port.GetPortId());
 					}
 					if (port.IsShowValue()) {
-						row.Add(port.ViewName, port.DefaultValue, port.ValueType, newValue => port.DefaultValue = newValue, port.attributeProvider).RegisterCallback<MouseEnterEvent>(ValueMouseEnterEvent);
+						row.Add(port.ViewName, port.DefaultValue, port.ValueType, newValue => port.DefaultValue = newValue.obj, port.attributeProvider).RegisterCallback<MouseEnterEvent>(ValueMouseEnterEvent);
 					}
 					else {
 						var label = row.AddLabel(port.ViewName, port.OutputPort ? TextAnchor.MiddleRight : TextAnchor.MiddleLeft);
