@@ -6,41 +6,48 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 namespace QTool.ECS {
-	public class QEntity : MonoBehaviour, IComponent {
+	public class QEntityObject : QComponent<QEntityObject> {
 		[QReadonly]
-		public Entity Entity;
+		public Entity entity;
 		[QObject(typeof(QEntityData))]
 		public string entityData;
 		private void Awake() {
-			Entity = QWorld.Active.CreateEntity();
-			QWorld.Active.AddComponent(Entity, this);
+			CreateEntity();
+		}
+		protected override void Start() {
+			base.Start();
+		}
+		public Entity CreateEntity() {
+			if (!entity.IsNull())
+				return entity;
 			var data = entityData.ParseQData<QEntityData>();
+			entity = QWorld.Active.CreateEntity();
 			if (data.components != null) {
 				foreach (var comp in data.components) {
-					QWorld.Active.AddComponent(Entity, comp);
+					QWorld.Active.AddComponent(entity, comp);
 				}
 			}
+			return entity;
 		}
 		private void OnValidate() {
-			if (!Application.IsPlaying(this) || Entity.IsNull() || QWorld.Active == null)
+			if (!Application.IsPlaying(this) || entity.IsNull() || QWorld.Active == null)
 				return;
-			var type = QWorld.Active.GetEntityType(Entity);
+			var type = QWorld.Active.GetEntityType(entity);
 			var data = entityData.ParseQData<QEntityData>();
 			if (data.components != null) {
 				foreach (var comp in data.components) {
-					type.SetComponent(Entity, comp);
+					type.SetComponent(entity, comp);
 				}
 			}
 		}
 	}
-	[RequireComponent(typeof(QEntity))]
-	public abstract class QComponent : MonoBehaviour, IComponent {
-		public QEntity entity;
-		private void Reset() {
-			entity = GetComponent<QEntity>();
+	[RequireComponent(typeof(QEntityObject))]
+	public abstract class QComponent<T> : MonoBehaviour, IComponent where T : QComponent<T> {
+		protected virtual void Start() {
+			QWorld.Active.AddComponent(GetComponent<QEntityObject>().entity, this as T);
 		}
-		private void Start() {
-			QWorld.Active.AddComponent(entity.Entity, this);
+		protected virtual void OnDestroy() {
+			QWorld.Active.RemoveComponent<T>(GetComponent<QEntityObject>().entity);
 		}
 	}
 
