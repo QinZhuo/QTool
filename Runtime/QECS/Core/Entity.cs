@@ -81,7 +81,12 @@ namespace QTool.ECS {
 				newType.componentArrays[trueType].SetObject(newType.entityMap[entity], component);
 			}
 			return newType;
-			;
+		}
+		public EntityType RemoveComponent<T>(in Entity entity) where T : IComponent {
+			var compType = typeof(T);
+			var newType = World.GetEntityType(componentArrays.Keys.Where(type=>type!= compType).ToArray());
+			MoveTo(entity, newType);
+			return newType;
 		}
 		private void MoveTo(in Entity entity, EntityType targetType) {
 			if (!entityMap.TryGetValue(entity, out var index))
@@ -89,7 +94,9 @@ namespace QTool.ECS {
 			var targetIndex = targetType.Count;
 			targetType.AddEntity(entity);
 			foreach (var item in componentArrays) {
-				item.Value.CopyTo(index, targetType.componentArrays[item.Key], targetIndex);
+				if (targetType.componentArrays.ContainsKey(item.Key)) {
+					item.Value.CopyTo(index, targetType.componentArrays[item.Key], targetIndex);
+				}
 			}
 			RemoveEntity(entity);
 		}
@@ -192,6 +199,10 @@ namespace QTool.ECS {
 		public void AddComponent<T>(in Entity entity, in T component) where T : IComponent {
 			var type = GetEntityType(entity);
 			entityMap[entity] = type.AddComponent(entity, component);
+		}
+		public void RemoveComponent<T>(in Entity entity) where T : IComponent {
+			var type = GetEntityType(entity);
+			entityMap[entity] = type.RemoveComponent<T>(entity);
 		}
 		public void SetComponent<T>(in Entity entity, in T component) where T : IComponent {
 			var type = GetEntityType(entity);

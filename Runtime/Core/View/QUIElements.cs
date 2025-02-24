@@ -451,6 +451,8 @@ namespace QTool {
 												}
 												changeEvent?.Invoke(new ChangeEvent(list));
 											}, customAttribute);
+											if (child == null)
+												continue;
 											child.RegisterCallback<ClickEvent>(e => {
 												if (e.clickCount == 2) {
 													list[(int)index]?.GetType().LocateTypeFile();

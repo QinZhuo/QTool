@@ -10,6 +10,13 @@ namespace QTool.ECS {
 		public void Update();
 	}
 	public abstract class QuerySystem : ISystem {
+		public string name { get; set; }
+		public QuerySystem() {
+			name=GetType().Name;
+		}
+		public override string ToString() {
+			return name;
+		}
 		[QName]
 		public IEnumerable<EntityType> EntityTypes { get; protected set; }
 		public World World { get; set; }
@@ -108,9 +115,9 @@ namespace QTool.ECS {
 				}
 			}
 		}
-		public abstract void Query(ref T1 comps);
+		public abstract void Query(ref T1 entity);
 	}
-	public abstract class QueryEntitySystem<T1, T2> : QuerySystem where T1 : struct, ITuple where T2 : struct, ITuple {
+	public abstract class QueryEntitySystem<T1, T2> : QueryEntitySystem<T1> where T1 : struct, ITuple where T2 : struct, ITuple {
 		[QName]
 		public IEnumerable<EntityType> EntityTypes2 { get; protected set; }
 		public override void Start() {
@@ -118,17 +125,18 @@ namespace QTool.ECS {
 			EntityTypes2 = World.GetEntityTypes<T2>();
 		}
 		public override void Update() {
-			foreach (var type in EntityTypes) {
-				foreach (var entity in type.Entities) {
+			foreach (var type1 in EntityTypes) {
+				foreach (var entity1 in type1.Entities) {
+					var comps1 = type1.GetComponents<T1>(entity1);
+					Query(ref comps1);
 					foreach (var type2 in EntityTypes2) {
 						foreach (var entity2 in type2.Entities) {
-							var comps1 = type.GetComponents<T1>(entity);
 							var comps2 = type2.GetComponents<T2>(entity2);
 							Query(ref comps1, ref comps2);
-							type.SetComponents(entity, comps1);
 							type2.SetComponents(entity2, comps2);
 						}
 					}
+					type1.SetComponents(entity1, comps1);
 				}
 			}
 		}
