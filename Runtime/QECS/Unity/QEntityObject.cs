@@ -6,16 +6,27 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 namespace QTool.ECS {
-	public class QEntityObject : QComponent<QEntityObject> {
+	public class QEntityObject : MonoBehaviour, IComponent {
 		[QReadonly]
 		public Entity entity;
 		[QObject(typeof(QEntityData))]
 		public string entityData;
+		private List<IComponent> components = new();
 		private void Awake() {
 			CreateEntity();
 		}
-		protected override void Start() {
-			base.Start();
+		protected virtual void Start() {
+			GetComponents(components);
+			foreach (var item in components) {
+				QWorld.Active.AddComponent(GetComponent<QEntityObject>().entity, item);
+			}
+		}
+		private void OnDestroy() {
+			if (entity.IsNull() || !QWorld.Exists)
+				return;
+			foreach (var item in components) {
+				QWorld.Active.RemoveComponent(GetComponent<QEntityObject>().entity, item);
+			}
 		}
 		public Entity CreateEntity() {
 			if (!entity.IsNull())
@@ -42,13 +53,7 @@ namespace QTool.ECS {
 		}
 	}
 	[RequireComponent(typeof(QEntityObject))]
-	public abstract class QComponent<T> : MonoBehaviour, IComponent where T : QComponent<T> {
-		protected virtual void Start() {
-			QWorld.Active.AddComponent(GetComponent<QEntityObject>().entity, this as T);
-		}
-		protected virtual void OnDestroy() {
-			QWorld.Active.RemoveComponent<T>(GetComponent<QEntityObject>().entity);
-		}
+	public abstract class QComponent : MonoBehaviour, IComponent {
 	}
 
 	public struct QEntityData {

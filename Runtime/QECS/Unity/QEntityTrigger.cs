@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
 namespace QTool.ECS {
-	public class QEntityTrigger : QComponent<QEntityTrigger> {
+	public class QEntityTrigger : QComponent {
 		private List<QEntityObject> entities = new();
 		public IEnumerable<QEntityObject> Others => entities;
 		private void OnTriggerEnter(Collider other) {
-			if (other.TryGetComponent<QEntityObject>(out var otherEntity)) { 
+			if (other.TryGetComponent<QEntityObject>(out var otherEntity)) {
 				entities.Add(otherEntity);
 			}
 		}

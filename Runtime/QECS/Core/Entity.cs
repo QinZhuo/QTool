@@ -18,12 +18,19 @@ namespace QTool.ECS {
 		public override string ToString() => $"{name} {entityMap.Count}";
 		[QName,QReadonly]
 		public string name { get; private set; }
-		public const int INIT_SIZE = 1024;
+		public const int INIT_SIZE = 4;
 		[QName]
 		private readonly Dictionary<Entity, int> entityMap = new();
 		private readonly Dictionary<Type, IComponentArray> componentArrays = new();
 		public bool ContainsType(Type type) => componentArrays.ContainsKey(type);
-		public IEnumerable<Entity> Entities => entityMap.Keys;
+		public IEnumerable<Entity> GetEntities(List<Entity> entities) {
+			entities.Clear();
+			entities.AddRange(entityMap.Keys);
+			return entities;
+		}
+		public IEnumerable<Entity> GetEntities() {
+			return entityMap.Keys;
+		}
 		[QName,QReadonly]
 		public int Count { get; private set; } = 0;
 		[QName,QReadonly]
@@ -40,7 +47,7 @@ namespace QTool.ECS {
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public void AddEntity(in Entity entity) {
 			if (Count >= Capacity) {
-				Capacity *= 2;
+				Capacity *= INIT_SIZE;
 				foreach (var item in componentArrays) {
 					item.Value.Resize(Capacity);
 				}
@@ -82,6 +89,12 @@ namespace QTool.ECS {
 			}
 			return newType;
 		}
+		public EntityType RemoveComponent<T>(in Entity entity, T comp) where T : class, IComponent {
+			var compType=comp.GetType();
+			var newType = World.GetEntityType(componentArrays.Keys.Where(type => type != compType).ToArray());
+			MoveTo(entity, newType);
+			return newType;
+		}
 		public EntityType RemoveComponent<T>(in Entity entity) where T : IComponent {
 			var compType = typeof(T);
 			var newType = World.GetEntityType(componentArrays.Keys.Where(type=>type!= compType).ToArray());
@@ -106,15 +119,16 @@ namespace QTool.ECS {
 			return ref (componentArrays[typeof(T)] as ComponentArray<T>).Get(index);
 		}
 		private Dictionary<Type, Type[]> TupleCache = new();
-		public T GetComponents<T>(in Entity entity) where T : struct, ITuple {
+		public T GetComponents<T>(Entity entity) where T : struct, ITuple {
 			if (!entityMap.TryGetValue(entity, out var index))
 				throw new ArgumentException("Invalid entity");
 			var type = typeof(T);
-			if(!TupleCache.TryGetValue(type,out var types)){
+			if (!TupleCache.TryGetValue(type, out var types)) {
 				types = type.GetGenericArguments();
 				TupleCache.Add(type, types);
 			}
-			return (T)Activator.CreateInstance(type, types.Select(type => (componentArrays[type].GetObject(index))).ToArray());
+			return (T)Activator.CreateInstance(type, types.Select(type => type.Equals(typeof(T))
+		? entity : (componentArrays[type].GetObject(index))).ToArray());
 		}
 		public void SetComponents<T>(in Entity entity,T comps) where T : struct, ITuple {
 			if (!entityMap.TryGetValue(entity, out var index))
@@ -125,6 +139,7 @@ namespace QTool.ECS {
 				TupleCache.Add(type, types);
 			}
 			for (int i = 0; i < comps.Length; i++) {
+				if (types[i] == typeof(Entity)) continue;
 				componentArrays[types[i]].SetObject(index, comps[i]);
 			}
 		}
@@ -193,12 +208,16 @@ namespace QTool.ECS {
 		}
 		public EntityType GetEntityType(in Entity entity) {
 			if (!entityMap.TryGetValue(entity, out var type))
-				throw new ArgumentException("Invalid entity");
+				throw new ArgumentException($"Invalid entity {entity}");
 			return type;
 		}
 		public void AddComponent<T>(in Entity entity, in T component) where T : IComponent {
 			var type = GetEntityType(entity);
 			entityMap[entity] = type.AddComponent(entity, component);
+		}
+		public void RemoveComponent<T>(in Entity entity, T compType) where T : class, IComponent {
+			var type = GetEntityType(entity);
+			entityMap[entity] = type.RemoveComponent(entity, compType);
 		}
 		public void RemoveComponent<T>(in Entity entity) where T : IComponent {
 			var type = GetEntityType(entity);
